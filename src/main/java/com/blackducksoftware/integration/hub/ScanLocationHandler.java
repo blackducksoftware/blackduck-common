@@ -42,7 +42,7 @@ public class ScanLocationHandler {
      */
     public void getScanLocationIdWithRetry(ClientResource resource, String remoteTargetPath, String versionId,
             Map<String, Boolean> scanLocationIds)
-            throws UnknownHostException, MalformedURLException, InterruptedException, BDRestException, HubIntegrationException {
+            throws UnknownHostException, InterruptedException, BDRestException, HubIntegrationException {
 
         if (resource == null) {
             throw new IllegalArgumentException("Need to provide a ClientResource in order to get the ScanLocation");
@@ -102,13 +102,14 @@ public class ScanLocationHandler {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                byte[] mapData = sb.toString().getBytes();
-
-                // Create HashMap from the Rest response
-                ObjectMapper responseMapper = new ObjectMapper();
-                responseMap = responseMapper.readValue(mapData, HashMap.class);
+                logger.info(sb.toString());
+                // byte[] mapData = sb.toString().getBytes();
+                //
+                // // Create HashMap from the Rest response
+                // ObjectMapper responseMapper = new ObjectMapper();
+                // responseMap = responseMapper.readValue(mapData, HashMap.class);
             } else {
-                throw new BDRestException(Messages.HubBuildScan_getErrorConnectingTo_0_(responseCode));
+                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode);
             }
 
             if (responseMap.containsKey("items") && ((ArrayList<LinkedHashMap<String, Object>>) responseMap.get("items")).size() > 0) {

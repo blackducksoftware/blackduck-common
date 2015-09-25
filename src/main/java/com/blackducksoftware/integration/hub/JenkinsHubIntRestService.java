@@ -33,6 +33,9 @@ import org.restlet.util.Series;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
 public class JenkinsHubIntRestService {
     private Series<Cookie> cookies;
@@ -260,11 +263,12 @@ public class JenkinsHubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                byte[] mapData = sb.toString().getBytes();
-                // Create HashMap from the Rest response
-                ObjectMapper responseMapper = new ObjectMapper();
-                list = responseMapper.readValue(mapData, ArrayList.class);
-                // responseMap = responseMapper.readValue(mapData, HashMap.class);
+                logger.info(sb.toString());
+                // byte[] mapData = sb.toString().getBytes();
+                // // Create HashMap from the Rest response
+                // ObjectMapper responseMapper = new ObjectMapper();
+                // list = responseMapper.readValue(mapData, ArrayList.class);
+                // // responseMap = responseMapper.readValue(mapData, HashMap.class);
                 return list;
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
@@ -297,11 +301,12 @@ public class JenkinsHubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                byte[] mapData = sb.toString().getBytes();
-                // Create HashMap from the Rest response
-                ObjectMapper responseMapper = new ObjectMapper();
-                list = responseMapper.readValue(mapData, ArrayList.class);
-                // responseMap = responseMapper.readValue(mapData, HashMap.class);
+                logger.info(sb.toString());
+                // byte[] mapData = sb.toString().getBytes();
+                // // Create HashMap from the Rest response
+                // ObjectMapper responseMapper = new ObjectMapper();
+                // list = responseMapper.readValue(mapData, ArrayList.class);
+                // // responseMap = responseMapper.readValue(mapData, HashMap.class);
                 return list;
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
@@ -333,19 +338,21 @@ public class JenkinsHubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                byte[] mapData = sb.toString().getBytes();
-                // Create HashMap from the Rest response
-                ObjectMapper responseMapper = new ObjectMapper();
-                responseMap = responseMapper.readValue(mapData, HashMap.class);
-
-                if (!responseMap.containsKey("id")) {
-                    // The Hub Api has changed and we received a JSON response that we did not expect
-                    throw new BDRestException(
-                            "Expected a different JSON response from the server, the Hub API's may have changed, Or the response was mapped incorrectly.",
-                            resource);
-                } else {
-                    return (String) responseMap.get("id");
-                }
+                logger.info(sb.toString());
+                // byte[] mapData = sb.toString().getBytes();
+                // // Create HashMap from the Rest response
+                // ObjectMapper responseMapper = new ObjectMapper();
+                // responseMap = responseMapper.readValue(mapData, HashMap.class);
+                //
+                // if (!responseMap.containsKey("id")) {
+                // // The Hub Api has changed and we received a JSON response that we did not expect
+                // throw new BDRestException(
+                // "Expected a different JSON response from the server, the Hub API's may have changed, Or the response was mapped incorrectly.",
+                // resource);
+                // } else {
+                // return (String) responseMap.get("id");
+                // }
+                return "Testing";
 
             } else {
                 throw new BDRestException("This Project does not exist or there is a problem connecting to the Hub server", resource);
@@ -405,7 +412,7 @@ public class JenkinsHubIntRestService {
 
                 ScanLocationHandler handler = new ScanLocationHandler(logger);
 
-                handler.getScanLocationIdWithRetry(build, resource, targetPath, versionId, scanLocationIds);
+                handler.getScanLocationIdWithRetry(resource, targetPath, versionId, scanLocationIds);
 
             }
         } catch (ResourceException e) {
@@ -431,20 +438,21 @@ public class JenkinsHubIntRestService {
                         resource.getRequest().setCookies(getCookies());
                         resource.setMethod(Method.POST);
 
-                        JSONObject obj = new JSONObject();
+                        JsonObject obj = new JsonObject();
 
-                        JSONObject ownerEntity = new JSONObject();
-                        ownerEntity.put("entityId", versionId);
+                        JsonObject ownerEntity = new JsonObject();
+
+                        ownerEntity.add("entityId", new JsonPrimitive(versionId));
                         // this is the version location
-                        ownerEntity.put("entityType", "RL");
+                        ownerEntity.add("entityType", new JsonPrimitive("RL"));
 
-                        JSONObject assetEntity = new JSONObject();
-                        assetEntity.put("entityId", scanId.getKey());
+                        JsonObject assetEntity = new JsonObject();
+                        assetEntity.add("entityId", new JsonPrimitive(scanId.getKey()));
                         // this is the code location
-                        assetEntity.put("entityType", "CL");
+                        assetEntity.add("entityType", new JsonPrimitive("CL"));
 
-                        obj.put("ownerEntityKey", ownerEntity);
-                        obj.put("assetEntityKey", assetEntity);
+                        obj.add("ownerEntityKey", ownerEntity);
+                        obj.add("assetEntityKey", assetEntity);
 
                         StringRepresentation stringRep = new StringRepresentation(obj.toString());
                         stringRep.setMediaType(MediaType.APPLICATION_JSON);
@@ -529,11 +537,12 @@ public class JenkinsHubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                byte[] mapData = sb.toString().getBytes();
-
-                // Create HashMap from the Rest response
-                ObjectMapper responseMapper = new ObjectMapper();
-                responseMap = responseMapper.readValue(mapData, LinkedHashMap.class);
+                logger.info(sb.toString());
+                // byte[] mapData = sb.toString().getBytes();
+                //
+                // // Create HashMap from the Rest response
+                // ObjectMapper responseMapper = new ObjectMapper();
+                // responseMap = responseMapper.readValue(mapData, LinkedHashMap.class);
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
@@ -577,8 +586,8 @@ public class JenkinsHubIntRestService {
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.POST);
 
-            JSONObject obj = new JSONObject();
-            obj.put("name", projectName);
+            JsonObject obj = new JsonObject();
+            obj.add("name", new JsonPrimitive(projectName));
 
             StringRepresentation stringRep = new StringRepresentation(obj.toString());
             stringRep.setMediaType(MediaType.APPLICATION_JSON);
@@ -598,19 +607,21 @@ public class JenkinsHubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                byte[] mapData = sb.toString().getBytes();
-
-                // Create HashMap from the Rest response
-                ObjectMapper responseMapper = new ObjectMapper();
-                responseMap = responseMapper.readValue(mapData, HashMap.class);
-                if (!responseMap.containsKey("id")) {
-                    // The Hub Api has changed and we received a JSON response that we did not expect
-                    throw new BDRestException(
-                            "Expected a different JSON response from the server, the Hub API's may have changed, Or the response was mapped incorrectly.",
-                            resource);
-                } else {
-                    return (String) responseMap.get("id");
-                }
+                logger.info(sb.toString());
+                // byte[] mapData = sb.toString().getBytes();
+                //
+                // // Create HashMap from the Rest response
+                // ObjectMapper responseMapper = new ObjectMapper();
+                // responseMap = responseMapper.readValue(mapData, HashMap.class);
+                // if (!responseMap.containsKey("id")) {
+                // // The Hub Api has changed and we received a JSON response that we did not expect
+                // throw new BDRestException(
+                // "Expected a different JSON response from the server, the Hub API's may have changed, Or the response was mapped incorrectly.",
+                // resource);
+                // } else {
+                // return (String) responseMap.get("id");
+                // }
+                return "Testing";
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
@@ -628,11 +639,11 @@ public class JenkinsHubIntRestService {
         int responseCode;
         HashMap<String, Object> responseMap = null;
         try {
-            JSONObject obj = new JSONObject();
-            obj.put("projectId", projectId);
-            obj.put("version", projectVersion);
-            obj.put("phase", phase);
-            obj.put("distribution", dist);
+            JsonObject obj = new JsonObject();
+            obj.add("projectId", new JsonPrimitive(projectId));
+            obj.add("version", new JsonPrimitive(projectVersion));
+            obj.add("phase", new JsonPrimitive(phase));
+            obj.add("distribution", new JsonPrimitive(dist));
 
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.POST);
@@ -654,18 +665,20 @@ public class JenkinsHubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                byte[] mapData = sb.toString().getBytes();
-
-                // Create HashMap from the Rest response
-                ObjectMapper responseMapper = new ObjectMapper();
-                responseMap = responseMapper.readValue(mapData, HashMap.class);
-                if (!responseMap.containsKey("id")) {
-                    // The Hub Api has changed and we received a JSON response that we did not expect
-                    throw new BDRestException(
-                            "Expected a different JSON response from the server, the Hub API's may have changed, Or the response was mapped incorrectly.");
-                } else {
-                    return (String) responseMap.get("id");
-                }
+                logger.info(sb.toString());
+                // byte[] mapData = sb.toString().getBytes();
+                //
+                // // Create HashMap from the Rest response
+                // ObjectMapper responseMapper = new ObjectMapper();
+                // responseMap = responseMapper.readValue(mapData, HashMap.class);
+                // if (!responseMap.containsKey("id")) {
+                // // The Hub Api has changed and we received a JSON response that we did not expect
+                // throw new BDRestException(
+                // "Expected a different JSON response from the server, the Hub API's may have changed, Or the response was mapped incorrectly.");
+                // } else {
+                // return (String) responseMap.get("id");
+                // }
+                return "Testing";
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
@@ -710,8 +723,15 @@ public class JenkinsHubIntRestService {
 
             if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
                 Response resp = resource.getResponse();
-                JSONObject obj = JSONObject.fromObject(resp.getEntityAsText());
-                return new Integer(obj.getInt("numericResult"));
+
+                JsonParser parser = new JsonParser();
+
+                String versionResponse = resp.getEntityAsText();
+                logger.info(versionResponse);
+
+                JsonObject versionObject = (JsonObject) parser.parse(versionResponse);
+
+                return versionObject.get("numericResult").getAsInt();
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
