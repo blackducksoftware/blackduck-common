@@ -131,7 +131,7 @@ public class ScanLocationHandler {
 
                         logger.debug("Comparing target : '" + remoteTargetPath + "' with path : '" + path + "'.");
                         if (remoteTargetPath.equals(path)) {
-                            logger.debug("[DEBUG] MATCHED!");
+                            logger.debug("MATCHED!");
                             matchFound = true;
                             handleScanLocationMatch(scanLocationIds, scanMatch, remoteTargetPath, versionId);
                             break;

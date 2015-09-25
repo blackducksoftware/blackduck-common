@@ -453,7 +453,7 @@ public class JenkinsHubIntRestService {
 
                         obj.add("ownerEntityKey", ownerEntity);
                         obj.add("assetEntityKey", assetEntity);
-
+                        // FIXME does JsonObject.toString() work ?
                         StringRepresentation stringRep = new StringRepresentation(obj.toString());
                         stringRep.setMediaType(MediaType.APPLICATION_JSON);
                         resource.post(stringRep);
@@ -588,7 +588,7 @@ public class JenkinsHubIntRestService {
 
             JsonObject obj = new JsonObject();
             obj.add("name", new JsonPrimitive(projectName));
-
+            // FIXME does JsonObject.toString() work ?
             StringRepresentation stringRep = new StringRepresentation(obj.toString());
             stringRep.setMediaType(MediaType.APPLICATION_JSON);
 
@@ -647,6 +647,8 @@ public class JenkinsHubIntRestService {
 
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.POST);
+
+            // FIXME does JsonObject.toString() work ?
             StringRepresentation stringRep = new StringRepresentation(obj.toString());
             stringRep.setMediaType(MediaType.APPLICATION_JSON);
 
