@@ -9,7 +9,7 @@
 	<version>1.1.0-SNAPSHOT</version>
 	<!-- !!! Also update the url below on release !!! -->
 	<name>General Code for Hub Integration with CI systems</name>
-	
+
 	<inceptionYear>2015</inceptionYear>
 
 	<scm>
@@ -44,12 +44,12 @@
 	<contributors>
 	</contributors>
 
-	<!-- get every artifact through repo.jenkins-ci.org, which proxies all the 
-		artifacts that we need -->
 	<repositories>
-		<!-- Need the integration repo before the other protex repos in order to 
-			pull Java 6 over Java 7 compiled versions (and to not get the CXF-bundle 
-			via blackduck-cxf-utilities) -->
+		<repository>
+			<id>maven-restlet</id>
+			<name>Public online Restlet repository</name>
+			<url>http://maven.restlet.org</url>
+		</repository>
 		<repository>
 			<id>integration.artifactory.blackducksoftware.com</id>
 			<name>integration-releases</name>
@@ -85,18 +85,33 @@
 			<url>http://artifactory.blackducksoftware.com:8081/artifactory/bds-jenkins-plugins-snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<dependencies>
 		<dependency>
-        	<groupId>org.restlet.jse</groupId>
-        	<artifactId>org.restlet</artifactId>
-        	<version>2.3.1</version>
-      	</dependency>
-		
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.localizer</groupId>
+			<artifactId>localizer</artifactId>
+			<version>1.10</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>org.restlet</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.blackducksoftware.integration</groupId>
+			<artifactId>int-suite-sdk-shared</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
@@ -113,7 +128,29 @@
 
 	<build>
 		<plugins>
-			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<!-- Add so Eclipse m2e can pick those up - if you see a error in 
+									eclipse about this click and select discover to install the m2e mapping for 
+									this maven plugin -->
+								<source>${project.build.directory}/generated-sources/localizer/</source>
+								<source>${project.build.directory}/generated-sources/annotations/</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -124,7 +161,7 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
-			
+
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -157,7 +194,7 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	
+
 	<profiles>
 		<profile>
 			<id>Sonargraph</id>
