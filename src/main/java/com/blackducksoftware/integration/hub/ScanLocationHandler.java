@@ -31,6 +31,7 @@ public class ScanLocationHandler {
     /**
      * Will attempt to retrieve the scanLocation with the current hostname and target path. If this cannot be found then
      *
+     * @param resource
      * @param targetPath
      * @param versionId
      * @return
@@ -40,14 +41,14 @@ public class ScanLocationHandler {
      * @throws BDRestException
      * @throws HubIntegrationException
      */
-    public void getScanLocationIdWithRetry(ClientResource resource, String remoteTargetPath, String versionId,
+    public void getScanLocationIdWithRetry(ClientResource resource, String targetPath, String versionId,
             Map<String, Boolean> scanLocationIds)
             throws UnknownHostException, InterruptedException, BDRestException, HubIntegrationException {
 
         if (resource == null) {
             throw new IllegalArgumentException("Need to provide a ClientResource in order to get the ScanLocation");
         }
-        if (StringUtils.isEmpty(remoteTargetPath)) {
+        if (StringUtils.isEmpty(targetPath)) {
             throw new IllegalArgumentException("Need to provide the targetPath of the ScanLocation.");
         }
         if (StringUtils.isEmpty(versionId)) {
@@ -59,9 +60,9 @@ public class ScanLocationHandler {
         while (!matchFound) {
             i++;
 
-            logger.info("Attempt # " + i + " to get the Scan Location for : '" + remoteTargetPath + "'.");
+            logger.info("Attempt # " + i + " to get the Scan Location for : '" + targetPath + "'.");
 
-            matchFound = scanLocationRetrieval(resource, remoteTargetPath, versionId, scanLocationIds);
+            matchFound = scanLocationRetrieval(resource, targetPath, versionId, scanLocationIds);
             if (matchFound) {
                 break;
             }
@@ -103,6 +104,7 @@ public class ScanLocationHandler {
                 }
                 bufReader.close();
                 logger.info(sb.toString());
+                // FIXME
                 // byte[] mapData = sb.toString().getBytes();
                 //
                 // // Create HashMap from the Rest response

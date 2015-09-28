@@ -37,10 +37,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
-public class JenkinsHubIntRestService {
+public class HubIntRestService {
     private Series<Cookie> cookies;
 
-    private String baseUrl;
+    private final String baseUrl;
 
     private String proxyHost;
 
@@ -54,7 +54,8 @@ public class JenkinsHubIntRestService {
 
     private IntLogger logger;
 
-    protected JenkinsHubIntRestService() {
+    public HubIntRestService(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     public String getProxyUsername() {
@@ -87,10 +88,6 @@ public class JenkinsHubIntRestService {
 
     public String getBaseUrl() {
         return baseUrl;
-    }
-
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
     }
 
     public void setProxyPort(int proxyPort) {
@@ -203,8 +200,8 @@ public class JenkinsHubIntRestService {
      * @throws HubIntegrationException
      * @throws URISyntaxException
      */
-    public int setCookies(String credentialUserName, String credentialPassword) throws HubIntegrationException, URISyntaxException {
-        String url = getBaseUrl() + "/j_spring_security_check?j_username=" + credentialUserName + "&j_password=" + credentialPassword;
+    public int setCookies(String hubUserName, String hubPassword) throws HubIntegrationException, URISyntaxException {
+        String url = getBaseUrl() + "/j_spring_security_check?j_username=" + hubUserName + "&j_password=" + hubPassword;
         ClientResource resource = createClientResource(url);
         resource.setMethod(Method.POST);
         EmptyRepresentation rep = new EmptyRepresentation();
@@ -263,6 +260,7 @@ public class JenkinsHubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
+                // FIXME
                 logger.info(sb.toString());
                 // byte[] mapData = sb.toString().getBytes();
                 // // Create HashMap from the Rest response
@@ -301,6 +299,7 @@ public class JenkinsHubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
+                // FIXME
                 logger.info(sb.toString());
                 // byte[] mapData = sb.toString().getBytes();
                 // // Create HashMap from the Rest response
@@ -338,6 +337,7 @@ public class JenkinsHubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
+                // FIXME
                 logger.info(sb.toString());
                 // byte[] mapData = sb.toString().getBytes();
                 // // Create HashMap from the Rest response
@@ -453,7 +453,6 @@ public class JenkinsHubIntRestService {
 
                         obj.add("ownerEntityKey", ownerEntity);
                         obj.add("assetEntityKey", assetEntity);
-                        // FIXME does JsonObject.toString() work ?
                         StringRepresentation stringRep = new StringRepresentation(obj.toString());
                         stringRep.setMediaType(MediaType.APPLICATION_JSON);
                         resource.post(stringRep);
@@ -499,6 +498,7 @@ public class JenkinsHubIntRestService {
     public ArrayList<String> getProjectIdsFromProjectMatches(ArrayList<LinkedHashMap<String, Object>> responseList,
             String projectName) throws IOException,
             BDRestException, URISyntaxException {
+        // FIXME will not need this method once we handle the responses correctly
         ArrayList<String> projectId = new ArrayList<String>();
         if (!responseList.isEmpty()) {
             for (LinkedHashMap<String, Object> map : responseList) {
@@ -537,6 +537,7 @@ public class JenkinsHubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
+                // FIXME
                 logger.info(sb.toString());
                 // byte[] mapData = sb.toString().getBytes();
                 //
@@ -556,7 +557,7 @@ public class JenkinsHubIntRestService {
             versionPhase, String versionDist)
             throws IOException, BDRestException, URISyntaxException {
         String versionId = null;
-
+        // FIXME should be replaced when we handle the responses with real objects
         if (responseMap.containsKey("items")) {
             ArrayList<LinkedHashMap<String, Object>> versionList = (ArrayList<LinkedHashMap<String, Object>>)
                     responseMap.get("items");
@@ -588,7 +589,6 @@ public class JenkinsHubIntRestService {
 
             JsonObject obj = new JsonObject();
             obj.add("name", new JsonPrimitive(projectName));
-            // FIXME does JsonObject.toString() work ?
             StringRepresentation stringRep = new StringRepresentation(obj.toString());
             stringRep.setMediaType(MediaType.APPLICATION_JSON);
 
@@ -607,6 +607,7 @@ public class JenkinsHubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
+                // FIXME
                 logger.info(sb.toString());
                 // byte[] mapData = sb.toString().getBytes();
                 //
@@ -648,7 +649,6 @@ public class JenkinsHubIntRestService {
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.POST);
 
-            // FIXME does JsonObject.toString() work ?
             StringRepresentation stringRep = new StringRepresentation(obj.toString());
             stringRep.setMediaType(MediaType.APPLICATION_JSON);
 
@@ -667,6 +667,7 @@ public class JenkinsHubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
+                // FIXME
                 logger.info(sb.toString());
                 // byte[] mapData = sb.toString().getBytes();
                 //
