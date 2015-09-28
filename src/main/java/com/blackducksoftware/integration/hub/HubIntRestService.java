@@ -32,10 +32,17 @@ import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
+import com.blackducksoftware.integration.hub.response.ProjectItem;
+import com.blackducksoftware.integration.hub.response.ReleaseItem;
+import com.blackducksoftware.integration.hub.response.ReleasesList;
+import com.blackducksoftware.integration.hub.response.VersionComparison;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.reflect.TypeToken;
 
 public class HubIntRestService {
     private Series<Cookie> cookies;
@@ -237,7 +244,7 @@ public class HubIntRestService {
         return cookies;
     }
 
-    public ArrayList<LinkedHashMap<String, Object>> getProjectMatches(String hubProjectName) throws IOException,
+    public List<AutoCompleteItem> getProjectMatches(String hubProjectName) throws IOException,
             BDRestException, URISyntaxException {
         // hubProjectName = URLEncoder.encode(hubProjectName, "UTF-8");
         String url = getBaseUrl() + "/api/v1/autocomplete/PROJECT?text=" + hubProjectName + "&limit=30&ownership=0";
@@ -249,7 +256,6 @@ public class HubIntRestService {
             int responseCode = resource.getResponse().getStatus().getCode();
 
             if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-                ArrayList<LinkedHashMap<String, Object>> list = null;
                 Response resp = resource.getResponse();
                 Reader reader = resp.getEntity().getReader();
                 BufferedReader bufReader = new BufferedReader(reader);
@@ -260,14 +266,11 @@ public class HubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                // FIXME
-                logger.info(sb.toString());
-                // byte[] mapData = sb.toString().getBytes();
-                // // Create HashMap from the Rest response
-                // ObjectMapper responseMapper = new ObjectMapper();
-                // list = responseMapper.readValue(mapData, ArrayList.class);
-                // // responseMap = responseMapper.readValue(mapData, HashMap.class);
-                return list;
+
+                Gson gson = new GsonBuilder().create();
+                return gson.fromJson(sb.toString(), new TypeToken<List<AutoCompleteItem>>() {
+                }.getType());
+
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
@@ -276,7 +279,7 @@ public class HubIntRestService {
         }
     }
 
-    public ArrayList<LinkedHashMap<String, Object>> getProjectById(String projectId) throws IOException,
+    public ProjectItem getProjectById(String projectId) throws IOException,
             BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/projects/" + projectId;
@@ -288,7 +291,6 @@ public class HubIntRestService {
             int responseCode = resource.getResponse().getStatus().getCode();
 
             if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-                ArrayList<LinkedHashMap<String, Object>> list = null;
                 Response resp = resource.getResponse();
                 Reader reader = resp.getEntity().getReader();
                 BufferedReader bufReader = new BufferedReader(reader);
@@ -299,14 +301,10 @@ public class HubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                // FIXME
                 logger.info(sb.toString());
-                // byte[] mapData = sb.toString().getBytes();
-                // // Create HashMap from the Rest response
-                // ObjectMapper responseMapper = new ObjectMapper();
-                // list = responseMapper.readValue(mapData, ArrayList.class);
-                // // responseMap = responseMapper.readValue(mapData, HashMap.class);
-                return list;
+                Gson gson = new GsonBuilder().create();
+                return gson.fromJson(sb.toString(), ProjectItem.class);
+
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
@@ -325,7 +323,6 @@ public class HubIntRestService {
             resource.get();
             int responseCode = resource.getResponse().getStatus().getCode();
 
-            HashMap<String, Object> responseMap = new HashMap<String, Object>();
             if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
                 Response resp = resource.getResponse();
                 Reader reader = resp.getEntity().getReader();
@@ -337,22 +334,9 @@ public class HubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                // FIXME
-                logger.info(sb.toString());
-                // byte[] mapData = sb.toString().getBytes();
-                // // Create HashMap from the Rest response
-                // ObjectMapper responseMapper = new ObjectMapper();
-                // responseMap = responseMapper.readValue(mapData, HashMap.class);
-                //
-                // if (!responseMap.containsKey("id")) {
-                // // The Hub Api has changed and we received a JSON response that we did not expect
-                // throw new BDRestException(
-                // "Expected a different JSON response from the server, the Hub API's may have changed, Or the response was mapped incorrectly.",
-                // resource);
-                // } else {
-                // return (String) responseMap.get("id");
-                // }
-                return "Testing";
+                Gson gson = new GsonBuilder().create();
+                ProjectItem project = gson.fromJson(sb.toString(), ProjectItem.class);
+                return project.getId();
 
             } else {
                 throw new BDRestException("This Project does not exist or there is a problem connecting to the Hub server", resource);
@@ -513,12 +497,11 @@ public class HubIntRestService {
         return projectId;
     }
 
-    public LinkedHashMap<String, Object> getVersionMatchesForProjectId(String projectId) throws IOException,
+    public List<ReleaseItem> getVersionMatchesForProjectId(String projectId) throws IOException,
             BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/projects/" + projectId + "/releases";
         ClientResource resource = createClientResource(url);
-        LinkedHashMap<String, Object> responseMap = null;
         try {
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.GET);
@@ -537,20 +520,18 @@ public class HubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                // FIXME
-                logger.info(sb.toString());
-                // byte[] mapData = sb.toString().getBytes();
-                //
-                // // Create HashMap from the Rest response
-                // ObjectMapper responseMapper = new ObjectMapper();
-                // responseMap = responseMapper.readValue(mapData, LinkedHashMap.class);
+                Gson gson = new GsonBuilder().create();
+                // have to turn it into the ReleasesList object because of the way they formatted the json
+                ReleasesList releasesList = gson.fromJson(sb.toString(), ReleasesList.class);
+
+                return releasesList.getItems();
+
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
         } catch (ResourceException e) {
             throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
-        return responseMap;
     }
 
     public String getVersionIdFromMatches(LinkedHashMap<String, Object> responseMap, String releaseVersion, String
@@ -582,7 +563,6 @@ public class HubIntRestService {
         // projectName = URLEncoder.encode(projectName, "UTF-8");
         String url = getBaseUrl() + "/api/v1/projects";
         ClientResource resource = createClientResource(url);
-        HashMap<String, Object> responseMap = null;
         try {
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.POST);
@@ -607,22 +587,10 @@ public class HubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                // FIXME
-                logger.info(sb.toString());
-                // byte[] mapData = sb.toString().getBytes();
-                //
-                // // Create HashMap from the Rest response
-                // ObjectMapper responseMapper = new ObjectMapper();
-                // responseMap = responseMapper.readValue(mapData, HashMap.class);
-                // if (!responseMap.containsKey("id")) {
-                // // The Hub Api has changed and we received a JSON response that we did not expect
-                // throw new BDRestException(
-                // "Expected a different JSON response from the server, the Hub API's may have changed, Or the response was mapped incorrectly.",
-                // resource);
-                // } else {
-                // return (String) responseMap.get("id");
-                // }
-                return "Testing";
+                Gson gson = new GsonBuilder().create();
+                ProjectItem project = gson.fromJson(sb.toString(), ProjectItem.class);
+                return project.getId();
+
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
@@ -638,7 +606,6 @@ public class HubIntRestService {
         String url = getBaseUrl() + "/api/v1/releases";
         ClientResource resource = createClientResource(url);
         int responseCode;
-        HashMap<String, Object> responseMap = null;
         try {
             JsonObject obj = new JsonObject();
             obj.add("projectId", new JsonPrimitive(projectId));
@@ -667,21 +634,9 @@ public class HubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                // FIXME
-                logger.info(sb.toString());
-                // byte[] mapData = sb.toString().getBytes();
-                //
-                // // Create HashMap from the Rest response
-                // ObjectMapper responseMapper = new ObjectMapper();
-                // responseMap = responseMapper.readValue(mapData, HashMap.class);
-                // if (!responseMap.containsKey("id")) {
-                // // The Hub Api has changed and we received a JSON response that we did not expect
-                // throw new BDRestException(
-                // "Expected a different JSON response from the server, the Hub API's may have changed, Or the response was mapped incorrectly.");
-                // } else {
-                // return (String) responseMap.get("id");
-                // }
-                return "Testing";
+                Gson gson = new GsonBuilder().create();
+                ReleaseItem release = gson.fromJson(sb.toString(), ReleaseItem.class);
+                return release.getId();
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
@@ -713,7 +668,7 @@ public class HubIntRestService {
         }
     }
 
-    public Integer compareWithHubVersion(String version) throws IOException, BDRestException, URISyntaxException {
+    public VersionComparison compareWithHubVersion(String version) throws IOException, BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/current-version-comparison?version=" + version;
         ClientResource resource = createClientResource(url);
@@ -725,16 +680,20 @@ public class HubIntRestService {
             responseCode = resource.getResponse().getStatus().getCode();
 
             if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+
                 Response resp = resource.getResponse();
-
-                JsonParser parser = new JsonParser();
-
-                String versionResponse = resp.getEntityAsText();
-                logger.info(versionResponse);
-
-                JsonObject versionObject = (JsonObject) parser.parse(versionResponse);
-
-                return versionObject.get("numericResult").getAsInt();
+                Reader reader = resp.getEntity().getReader();
+                BufferedReader bufReader = new BufferedReader(reader);
+                StringBuilder sb = new StringBuilder();
+                String line = bufReader.readLine();
+                while (line != null) {
+                    sb.append(line + "\n");
+                    line = bufReader.readLine();
+                }
+                bufReader.close();
+                Gson gson = new GsonBuilder().create();
+                VersionComparison comparison = gson.fromJson(sb.toString(), VersionComparison.class);
+                return comparison;
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
