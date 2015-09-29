@@ -9,10 +9,12 @@ import org.restlet.util.Series;
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 
-public class HubIntTestHelper extends HubIntRestService {
+public class HubIntTestHelper {
 
-    public HubIntTestHelper(String baseUrl) {
-        super(baseUrl);
+    private final HubIntRestService restService;
+
+    public HubIntTestHelper(HubIntRestService restService) {
+        this.restService = restService;
     }
 
     /**
@@ -28,8 +30,8 @@ public class HubIntTestHelper extends HubIntRestService {
             return false;
         }
 
-        Series<Cookie> cookies = getCookies();
-        String url = getBaseUrl() + "/api/v1/projects/" + projectId;
+        Series<Cookie> cookies = restService.getCookies();
+        String url = restService.getBaseUrl() + "/api/v1/projects/" + projectId;
         ClientResource resource = new ClientResource(url);
 
         resource.getRequest().setCookies(cookies);

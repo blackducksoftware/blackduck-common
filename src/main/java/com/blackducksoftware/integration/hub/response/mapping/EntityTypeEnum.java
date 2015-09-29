@@ -4,17 +4,17 @@ public enum EntityTypeEnum {
 
     RL // Release? Used for owner Entity Type
     ,
-    CL
+    CL // Code Location? Used for the asset Entity Type
     ,
-    UNKNOWN; // Code Location? Used for the asset Entity Type
+    UNKNOWNENTITY;
 
     public static EntityTypeEnum getEntityTypeEnum(String entityType) {
-        if (entityType.equalsIgnoreCase(RL.toString())) {
+        if (entityType.equalsIgnoreCase(RL.name())) {
             return EntityTypeEnum.RL;
-        } else if (entityType.equalsIgnoreCase(CL.toString())) {
+        } else if (entityType.equalsIgnoreCase(CL.name())) {
             return EntityTypeEnum.CL;
         } else {
-            return EntityTypeEnum.UNKNOWN;
+            return EntityTypeEnum.UNKNOWNENTITY;
         }
     }
 

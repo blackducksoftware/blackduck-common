@@ -48,44 +48,10 @@ public class HubIntRestService {
 
     private final String baseUrl;
 
-    private String proxyHost;
-
-    private int proxyPort;
-
-    private String proxyUsername;
-
-    private String proxyPassword;
-
-    private List<Pattern> noProxyHosts;
-
     private IntLogger logger;
 
     public HubIntRestService(String baseUrl) {
         this.baseUrl = baseUrl;
-    }
-
-    public String getProxyUsername() {
-        return proxyUsername;
-    }
-
-    public void setProxyUsername(String proxyUsername) {
-        this.proxyUsername = proxyUsername;
-    }
-
-    public String getProxyPassword() {
-        return proxyPassword;
-    }
-
-    public void setProxyPassword(String proxyPassword) {
-        this.proxyPassword = proxyPassword;
-    }
-
-    public void setNoProxyHosts(List<Pattern> noProxyHosts) {
-        this.noProxyHosts = noProxyHosts;
-    }
-
-    public List<Pattern> getNoProxyHosts() {
-        return noProxyHosts;
     }
 
     public void setLogger(IntLogger logger) {
@@ -96,37 +62,18 @@ public class HubIntRestService {
         return baseUrl;
     }
 
-    public void setProxyPort(int proxyPort) {
-        this.proxyPort = proxyPort;
-    }
-
-    public int getProxyPort() {
-        return proxyPort;
-    }
-
-    public void setProxyHost(String proxyHost) {
-        this.proxyHost = proxyHost;
-    }
-
-    public String getProxyHost() {
-        return proxyHost;
-    }
-
     /**
-     * Create the Client Resource, sets the Proxy settings that the User may have configured.
+     * Sets the Proxy settings that the User may have configured.
      * The proxy settings get set as System properties.
      * I.E. https.proxyHost, https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
      *
-     * @param url
-     *            String
-     * @return ClientResource
-     * @throws URISyntaxException
      */
-    private ClientResource createClientResource(String url) throws URISyntaxException {
-        ClientResource resource = new ClientResource(new Context(), new URI(url));
+    public void setProxyProperties(final String proxyHost, final int proxyPort, final List<Pattern> noProxyHosts, final String proxyUsername,
+            final String proxyPassword) {
+
         cleanUpOldProxySettings();
 
-        if (!StringUtils.isBlank(proxyHost) && proxyPort != 0) {
+        if (!StringUtils.isBlank(proxyHost) && proxyPort > 0) {
             logger.debug("Using Proxy : " + proxyHost + ", at Port : " + proxyPort);
 
             System.setProperty("https.proxyHost", proxyHost);
@@ -161,6 +108,18 @@ public class HubIntRestService {
                 System.setProperty("http.nonProxyHosts", noProxyHostsString);
             }
         }
+    }
+
+    /**
+     * Create the Client Resource
+     *
+     * @param url
+     *            String
+     * @return ClientResource
+     * @throws URISyntaxException
+     */
+    private ClientResource createClientResource(String url) throws URISyntaxException {
+        ClientResource resource = new ClientResource(new Context(), new URI(url));
 
         return resource;
     }
@@ -474,12 +433,12 @@ public class HubIntRestService {
                         AssetReferenceItem assetReference = new AssetReferenceItem();
 
                         EntityItem ownerEntity = new EntityItem();
-                        ownerEntity.setEntityType(EntityTypeEnum.RL.toString());
+                        ownerEntity.setEntityType(EntityTypeEnum.RL.name());
                         ownerEntity.setEntityId(versionId);
 
                         EntityItem assetEntity = new EntityItem();
 
-                        assetEntity.setEntityType(EntityTypeEnum.CL.toString());
+                        assetEntity.setEntityType(EntityTypeEnum.CL.name());
                         assetEntity.setEntityId(scanId.getKey());
 
                         assetReference.setOwnerEntityKey(ownerEntity);
