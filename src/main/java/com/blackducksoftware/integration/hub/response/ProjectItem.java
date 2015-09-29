@@ -16,6 +16,16 @@ public class ProjectItem {
 
     private Boolean openSource;
 
+    public ProjectItem(String id, Boolean kb, String name, Boolean restructured, String canonicalReleaseId, Boolean internal, Boolean openSource) {
+        this.id = id;
+        this.kb = kb;
+        this.name = name;
+        this.restructured = restructured;
+        this.canonicalReleaseId = canonicalReleaseId;
+        this.internal = internal;
+        this.openSource = openSource;
+    }
+
     public String getId() {
         return id;
     }

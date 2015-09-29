@@ -10,6 +10,13 @@ public class VersionComparison {
 
     private String operatorResult;
 
+    public VersionComparison(String consumerVersion, String producerVersion, Integer numericResult, String operatorResult) {
+        this.consumerVersion = consumerVersion;
+        this.producerVersion = producerVersion;
+        this.numericResult = numericResult;
+        this.operatorResult = operatorResult;
+    }
+
     public String getConsumerVersion() {
         return consumerVersion;
     }

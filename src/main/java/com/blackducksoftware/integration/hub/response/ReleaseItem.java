@@ -28,6 +28,24 @@ public class ReleaseItem {
 
     private String riskProfileUrl;
 
+    public ReleaseItem(String id, Boolean kb, Boolean ohloh, String projectId, String version, String phase, String distribution,
+            String fileBomCodeLocationsUrl, String fileBomEntriesUrl, String codeLocationsUrl, String bomCountsUrl, String vulnerabilityCountsUrl,
+            String riskProfileUrl) {
+        this.id = id;
+        this.kb = kb;
+        this.ohloh = ohloh;
+        this.projectId = projectId;
+        this.version = version;
+        this.phase = phase;
+        this.distribution = distribution;
+        this.fileBomCodeLocationsUrl = fileBomCodeLocationsUrl;
+        this.fileBomEntriesUrl = fileBomEntriesUrl;
+        this.codeLocationsUrl = codeLocationsUrl;
+        this.bomCountsUrl = bomCountsUrl;
+        this.vulnerabilityCountsUrl = vulnerabilityCountsUrl;
+        this.riskProfileUrl = riskProfileUrl;
+    }
+
     public String getId() {
         return id;
     }

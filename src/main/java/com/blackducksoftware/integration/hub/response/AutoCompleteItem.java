@@ -6,6 +6,11 @@ public class AutoCompleteItem {
 
     private String uuid;
 
+    public AutoCompleteItem(String value, String uuid) {
+        this.value = value;
+        this.uuid = uuid;
+    }
+
     public String getValue() {
         return value;
     }
