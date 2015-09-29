@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,17 +29,27 @@ public abstract class ScanExecutor {
 
     private final List<File> scanTargets;
 
-    private final Integer buildNumber;
+    private final int buildNumber;
 
-    private Integer scanMemory;
+    private int scanMemory;
 
     private IntLogger logger;
 
-    private String hubVersion;
+    private boolean hubSupportLogOption;
 
     private File workingDirectory;
 
-    private Boolean isTest;
+    private String proxyHost;
+
+    private int proxyPort;
+
+    private List<Pattern> noProxyHosts;
+
+    private String proxyUsername;
+
+    private String proxyPassword;
+
+    private boolean isTest = false;
 
     protected ScanExecutor(String hubUrl, String hubUsername, String hubPassword, List<File> scanTargets, Integer buildNumber) {
 
@@ -84,12 +95,12 @@ public abstract class ScanExecutor {
         this.scanMemory = scanMemory;
     }
 
-    public String getHubVersion() {
-        return hubVersion;
+    public boolean doesHubSupportLogOption() {
+        return hubSupportLogOption;
     }
 
-    public void setHubVersion(String hubVersion) {
-        this.hubVersion = hubVersion;
+    public void setHubSupportLogOption(boolean hubSupportLogOption) {
+        this.hubSupportLogOption = hubSupportLogOption;
     }
 
     public File getWorkingDirectory() {
@@ -104,6 +115,10 @@ public abstract class ScanExecutor {
         return hubUrl;
     }
 
+    public Integer getBuildNumber() {
+        return buildNumber;
+    }
+
     public String getHubUsername() {
         return hubUsername;
     }
@@ -112,16 +127,52 @@ public abstract class ScanExecutor {
         return hubPassword;
     }
 
-    public Boolean getIsTest() {
-        return isTest;
-    }
-
     protected Boolean isTest() {
         return isTest;
     }
 
     protected void setIsTest(Boolean isTest) {
         this.isTest = isTest;
+    }
+
+    public String getProxyHost() {
+        return proxyHost;
+    }
+
+    public void setProxyHost(String proxyHost) {
+        this.proxyHost = proxyHost;
+    }
+
+    public Integer getProxyPort() {
+        return proxyPort;
+    }
+
+    public void setProxyPort(Integer proxyPort) {
+        this.proxyPort = proxyPort;
+    }
+
+    public List<Pattern> getNoProxyHosts() {
+        return noProxyHosts;
+    }
+
+    public void setNoProxyHosts(List<Pattern> noProxyHosts) {
+        this.noProxyHosts = noProxyHosts;
+    }
+
+    public String getProxyUsername() {
+        return proxyUsername;
+    }
+
+    public void setProxyUsername(String proxyUsername) {
+        this.proxyUsername = proxyUsername;
+    }
+
+    public String getProxyPassword() {
+        return proxyPassword;
+    }
+
+    public void setProxyPassword(String proxyPassword) {
+        this.proxyPassword = proxyPassword;
     }
 
     private boolean isConfiguredCorrectly(File scanExec, File oneJarPath, File javaExec) {
@@ -153,7 +204,7 @@ public abstract class ScanExecutor {
             return false;
         }
 
-        if (scanMemory == null) {
+        if (scanMemory <= 0) {
             logger.error("No memory set for the HUB CLI. Will use the default memory, " + DEFAULT_MEMORY);
             setScanMemory(DEFAULT_MEMORY);
         }
@@ -177,26 +228,29 @@ public abstract class ScanExecutor {
                 cmd.add("-Done-jar.silent=true");
                 cmd.add("-Done-jar.jar.path=" + oneJarPath.getCanonicalPath());
 
-                // TODO add proxy configuration for the CLI as soon as the CLI has proxy support
-                // Jenkins jenkins = Jenkins.getInstance();
-                // if (jenkins != null) {
-                // ProxyConfiguration proxy = jenkins.proxy;
-                // if (proxy != null && proxy.getNoProxyHostPatterns() != null) {
-                // if (!JenkinsHubIntRestService.getMatchingNoProxyHostPatterns(url.getHost(),
-                // proxy.getNoProxyHostPatterns()))
-                // {
-                // if (StringUtils.isNotBlank(proxy.name) && proxy.port != 0) {
-                // // System.setProperty("http.proxyHost", proxy.name);
-                // // System.setProperty("http.proxyPort", Integer.toString(proxy.port));
-                // // cmd.add("-Dhttp.useProxy=true");
-                // cmd.add("-Dblackduck.hub.proxy.host=" + proxy.name);
-                // cmd.add("-Dblackduck.hub.proxy.port=" + proxy.port);
-                // System.setProperty("blackduck.hub.proxy.host", proxy.name);
-                // System.setProperty("blackduck.hub.proxy.port", Integer.toString(proxy.port));
-                // }
-                // }
-                // }
-                // }
+                if (StringUtils.isNotBlank(getProxyHost()) && getProxyPort() != null) {
+                    cmd.add("-Dhttp.proxyHost=" + getProxyHost());
+                    cmd.add("-Dhttp.proxyPort=" + getProxyPort());
+                    cmd.add("-Dhttps.proxyHost=" + getProxyHost());
+                    cmd.add("-Dhttps.proxyPort=" + getProxyPort());
+
+                    if (getNoProxyHosts() != null) {
+                        StringBuilder noProxyHosts = new StringBuilder();
+
+                        for (Pattern pattern : getNoProxyHosts()) {
+                            if (noProxyHosts.length() > 0) {
+                                noProxyHosts.append("|");
+                            }
+                            noProxyHosts.append(pattern.toString());
+                        }
+                        cmd.add("-Dhttp.nonProxyHosts=" + noProxyHosts.toString());
+                    }
+                    if (StringUtils.isNotBlank(getProxyUsername()) && StringUtils.isNotBlank(getProxyPassword())) {
+                        // FIXME are these the properties that the CLI uses? ask Joe
+                        cmd.add("-Dhttp.proxyUser=" + getProxyUsername());
+                        cmd.add("-Dhttp.proxyPassword=" + getProxyPassword());
+                    }
+                }
 
                 cmd.add("-Xmx" + scanMemory + "m");
 
@@ -232,7 +286,9 @@ public abstract class ScanExecutor {
                 // cmd.add("-v");
                 File logDirectory = null;
 
-                if (hubVersion != null && !hubVersion.equals("2.0.0")) {
+                if (doesHubSupportLogOption()) {
+                    // Only add the logDir option if the Hub supports the logDir option
+
                     logDirectory = new File(new File(getWorkingDirectory(), "HubScanLogs"), String.valueOf(buildNumber));
                     // This log directory should never exist as a new one is created for each Build
                     logDirectory.mkdirs();
@@ -249,7 +305,7 @@ public abstract class ScanExecutor {
                     cmd.add(targetPath);
                 }
 
-                executeScan(cmd);
+                return executeScan(cmd);
 
             } catch (MalformedURLException e) {
                 throw new HubIntegrationException("The server URL provided was not a valid", e);
@@ -261,7 +317,6 @@ public abstract class ScanExecutor {
         } else {
             return Result.FAILURE;
         }
-        return Result.SUCCESS;
     }
 
     protected abstract Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException;
