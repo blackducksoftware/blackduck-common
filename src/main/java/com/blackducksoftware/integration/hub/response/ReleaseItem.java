@@ -28,6 +28,10 @@ public class ReleaseItem {
 
     private String riskProfileUrl;
 
+    public ReleaseItem() {
+
+    }
+
     public ReleaseItem(String id, Boolean kb, Boolean ohloh, String projectId, String version, String phase, String distribution,
             String fileBomCodeLocationsUrl, String fileBomEntriesUrl, String codeLocationsUrl, String bomCountsUrl, String vulnerabilityCountsUrl,
             String riskProfileUrl) {

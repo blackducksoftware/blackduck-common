@@ -9,9 +9,7 @@ import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,6 +35,9 @@ import com.blackducksoftware.integration.hub.response.ProjectItem;
 import com.blackducksoftware.integration.hub.response.ReleaseItem;
 import com.blackducksoftware.integration.hub.response.ReleasesList;
 import com.blackducksoftware.integration.hub.response.VersionComparison;
+import com.blackducksoftware.integration.hub.response.mapping.AssetReferenceItem;
+import com.blackducksoftware.integration.hub.response.mapping.EntityItem;
+import com.blackducksoftware.integration.hub.response.mapping.EntityTypeEnum;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -407,7 +408,6 @@ public class HubIntRestService {
 
     public void mapScansToProjectVersion(IntLogger logger, Map<String, Boolean> scanLocationIds, String
             versionId) throws BDRestException, URISyntaxException {
-        // FIXME Need to change this to /api/v1/asset-references soon
         String url = getBaseUrl() + "/api/v1/assetreferences";
         ClientResource resource = createClientResource(url);
         try {
@@ -422,22 +422,23 @@ public class HubIntRestService {
                         resource.getRequest().setCookies(getCookies());
                         resource.setMethod(Method.POST);
 
-                        JsonObject obj = new JsonObject();
+                        AssetReferenceItem assetReference = new AssetReferenceItem();
 
-                        JsonObject ownerEntity = new JsonObject();
+                        EntityItem ownerEntity = new EntityItem();
+                        ownerEntity.setEntityType(EntityTypeEnum.RL.toString());
+                        ownerEntity.setEntityId(versionId);
 
-                        ownerEntity.add("entityId", new JsonPrimitive(versionId));
-                        // this is the version location
-                        ownerEntity.add("entityType", new JsonPrimitive("RL"));
+                        EntityItem assetEntity = new EntityItem();
 
-                        JsonObject assetEntity = new JsonObject();
-                        assetEntity.add("entityId", new JsonPrimitive(scanId.getKey()));
-                        // this is the code location
-                        assetEntity.add("entityType", new JsonPrimitive("CL"));
+                        assetEntity.setEntityType(EntityTypeEnum.CL.toString());
+                        assetEntity.setEntityId(scanId.getKey());
 
-                        obj.add("ownerEntityKey", ownerEntity);
-                        obj.add("assetEntityKey", assetEntity);
-                        StringRepresentation stringRep = new StringRepresentation(obj.toString());
+                        assetReference.setOwnerEntityKey(ownerEntity);
+                        assetReference.setAssetEntityKey(assetEntity);
+
+                        Gson gson = new GsonBuilder().create();
+
+                        StringRepresentation stringRep = new StringRepresentation(gson.toJson(assetReference));
                         stringRep.setMediaType(MediaType.APPLICATION_JSON);
                         resource.post(stringRep);
                         int responseCode = resource.getResponse().getStatus().getCode();
@@ -466,35 +467,6 @@ public class HubIntRestService {
             throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
 
-    }
-
-    /**
-     * Gets the project Ids for every project with a name that matches exactly to the one specified.
-     *
-     * @param responseList
-     *            ArrayList<LinkedHashMap<String, Object>>
-     * @param projectName
-     *            String
-     * @return ArrayList<String> the project Ids
-     * @throws IOException
-     * @throws BDRestException
-     */
-    public ArrayList<String> getProjectIdsFromProjectMatches(ArrayList<LinkedHashMap<String, Object>> responseList,
-            String projectName) throws IOException,
-            BDRestException, URISyntaxException {
-        // FIXME will not need this method once we handle the responses correctly
-        ArrayList<String> projectId = new ArrayList<String>();
-        if (!responseList.isEmpty()) {
-            for (LinkedHashMap<String, Object> map : responseList) {
-                if (map.get("value").equals(projectName)) {
-                    projectId.add((String) map.get("uuid"));
-                }
-                // else {
-                // name does not match
-                // }
-            }
-        }
-        return projectId;
     }
 
     public List<ReleaseItem> getVersionMatchesForProjectId(String projectId) throws IOException,
@@ -532,31 +504,6 @@ public class HubIntRestService {
         } catch (ResourceException e) {
             throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
-    }
-
-    public String getVersionIdFromMatches(LinkedHashMap<String, Object> responseMap, String releaseVersion, String
-            versionPhase, String versionDist)
-            throws IOException, BDRestException, URISyntaxException {
-        String versionId = null;
-        // FIXME should be replaced when we handle the responses with real objects
-        if (responseMap.containsKey("items")) {
-            ArrayList<LinkedHashMap<String, Object>> versionList = (ArrayList<LinkedHashMap<String, Object>>)
-                    responseMap.get("items");
-            for (LinkedHashMap<String, Object> release : versionList) {
-                if (((String) release.get("version")).equals(releaseVersion)) {
-                    versionId = (String) release.get("id");
-                    if (!((String) release.get("phase")).equals(versionPhase) && logger != null) {
-                        logger.info(
-                                "WARNING: The selected Phase does not match the Phase of this Version. If you wish to update the Phase please do so in the Hub.");
-                    }
-                    if (!((String) release.get("distribution")).equals(versionDist) && logger != null) {
-                        logger.info(
-                                "WARNING: The selected Distribution does not match the Distribution of this Version. If you wish to update the Distribution please do so in the Hub.");
-                    }
-                }
-            }
-        }
-        return versionId;
     }
 
     public String createHubProject(String projectName) throws IOException, BDRestException, URISyntaxException {
@@ -607,16 +554,17 @@ public class HubIntRestService {
         ClientResource resource = createClientResource(url);
         int responseCode;
         try {
-            JsonObject obj = new JsonObject();
-            obj.add("projectId", new JsonPrimitive(projectId));
-            obj.add("version", new JsonPrimitive(projectVersion));
-            obj.add("phase", new JsonPrimitive(phase));
-            obj.add("distribution", new JsonPrimitive(dist));
+            ReleaseItem newRelease = new ReleaseItem();
+            newRelease.setProjectId(projectId);
+            newRelease.setVersion(projectVersion);
+            newRelease.setPhase(phase);
+            newRelease.setDistribution(dist);
 
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.POST);
 
-            StringRepresentation stringRep = new StringRepresentation(obj.toString());
+            Gson gson = new GsonBuilder().create();
+            StringRepresentation stringRep = new StringRepresentation(gson.toJson(newRelease));
             stringRep.setMediaType(MediaType.APPLICATION_JSON);
 
             resource.post(stringRep);
@@ -634,7 +582,6 @@ public class HubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                Gson gson = new GsonBuilder().create();
                 ReleaseItem release = gson.fromJson(sb.toString(), ReleaseItem.class);
                 return release.getId();
             } else {

@@ -5,11 +5,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +15,13 @@ import org.restlet.resource.ClientResource;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.response.mapping.EntityItem;
+import com.blackducksoftware.integration.hub.response.mapping.EntityTypeEnum;
+import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
+import com.blackducksoftware.integration.hub.response.mapping.ScanLocationResults;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class ScanLocationHandler {
 
@@ -92,6 +95,7 @@ public class ScanLocationHandler {
         int responseCode = resource.getResponse().getStatus().getCode();
         try {
             HashMap<String, Object> responseMap = null;
+            ScanLocationResults results = null;
             if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
                 Response resp = resource.getResponse();
                 Reader reader = resp.getEntity().getReader();
@@ -104,44 +108,21 @@ public class ScanLocationHandler {
                 }
                 bufReader.close();
                 logger.info(sb.toString());
-                // FIXME
-                // byte[] mapData = sb.toString().getBytes();
-                //
-                // // Create HashMap from the Rest response
-                // ObjectMapper responseMapper = new ObjectMapper();
-                // responseMap = responseMapper.readValue(mapData, HashMap.class);
+                Gson gson = new GsonBuilder().create();
+
+                results = gson.fromJson(sb.toString(), ScanLocationResults.class);
+
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode);
             }
 
-            if (responseMap.containsKey("items") && ((ArrayList<LinkedHashMap<String, Object>>) responseMap.get("items")).size() > 0) {
-                ArrayList<LinkedHashMap<String, Object>> scanMatchesList = (ArrayList<LinkedHashMap<String, Object>>) responseMap.get("items");
+            if (results != null && results.getTotalCount() > 0 && results.getItems().size() > 0) {
                 // More than one match found
                 String path = null;
-                if (scanMatchesList.size() > 1) {
-                    for (LinkedHashMap<String, Object> scanMatch : scanMatchesList) {
+                // if (results.getItems().size() > 1) {
+                for (ScanLocationItem scanMatch : results.getItems()) {
 
-                        path = ((String) scanMatch.get("path")).trim();
-
-                        // Remove trailing slash from both strings
-                        if (path.endsWith("/")) {
-                            path = path.substring(0, path.length() - 1);
-                        }
-                        if (remoteTargetPath.endsWith("/")) {
-                            remoteTargetPath = remoteTargetPath.substring(0, remoteTargetPath.length() - 1);
-                        }
-
-                        logger.debug("Comparing target : '" + remoteTargetPath + "' with path : '" + path + "'.");
-                        if (remoteTargetPath.equals(path)) {
-                            logger.debug("MATCHED!");
-                            matchFound = true;
-                            handleScanLocationMatch(scanLocationIds, scanMatch, remoteTargetPath, versionId);
-                            break;
-                        }
-                    }
-                } else if (scanMatchesList.size() == 1) {
-                    LinkedHashMap<String, Object> scanMatch = scanMatchesList.get(0);
-                    path = (String) scanMatch.get("path");
+                    path = scanMatch.getPath().trim();
 
                     // Remove trailing slash from both strings
                     if (path.endsWith("/")) {
@@ -150,26 +131,14 @@ public class ScanLocationHandler {
                     if (remoteTargetPath.endsWith("/")) {
                         remoteTargetPath = remoteTargetPath.substring(0, remoteTargetPath.length() - 1);
                     }
-
                     logger.debug("Comparing target : '" + remoteTargetPath + "' with path : '" + path + "'.");
-                    // trim the path, this way there should be no whitespaces to intefere with the comparison
-                    if (remoteTargetPath.equals(path.trim())) {
+                    if (remoteTargetPath.equals(path)) {
                         logger.debug("MATCHED!");
                         matchFound = true;
                         handleScanLocationMatch(scanLocationIds, scanMatch, remoteTargetPath, versionId);
+                        break;
                     }
                 }
-                // if (scanId != null) {
-                // return scanId;
-                //
-                // } else {
-                // if (!alreadyMapped) {
-                // // TODO perform retry until the scan location is available
-                // listener.getLogger().println(
-                // "[ERROR] No Scan Location Id could be found for the scan target : '" + targetPath + "'.");
-                //
-                // }
-                // }
             } else {
                 logger.error(
                         "No Scan Location Id could be found for the scan target : '" + remoteTargetPath + "'.");
@@ -183,53 +152,39 @@ public class ScanLocationHandler {
         return matchFound;
     }
 
-    private void handleScanLocationMatch(Map<String, Boolean> scanLocationIds, LinkedHashMap<String, Object> scanMatch, String targetPath, String versionId)
+    private void handleScanLocationMatch(Map<String, Boolean> scanLocationIds, ScanLocationItem scanMatch, String targetPath, String versionId)
             throws HubIntegrationException {
-        if (scanMatch.containsKey("assetReferenceList")) {
-            Object assetRefObject = scanMatch.get("assetReferenceList");
-            ArrayList<LinkedHashMap<String, Object>> assetReferences = (ArrayList<LinkedHashMap<String, Object>>) assetRefObject;
-            if (!assetReferences.isEmpty()) {
-                boolean scanAlreadyMatched = false;
-                for (LinkedHashMap<String, Object> assetReference : assetReferences) {
-                    LinkedHashMap<String, Object> ownerEntity = (LinkedHashMap<String, Object>) assetReference.get("ownerEntityKey");
-                    if (!ownerEntity.containsKey("entityId")) {
-                        logger.error("Owner entity does not have 'entityId' key");
-                        Set<String> keys = ownerEntity.keySet();
-                        logger.debug("Owner entity has these keys : ");
-                        for (String key : keys) {
-                            logger.debug("key = " + key);
-                        }
-                        throw new HubIntegrationException("The scan has an owner but the owner does not have an 'entityId'");
-                    } else {
-                        String ownerId = (String) ownerEntity.get("entityId");
-                        if (ownerId.equals(versionId)) {
-                            scanAlreadyMatched = true;
-                            break;
-                        }
+
+        if (!scanMatch.getAssetReferenceList().isEmpty()) {
+            boolean scanAlreadyMatched = false;
+            for (EntityItem assetReference : scanMatch.getAssetReferenceList()) {
+                if (assetReference.getEntityType() == EntityTypeEnum.RL.toString()) {
+                    String ownerId = assetReference.getEntityId();
+                    if (ownerId.equals(versionId)) {
+                        scanAlreadyMatched = true;
+                        break;
                     }
                 }
-
-                if (scanAlreadyMatched) {
-                    String scanId = (String) scanMatch.get("id");
-                    scanLocationIds.put(scanId, true);
-                    logger.debug("The scan target : '"
-                            + targetPath
-                            + "' has Scan Location Id: '"
-                            + scanId
-                            + "'. This is already mapped to the Version with Id: '"
-                            + versionId + "'.");
-                    return;
-                } else {
-                    String scanId = (String) scanMatch.get("id");
-                    logger.debug(
-                            "The scan target : '" + targetPath + "' has Scan Location Id: '" + scanId + "'.");
-                    scanLocationIds.put(scanId, false);
-                    return;
-                }
-
+            }
+            if (scanAlreadyMatched) {
+                String scanId = scanMatch.getId();
+                scanLocationIds.put(scanId, true);
+                logger.debug("The scan target : '"
+                        + targetPath
+                        + "' has Scan Location Id: '"
+                        + scanId
+                        + "'. This is already mapped to the Version with Id: '"
+                        + versionId + "'.");
+                return;
+            } else {
+                String scanId = scanMatch.getId();
+                logger.debug(
+                        "The scan target : '" + targetPath + "' has Scan Location Id: '" + scanId + "'.");
+                scanLocationIds.put(scanId, false);
+                return;
             }
         }
-        String scanId = (String) scanMatch.get("id");
+        String scanId = scanMatch.getId();
         logger.debug(
                 "The scan target : '" + targetPath + "' has Scan Location Id: '" + scanId + "'.");
         scanLocationIds.put(scanId, false);

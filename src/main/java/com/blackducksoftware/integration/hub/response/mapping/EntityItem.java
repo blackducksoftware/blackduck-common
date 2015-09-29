@@ -2,12 +2,6 @@ package com.blackducksoftware.integration.hub.response.mapping;
 
 public class EntityItem {
 
-    public static enum entityTypeEnum {
-        RL // Release? Used for owner Entity Type
-        ,
-        CL // Code Location? Used for the asset Entity Type
-    }
-
     private String entityType;
 
     private String entityId;

@@ -10,6 +10,10 @@ public class VersionComparison {
 
     private String operatorResult;
 
+    public VersionComparison() {
+
+    }
+
     public VersionComparison(String consumerVersion, String producerVersion, Integer numericResult, String operatorResult) {
         this.consumerVersion = consumerVersion;
         this.producerVersion = producerVersion;
