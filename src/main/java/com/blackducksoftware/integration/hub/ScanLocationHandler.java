@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -33,11 +32,15 @@ public class ScanLocationHandler {
 
     /**
      * Will attempt to retrieve the scanLocation with the current hostname and target path. If this cannot be found then
+     * it retry's every 5 seconds for 2 minutes
      *
      * @param resource
+     *            ClientResource
      * @param targetPath
+     *            String
      * @param versionId
-     * @return
+     *            String
+     *
      * @throws UnknownHostException
      * @throws MalformedURLException
      * @throws InterruptedException
@@ -87,6 +90,21 @@ public class ScanLocationHandler {
 
     }
 
+    /**
+     * Attempts to get the scan location for the Host and Path. Searches throught the results to see if there is an
+     * exact match.
+     *
+     * @param resource
+     *            ClientResource
+     * @param remoteTargetPath
+     *            String
+     * @param versionId
+     *            String
+     * @param scanLocationIds
+     *            Map<<String, Boolean>>
+     * @return (boolean) MatchFound
+     * @throws HubIntegrationException
+     */
     private boolean scanLocationRetrieval(ClientResource resource, String remoteTargetPath, String versionId, Map<String, Boolean> scanLocationIds)
             throws HubIntegrationException {
         boolean matchFound = false;
@@ -94,7 +112,6 @@ public class ScanLocationHandler {
 
         int responseCode = resource.getResponse().getStatus().getCode();
         try {
-            HashMap<String, Object> responseMap = null;
             ScanLocationResults results = null;
             if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
                 Response resp = resource.getResponse();
@@ -152,6 +169,19 @@ public class ScanLocationHandler {
         return matchFound;
     }
 
+    /**
+     * Checks the scan match to see if it has already been mapped to this version or not.
+     *
+     * @param scanLocationIds
+     *            Map<<String, Boolean>>
+     * @param scanMatch
+     *            ScanLocationItem
+     * @param targetPath
+     *            String
+     * @param versionId
+     *            String
+     * @throws HubIntegrationException
+     */
     private void handleScanLocationMatch(Map<String, Boolean> scanLocationIds, ScanLocationItem scanMatch, String targetPath, String versionId)
             throws HubIntegrationException {
 

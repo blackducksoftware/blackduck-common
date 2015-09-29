@@ -162,98 +162,104 @@ public abstract class ScanExecutor {
     }
 
     public Result setupAndRunScan(File scanExec, File oneJarPath, File javaExec) throws HubIntegrationException {
-        try {
-            URL url = new URL(getHubUrl());
-            List<String> cmd = new ArrayList<String>();
+        if (isConfiguredCorrectly(scanExec, oneJarPath, javaExec)) {
 
-            String javaPath = javaExec.getCanonicalPath();
+            try {
 
-            logger.debug("Using this java installation : " + javaPath);
+                URL url = new URL(getHubUrl());
+                List<String> cmd = new ArrayList<String>();
 
-            cmd.add(javaPath);
-            cmd.add("-Done-jar.silent=true");
-            cmd.add("-Done-jar.jar.path=" + oneJarPath.getCanonicalPath());
+                String javaPath = javaExec.getCanonicalPath();
 
-            // TODO add proxy configuration for the CLI as soon as the CLI has proxy support
-            // Jenkins jenkins = Jenkins.getInstance();
-            // if (jenkins != null) {
-            // ProxyConfiguration proxy = jenkins.proxy;
-            // if (proxy != null && proxy.getNoProxyHostPatterns() != null) {
-            // if (!JenkinsHubIntRestService.getMatchingNoProxyHostPatterns(url.getHost(),
-            // proxy.getNoProxyHostPatterns()))
-            // {
-            // if (StringUtils.isNotBlank(proxy.name) && proxy.port != 0) {
-            // // System.setProperty("http.proxyHost", proxy.name);
-            // // System.setProperty("http.proxyPort", Integer.toString(proxy.port));
-            // // cmd.add("-Dhttp.useProxy=true");
-            // cmd.add("-Dblackduck.hub.proxy.host=" + proxy.name);
-            // cmd.add("-Dblackduck.hub.proxy.port=" + proxy.port);
-            // System.setProperty("blackduck.hub.proxy.host", proxy.name);
-            // System.setProperty("blackduck.hub.proxy.port", Integer.toString(proxy.port));
-            // }
-            // }
-            // }
-            // }
+                logger.debug("Using this java installation : " + javaPath);
 
-            cmd.add("-Xmx" + scanMemory + "m");
+                cmd.add(javaPath);
+                cmd.add("-Done-jar.silent=true");
+                cmd.add("-Done-jar.jar.path=" + oneJarPath.getCanonicalPath());
 
-            cmd.add("-jar");
-            cmd.add(scanExec.getCanonicalPath());
-            cmd.add("--scheme");
-            cmd.add(url.getProtocol());
-            cmd.add("--host");
-            cmd.add(url.getHost());
-            logger.debug("Using this Hub hostname : '" + url.getHost() + "'");
-            cmd.add("--username");
-            cmd.add(getHubUsername());
-            cmd.add("--password");
-            cmd.add(getHubPassword());
+                // TODO add proxy configuration for the CLI as soon as the CLI has proxy support
+                // Jenkins jenkins = Jenkins.getInstance();
+                // if (jenkins != null) {
+                // ProxyConfiguration proxy = jenkins.proxy;
+                // if (proxy != null && proxy.getNoProxyHostPatterns() != null) {
+                // if (!JenkinsHubIntRestService.getMatchingNoProxyHostPatterns(url.getHost(),
+                // proxy.getNoProxyHostPatterns()))
+                // {
+                // if (StringUtils.isNotBlank(proxy.name) && proxy.port != 0) {
+                // // System.setProperty("http.proxyHost", proxy.name);
+                // // System.setProperty("http.proxyPort", Integer.toString(proxy.port));
+                // // cmd.add("-Dhttp.useProxy=true");
+                // cmd.add("-Dblackduck.hub.proxy.host=" + proxy.name);
+                // cmd.add("-Dblackduck.hub.proxy.port=" + proxy.port);
+                // System.setProperty("blackduck.hub.proxy.host", proxy.name);
+                // System.setProperty("blackduck.hub.proxy.port", Integer.toString(proxy.port));
+                // }
+                // }
+                // }
+                // }
 
-            if (url.getPort() != -1) {
-                cmd.add("--port");
-                cmd.add(Integer.toString(url.getPort()));
-            } else {
-                if (url.getDefaultPort() != -1) {
+                cmd.add("-Xmx" + scanMemory + "m");
+
+                cmd.add("-jar");
+                cmd.add(scanExec.getCanonicalPath());
+                cmd.add("--scheme");
+                cmd.add(url.getProtocol());
+                cmd.add("--host");
+                cmd.add(url.getHost());
+                logger.debug("Using this Hub hostname : '" + url.getHost() + "'");
+                cmd.add("--username");
+                cmd.add(getHubUsername());
+                cmd.add("--password");
+                cmd.add(getHubPassword());
+
+                if (url.getPort() != -1) {
                     cmd.add("--port");
-                    cmd.add(Integer.toString(url.getDefaultPort()));
+                    cmd.add(Integer.toString(url.getPort()));
                 } else {
-                    logger.warn("Could not find a port to use for the Server.");
+                    if (url.getDefaultPort() != -1) {
+                        cmd.add("--port");
+                        cmd.add(Integer.toString(url.getDefaultPort()));
+                    } else {
+                        logger.warn("Could not find a port to use for the Server.");
+                    }
+
                 }
 
+                if (isTest()) {
+                    // The new dry run option
+                    cmd.add("--selfTest");
+                }
+                // cmd.add("-v");
+                File logDirectory = null;
+
+                if (hubVersion != null && !hubVersion.equals("2.0.0")) {
+                    logDirectory = new File(new File(getWorkingDirectory(), "HubScanLogs"), String.valueOf(buildNumber));
+                    // This log directory should never exist as a new one is created for each Build
+                    logDirectory.mkdirs();
+                    // Need to only add this option if version 2.0.1 or later,
+                    // this is the pro-active approach to the log problem
+                    cmd.add("--logDir");
+
+                    cmd.add(logDirectory.getCanonicalPath());
+                }
+
+                for (File target : scanTargets) {
+                    String targetPath = target.getCanonicalPath();
+                    // targetPath = PostBuildHubScan.correctSeparatorInPath(targetPath, separator);
+                    cmd.add(targetPath);
+                }
+
+                executeScan(cmd);
+
+            } catch (MalformedURLException e) {
+                throw new HubIntegrationException("The server URL provided was not a valid", e);
+            } catch (IOException e) {
+                throw new HubIntegrationException(e.getMessage(), e);
+            } catch (InterruptedException e) {
+                throw new HubIntegrationException(e.getMessage(), e);
             }
-
-            if (isTest()) {
-                // The new dry run option
-                cmd.add("--selfTest");
-            }
-            // cmd.add("-v");
-            File logDirectory = null;
-            Boolean oldCLi = false;
-
-            if (hubVersion != null && !hubVersion.equals("2.0.0")) {
-                logDirectory = new File(new File(getWorkingDirectory(), "HubScanLogs"), String.valueOf(buildNumber));
-                // This log directory should never exist as a new one is created for each Build
-                logDirectory.mkdirs();
-                // Need to only add this option if version 2.0.1 or later,
-                // this is the pro-active approach to the log problem
-                cmd.add("--logDir");
-
-                cmd.add(logDirectory.getCanonicalPath());
-            }
-
-            for (File target : scanTargets) {
-                String targetPath = target.getCanonicalPath();
-                // targetPath = PostBuildHubScan.correctSeparatorInPath(targetPath, separator);
-                cmd.add(targetPath);
-            }
-
-            executeScan(cmd);
-        } catch (MalformedURLException e) {
-            throw new HubIntegrationException("The server URL provided was not a valid", e);
-        } catch (IOException e) {
-            throw new HubIntegrationException(e.getMessage(), e);
-        } catch (InterruptedException e) {
-            throw new HubIntegrationException(e.getMessage(), e);
+        } else {
+            return Result.FAILURE;
         }
         return Result.SUCCESS;
     }

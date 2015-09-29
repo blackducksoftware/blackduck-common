@@ -41,8 +41,6 @@ import com.blackducksoftware.integration.hub.response.mapping.EntityTypeEnum;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 
 public class HubIntRestService {
@@ -114,6 +112,16 @@ public class HubIntRestService {
         return proxyHost;
     }
 
+    /**
+     * Create the Client Resource, sets the Proxy settings that the User may have configured.
+     * The proxy settings get set as System properties.
+     * I.E. https.proxyHost, https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
+     *
+     * @param url
+     *            String
+     * @return ClientResource
+     * @throws URISyntaxException
+     */
     private ClientResource createClientResource(String url) throws URISyntaxException {
         ClientResource resource = new ClientResource(new Context(), new URI(url));
         cleanUpOldProxySettings();
@@ -157,6 +165,11 @@ public class HubIntRestService {
         return resource;
     }
 
+    /**
+     * Clears the previously set System properties
+     * I.E. https.proxyHost, https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
+     *
+     */
     @SuppressWarnings("restriction")
     private void cleanUpOldProxySettings() {
         System.clearProperty("https.proxyHost");
@@ -196,11 +209,9 @@ public class HubIntRestService {
     /**
      * Gets the cookie for the Authorized connection to the Hub server. Returns the response code from the connection.
      *
-     * @param serverUrl
-     *            String the Url for the Hub server
-     * @param credentialUserName
+     * @param hubUserName
      *            String the Username for the Hub server
-     * @param credentialPassword
+     * @param hubPassword
      *            String the Password for the Hub server
      *
      * @return int Status code
@@ -245,6 +256,16 @@ public class HubIntRestService {
         return cookies;
     }
 
+    /**
+     * Retrieves a list of Hub Projects that may match the hubProjectName
+     *
+     * @param hubProjectName
+     *            String
+     * @return List<<AutoCompleteItem>>
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
     public List<AutoCompleteItem> getProjectMatches(String hubProjectName) throws IOException,
             BDRestException, URISyntaxException {
         // hubProjectName = URLEncoder.encode(hubProjectName, "UTF-8");
@@ -280,6 +301,16 @@ public class HubIntRestService {
         }
     }
 
+    /**
+     * Gets the Hub Project that is specified by the projectId
+     *
+     * @param projectId
+     *            String
+     * @return ProjectItem
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
     public ProjectItem getProjectById(String projectId) throws IOException,
             BDRestException, URISyntaxException {
 
@@ -314,9 +345,19 @@ public class HubIntRestService {
         }
     }
 
-    public String getProjectId(String hubProjectName) throws IOException, BDRestException, URISyntaxException {
+    /**
+     * Gets the Project that is specified by the projectName
+     *
+     * @param projectName
+     *            String
+     * @return
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    public ProjectItem getProjectByName(String projectName) throws IOException, BDRestException, URISyntaxException {
         // hubProjectName = URLEncoder.encode(hubProjectName, "UTF-8");
-        String url = getBaseUrl() + "/api/v1/projects?name=" + hubProjectName;
+        String url = getBaseUrl() + "/api/v1/projects?name=" + projectName;
         ClientResource resource = createClientResource(url);
         try {
             resource.getRequest().setCookies(getCookies());
@@ -336,8 +377,7 @@ public class HubIntRestService {
                 }
                 bufReader.close();
                 Gson gson = new GsonBuilder().create();
-                ProjectItem project = gson.fromJson(sb.toString(), ProjectItem.class);
-                return project.getId();
+                return gson.fromJson(sb.toString(), ProjectItem.class);
 
             } else {
                 throw new BDRestException("This Project does not exist or there is a problem connecting to the Hub server", resource);
@@ -348,26 +388,24 @@ public class HubIntRestService {
     }
 
     /**
-     * Gets the scan Id for each scan target, it searches the list of scans and gets the latest scan id for the scan
-     * matching the hostname and path. If the matching scans are already mapped to the Version then that id will not
-     * be
-     * returned in the list.
+     * Gets the scan Id for each scan target, it searches the list of scans and gets the latest scan Id for the scan
+     * matching the hostname and path.
+     * Returns a Map of scan Id's, and a Boolean to mark if that has already been mapped to this version or not
      *
-     * @param listener
-     *            BuildListener
+     * @param hostname
+     *            String
      * @param scanTargets
-     *            List<String>
+     *            List<<String>>
      * @param versionId
      *            String
-     *
-     * @return Map<Boolean, String> scan Ids
+     * @return Map<<String, Boolean>>
      * @throws UnknownHostException
-     * @throws MalformedURLException
      * @throws InterruptedException
      * @throws BDRestException
      * @throws HubIntegrationException
+     * @throws URISyntaxException
      */
-    public Map<String, Boolean> getScanLocationIds(String hostname, IntLogger logger, List<String>
+    public Map<String, Boolean> getScanLocationIds(String hostname, List<String>
             scanTargets, String versionId)
             throws UnknownHostException,
             InterruptedException, BDRestException, HubIntegrationException, URISyntaxException {
@@ -406,7 +444,18 @@ public class HubIntRestService {
         return scanLocationIds;
     }
 
-    public void mapScansToProjectVersion(IntLogger logger, Map<String, Boolean> scanLocationIds, String
+    /**
+     * If the scan Id has not already been mapped to the Version then it will make that mapping, otherwise it will not
+     * perform the mapping.
+     *
+     * @param scanLocationIds
+     *            Map<<String, Boolean>>
+     * @param versionId
+     *            String
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    public void mapScansToProjectVersion(Map<String, Boolean> scanLocationIds, String
             versionId) throws BDRestException, URISyntaxException {
         String url = getBaseUrl() + "/api/v1/assetreferences";
         ClientResource resource = createClientResource(url);
@@ -469,7 +518,17 @@ public class HubIntRestService {
 
     }
 
-    public List<ReleaseItem> getVersionMatchesForProjectId(String projectId) throws IOException,
+    /**
+     * Gets the list of Versions for the specified Project
+     *
+     * @param projectId
+     *            String
+     * @return List<<ReleaseItem>>
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    public List<ReleaseItem> getVersionsForProject(String projectId) throws IOException,
             BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/projects/" + projectId + "/releases";
@@ -506,6 +565,16 @@ public class HubIntRestService {
         }
     }
 
+    /**
+     * Creates a Hub Project with the specified name.
+     *
+     * @param projectName
+     *            String
+     * @return (String) ProjectId
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
     public String createHubProject(String projectName) throws IOException, BDRestException, URISyntaxException {
         // projectName = URLEncoder.encode(projectName, "UTF-8");
         String url = getBaseUrl() + "/api/v1/projects";
@@ -514,9 +583,11 @@ public class HubIntRestService {
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.POST);
 
-            JsonObject obj = new JsonObject();
-            obj.add("name", new JsonPrimitive(projectName));
-            StringRepresentation stringRep = new StringRepresentation(obj.toString());
+            ProjectItem newProject = new ProjectItem();
+            newProject.setName(projectName);
+
+            Gson gson = new GsonBuilder().create();
+            StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
             stringRep.setMediaType(MediaType.APPLICATION_JSON);
 
             resource.post(stringRep);
@@ -534,7 +605,6 @@ public class HubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                Gson gson = new GsonBuilder().create();
                 ProjectItem project = gson.fromJson(sb.toString(), ProjectItem.class);
                 return project.getId();
 
@@ -547,6 +617,22 @@ public class HubIntRestService {
 
     }
 
+    /**
+     * Creates a new Version in the Project specified, using the phase and distribution provided
+     *
+     * @param projectVersion
+     *            String
+     * @param projectId
+     *            String
+     * @param phase
+     *            String
+     * @param dist
+     *            String
+     * @return (String) VersionId
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
     public String createHubVersion(String projectVersion, String projectId, String phase, String dist) throws
             IOException, BDRestException, URISyntaxException {
         // projectVersion = URLEncoder.encode(projectVersion, "UTF-8");
@@ -593,6 +679,14 @@ public class HubIntRestService {
         }
     }
 
+    /**
+     * Retrieves the version of the Hub server
+     *
+     * @return String
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
     public String getHubVersion() throws IOException, BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/current-version";
@@ -615,6 +709,16 @@ public class HubIntRestService {
         }
     }
 
+    /**
+     * Compares the specified version with the actual version of the Hub server.
+     *
+     * @param version
+     *            String
+     * @return VersionComparison
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
     public VersionComparison compareWithHubVersion(String version) throws IOException, BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/current-version-comparison?version=" + version;
