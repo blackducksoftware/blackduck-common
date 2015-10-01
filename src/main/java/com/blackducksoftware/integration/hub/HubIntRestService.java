@@ -117,8 +117,10 @@ public class HubIntRestService {
      *            String
      * @return ClientResource
      * @throws URISyntaxException
+     * @throws MalformedURLException
      */
     private ClientResource createClientResource(String url) throws URISyntaxException {
+        url = url.replaceAll(" ", "%20");
         ClientResource resource = new ClientResource(new Context(), new URI(url));
 
         return resource;
@@ -363,6 +365,7 @@ public class HubIntRestService {
      * @throws BDRestException
      * @throws HubIntegrationException
      * @throws URISyntaxException
+     * @throws MalformedURLException
      */
     public Map<String, Boolean> getScanLocationIds(String hostname, List<String>
             scanTargets, String versionId)
@@ -413,6 +416,7 @@ public class HubIntRestService {
      *            String
      * @throws BDRestException
      * @throws URISyntaxException
+     * @throws MalformedURLException
      */
     public void mapScansToProjectVersion(Map<String, Boolean> scanLocationIds, String
             versionId) throws BDRestException, URISyntaxException {
