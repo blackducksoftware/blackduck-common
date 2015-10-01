@@ -27,7 +27,7 @@ public abstract class ScanExecutor {
 
     private final String hubPassword;
 
-    private final List<File> scanTargets;
+    private final List<String> scanTargets;
 
     private final int buildNumber;
 
@@ -51,7 +51,7 @@ public abstract class ScanExecutor {
 
     private boolean isTest = false;
 
-    protected ScanExecutor(String hubUrl, String hubUsername, String hubPassword, List<File> scanTargets, Integer buildNumber) {
+    protected ScanExecutor(String hubUrl, String hubUsername, String hubPassword, List<String> scanTargets, Integer buildNumber) {
 
         if (StringUtils.isBlank(hubUrl)) {
             throw new IllegalArgumentException("No Hub URL provided.");
@@ -83,7 +83,7 @@ public abstract class ScanExecutor {
         this.logger = logger;
     }
 
-    public List<File> getScanTargets() {
+    public List<String> getScanTargets() {
         return scanTargets;
     }
 
@@ -176,36 +176,36 @@ public abstract class ScanExecutor {
     }
 
     private boolean isConfiguredCorrectly(File scanExec, File oneJarPath, File javaExec) {
-        if (logger == null) {
+        if (getLogger() == null) {
             System.out.println("Could not find a logger");
             return false;
         }
 
         if (scanExec == null) {
-            logger.error("Please provide the Hub scan CLI.");
+            getLogger().error("Please provide the Hub scan CLI.");
             return false;
         }
         else if (!scanExec.exists()) {
-            logger.error("The Hub scan CLI provided does not exist.");
+            getLogger().error("The Hub scan CLI provided does not exist.");
             return false;
         }
 
         if (oneJarPath == null) {
-            logger.error("Please provide the path for the CLI cache.");
+            getLogger().error("Please provide the path for the CLI cache.");
             return false;
         }
 
         if (javaExec == null) {
-            logger.error("Please provide the java home directory.");
+            getLogger().error("Please provide the java home directory.");
             return false;
         }
         else if (!javaExec.exists()) {
-            logger.error("The Java home provided does not exist.");
+            getLogger().error("The Java home provided does not exist.");
             return false;
         }
 
         if (scanMemory <= 0) {
-            logger.error("No memory set for the HUB CLI. Will use the default memory, " + DEFAULT_MEMORY);
+            getLogger().error("No memory set for the HUB CLI. Will use the default memory, " + DEFAULT_MEMORY);
             setScanMemory(DEFAULT_MEMORY);
         }
 
@@ -222,7 +222,7 @@ public abstract class ScanExecutor {
 
                 String javaPath = javaExec.getCanonicalPath();
 
-                logger.debug("Using this java installation : " + javaPath);
+                getLogger().debug("Using this java installation : " + javaPath);
 
                 cmd.add(javaPath);
                 cmd.add("-Done-jar.silent=true");
@@ -231,8 +231,6 @@ public abstract class ScanExecutor {
                 if (StringUtils.isNotBlank(getProxyHost()) && getProxyPort() != null) {
                     cmd.add("-Dhttp.proxyHost=" + getProxyHost());
                     cmd.add("-Dhttp.proxyPort=" + getProxyPort());
-                    cmd.add("-Dhttps.proxyHost=" + getProxyHost());
-                    cmd.add("-Dhttps.proxyPort=" + getProxyPort());
 
                     if (getNoProxyHosts() != null) {
                         StringBuilder noProxyHosts = new StringBuilder();
@@ -246,7 +244,6 @@ public abstract class ScanExecutor {
                         cmd.add("-Dhttp.nonProxyHosts=" + noProxyHosts.toString());
                     }
                     if (StringUtils.isNotBlank(getProxyUsername()) && StringUtils.isNotBlank(getProxyPassword())) {
-                        // FIXME are these the properties that the CLI uses? ask Joe
                         cmd.add("-Dhttp.proxyUser=" + getProxyUsername());
                         cmd.add("-Dhttp.proxyPassword=" + getProxyPassword());
                     }
@@ -260,7 +257,7 @@ public abstract class ScanExecutor {
                 cmd.add(url.getProtocol());
                 cmd.add("--host");
                 cmd.add(url.getHost());
-                logger.debug("Using this Hub hostname : '" + url.getHost() + "'");
+                getLogger().debug("Using this Hub hostname : '" + url.getHost() + "'");
                 cmd.add("--username");
                 cmd.add(getHubUsername());
                 cmd.add("--password");
@@ -274,7 +271,7 @@ public abstract class ScanExecutor {
                         cmd.add("--port");
                         cmd.add(Integer.toString(url.getDefaultPort()));
                     } else {
-                        logger.warn("Could not find a port to use for the Server.");
+                        getLogger().warn("Could not find a port to use for the Server.");
                     }
 
                 }
@@ -299,13 +296,11 @@ public abstract class ScanExecutor {
                     cmd.add(logDirectory.getCanonicalPath());
                 }
 
-                for (File target : scanTargets) {
-                    String targetPath = target.getCanonicalPath();
-                    // targetPath = PostBuildHubScan.correctSeparatorInPath(targetPath, separator);
-                    cmd.add(targetPath);
+                for (String target : scanTargets) {
+                    cmd.add(target);
                 }
 
-                return executeScan(cmd);
+                return executeScan(cmd, logDirectory);
 
             } catch (MalformedURLException e) {
                 throw new HubIntegrationException("The server URL provided was not a valid", e);
@@ -319,5 +314,5 @@ public abstract class ScanExecutor {
         }
     }
 
-    protected abstract Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException;
+    protected abstract Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException;
 }

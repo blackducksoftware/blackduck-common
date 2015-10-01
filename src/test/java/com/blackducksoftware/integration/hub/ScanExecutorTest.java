@@ -51,7 +51,8 @@ public class ScanExecutorTest {
         new ScanExecutor(null, null, null, null, null) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+                // TODO Auto-generated function stub
                 return null;
             }
 
@@ -65,7 +66,8 @@ public class ScanExecutorTest {
         new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), null, null, null, null) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+                // TODO Auto-generated function stub
                 return null;
             }
 
@@ -80,7 +82,7 @@ public class ScanExecutorTest {
                 null) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -95,7 +97,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), null, null) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -107,14 +109,14 @@ public class ScanExecutorTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("No build number provided.");
 
-        ArrayList<File> scanTargets = new ArrayList<File>();
-        scanTargets.add(new File(""));
+        ArrayList<String> scanTargets = new ArrayList<String>();
+        scanTargets.add((new File("")).getAbsolutePath());
 
         new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, null) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -124,14 +126,14 @@ public class ScanExecutorTest {
     @Test
     public void testValidConstructor() throws Exception {
 
-        ArrayList<File> scanTargets = new ArrayList<File>();
-        scanTargets.add(new File(""));
+        ArrayList<String> scanTargets = new ArrayList<String>();
+        scanTargets.add((new File("")).getAbsolutePath());
 
         new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -141,14 +143,14 @@ public class ScanExecutorTest {
     @Test
     public void testSetupNoLogger() throws Exception {
 
-        ArrayList<File> scanTargets = new ArrayList<File>();
-        scanTargets.add(new File(""));
+        ArrayList<String> scanTargets = new ArrayList<String>();
+        scanTargets.add((new File("")).getAbsolutePath());
 
         ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -160,14 +162,14 @@ public class ScanExecutorTest {
     @Test
     public void testSetupNoScanExec() throws Exception {
 
-        ArrayList<File> scanTargets = new ArrayList<File>();
-        scanTargets.add(new File(""));
+        ArrayList<String> scanTargets = new ArrayList<String>();
+        scanTargets.add((new File("")).getAbsolutePath());
 
         ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -184,14 +186,14 @@ public class ScanExecutorTest {
     @Test
     public void testSetupScanExecDoesNotExist() throws Exception {
 
-        ArrayList<File> scanTargets = new ArrayList<File>();
-        scanTargets.add(new File(""));
+        ArrayList<String> scanTargets = new ArrayList<String>();
+        scanTargets.add((new File("")).getAbsolutePath());
 
         ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -208,14 +210,14 @@ public class ScanExecutorTest {
     @Test
     public void testSetupNoOneJarFile() throws Exception {
 
-        ArrayList<File> scanTargets = new ArrayList<File>();
-        scanTargets.add(new File(""));
+        ArrayList<String> scanTargets = new ArrayList<String>();
+        scanTargets.add((new File("")).getAbsolutePath());
 
         ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -232,14 +234,14 @@ public class ScanExecutorTest {
     @Test
     public void testSetupNoJavaExec() throws Exception {
 
-        ArrayList<File> scanTargets = new ArrayList<File>();
-        scanTargets.add(new File(""));
+        ArrayList<String> scanTargets = new ArrayList<String>();
+        scanTargets.add((new File("")).getAbsolutePath());
 
         ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -256,14 +258,14 @@ public class ScanExecutorTest {
     @Test
     public void testSetupJavaExecDoesNotExist() throws Exception {
 
-        ArrayList<File> scanTargets = new ArrayList<File>();
-        scanTargets.add(new File(""));
+        ArrayList<String> scanTargets = new ArrayList<String>();
+        scanTargets.add((new File("")).getAbsolutePath());
 
         ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -280,14 +282,14 @@ public class ScanExecutorTest {
     @Test
     public void testSetupNoMemoryProvided() throws Exception {
 
-        ArrayList<File> scanTargets = new ArrayList<File>();
-        scanTargets.add(new File(""));
+        ArrayList<String> scanTargets = new ArrayList<String>();
+        scanTargets.add((new File("")).getAbsolutePath());
 
         ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 return Result.SUCCESS;
             }
 
@@ -304,8 +306,8 @@ public class ScanExecutorTest {
     @Test
     public void testSetupValid() throws Exception {
 
-        ArrayList<File> scanTargets = new ArrayList<File>();
-        scanTargets.add(new File(""));
+        ArrayList<String> scanTargets = new ArrayList<String>();
+        scanTargets.add((new File("")).getAbsolutePath());
 
         final List<String> cmdList = new ArrayList<String>();
 
@@ -313,7 +315,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 cmdList.addAll(cmd);
                 return Result.SUCCESS;
             }
@@ -347,15 +349,15 @@ public class ScanExecutorTest {
         assertTrue(actualCmd, actualCmd.contains("--username"));
         assertTrue(actualCmd, actualCmd.contains("--password"));
         assertTrue(actualCmd, actualCmd.contains("--port"));
-        assertTrue(actualCmd, actualCmd.contains(scanTargets.get(0).getCanonicalPath()));
+        assertTrue(actualCmd, actualCmd.contains(scanTargets.get(0)));
 
     }
 
     @Test
     public void testSetupHubSupportsLogOption() throws Exception {
 
-        ArrayList<File> scanTargets = new ArrayList<File>();
-        scanTargets.add(new File(""));
+        ArrayList<String> scanTargets = new ArrayList<String>();
+        scanTargets.add((new File("")).getAbsolutePath());
 
         final List<String> cmdList = new ArrayList<String>();
 
@@ -363,7 +365,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 cmdList.addAll(cmd);
                 return Result.SUCCESS;
             }
@@ -399,15 +401,15 @@ public class ScanExecutorTest {
         assertTrue(actualCmd, actualCmd.contains("--password"));
         assertTrue(actualCmd, actualCmd.contains("--port"));
         assertTrue(actualCmd, actualCmd.contains("--logDir"));
-        assertTrue(actualCmd, actualCmd.contains(scanTargets.get(0).getCanonicalPath()));
+        assertTrue(actualCmd, actualCmd.contains(scanTargets.get(0)));
 
     }
 
     @Test
     public void testSetupProxySettings() throws Exception {
 
-        ArrayList<File> scanTargets = new ArrayList<File>();
-        scanTargets.add(new File(""));
+        ArrayList<String> scanTargets = new ArrayList<String>();
+        scanTargets.add((new File("")).getAbsolutePath());
 
         final List<String> cmdList = new ArrayList<String>();
 
@@ -415,7 +417,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
                 cmdList.addAll(cmd);
                 return Result.SUCCESS;
             }
@@ -452,8 +454,6 @@ public class ScanExecutorTest {
 
         assertTrue(actualCmd, actualCmd.contains("-Dhttp.proxyHost="));
         assertTrue(actualCmd, actualCmd.contains("-Dhttp.proxyPort="));
-        assertTrue(actualCmd, actualCmd.contains("-Dhttps.proxyHost="));
-        assertTrue(actualCmd, actualCmd.contains("-Dhttps.proxyPort="));
         assertTrue(actualCmd, actualCmd.contains("-Dhttp.nonProxyHosts="));
 
         assertTrue(actualCmd, actualCmd.contains("-Dhttp.proxyUser="));
@@ -466,7 +466,7 @@ public class ScanExecutorTest {
         assertTrue(actualCmd, actualCmd.contains("--username"));
         assertTrue(actualCmd, actualCmd.contains("--password"));
         assertTrue(actualCmd, actualCmd.contains("--port"));
-        assertTrue(actualCmd, actualCmd.contains(scanTargets.get(0).getCanonicalPath()));
+        assertTrue(actualCmd, actualCmd.contains(scanTargets.get(0)));
 
     }
 
