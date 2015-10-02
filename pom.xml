@@ -78,11 +78,11 @@
 	<distributionManagement>
 		<repository>
 			<id>bds-artifactory</id>
-			<url>http://artifactory.blackducksoftware.com:8081/artifactory/bds-jenkins-plugins</url>
+			<url>http://artifactory.blackducksoftware.com:8081/artifactory/integration</url>
 		</repository>
 		<snapshotRepository>
 			<id>artifactory.blackducksoftware.com</id>
-			<url>http://artifactory.blackducksoftware.com:8081/artifactory/bds-jenkins-plugins-snapshot</url>
+			<url>http://artifactory.blackducksoftware.com:8081/artifactory/integration-snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 
