@@ -14,8 +14,7 @@ import org.restlet.resource.ClientResource;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.response.mapping.EntityItem;
-import com.blackducksoftware.integration.hub.response.mapping.EntityTypeEnum;
+import com.blackducksoftware.integration.hub.response.mapping.AssetReferenceItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanLocationResults;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
@@ -124,9 +123,8 @@ public class ScanLocationHandler {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                logger.info(sb.toString());
+                logger.debug(sb.toString());
                 Gson gson = new GsonBuilder().create();
-
                 results = gson.fromJson(sb.toString(), ScanLocationResults.class);
 
             } else {
@@ -187,10 +185,13 @@ public class ScanLocationHandler {
 
         if (!scanMatch.getAssetReferenceList().isEmpty()) {
             boolean scanAlreadyMatched = false;
-            for (EntityItem assetReference : scanMatch.getAssetReferenceList()) {
-                if (assetReference.getEntityType() == EntityTypeEnum.RL.toString()) {
-                    String ownerId = assetReference.getEntityId();
-                    if (ownerId.equals(versionId)) {
+            for (AssetReferenceItem assetReference : scanMatch.getAssetReferenceList()) {
+                if (assetReference.getOwnerEntityKey() != null && StringUtils.isNotBlank(assetReference.getOwnerEntityKey().getEntityId())
+                        && assetReference.getOwnerEntityKey().getEntityId().equals(versionId)) {
+                    // The owner matches the version we want to map to
+                    if (assetReference.getAssetEntityKey() != null && StringUtils.isNotBlank(assetReference.getAssetEntityKey().getEntityId())
+                            && assetReference.getAssetEntityKey().getEntityId().equals(scanMatch.getId())) {
+                        // The asset Id matches the current scan Id, so this scan is already mapped to the version
                         scanAlreadyMatched = true;
                         break;
                     }

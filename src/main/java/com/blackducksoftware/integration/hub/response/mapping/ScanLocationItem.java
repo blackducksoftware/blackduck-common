@@ -18,7 +18,7 @@ public class ScanLocationItem {
 
     private String scanTime;
 
-    private List<EntityItem> assetReferenceList;
+    private List<AssetReferenceItem> assetReferenceList;
 
     public String getId() {
         return id;
@@ -76,11 +76,11 @@ public class ScanLocationItem {
         this.scanTime = scanTime;
     }
 
-    public List<EntityItem> getAssetReferenceList() {
+    public List<AssetReferenceItem> getAssetReferenceList() {
         return assetReferenceList;
     }
 
-    public void setAssetReferenceList(List<EntityItem> assetReferenceList) {
+    public void setAssetReferenceList(List<AssetReferenceItem> assetReferenceList) {
         this.assetReferenceList = assetReferenceList;
     }
 

@@ -37,7 +37,13 @@ public abstract class ScanExecutor {
 
     private boolean hubSupportLogOption;
 
-    private File workingDirectory;
+    private boolean cliSupportsMapping;
+
+    private String project;
+
+    private String version;
+
+    private String workingDirectory;
 
     private String proxyHost;
 
@@ -103,11 +109,35 @@ public abstract class ScanExecutor {
         this.hubSupportLogOption = hubSupportLogOption;
     }
 
-    public File getWorkingDirectory() {
+    public boolean doesCliSupportsMapping() {
+        return cliSupportsMapping;
+    }
+
+    public void setCliSupportsMapping(boolean cliSupportsMapping) {
+        this.cliSupportsMapping = cliSupportsMapping;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getWorkingDirectory() {
         return workingDirectory;
     }
 
-    public void setWorkingDirectory(File workingDirectory) {
+    public void setWorkingDirectory(String workingDirectory) {
         this.workingDirectory = workingDirectory;
     }
 
@@ -287,27 +317,38 @@ public abstract class ScanExecutor {
                     // The new dry run option
                     cmd.add("--selfTest");
                 }
-                // cmd.add("-v");
-                File logDirectory = null;
+                cmd.add("-v");
+                String logDirectoryPath = null;
 
                 if (doesHubSupportLogOption()) {
                     // Only add the logDir option if the Hub supports the logDir option
 
-                    logDirectory = new File(new File(getWorkingDirectory(), "HubScanLogs"), String.valueOf(buildNumber));
-                    // This log directory should never exist as a new one is created for each Build
-                    logDirectory.mkdirs();
+                    logDirectoryPath = getLogDirectoryPath();
                     // Need to only add this option if version 2.0.1 or later,
                     // this is the pro-active approach to the log problem
                     cmd.add("--logDir");
 
-                    cmd.add(logDirectory.getCanonicalPath());
+                    cmd.add(logDirectoryPath);
+                }
+
+                if (doesCliSupportsMapping() && StringUtils.isNotBlank(getProject()) && StringUtils.isNotBlank(getVersion())) {
+                    // Only add the project and release options if the Hub supports them
+
+                    // Need to only add this option if version 2.1.0 or later
+                    cmd.add("--project");
+
+                    cmd.add(getProject());
+
+                    cmd.add("--release");
+
+                    cmd.add(getVersion());
                 }
 
                 for (String target : scanTargets) {
                     cmd.add(target);
                 }
 
-                return executeScan(cmd, logDirectory);
+                return executeScan(cmd, logDirectoryPath);
 
             } catch (MalformedURLException e) {
                 throw new HubIntegrationException("The server URL provided was not a valid", e);
@@ -321,5 +362,20 @@ public abstract class ScanExecutor {
         }
     }
 
-    protected abstract Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException;
+    /**
+     * Should determine the path to the log directory to pass into the CLI. If the directory does not exist it should be
+     * created here.
+     *
+     * @return String
+     * @throws IOException
+     */
+    protected String getLogDirectoryPath() throws IOException {
+        File logDirectory = new File(new File(getWorkingDirectory(), "HubScanLogs"), String.valueOf(getBuildNumber()));
+        // This log directory should never exist as a new one is created for each Build
+        logDirectory.mkdirs();
+
+        return logDirectory.getCanonicalPath();
+    }
+
+    protected abstract Result executeScan(List<String> cmd, String logDirectoryPath) throws HubIntegrationException, InterruptedException;
 }

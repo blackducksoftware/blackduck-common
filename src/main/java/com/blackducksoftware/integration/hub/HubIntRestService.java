@@ -74,7 +74,9 @@ public class HubIntRestService {
         cleanUpOldProxySettings();
 
         if (!StringUtils.isBlank(proxyHost) && proxyPort > 0) {
-            logger.debug("Using Proxy : " + proxyHost + ", at Port : " + proxyPort);
+            if (logger != null) {
+                logger.debug("Using Proxy : " + proxyHost + ", at Port : " + proxyPort);
+            }
 
             System.setProperty("https.proxyHost", proxyHost);
             System.setProperty("https.proxyPort", Integer.toString(proxyPort));
@@ -450,6 +452,7 @@ public class HubIntRestService {
 
                         Gson gson = new GsonBuilder().create();
 
+                        logger.debug("Asset reference mapping object : " + gson.toJson(assetReference));
                         StringRepresentation stringRep = new StringRepresentation(gson.toJson(assetReference));
                         stringRep.setMediaType(MediaType.APPLICATION_JSON);
                         resource.post(stringRep);

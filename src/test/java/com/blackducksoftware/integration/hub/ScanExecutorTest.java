@@ -51,7 +51,7 @@ public class ScanExecutorTest {
         new ScanExecutor(null, null, null, null, null) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 // TODO Auto-generated function stub
                 return null;
             }
@@ -66,7 +66,7 @@ public class ScanExecutorTest {
         new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), null, null, null, null) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 // TODO Auto-generated function stub
                 return null;
             }
@@ -82,7 +82,7 @@ public class ScanExecutorTest {
                 null) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -97,7 +97,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), null, null) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -116,7 +116,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, null) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -133,7 +133,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -150,7 +150,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -169,7 +169,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -193,7 +193,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -217,7 +217,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -241,7 +241,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -265,7 +265,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 return null;
             }
 
@@ -289,7 +289,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 return Result.SUCCESS;
             }
 
@@ -315,7 +315,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 cmdList.addAll(cmd);
                 return Result.SUCCESS;
             }
@@ -365,7 +365,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 cmdList.addAll(cmd);
                 return Result.SUCCESS;
             }
@@ -417,7 +417,7 @@ public class ScanExecutorTest {
                 testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123) {
 
             @Override
-            protected Result executeScan(List<String> cmd, File logDirectory) throws HubIntegrationException, InterruptedException {
+            protected Result executeScan(List<String> cmd, String logDirectory) throws HubIntegrationException, InterruptedException {
                 cmdList.addAll(cmd);
                 return Result.SUCCESS;
             }
