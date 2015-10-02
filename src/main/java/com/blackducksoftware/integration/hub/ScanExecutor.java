@@ -175,7 +175,7 @@ public abstract class ScanExecutor {
         this.proxyPassword = proxyPassword;
     }
 
-    private boolean isConfiguredCorrectly(File scanExec, File oneJarPath, File javaExec) {
+    protected boolean isConfiguredCorrectly(File scanExec, File oneJarPath, File javaExec) {
         if (getLogger() == null) {
             System.out.println("Could not find a logger");
             return false;
