@@ -175,7 +175,7 @@ public abstract class ScanExecutor {
         this.proxyPassword = proxyPassword;
     }
 
-    protected boolean isConfiguredCorrectly(File scanExec, File oneJarPath, File javaExec) {
+    protected boolean isConfiguredCorrectly(String scanExec, String oneJarPath, String javaExec) {
         if (getLogger() == null) {
             System.out.println("Could not find a logger");
             return false;
@@ -185,9 +185,13 @@ public abstract class ScanExecutor {
             getLogger().error("Please provide the Hub scan CLI.");
             return false;
         }
-        else if (!scanExec.exists()) {
-            getLogger().error("The Hub scan CLI provided does not exist.");
-            return false;
+        else {
+            File scanExecFile = new File(scanExec);
+            if (!scanExecFile.exists()) {
+
+                getLogger().error("The Hub scan CLI provided does not exist.");
+                return false;
+            }
         }
 
         if (oneJarPath == null) {
@@ -199,9 +203,12 @@ public abstract class ScanExecutor {
             getLogger().error("Please provide the java home directory.");
             return false;
         }
-        else if (!javaExec.exists()) {
-            getLogger().error("The Java home provided does not exist.");
-            return false;
+        else {
+            File javaExecFile = new File(javaExec);
+            if (!javaExecFile.exists()) {
+                getLogger().error("The Java home provided does not exist.");
+                return false;
+            }
         }
 
         if (scanMemory <= 0) {
@@ -212,7 +219,7 @@ public abstract class ScanExecutor {
         return true;
     }
 
-    public Result setupAndRunScan(File scanExec, File oneJarPath, File javaExec) throws HubIntegrationException {
+    public Result setupAndRunScan(String scanExec, String oneJarPath, String javaExec) throws HubIntegrationException {
         if (isConfiguredCorrectly(scanExec, oneJarPath, javaExec)) {
 
             try {
@@ -220,13 +227,13 @@ public abstract class ScanExecutor {
                 URL url = new URL(getHubUrl());
                 List<String> cmd = new ArrayList<String>();
 
-                String javaPath = javaExec.getCanonicalPath();
+                String javaPath = javaExec;
 
                 getLogger().debug("Using this java installation : " + javaPath);
 
                 cmd.add(javaPath);
                 cmd.add("-Done-jar.silent=true");
-                cmd.add("-Done-jar.jar.path=" + oneJarPath.getCanonicalPath());
+                cmd.add("-Done-jar.jar.path=" + oneJarPath);
 
                 if (StringUtils.isNotBlank(getProxyHost()) && getProxyPort() != null) {
                     cmd.add("-Dhttp.proxyHost=" + getProxyHost());
@@ -252,7 +259,7 @@ public abstract class ScanExecutor {
                 cmd.add("-Xmx" + scanMemory + "m");
 
                 cmd.add("-jar");
-                cmd.add(scanExec.getCanonicalPath());
+                cmd.add(scanExec);
                 cmd.add("--scheme");
                 cmd.add(url.getProtocol());
                 cmd.add("--host");

@@ -200,7 +200,7 @@ public class ScanExecutorTest {
         };
         TestLogger logger = new TestLogger();
         executor.setLogger(logger);
-        Result result = executor.setupAndRunScan(new File("./Fake"), null, null);
+        Result result = executor.setupAndRunScan("./Fake", null, null);
         assertEquals(Result.FAILURE, result);
 
         String output = logger.getOutputString();
@@ -224,7 +224,7 @@ public class ScanExecutorTest {
         };
         TestLogger logger = new TestLogger();
         executor.setLogger(logger);
-        Result result = executor.setupAndRunScan(new File("."), null, null);
+        Result result = executor.setupAndRunScan(".", null, null);
         assertEquals(Result.FAILURE, result);
 
         String output = logger.getOutputString();
@@ -248,7 +248,7 @@ public class ScanExecutorTest {
         };
         TestLogger logger = new TestLogger();
         executor.setLogger(logger);
-        Result result = executor.setupAndRunScan(new File("."), new File("."), null);
+        Result result = executor.setupAndRunScan(".", ".", null);
         assertEquals(Result.FAILURE, result);
 
         String output = logger.getOutputString();
@@ -272,7 +272,7 @@ public class ScanExecutorTest {
         };
         TestLogger logger = new TestLogger();
         executor.setLogger(logger);
-        Result result = executor.setupAndRunScan(new File("."), new File("."), new File("./Fake"));
+        Result result = executor.setupAndRunScan(".", ".", "./Fake");
         assertEquals(Result.FAILURE, result);
 
         String output = logger.getOutputString();
@@ -296,7 +296,7 @@ public class ScanExecutorTest {
         };
         TestLogger logger = new TestLogger();
         executor.setLogger(logger);
-        Result result = executor.setupAndRunScan(new File("."), new File("."), new File("."));
+        Result result = executor.setupAndRunScan(".", ".", ".");
         assertEquals(Result.SUCCESS, result);
 
         String output = logger.getOutputString();
@@ -325,7 +325,7 @@ public class ScanExecutorTest {
         executor.setLogger(logger);
         executor.setScanMemory(8192);
 
-        Result result = executor.setupAndRunScan(new File("."), new File("."), new File("."));
+        Result result = executor.setupAndRunScan(".", ".", ".");
         assertEquals(Result.SUCCESS, result);
 
         String output = logger.getOutputString();
@@ -376,7 +376,7 @@ public class ScanExecutorTest {
         executor.setScanMemory(8192);
         executor.setHubSupportLogOption(true);
 
-        Result result = executor.setupAndRunScan(new File("."), new File("."), new File("."));
+        Result result = executor.setupAndRunScan(".", ".", ".");
         assertEquals(Result.SUCCESS, result);
 
         String output = logger.getOutputString();
@@ -434,7 +434,7 @@ public class ScanExecutorTest {
         executor.setProxyPassword(testProperties.getProperty("TEST_PROXY_PASSWORD_BASIC"));
         executor.setNoProxyHosts(noProxyHosts);
 
-        Result result = executor.setupAndRunScan(new File("."), new File("."), new File("."));
+        Result result = executor.setupAndRunScan(".", ".", ".");
         assertEquals(Result.SUCCESS, result);
 
         String output = logger.getOutputString();
