@@ -57,6 +57,8 @@ public abstract class ScanExecutor {
 
     private boolean isTest = false;
 
+    private boolean verboseRun;
+
     protected ScanExecutor(String hubUrl, String hubUsername, String hubPassword, List<String> scanTargets, Integer buildNumber) {
 
         if (StringUtils.isBlank(hubUrl)) {
@@ -163,6 +165,14 @@ public abstract class ScanExecutor {
 
     protected void setIsTest(Boolean isTest) {
         this.isTest = isTest;
+    }
+
+    public boolean isVerboseRun() {
+        return verboseRun;
+    }
+
+    public void setVerboseRun(boolean verboseRun) {
+        this.verboseRun = verboseRun;
     }
 
     public String getProxyHost() {
@@ -317,7 +327,10 @@ public abstract class ScanExecutor {
                     // The new dry run option
                     cmd.add("--selfTest");
                 }
-                cmd.add("-v");
+                if (isVerboseRun()) {
+                    cmd.add("-v");
+                }
+
                 String logDirectoryPath = null;
 
                 if (doesHubSupportLogOption()) {
