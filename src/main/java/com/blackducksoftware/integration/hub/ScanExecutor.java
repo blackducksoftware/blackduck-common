@@ -334,7 +334,7 @@ public abstract class ScanExecutor {
                 if (doesCliSupportsMapping() && StringUtils.isNotBlank(getProject()) && StringUtils.isNotBlank(getVersion())) {
                     // Only add the project and release options if the Hub supports them
 
-                    // Need to only add this option if version 2.1.0 or later
+                    // Need to only add this option if version 2.2.? or later
                     cmd.add("--project");
 
                     cmd.add(getProject());
