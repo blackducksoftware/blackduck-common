@@ -296,7 +296,7 @@ public class HubIntRestService {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                logger.info(sb.toString());
+                // logger.info(sb.toString());
                 Gson gson = new GsonBuilder().create();
                 return gson.fromJson(sb.toString(), ProjectItem.class);
 

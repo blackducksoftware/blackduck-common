@@ -123,7 +123,6 @@ public class ScanLocationHandler {
                     line = bufReader.readLine();
                 }
                 bufReader.close();
-                logger.debug(sb.toString());
                 Gson gson = new GsonBuilder().create();
                 results = gson.fromJson(sb.toString(), ScanLocationResults.class);
 
