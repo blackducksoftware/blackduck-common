@@ -110,17 +110,17 @@
 		<dependency>
 			<groupId>com.blackducksoftware.integration</groupId>
 			<artifactId>build-info</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>2.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.blackducksoftware.integration.maven.maven30</groupId>
 			<artifactId>build-info-recorder-mvn30</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>2.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.blackducksoftware.integration.maven.maven31</groupId>
 			<artifactId>build-info-recorder-mvn31</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>2.0.1</version>
 		</dependency>
 		
 		<dependency>
