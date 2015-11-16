@@ -3,9 +3,7 @@ package com.blackducksoftware.integration.hub;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.net.Authenticator;
 import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
@@ -18,6 +16,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.Context;
 import org.restlet.Response;
+import org.restlet.data.ChallengeRequest;
+import org.restlet.data.ChallengeResponse;
 import org.restlet.data.Cookie;
 import org.restlet.data.CookieSetting;
 import org.restlet.data.MediaType;
@@ -49,6 +49,10 @@ public class HubIntRestService {
     private final String baseUrl;
 
     private IntLogger logger;
+
+    private String proxyUsername;
+
+    private String proxyPassword;
 
     public HubIntRestService(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -84,17 +88,19 @@ public class HubIntRestService {
             System.setProperty("http.proxyPort", Integer.toString(proxyPort));
 
             if (!StringUtils.isBlank(proxyUsername) && !StringUtils.isBlank(proxyPassword)) {
+                this.proxyUsername = proxyUsername;
+                this.proxyPassword = proxyPassword;
 
-                // Java ignores http.proxyUser. Here's the workaround.
-                Authenticator.setDefault(new Authenticator() {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        if (getRequestorType() == RequestorType.PROXY) {
-                            return new PasswordAuthentication(proxyUsername, proxyPassword.toCharArray());
-                        }
-                        return null;
-                    }
-                });
+                // // Java ignores http.proxyUser. Here's the workaround.
+                // Authenticator.setDefault(new Authenticator() {
+                // @Override
+                // protected PasswordAuthentication getPasswordAuthentication() {
+                // if (getRequestorType() == RequestorType.PROXY) {
+                // return new PasswordAuthentication(proxyUsername, proxyPassword.toCharArray());
+                // }
+                // return null;
+                // }
+                // });
             }
         }
         if (noProxyHosts != null && !noProxyHosts.isEmpty()) {
@@ -123,8 +129,11 @@ public class HubIntRestService {
      */
     private ClientResource createClientResource(String url) throws URISyntaxException {
         url = url.replaceAll(" ", "%20");
-        ClientResource resource = new ClientResource(new Context(), new URI(url));
+        Context context = new Context();
+        context.getParameters().add("socketTimeout", "10000");
+        // Should throw timeout exception after 10 seconds
 
+        ClientResource resource = new ClientResource(context, new URI(url));
         return resource;
     }
 
@@ -141,32 +150,32 @@ public class HubIntRestService {
         System.clearProperty("http.proxyPort");
         System.clearProperty("http.nonProxyHosts");
 
-        // Authentication caching workaround
-        // This is not working to remove the authentication cache
-        sun.net.www.protocol.http.AuthCache cache = new sun.net.www.protocol.http.AuthCache() {
-
-            @Override
-            public sun.net.www.protocol.http.AuthCacheValue get(String arg0, String arg1) {
-                return null;
-            }
-
-            @Override
-            public void put(String arg0, sun.net.www.protocol.http.AuthCacheValue arg1) {
-            }
-
-            @Override
-            public void remove(String arg0, sun.net.www.protocol.http.AuthCacheValue arg1) {
-            }
-
-        };
-        sun.net.www.protocol.http.AuthCacheValue.setAuthCache(cache);
-
-        Authenticator.setDefault(new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return null;
-            }
-        });
+        // // Authentication caching workaround
+        // // This is not working to remove the authentication cache
+        // sun.net.www.protocol.http.AuthCache cache = new sun.net.www.protocol.http.AuthCache() {
+        //
+        // @Override
+        // public sun.net.www.protocol.http.AuthCacheValue get(String arg0, String arg1) {
+        // return null;
+        // }
+        //
+        // @Override
+        // public void put(String arg0, sun.net.www.protocol.http.AuthCacheValue arg1) {
+        // }
+        //
+        // @Override
+        // public void remove(String arg0, sun.net.www.protocol.http.AuthCacheValue arg1) {
+        // }
+        //
+        // };
+        // sun.net.www.protocol.http.AuthCacheValue.setAuthCache(cache);
+        //
+        // Authenticator.setDefault(new Authenticator() {
+        // @Override
+        // protected PasswordAuthentication getPasswordAuthentication() {
+        // return null;
+        // }
+        // });
     }
 
     /**
@@ -182,35 +191,78 @@ public class HubIntRestService {
      * @throws HubIntegrationException
      * @throws URISyntaxException
      */
-    public int setCookies(String hubUserName, String hubPassword) throws HubIntegrationException, URISyntaxException {
+    public int setCookies(String hubUserName, String hubPassword) throws HubIntegrationException, URISyntaxException, BDRestException {
+        return setCookies(hubUserName, hubPassword, null, 0);
+    }
+
+    /**
+     * Gets the cookie for the Authorized connection to the Hub server. Returns the response code from the connection.
+     *
+     * @param hubUserName
+     *            String the Username for the Hub server
+     * @param hubPassword
+     *            String the Password for the Hub server
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @return int Status code
+     * @throws MalformedURLException
+     * @throws HubIntegrationException
+     * @throws URISyntaxException
+     * @throws BDRestException
+     */
+    private int setCookies(String hubUserName, String hubPassword, ChallengeRequest proxyChallengeRequest, Integer attempt) throws HubIntegrationException,
+            URISyntaxException, BDRestException {
         String url = getBaseUrl() + "/j_spring_security_check?j_username=" + hubUserName + "&j_password=" + hubPassword;
         ClientResource resource = createClientResource(url);
-        resource.setMethod(Method.POST);
-        EmptyRepresentation rep = new EmptyRepresentation();
 
-        resource.post(rep);
-        if (cookies == null) {
-            Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
-            if (cookieSettings == null || cookieSettings.size() == 0) {
-                throw new HubIntegrationException("Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
-            }
-
-            Series<Cookie> requestCookies = resource.getRequest().getCookies();
-            for (CookieSetting ck : cookieSettings) {
-                Cookie cookie = new Cookie();
-                cookie.setName(ck.getName());
-                cookie.setDomain(ck.getDomain());
-                cookie.setPath(ck.getPath());
-                cookie.setValue(ck.getValue());
-                cookie.setVersion(ck.getVersion());
-                requestCookies.add(cookie);
-            }
-
-            cookies = requestCookies;
+        if (proxyChallengeRequest != null) {
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
+                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
+                    0L));
         }
-        // else {
-        // cookies already set
-        // }
+        resource.setMethod(Method.POST);
+        try {
+
+            EmptyRepresentation rep = new EmptyRepresentation();
+
+            resource.post(rep);
+            if (cookies == null) {
+                Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
+                if (cookieSettings == null || cookieSettings.size() == 0) {
+                    throw new HubIntegrationException("Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
+                }
+
+                Series<Cookie> requestCookies = resource.getRequest().getCookies();
+                for (CookieSetting ck : cookieSettings) {
+                    Cookie cookie = new Cookie();
+                    cookie.setName(ck.getName());
+                    cookie.setDomain(ck.getDomain());
+                    cookie.setPath(ck.getPath());
+                    cookie.setValue(ck.getValue());
+                    cookie.setVersion(ck.getVersion());
+                    requestCookies.add(cookie);
+                }
+
+                cookies = requestCookies;
+            }
+            // else {
+            // cookies already set
+            // }
+        } catch (ResourceException e) {
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    return setCookies(hubUserName, hubPassword, newChallengeRequest, attempt++);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
+            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+        }
 
         return resource.getResponse().getStatus().getCode();
     }
@@ -224,6 +276,7 @@ public class HubIntRestService {
      *
      * @param hubProjectName
      *            String
+     *
      * @return List<<AutoCompleteItem>>
      * @throws IOException
      * @throws BDRestException
@@ -231,9 +284,35 @@ public class HubIntRestService {
      */
     public List<AutoCompleteItem> getProjectMatches(String hubProjectName) throws IOException,
             BDRestException, URISyntaxException {
+
+        return getProjectMatches(hubProjectName, null, 0);
+    }
+
+    /**
+     * Retrieves a list of Hub Projects that may match the hubProjectName
+     *
+     * @param hubProjectName
+     *            String
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @return List<<AutoCompleteItem>>
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    private List<AutoCompleteItem> getProjectMatches(String hubProjectName, ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException,
+            BDRestException, URISyntaxException {
         // hubProjectName = URLEncoder.encode(hubProjectName, "UTF-8");
         String url = getBaseUrl() + "/api/v1/autocomplete/PROJECT?text=" + hubProjectName + "&limit=30&ownership=0";
         ClientResource resource = createClientResource(url);
+        if (proxyChallengeRequest != null) {
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
+                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
+                    0L));
+        }
         try {
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.GET);
@@ -260,8 +339,18 @@ public class HubIntRestService {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
         } catch (ResourceException e) {
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    return getProjectMatches(hubProjectName, newChallengeRequest, attempt++);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
             throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
+
     }
 
     /**
@@ -269,6 +358,7 @@ public class HubIntRestService {
      *
      * @param projectId
      *            String
+     *
      * @return ProjectItem
      * @throws IOException
      * @throws BDRestException
@@ -276,9 +366,34 @@ public class HubIntRestService {
      */
     public ProjectItem getProjectById(String projectId) throws IOException,
             BDRestException, URISyntaxException {
+        return getProjectById(projectId, null, 0);
+    }
+
+    /**
+     * Gets the Hub Project that is specified by the projectId
+     *
+     * @param projectId
+     *            String
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @return ProjectItem
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    private ProjectItem getProjectById(String projectId, ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException,
+            BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/projects/" + projectId;
         ClientResource resource = createClientResource(url);
+        if (proxyChallengeRequest != null) {
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
+                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
+                    0L));
+        }
         try {
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.GET);
@@ -304,6 +419,15 @@ public class HubIntRestService {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
         } catch (ResourceException e) {
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    return getProjectById(projectId, newChallengeRequest, attempt++);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
             throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
     }
@@ -313,15 +437,42 @@ public class HubIntRestService {
      *
      * @param projectName
      *            String
+     *
      * @return
      * @throws IOException
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    public ProjectItem getProjectByName(String projectName) throws IOException, BDRestException, URISyntaxException {
+    public ProjectItem getProjectByName(String projectName) throws IOException, BDRestException,
+            URISyntaxException {
+        return getProjectByName(projectName, null, 0);
+    }
+
+    /**
+     * Gets the Project that is specified by the projectName
+     *
+     * @param projectName
+     *            String
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @return
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    private ProjectItem getProjectByName(String projectName, ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException, BDRestException,
+            URISyntaxException {
         // hubProjectName = URLEncoder.encode(hubProjectName, "UTF-8");
         String url = getBaseUrl() + "/api/v1/projects?name=" + projectName;
         ClientResource resource = createClientResource(url);
+        if (proxyChallengeRequest != null) {
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
+                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
+                    0L));
+        }
         try {
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.GET);
@@ -346,6 +497,15 @@ public class HubIntRestService {
                 throw new BDRestException("This Project does not exist or there is a problem connecting to the Hub server", resource);
             }
         } catch (ResourceException e) {
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    return getProjectByName(projectName, newChallengeRequest, attempt++);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
             throw new BDRestException("This Project does not exist or there is a problem connecting to the Hub server", e, resource);
         }
     }
@@ -361,6 +521,7 @@ public class HubIntRestService {
      *            List<<String>>
      * @param versionId
      *            String
+     *
      * @return Map<<String, Boolean>>
      * @throws UnknownHostException
      * @throws InterruptedException
@@ -371,6 +532,37 @@ public class HubIntRestService {
      */
     public Map<String, Boolean> getScanLocationIds(String hostname, List<String>
             scanTargets, String versionId)
+            throws UnknownHostException,
+            InterruptedException, BDRestException, HubIntegrationException, URISyntaxException {
+        return getScanLocationIds(hostname, scanTargets, versionId, null, 0);
+    }
+
+    /**
+     * Gets the scan Id for each scan target, it searches the list of scans and gets the latest scan Id for the scan
+     * matching the hostname and path.
+     * Returns a Map of scan Id's, and a Boolean to mark if that has already been mapped to this version or not
+     *
+     * @param hostname
+     *            String
+     * @param scanTargets
+     *            List<<String>>
+     * @param versionId
+     *            String
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @return Map<<String, Boolean>>
+     * @throws UnknownHostException
+     * @throws InterruptedException
+     * @throws BDRestException
+     * @throws HubIntegrationException
+     * @throws URISyntaxException
+     * @throws MalformedURLException
+     */
+    private Map<String, Boolean> getScanLocationIds(String hostname, List<String>
+            scanTargets, String versionId, ChallengeRequest proxyChallengeRequest, Integer attempt)
             throws UnknownHostException,
             InterruptedException, BDRestException, HubIntegrationException, URISyntaxException {
         HashMap<String, Boolean> scanLocationIds = new HashMap<String, Boolean>();
@@ -393,6 +585,12 @@ public class HubIntRestService {
                                 "'");
 
                 resource = createClientResource(url);
+                if (proxyChallengeRequest != null) {
+                    resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword
+                            .toCharArray(),
+                            proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
+                            0L));
+                }
 
                 resource.getRequest().setCookies(getCookies());
                 resource.setMethod(Method.GET);
@@ -403,6 +601,15 @@ public class HubIntRestService {
 
             }
         } catch (ResourceException e) {
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    return getScanLocationIds(hostname, scanTargets, versionId, newChallengeRequest, attempt++);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
             throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
         return scanLocationIds;
@@ -416,14 +623,43 @@ public class HubIntRestService {
      *            Map<<String, Boolean>>
      * @param versionId
      *            String
+     *
      * @throws BDRestException
      * @throws URISyntaxException
      * @throws MalformedURLException
      */
     public void mapScansToProjectVersion(Map<String, Boolean> scanLocationIds, String
             versionId) throws BDRestException, URISyntaxException {
+        mapScansToProjectVersion(scanLocationIds, versionId, null, 0);
+    }
+
+    /**
+     * If the scan Id has not already been mapped to the Version then it will make that mapping, otherwise it will not
+     * perform the mapping.
+     *
+     * @param scanLocationIds
+     *            Map<<String, Boolean>>
+     * @param versionId
+     *            String
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @throws BDRestException
+     * @throws URISyntaxException
+     * @throws MalformedURLException
+     */
+    private void mapScansToProjectVersion(Map<String, Boolean> scanLocationIds, String
+            versionId, ChallengeRequest proxyChallengeRequest, Integer attempt) throws BDRestException, URISyntaxException {
         String url = getBaseUrl() + "/api/v1/assetreferences";
         ClientResource resource = createClientResource(url);
+        if (proxyChallengeRequest != null) {
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword
+                    .toCharArray(),
+                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
+                    0L));
+        }
         try {
             if (!scanLocationIds.isEmpty()) {
                 for (Entry<String, Boolean> scanId : scanLocationIds.entrySet()) {
@@ -479,6 +715,15 @@ public class HubIntRestService {
                 logger.debug("Could not find any scan Id's to map to the Version.");
             }
         } catch (ResourceException e) {
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    mapScansToProjectVersion(scanLocationIds, versionId, newChallengeRequest, attempt++);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
             throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
 
@@ -489,6 +734,7 @@ public class HubIntRestService {
      *
      * @param projectId
      *            String
+     *
      * @return List<<ReleaseItem>>
      * @throws IOException
      * @throws BDRestException
@@ -496,9 +742,35 @@ public class HubIntRestService {
      */
     public List<ReleaseItem> getVersionsForProject(String projectId) throws IOException,
             BDRestException, URISyntaxException {
+        return getVersionsForProject(projectId, null, 0);
+    }
+
+    /**
+     * Gets the list of Versions for the specified Project
+     *
+     * @param projectId
+     *            String
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @return List<<ReleaseItem>>
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    private List<ReleaseItem> getVersionsForProject(String projectId, ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException,
+            BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/projects/" + projectId + "/releases";
         ClientResource resource = createClientResource(url);
+        if (proxyChallengeRequest != null) {
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword
+                    .toCharArray(),
+                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
+                    0L));
+        }
         try {
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.GET);
@@ -527,6 +799,15 @@ public class HubIntRestService {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
         } catch (ResourceException e) {
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    return getVersionsForProject(projectId, newChallengeRequest, attempt++);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
             throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
     }
@@ -536,15 +817,43 @@ public class HubIntRestService {
      *
      * @param projectName
      *            String
+     *
      * @return (String) ProjectId
      * @throws IOException
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    public String createHubProject(String projectName) throws IOException, BDRestException, URISyntaxException {
+    public String createHubProject(String projectName) throws IOException, BDRestException,
+            URISyntaxException {
+        return createHubProject(projectName, null, 0);
+    }
+
+    /**
+     * Creates a Hub Project with the specified name.
+     *
+     * @param projectName
+     *            String
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @return (String) ProjectId
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    private String createHubProject(String projectName, ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException, BDRestException,
+            URISyntaxException {
         // projectName = URLEncoder.encode(projectName, "UTF-8");
         String url = getBaseUrl() + "/api/v1/projects";
         ClientResource resource = createClientResource(url);
+        if (proxyChallengeRequest != null) {
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword
+                    .toCharArray(),
+                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
+                    0L));
+        }
         try {
             resource.getRequest().setCookies(getCookies());
             resource.setMethod(Method.POST);
@@ -575,9 +884,19 @@ public class HubIntRestService {
                 return project.getId();
 
             } else {
+
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
         } catch (ResourceException e) {
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    return createHubProject(projectName, newChallengeRequest, attempt++);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
             throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
 
@@ -601,9 +920,43 @@ public class HubIntRestService {
      */
     public String createHubVersion(String projectVersion, String projectId, String phase, String dist) throws
             IOException, BDRestException, URISyntaxException {
+        return createHubVersion(projectVersion, projectId, phase, dist, null, 0);
+    }
+
+    /**
+     * Creates a new Version in the Project specified, using the phase and distribution provided
+     *
+     * @param projectVersion
+     *            String
+     * @param projectId
+     *            String
+     * @param phase
+     *            String
+     * @param dist
+     *            String
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @return (String) VersionId
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    private String createHubVersion(String projectVersion, String projectId, String phase, String dist, ChallengeRequest proxyChallengeRequest, Integer attempt)
+            throws
+            IOException, BDRestException, URISyntaxException {
         // projectVersion = URLEncoder.encode(projectVersion, "UTF-8");
         String url = getBaseUrl() + "/api/v1/releases";
         ClientResource resource = createClientResource(url);
+
+        if (proxyChallengeRequest != null) {
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
+                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
+                    0L));
+        }
+
         int responseCode;
         try {
             ReleaseItem newRelease = new ReleaseItem();
@@ -641,6 +994,15 @@ public class HubIntRestService {
             }
 
         } catch (ResourceException e) {
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    return createHubVersion(projectVersion, projectId, phase, dist, newChallengeRequest, attempt++);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
             throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
     }
@@ -654,9 +1016,31 @@ public class HubIntRestService {
      * @throws URISyntaxException
      */
     public String getHubVersion() throws IOException, BDRestException, URISyntaxException {
+        return getHubVersion(null, 0);
+    }
+
+    /**
+     * Retrieves the version of the Hub server
+     *
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @return String
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    private String getHubVersion(ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException, BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/current-version";
         ClientResource resource = createClientResource(url);
+        if (proxyChallengeRequest != null) {
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
+                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
+                    0L));
+        }
         int responseCode = 0;
         try {
             resource.getRequest().setCookies(getCookies());
@@ -671,7 +1055,16 @@ public class HubIntRestService {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
         } catch (ResourceException e) {
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, e, resource);
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    return getHubVersion(newChallengeRequest, attempt++);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
+            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: ", e, resource);
         }
     }
 
@@ -680,15 +1073,46 @@ public class HubIntRestService {
      *
      * @param version
      *            String
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
      * @return VersionComparison
      * @throws IOException
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    public VersionComparison compareWithHubVersion(String version) throws IOException, BDRestException, URISyntaxException {
+    public VersionComparison compareWithHubVersion(String version) throws IOException,
+            BDRestException, URISyntaxException {
+        return compareWithHubVersion(version, null, 0);
+    }
+
+    /**
+     * Compares the specified version with the actual version of the Hub server.
+     *
+     * @param version
+     *            String
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @return VersionComparison
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    private VersionComparison compareWithHubVersion(String version, ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException,
+            BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/current-version-comparison?version=" + version;
         ClientResource resource = createClientResource(url);
+        if (proxyChallengeRequest != null) {
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
+                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
+                    0L));
+        }
         int responseCode = 0;
         try {
             resource.getRequest().setCookies(getCookies());
@@ -715,7 +1139,16 @@ public class HubIntRestService {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
         } catch (ResourceException e) {
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, e, resource);
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    return compareWithHubVersion(version, newChallengeRequest, attempt++);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
+            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: ", e, resource);
         }
     }
 
