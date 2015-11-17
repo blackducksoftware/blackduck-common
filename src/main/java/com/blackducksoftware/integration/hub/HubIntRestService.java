@@ -3,10 +3,13 @@ package com.blackducksoftware.integration.hub;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.Authenticator;
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,16 +94,17 @@ public class HubIntRestService {
                 this.proxyUsername = proxyUsername;
                 this.proxyPassword = proxyPassword;
 
-                // // Java ignores http.proxyUser. Here's the workaround.
-                // Authenticator.setDefault(new Authenticator() {
-                // @Override
-                // protected PasswordAuthentication getPasswordAuthentication() {
-                // if (getRequestorType() == RequestorType.PROXY) {
-                // return new PasswordAuthentication(proxyUsername, proxyPassword.toCharArray());
-                // }
-                // return null;
-                // }
-                // });
+                // Java ignores http.proxyUser. Here's the workaround.
+                Authenticator.setDefault(new Authenticator() {
+                    // Need this to support digest authentication
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        if (getRequestorType() == RequestorType.PROXY) {
+                            return new PasswordAuthentication(proxyUsername, proxyPassword.toCharArray());
+                        }
+                        return null;
+                    }
+                });
             }
         }
         if (noProxyHosts != null && !noProxyHosts.isEmpty()) {
@@ -130,7 +134,7 @@ public class HubIntRestService {
     private ClientResource createClientResource(String url) throws URISyntaxException {
         url = url.replaceAll(" ", "%20");
         Context context = new Context();
-        context.getParameters().add("socketTimeout", "10000");
+        context.getParameters().add("socketTimeout", "15000");
         // Should throw timeout exception after 10 seconds
 
         ClientResource resource = new ClientResource(context, new URI(url));
@@ -150,32 +154,60 @@ public class HubIntRestService {
         System.clearProperty("http.proxyPort");
         System.clearProperty("http.nonProxyHosts");
 
-        // // Authentication caching workaround
-        // // This is not working to remove the authentication cache
-        // sun.net.www.protocol.http.AuthCache cache = new sun.net.www.protocol.http.AuthCache() {
-        //
-        // @Override
-        // public sun.net.www.protocol.http.AuthCacheValue get(String arg0, String arg1) {
-        // return null;
-        // }
-        //
-        // @Override
-        // public void put(String arg0, sun.net.www.protocol.http.AuthCacheValue arg1) {
-        // }
-        //
-        // @Override
-        // public void remove(String arg0, sun.net.www.protocol.http.AuthCacheValue arg1) {
-        // }
-        //
-        // };
-        // sun.net.www.protocol.http.AuthCacheValue.setAuthCache(cache);
-        //
-        // Authenticator.setDefault(new Authenticator() {
-        // @Override
-        // protected PasswordAuthentication getPasswordAuthentication() {
-        // return null;
-        // }
-        // });
+        // Authentication caching workaround
+        // This is not working to remove the authentication cache
+        sun.net.www.protocol.http.AuthCache cache = new sun.net.www.protocol.http.AuthCache() {
+
+            @Override
+            public sun.net.www.protocol.http.AuthCacheValue get(String arg0, String arg1) {
+                return null;
+            }
+
+            @Override
+            public void put(String arg0, sun.net.www.protocol.http.AuthCacheValue arg1) {
+            }
+
+            @Override
+            public void remove(String arg0, sun.net.www.protocol.http.AuthCacheValue arg1) {
+            }
+
+        };
+        sun.net.www.protocol.http.AuthCacheValue.setAuthCache(cache);
+
+        Authenticator.setDefault(new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return null;
+            }
+        });
+    }
+
+    public void parseChallengeRequestRawValue(ChallengeRequest proxyChallengeRequest) {
+        if (proxyChallengeRequest == null || StringUtils.isBlank(proxyChallengeRequest.getRawValue())) {
+            return;
+        }
+        String rawValue = proxyChallengeRequest.getRawValue();
+
+        String[] splitRawValue = rawValue.split(",");
+        for (String currentValue : splitRawValue) {
+            currentValue = currentValue.trim();
+            if (StringUtils.isBlank(proxyChallengeRequest.getRealm()) && currentValue.startsWith("realm=")) {
+                String realm = currentValue.substring("realm=".length());
+                proxyChallengeRequest.setRealm(realm);
+            } else if (StringUtils.isBlank(proxyChallengeRequest.getServerNonce()) && currentValue.startsWith("nonce=")) {
+                String nonce = currentValue.substring("nonce=".length());
+                proxyChallengeRequest.setServerNonce(nonce);
+            } else if ((proxyChallengeRequest.getQualityOptions() == null || proxyChallengeRequest.getQualityOptions().isEmpty())
+                    && currentValue.startsWith("qop=")) {
+                String qop = currentValue.substring("qop=".length());
+                List<String> qualityOptions = new ArrayList<String>();
+                qualityOptions.add(qop);
+                proxyChallengeRequest.setQualityOptions(qualityOptions);
+            } else if (currentValue.startsWith("stale=")) {
+                String stale = currentValue.substring("stale=".length());
+                proxyChallengeRequest.setStale(Boolean.valueOf(stale));
+            }
+        }
     }
 
     /**
@@ -213,15 +245,19 @@ public class HubIntRestService {
      * @throws URISyntaxException
      * @throws BDRestException
      */
-    private int setCookies(String hubUserName, String hubPassword, ChallengeRequest proxyChallengeRequest, Integer attempt) throws HubIntegrationException,
+    private int setCookies(String hubUserName, String hubPassword, ChallengeRequest proxyChallengeRequest, int attempt) throws HubIntegrationException,
             URISyntaxException, BDRestException {
         String url = getBaseUrl() + "/j_spring_security_check?j_username=" + hubUserName + "&j_password=" + hubPassword;
         ClientResource resource = createClientResource(url);
 
         if (proxyChallengeRequest != null) {
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
-                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
-                    0L));
+            // This should replace the authenticator for the proxy authentication
+            // BUT it doesn't work for Digest authentication
+            parseChallengeRequestRawValue(proxyChallengeRequest);
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                    0, 0L));
         }
         resource.setMethod(Method.POST);
         try {
@@ -256,7 +292,7 @@ public class HubIntRestService {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
-                    return setCookies(hubUserName, hubPassword, newChallengeRequest, attempt++);
+                    return setCookies(hubUserName, hubPassword, newChallengeRequest, attempt + 1);
                 } else {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
@@ -303,15 +339,19 @@ public class HubIntRestService {
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    private List<AutoCompleteItem> getProjectMatches(String hubProjectName, ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException,
+    private List<AutoCompleteItem> getProjectMatches(String hubProjectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
             BDRestException, URISyntaxException {
         // hubProjectName = URLEncoder.encode(hubProjectName, "UTF-8");
         String url = getBaseUrl() + "/api/v1/autocomplete/PROJECT?text=" + hubProjectName + "&limit=30&ownership=0";
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
-                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
-                    0L));
+            // This should replace the authenticator for the proxy authentication
+            // BUT it doesn't work for Digest authentication
+            parseChallengeRequestRawValue(proxyChallengeRequest);
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                    0, 0L));
         }
         try {
             resource.getRequest().setCookies(getCookies());
@@ -343,7 +383,7 @@ public class HubIntRestService {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
-                    return getProjectMatches(hubProjectName, newChallengeRequest, attempt++);
+                    return getProjectMatches(hubProjectName, newChallengeRequest, attempt + 1);
                 } else {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
@@ -384,15 +424,19 @@ public class HubIntRestService {
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    private ProjectItem getProjectById(String projectId, ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException,
+    private ProjectItem getProjectById(String projectId, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
             BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/projects/" + projectId;
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
-                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
-                    0L));
+            // This should replace the authenticator for the proxy authentication
+            // BUT it doesn't work for Digest authentication
+            parseChallengeRequestRawValue(proxyChallengeRequest);
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                    0, 0L));
         }
         try {
             resource.getRequest().setCookies(getCookies());
@@ -423,7 +467,7 @@ public class HubIntRestService {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
-                    return getProjectById(projectId, newChallengeRequest, attempt++);
+                    return getProjectById(projectId, newChallengeRequest, attempt + 1);
                 } else {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
@@ -463,15 +507,19 @@ public class HubIntRestService {
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    private ProjectItem getProjectByName(String projectName, ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException, BDRestException,
+    private ProjectItem getProjectByName(String projectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException,
             URISyntaxException {
         // hubProjectName = URLEncoder.encode(hubProjectName, "UTF-8");
         String url = getBaseUrl() + "/api/v1/projects?name=" + projectName;
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
-                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
-                    0L));
+            // This should replace the authenticator for the proxy authentication
+            // BUT it doesn't work for Digest authentication
+            parseChallengeRequestRawValue(proxyChallengeRequest);
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                    0, 0L));
         }
         try {
             resource.getRequest().setCookies(getCookies());
@@ -501,7 +549,7 @@ public class HubIntRestService {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
-                    return getProjectByName(projectName, newChallengeRequest, attempt++);
+                    return getProjectByName(projectName, newChallengeRequest, attempt + 1);
                 } else {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
@@ -562,7 +610,7 @@ public class HubIntRestService {
      * @throws MalformedURLException
      */
     private Map<String, Boolean> getScanLocationIds(String hostname, List<String>
-            scanTargets, String versionId, ChallengeRequest proxyChallengeRequest, Integer attempt)
+            scanTargets, String versionId, ChallengeRequest proxyChallengeRequest, int attempt)
             throws UnknownHostException,
             InterruptedException, BDRestException, HubIntegrationException, URISyntaxException {
         HashMap<String, Boolean> scanLocationIds = new HashMap<String, Boolean>();
@@ -586,10 +634,13 @@ public class HubIntRestService {
 
                 resource = createClientResource(url);
                 if (proxyChallengeRequest != null) {
-                    resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword
-                            .toCharArray(),
-                            proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
-                            0L));
+                    // This should replace the authenticator for the proxy authentication
+                    // BUT it doesn't work for Digest authentication
+                    parseChallengeRequestRawValue(proxyChallengeRequest);
+                    resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                            proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                            null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                            0, 0L));
                 }
 
                 resource.getRequest().setCookies(getCookies());
@@ -605,7 +656,7 @@ public class HubIntRestService {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
-                    return getScanLocationIds(hostname, scanTargets, versionId, newChallengeRequest, attempt++);
+                    return getScanLocationIds(hostname, scanTargets, versionId, newChallengeRequest, attempt + 1);
                 } else {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
@@ -651,14 +702,17 @@ public class HubIntRestService {
      * @throws MalformedURLException
      */
     private void mapScansToProjectVersion(Map<String, Boolean> scanLocationIds, String
-            versionId, ChallengeRequest proxyChallengeRequest, Integer attempt) throws BDRestException, URISyntaxException {
+            versionId, ChallengeRequest proxyChallengeRequest, int attempt) throws BDRestException, URISyntaxException {
         String url = getBaseUrl() + "/api/v1/assetreferences";
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword
-                    .toCharArray(),
-                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
-                    0L));
+            // This should replace the authenticator for the proxy authentication
+            // BUT it doesn't work for Digest authentication
+            parseChallengeRequestRawValue(proxyChallengeRequest);
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                    0, 0L));
         }
         try {
             if (!scanLocationIds.isEmpty()) {
@@ -719,7 +773,7 @@ public class HubIntRestService {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
-                    mapScansToProjectVersion(scanLocationIds, versionId, newChallengeRequest, attempt++);
+                    mapScansToProjectVersion(scanLocationIds, versionId, newChallengeRequest, attempt + 1);
                 } else {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
@@ -760,16 +814,19 @@ public class HubIntRestService {
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    private List<ReleaseItem> getVersionsForProject(String projectId, ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException,
+    private List<ReleaseItem> getVersionsForProject(String projectId, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
             BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/projects/" + projectId + "/releases";
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword
-                    .toCharArray(),
-                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
-                    0L));
+            // This should replace the authenticator for the proxy authentication
+            // BUT it doesn't work for Digest authentication
+            parseChallengeRequestRawValue(proxyChallengeRequest);
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                    0, 0L));
         }
         try {
             resource.getRequest().setCookies(getCookies());
@@ -803,7 +860,7 @@ public class HubIntRestService {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
-                    return getVersionsForProject(projectId, newChallengeRequest, attempt++);
+                    return getVersionsForProject(projectId, newChallengeRequest, attempt + 1);
                 } else {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
@@ -843,16 +900,19 @@ public class HubIntRestService {
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    private String createHubProject(String projectName, ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException, BDRestException,
+    private String createHubProject(String projectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException,
             URISyntaxException {
         // projectName = URLEncoder.encode(projectName, "UTF-8");
         String url = getBaseUrl() + "/api/v1/projects";
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword
-                    .toCharArray(),
-                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
-                    0L));
+            // This should replace the authenticator for the proxy authentication
+            // BUT it doesn't work for Digest authentication
+            parseChallengeRequestRawValue(proxyChallengeRequest);
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                    0, 0L));
         }
         try {
             resource.getRequest().setCookies(getCookies());
@@ -892,7 +952,7 @@ public class HubIntRestService {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
-                    return createHubProject(projectName, newChallengeRequest, attempt++);
+                    return createHubProject(projectName, newChallengeRequest, attempt + 1);
                 } else {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
@@ -944,7 +1004,7 @@ public class HubIntRestService {
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    private String createHubVersion(String projectVersion, String projectId, String phase, String dist, ChallengeRequest proxyChallengeRequest, Integer attempt)
+    private String createHubVersion(String projectVersion, String projectId, String phase, String dist, ChallengeRequest proxyChallengeRequest, int attempt)
             throws
             IOException, BDRestException, URISyntaxException {
         // projectVersion = URLEncoder.encode(projectVersion, "UTF-8");
@@ -952,9 +1012,13 @@ public class HubIntRestService {
         ClientResource resource = createClientResource(url);
 
         if (proxyChallengeRequest != null) {
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
-                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
-                    0L));
+            // This should replace the authenticator for the proxy authentication
+            // BUT it doesn't work for Digest authentication
+            parseChallengeRequestRawValue(proxyChallengeRequest);
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                    0, 0L));
         }
 
         int responseCode;
@@ -998,7 +1062,7 @@ public class HubIntRestService {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
-                    return createHubVersion(projectVersion, projectId, phase, dist, newChallengeRequest, attempt++);
+                    return createHubVersion(projectVersion, projectId, phase, dist, newChallengeRequest, attempt + 1);
                 } else {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
@@ -1032,14 +1096,18 @@ public class HubIntRestService {
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    private String getHubVersion(ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException, BDRestException, URISyntaxException {
+    private String getHubVersion(ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/current-version";
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
-                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
-                    0L));
+            // This should replace the authenticator for the proxy authentication
+            // BUT it doesn't work for Digest authentication
+            parseChallengeRequestRawValue(proxyChallengeRequest);
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                    0, 0L));
         }
         int responseCode = 0;
         try {
@@ -1059,7 +1127,7 @@ public class HubIntRestService {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
-                    return getHubVersion(newChallengeRequest, attempt++);
+                    return getHubVersion(newChallengeRequest, attempt + 1);
                 } else {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
@@ -1103,15 +1171,19 @@ public class HubIntRestService {
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    private VersionComparison compareWithHubVersion(String version, ChallengeRequest proxyChallengeRequest, Integer attempt) throws IOException,
+    private VersionComparison compareWithHubVersion(String version, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
             BDRestException, URISyntaxException {
 
         String url = getBaseUrl() + "/api/v1/current-version-comparison?version=" + version;
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null, proxyUsername, proxyPassword.toCharArray(),
-                    proxyChallengeRequest.getDigestAlgorithm(), null, null, null, null, null, null, null, 0,
-                    0L));
+            // This should replace the authenticator for the proxy authentication
+            // BUT it doesn't work for Digest authentication
+            parseChallengeRequestRawValue(proxyChallengeRequest);
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                    0, 0L));
         }
         int responseCode = 0;
         try {
@@ -1143,7 +1215,7 @@ public class HubIntRestService {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
-                    return compareWithHubVersion(version, newChallengeRequest, attempt++);
+                    return compareWithHubVersion(version, newChallengeRequest, attempt + 1);
                 } else {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
