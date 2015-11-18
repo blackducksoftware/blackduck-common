@@ -297,7 +297,7 @@ public class HubIntRestService {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
             }
-            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+            throw e;
         }
 
         return resource.getResponse().getStatus().getCode();
