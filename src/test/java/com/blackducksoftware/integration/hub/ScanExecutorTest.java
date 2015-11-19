@@ -452,12 +452,12 @@ public class ScanExecutorTest {
         assertTrue(actualCmd, actualCmd.contains("-Done-jar.silent=true"));
         assertTrue(actualCmd, actualCmd.contains("-Done-jar.jar.path="));
 
-        assertTrue(actualCmd, actualCmd.contains("-Dhttp.proxyHost="));
-        assertTrue(actualCmd, actualCmd.contains("-Dhttp.proxyPort="));
+        assertTrue(actualCmd, actualCmd.contains("-Dhttp.proxyHost=") || actualCmd.contains("-Dhttps.proxyHost="));
+        assertTrue(actualCmd, actualCmd.contains("-Dhttp.proxyPort=") || actualCmd.contains("-Dhttps.proxyPort="));
         assertTrue(actualCmd, actualCmd.contains("-Dhttp.nonProxyHosts="));
 
-        assertTrue(actualCmd, actualCmd.contains("-Dhttp.proxyUser="));
-        assertTrue(actualCmd, actualCmd.contains("-Dhttp.proxyPassword="));
+        assertTrue(actualCmd, actualCmd.contains("-Dhttp.proxyUser=") || actualCmd.contains("-Dhttps.proxyUser="));
+        assertTrue(actualCmd, actualCmd.contains("-Dhttp.proxyPassword=") || actualCmd.contains("-Dhttps.proxyPassword="));
 
         assertTrue(actualCmd, actualCmd.contains("-Xmx"));
         assertTrue(actualCmd, actualCmd.contains("-jar"));

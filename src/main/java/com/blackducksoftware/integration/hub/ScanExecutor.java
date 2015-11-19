@@ -278,6 +278,8 @@ public abstract class ScanExecutor {
                 if (StringUtils.isNotBlank(getProxyHost()) && getProxyPort() != null) {
                     cmd.add("-Dhttp.proxyHost=" + getProxyHost());
                     cmd.add("-Dhttp.proxyPort=" + getProxyPort());
+                    // cmd.add("-Dhttps.proxyHost=" + getProxyHost());
+                    // cmd.add("-Dhttps.proxyPort=" + getProxyPort());
 
                     if (getNoProxyHosts() != null) {
                         StringBuilder noProxyHosts = new StringBuilder();
@@ -293,6 +295,8 @@ public abstract class ScanExecutor {
                     if (StringUtils.isNotBlank(getProxyUsername()) && StringUtils.isNotBlank(getProxyPassword())) {
                         cmd.add("-Dhttp.proxyUser=" + getProxyUsername());
                         cmd.add("-Dhttp.proxyPassword=" + getProxyPassword());
+                        // cmd.add("-Dhttps.proxyUser=" + getProxyUsername());
+                        // cmd.add("-Dhttps.proxyPassword=" + getProxyPassword());
                     }
                 }
 
