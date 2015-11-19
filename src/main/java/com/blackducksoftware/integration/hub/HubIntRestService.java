@@ -134,8 +134,8 @@ public class HubIntRestService {
     private ClientResource createClientResource(String url) throws URISyntaxException {
         url = url.replaceAll(" ", "%20");
         Context context = new Context();
-        context.getParameters().add("socketTimeout", "15000");
-        // Should throw timeout exception after 10 seconds
+        context.getParameters().add("socketTimeout", "120000");
+        // Should throw timeout exception after 2 minutes
 
         ClientResource resource = new ClientResource(context, new URI(url));
         return resource;
