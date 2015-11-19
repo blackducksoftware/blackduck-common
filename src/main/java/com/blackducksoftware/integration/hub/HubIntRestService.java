@@ -134,7 +134,11 @@ public class HubIntRestService {
     private ClientResource createClientResource(String url) throws URISyntaxException {
         url = url.replaceAll(" ", "%20");
         Context context = new Context();
+
+        // the socketTimeout parameter is used in the httpClient extension that we do not use
+        // We can probably remove this parameter
         context.getParameters().add("socketTimeout", "120000");
+
         context.getParameters().add("socketConnectTimeoutMs", "120000");
         context.getParameters().add("readTimeout", "120000");
         // Should throw timeout exception after 2 minutes
