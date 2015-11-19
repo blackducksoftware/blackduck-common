@@ -135,6 +135,7 @@ public class HubIntRestService {
         url = url.replaceAll(" ", "%20");
         Context context = new Context();
         context.getParameters().add("socketTimeout", "120000");
+        context.getParameters().add("socketConnectTimeoutMs", "120000");
         // Should throw timeout exception after 2 minutes
 
         ClientResource resource = new ClientResource(context, new URI(url));
