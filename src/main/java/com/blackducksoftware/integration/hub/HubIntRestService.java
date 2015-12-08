@@ -160,26 +160,6 @@ public class HubIntRestService {
         System.clearProperty("http.proxyPort");
         System.clearProperty("http.nonProxyHosts");
 
-        // Authentication caching workaround
-        // This is not working to remove the authentication cache
-        sun.net.www.protocol.http.AuthCache cache = new sun.net.www.protocol.http.AuthCache() {
-
-            @Override
-            public sun.net.www.protocol.http.AuthCacheValue get(String arg0, String arg1) {
-                return null;
-            }
-
-            @Override
-            public void put(String arg0, sun.net.www.protocol.http.AuthCacheValue arg1) {
-            }
-
-            @Override
-            public void remove(String arg0, sun.net.www.protocol.http.AuthCacheValue arg1) {
-            }
-
-        };
-        sun.net.www.protocol.http.AuthCacheValue.setAuthCache(cache);
-
         Authenticator.setDefault(new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
