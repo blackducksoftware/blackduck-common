@@ -48,7 +48,7 @@ public class ScanLocationHandler {
      */
     public void getScanLocationIdWithRetry(ClientResource resource, String targetPath, String versionId,
             Map<String, Boolean> scanLocationIds)
-            throws UnknownHostException, InterruptedException, BDRestException, HubIntegrationException {
+                    throws UnknownHostException, InterruptedException, BDRestException, HubIntegrationException {
 
         if (resource == null) {
             throw new IllegalArgumentException("Need to provide a ClientResource in order to get the ScanLocation");
@@ -182,7 +182,7 @@ public class ScanLocationHandler {
     private void handleScanLocationMatch(Map<String, Boolean> scanLocationIds, ScanLocationItem scanMatch, String targetPath, String versionId)
             throws HubIntegrationException {
 
-        if (!scanMatch.getAssetReferenceList().isEmpty()) {
+        if (scanMatch.getAssetReferenceList() != null && !scanMatch.getAssetReferenceList().isEmpty()) {
             boolean scanAlreadyMatched = false;
             for (AssetReferenceItem assetReference : scanMatch.getAssetReferenceList()) {
                 if (assetReference.getOwnerEntityKey() != null && StringUtils.isNotBlank(assetReference.getOwnerEntityKey().getEntityId())
