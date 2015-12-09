@@ -39,6 +39,8 @@ public abstract class ScanExecutor {
 
     private boolean cliSupportsMapping;
 
+    private boolean shouldParseStatus;
+
     private String project;
 
     private String version;
@@ -117,6 +119,14 @@ public abstract class ScanExecutor {
 
     public void setCliSupportsMapping(boolean cliSupportsMapping) {
         this.cliSupportsMapping = cliSupportsMapping;
+    }
+
+    public boolean shouldParseStatus() {
+        return shouldParseStatus;
+    }
+
+    public void setShouldParseStatus(boolean shouldParseStatus) {
+        this.shouldParseStatus = shouldParseStatus;
     }
 
     public String getProject() {
