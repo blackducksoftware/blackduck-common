@@ -16,11 +16,14 @@ public class ProjectItem {
 
     private Boolean openSource;
 
+    private ReleaseItem release;
+
     public ProjectItem() {
 
     }
 
-    public ProjectItem(String id, Boolean kb, String name, Boolean restructured, String canonicalReleaseId, Boolean internal, Boolean openSource) {
+    public ProjectItem(String id, Boolean kb, String name, Boolean restructured, String canonicalReleaseId, Boolean internal, Boolean openSource,
+            ReleaseItem release) {
         this.id = id;
         this.kb = kb;
         this.name = name;
@@ -28,6 +31,7 @@ public class ProjectItem {
         this.canonicalReleaseId = canonicalReleaseId;
         this.internal = internal;
         this.openSource = openSource;
+        this.release = release;
     }
 
     public String getId() {
@@ -84,6 +88,14 @@ public class ProjectItem {
 
     public void setOpenSource(Boolean openSource) {
         this.openSource = openSource;
+    }
+
+    public ReleaseItem getReleaseItem() {
+        return release;
+    }
+
+    public void setReleaseItem(ReleaseItem release) {
+        this.release = release;
     }
 
     @Override

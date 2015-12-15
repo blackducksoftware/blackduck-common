@@ -1058,6 +1058,118 @@ public class HubIntRestService {
     }
 
     /**
+     * Creates a Hub Project and version with the specified information.
+     *
+     * @param projectName
+     *            String
+     * @param versionName
+     *            String
+     * @param phase
+     *            String
+     * @param dist
+     *            String
+     *
+     * @return (String) ProjectId
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    public String createHubProjectAndVersion(String projectName, String versionName, String phase, String dist) throws IOException, BDRestException,
+            URISyntaxException {
+        return createHubProjectAndVersion(projectName, versionName, phase, dist, null, 0);
+    }
+
+    /**
+     * Creates a Hub Project and version with the specified information.
+     *
+     * @param projectName
+     *            String
+     * @param versionName
+     *            String
+     * @param phase
+     *            String
+     * @param dist
+     *            String
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @return (String) ProjectId
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    private String createHubProjectAndVersion(String projectName, String versionName, String phase, String dist, ChallengeRequest proxyChallengeRequest,
+            int attempt) throws IOException, BDRestException,
+            URISyntaxException {
+        // projectName = URLEncoder.encode(projectName, "UTF-8");
+        String url = getBaseUrl() + "/api/v1/projects";
+        ClientResource resource = createClientResource(url);
+        if (proxyChallengeRequest != null) {
+            // This should replace the authenticator for the proxy authentication
+            // BUT it doesn't work for Digest authentication
+            parseChallengeRequestRawValue(proxyChallengeRequest);
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                    0, 0L));
+        }
+        try {
+            ReleaseItem newRelease = new ReleaseItem();
+            newRelease.setVersion(versionName);
+            newRelease.setPhase(phase);
+            newRelease.setDistribution(dist);
+
+            resource.getRequest().setCookies(getCookies());
+            resource.setMethod(Method.POST);
+
+            ProjectItem newProject = new ProjectItem();
+            newProject.setName(projectName);
+            newProject.setReleaseItem(newRelease);
+
+            Gson gson = new GsonBuilder().create();
+            StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
+            stringRep.setMediaType(MediaType.APPLICATION_JSON);
+
+            resource.post(stringRep);
+            int responseCode = resource.getResponse().getStatus().getCode();
+
+            if (responseCode == 201) {
+
+                Response resp = resource.getResponse();
+                Reader reader = resp.getEntity().getReader();
+                BufferedReader bufReader = new BufferedReader(reader);
+                StringBuilder sb = new StringBuilder();
+                String line = bufReader.readLine();
+                while (line != null) {
+                    sb.append(line + "\n");
+                    line = bufReader.readLine();
+                }
+                bufReader.close();
+                ProjectItem project = gson.fromJson(sb.toString(), ProjectItem.class);
+                return project.getId();
+
+            } else {
+
+                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            }
+        } catch (ResourceException e) {
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    return createHubProjectAndVersion(projectName, versionName, phase, dist, newChallengeRequest, attempt + 1);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
+            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+        }
+
+    }
+
+    /**
      * Retrieves the version of the Hub server
      *
      * @return String

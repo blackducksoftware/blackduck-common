@@ -213,6 +213,36 @@ public class HubIntRestServiceTest {
     }
 
     @Test
+    public void testCreateHubProjectAndVersion() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setLogger(logger);
+        restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
+        // TEST_CREATE_PROJECT
+        String projectId = null;
+        try {
+
+            projectId = restService.createHubProjectAndVersion(testProperties.getProperty("TEST_CREATE_PROJECT"),
+                    testProperties.getProperty("TEST_CREATE_VERSION"), PhaseEnum.DEVELOPMENT.name(),
+                    DistributionEnum.INTERNAL.name());
+
+            assertTrue(StringUtils.isNotBlank(projectId));
+        } finally {
+            if (StringUtils.isBlank(projectId)) {
+                ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
+                projectId = project.getId();
+            }
+            if (StringUtils.isNotBlank(projectId)) {
+                HubIntTestHelper helper = new HubIntTestHelper(restService);
+                helper.deleteHubProject(projectId);
+            }
+        }
+
+        assertTrue(logger.getErrorList().isEmpty());
+    }
+
+    @Test
     public void testCreateHubVersion() throws Exception {
         TestLogger logger = new TestLogger();
 
