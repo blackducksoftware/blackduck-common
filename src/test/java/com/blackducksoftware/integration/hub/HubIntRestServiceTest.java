@@ -45,18 +45,6 @@ public class HubIntRestServiceTest {
 
     }
 
-    // List<String> paths = new ArrayList<String>();
-    // paths.add("/Users/jrichard/Documents/Jenkins/Jenkins-Hub-Git/int-hub-jenkins/test-workspace/workspace");
-    // Map<String, Boolean> response = null;
-    // try {
-    // response = restService.getScanLocationIds("jrichardMac", paths,
-    // "5003bbc7-fc7a-4ba5-9070-d2c3a260b7b8");
-    //
-    // restService.mapScansToProjectVersion(response, "5003bbc7-fc7a-4ba5-9070-d2c3a260b7b8");
-    // } finally {
-    // System.out.println(logger.getOutputString());
-    //
-
     @Test
     public void testSetCookies() throws Exception {
         TestLogger logger = new TestLogger();
