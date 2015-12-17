@@ -33,6 +33,7 @@ import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.response.ProjectItem;
 import com.blackducksoftware.integration.hub.response.ReleaseItem;
@@ -472,9 +473,10 @@ public class HubIntRestService {
      * @throws IOException
      * @throws BDRestException
      * @throws URISyntaxException
+     * @throws ProjectDoesNotExistException
      */
     public ProjectItem getProjectByName(String projectName) throws IOException, BDRestException,
-            URISyntaxException {
+            URISyntaxException, ProjectDoesNotExistException {
         return getProjectByName(projectName, null, 0);
     }
 
@@ -492,9 +494,10 @@ public class HubIntRestService {
      * @throws IOException
      * @throws BDRestException
      * @throws URISyntaxException
+     * @throws ProjectDoesNotExistException
      */
     private ProjectItem getProjectByName(String projectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException,
-            URISyntaxException {
+            URISyntaxException, ProjectDoesNotExistException {
         // hubProjectName = URLEncoder.encode(hubProjectName, "UTF-8");
         String url = getBaseUrl() + "/api/v1/projects?name=" + projectName;
         ClientResource resource = createClientResource(url);
@@ -540,7 +543,7 @@ public class HubIntRestService {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
             }
-            throw new BDRestException("This Project does not exist or there is a problem connecting to the Hub server", e, resource);
+            throw new ProjectDoesNotExistException("This Project does not exist.", e, resource);
         }
     }
 
