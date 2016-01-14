@@ -57,7 +57,6 @@ public abstract class ScanExecutor {
 
     private String proxyPassword;
 
-    private boolean isTest = false;
 
     private boolean verboseRun;
 
@@ -169,13 +168,6 @@ public abstract class ScanExecutor {
         return hubPassword;
     }
 
-    protected Boolean isTest() {
-        return isTest;
-    }
-
-    protected void setIsTest(Boolean isTest) {
-        this.isTest = isTest;
-    }
 
     public boolean isVerboseRun() {
         return verboseRun;
@@ -337,10 +329,6 @@ public abstract class ScanExecutor {
 
                 }
 
-                if (isTest()) {
-                    // The new dry run option
-                    cmd.add("--selfTest");
-                }
                 if (isVerboseRun()) {
                     cmd.add("-v");
                 }

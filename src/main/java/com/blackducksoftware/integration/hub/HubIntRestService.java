@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Constructor;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
@@ -161,12 +162,48 @@ public class HubIntRestService {
         System.clearProperty("http.proxyPort");
         System.clearProperty("http.nonProxyHosts");
 
+        attemptResetProxyCache();
+
         Authenticator.setDefault(new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return null;
             }
         });
+    }
+
+    private void attemptResetProxyCache() {
+        try {
+            // works, and resets the cache when using sun classes
+            // sun.net.www.protocol.http.AuthCacheValue.setAuthCache(new
+            // sun.net.www.protocol.http.AuthCacheImpl());
+
+            // Attempt the same thing using reflection in case they are not using a jdk with sun classes
+
+            Class<?> sunAuthCacheValue;
+            Class<?> sunAuthCache;
+            Class<?> sunAuthCacheImpl;
+            try {
+                sunAuthCacheValue = Class.forName("sun.net.www.protocol.http.AuthCacheValue");
+                sunAuthCache = Class.forName("sun.net.www.protocol.http.AuthCache");
+                sunAuthCacheImpl = Class.forName("sun.net.www.protocol.http.AuthCacheImpl");
+            } catch (Exception e) {
+                // Must not be using a JDK with sun classes so we abandon this reset since it is sun specific
+                return;
+            }
+
+            java.lang.reflect.Method m = sunAuthCacheValue.getDeclaredMethod("setAuthCache", sunAuthCache);
+
+            Constructor<?> authCacheImplConstr = sunAuthCacheImpl.getConstructor();
+            Object authCachImp = authCacheImplConstr.newInstance();
+
+            m.invoke(null, authCachImp);
+
+        } catch (Exception e) {
+            if (logger != null) {
+                logger.error(e);
+            }
+        }
     }
 
     public void parseChallengeRequestRawValue(ChallengeRequest proxyChallengeRequest) {
