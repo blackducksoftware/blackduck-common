@@ -1,17 +1,42 @@
 package com.blackducksoftware.integration.hub.response;
 
 public enum PhaseEnum {
-    PLANNING
+    PLANNING("In Planning")
     ,
-    DEVELOPMENT
+    DEVELOPMENT("In Developement")
     ,
-    RELEASED
+    RELEASED("Released")
     ,
-    DEPRECATED
+    DEPRECATED("Deprecated")
     ,
-    ARCHIVED
+    ARCHIVED("Archived")
     ,
-    UNKNOWNPHASE;
+    UNKNOWNPHASE("Unknown Phase");
+
+    private final String displayValue;
+
+    private PhaseEnum(String displayValue) {
+        this.displayValue = displayValue;
+    }
+
+    public String getDisplayValue() {
+        return displayValue;
+    }
+
+    public static PhaseEnum getPhaseByDisplayValue(String displayValue) {
+        if (displayValue.equalsIgnoreCase(PLANNING.getDisplayValue())) {
+            return PhaseEnum.PLANNING;
+        } else if (displayValue.equalsIgnoreCase(DEVELOPMENT.getDisplayValue())) {
+            return PhaseEnum.DEVELOPMENT;
+        } else if (displayValue.equalsIgnoreCase(RELEASED.getDisplayValue())) {
+            return PhaseEnum.RELEASED;
+        } else if (displayValue.equalsIgnoreCase(DEPRECATED.getDisplayValue())) {
+            return PhaseEnum.DEPRECATED;
+        } else if (displayValue.equalsIgnoreCase(ARCHIVED.getDisplayValue())) {
+            return PhaseEnum.ARCHIVED;
+        }
+        return PhaseEnum.UNKNOWNPHASE;
+    }
 
     public static PhaseEnum getPhaseEnum(String phaseEnum) {
         if (phaseEnum.equalsIgnoreCase(PLANNING.name())) {
