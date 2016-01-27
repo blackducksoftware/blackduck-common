@@ -71,6 +71,38 @@ public class HubIntRestService {
         return baseUrl;
     }
 
+    private void attemptResetProxyCache() {
+        try {
+            // works, and resets the cache when using sun classes
+            // sun.net.www.protocol.http.AuthCacheValue.setAuthCache(new
+            // sun.net.www.protocol.http.AuthCacheImpl());
+
+            // Attempt the same thing using reflection in case they are not using a jdk with sun classes
+
+            Class<?> sunAuthCacheValue;
+            Class<?> sunAuthCache;
+            Class<?> sunAuthCacheImpl;
+            try {
+                sunAuthCacheValue = Class.forName("sun.net.www.protocol.http.AuthCacheValue");
+                sunAuthCache = Class.forName("sun.net.www.protocol.http.AuthCache");
+                sunAuthCacheImpl = Class.forName("sun.net.www.protocol.http.AuthCacheImpl");
+            } catch (Exception e) {
+                // Must not be using a JDK with sun classes so we abandon this reset since it is sun specific
+                return;
+            }
+
+            java.lang.reflect.Method m = sunAuthCacheValue.getDeclaredMethod("setAuthCache", sunAuthCache);
+
+            Constructor<?> authCacheImplConstr = sunAuthCacheImpl.getConstructor();
+            Object authCachImp = authCacheImplConstr.newInstance();
+
+            m.invoke(null, authCachImp);
+
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
     /**
      * Sets the Proxy settings that the User may have configured.
      * The proxy settings get set as System properties.
@@ -164,46 +196,7 @@ public class HubIntRestService {
 
         attemptResetProxyCache();
 
-        Authenticator.setDefault(new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return null;
-            }
-        });
-    }
-
-    private void attemptResetProxyCache() {
-        try {
-            // works, and resets the cache when using sun classes
-            // sun.net.www.protocol.http.AuthCacheValue.setAuthCache(new
-            // sun.net.www.protocol.http.AuthCacheImpl());
-
-            // Attempt the same thing using reflection in case they are not using a jdk with sun classes
-
-            Class<?> sunAuthCacheValue;
-            Class<?> sunAuthCache;
-            Class<?> sunAuthCacheImpl;
-            try {
-                sunAuthCacheValue = Class.forName("sun.net.www.protocol.http.AuthCacheValue");
-                sunAuthCache = Class.forName("sun.net.www.protocol.http.AuthCache");
-                sunAuthCacheImpl = Class.forName("sun.net.www.protocol.http.AuthCacheImpl");
-            } catch (Exception e) {
-                // Must not be using a JDK with sun classes so we abandon this reset since it is sun specific
-                return;
-            }
-
-            java.lang.reflect.Method m = sunAuthCacheValue.getDeclaredMethod("setAuthCache", sunAuthCache);
-
-            Constructor<?> authCacheImplConstr = sunAuthCacheImpl.getConstructor();
-            Object authCachImp = authCacheImplConstr.newInstance();
-
-            m.invoke(null, authCachImp);
-
-        } catch (Exception e) {
-            if (logger != null) {
-                logger.error(e);
-            }
-        }
+        Authenticator.setDefault(null);
     }
 
     public void parseChallengeRequestRawValue(ChallengeRequest proxyChallengeRequest) {
