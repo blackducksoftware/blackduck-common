@@ -8,7 +8,7 @@ public enum DistributionEnum {
     ,
     INTERNAL("Internal")
     ,
-    OPENSOURCE("Open Source (Hub 2.3)")
+    OPENSOURCE("Open Source")
     ,
     UNKNOWNDISTRIBUTION("Unknown Distribution");
 
