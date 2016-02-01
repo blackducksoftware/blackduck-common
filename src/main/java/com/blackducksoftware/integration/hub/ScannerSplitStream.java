@@ -21,7 +21,7 @@ public class ScannerSplitStream extends OutputStream {
 
     private static final int CR = 13; // Carriage return
 
-    private static final String EXCEPTION = "Exception ";
+    private static final String EXCEPTION = "Exception:";
 
     private static final String FINISHED = "Finished in";
 
@@ -91,25 +91,25 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     private Boolean isLoggableLine(String line) {
-        if (line.startsWith(ERROR) || line.contains(ERROR)) {
+        if (line.contains(ERROR)) {
             return true;
         }
-        if (line.startsWith(WARN) || line.contains(WARN)) {
+        if (line.contains(WARN)) {
             return true;
         }
-        if (line.startsWith(INFO) || line.contains(INFO)) {
+        if (line.contains(INFO)) {
             return true;
         }
-        if (line.startsWith(DEBUG) || line.contains(DEBUG)) {
+        if (line.contains(DEBUG)) {
             return true;
         }
-        if (line.startsWith(TRACE) || line.contains(TRACE)) {
+        if (line.contains(TRACE)) {
             return true;
         }
-        if (line.startsWith(EXCEPTION) || line.contains(EXCEPTION)) {
+        if (line.contains(EXCEPTION)) {
             return true;
         }
-        if (line.startsWith(FINISHED) || line.contains(FINISHED)) {
+        if (line.contains(FINISHED)) {
             return true;
         }
         return false;
