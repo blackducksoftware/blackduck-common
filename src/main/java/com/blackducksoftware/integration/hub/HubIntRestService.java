@@ -66,7 +66,11 @@ public class HubIntRestService {
     }
 
     public void setTimeout(int timeout) {
-        this.timeout = timeout;
+        if (timeout == 0) {
+            throw new IllegalArgumentException("Can not set the timeout to zero.");
+        }
+        // the User sets the timeout in seconds, so we translate to ms
+        this.timeout = timeout * 1000;
     }
 
     public void setLogger(IntLogger logger) {
@@ -177,7 +181,7 @@ public class HubIntRestService {
 
         // the socketTimeout parameter is used in the httpClient extension that we do not use
         // We can probably remove this parameter
-        String stringTimeout = String.valueOf(timeout * 1000);
+        String stringTimeout = String.valueOf(timeout);
 
         context.getParameters().add("socketTimeout", stringTimeout);
 
