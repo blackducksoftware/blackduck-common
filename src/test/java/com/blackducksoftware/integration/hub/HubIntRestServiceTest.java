@@ -214,8 +214,12 @@ public class HubIntRestServiceTest {
             assertTrue(StringUtils.isNotBlank(projectId));
         } finally {
             if (StringUtils.isBlank(projectId)) {
-                ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
-                projectId = project.getId();
+                try {
+                    ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
+                    projectId = project.getId();
+                } catch (Exception e) {
+                    // ignore exception
+                }
             }
             if (StringUtils.isNotBlank(projectId)) {
                 HubIntTestHelper helper = new HubIntTestHelper(restService);
@@ -244,8 +248,12 @@ public class HubIntRestServiceTest {
             assertTrue(StringUtils.isNotBlank(projectId));
         } finally {
             if (StringUtils.isBlank(projectId)) {
-                ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
-                projectId = project.getId();
+                try {
+                    ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
+                    projectId = project.getId();
+                } catch (Exception e) {
+                    // ignore exception
+                }
             }
             if (StringUtils.isNotBlank(projectId)) {
                 HubIntTestHelper helper = new HubIntTestHelper(restService);
@@ -276,8 +284,12 @@ public class HubIntRestServiceTest {
             assertTrue(StringUtils.isNotBlank(versionId));
         } finally {
             if (StringUtils.isBlank(projectId)) {
-                ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
-                projectId = project.getId();
+                try {
+                    ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
+                    projectId = project.getId();
+                } catch (Exception e) {
+                    // ignore exception
+                }
             }
             if (StringUtils.isNotBlank(projectId)) {
                 HubIntTestHelper helper = new HubIntTestHelper(restService);
