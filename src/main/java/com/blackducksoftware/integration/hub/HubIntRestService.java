@@ -53,6 +53,8 @@ public class HubIntRestService {
 
     private final String baseUrl;
 
+    private int timeout = 120;
+
     private IntLogger logger;
 
     private String proxyUsername;
@@ -61,6 +63,14 @@ public class HubIntRestService {
 
     public HubIntRestService(String baseUrl) {
         this.baseUrl = baseUrl;
+    }
+
+    public void setTimeout(int timeout) {
+        if (timeout == 0) {
+            throw new IllegalArgumentException("Can not set the timeout to zero.");
+        }
+        // the User sets the timeout in seconds, so we translate to ms
+        this.timeout = timeout * 1000;
     }
 
     public void setLogger(IntLogger logger) {
@@ -171,11 +181,13 @@ public class HubIntRestService {
 
         // the socketTimeout parameter is used in the httpClient extension that we do not use
         // We can probably remove this parameter
-        context.getParameters().add("socketTimeout", "120000");
+        String stringTimeout = String.valueOf(timeout);
 
-        context.getParameters().add("socketConnectTimeoutMs", "120000");
-        context.getParameters().add("readTimeout", "120000");
-        // Should throw timeout exception after 2 minutes
+        context.getParameters().add("socketTimeout", stringTimeout);
+
+        context.getParameters().add("socketConnectTimeoutMs", stringTimeout);
+        context.getParameters().add("readTimeout", stringTimeout);
+        // Should throw timeout exception after the specified timeout, default is 2 minutes
 
         ClientResource resource = new ClientResource(context, new URI(url));
         return resource;

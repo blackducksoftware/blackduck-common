@@ -13,7 +13,9 @@ import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.response.DistributionEnum;
@@ -27,6 +29,9 @@ import com.blackducksoftware.integration.hub.util.TestLogger;
 public class HubIntRestServiceTest {
 
     private static Properties testProperties;
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @BeforeClass
     public static void testInit() {
@@ -50,6 +55,27 @@ public class HubIntRestServiceTest {
         TestLogger logger = new TestLogger();
 
         HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setLogger(logger);
+        restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
+
+        assertNotNull(restService.getCookies());
+        assertTrue(!restService.getCookies().isEmpty());
+        assertTrue(logger.getErrorList().isEmpty());
+    }
+
+    @Test
+    public void testSetTimeoutZero() throws Exception {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Can not set the timeout to zero.");
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setTimeout(0);
+    }
+
+    @Test
+    public void testSetTimeout() throws Exception {
+        TestLogger logger = new TestLogger();
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setTimeout(120);
         restService.setLogger(logger);
         restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
 
@@ -188,8 +214,12 @@ public class HubIntRestServiceTest {
             assertTrue(StringUtils.isNotBlank(projectId));
         } finally {
             if (StringUtils.isBlank(projectId)) {
-                ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
-                projectId = project.getId();
+                try {
+                    ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
+                    projectId = project.getId();
+                } catch (Exception e) {
+                    // ignore exception
+                }
             }
             if (StringUtils.isNotBlank(projectId)) {
                 HubIntTestHelper helper = new HubIntTestHelper(restService);
@@ -218,8 +248,12 @@ public class HubIntRestServiceTest {
             assertTrue(StringUtils.isNotBlank(projectId));
         } finally {
             if (StringUtils.isBlank(projectId)) {
-                ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
-                projectId = project.getId();
+                try {
+                    ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
+                    projectId = project.getId();
+                } catch (Exception e) {
+                    // ignore exception
+                }
             }
             if (StringUtils.isNotBlank(projectId)) {
                 HubIntTestHelper helper = new HubIntTestHelper(restService);
@@ -250,8 +284,12 @@ public class HubIntRestServiceTest {
             assertTrue(StringUtils.isNotBlank(versionId));
         } finally {
             if (StringUtils.isBlank(projectId)) {
-                ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
-                projectId = project.getId();
+                try {
+                    ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
+                    projectId = project.getId();
+                } catch (Exception e) {
+                    // ignore exception
+                }
             }
             if (StringUtils.isNotBlank(projectId)) {
                 HubIntTestHelper helper = new HubIntTestHelper(restService);
