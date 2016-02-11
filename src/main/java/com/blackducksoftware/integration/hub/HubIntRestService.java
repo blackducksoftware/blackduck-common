@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -177,6 +178,7 @@ public class HubIntRestService {
      */
     private ClientResource createClientResource(String url) throws URISyntaxException {
         url = url.replaceAll(" ", "%20");
+
         Context context = new Context();
 
         // the socketTimeout parameter is used in the httpClient extension that we do not use
@@ -540,7 +542,9 @@ public class HubIntRestService {
      */
     private ProjectItem getProjectByName(String projectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException,
             URISyntaxException, ProjectDoesNotExistException {
-        // hubProjectName = URLEncoder.encode(hubProjectName, "UTF-8");
+
+        projectName = URLEncoder.encode(projectName, "UTF-8");
+
         String url = getBaseUrl() + "/api/v1/projects?name=" + projectName;
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {

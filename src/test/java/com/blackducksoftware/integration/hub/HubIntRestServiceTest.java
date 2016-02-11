@@ -115,6 +115,48 @@ public class HubIntRestServiceTest {
     }
 
     @Test
+    public void testGetProjectByNameSpecialCharacters() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        String projectName = "CItest!@#$^&";
+
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setLogger(logger);
+        restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
+        String projectId = null;
+        try {
+
+            projectId = restService.createHubProject(projectName);
+
+            assertTrue(StringUtils.isNotBlank(projectId));
+
+            ProjectItem project = restService.getProjectByName(projectName);
+
+            assertNotNull(project);
+            assertEquals(projectName, project.getName());
+            assertTrue(logger.getErrorList().isEmpty());
+
+        } finally {
+            if (StringUtils.isBlank(projectId)) {
+                try {
+                    ProjectItem project = restService.getProjectByName(projectName);
+                    projectId = project.getId();
+                } catch (Exception e) {
+                    // ignore exception
+                }
+            }
+            if (StringUtils.isNotBlank(projectId)) {
+                HubIntTestHelper helper = new HubIntTestHelper(restService);
+                helper.deleteHubProject(projectId);
+            }
+        }
+
+        assertTrue(logger.getErrorList().isEmpty());
+    }
+
+    // TODO
+
+    @Test
     public void testGetProjectById() throws Exception {
         TestLogger logger = new TestLogger();
 
@@ -216,6 +258,39 @@ public class HubIntRestServiceTest {
             if (StringUtils.isBlank(projectId)) {
                 try {
                     ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
+                    projectId = project.getId();
+                } catch (Exception e) {
+                    // ignore exception
+                }
+            }
+            if (StringUtils.isNotBlank(projectId)) {
+                HubIntTestHelper helper = new HubIntTestHelper(restService);
+                helper.deleteHubProject(projectId);
+            }
+        }
+
+        assertTrue(logger.getErrorList().isEmpty());
+    }
+
+    @Test
+    public void testCreateHubProjectSpecialCharacters() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        String projectName = "CItest!@#$^&";
+
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setLogger(logger);
+        restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
+        String projectId = null;
+        try {
+
+            projectId = restService.createHubProject(projectName);
+
+            assertTrue(StringUtils.isNotBlank(projectId));
+        } finally {
+            if (StringUtils.isBlank(projectId)) {
+                try {
+                    ProjectItem project = restService.getProjectByName(projectName);
                     projectId = project.getId();
                 } catch (Exception e) {
                     // ignore exception
