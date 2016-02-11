@@ -53,7 +53,7 @@ public class HubIntRestService {
 
     private final String baseUrl;
 
-    private int timeout = 120;
+    private int timeout = 120000;
 
     private IntLogger logger;
 
