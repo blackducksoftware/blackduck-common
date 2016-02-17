@@ -40,6 +40,8 @@ import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.response.ProjectItem;
 import com.blackducksoftware.integration.hub.response.ReleaseItem;
 import com.blackducksoftware.integration.hub.response.ReleasesList;
+import com.blackducksoftware.integration.hub.response.ReportCreationItem;
+import com.blackducksoftware.integration.hub.response.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.response.VersionComparison;
 import com.blackducksoftware.integration.hub.response.mapping.AssetReferenceItem;
 import com.blackducksoftware.integration.hub.response.mapping.EntityItem;
@@ -1369,6 +1371,110 @@ public class HubIntRestService {
             }
             throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: ", e, resource);
         }
+    }
+
+    /**
+     * Generates a new Hub report for the specified version.
+     *
+     * @param versionId
+     *            String
+     *
+     * @return (String) ReportUrl
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    public String generateHubReport(String versionId, ReportFormatEnum reportFormat) throws IOException, BDRestException,
+            URISyntaxException {
+        return generateHubReport(versionId, reportFormat, null, 0);
+    }
+
+    /**
+     * Generates a new Hub report for the specified version.
+     *
+     * @param versionId
+     *            String
+     * @param proxyChallengeRequest
+     *            ChallengeRequest proxyChallenge to get the correct authentication
+     * @param attempt
+     *            Integer authentication attempt number
+     *
+     * @return (String) ReportUrl
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    private String generateHubReport(String versionId, ReportFormatEnum reportFormat, ChallengeRequest proxyChallengeRequest,
+            int attempt) throws IOException, BDRestException,
+            URISyntaxException {
+        // projectName = URLEncoder.encode(projectName, "UTF-8");
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/versions/");
+        urlBuilder.append(versionId);
+        urlBuilder.append("/reports");
+
+        String url = urlBuilder.toString();
+        ClientResource resource = createClientResource(url);
+        if (proxyChallengeRequest != null) {
+            // This should replace the authenticator for the proxy authentication
+            // BUT it doesn't work for Digest authentication
+            parseChallengeRequestRawValue(proxyChallengeRequest);
+            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
+                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
+                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
+                    0, 0L));
+        }
+        try {
+
+            resource.getRequest().setCookies(getCookies());
+            resource.setMethod(Method.POST);
+
+            ReportCreationItem newReportItem = new ReportCreationItem(reportFormat);
+
+            Gson gson = new GsonBuilder().create();
+            StringRepresentation stringRep = new StringRepresentation(gson.toJson(newReportItem));
+            stringRep.setMediaType(MediaType.APPLICATION_JSON);
+
+            resource.post(stringRep);
+            int responseCode = resource.getResponse().getStatus().getCode();
+
+            if (responseCode == 201) {
+                // TODO read the response headers to get the report Id / the location URL to get this report
+
+                // Headers Ex:
+                // {
+                // "pragma": "no-cache",
+                // "date": "Wed, 17 Feb 2016 21:49:44 GMT",
+                // "server": "Apache-Coyote/1.1",
+                // "allow": "GET, DELETE",
+                // "location":
+                // "http://integration-hub/api/versions/99743689-711e-440d-ba95-29f5646f6104/reports/81814a03-25d3-4ba9-8b28-323085f15981",
+                // "cache-control": "no-cache",
+                // "content-length": "0",
+                // "expires": "-1",
+                // "content-type": null
+                // }
+
+                return "";
+
+            } else {
+
+                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            }
+        } catch (ResourceException e) {
+            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+
+                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
+                if (attempt < 2) {
+                    return generateHubReport(versionId, reportFormat, newChallengeRequest, attempt + 1);
+                } else {
+                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                }
+            }
+            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+        }
+
     }
 
 }
