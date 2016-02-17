@@ -11,9 +11,9 @@
 	<inceptionYear>2015</inceptionYear>
 
 	<scm>
-		<url>http://stash.blackducksoftware.com/scm/is/int-hub-ci.git</url>
-		<connection>scm:git:http://stash.blackducksoftware.com/scm/is/int-hub-ci.git</connection>
-		<developerConnection>scm:git:http://stash.blackducksoftware.com/scm/is/int-hub-ci.git</developerConnection>
+		<url>https://bitbucket.dc1.lan/scm/is/int-hub-ci.git</url>
+		<connection>scm:git:https://bitbucket.dc1.lan/scm/is/int-hub-ci.git</connection>
+		<developerConnection>scm:git:ssh://git@bitbucket.dc1.lan:7999/is/int-hub-ci.git</developerConnection>
 	</scm>
 
 	<licenses>
