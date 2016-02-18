@@ -91,13 +91,23 @@ public class HubIntRestServiceTest {
         HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
         restService.setLogger(logger);
         restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
+        String testProjectName = "TESTNAME";
+        String projectId = null;
+        try {
 
-        List<AutoCompleteItem> matches = restService.getProjectMatches(testProperties.getProperty("TEST_PROJECT"));
+            projectId = restService.createHubProject(testProjectName);
 
-        assertNotNull("matches must be not null", matches);
-        // FIXME, why can we expect this project to have matches? assertTrue("matches expected to be not empty",
-        // !matches.isEmpty());
-        assertTrue("error log expected to be empty", logger.getErrorList().isEmpty());
+            List<AutoCompleteItem> matches = restService.getProjectMatches(testProjectName);
+
+            assertNotNull("matches must be not null", matches);
+            assertTrue(!matches.isEmpty());
+            assertTrue("error log expected to be empty", logger.getErrorList().isEmpty());
+        } finally {
+            if (StringUtils.isNotBlank(projectId)) {
+                HubIntTestHelper helper = new HubIntTestHelper(restService);
+                helper.deleteHubProject(projectId);
+            }
+        }
     }
 
     @Test
