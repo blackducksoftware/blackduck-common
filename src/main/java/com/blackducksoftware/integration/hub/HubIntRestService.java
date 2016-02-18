@@ -280,7 +280,14 @@ public class HubIntRestService {
      */
     private int setCookies(String hubUserName, String hubPassword, ChallengeRequest proxyChallengeRequest, int attempt) throws HubIntegrationException,
             URISyntaxException, BDRestException {
-        String url = getBaseUrl() + "/j_spring_security_check?j_username=" + hubUserName + "&j_password=" + hubPassword;
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/j_spring_security_check?j_username=");
+        urlBuilder.append(hubUserName);
+        urlBuilder.append("&j_password=");
+        urlBuilder.append(hubPassword);
+
+        String url = urlBuilder.toString();
         ClientResource resource = createClientResource(url);
 
         if (proxyChallengeRequest != null) {
@@ -374,8 +381,13 @@ public class HubIntRestService {
      */
     private List<AutoCompleteItem> getProjectMatches(String hubProjectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
             BDRestException, URISyntaxException {
-        // hubProjectName = URLEncoder.encode(hubProjectName, "UTF-8");
-        String url = getBaseUrl() + "/api/v1/autocomplete/PROJECT?text=" + hubProjectName + "&limit=30&ownership=0";
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/v1/autocomplete/PROJECT?text=");
+        urlBuilder.append(hubProjectName);
+        urlBuilder.append("&limit=30&ownership=0");
+
+        String url = urlBuilder.toString();
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
@@ -459,8 +471,12 @@ public class HubIntRestService {
      */
     private ProjectItem getProjectById(String projectId, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
             BDRestException, URISyntaxException {
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/v1/projects/");
+        urlBuilder.append(projectId);
 
-        String url = getBaseUrl() + "/api/v1/projects/" + projectId;
+        String url = urlBuilder.toString();
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
@@ -545,9 +561,15 @@ public class HubIntRestService {
     private ProjectItem getProjectByName(String projectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException,
             URISyntaxException, ProjectDoesNotExistException {
 
+        // Need to URL encode the name since it will be in the URL
         projectName = URLEncoder.encode(projectName, "UTF-8");
 
-        String url = getBaseUrl() + "/api/v1/projects?name=" + projectName;
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/v1/projects?name=");
+        urlBuilder.append(projectName);
+
+        String url = urlBuilder.toString();
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
@@ -664,7 +686,14 @@ public class HubIntRestService {
                     targetPath = "/" + targetPath;
                 }
 
-                url = baseUrl + "/api/v1/scanlocations?host=" + hostname + "&path=" + targetPath;
+                StringBuilder urlBuilder = new StringBuilder();
+                urlBuilder.append(getBaseUrl());
+                urlBuilder.append("/api/v1/scanlocations?host=");
+                urlBuilder.append(hostname);
+                urlBuilder.append("&path=");
+                urlBuilder.append(targetPath);
+
+                url = urlBuilder.toString();
                 logger.debug(
                         "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + targetPath +
                                 "'");
@@ -740,7 +769,11 @@ public class HubIntRestService {
      */
     private void mapScansToProjectVersion(Map<String, Boolean> scanLocationIds, String
             versionId, ChallengeRequest proxyChallengeRequest, int attempt) throws BDRestException, URISyntaxException {
-        String url = getBaseUrl() + "/api/v1/assetreferences";
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/v1/assetreferences");
+
+        String url = urlBuilder.toString();
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
@@ -853,8 +886,13 @@ public class HubIntRestService {
      */
     private List<ReleaseItem> getVersionsForProject(String projectId, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
             BDRestException, URISyntaxException {
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/v1/projects/");
+        urlBuilder.append(projectId);
+        urlBuilder.append("/releases");
 
-        String url = getBaseUrl() + "/api/v1/projects/" + projectId + "/releases";
+        String url = urlBuilder.toString();
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
@@ -939,8 +977,11 @@ public class HubIntRestService {
      */
     private String createHubProject(String projectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException,
             URISyntaxException {
-        // projectName = URLEncoder.encode(projectName, "UTF-8");
-        String url = getBaseUrl() + "/api/v1/projects";
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/v1/projects");
+
+        String url = urlBuilder.toString();
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
@@ -1042,10 +1083,12 @@ public class HubIntRestService {
      * @throws URISyntaxException
      */
     private String createHubVersion(String projectVersion, String projectId, String phase, String dist, ChallengeRequest proxyChallengeRequest, int attempt)
-            throws
-            IOException, BDRestException, URISyntaxException {
-        // projectVersion = URLEncoder.encode(projectVersion, "UTF-8");
-        String url = getBaseUrl() + "/api/v1/releases";
+            throws IOException, BDRestException, URISyntaxException {
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/v1/releases");
+
+        String url = urlBuilder.toString();
         ClientResource resource = createClientResource(url);
 
         if (proxyChallengeRequest != null) {
@@ -1154,8 +1197,11 @@ public class HubIntRestService {
     private String createHubProjectAndVersion(String projectName, String versionName, String phase, String dist, ChallengeRequest proxyChallengeRequest,
             int attempt) throws IOException, BDRestException,
             URISyntaxException {
-        // projectName = URLEncoder.encode(projectName, "UTF-8");
-        String url = getBaseUrl() + "/api/v1/projects";
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/v1/projects");
+
+        String url = urlBuilder.toString();
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
@@ -1246,8 +1292,11 @@ public class HubIntRestService {
      * @throws URISyntaxException
      */
     private String getHubVersion(ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException, URISyntaxException {
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/v1/current-version/");
 
-        String url = getBaseUrl() + "/api/v1/current-version";
+        String url = urlBuilder.toString();
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
@@ -1322,8 +1371,12 @@ public class HubIntRestService {
      */
     private VersionComparison compareWithHubVersion(String version, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
             BDRestException, URISyntaxException {
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/v1/current-version-comparison?version=");
+        urlBuilder.append(version);
 
-        String url = getBaseUrl() + "/api/v1/current-version-comparison?version=" + version;
+        String url = urlBuilder.toString();
         ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
