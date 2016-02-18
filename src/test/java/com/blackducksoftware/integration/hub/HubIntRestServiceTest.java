@@ -12,11 +12,13 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.response.DistributionEnum;
 import com.blackducksoftware.integration.hub.response.PhaseEnum;
@@ -30,11 +32,13 @@ public class HubIntRestServiceTest {
 
     private static Properties testProperties;
 
+    private static HubIntTestHelper helper;
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
     @BeforeClass
-    public static void testInit() {
+    public static void testInit() throws Exception {
         testProperties = new Properties();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         InputStream is = classLoader.getResourceAsStream("test.properties");
@@ -47,6 +51,42 @@ public class HubIntRestServiceTest {
         System.out.println(testProperties.getProperty("TEST_HUB_SERVER_URL"));
         System.out.println(testProperties.getProperty("TEST_USERNAME"));
         System.out.println(testProperties.getProperty("TEST_PASSWORD"));
+
+        helper = new HubIntTestHelper(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        helper.setLogger(new TestLogger());
+        helper.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
+
+        try {
+            ProjectItem project = helper.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
+
+            List<ReleaseItem> projectVersions = helper.getVersionsForProject(project.getId());
+            boolean versionExists = false;
+            for (ReleaseItem release : projectVersions) {
+                if (testProperties.getProperty("TEST_VERSION").equals(release.getVersion())) {
+                    versionExists = true;
+                    break;
+                }
+            }
+            if (!versionExists) {
+                helper.createHubVersion(testProperties.getProperty("TEST_VERSION"), project.getId(),
+                        testProperties.getProperty("TEST_PHASE"),
+                        testProperties.getProperty("TEST_DISTRIBUTION"));
+            }
+
+        } catch (ProjectDoesNotExistException e) {
+            helper.createHubProjectAndVersion(testProperties.getProperty("TEST_PROJECT"), testProperties.getProperty("TEST_VERSION"),
+                    testProperties.getProperty("TEST_PHASE"), testProperties.getProperty("TEST_DISTRIBUTION"));
+        }
+    }
+
+    @AfterClass
+    public static void testTeardown() {
+        try {
+            ProjectItem project = helper.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
+            helper.deleteHubProject(project.getId());
+        } catch (Exception e) {
+
+        }
 
     }
 
@@ -97,6 +137,9 @@ public class HubIntRestServiceTest {
 
             projectId = restService.createHubProject(testProjectName);
 
+            // Sleep for 1 second, server takes a second before you can start using projects
+            Thread.sleep(1000);
+
             List<AutoCompleteItem> matches = restService.getProjectMatches(testProjectName);
 
             assertNotNull("matches must be not null", matches);
@@ -104,7 +147,6 @@ public class HubIntRestServiceTest {
             assertTrue("error log expected to be empty", logger.getErrorList().isEmpty());
         } finally {
             if (StringUtils.isNotBlank(projectId)) {
-                HubIntTestHelper helper = new HubIntTestHelper(restService);
                 helper.deleteHubProject(projectId);
             }
         }
@@ -157,15 +199,12 @@ public class HubIntRestServiceTest {
                 }
             }
             if (StringUtils.isNotBlank(projectId)) {
-                HubIntTestHelper helper = new HubIntTestHelper(restService);
                 helper.deleteHubProject(projectId);
             }
         }
 
         assertTrue(logger.getErrorList().isEmpty());
     }
-
-    // TODO
 
     @Test
     public void testGetProjectById() throws Exception {
@@ -275,7 +314,6 @@ public class HubIntRestServiceTest {
                 }
             }
             if (StringUtils.isNotBlank(projectId)) {
-                HubIntTestHelper helper = new HubIntTestHelper(restService);
                 helper.deleteHubProject(projectId);
             }
         }
@@ -308,7 +346,6 @@ public class HubIntRestServiceTest {
                 }
             }
             if (StringUtils.isNotBlank(projectId)) {
-                HubIntTestHelper helper = new HubIntTestHelper(restService);
                 helper.deleteHubProject(projectId);
             }
         }
@@ -342,7 +379,6 @@ public class HubIntRestServiceTest {
                 }
             }
             if (StringUtils.isNotBlank(projectId)) {
-                HubIntTestHelper helper = new HubIntTestHelper(restService);
                 helper.deleteHubProject(projectId);
             }
         }
@@ -378,7 +414,6 @@ public class HubIntRestServiceTest {
                 }
             }
             if (StringUtils.isNotBlank(projectId)) {
-                HubIntTestHelper helper = new HubIntTestHelper(restService);
                 helper.deleteHubProject(projectId);
             }
         }
