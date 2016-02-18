@@ -1292,7 +1292,7 @@ public class HubIntRestService {
     private String getHubVersion(ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException, URISyntaxException {
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/current-version/api/v1/projects");
+        urlBuilder.append("/api/v1/current-version/");
 
         String url = urlBuilder.toString();
         ClientResource resource = createClientResource(url);
