@@ -970,6 +970,10 @@ public class HubIntRestService {
      */
     public String generateHubReport(String versionId, ReportFormatEnum reportFormat) throws IOException, BDRestException,
             URISyntaxException {
+        if (ReportFormatEnum.UNKNOWN == reportFormat) {
+            throw new IllegalArgumentException("Can not generate a report of format : " + reportFormat);
+        }
+
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(getBaseUrl());
         urlBuilder.append("/api/versions/");
@@ -1038,7 +1042,7 @@ public class HubIntRestService {
             String response = resource.getResponse().getEntityAsText();
 
             ReportMetaInformationItem reportMetaInfo = new Gson().fromJson(response, ReportMetaInformationItem.class);
-
+            // FIXME return ReportMetaInformationItem so we can determine when the report completed?
             return reportMetaInfo.get_meta().getLinks();
         } else {
             throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);

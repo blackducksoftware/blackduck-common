@@ -491,6 +491,15 @@ public class HubIntRestServiceTest {
     }
 
     @Test
+    public void testGenerateHubReportFormatUNKNOWN() throws Exception {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Can not generate a report of format : ");
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+
+        restService.generateHubReport(null, ReportFormatEnum.UNKNOWN);
+    }
+
+    @Test
     public void testGenerateHubReportAndGetReportLinks() throws Exception {
         TestLogger logger = new TestLogger();
 
