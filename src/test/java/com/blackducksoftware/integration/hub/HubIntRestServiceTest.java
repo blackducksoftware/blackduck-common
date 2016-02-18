@@ -24,6 +24,8 @@ import com.blackducksoftware.integration.hub.response.DistributionEnum;
 import com.blackducksoftware.integration.hub.response.PhaseEnum;
 import com.blackducksoftware.integration.hub.response.ProjectItem;
 import com.blackducksoftware.integration.hub.response.ReleaseItem;
+import com.blackducksoftware.integration.hub.response.ReportFormatEnum;
+import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem.ReportMetaLinkItem;
 import com.blackducksoftware.integration.hub.response.VersionComparison;
 import com.blackducksoftware.integration.hub.util.HubIntTestHelper;
 import com.blackducksoftware.integration.hub.util.TestLogger;
@@ -459,4 +461,74 @@ public class HubIntRestServiceTest {
 
         assertTrue(logger.getErrorList().isEmpty());
     }
+
+    @Test
+    public void testGenerateHubReport() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setLogger(logger);
+        restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
+
+        ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
+        List<ReleaseItem> releases = restService.getVersionsForProject(project.getId());
+        ReleaseItem release = null;
+        for (ReleaseItem currentRelease : releases) {
+            if (testProperties.getProperty("TEST_VERSION").equals(currentRelease.getVersion())) {
+                release = currentRelease;
+                break;
+            }
+        }
+        assertNotNull(
+                "In project : " + testProperties.getProperty("TEST_PROJECT") + " , could not find the version : " + testProperties.getProperty("TEST_VERSION"),
+                release);
+        String reportUrl = null;
+        reportUrl = restService.generateHubReport(release.getId(), ReportFormatEnum.JSON);
+
+        assertNotNull(reportUrl, reportUrl);
+        // The project specified in the test properties file will be deleted at the end of the tests
+        // So we dont need to worry about cleaning up the reports
+    }
+
+    @Test
+    public void testGenerateHubReportAndGetReportLinks() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setLogger(logger);
+        restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
+
+        ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
+        List<ReleaseItem> releases = restService.getVersionsForProject(project.getId());
+        ReleaseItem release = null;
+        for (ReleaseItem currentRelease : releases) {
+            if (testProperties.getProperty("TEST_VERSION").equals(currentRelease.getVersion())) {
+                release = currentRelease;
+                break;
+            }
+        }
+        assertNotNull(
+                "In project : " + testProperties.getProperty("TEST_PROJECT") + " , could not find the version : " + testProperties.getProperty("TEST_VERSION"),
+                release);
+
+        String reportUrl = null;
+        // FIXME this keeps throwing 512 when run through Maven
+        reportUrl = restService.generateHubReport(release.getId(), ReportFormatEnum.JSON);
+
+        assertNotNull(reportUrl, reportUrl);
+
+        List<ReportMetaLinkItem> links = restService.getReportLinks(reportUrl);
+
+        ReportMetaLinkItem contentLink = null;
+        for (ReportMetaLinkItem link : links) {
+            if (link.getRel().equalsIgnoreCase("content")) {
+                contentLink = link;
+                break;
+            }
+        }
+        assertNotNull("Could not find the content link for the report at : " + reportUrl, contentLink);
+        // The project specified in the test properties file will be deleted at the end of the tests
+        // So we dont need to worry about cleaning up the reports
+    }
+
 }
