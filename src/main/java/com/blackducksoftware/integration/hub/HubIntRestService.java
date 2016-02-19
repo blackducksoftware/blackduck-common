@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
@@ -38,7 +39,6 @@ import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistExcept
 import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.response.ProjectItem;
 import com.blackducksoftware.integration.hub.response.ReleaseItem;
-import com.blackducksoftware.integration.hub.response.ReleasesList;
 import com.blackducksoftware.integration.hub.response.VersionComparison;
 import com.blackducksoftware.integration.hub.response.mapping.AssetReferenceItem;
 import com.blackducksoftware.integration.hub.response.mapping.EntityItem;
@@ -46,6 +46,7 @@ import com.blackducksoftware.integration.hub.response.mapping.EntityTypeEnum;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class HubIntRestService {
@@ -904,10 +905,14 @@ public class HubIntRestService {
                 }
                 bufReader.close();
                 Gson gson = new GsonBuilder().create();
-                // have to turn it into the ReleasesList object because of the way they formatted the json
-                ReleasesList releasesList = gson.fromJson(sb.toString(), ReleasesList.class);
+                JsonObject releaseListJsonObj = gson.fromJson(sb.toString(), JsonObject.class);
 
-                return releasesList.getItems();
+                Type listType = new TypeToken<ArrayList<ReleaseItem>>() {
+                }.getType();
+
+                List<ReleaseItem> releasesList = gson.fromJson(releaseListJsonObj.get("items"), listType);
+
+                return releasesList;
 
             } else {
                 throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
