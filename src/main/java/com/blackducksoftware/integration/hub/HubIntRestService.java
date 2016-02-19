@@ -38,6 +38,7 @@ import org.restlet.util.Series;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
+import com.blackducksoftware.integration.hub.report.api.VersionReport;
 import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.response.ProjectItem;
 import com.blackducksoftware.integration.hub.response.ReleaseItem;
@@ -342,19 +343,10 @@ public class HubIntRestService {
         int responseCode = resource.getResponse().getStatus().getCode();
 
         if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-            Response resp = resource.getResponse();
-            Reader reader = resp.getEntity().getReader();
-            BufferedReader bufReader = new BufferedReader(reader);
-            StringBuilder sb = new StringBuilder();
-            String line = bufReader.readLine();
-            while (line != null) {
-                sb.append(line + "\n");
-                line = bufReader.readLine();
-            }
-            bufReader.close();
+            String response = readResponseAsString(resource.getResponse());
 
             Gson gson = new GsonBuilder().create();
-            return gson.fromJson(sb.toString(), new TypeToken<List<AutoCompleteItem>>() {
+            return gson.fromJson(response, new TypeToken<List<AutoCompleteItem>>() {
             }.getType());
 
         } else {
@@ -386,19 +378,10 @@ public class HubIntRestService {
         int responseCode = resource.getResponse().getStatus().getCode();
 
         if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-            Response resp = resource.getResponse();
-            Reader reader = resp.getEntity().getReader();
-            BufferedReader bufReader = new BufferedReader(reader);
-            StringBuilder sb = new StringBuilder();
-            String line = bufReader.readLine();
-            while (line != null) {
-                sb.append(line + "\n");
-                line = bufReader.readLine();
-            }
-            bufReader.close();
-            // logger.info(sb.toString());
+            String response = readResponseAsString(resource.getResponse());
+            // logger.info(response);
             Gson gson = new GsonBuilder().create();
-            return gson.fromJson(sb.toString(), ProjectItem.class);
+            return gson.fromJson(response, ProjectItem.class);
 
         } else {
             throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
@@ -429,18 +412,9 @@ public class HubIntRestService {
         int responseCode = resource.getResponse().getStatus().getCode();
 
         if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-            Response resp = resource.getResponse();
-            Reader reader = resp.getEntity().getReader();
-            BufferedReader bufReader = new BufferedReader(reader);
-            StringBuilder sb = new StringBuilder();
-            String line = bufReader.readLine();
-            while (line != null) {
-                sb.append(line + "\n");
-                line = bufReader.readLine();
-            }
-            bufReader.close();
+            String response = readResponseAsString(resource.getResponse());
             Gson gson = new GsonBuilder().create();
-            return gson.fromJson(sb.toString(), ProjectItem.class);
+            return gson.fromJson(response, ProjectItem.class);
 
         } else if (responseCode == 404) {
             throw new ProjectDoesNotExistException("This Project does not exist.", resource);
@@ -659,18 +633,9 @@ public class HubIntRestService {
         int responseCode = resource.getResponse().getStatus().getCode();
 
         if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-            Response resp = resource.getResponse();
-            Reader reader = resp.getEntity().getReader();
-            BufferedReader bufReader = new BufferedReader(reader);
-            StringBuilder sb = new StringBuilder();
-            String line = bufReader.readLine();
-            while (line != null) {
-                sb.append(line + "\n");
-                line = bufReader.readLine();
-            }
-            bufReader.close();
+            String response = readResponseAsString(resource.getResponse());
             Gson gson = new GsonBuilder().create();
-            JsonObject releaseListJsonObj = gson.fromJson(sb.toString(), JsonObject.class);
+            JsonObject releaseListJsonObj = gson.fromJson(response, JsonObject.class);
 
             Type listType = new TypeToken<ArrayList<ReleaseItem>>() {
             }.getType();
@@ -717,17 +682,8 @@ public class HubIntRestService {
 
         if (responseCode == 201) {
 
-            Response resp = resource.getResponse();
-            Reader reader = resp.getEntity().getReader();
-            BufferedReader bufReader = new BufferedReader(reader);
-            StringBuilder sb = new StringBuilder();
-            String line = bufReader.readLine();
-            while (line != null) {
-                sb.append(line + "\n");
-                line = bufReader.readLine();
-            }
-            bufReader.close();
-            ProjectItem project = gson.fromJson(sb.toString(), ProjectItem.class);
+            String response = readResponseAsString(resource.getResponse());
+            ProjectItem project = gson.fromJson(response, ProjectItem.class);
             return project.getId();
 
         } else {
@@ -780,17 +736,8 @@ public class HubIntRestService {
 
         if (responseCode == 201) {
 
-            Response resp = resource.getResponse();
-            Reader reader = resp.getEntity().getReader();
-            BufferedReader bufReader = new BufferedReader(reader);
-            StringBuilder sb = new StringBuilder();
-            String line = bufReader.readLine();
-            while (line != null) {
-                sb.append(line + "\n");
-                line = bufReader.readLine();
-            }
-            bufReader.close();
-            ReleaseItem release = gson.fromJson(sb.toString(), ReleaseItem.class);
+            String response = readResponseAsString(resource.getResponse());
+            ReleaseItem release = gson.fromJson(response, ReleaseItem.class);
             return release.getId();
         } else {
             throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
@@ -842,17 +789,8 @@ public class HubIntRestService {
 
         if (responseCode == 201) {
 
-            Response resp = resource.getResponse();
-            Reader reader = resp.getEntity().getReader();
-            BufferedReader bufReader = new BufferedReader(reader);
-            StringBuilder sb = new StringBuilder();
-            String line = bufReader.readLine();
-            while (line != null) {
-                sb.append(line + "\n");
-                line = bufReader.readLine();
-            }
-            bufReader.close();
-            ProjectItem project = gson.fromJson(sb.toString(), ProjectItem.class);
+            String response = readResponseAsString(resource.getResponse());
+            ProjectItem project = gson.fromJson(response, ProjectItem.class);
             return project.getId();
 
         } else {
@@ -918,18 +856,9 @@ public class HubIntRestService {
 
         if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
 
-            Response resp = resource.getResponse();
-            Reader reader = resp.getEntity().getReader();
-            BufferedReader bufReader = new BufferedReader(reader);
-            StringBuilder sb = new StringBuilder();
-            String line = bufReader.readLine();
-            while (line != null) {
-                sb.append(line + "\n");
-                line = bufReader.readLine();
-            }
-            bufReader.close();
+            String response = readResponseAsString(resource.getResponse());
             Gson gson = new GsonBuilder().create();
-            VersionComparison comparison = gson.fromJson(sb.toString(), VersionComparison.class);
+            VersionComparison comparison = gson.fromJson(response, VersionComparison.class);
             return comparison;
         } else {
             throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
@@ -1016,8 +945,7 @@ public class HubIntRestService {
         int responseCode = resource.getResponse().getStatus().getCode();
 
         if (responseCode == 200) {
-
-            String response = resource.getResponse().getEntityAsText();
+            String response = readResponseAsString(resource.getResponse());
 
             return new Gson().fromJson(response, ReportMetaInformationItem.class);
         } else {
@@ -1027,17 +955,17 @@ public class HubIntRestService {
     }
 
     /**
-     * Get the links from the Report Url
+     * Gets the content of the report
      *
      * @param reportUrl
      *            String
      *
-     * @return (ReportMetaInformationItem) report meta information
+     * @return (VersionReport) report content
      * @throws IOException
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    public ReportMetaInformationItem getReportContent(String reportContentUrl) throws IOException, BDRestException,
+    public VersionReport getReportContent(String reportContentUrl) throws IOException, BDRestException,
             URISyntaxException {
 
         ClientResource resource = createClientResource(reportContentUrl);
@@ -1048,14 +976,35 @@ public class HubIntRestService {
         int responseCode = resource.getResponse().getStatus().getCode();
 
         if (responseCode == 200) {
+            String response = readResponseAsString(resource.getResponse());
 
-            String response = resource.getResponse().getEntityAsText();
+            Gson gson = new GsonBuilder().create();
 
-            return new Gson().fromJson(response, ReportMetaInformationItem.class);
+            JsonObject reportContent = gson.fromJson(response, JsonObject.class);
+
+            VersionReport report = gson.fromJson(reportContent.get("reportContent"), VersionReport.class);
+
+            return report;
         } else {
             throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
         }
 
+    }
+
+    private String readResponseAsString(Response response) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        Reader reader = response.getEntity().getReader();
+        BufferedReader bufReader = new BufferedReader(reader);
+        try {
+            String line = bufReader.readLine();
+            while (line != null) {
+                sb.append(line + "\n");
+                line = bufReader.readLine();
+            }
+        } finally {
+            bufReader.close();
+        }
+        return sb.toString();
     }
 
     private void handleRequest(ClientResource resource, ChallengeRequest proxyChallengeRequest,
