@@ -25,6 +25,7 @@ import com.blackducksoftware.integration.hub.response.PhaseEnum;
 import com.blackducksoftware.integration.hub.response.ProjectItem;
 import com.blackducksoftware.integration.hub.response.ReleaseItem;
 import com.blackducksoftware.integration.hub.response.ReportFormatEnum;
+import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
 import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem.ReportMetaLinkItem;
 import com.blackducksoftware.integration.hub.response.VersionComparison;
 import com.blackducksoftware.integration.hub.util.HubIntTestHelper;
@@ -521,12 +522,15 @@ public class HubIntRestServiceTest {
                 release);
 
         String reportUrl = null;
+        System.err.println(release.getId());
         // FIXME this keeps throwing 512 when run through Maven
         reportUrl = restService.generateHubReport(release.getId(), ReportFormatEnum.JSON);
 
         assertNotNull(reportUrl, reportUrl);
 
-        List<ReportMetaLinkItem> links = restService.getReportLinks(reportUrl);
+        ReportMetaInformationItem reportInfo = restService.getReportLinks(reportUrl);
+
+        List<ReportMetaLinkItem> links = reportInfo.get_meta().getLinks();
 
         ReportMetaLinkItem contentLink = null;
         for (ReportMetaLinkItem link : links) {

@@ -42,10 +42,8 @@ import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.response.ProjectItem;
 import com.blackducksoftware.integration.hub.response.ReleaseItem;
 import com.blackducksoftware.integration.hub.response.ReleasesList;
-import com.blackducksoftware.integration.hub.response.ReportCreationItem;
 import com.blackducksoftware.integration.hub.response.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
-import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem.ReportMetaLinkItem;
 import com.blackducksoftware.integration.hub.response.VersionComparison;
 import com.blackducksoftware.integration.hub.response.mapping.AssetReferenceItem;
 import com.blackducksoftware.integration.hub.response.mapping.EntityItem;
@@ -53,6 +51,7 @@ import com.blackducksoftware.integration.hub.response.mapping.EntityTypeEnum;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class HubIntRestService {
@@ -986,10 +985,11 @@ public class HubIntRestService {
         resource.getRequest().setCookies(getCookies());
         resource.setMethod(Method.POST);
 
-        ReportCreationItem newReportItem = new ReportCreationItem(reportFormat);
+        JsonObject json = new JsonObject();
+        json.addProperty("reportFormat", reportFormat.name());
 
         Gson gson = new GsonBuilder().create();
-        StringRepresentation stringRep = new StringRepresentation(gson.toJson(newReportItem));
+        StringRepresentation stringRep = new StringRepresentation(gson.toJson(json));
         stringRep.setMediaType(MediaType.APPLICATION_JSON);
         resource.getRequest().setEntity(stringRep);
         handleRequest(resource, null, 0);
@@ -1021,12 +1021,12 @@ public class HubIntRestService {
      * @param reportUrl
      *            String
      *
-     * @return (List<<ReportMetaLinkItem>>) report links
+     * @return (ReportMetaInformationItem) report meta information
      * @throws IOException
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    public List<ReportMetaLinkItem> getReportLinks(String reportUrl) throws IOException, BDRestException,
+    public ReportMetaInformationItem getReportLinks(String reportUrl) throws IOException, BDRestException,
             URISyntaxException {
 
         ClientResource resource = createClientResource(reportUrl);
@@ -1041,9 +1041,40 @@ public class HubIntRestService {
 
             String response = resource.getResponse().getEntityAsText();
 
-            ReportMetaInformationItem reportMetaInfo = new Gson().fromJson(response, ReportMetaInformationItem.class);
-            // FIXME return ReportMetaInformationItem so we can determine when the report completed?
-            return reportMetaInfo.get_meta().getLinks();
+            return new Gson().fromJson(response, ReportMetaInformationItem.class);
+        } else {
+            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+        }
+
+    }
+
+    /**
+     * Get the links from the Report Url
+     *
+     * @param reportUrl
+     *            String
+     *
+     * @return (ReportMetaInformationItem) report meta information
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    public ReportMetaInformationItem getReportContent(String reportContentUrl) throws IOException, BDRestException,
+            URISyntaxException {
+
+        ClientResource resource = createClientResource(reportContentUrl);
+
+        resource.getRequest().setCookies(getCookies());
+        resource.setMethod(Method.GET);
+
+        handleRequest(resource, null, 0);
+        int responseCode = resource.getResponse().getStatus().getCode();
+
+        if (responseCode == 200) {
+
+            String response = resource.getResponse().getEntityAsText();
+
+            return new Gson().fromJson(response, ReportMetaInformationItem.class);
         } else {
             throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
         }
