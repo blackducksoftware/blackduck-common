@@ -9,7 +9,6 @@ import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -176,8 +175,7 @@ public class HubIntRestService {
      * @throws URISyntaxException
      * @throws MalformedURLException
      */
-    private ClientResource createClientResource(String url) throws URISyntaxException {
-        url = url.replaceAll(" ", "%20");
+    private ClientResource createClientResource() throws URISyntaxException {
 
         Context context = new Context();
 
@@ -191,7 +189,7 @@ public class HubIntRestService {
         context.getParameters().add("readTimeout", stringTimeout);
         // Should throw timeout exception after the specified timeout, default is 2 minutes
 
-        ClientResource resource = new ClientResource(context, new URI(url));
+        ClientResource resource = new ClientResource(context, new URI(getBaseUrl()));
         return resource;
     }
 
@@ -278,15 +276,11 @@ public class HubIntRestService {
      */
     private int setCookies(String hubUserName, String hubPassword, ChallengeRequest proxyChallengeRequest, int attempt) throws HubIntegrationException,
             URISyntaxException, BDRestException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/j_spring_security_check?j_username=");
-        urlBuilder.append(hubUserName);
-        urlBuilder.append("&j_password=");
-        urlBuilder.append(hubPassword);
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
+        ClientResource resource = createClientResource();
+        resource.addSegment("j_spring_security_check");
+        resource.addQueryParameter("j_username", hubUserName);
+        resource.addQueryParameter("j_password", hubPassword);
 
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
@@ -379,14 +373,15 @@ public class HubIntRestService {
      */
     private List<AutoCompleteItem> getProjectMatches(String hubProjectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
             BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/autocomplete/PROJECT?text=");
-        urlBuilder.append(hubProjectName);
-        urlBuilder.append("&limit=30&ownership=0");
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("autocomplete");
+        resource.addSegment("PROJECT");
+        resource.addQueryParameter("text", hubProjectName);
+        resource.addQueryParameter("limit", "30");
+        resource.addQueryParameter("ownership", "0");
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
             // BUT it doesn't work for Digest authentication
@@ -469,13 +464,12 @@ public class HubIntRestService {
      */
     private ProjectItem getProjectById(String projectId, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
             BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/projects/");
-        urlBuilder.append(projectId);
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("projects");
+        resource.addSegment(projectId);
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
             // BUT it doesn't work for Digest authentication
@@ -558,17 +552,12 @@ public class HubIntRestService {
      */
     private ProjectItem getProjectByName(String projectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException,
             URISyntaxException, ProjectDoesNotExistException {
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("projects");
+        resource.addQueryParameter("name", projectName);
 
-        // Need to URL encode the name since it will be in the URL
-        projectName = URLEncoder.encode(projectName, "UTF-8");
-
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/projects?name=");
-        urlBuilder.append(projectName);
-
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
             // BUT it doesn't work for Digest authentication
@@ -684,19 +673,17 @@ public class HubIntRestService {
                     targetPath = "/" + targetPath;
                 }
 
-                StringBuilder urlBuilder = new StringBuilder();
-                urlBuilder.append(getBaseUrl());
-                urlBuilder.append("/api/v1/scanlocations?host=");
-                urlBuilder.append(hostname);
-                urlBuilder.append("&path=");
-                urlBuilder.append(targetPath);
-
-                url = urlBuilder.toString();
                 logger.debug(
                         "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + targetPath +
                                 "'");
 
-                resource = createClientResource(url);
+                resource = createClientResource();
+                resource.addSegment("api");
+                resource.addSegment("v1");
+                resource.addSegment("scanlocations");
+                resource.addQueryParameter("host", hostname);
+                resource.addQueryParameter("path", targetPath);
+
                 if (proxyChallengeRequest != null) {
                     // This should replace the authenticator for the proxy authentication
                     // BUT it doesn't work for Digest authentication
@@ -767,12 +754,11 @@ public class HubIntRestService {
      */
     private void mapScansToProjectVersion(Map<String, Boolean> scanLocationIds, String
             versionId, ChallengeRequest proxyChallengeRequest, int attempt) throws BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/assetreferences");
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("assetreferences");
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
             // BUT it doesn't work for Digest authentication
@@ -884,14 +870,12 @@ public class HubIntRestService {
      */
     private List<ReleaseItem> getVersionsForProject(String projectId, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
             BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/projects/");
-        urlBuilder.append(projectId);
-        urlBuilder.append("/releases");
-
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("projects");
+        resource.addSegment(projectId);
+        resource.addSegment("releases");
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
             // BUT it doesn't work for Digest authentication
@@ -975,12 +959,11 @@ public class HubIntRestService {
      */
     private String createHubProject(String projectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException,
             URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/projects");
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("projects");
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
             // BUT it doesn't work for Digest authentication
@@ -1082,12 +1065,10 @@ public class HubIntRestService {
      */
     private String createHubVersion(String projectVersion, String projectId, String phase, String dist, ChallengeRequest proxyChallengeRequest, int attempt)
             throws IOException, BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/releases");
-
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("releases");
 
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
@@ -1195,12 +1176,10 @@ public class HubIntRestService {
     private String createHubProjectAndVersion(String projectName, String versionName, String phase, String dist, ChallengeRequest proxyChallengeRequest,
             int attempt) throws IOException, BDRestException,
             URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/projects");
-
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("projects");
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
             // BUT it doesn't work for Digest authentication
@@ -1290,12 +1269,11 @@ public class HubIntRestService {
      * @throws URISyntaxException
      */
     private String getHubVersion(ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/current-version/");
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("current-version");
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
             // BUT it doesn't work for Digest authentication
@@ -1369,13 +1347,12 @@ public class HubIntRestService {
      */
     private VersionComparison compareWithHubVersion(String version, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
             BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/current-version-comparison?version=");
-        urlBuilder.append(version);
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("current-version-comparison");
+        resource.addQueryParameter("version", version);
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
             // BUT it doesn't work for Digest authentication
