@@ -9,7 +9,6 @@ import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -181,8 +180,20 @@ public class HubIntRestService {
      * @throws URISyntaxException
      * @throws MalformedURLException
      */
-    private ClientResource createClientResource(String url) throws URISyntaxException {
-        url = url.replaceAll(" ", "%20");
+    private ClientResource createClientResource() throws URISyntaxException {
+        return createClientResource(getBaseUrl());
+    }
+
+    /**
+     * Create the Client Resource
+     *
+     * @param url
+     *            String
+     * @return ClientResource
+     * @throws URISyntaxException
+     * @throws MalformedURLException
+     */
+    private ClientResource createClientResource(String providedUrl) throws URISyntaxException {
 
         Context context = new Context();
 
@@ -196,7 +207,8 @@ public class HubIntRestService {
         context.getParameters().add("readTimeout", stringTimeout);
         // Should throw timeout exception after the specified timeout, default is 2 minutes
 
-        ClientResource resource = new ClientResource(context, new URI(url));
+        ClientResource resource = new ClientResource(context, new URI(getBaseUrl()));
+        resource.getRequest().setCookies(getCookies());
         return resource;
     }
 
@@ -262,15 +274,11 @@ public class HubIntRestService {
      */
     public int setCookies(String hubUserName, String hubPassword) throws HubIntegrationException,
             URISyntaxException, BDRestException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/j_spring_security_check?j_username=");
-        urlBuilder.append(hubUserName);
-        urlBuilder.append("&j_password=");
-        urlBuilder.append(hubPassword);
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
+        ClientResource resource = createClientResource();
+        resource.addSegment("j_spring_security_check");
+        resource.addQueryParameter("j_username", hubUserName);
+        resource.addQueryParameter("j_password", hubPassword);
 
         resource.setMethod(Method.POST);
 
@@ -320,15 +328,15 @@ public class HubIntRestService {
      */
     public List<AutoCompleteItem> getProjectMatches(String hubProjectName) throws IOException,
             BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/autocomplete/PROJECT?text=");
-        urlBuilder.append(hubProjectName);
-        urlBuilder.append("&limit=30&ownership=0");
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("autocomplete");
+        resource.addSegment("PROJECT");
+        resource.addQueryParameter("text", hubProjectName);
+        resource.addQueryParameter("limit", "30");
+        resource.addQueryParameter("ownership", "0");
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
-        resource.getRequest().setCookies(getCookies());
         resource.setMethod(Method.GET);
         handleRequest(resource, null, 0);
         int responseCode = resource.getResponse().getStatus().getCode();
@@ -367,14 +375,12 @@ public class HubIntRestService {
      */
     public ProjectItem getProjectById(String projectId) throws IOException,
             BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/projects/");
-        urlBuilder.append(projectId);
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("projects");
+        resource.addSegment(projectId);
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
-        resource.getRequest().setCookies(getCookies());
         resource.setMethod(Method.GET);
         handleRequest(resource, null, 0);
         int responseCode = resource.getResponse().getStatus().getCode();
@@ -413,18 +419,11 @@ public class HubIntRestService {
      */
     public ProjectItem getProjectByName(String projectName) throws IOException, BDRestException,
             URISyntaxException, ProjectDoesNotExistException {
-
-        // Need to URL encode the name since it will be in the URL
-        projectName = URLEncoder.encode(projectName, "UTF-8");
-
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/projects?name=");
-        urlBuilder.append(projectName);
-
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
-        resource.getRequest().setCookies(getCookies());
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("projects");
+        resource.addQueryParameter("name", projectName);
         resource.setMethod(Method.GET);
         handleRequest(resource, null, 0);
         int responseCode = resource.getResponse().getStatus().getCode();
@@ -507,7 +506,6 @@ public class HubIntRestService {
             InterruptedException, BDRestException, HubIntegrationException, URISyntaxException {
         HashMap<String, Boolean> scanLocationIds = new HashMap<String, Boolean>();
         ClientResource resource = null;
-        String url = null;
         try {
             for (String targetPath : scanTargets) {
                 // Scan paths in the Hub only use '/' not '\'
@@ -519,19 +517,17 @@ public class HubIntRestService {
                     targetPath = "/" + targetPath;
                 }
 
-                StringBuilder urlBuilder = new StringBuilder();
-                urlBuilder.append(getBaseUrl());
-                urlBuilder.append("/api/v1/scanlocations?host=");
-                urlBuilder.append(hostname);
-                urlBuilder.append("&path=");
-                urlBuilder.append(targetPath);
-
-                url = urlBuilder.toString();
                 logger.debug(
                         "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + targetPath +
                                 "'");
 
-                resource = createClientResource(url);
+                resource = createClientResource();
+                resource.addSegment("api");
+                resource.addSegment("v1");
+                resource.addSegment("scanlocations");
+                resource.addQueryParameter("host", hostname);
+                resource.addQueryParameter("path", targetPath);
+
                 if (proxyChallengeRequest != null) {
                     // This should replace the authenticator for the proxy authentication
                     // BUT it doesn't work for Digest authentication
@@ -542,7 +538,6 @@ public class HubIntRestService {
                             0, 0L));
                 }
 
-                resource.getRequest().setCookies(getCookies());
                 resource.setMethod(Method.GET);
 
                 ScanLocationHandler handler = new ScanLocationHandler(logger);
@@ -580,12 +575,10 @@ public class HubIntRestService {
      */
     public void mapScansToProjectVersion(Map<String, Boolean> scanLocationIds, String
             versionId) throws BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/assetreferences");
-
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("assetreferences");
         if (!scanLocationIds.isEmpty()) {
             for (Entry<String, Boolean> scanId : scanLocationIds.entrySet()) {
                 if (!scanId.getValue()) {
@@ -593,9 +586,6 @@ public class HubIntRestService {
                     logger.debug(
                             "Mapping the scan location with id: '" + scanId.getKey() + "', to the Version with Id: '" + versionId +
                                     "'.");
-
-                    resource.getRequest().setCookies(getCookies());
-                    resource.setMethod(Method.POST);
 
                     AssetReferenceItem assetReference = new AssetReferenceItem();
 
@@ -616,7 +606,7 @@ public class HubIntRestService {
                     logger.debug("Asset reference mapping object : " + gson.toJson(assetReference));
                     StringRepresentation stringRep = new StringRepresentation(gson.toJson(assetReference));
                     stringRep.setMediaType(MediaType.APPLICATION_JSON);
-                    resource.getRequest().setCookies(getCookies());
+
                     resource.setMethod(Method.POST);
                     handleRequest(resource, null, 0);
                     int responseCode = resource.getResponse().getStatus().getCode();
@@ -657,15 +647,13 @@ public class HubIntRestService {
      */
     public List<ReleaseItem> getVersionsForProject(String projectId) throws IOException,
             BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/projects/");
-        urlBuilder.append(projectId);
-        urlBuilder.append("/releases");
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("projects");
+        resource.addSegment(projectId);
+        resource.addSegment("releases");
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
-        resource.getRequest().setCookies(getCookies());
         resource.setMethod(Method.GET);
         handleRequest(resource, null, 0);
         int responseCode = resource.getResponse().getStatus().getCode();
@@ -706,13 +694,11 @@ public class HubIntRestService {
      */
     public String createHubProject(String projectName) throws IOException, BDRestException,
             URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/projects");
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("projects");
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
-        resource.getRequest().setCookies(getCookies());
         resource.setMethod(Method.POST);
 
         ProjectItem newProject = new ProjectItem();
@@ -767,12 +753,10 @@ public class HubIntRestService {
      */
     public String createHubVersion(String projectVersion, String projectId, String phase, String dist)
             throws IOException, BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/releases");
-
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("releases");
 
         int responseCode;
         ReleaseItem newRelease = new ReleaseItem();
@@ -781,7 +765,6 @@ public class HubIntRestService {
         newRelease.setPhase(phase);
         newRelease.setDistribution(dist);
 
-        resource.getRequest().setCookies(getCookies());
         resource.setMethod(Method.POST);
 
         Gson gson = new GsonBuilder().create();
@@ -831,18 +814,16 @@ public class HubIntRestService {
      */
     public String createHubProjectAndVersion(String projectName, String versionName, String phase, String dist) throws IOException, BDRestException,
             URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/projects");
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("projects");
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
         ReleaseItem newRelease = new ReleaseItem();
         newRelease.setVersion(versionName);
         newRelease.setPhase(phase);
         newRelease.setDistribution(dist);
 
-        resource.getRequest().setCookies(getCookies());
         resource.setMethod(Method.POST);
 
         ProjectItem newProject = new ProjectItem();
@@ -887,14 +868,13 @@ public class HubIntRestService {
      * @throws URISyntaxException
      */
     public String getHubVersion() throws IOException, BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/current-version/");
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("current-version");
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
         int responseCode = 0;
-        resource.getRequest().setCookies(getCookies());
+
         resource.setMethod(Method.GET);
         handleRequest(resource, null, 0);
         responseCode = resource.getResponse().getStatus().getCode();
@@ -920,15 +900,15 @@ public class HubIntRestService {
      */
     public VersionComparison compareWithHubVersion(String version) throws IOException,
             BDRestException, URISyntaxException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/v1/current-version-comparison?version=");
-        urlBuilder.append(version);
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("v1");
+        resource.addSegment("current-version-comparison");
+        resource.addQueryParameter("version", version);
+
         int responseCode = 0;
-        resource.getRequest().setCookies(getCookies());
+
         resource.setMethod(Method.GET);
         handleRequest(resource, null, 0);
         responseCode = resource.getResponse().getStatus().getCode();
@@ -973,16 +953,12 @@ public class HubIntRestService {
             throw new IllegalArgumentException("Can not generate a report of format : " + reportFormat);
         }
 
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
-        urlBuilder.append("/api/versions/");
-        urlBuilder.append(versionId);
-        urlBuilder.append("/reports");
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("versions");
+        resource.addSegment(versionId);
+        resource.addSegment("reports");
 
-        String url = urlBuilder.toString();
-        ClientResource resource = createClientResource(url);
-
-        resource.getRequest().setCookies(getCookies());
         resource.setMethod(Method.POST);
 
         JsonObject json = new JsonObject();
@@ -1031,7 +1007,6 @@ public class HubIntRestService {
 
         ClientResource resource = createClientResource(reportUrl);
 
-        resource.getRequest().setCookies(getCookies());
         resource.setMethod(Method.GET);
 
         handleRequest(resource, null, 0);
@@ -1064,7 +1039,6 @@ public class HubIntRestService {
 
         ClientResource resource = createClientResource(reportContentUrl);
 
-        resource.getRequest().setCookies(getCookies());
         resource.setMethod(Method.GET);
 
         handleRequest(resource, null, 0);
@@ -1109,5 +1083,4 @@ public class HubIntRestService {
         }
 
     }
-
 }
