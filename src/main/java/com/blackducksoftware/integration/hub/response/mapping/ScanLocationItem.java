@@ -18,6 +18,8 @@ public class ScanLocationItem {
 
     private String scanTime;
 
+    private List<ScanHistoryItem> scanList;
+
     private List<AssetReferenceItem> assetReferenceList;
 
     public String getId() {
@@ -84,27 +86,12 @@ public class ScanLocationItem {
         this.assetReferenceList = assetReferenceList;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("ScanLocationResults [id=");
-        builder.append(id);
-        builder.append(", scanId=");
-        builder.append(scanId);
-        builder.append(", host=");
-        builder.append(host);
-        builder.append(", path=");
-        builder.append(path);
-        builder.append(", scanInitiatorName=");
-        builder.append(scanInitiatorName);
-        builder.append(", lastScanUploadDate=");
-        builder.append(lastScanUploadDate);
-        builder.append(", scanTime=");
-        builder.append(scanTime);
-        builder.append(", assetReferenceList=");
-        builder.append(assetReferenceList);
-        builder.append("]");
-        return builder.toString();
+    public List<ScanHistoryItem> getScanList() {
+        return scanList;
+    }
+
+    public void setScanList(List<ScanHistoryItem> scanList) {
+        this.scanList = scanList;
     }
 
     @Override
@@ -118,6 +105,7 @@ public class ScanLocationItem {
         result = prime * result + ((path == null) ? 0 : path.hashCode());
         result = prime * result + ((scanId == null) ? 0 : scanId.hashCode());
         result = prime * result + ((scanInitiatorName == null) ? 0 : scanInitiatorName.hashCode());
+        result = prime * result + ((scanList == null) ? 0 : scanList.hashCode());
         result = prime * result + ((scanTime == null) ? 0 : scanTime.hashCode());
         return result;
     }
@@ -183,6 +171,13 @@ public class ScanLocationItem {
         } else if (!scanInitiatorName.equals(other.scanInitiatorName)) {
             return false;
         }
+        if (scanList == null) {
+            if (other.scanList != null) {
+                return false;
+            }
+        } else if (!scanList.equals(other.scanList)) {
+            return false;
+        }
         if (scanTime == null) {
             if (other.scanTime != null) {
                 return false;
@@ -191,6 +186,31 @@ public class ScanLocationItem {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("ScanLocationItem [id=");
+        builder.append(id);
+        builder.append(", scanId=");
+        builder.append(scanId);
+        builder.append(", host=");
+        builder.append(host);
+        builder.append(", path=");
+        builder.append(path);
+        builder.append(", scanInitiatorName=");
+        builder.append(scanInitiatorName);
+        builder.append(", lastScanUploadDate=");
+        builder.append(lastScanUploadDate);
+        builder.append(", scanTime=");
+        builder.append(scanTime);
+        builder.append(", scanList=");
+        builder.append(scanList);
+        builder.append(", assetReferenceList=");
+        builder.append(assetReferenceList);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

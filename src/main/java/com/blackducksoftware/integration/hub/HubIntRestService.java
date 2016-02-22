@@ -48,6 +48,8 @@ import com.blackducksoftware.integration.hub.response.VersionComparison;
 import com.blackducksoftware.integration.hub.response.mapping.AssetReferenceItem;
 import com.blackducksoftware.integration.hub.response.mapping.EntityItem;
 import com.blackducksoftware.integration.hub.response.mapping.EntityTypeEnum;
+import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
+import com.blackducksoftware.integration.hub.response.mapping.ScanLocationResults;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -868,6 +870,94 @@ public class HubIntRestService {
     }
 
     /**
+     * Gets the code locations that match the host and paths provided
+     *
+     * @param hostname
+     *            String
+     * @param scanTargets
+     *            List<<String>>
+     *
+     * @return List<<ScanLocationItem>>
+     * @throws InterruptedException
+     * @throws BDRestException
+     * @throws HubIntegrationException
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws MalformedURLException
+     */
+    public List<ScanLocationItem> getScanLocations(String hostname, List<String>
+            scanTargets) throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
+        List<ScanLocationItem> codeLocations = new ArrayList<ScanLocationItem>();
+
+        ClientResource resource = null;
+        for (String targetPath : scanTargets) {
+            // Scan paths in the Hub only use '/' not '\'
+            if (targetPath.contains("\\")) {
+                targetPath = targetPath.replace("\\", "/");
+            }
+            // and it always starts with a '/'
+            if (!targetPath.startsWith("/")) {
+                targetPath = "/" + targetPath;
+            }
+
+            logger.debug(
+                    "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + targetPath +
+                            "'");
+
+            resource = createClientResource();
+            resource.addSegment("api");
+            resource.addSegment("v1");
+            resource.addSegment("scanlocations");
+            resource.addQueryParameter("host", hostname);
+            resource.addQueryParameter("path", targetPath);
+
+            resource.setMethod(Method.GET);
+
+            handleRequest(resource, null, 0);
+
+            int responseCode = resource.getResponse().getStatus().getCode();
+
+            if (responseCode == 200) {
+                String response = readResponseAsString(resource.getResponse());
+                ScanLocationResults results = new Gson().fromJson(response, ScanLocationResults.class);
+                ScanLocationItem currentCodeLocation = getScanLocationMatch(hostname, targetPath, results);
+
+                codeLocations.add(currentCodeLocation);
+            } else {
+                throw new BDRestException("There was a problem getting the code locations for the host and paths provided. Error Code: " + responseCode,
+                        resource);
+            }
+
+        }
+        return codeLocations;
+    }
+
+    private ScanLocationItem getScanLocationMatch(String hostname, String scanTarget, ScanLocationResults results) {
+        String targetPath = scanTarget;
+
+        if (targetPath.endsWith("/")) {
+            targetPath = targetPath.substring(0, targetPath.length() - 1);
+        }
+
+        for (ScanLocationItem scanMatch : results.getItems()) {
+
+            String path = scanMatch.getPath().trim();
+
+            // Remove trailing slash from both strings
+            if (path.endsWith("/")) {
+                path = path.substring(0, path.length() - 1);
+            }
+            logger.debug("Comparing target : '" + targetPath + "' with path : '" + path + "'.");
+            if (targetPath.equals(path)) {
+                logger.debug("MATCHED!");
+                return scanMatch;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Generates a new Hub report for the specified version.
      *
      * @param versionId
@@ -959,7 +1049,6 @@ public class HubIntRestService {
         if (responseCode == 200) {
             String response = readResponseAsString(resource.getResponse());
 
-            // Getting weird html response back
             return new Gson().fromJson(response, ReportMetaInformationItem.class);
         } else {
             throw new BDRestException("There was a problem getting the links for the specified report. Error Code: " + responseCode, resource);

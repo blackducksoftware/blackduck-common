@@ -30,6 +30,7 @@ import com.blackducksoftware.integration.hub.response.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
 import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem.ReportMetaLinkItem;
 import com.blackducksoftware.integration.hub.response.VersionComparison;
+import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
 import com.blackducksoftware.integration.hub.util.HubIntTestHelper;
 import com.blackducksoftware.integration.hub.util.TestLogger;
 
@@ -558,4 +559,27 @@ public class HubIntRestServiceTest {
         assertNotNull(report.getDetailedReleaseSummary().getVersion());
     }
 
+    @Test
+    public void testGetCodeLocations() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setLogger(logger);
+        restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
+
+        // These code locations are assumed to exist on the specified Hub server
+        // FIXME somehow create code locations to test here
+        // Mock the client resource? and mock the response from the server for this method?
+        List<String> scanTargets = new ArrayList<String>();
+        scanTargets.add("/Users/Shared/Jenkins/Home/jobs/Hub Test with spaces/workspace/mvnexbook-examples-1.0/ch-multi-spring");
+        scanTargets.add("/TeamCity/buildAgent/work/bce8292be20cfe19/proserv");
+        scanTargets.add("/TeamCity/buildAgent/work/bce8292be20cfe19/craftedPomFiles");
+
+        List<ScanLocationItem> codeLocations = restService.getScanLocations("jrichardMac", scanTargets);
+
+        assertNotNull(codeLocations);
+
+        assertTrue(!codeLocations.isEmpty());
+
+    }
 }
