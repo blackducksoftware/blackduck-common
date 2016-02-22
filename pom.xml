@@ -133,6 +133,7 @@
     <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet</artifactId>
+      <!-- Restlet 2.3.x and higher require java 7 -->
       <version>2.2.3</version>
     </dependency>
     <dependency>

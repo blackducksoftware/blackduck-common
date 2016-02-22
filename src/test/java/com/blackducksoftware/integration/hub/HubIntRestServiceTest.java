@@ -523,7 +523,6 @@ public class HubIntRestServiceTest {
 
         String reportUrl = null;
         System.err.println(release.getId());
-        // FIXME this keeps throwing 512 when run through Maven
         reportUrl = restService.generateHubReport(release.getId(), ReportFormatEnum.JSON);
 
         assertNotNull(reportUrl, reportUrl);

@@ -208,7 +208,7 @@ public class HubIntRestService {
         context.getParameters().add("readTimeout", stringTimeout);
         // Should throw timeout exception after the specified timeout, default is 2 minutes
 
-        ClientResource resource = new ClientResource(context, new URI(getBaseUrl()));
+        ClientResource resource = new ClientResource(context, new URI(providedUrl));
         resource.getRequest().setCookies(getCookies());
         return resource;
     }
@@ -350,7 +350,7 @@ public class HubIntRestService {
             }.getType());
 
         } else {
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            throw new BDRestException("There was a problem getting the project matches. Error Code: " + responseCode, resource);
         }
 
     }
@@ -384,7 +384,7 @@ public class HubIntRestService {
             return gson.fromJson(response, ProjectItem.class);
 
         } else {
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            throw new BDRestException("There was a problem getting the project for this Id. Error Code: " + responseCode, resource);
         }
     }
 
@@ -419,7 +419,7 @@ public class HubIntRestService {
         } else if (responseCode == 404) {
             throw new ProjectDoesNotExistException("This Project does not exist.", resource);
         } else {
-            throw new BDRestException("This Project does not exist or there is a problem connecting to the Hub server", resource);
+            throw new BDRestException("There was a problem getting a Project by this name.", resource);
         }
     }
 
@@ -529,7 +529,7 @@ public class HubIntRestService {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
             }
-            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+            throw new BDRestException("There was a problem getting the scan locations.", e, resource);
         }
         return scanLocationIds;
     }
@@ -592,7 +592,7 @@ public class HubIntRestService {
                                 "Successfully mapped the scan with id: '" + scanId.getKey() + "', to the Version with Id: '" + versionId
                                         + "'.");
                     } else {
-                        throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode,
+                        throw new BDRestException("There was a problem mapping the scan location to the specified version. Error Code: " + responseCode,
                                 resource);
                     }
                 } else {
@@ -645,7 +645,7 @@ public class HubIntRestService {
             return releasesList;
 
         } else {
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            throw new BDRestException("There was a problem getting the versions for this Project. Error Code: " + responseCode, resource);
         }
     }
 
@@ -688,7 +688,7 @@ public class HubIntRestService {
 
         } else {
 
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            throw new BDRestException("There was a problem creating this Hub Project. Error Code: " + responseCode, resource);
         }
 
     }
@@ -740,7 +740,7 @@ public class HubIntRestService {
             ReleaseItem release = gson.fromJson(response, ReleaseItem.class);
             return release.getId();
         } else {
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            throw new BDRestException("There was a problem creating this Version for the specified Hub Project. Error Code: " + responseCode, resource);
         }
 
     }
@@ -795,7 +795,7 @@ public class HubIntRestService {
 
         } else {
 
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            throw new BDRestException("There was a problem creating the specified Project and Version. Error Code: " + responseCode, resource);
         }
 
     }
@@ -824,7 +824,7 @@ public class HubIntRestService {
             Response resp = resource.getResponse();
             return resp.getEntityAsText();
         } else {
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            throw new BDRestException("There was a problem getting the version of the Hub server. Error Code: " + responseCode, resource);
         }
     }
 
@@ -861,7 +861,8 @@ public class HubIntRestService {
             VersionComparison comparison = gson.fromJson(response, VersionComparison.class);
             return comparison;
         } else {
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            throw new BDRestException("There was a problem comparing the specified version to the version of the Hub server. Error Code: " + responseCode,
+                    resource);
         }
     }
 
@@ -918,7 +919,7 @@ public class HubIntRestService {
             return reportUrl.getValue();
 
         } else {
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            throw new BDRestException("There was a problem generating a report for this Version. Error Code: " + responseCode, resource);
         }
 
     }
@@ -939,6 +940,16 @@ public class HubIntRestService {
 
         ClientResource resource = createClientResource(reportUrl);
 
+        Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+        if (requestHeaders == null) {
+            requestHeaders = new Series(Header.class);
+            resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
+        }
+        requestHeaders.add(new Header("Accept", MediaType.APPLICATION_JSON.toString()));
+
+        // Restlet 2.3.4 and higher
+        // resource.accept(MediaType.APPLICATION_JSON);
+
         resource.setMethod(Method.GET);
 
         handleRequest(resource, null, 0);
@@ -947,9 +958,10 @@ public class HubIntRestService {
         if (responseCode == 200) {
             String response = readResponseAsString(resource.getResponse());
 
+            // Getting weird html response back
             return new Gson().fromJson(response, ReportMetaInformationItem.class);
         } else {
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            throw new BDRestException("There was a problem getting the links for the specified report. Error Code: " + responseCode, resource);
         }
 
     }
@@ -986,7 +998,7 @@ public class HubIntRestService {
 
             return report;
         } else {
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
+            throw new BDRestException("There was a problem getting the content of this Report. Error Code: " + responseCode, resource);
         }
 
     }
