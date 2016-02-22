@@ -49,4 +49,84 @@ public class VersionReport {
     public List<DetailedFileBomViewEntry> getDetailedFileBomViewEntries() {
         return detailedFileBomViewEntries;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((aggregateBomViewEntries == null) ? 0 : aggregateBomViewEntries.hashCode());
+        result = prime * result + ((detailedCodeLocations == null) ? 0 : detailedCodeLocations.hashCode());
+        result = prime * result + ((detailedFileBomViewEntries == null) ? 0 : detailedFileBomViewEntries.hashCode());
+        result = prime * result + ((detailedReleaseSummary == null) ? 0 : detailedReleaseSummary.hashCode());
+        result = prime * result + ((detailedVulnerabilities == null) ? 0 : detailedVulnerabilities.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        VersionReport other = (VersionReport) obj;
+        if (aggregateBomViewEntries == null) {
+            if (other.aggregateBomViewEntries != null) {
+                return false;
+            }
+        } else if (!aggregateBomViewEntries.equals(other.aggregateBomViewEntries)) {
+            return false;
+        }
+        if (detailedCodeLocations == null) {
+            if (other.detailedCodeLocations != null) {
+                return false;
+            }
+        } else if (!detailedCodeLocations.equals(other.detailedCodeLocations)) {
+            return false;
+        }
+        if (detailedFileBomViewEntries == null) {
+            if (other.detailedFileBomViewEntries != null) {
+                return false;
+            }
+        } else if (!detailedFileBomViewEntries.equals(other.detailedFileBomViewEntries)) {
+            return false;
+        }
+        if (detailedReleaseSummary == null) {
+            if (other.detailedReleaseSummary != null) {
+                return false;
+            }
+        } else if (!detailedReleaseSummary.equals(other.detailedReleaseSummary)) {
+            return false;
+        }
+        if (detailedVulnerabilities == null) {
+            if (other.detailedVulnerabilities != null) {
+                return false;
+            }
+        } else if (!detailedVulnerabilities.equals(other.detailedVulnerabilities)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("VersionReport [detailedReleaseSummary=");
+        builder.append(detailedReleaseSummary);
+        builder.append(", detailedCodeLocations=");
+        builder.append(detailedCodeLocations);
+        builder.append(", aggregateBomViewEntries=");
+        builder.append(aggregateBomViewEntries);
+        builder.append(", detailedVulnerabilities=");
+        builder.append(detailedVulnerabilities);
+        builder.append(", detailedFileBomViewEntries=");
+        builder.append(detailedFileBomViewEntries);
+        builder.append("]");
+        return builder.toString();
+    }
+
 }

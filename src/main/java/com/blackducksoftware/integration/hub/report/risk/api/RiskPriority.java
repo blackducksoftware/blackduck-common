@@ -111,4 +111,16 @@ public enum RiskPriority {
         }
     }
 
+    public static RiskPriority getRiskPriority(String riskPriority) {
+        if (riskPriority.equalsIgnoreCase(LOW.name())) {
+            return RiskPriority.LOW;
+        } else if (riskPriority.equalsIgnoreCase(MEDIUM.name())) {
+            return RiskPriority.MEDIUM;
+        } else if (riskPriority.equalsIgnoreCase(HIGH.name())) {
+            return RiskPriority.HIGH;
+        } else {
+            return RiskPriority.UNKNOWN;
+        }
+    }
+
 }

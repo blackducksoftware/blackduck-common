@@ -2,25 +2,27 @@ package com.blackducksoftware.integration.hub.response;
 
 import java.util.List;
 
+import org.joda.time.DateTime;
+
 public class ReportMetaInformationItem {
 
-    String reportFormat;
+    private String reportFormat;
 
-    String locale;
+    private String locale;
 
-    String fileName;
+    private String fileName;
 
-    int fileSize;
+    private int fileSize;
 
-    String createdAt;
+    private DateTime createdAt;
 
-    String updatedAt;
+    private DateTime updatedAt;
 
-    String finishedAt;
+    private DateTime finishedAt;
 
-    String createdBy;
+    private String createdBy;
 
-    ReportMetaItem _meta;
+    private ReportMetaItem _meta;
 
     public String getReportFormat() {
         return reportFormat;
@@ -54,27 +56,27 @@ public class ReportMetaInformationItem {
         this.fileSize = fileSize;
     }
 
-    public String getCreatedAt() {
+    public DateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(DateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public String getUpdatedAt() {
+    public DateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(String updatedAt) {
+    public void setUpdatedAt(DateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public String getFinishedAt() {
+    public DateTime getFinishedAt() {
         return finishedAt;
     }
 
-    public void setFinishedAt(String finishedAt) {
+    public void setFinishedAt(DateTime finishedAt) {
         this.finishedAt = finishedAt;
     }
 

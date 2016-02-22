@@ -509,21 +509,16 @@ public class HubIntRestServiceTest {
         restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
 
         ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
-        List<ReleaseItem> releases = restService.getVersionsForProject(project.getId());
-        ReleaseItem release = null;
-        for (ReleaseItem currentRelease : releases) {
-            if (testProperties.getProperty("TEST_VERSION").equals(currentRelease.getVersion())) {
-                release = currentRelease;
-                break;
-            }
-        }
-        assertNotNull(
-                "In project : " + testProperties.getProperty("TEST_PROJECT") + " , could not find the version : " + testProperties.getProperty("TEST_VERSION"),
-                release);
+
+        String versionId = restService.createHubVersion("Report Version", project.getId(), PhaseEnum.DEVELOPMENT.name(), DistributionEnum.INTERNAL.name());
 
         String reportUrl = null;
-        System.err.println(release.getId());
-        reportUrl = restService.generateHubReport(release.getId(), ReportFormatEnum.JSON);
+        System.err.println(versionId);
+
+        // Give the server a second to recognize the new version
+        Thread.sleep(1000);
+
+        reportUrl = restService.generateHubReport(versionId, ReportFormatEnum.JSON);
 
         assertNotNull(reportUrl, reportUrl);
 

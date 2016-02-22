@@ -113,4 +113,144 @@ public class AggregateBomViewEntry {
     public void setRiskProfile(RiskProfile riskProfile) {
         this.riskProfile = riskProfile;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((bomEntryIds == null) ? 0 : bomEntryIds.hashCode());
+        result = prime * result + ((bomViewEntryIds == null) ? 0 : bomViewEntryIds.hashCode());
+        result = prime * result + ((componentMatchTypes == null) ? 0 : componentMatchTypes.hashCode());
+        result = prime * result + ((createdByUsers == null) ? 0 : createdByUsers.hashCode());
+        result = prime * result + ((inUses == null) ? 0 : inUses.hashCode());
+        result = prime * result + ((licenses == null) ? 0 : licenses.hashCode());
+        result = prime * result + ((matchTypes == null) ? 0 : matchTypes.hashCode());
+        result = prime * result + ((producerMatchTypes == null) ? 0 : producerMatchTypes.hashCode());
+        result = prime * result + ((riskProfile == null) ? 0 : riskProfile.hashCode());
+        result = prime * result + ((since == null) ? 0 : since.hashCode());
+        result = prime * result + ((usages == null) ? 0 : usages.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        AggregateBomViewEntry other = (AggregateBomViewEntry) obj;
+        if (bomEntryIds == null) {
+            if (other.bomEntryIds != null) {
+                return false;
+            }
+        } else if (!bomEntryIds.equals(other.bomEntryIds)) {
+            return false;
+        }
+        if (bomViewEntryIds == null) {
+            if (other.bomViewEntryIds != null) {
+                return false;
+            }
+        } else if (!bomViewEntryIds.equals(other.bomViewEntryIds)) {
+            return false;
+        }
+        if (componentMatchTypes == null) {
+            if (other.componentMatchTypes != null) {
+                return false;
+            }
+        } else if (!componentMatchTypes.equals(other.componentMatchTypes)) {
+            return false;
+        }
+        if (createdByUsers == null) {
+            if (other.createdByUsers != null) {
+                return false;
+            }
+        } else if (!createdByUsers.equals(other.createdByUsers)) {
+            return false;
+        }
+        if (inUses == null) {
+            if (other.inUses != null) {
+                return false;
+            }
+        } else if (!inUses.equals(other.inUses)) {
+            return false;
+        }
+        if (licenses == null) {
+            if (other.licenses != null) {
+                return false;
+            }
+        } else if (!licenses.equals(other.licenses)) {
+            return false;
+        }
+        if (matchTypes == null) {
+            if (other.matchTypes != null) {
+                return false;
+            }
+        } else if (!matchTypes.equals(other.matchTypes)) {
+            return false;
+        }
+        if (producerMatchTypes == null) {
+            if (other.producerMatchTypes != null) {
+                return false;
+            }
+        } else if (!producerMatchTypes.equals(other.producerMatchTypes)) {
+            return false;
+        }
+        if (riskProfile == null) {
+            if (other.riskProfile != null) {
+                return false;
+            }
+        } else if (!riskProfile.equals(other.riskProfile)) {
+            return false;
+        }
+        if (since == null) {
+            if (other.since != null) {
+                return false;
+            }
+        } else if (!since.equals(other.since)) {
+            return false;
+        }
+        if (usages == null) {
+            if (other.usages != null) {
+                return false;
+            }
+        } else if (!usages.equals(other.usages)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("AggregateBomViewEntry [bomEntryIds=");
+        builder.append(bomEntryIds);
+        builder.append(", bomViewEntryIds=");
+        builder.append(bomViewEntryIds);
+        builder.append(", matchTypes=");
+        builder.append(matchTypes);
+        builder.append(", producerMatchTypes=");
+        builder.append(producerMatchTypes);
+        builder.append(", componentMatchTypes=");
+        builder.append(componentMatchTypes);
+        builder.append(", usages=");
+        builder.append(usages);
+        builder.append(", inUses=");
+        builder.append(inUses);
+        builder.append(", createdByUsers=");
+        builder.append(createdByUsers);
+        builder.append(", since=");
+        builder.append(since);
+        builder.append(", licenses=");
+        builder.append(licenses);
+        builder.append(", riskProfile=");
+        builder.append(riskProfile);
+        builder.append("]");
+        return builder.toString();
+    }
+
 }
