@@ -51,6 +51,7 @@ import com.blackducksoftware.integration.hub.response.mapping.EntityTypeEnum;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
@@ -992,9 +993,33 @@ public class HubIntRestService {
 
             Gson gson = new GsonBuilder().create();
 
-            JsonObject reportContent = gson.fromJson(response, JsonObject.class);
+            // FIXME make this less unstable if there are changes, in the response
+            // For some reason the Hub responds with this weird json structure
+            // EX:
+            // {
+            // "reportContent": [
+            // {
+            // "fileName": "CITestProject/CITestVersion1/version.json",
+            // "fileContent": {
+            // "detailedReleaseSummary": {
+            // ...
+            // },
+            // "detailedCodeLocations": [],
+            // "aggregateBomViewEntries": [],
+            // "detailedVulnerabilities": [],
+            // "detailedFileBomViewEntries": []
+            // }
+            // }
+            // ]
+            // }
 
-            VersionReport report = gson.fromJson(reportContent.get("reportContent"), VersionReport.class);
+            JsonObject reportResponse = gson.fromJson(response, JsonObject.class);
+
+            JsonArray reportConentArray = gson.fromJson(reportResponse.get("reportContent"), JsonArray.class);
+
+            JsonObject reportFile = (JsonObject) reportConentArray.get(0);
+
+            VersionReport report = gson.fromJson(reportFile.get("fileContent"), VersionReport.class);
 
             return report;
         } else {

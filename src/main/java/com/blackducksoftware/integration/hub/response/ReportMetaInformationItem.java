@@ -2,6 +2,7 @@ package com.blackducksoftware.integration.hub.response;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 public class ReportMetaInformationItem {
@@ -14,11 +15,11 @@ public class ReportMetaInformationItem {
 
     private int fileSize;
 
-    private DateTime createdAt;
+    private String createdAt;
 
-    private DateTime updatedAt;
+    private String updatedAt;
 
-    private DateTime finishedAt;
+    private String finishedAt;
 
     private String createdBy;
 
@@ -56,27 +57,27 @@ public class ReportMetaInformationItem {
         this.fileSize = fileSize;
     }
 
-    public DateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(DateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
-    public DateTime getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(DateTime updatedAt) {
+    public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public DateTime getFinishedAt() {
+    public String getFinishedAt() {
         return finishedAt;
     }
 
-    public void setFinishedAt(DateTime finishedAt) {
+    public void setFinishedAt(String finishedAt) {
         this.finishedAt = finishedAt;
     }
 
@@ -94,6 +95,25 @@ public class ReportMetaInformationItem {
 
     public void set_meta(ReportMetaItem _meta) {
         this._meta = _meta;
+    }
+
+    private DateTime stringToDateTime(String dateString) {
+        if (StringUtils.isBlank(dateString)) {
+            return null;
+        }
+        return new DateTime(dateString);
+    }
+
+    public DateTime getTimeCreatedAt() {
+        return stringToDateTime(createdAt);
+    }
+
+    public DateTime getTimeUpdatedAt() {
+        return stringToDateTime(updatedAt);
+    }
+
+    public DateTime getTimeFinishedAt() {
+        return stringToDateTime(finishedAt);
     }
 
     @Override

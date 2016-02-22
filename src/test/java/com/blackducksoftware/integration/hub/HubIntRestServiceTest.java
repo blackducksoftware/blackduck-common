@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -19,6 +20,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
+import com.blackducksoftware.integration.hub.report.api.VersionReport;
 import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.response.DistributionEnum;
 import com.blackducksoftware.integration.hub.response.PhaseEnum;
@@ -501,7 +503,7 @@ public class HubIntRestServiceTest {
     }
 
     @Test
-    public void testGenerateHubReportAndGetReportLinks() throws Exception {
+    public void testGenerateHubReportAndReadReport() throws Exception {
         TestLogger logger = new TestLogger();
 
         HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
@@ -522,7 +524,15 @@ public class HubIntRestServiceTest {
 
         assertNotNull(reportUrl, reportUrl);
 
-        ReportMetaInformationItem reportInfo = restService.getReportLinks(reportUrl);
+        DateTime timeFinished = null;
+        ReportMetaInformationItem reportInfo = null;
+
+        while (timeFinished == null) {
+            Thread.sleep(5000);
+            reportInfo = restService.getReportLinks(reportUrl);
+
+            timeFinished = reportInfo.getTimeFinishedAt();
+        }
 
         List<ReportMetaLinkItem> links = reportInfo.get_meta().getLinks();
 
@@ -536,6 +546,16 @@ public class HubIntRestServiceTest {
         assertNotNull("Could not find the content link for the report at : " + reportUrl, contentLink);
         // The project specified in the test properties file will be deleted at the end of the tests
         // So we dont need to worry about cleaning up the reports
+
+        VersionReport report = restService.getReportContent(contentLink.getHref());
+        assertNotNull(report);
+        assertNotNull(report.getDetailedReleaseSummary());
+        assertNotNull(report.getDetailedReleaseSummary().getPhase());
+        assertNotNull(report.getDetailedReleaseSummary().getDistribution());
+        assertNotNull(report.getDetailedReleaseSummary().getProjectId());
+        assertNotNull(report.getDetailedReleaseSummary().getProjectName());
+        assertNotNull(report.getDetailedReleaseSummary().getVersionId());
+        assertNotNull(report.getDetailedReleaseSummary().getVersion());
     }
 
 }
