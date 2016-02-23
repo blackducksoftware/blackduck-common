@@ -296,28 +296,33 @@ public class HubIntRestService {
         EmptyRepresentation rep = new EmptyRepresentation();
         resource.getRequest().setEntity(rep);
         handleRequest(resource, null, 0);
-        if (cookies == null) {
-            Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
-            if (cookieSettings == null || cookieSettings.size() == 0) {
-                throw new HubIntegrationException("Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
-            }
+        int statusCode = resource.getResponse().getStatus().getCode();
+        if (statusCode == 204) {
+            if (cookies == null) {
+                Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
+                if (cookieSettings == null || cookieSettings.size() == 0) {
+                    throw new HubIntegrationException("Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
+                }
 
-            Series<Cookie> requestCookies = resource.getRequest().getCookies();
-            for (CookieSetting ck : cookieSettings) {
-                Cookie cookie = new Cookie();
-                cookie.setName(ck.getName());
-                cookie.setDomain(ck.getDomain());
-                cookie.setPath(ck.getPath());
-                cookie.setValue(ck.getValue());
-                cookie.setVersion(ck.getVersion());
-                requestCookies.add(cookie);
-            }
+                Series<Cookie> requestCookies = resource.getRequest().getCookies();
+                for (CookieSetting ck : cookieSettings) {
+                    Cookie cookie = new Cookie();
+                    cookie.setName(ck.getName());
+                    cookie.setDomain(ck.getDomain());
+                    cookie.setPath(ck.getPath());
+                    cookie.setValue(ck.getValue());
+                    cookie.setVersion(ck.getVersion());
+                    requestCookies.add(cookie);
+                }
 
-            cookies = requestCookies;
+                cookies = requestCookies;
+            }
+            // else {
+            // cookies already set
+            // }
+        } else {
+            throw new HubIntegrationException(resource.getResponse().getStatus().toString());
         }
-        // else {
-        // cookies already set
-        // }
 
         return resource.getResponse().getStatus().getCode();
     }
