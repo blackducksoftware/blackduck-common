@@ -2,6 +2,7 @@ package com.blackducksoftware.integration.hub.report.api;
 
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 /**
@@ -22,7 +23,7 @@ public class DetailedReleaseSummary {
 
     private final String nickname;
 
-    private final DateTime releasedOn;
+    private final String releasedOn;
 
     private final String phase;
 
@@ -34,7 +35,7 @@ public class DetailedReleaseSummary {
             String version,
             String versionComments,
             String nickname,
-            DateTime releasedOn,
+            String releasedOn,
             String phase,
             String distribution) {
         this.projectId = projectId;
@@ -72,7 +73,7 @@ public class DetailedReleaseSummary {
         return nickname;
     }
 
-    public DateTime getReleasedOn() {
+    public String getReleasedOn() {
         return releasedOn;
     }
 
@@ -82,6 +83,13 @@ public class DetailedReleaseSummary {
 
     public String getDistribution() {
         return distribution;
+    }
+
+    public DateTime getReleasedOnTime() {
+        if (StringUtils.isBlank(releasedOn)) {
+            return null;
+        }
+        return new DateTime(releasedOn);
     }
 
     @Override

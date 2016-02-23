@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub.report.api;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.report.risk.api.RiskProfile;
@@ -35,7 +36,7 @@ public class AggregateBomViewEntry {
     /**
      * minimal of since of all entries
      */
-    private final DateTime since;
+    private final String since;
 
     private final List<LicenseDefinition> licenses;
 
@@ -50,7 +51,7 @@ public class AggregateBomViewEntry {
             List<String> usages,
             List<Boolean> inUses,
             List<UserData> createdByUsers,
-            DateTime since,
+            String since,
             List<LicenseDefinition> licenses,
             RiskProfile riskProfile) {
         this.bomEntryIds = bomEntryIds;
@@ -98,7 +99,7 @@ public class AggregateBomViewEntry {
         return createdByUsers;
     }
 
-    public DateTime getSince() {
+    public String getSince() {
         return since;
     }
 
@@ -112,6 +113,13 @@ public class AggregateBomViewEntry {
 
     public void setRiskProfile(RiskProfile riskProfile) {
         this.riskProfile = riskProfile;
+    }
+
+    public DateTime getSinceTime() {
+        if (StringUtils.isBlank(since)) {
+            return null;
+        }
+        return new DateTime(since);
     }
 
     @Override

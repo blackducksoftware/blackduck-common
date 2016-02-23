@@ -1,5 +1,8 @@
 package com.blackducksoftware.integration.hub.response.mapping;
 
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+
 public class ScanHistoryItem {
 
     private String scannerVersion;
@@ -80,6 +83,13 @@ public class ScanHistoryItem {
 
     public void setNumNonDirFiles(String numNonDirFiles) {
         this.numNonDirFiles = numNonDirFiles;
+    }
+
+    public DateTime getCreatedOnTime() {
+        if (StringUtils.isBlank(createdOn)) {
+            return null;
+        }
+        return new DateTime(createdOn);
     }
 
     @Override

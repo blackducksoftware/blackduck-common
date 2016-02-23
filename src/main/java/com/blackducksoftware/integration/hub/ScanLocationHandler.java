@@ -48,7 +48,7 @@ public class ScanLocationHandler {
      */
     public void getScanLocationIdWithRetry(ClientResource resource, String targetPath, String versionId,
             Map<String, Boolean> scanLocationIds)
-                    throws UnknownHostException, InterruptedException, BDRestException, HubIntegrationException {
+            throws UnknownHostException, InterruptedException, BDRestException, HubIntegrationException {
 
         if (resource == null) {
             throw new IllegalArgumentException("Need to provide a ClientResource in order to get the ScanLocation");
@@ -220,4 +220,5 @@ public class ScanLocationHandler {
         scanLocationIds.put(scanId, false);
 
     }
+
 }

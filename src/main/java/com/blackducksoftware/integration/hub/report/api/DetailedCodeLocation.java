@@ -2,6 +2,7 @@ package com.blackducksoftware.integration.hub.report.api;
 
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 /**
@@ -17,13 +18,13 @@ public class DetailedCodeLocation {
 
     private final String initiatedBy;
 
-    private final DateTime lastUpload;
+    private final String lastUpload;
 
     public DetailedCodeLocation(UUID codeLocationId,
             String host,
             String path,
             String initiatedBy,
-            DateTime lastUpload) {
+            String lastUpload) {
         this.codeLocationId = codeLocationId;
         this.host = host;
         this.path = path;
@@ -47,8 +48,15 @@ public class DetailedCodeLocation {
         return initiatedBy;
     }
 
-    public DateTime getLastUpload() {
+    public String getLastUpload() {
         return lastUpload;
+    }
+
+    public DateTime getLastUploadTime() {
+        if (StringUtils.isBlank(lastUpload)) {
+            return null;
+        }
+        return new DateTime(lastUpload);
     }
 
     @Override
