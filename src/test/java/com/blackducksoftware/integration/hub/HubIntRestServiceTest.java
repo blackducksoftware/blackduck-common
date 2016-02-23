@@ -18,6 +18,13 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.resource.ClientResource;
 
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.report.api.VersionReport;
@@ -31,8 +38,10 @@ import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
 import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem.ReportMetaLinkItem;
 import com.blackducksoftware.integration.hub.response.VersionComparison;
 import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
+import com.blackducksoftware.integration.hub.response.mapping.ScanLocationResults;
 import com.blackducksoftware.integration.hub.util.HubIntTestHelper;
 import com.blackducksoftware.integration.hub.util.TestLogger;
+import com.google.gson.Gson;
 
 public class HubIntRestServiceTest {
 
@@ -563,23 +572,64 @@ public class HubIntRestServiceTest {
     public void testGetCodeLocations() throws Exception {
         TestLogger logger = new TestLogger();
 
-        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        HubIntRestService restService = new HubIntRestService("FakeUrl");
         restService.setLogger(logger);
-        restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
 
-        // These code locations are assumed to exist on the specified Hub server
-        // FIXME somehow create code locations to test here
-        // Mock the client resource? and mock the response from the server for this method?
+        final String fakeHost = "TestHost";
+        final String serverPath1 = "/Test/Fake/Path";
+        final String serverPath2 = "/Test/Fake/Path/Child/";
+        final String serverPath3 = "/Test/Fake/File";
+
+        HubIntRestService restServiceSpy = Mockito.spy(restService);
+
+        ClientResource clientResource = new ClientResource("");
+        final ClientResource resourceSpy = Mockito.spy(clientResource);
+
+        Mockito.when(resourceSpy.handle()).then(new Answer<Representation>() {
+            @Override
+            public Representation answer(InvocationOnMock invocation) throws Throwable {
+
+                ScanLocationResults scanLocationResults = new ScanLocationResults();
+                scanLocationResults.setTotalCount(3);
+                ScanLocationItem sl1 = new ScanLocationItem();
+                sl1.setHost(fakeHost);
+                sl1.setPath(serverPath1);
+                ScanLocationItem sl2 = new ScanLocationItem();
+                sl2.setHost(fakeHost);
+                sl2.setPath(serverPath2);
+                ScanLocationItem sl3 = new ScanLocationItem();
+                sl3.setHost(fakeHost);
+                sl3.setPath(serverPath3);
+
+                List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+                items.add(sl1);
+                items.add(sl2);
+                items.add(sl3);
+
+                scanLocationResults.setItems(items);
+
+                String scResults = new Gson().toJson(scanLocationResults);
+                StringRepresentation rep = new StringRepresentation(scResults);
+                Response response = new Response(null);
+                response.setEntity(rep);
+
+                resourceSpy.setResponse(response);
+                return null;
+            }
+        });
+
+        Mockito.when(restServiceSpy.createClientResource()).thenReturn(resourceSpy);
+
         List<String> scanTargets = new ArrayList<String>();
-        scanTargets.add("/Users/Shared/Jenkins/Home/jobs/Hub Test with spaces/workspace/mvnexbook-examples-1.0/ch-multi-spring");
-        scanTargets.add("/TeamCity/buildAgent/work/bce8292be20cfe19/proserv");
-        scanTargets.add("/TeamCity/buildAgent/work/bce8292be20cfe19/craftedPomFiles");
+        scanTargets.add("Test/Fake/Path/Child");
+        scanTargets.add("Test\\Fake\\File");
 
-        List<ScanLocationItem> codeLocations = restService.getScanLocations("jrichardMac", scanTargets);
+        List<ScanLocationItem> codeLocations = restServiceSpy.getScanLocations(fakeHost, scanTargets);
 
         assertNotNull(codeLocations);
-
-        assertTrue(!codeLocations.isEmpty());
+        assertTrue(codeLocations.size() == 2);
+        assertNotNull(codeLocations.get(0));
+        assertNotNull(codeLocations.get(1));
 
     }
 }

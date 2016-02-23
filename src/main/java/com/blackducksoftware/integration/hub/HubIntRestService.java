@@ -184,7 +184,10 @@ public class HubIntRestService {
      * @throws URISyntaxException
      * @throws MalformedURLException
      */
-    private ClientResource createClientResource() throws URISyntaxException {
+    // Make this protected for testing the getCodeLocations, otherwise we need to use
+    // Powermockito to stub this to use a mock resource OR we would need to setup code
+    // locations on the server and hope they dont get deleted
+    protected ClientResource createClientResource() throws URISyntaxException {
         return createClientResource(getBaseUrl());
     }
 
