@@ -157,6 +157,17 @@ public class AggregateBomViewEntry {
         return producerReleases;
     }
 
+    public String getProducerReleasesDisplay() {
+        StringBuilder versionBuilder = new StringBuilder();
+        for (ReleaseData release : producerReleases) {
+            if (versionBuilder.length() > 0) {
+                versionBuilder.append(", ");
+            }
+            versionBuilder.append(release.getVersion());
+        }
+        return versionBuilder.toString();
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
