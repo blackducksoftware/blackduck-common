@@ -911,7 +911,7 @@ public class HubIntRestService {
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         while (elapsedTime < maximumWait) {
-
+            // logger.trace("CHECKING CODE LOCATIONS");
             List<ScanLocationItem> scanLocationsToCheck = getScanLocations(hostname, scanTargets);
             boolean upToDate = true;
             for (ScanLocationItem currentCodeLocation : scanLocationsToCheck) {
@@ -979,9 +979,9 @@ public class HubIntRestService {
                 targetPath = "/" + targetPath;
             }
 
-            logger.debug(
-                    "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + targetPath +
-                            "'");
+            // logger.debug(
+            // "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + targetPath +
+            // "'");
 
             resource = createClientResource();
             resource.addSegment("api");
@@ -1029,9 +1029,9 @@ public class HubIntRestService {
             if (path.endsWith("/")) {
                 path = path.substring(0, path.length() - 1);
             }
-            logger.trace("Comparing target : '" + targetPath + "' with path : '" + path + "'.");
+            // logger.trace("Comparing target : '" + targetPath + "' with path : '" + path + "'.");
             if (targetPath.equals(path)) {
-                logger.trace("MATCHED!");
+                // logger.trace("MATCHED!");
                 return scanMatch;
             }
         }
