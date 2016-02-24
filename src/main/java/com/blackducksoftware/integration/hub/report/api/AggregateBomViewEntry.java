@@ -38,6 +38,10 @@ public class AggregateBomViewEntry {
      */
     private final String since;
 
+    private final ProjectData producerProject;
+
+    private final List<ReleaseData> producerReleases;
+
     private final List<LicenseDefinition> licenses;
 
     private RiskProfile riskProfile;
@@ -52,6 +56,8 @@ public class AggregateBomViewEntry {
             List<Boolean> inUses,
             List<UserData> createdByUsers,
             String since,
+            ProjectData producerProject,
+            List<ReleaseData> producerReleases,
             List<LicenseDefinition> licenses,
             RiskProfile riskProfile) {
         this.bomEntryIds = bomEntryIds;
@@ -63,6 +69,8 @@ public class AggregateBomViewEntry {
         this.inUses = inUses;
         this.createdByUsers = createdByUsers;
         this.since = since;
+        this.producerProject = producerProject;
+        this.producerReleases = producerReleases;
         this.licenses = licenses;
         this.riskProfile = riskProfile;
     }
@@ -107,6 +115,25 @@ public class AggregateBomViewEntry {
         return licenses;
     }
 
+    public String getLicensesDisplay() {
+        // The first license should be the "parent license" and it should have the correct display of all the licenses
+        // for this entry
+
+        // TODO improve license display
+        StringBuilder licenseBuilder = new StringBuilder();
+
+        // This loop should be unecessary
+        for (LicenseDefinition license : licenses) {
+            if (licenseBuilder.length() > 0) {
+                // Separate licenses
+                licenseBuilder.append("::");
+            }
+            licenseBuilder.append(license.getLicenseDisplay());
+        }
+
+        return licenseBuilder.toString();
+    }
+
     public RiskProfile getRiskProfile() {
         return riskProfile;
     }
@@ -122,6 +149,14 @@ public class AggregateBomViewEntry {
         return new DateTime(since);
     }
 
+    public ProjectData getProducerProject() {
+        return producerProject;
+    }
+
+    public List<ReleaseData> getProducerReleases() {
+        return producerReleases;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -134,6 +169,8 @@ public class AggregateBomViewEntry {
         result = prime * result + ((licenses == null) ? 0 : licenses.hashCode());
         result = prime * result + ((matchTypes == null) ? 0 : matchTypes.hashCode());
         result = prime * result + ((producerMatchTypes == null) ? 0 : producerMatchTypes.hashCode());
+        result = prime * result + ((producerProject == null) ? 0 : producerProject.hashCode());
+        result = prime * result + ((producerReleases == null) ? 0 : producerReleases.hashCode());
         result = prime * result + ((riskProfile == null) ? 0 : riskProfile.hashCode());
         result = prime * result + ((since == null) ? 0 : since.hashCode());
         result = prime * result + ((usages == null) ? 0 : usages.hashCode());
@@ -208,6 +245,20 @@ public class AggregateBomViewEntry {
         } else if (!producerMatchTypes.equals(other.producerMatchTypes)) {
             return false;
         }
+        if (producerProject == null) {
+            if (other.producerProject != null) {
+                return false;
+            }
+        } else if (!producerProject.equals(other.producerProject)) {
+            return false;
+        }
+        if (producerReleases == null) {
+            if (other.producerReleases != null) {
+                return false;
+            }
+        } else if (!producerReleases.equals(other.producerReleases)) {
+            return false;
+        }
         if (riskProfile == null) {
             if (other.riskProfile != null) {
                 return false;
@@ -253,6 +304,10 @@ public class AggregateBomViewEntry {
         builder.append(createdByUsers);
         builder.append(", since=");
         builder.append(since);
+        builder.append(", producerProject=");
+        builder.append(producerProject);
+        builder.append(", producerReleases=");
+        builder.append(producerReleases);
         builder.append(", licenses=");
         builder.append(licenses);
         builder.append(", riskProfile=");
