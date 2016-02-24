@@ -6,6 +6,8 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.report.risk.api.RiskCategory;
+import com.blackducksoftware.integration.hub.report.risk.api.RiskPriorityDistribution;
 import com.blackducksoftware.integration.hub.report.risk.api.RiskProfile;
 
 /**
@@ -136,6 +138,26 @@ public class AggregateBomViewEntry {
 
     public RiskProfile getRiskProfile() {
         return riskProfile;
+    }
+
+    public RiskPriorityDistribution getVulnerabilityRisk() {
+        return riskProfile.getRiskPriorityDistribution(RiskCategory.VULNERABILITY);
+    }
+
+    public RiskPriorityDistribution getActivityRisk() {
+        return riskProfile.getRiskPriorityDistribution(RiskCategory.ACTIVITY);
+    }
+
+    public RiskPriorityDistribution getVersionRisk() {
+        return riskProfile.getRiskPriorityDistribution(RiskCategory.VERSION);
+    }
+
+    public RiskPriorityDistribution getLicenseRisk() {
+        return riskProfile.getRiskPriorityDistribution(RiskCategory.LICENSE);
+    }
+
+    public RiskPriorityDistribution getOperationalRisk() {
+        return riskProfile.getRiskPriorityDistribution(RiskCategory.OPERATIONAL);
     }
 
     public void setRiskProfile(RiskProfile riskProfile) {
