@@ -1191,6 +1191,7 @@ public class HubIntRestService {
             JsonObject reportFile = (JsonObject) reportConentArray.get(0);
 
             VersionReport report = gson.fromJson(reportFile.get("fileContent"), VersionReport.class);
+            // FIXME not serializing the RiskProfile correctly
 
             return report;
         } else {

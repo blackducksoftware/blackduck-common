@@ -6,8 +6,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
-import com.blackducksoftware.integration.hub.report.risk.api.RiskCategory;
-import com.blackducksoftware.integration.hub.report.risk.api.RiskPriorityDistribution;
+import com.blackducksoftware.integration.hub.report.risk.api.RiskCounts;
 import com.blackducksoftware.integration.hub.report.risk.api.RiskProfile;
 
 /**
@@ -140,24 +139,24 @@ public class AggregateBomViewEntry {
         return riskProfile;
     }
 
-    public RiskPriorityDistribution getVulnerabilityRisk() {
-        return riskProfile.getRiskPriorityDistribution(RiskCategory.VULNERABILITY);
+    public RiskCounts getVulnerabilityRisk() {
+        return riskProfile.getCategories().getVULNERABILITY();
     }
 
-    public RiskPriorityDistribution getActivityRisk() {
-        return riskProfile.getRiskPriorityDistribution(RiskCategory.ACTIVITY);
+    public RiskCounts getActivityRisk() {
+        return riskProfile.getCategories().getACTIVITY();
     }
 
-    public RiskPriorityDistribution getVersionRisk() {
-        return riskProfile.getRiskPriorityDistribution(RiskCategory.VERSION);
+    public RiskCounts getVersionRisk() {
+        return riskProfile.getCategories().getVERSION();
     }
 
-    public RiskPriorityDistribution getLicenseRisk() {
-        return riskProfile.getRiskPriorityDistribution(RiskCategory.LICENSE);
+    public RiskCounts getLicenseRisk() {
+        return riskProfile.getCategories().getLICENSE();
     }
 
-    public RiskPriorityDistribution getOperationalRisk() {
-        return riskProfile.getRiskPriorityDistribution(RiskCategory.OPERATIONAL);
+    public RiskCounts getOperationalRisk() {
+        return riskProfile.getCategories().getOPERATIONAL();
     }
 
     public void setRiskProfile(RiskProfile riskProfile) {

@@ -11,13 +11,6 @@
  */
 package com.blackducksoftware.integration.hub.report.risk.api;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-
 /**
  * Summary stats of items that fall in each risk priority per risk category
  *
@@ -26,31 +19,13 @@ import com.google.common.collect.Maps;
 public class RiskProfile {
     private final int numberOfItems;
 
-    private final Map<RiskCategory, RiskPriorityDistribution> categories;
-
-    public RiskProfile() {
-        this(0, Maps.<RiskCategory, RiskPriorityDistribution> newHashMap());
-    }
-
-    public RiskProfile(Map<RiskCategory, RiskPriorityDistribution> categories) {
-        this(1, categories);
-    }
-
-    public RiskProfile(List<RiskCategory> categories) {
-        Map<RiskCategory, RiskPriorityDistribution> riskPriorityDistributionMap = Maps.newHashMap();
-        for (RiskCategory category : categories) {
-            riskPriorityDistributionMap.put(category, new RiskPriorityDistribution());
-        }
-
-        numberOfItems = 0;
-        this.categories = riskPriorityDistributionMap;
-    }
+    private final RiskCategories categories;
 
     public RiskProfile(
             int numberOfItems,
-            Map<RiskCategory, RiskPriorityDistribution> categories) {
+            RiskCategories categories) {
         this.numberOfItems = numberOfItems;
-        this.categories = ImmutableMap.copyOf(categories);
+        this.categories = categories;
     }
 
     /**
@@ -67,30 +42,8 @@ public class RiskProfile {
      *
      * @return
      */
-    public Map<RiskCategory, RiskPriorityDistribution> getCategories() {
+    public RiskCategories getCategories() {
         return categories;
-    }
-
-    private int getItemCount(Map<RiskCategory, RiskPriorityDistribution> map) {
-        int numItems = 0;
-
-        for (Entry<RiskCategory, RiskPriorityDistribution> entry : map.entrySet()) {
-            RiskPriorityDistribution distribution = entry.getValue();
-            for (int count : distribution.getCounts()) {
-                if (count > 0) {
-                    numItems++;
-                }
-            }
-        }
-
-        return numItems;
-    }
-
-    public RiskPriorityDistribution getRiskPriorityDistribution(RiskCategory riskCategory) {
-        if (!getCategories().isEmpty()) {
-            return categories.get(riskCategory);
-        }
-        return null;
     }
 
     @Override
