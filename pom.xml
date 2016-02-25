@@ -246,19 +246,4 @@
 		</plugins>
 	</build>
 
-	<profiles>
-		<profile>
-			<id>Sonargraph</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<pluginRepositories>
-				<pluginRepository>
-					<id>hello2morrow.maven.repository</id>
-					<url>http://artifactory.blackducksoftware.com:8081/artifactory/hello2morrow</url>
-				</pluginRepository>
-			</pluginRepositories>
-		</profile>
-	</profiles>
-
 </project>
