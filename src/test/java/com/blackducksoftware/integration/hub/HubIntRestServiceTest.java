@@ -569,6 +569,27 @@ public class HubIntRestServiceTest {
         assertNotNull(report.getDetailedReleaseSummary().getProjectName());
         assertNotNull(report.getDetailedReleaseSummary().getVersionId());
         assertNotNull(report.getDetailedReleaseSummary().getVersion());
+
+        String reportId = restService.getReportIdFromReportUrl(reportUrl);
+        assertEquals(204, restService.deleteHubReport(versionId, reportId));
+
+    }
+
+    @Test
+    public void testGetReportIdFromReportUrl() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setLogger(logger);
+        String expectedId = "IDThatShouldBeFound";
+
+        String reportUrl = "test/test/test/id/id/yoyo.yo/" + expectedId;
+        String reportId = restService.getReportIdFromReportUrl(reportUrl);
+        assertEquals(expectedId, reportId);
+
+        reportUrl = "test/test/" + expectedId + "/test/id/id/yoyo.yo/";
+        reportId = restService.getReportIdFromReportUrl(reportUrl);
+        assertEquals("yoyo.yo", reportId);
     }
 
     @Test

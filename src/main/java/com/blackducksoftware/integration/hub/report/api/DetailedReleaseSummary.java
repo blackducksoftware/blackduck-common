@@ -8,7 +8,6 @@ import org.joda.time.DateTime;
 /**
  * Detailed release summary.
  *
- * @author skatzman
  */
 public class DetailedReleaseSummary {
     private final UUID projectId;
@@ -29,6 +28,8 @@ public class DetailedReleaseSummary {
 
     private final String distribution;
 
+    private final URLProvider uiUrlGenerator;
+
     public DetailedReleaseSummary(UUID projectId,
             UUID versionId,
             String projectName,
@@ -37,7 +38,7 @@ public class DetailedReleaseSummary {
             String nickname,
             String releasedOn,
             String phase,
-            String distribution) {
+            String distribution, URLProvider uiUrlGenerator) {
         this.projectId = projectId;
         this.versionId = versionId;
         this.projectName = projectName;
@@ -47,6 +48,7 @@ public class DetailedReleaseSummary {
         this.releasedOn = releasedOn;
         this.phase = phase;
         this.distribution = distribution;
+        this.uiUrlGenerator = uiUrlGenerator;
     }
 
     public UUID getProjectId() {
@@ -92,6 +94,10 @@ public class DetailedReleaseSummary {
         return new DateTime(releasedOn);
     }
 
+    public URLProvider getUiUrlGenerator() {
+        return uiUrlGenerator;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -102,6 +108,7 @@ public class DetailedReleaseSummary {
         result = prime * result + ((projectId == null) ? 0 : projectId.hashCode());
         result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
         result = prime * result + ((releasedOn == null) ? 0 : releasedOn.hashCode());
+        result = prime * result + ((uiUrlGenerator == null) ? 0 : uiUrlGenerator.hashCode());
         result = prime * result + ((version == null) ? 0 : version.hashCode());
         result = prime * result + ((versionComments == null) ? 0 : versionComments.hashCode());
         result = prime * result + ((versionId == null) ? 0 : versionId.hashCode());
@@ -162,6 +169,13 @@ public class DetailedReleaseSummary {
         } else if (!releasedOn.equals(other.releasedOn)) {
             return false;
         }
+        if (uiUrlGenerator == null) {
+            if (other.uiUrlGenerator != null) {
+                return false;
+            }
+        } else if (!uiUrlGenerator.equals(other.uiUrlGenerator)) {
+            return false;
+        }
         if (version == null) {
             if (other.version != null) {
                 return false;
@@ -207,8 +221,70 @@ public class DetailedReleaseSummary {
         builder.append(phase);
         builder.append(", distribution=");
         builder.append(distribution);
+        builder.append(", uiUrlGenerator=");
+        builder.append(uiUrlGenerator);
         builder.append("]");
         return builder.toString();
+    }
+
+    public class URLProvider {
+        private final String baseUrl;
+
+        public URLProvider(String baseUrl) {
+            this.baseUrl = baseUrl;
+        }
+
+        public String getBaseUrl() {
+            return baseUrl;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + getOuterType().hashCode();
+            result = prime * result + ((baseUrl == null) ? 0 : baseUrl.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            URLProvider other = (URLProvider) obj;
+            if (!getOuterType().equals(other.getOuterType())) {
+                return false;
+            }
+            if (baseUrl == null) {
+                if (other.baseUrl != null) {
+                    return false;
+                }
+            } else if (!baseUrl.equals(other.baseUrl)) {
+                return false;
+            }
+            return true;
+        }
+
+        private DetailedReleaseSummary getOuterType() {
+            return DetailedReleaseSummary.this;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("URLProvider [baseUrl=");
+            builder.append(baseUrl);
+            builder.append("]");
+            return builder.toString();
+        }
+
     }
 
 }

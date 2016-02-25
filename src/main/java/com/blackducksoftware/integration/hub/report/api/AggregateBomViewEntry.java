@@ -179,14 +179,8 @@ public class AggregateBomViewEntry {
     }
 
     public String getProducerReleasesId() {
-        StringBuilder versionIdBuilder = new StringBuilder();
-        for (ReleaseData release : producerReleases) {
-            if (versionIdBuilder.length() > 0) {
-                versionIdBuilder.append(", ");
-            }
-            versionIdBuilder.append(release.getId());
-        }
-        return versionIdBuilder.toString();
+        // FIXME there should only be a single producer release
+        return producerReleases.get(0).getId();
     }
 
     public String getProducerReleasesDisplay() {

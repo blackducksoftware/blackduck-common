@@ -2,10 +2,12 @@ package com.blackducksoftware.integration.hub.report.api;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.opensaml.util.URLBuilder;
+
 /**
  * Version report.
  *
- * @author skatzman
  */
 public class VersionReport {
     private final DetailedReleaseSummary detailedReleaseSummary;
@@ -32,6 +34,37 @@ public class VersionReport {
 
     public DetailedReleaseSummary getDetailedReleaseSummary() {
         return detailedReleaseSummary;
+    }
+
+    public String getBaseUrl() {
+        if (detailedReleaseSummary == null || detailedReleaseSummary.getUiUrlGenerator() == null) {
+            return null;
+        }
+        return detailedReleaseSummary.getUiUrlGenerator().getBaseUrl();
+    }
+
+    public String getComponentUrl(AggregateBomViewEntry entry) {
+        if (StringUtils.isBlank(getBaseUrl()) || entry == null ||
+                entry.getProducerProject() == null || StringUtils.isBlank(entry.getProducerProject().getId())) {
+            return null;
+        }
+
+        URLBuilder builder = new URLBuilder(getBaseUrl());
+        builder.setFragment("projects/id:" + entry.getProducerProject().getId());
+
+        return builder.buildURL();
+    }
+
+    public String getVersionUrl(AggregateBomViewEntry entry) {
+        if (StringUtils.isBlank(getBaseUrl()) || entry == null ||
+                entry.getProducerProject() == null || StringUtils.isBlank(entry.getProducerProject().getId())) {
+            return null;
+        }
+
+        URLBuilder builder = new URLBuilder(getBaseUrl());
+        builder.setFragment("versions/id:" + entry.getProducerReleasesId());
+
+        return builder.buildURL();
     }
 
     public List<DetailedCodeLocation> getDetailedCodeLocations() {

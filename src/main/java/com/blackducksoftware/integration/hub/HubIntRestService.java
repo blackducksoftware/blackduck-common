@@ -1094,7 +1094,34 @@ public class HubIntRestService {
         } else {
             throw new BDRestException("There was a problem generating a report for this Version. Error Code: " + responseCode, resource);
         }
+    }
 
+    public String getReportIdFromReportUrl(String reportUrl) {
+        // The report ID should be the last segment of the Url
+        String[] segments = reportUrl.split("/");
+        return segments[segments.length - 1];
+    }
+
+    public int deleteHubReport(String versionId, String reportId) throws IOException, BDRestException,
+            URISyntaxException {
+
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("versions");
+        resource.addSegment(versionId);
+        resource.addSegment("reports");
+        resource.addSegment(reportId);
+
+        resource.setMethod(Method.DELETE);
+
+        handleRequest(resource, null, 0);
+
+        int responseCode = resource.getResponse().getStatus().getCode();
+
+        if (responseCode != 204) {
+            throw new BDRestException("There was a problem deleting this report. Error Code: " + responseCode, resource);
+        }
+        return responseCode;
     }
 
     /**
