@@ -151,6 +151,10 @@ public class AggregateBomViewEntry {
         return riskProfile.getCategories().getLICENSE();
     }
 
+    /**
+     * Returns the appropriate String for the License Risk type to be used in the UI
+     *
+     */
     public String getLicenseRiskString() {
         if (getLicenseRisk().getHIGH() != 0) {
             return "H";
@@ -167,6 +171,10 @@ public class AggregateBomViewEntry {
         return riskProfile.getCategories().getOPERATIONAL();
     }
 
+    /**
+     * Returns the appropriate String for the Operational Risk type to be used in the UI
+     *
+     */
     public String getOperationalRiskString() {
         if (getOperationalRisk().getHIGH() != 0) {
             return "H";
