@@ -1,5 +1,6 @@
 package com.blackducksoftware.integration.hub.report.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,10 +13,9 @@ import com.blackducksoftware.integration.hub.report.risk.api.RiskProfile;
 /**
  * This is a view of an aggregation of BomEntries.
  *
- *
  */
 public class AggregateBomViewEntry {
-    private final List<UUID> bomEntryIds;
+    private final List<String> bomEntryIds;
 
     private final List<Long> bomViewEntryIds;
 
@@ -48,7 +48,7 @@ public class AggregateBomViewEntry {
     private RiskProfile riskProfile;
 
     public AggregateBomViewEntry(// NOPMD ExcessiveParameterList
-            List<UUID> bomEntryIds,
+            List<String> bomEntryIds,
             List<Long> bomViewEntryIds,
             List<String> matchTypes,
             List<String> producerMatchTypes,
@@ -76,8 +76,16 @@ public class AggregateBomViewEntry {
         this.riskProfile = riskProfile;
     }
 
-    public List<UUID> getBomEntryIds() {
+    public List<String> getBomEntryIds() {
         return bomEntryIds;
+    }
+
+    public List<UUID> getBomEntryUUIds() {
+        List<UUID> bomEntryUUIds = new ArrayList<UUID>();
+        for (String bomEntryId : bomEntryIds) {
+            bomEntryUUIds.add(UUID.fromString(bomEntryId));
+        }
+        return bomEntryUUIds;
     }
 
     public List<Long> getBomViewEntryIds() {
@@ -120,19 +128,7 @@ public class AggregateBomViewEntry {
         // The first license should be the "parent license" and it should have the correct display of all the licenses
         // for this entry
 
-        // TODO improve license display
-        StringBuilder licenseBuilder = new StringBuilder();
-
-        // This loop should be unecessary
-        for (LicenseDefinition license : licenses) {
-            if (licenseBuilder.length() > 0) {
-                // Separate licenses
-                licenseBuilder.append("::");
-            }
-            licenseBuilder.append(license.getLicenseDisplay());
-        }
-
-        return licenseBuilder.toString();
+        return licenses.get(0).getLicenseDisplay();
     }
 
     public RiskProfile getRiskProfile() {
@@ -155,8 +151,32 @@ public class AggregateBomViewEntry {
         return riskProfile.getCategories().getLICENSE();
     }
 
+    public String getLicenseRiskString() {
+        if (getLicenseRisk().getHIGH() != 0) {
+            return "H";
+        } else if (getLicenseRisk().getMEDIUM() != 0) {
+            return "M";
+        } else if (getLicenseRisk().getLOW() != 0) {
+            return "L";
+        } else {
+            return "-";
+        }
+    }
+
     public RiskCounts getOperationalRisk() {
         return riskProfile.getCategories().getOPERATIONAL();
+    }
+
+    public String getOperationalRiskString() {
+        if (getOperationalRisk().getHIGH() != 0) {
+            return "H";
+        } else if (getOperationalRisk().getMEDIUM() != 0) {
+            return "M";
+        } else if (getOperationalRisk().getLOW() != 0) {
+            return "L";
+        } else {
+            return "-";
+        }
     }
 
     public void setRiskProfile(RiskProfile riskProfile) {

@@ -155,8 +155,8 @@ public class HubIntRestServiceTest {
 
             projectId = restService.createHubProject(testProjectName);
 
-            // Sleep for 1 second, server takes a second before you can start using projects
-            Thread.sleep(2000);
+            // Sleep for 3 second, server takes a second before you can start using projects
+            Thread.sleep(3000);
 
             List<AutoCompleteItem> matches = restService.getProjectMatches(testProjectName);
 
