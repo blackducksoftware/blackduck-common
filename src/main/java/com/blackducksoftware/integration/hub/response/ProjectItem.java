@@ -115,6 +115,8 @@ public class ProjectItem {
         builder.append(internal);
         builder.append(", openSource=");
         builder.append(openSource);
+        builder.append(", release=");
+        builder.append(release);
         builder.append("]");
         return builder.toString();
     }
@@ -129,6 +131,7 @@ public class ProjectItem {
         result = prime * result + ((kb == null) ? 0 : kb.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + ((openSource == null) ? 0 : openSource.hashCode());
+        result = prime * result + ((release == null) ? 0 : release.hashCode());
         result = prime * result + ((restructured == null) ? 0 : restructured.hashCode());
         return result;
     }
@@ -185,6 +188,13 @@ public class ProjectItem {
                 return false;
             }
         } else if (!openSource.equals(other.openSource)) {
+            return false;
+        }
+        if (release == null) {
+            if (other.release != null) {
+                return false;
+            }
+        } else if (!release.equals(other.release)) {
             return false;
         }
         if (restructured == null) {
