@@ -57,7 +57,6 @@ public abstract class ScanExecutor {
 
     private String proxyPassword;
 
-
     private boolean verboseRun;
 
     protected ScanExecutor(String hubUrl, String hubUsername, String hubPassword, List<String> scanTargets, Integer buildNumber) {
@@ -168,7 +167,6 @@ public abstract class ScanExecutor {
         return hubPassword;
     }
 
-
     public boolean isVerboseRun() {
         return verboseRun;
     }
@@ -217,8 +215,10 @@ public abstract class ScanExecutor {
         this.proxyPassword = proxyPassword;
     }
 
+    @SuppressWarnings(value = { "SystemPrintln" })
     protected boolean isConfiguredCorrectly(String scanExec, String oneJarPath, String javaExec) {
         if (getLogger() == null) {
+            // Need to suppress the sonar rule here.
             System.out.println("Could not find a logger");
             return false;
         }

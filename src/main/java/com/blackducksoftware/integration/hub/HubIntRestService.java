@@ -122,7 +122,7 @@ public class HubIntRestService {
             m.invoke(null, authCachImp);
 
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
