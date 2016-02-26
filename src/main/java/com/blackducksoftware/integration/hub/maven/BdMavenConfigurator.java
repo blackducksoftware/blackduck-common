@@ -124,14 +124,9 @@ public class BdMavenConfigurator {
             throw new IllegalArgumentException("The first 2 parts of the version should be integers. Ex : 2.1 , 3.0 , 3.3 , etc.", e);
         }
 
-        if (majorVersion < 3) {
+        // Return false if it is 3.0 or less
+        if (majorVersion < 3 || (majorVersion == 3 && minorVersion == 0)) {
             return false;
-        } else if (majorVersion == 3) {
-            if (minorVersion > 0) {
-                return true;
-            } else {
-                return false;
-            }
         } else {
             return true;
         }
@@ -146,6 +141,7 @@ public class BdMavenConfigurator {
      * @return Boolean
      * @throws IllegalArgumentException
      */
+    @SuppressWarnings(value = { "checkstyle:com.puppycrawl.tools.checkstyle.checks.coding.SimplifyBooleanReturnCheck" })
     public Boolean isMaven30OrLater(String mavenVersion) throws IllegalArgumentException {
         if (StringUtils.isEmpty(mavenVersion)) {
             throw new IllegalArgumentException("No Maven version was supplied");
@@ -156,10 +152,9 @@ public class BdMavenConfigurator {
                     "Maven version supplied is too short. Need to at least supply the first 2 parts of the version. Ex: 2.1 , 3.0 , 3.2 , etc.");
         }
         Integer majorVersion = null;
-        Integer minorVersion = null;
         try {
             majorVersion = Integer.valueOf(versionParts[0]);
-            minorVersion = Integer.valueOf(versionParts[1]);
+            Integer.valueOf(versionParts[1]);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("The first 2 parts of the version should be integers. Ex : 2.1 , 3.0 , 3.3 , etc.", e);
         }
