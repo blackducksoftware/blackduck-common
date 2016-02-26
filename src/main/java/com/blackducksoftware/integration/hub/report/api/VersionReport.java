@@ -32,6 +32,18 @@ public class VersionReport {
         return detailedReleaseSummary.getUiUrlGenerator().getBaseUrl();
     }
 
+    public String getReportVersionUrl() {
+        if (StringUtils.isBlank(getBaseUrl()) || detailedReleaseSummary == null
+                || detailedReleaseSummary.getVersionId() == null) {
+            return null;
+        }
+
+        URLBuilder builder = new URLBuilder(getBaseUrl());
+        builder.setFragment("versions/id:" + detailedReleaseSummary.getVersionId());
+
+        return builder.buildURL();
+    }
+
     public String getComponentUrl(AggregateBomViewEntry entry) {
         if (StringUtils.isBlank(getBaseUrl()) || entry == null ||
                 entry.getProducerProject() == null || StringUtils.isBlank(entry.getProducerProject().getId())) {

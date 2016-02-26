@@ -10,9 +10,9 @@ import org.joda.time.DateTime;
  *
  */
 public class DetailedReleaseSummary {
-    private final UUID projectId;
+    private final String projectId;
 
-    private final UUID versionId;
+    private final String versionId;
 
     private final String projectName;
 
@@ -30,8 +30,8 @@ public class DetailedReleaseSummary {
 
     private final URLProvider uiUrlGenerator;
 
-    public DetailedReleaseSummary(UUID projectId,
-            UUID versionId,
+    public DetailedReleaseSummary(String projectId,
+            String versionId,
             String projectName,
             String version,
             String versionComments,
@@ -51,12 +51,20 @@ public class DetailedReleaseSummary {
         this.uiUrlGenerator = uiUrlGenerator;
     }
 
-    public UUID getProjectId() {
+    public String getProjectId() {
         return projectId;
     }
 
-    public UUID getVersionId() {
+    public String getVersionId() {
         return versionId;
+    }
+
+    public UUID getProjectUUId() {
+        return UUID.fromString(projectId);
+    }
+
+    public UUID getVersionUUId() {
+        return UUID.fromString(versionId);
     }
 
     public String getProjectName() {
