@@ -2,17 +2,13 @@ package com.blackducksoftware.integration.hub.response;
 
 public class VersionComparison {
 
-    private String consumerVersion;
+    private final String consumerVersion;
 
-    private String producerVersion;
+    private final String producerVersion;
 
-    private Integer numericResult;
+    private final Integer numericResult;
 
-    private String operatorResult;
-
-    public VersionComparison() {
-
-    }
+    private final String operatorResult;
 
     public VersionComparison(String consumerVersion, String producerVersion, Integer numericResult, String operatorResult) {
         this.consumerVersion = consumerVersion;
@@ -25,32 +21,16 @@ public class VersionComparison {
         return consumerVersion;
     }
 
-    public void setConsumerVersion(String consumerVersion) {
-        this.consumerVersion = consumerVersion;
-    }
-
     public String getProducerVersion() {
         return producerVersion;
-    }
-
-    public void setProducerVersion(String producerVersion) {
-        this.producerVersion = producerVersion;
     }
 
     public Integer getNumericResult() {
         return numericResult;
     }
 
-    public void setNumericResult(Integer numericResult) {
-        this.numericResult = numericResult;
-    }
-
     public String getOperatorResult() {
         return operatorResult;
-    }
-
-    public void setOperatorResult(String operatorResult) {
-        this.operatorResult = operatorResult;
     }
 
     @Override
