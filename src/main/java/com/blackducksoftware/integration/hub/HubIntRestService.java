@@ -1234,7 +1234,8 @@ public class HubIntRestService {
         try {
             String line = bufReader.readLine();
             while (line != null) {
-                sb.append(line + "\n");
+                sb.append(line);
+                sb.append("\n");
                 line = bufReader.readLine();
             }
         } finally {
