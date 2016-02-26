@@ -5,6 +5,9 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.response.DistributionEnum;
+import com.blackducksoftware.integration.hub.response.PhaseEnum;
+
 /**
  * Detailed release summary.
  *
@@ -93,6 +96,14 @@ public class DetailedReleaseSummary {
 
     public String getDistribution() {
         return distribution;
+    }
+
+    public String getPhaseDisplayValue() {
+        return PhaseEnum.getPhaseEnum(phase).getDisplayValue();
+    }
+
+    public String getDistributionDisplayValue() {
+        return DistributionEnum.getDistributionEnum(distribution).getDisplayValue();
     }
 
     public DateTime getReleasedOnTime() {

@@ -35,14 +35,13 @@ public enum DistributionEnum {
         return DistributionEnum.UNKNOWNDISTRIBUTION;
     }
 
-    public static DistributionEnum getDistributionEnum(String distributionEnum) {
-        if (distributionEnum.equalsIgnoreCase(EXTERNAL.name())) {
-            return DistributionEnum.EXTERNAL;
-        } else if (distributionEnum.equalsIgnoreCase(SAAS.name())) {
-            return DistributionEnum.SAAS;
-        } else if (distributionEnum.equalsIgnoreCase(INTERNAL.name())) {
-            return DistributionEnum.INTERNAL;
+    public static DistributionEnum getDistributionEnum(String distribution) {
+        DistributionEnum distributionEnum = UNKNOWNDISTRIBUTION;
+        try {
+            distributionEnum = DistributionEnum.valueOf(distribution.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // ignore expection
         }
-        return DistributionEnum.UNKNOWNDISTRIBUTION;
+        return distributionEnum;
     }
 }
