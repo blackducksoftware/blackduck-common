@@ -48,6 +48,7 @@ public class HostnameHelper {
                 }
             } catch (SocketException se) {
                 // ignore this
+                return hostName;
             }
         }
         return hostName;

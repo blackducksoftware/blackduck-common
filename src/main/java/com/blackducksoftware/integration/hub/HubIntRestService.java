@@ -1263,7 +1263,8 @@ public class HubIntRestService {
         try {
             resource.handle();
         } catch (ResourceException e) {
-            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+            if (resource.getProxyChallengeRequests() != null && !resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername)
+                    && StringUtils.isNotBlank(proxyPassword)) {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
@@ -1274,6 +1275,5 @@ public class HubIntRestService {
             }
             throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
-
     }
 }
