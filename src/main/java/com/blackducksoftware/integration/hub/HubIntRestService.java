@@ -249,21 +249,21 @@ public class HubIntRestService {
 
         String[] splitRawValue = rawValue.split(",");
         for (String currentValue : splitRawValue) {
-            currentValue = currentValue.trim();
-            if (StringUtils.isBlank(proxyChallengeRequest.getRealm()) && currentValue.startsWith("realm=")) {
-                String realm = currentValue.substring("realm=".length());
+            String trimmedCurrentValue = currentValue.trim();
+            if (StringUtils.isBlank(proxyChallengeRequest.getRealm()) && trimmedCurrentValue.startsWith("realm=")) {
+                String realm = trimmedCurrentValue.substring("realm=".length());
                 proxyChallengeRequest.setRealm(realm);
-            } else if (StringUtils.isBlank(proxyChallengeRequest.getServerNonce()) && currentValue.startsWith("nonce=")) {
-                String nonce = currentValue.substring("nonce=".length());
+            } else if (StringUtils.isBlank(proxyChallengeRequest.getServerNonce()) && trimmedCurrentValue.startsWith("nonce=")) {
+                String nonce = trimmedCurrentValue.substring("nonce=".length());
                 proxyChallengeRequest.setServerNonce(nonce);
             } else if ((proxyChallengeRequest.getQualityOptions() == null || proxyChallengeRequest.getQualityOptions().isEmpty())
-                    && currentValue.startsWith("qop=")) {
-                String qop = currentValue.substring("qop=".length());
+                    && trimmedCurrentValue.startsWith("qop=")) {
+                String qop = trimmedCurrentValue.substring("qop=".length());
                 List<String> qualityOptions = new ArrayList<String>();
                 qualityOptions.add(qop);
                 proxyChallengeRequest.setQualityOptions(qualityOptions);
-            } else if (currentValue.startsWith("stale=")) {
-                String stale = currentValue.substring("stale=".length());
+            } else if (trimmedCurrentValue.startsWith("stale=")) {
+                String stale = trimmedCurrentValue.substring("stale=".length());
                 proxyChallengeRequest.setStale(Boolean.valueOf(stale));
             }
         }
@@ -497,17 +497,19 @@ public class HubIntRestService {
         ClientResource resource = null;
         try {
             for (String targetPath : scanTargets) {
+                String correctedTargetPath = targetPath;
+
                 // Scan paths in the Hub only use '/' not '\'
-                if (targetPath.contains("\\")) {
-                    targetPath = targetPath.replace("\\", "/");
+                if (correctedTargetPath.contains("\\")) {
+                    correctedTargetPath = correctedTargetPath.replace("\\", "/");
                 }
                 // and it always starts with a '/'
-                if (!targetPath.startsWith("/")) {
-                    targetPath = "/" + targetPath;
+                if (!correctedTargetPath.startsWith("/")) {
+                    correctedTargetPath = "/" + correctedTargetPath;
                 }
 
                 logger.debug(
-                        "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + targetPath +
+                        "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + correctedTargetPath +
                                 "'");
 
                 resource = createClientResource();
@@ -515,7 +517,7 @@ public class HubIntRestService {
                 resource.addSegment("v1");
                 resource.addSegment("scanlocations");
                 resource.addQueryParameter("host", hostname);
-                resource.addQueryParameter("path", targetPath);
+                resource.addQueryParameter("path", correctedTargetPath);
 
                 if (proxyChallengeRequest != null) {
                     // This should replace the authenticator for the proxy authentication
@@ -531,7 +533,7 @@ public class HubIntRestService {
 
                 ScanLocationHandler handler = new ScanLocationHandler(logger);
 
-                handler.getScanLocationIdWithRetry(resource, targetPath, versionId, scanLocationIds);
+                handler.getScanLocationIdWithRetry(resource, correctedTargetPath, versionId, scanLocationIds);
 
             }
         } catch (ResourceException e) {

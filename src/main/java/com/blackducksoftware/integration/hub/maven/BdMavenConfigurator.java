@@ -371,13 +371,32 @@ public class BdMavenConfigurator {
      */
     private String decode(String s) throws UnsupportedEncodingException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        Character[] hexChars = new Character[2];
+        boolean isHex = false;
+
         for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
             if (ch == '%') {
-                baos.write(hexToInt(s.charAt(i + 1)) * 16 + hexToInt(s.charAt(i + 2)));
-                i += 2;
+                // The next 2 characters should be the hex value
+                isHex = true;
                 continue;
+            } else if (isHex) {
+                if (hexChars[0] == null) {
+                    // First hex character
+                    hexChars[0] = ch;
+                    continue;
+                }
+                // Second hex character
+                hexChars[1] = ch;
+                baos.write(hexToInt(hexChars[0]) * 16 + hexToInt(hexChars[1]));
+                // Reset the buffer and boolean after we write the converted hex
+                hexChars = new Character[2];
+                isHex = false;
+                continue;
+
             }
+
             baos.write(ch);
         }
         return new String(baos.toByteArray(), "UTF-8");
