@@ -7,94 +7,71 @@ import org.joda.time.DateTime;
 
 public class ReportMetaInformationItem {
 
-    private String reportFormat;
+    private final String reportFormat;
 
-    private String locale;
+    private final String locale;
 
-    private String fileName;
+    private final String fileName;
 
-    private int fileSize;
+    private final int fileSize;
 
-    private String createdAt;
+    private final String createdAt;
 
-    private String updatedAt;
+    private final String updatedAt;
 
-    private String finishedAt;
+    private final String finishedAt;
 
-    private String createdBy;
+    private final String createdBy;
 
-    private ReportMetaItem _meta;
+    private final ReportMetaItem _meta;
+
+    public ReportMetaInformationItem(String reportFormat, String locale, String fileName, int fileSize, String createdAt, String updatedAt, String finishedAt,
+            String createdBy, ReportMetaItem _meta) {
+        this.reportFormat = reportFormat;
+        this.locale = locale;
+        this.fileName = fileName;
+        this.fileSize = fileSize;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.finishedAt = finishedAt;
+        this.createdBy = createdBy;
+        this._meta = _meta;
+    }
 
     public String getReportFormat() {
         return reportFormat;
-    }
-
-    public void setReportFormat(String reportFormat) {
-        this.reportFormat = reportFormat;
     }
 
     public String getLocale() {
         return locale;
     }
 
-    public void setLocale(String locale) {
-        this.locale = locale;
-    }
-
     public String getFileName() {
         return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
     }
 
     public int getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(int fileSize) {
-        this.fileSize = fileSize;
-    }
-
     public String getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
     }
 
     public String getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public String getFinishedAt() {
         return finishedAt;
-    }
-
-    public void setFinishedAt(String finishedAt) {
-        this.finishedAt = finishedAt;
     }
 
     public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
     public ReportMetaItem get_meta() {
         return _meta;
-    }
-
-    public void set_meta(ReportMetaItem _meta) {
-        this._meta = _meta;
     }
 
     private DateTime stringToDateTime(String dateString) {
@@ -232,34 +209,28 @@ public class ReportMetaInformationItem {
     }
 
     public class ReportMetaItem {
-        List<String> allow;
+        private final List<String> allow;
 
-        String href;
+        private final String href;
 
-        List<ReportMetaLinkItem> links;
+        private final List<ReportMetaLinkItem> links;
+
+        public ReportMetaItem(List<String> allow, String href, List<ReportMetaLinkItem> links) {
+            this.allow = allow;
+            this.href = href;
+            this.links = links;
+        }
 
         public List<String> getAllow() {
             return allow;
-        }
-
-        public void setAllow(List<String> allow) {
-            this.allow = allow;
         }
 
         public String getHref() {
             return href;
         }
 
-        public void setHref(String href) {
-            this.href = href;
-        }
-
         public List<ReportMetaLinkItem> getLinks() {
             return links;
-        }
-
-        public void setLinks(List<ReportMetaLinkItem> links) {
-            this.links = links;
         }
 
         @Override
@@ -332,24 +303,21 @@ public class ReportMetaInformationItem {
     }
 
     public class ReportMetaLinkItem {
-        String rel;
+        private final String rel;
 
-        String href;
+        private final String href;
+
+        public ReportMetaLinkItem(String rel, String href) {
+            this.rel = rel;
+            this.href = href;
+        }
 
         public String getRel() {
             return rel;
         }
 
-        public void setRel(String rel) {
-            this.rel = rel;
-        }
-
         public String getHref() {
             return href;
-        }
-
-        public void setHref(String href) {
-            this.href = href;
         }
 
         @Override

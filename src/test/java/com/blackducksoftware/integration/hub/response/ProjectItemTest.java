@@ -8,7 +8,7 @@ import org.junit.Test;
 public class ProjectItemTest {
 
     @Test
-    public void testProjectItemItem() {
+    public void testProjectItem() {
         final String id1 = "ID1";
         final Boolean kb1 = true;
         final String name1 = "Name1";

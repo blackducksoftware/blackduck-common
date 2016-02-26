@@ -8,7 +8,7 @@ import org.junit.Test;
 public class ReleaseItemTest {
 
     @Test
-    public void testReleaseItemItem() {
+    public void testReleaseItem() {
         final String id1 = "ID1";
         final Boolean kb1 = true;
         final Boolean ohloh1 = true;
