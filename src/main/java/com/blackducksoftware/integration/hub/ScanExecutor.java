@@ -387,7 +387,7 @@ public abstract class ScanExecutor {
     protected String getLogDirectoryPath() throws IOException {
         File logDirectory = new File(new File(getWorkingDirectory(), "HubScanLogs"), String.valueOf(getBuildNumber()));
         // This log directory should never exist as a new one is created for each Build
-        if (!logDirectory.mkdirs()) {
+        if (!logDirectory.exists() && !logDirectory.mkdirs()) {
             throw new IOException("Could not create the HubScanLogs directory!");
         }
 
