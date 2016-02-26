@@ -108,7 +108,7 @@ public class ScanLocationHandler {
             throws HubIntegrationException {
         boolean matchFound = false;
         resource.get();
-
+        String remotePath = remoteTargetPath;
         int responseCode = resource.getResponse().getStatus().getCode();
         try {
             ScanLocationResults results = null;
@@ -142,20 +142,20 @@ public class ScanLocationHandler {
                     if (path.endsWith("/")) {
                         path = path.substring(0, path.length() - 1);
                     }
-                    if (remoteTargetPath.endsWith("/")) {
-                        remoteTargetPath = remoteTargetPath.substring(0, remoteTargetPath.length() - 1);
+                    if (remotePath.endsWith("/")) {
+                        remotePath = remotePath.substring(0, remotePath.length() - 1);
                     }
-                    logger.debug("Comparing target : '" + remoteTargetPath + "' with path : '" + path + "'.");
-                    if (remoteTargetPath.equals(path)) {
+                    logger.debug("Comparing target : '" + remotePath + "' with path : '" + path + "'.");
+                    if (remotePath.equals(path)) {
                         logger.debug("MATCHED!");
                         matchFound = true;
-                        handleScanLocationMatch(scanLocationIds, scanMatch, remoteTargetPath, versionId);
+                        handleScanLocationMatch(scanLocationIds, scanMatch, remotePath, versionId);
                         break;
                     }
                 }
             } else {
                 logger.error(
-                        "No Scan Location Id could be found for the scan target : '" + remoteTargetPath + "'.");
+                        "No Scan Location Id could be found for the scan target : '" + remotePath + "'.");
             }
         } catch (IOException e) {
             logger.error(e);

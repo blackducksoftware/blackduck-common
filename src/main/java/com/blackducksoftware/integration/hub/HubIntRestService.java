@@ -972,17 +972,19 @@ public class HubIntRestService {
 
         ClientResource resource = null;
         for (String targetPath : scanTargets) {
+            String correctedTargetPath = targetPath;
+
             // Scan paths in the Hub only use '/' not '\'
-            if (targetPath.contains("\\")) {
-                targetPath = targetPath.replace("\\", "/");
+            if (correctedTargetPath.contains("\\")) {
+                correctedTargetPath = correctedTargetPath.replace("\\", "/");
             }
             // and it always starts with a '/'
-            if (!targetPath.startsWith("/")) {
-                targetPath = "/" + targetPath;
+            if (!correctedTargetPath.startsWith("/")) {
+                correctedTargetPath = "/" + correctedTargetPath;
             }
 
             // logger.debug(
-            // "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + targetPath +
+            // "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + correctedTargetPath +
             // "'");
 
             resource = createClientResource();
@@ -990,7 +992,7 @@ public class HubIntRestService {
             resource.addSegment("v1");
             resource.addSegment("scanlocations");
             resource.addQueryParameter("host", hostname);
-            resource.addQueryParameter("path", targetPath);
+            resource.addQueryParameter("path", correctedTargetPath);
 
             resource.setMethod(Method.GET);
 
@@ -1001,9 +1003,9 @@ public class HubIntRestService {
             if (responseCode == 200) {
                 String response = readResponseAsString(resource.getResponse());
                 ScanLocationResults results = new Gson().fromJson(response, ScanLocationResults.class);
-                ScanLocationItem currentCodeLocation = getScanLocationMatch(hostname, targetPath, results);
+                ScanLocationItem currentCodeLocation = getScanLocationMatch(hostname, correctedTargetPath, results);
                 if (currentCodeLocation == null) {
-                    throw new HubIntegrationException("Could not determine the code location for the Host : " + hostname + " and Path : " + targetPath);
+                    throw new HubIntegrationException("Could not determine the code location for the Host : " + hostname + " and Path : " + correctedTargetPath);
                 }
 
                 codeLocations.add(currentCodeLocation);
