@@ -7,13 +7,13 @@ public enum ReportFormatEnum {
     UNKNOWN;
 
     public static ReportFormatEnum getReportFormatEnum(String reportFormatEnum) {
-        if (reportFormatEnum.equalsIgnoreCase(CSV.name())) {
-            return ReportFormatEnum.CSV;
-        } else if (reportFormatEnum.equalsIgnoreCase(JSON.name())) {
-            return ReportFormatEnum.JSON;
-        } else {
-            return ReportFormatEnum.UNKNOWN;
+        ReportFormatEnum reportFormat = UNKNOWN;
+        try {
+            reportFormat = ReportFormatEnum.valueOf(reportFormatEnum.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // ignore expection
         }
+        return reportFormat;
     }
 
 }
