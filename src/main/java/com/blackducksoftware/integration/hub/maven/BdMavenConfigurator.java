@@ -121,7 +121,7 @@ public class BdMavenConfigurator {
             majorVersion = Integer.valueOf(versionParts[0]);
             minorVersion = Integer.valueOf(versionParts[1]);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("The first 2 parts of the version should be integers. Ex : 2.1 , 3.0 , 3.3 , etc.");
+            throw new IllegalArgumentException("The first 2 parts of the version should be integers. Ex : 2.1 , 3.0 , 3.3 , etc.", e);
         }
 
         if (majorVersion < 3) {
@@ -161,7 +161,7 @@ public class BdMavenConfigurator {
             majorVersion = Integer.valueOf(versionParts[0]);
             minorVersion = Integer.valueOf(versionParts[1]);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("The first 2 parts of the version should be integers. Ex : 2.1 , 3.0 , 3.3 , etc.");
+            throw new IllegalArgumentException("The first 2 parts of the version should be integers. Ex : 2.1 , 3.0 , 3.3 , etc.", e);
         }
 
         if (majorVersion < 3) {
