@@ -74,7 +74,7 @@ public class ScanLocationHandler {
             long end = System.currentTimeMillis() - start;
             if (end > 120 * 1000) { // This should check if the loop has been running for 2 minutes. If it has, the
                 // exception is thrown.
-                throw new BDRestException("Can not find the Scan Location after 2 minutes. Try again later.");
+                throw new BDRestException("Can not find the Scan Location after 2 minutes. Try again later.", resource);
             }
             long minutes = TimeUnit.MILLISECONDS.toMinutes(end);
             long seconds = TimeUnit.MILLISECONDS.toSeconds(end) -
@@ -127,7 +127,7 @@ public class ScanLocationHandler {
                 results = gson.fromJson(sb.toString(), ScanLocationResults.class);
 
             } else {
-                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode);
+                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
 
             if (results != null && results.getTotalCount() > 0 && results.getItems().size() > 0) {

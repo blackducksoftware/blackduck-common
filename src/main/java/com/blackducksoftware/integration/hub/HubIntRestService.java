@@ -1080,13 +1080,13 @@ public class HubIntRestService {
 
         if (responseCode == 201) {
             if (resource.getResponse().getAttributes() == null || resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
-                throw new BDRestException("Could not get the response headers after creating the report.");
+                throw new BDRestException("Could not get the response headers after creating the report.", resource);
             }
             Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
             Header reportUrl = responseHeaders.getFirst("location", true);
 
             if (reportUrl == null || StringUtils.isBlank(reportUrl.getValue())) {
-                throw new BDRestException("Could not get the report URL from the response headers.");
+                throw new BDRestException("Could not get the report URL from the response headers.", resource);
             }
 
             return reportUrl.getValue();
