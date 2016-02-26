@@ -39,8 +39,9 @@ public class VersionReport {
         }
 
         URLBuilder builder = new URLBuilder(getBaseUrl());
-        builder.setFragment("versions/id:" + detailedReleaseSummary.getVersionId());
+        builder.setFragment("versions/id:" + detailedReleaseSummary.getVersionId() + "/view:bom");
 
+        String url = builder.buildURL();
         return builder.buildURL();
     }
 
