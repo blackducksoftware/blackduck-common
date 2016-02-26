@@ -12,25 +12,13 @@ import org.opensaml.util.URLBuilder;
 public class VersionReport {
     private final DetailedReleaseSummary detailedReleaseSummary;
 
-    // private final List<DetailedCodeLocation> detailedCodeLocations;
-
     private final List<AggregateBomViewEntry> aggregateBomViewEntries;
-
-    // private final List<DetailedVulnerability> detailedVulnerabilities;
-
-    // private final List<DetailedFileBomViewEntry> detailedFileBomViewEntries;
 
     public VersionReport(DetailedReleaseSummary detailedReleaseSummary,
             // List<DetailedCodeLocation> detailedCodeLocations,
-            List<AggregateBomViewEntry> aggregateBomViewEntries
-    // List<DetailedVulnerability> detailedVulnerabilities,
-    // List<DetailedFileBomViewEntry> detailedFileBomViewEntries
-    ) {
+            List<AggregateBomViewEntry> aggregateBomViewEntries) {
         this.detailedReleaseSummary = detailedReleaseSummary;
-        // this.detailedCodeLocations = detailedCodeLocations;
         this.aggregateBomViewEntries = aggregateBomViewEntries;
-        // this.detailedVulnerabilities = detailedVulnerabilities;
-        // this.detailedFileBomViewEntries = detailedFileBomViewEntries;
     }
 
     public DetailedReleaseSummary getDetailedReleaseSummary() {
@@ -68,31 +56,16 @@ public class VersionReport {
         return builder.buildURL();
     }
 
-    // public List<DetailedCodeLocation> getDetailedCodeLocations() {
-    // return detailedCodeLocations;
-    // }
-
     public List<AggregateBomViewEntry> getAggregateBomViewEntries() {
         return aggregateBomViewEntries;
     }
-
-    // public List<DetailedVulnerability> getDetailedVulnerabilities() {
-    // return detailedVulnerabilities;
-    // }
-
-    // public List<DetailedFileBomViewEntry> getDetailedFileBomViewEntries() {
-    // return detailedFileBomViewEntries;
-    // }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((aggregateBomViewEntries == null) ? 0 : aggregateBomViewEntries.hashCode());
-        // result = prime * result + ((detailedCodeLocations == null) ? 0 : detailedCodeLocations.hashCode());
-        // result = prime * result + ((detailedFileBomViewEntries == null) ? 0 : detailedFileBomViewEntries.hashCode());
         result = prime * result + ((detailedReleaseSummary == null) ? 0 : detailedReleaseSummary.hashCode());
-        // result = prime * result + ((detailedVulnerabilities == null) ? 0 : detailedVulnerabilities.hashCode());
         return result;
     }
 
@@ -115,20 +88,6 @@ public class VersionReport {
         } else if (!aggregateBomViewEntries.equals(other.aggregateBomViewEntries)) {
             return false;
         }
-        // if (detailedCodeLocations == null) {
-        // if (other.detailedCodeLocations != null) {
-        // return false;
-        // }
-        // } else if (!detailedCodeLocations.equals(other.detailedCodeLocations)) {
-        // return false;
-        // }
-        // if (detailedFileBomViewEntries == null) {
-        // if (other.detailedFileBomViewEntries != null) {
-        // return false;
-        // }
-        // } else if (!detailedFileBomViewEntries.equals(other.detailedFileBomViewEntries)) {
-        // return false;
-        // }
         if (detailedReleaseSummary == null) {
             if (other.detailedReleaseSummary != null) {
                 return false;
@@ -136,13 +95,6 @@ public class VersionReport {
         } else if (!detailedReleaseSummary.equals(other.detailedReleaseSummary)) {
             return false;
         }
-        // if (detailedVulnerabilities == null) {
-        // if (other.detailedVulnerabilities != null) {
-        // return false;
-        // }
-        // } else if (!detailedVulnerabilities.equals(other.detailedVulnerabilities)) {
-        // return false;
-        // }
         return true;
     }
 
@@ -151,14 +103,8 @@ public class VersionReport {
         StringBuilder builder = new StringBuilder();
         builder.append("VersionReport [detailedReleaseSummary=");
         builder.append(detailedReleaseSummary);
-        // builder.append(", detailedCodeLocations=");
-        // builder.append(detailedCodeLocations);
         builder.append(", aggregateBomViewEntries=");
         builder.append(aggregateBomViewEntries);
-        // builder.append(", detailedVulnerabilities=");
-        // builder.append(detailedVulnerabilities);
-        // builder.append(", detailedFileBomViewEntries=");
-        // builder.append(detailedFileBomViewEntries);
         builder.append("]");
         return builder.toString();
     }
