@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 
 public class ScannerSplitStream extends OutputStream {
@@ -35,15 +37,15 @@ public class ScannerSplitStream extends OutputStream {
 
     private static final String TRACE = "TRACE:";
 
-    private final StringBuilder outputBuilder = new StringBuilder();
-
     private final OutputStream outputFileStream;
 
     private final IntLogger logger;
 
-    private StringBuilder lineBuffer = new StringBuilder();
+    private String output = "";
 
-    private StringBuilder currentLineBuffer = new StringBuilder();
+    private String lineBuffer = "";
+
+    private String currentLine = "";
 
     public ScannerSplitStream(IntLogger logger, OutputStream outputFileStream) {
         this.outputFileStream = outputFileStream;
@@ -51,11 +53,11 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     public String getOutput() {
-        return outputBuilder.toString();
+        return output;
     }
 
     public Boolean hasOutput() {
-        return outputBuilder != null && outputBuilder.length() > 0;
+        return StringUtils.isNotBlank(output);
     }
 
     @Override
@@ -64,28 +66,30 @@ public class ScannerSplitStream extends OutputStream {
 
         String stringAcii = new String(Character.toChars(b));
 
-        String currentLine = currentLineBuffer.toString();
+        StringBuilder builder = new StringBuilder();
+        builder.append(currentLine);
         switch (b) {
         case ETX:
             processLine(currentLine);
-            currentLineBuffer = new StringBuilder();
+            currentLine = "";
             return;
         case EOT:
             processLine(currentLine);
-            currentLineBuffer = new StringBuilder();
+            currentLine = "";
             return;
         case LF:
             processLine(currentLine);
-            currentLineBuffer = new StringBuilder();
+            currentLine = "";
             return;
         case CR:
             processLine(currentLine);
-            currentLineBuffer = new StringBuilder();
+            currentLine = "";
             return;
         case EOF:
             throw new EOFException();
         default:
-            currentLineBuffer.append(stringAcii);
+            builder.append(stringAcii);
+            currentLine = builder.toString();
             return;
         }
     }
@@ -118,25 +122,27 @@ public class ScannerSplitStream extends OutputStream {
     private void processLine(String line) throws UnsupportedEncodingException {
         if (lineBuffer.length() == 0) {
             // First log line found, put it in the buffer
-
-            lineBuffer.append(line);
+            lineBuffer = line;
 
         } else if (isLoggableLine(line)) {
             // next real log message came in, print the log in the buffer
             // print stored lines
             writeToConsole(lineBuffer.toString());
 
-            // clear and add current line to the buffer
-            lineBuffer = new StringBuilder();
-            lineBuffer.append(line);
+            // replace with the current line
+            lineBuffer = line;
 
         } else {
             // We assume that each new log starts with the log level, if this line does not contain a log level it
             // must only be a piece of a log
 
             // needs to be added into the buffer
-            lineBuffer.append(System.getProperty("line.separator") + line);
+            StringBuilder builder = new StringBuilder();
+            builder.append(lineBuffer);
 
+            builder.append(System.getProperty("line.separator"));
+            builder.append(line);
+            lineBuffer = builder.toString();
         }
     }
 
@@ -190,23 +196,32 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     private void writeToConsole(String line) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(output);
 
         if (line.contains(EXCEPTION)) {
             // looking for 'Exception in thread' type messages
-            outputBuilder.append(line + System.getProperty("line.separator"));
+            builder.append(line);
+            builder.append(System.getProperty("line.separator"));
             logger.error(line);
         } else if (line.contains(FINISHED)) {
-            outputBuilder.append(line + System.getProperty("line.separator"));
+            builder.append(line);
+            builder.append(System.getProperty("line.separator"));
             logger.info(line);
         } else if (line.contains(ERROR)) {
-            outputBuilder.append(line + System.getProperty("line.separator"));
+            builder.append(line);
+            builder.append(System.getProperty("line.separator"));
             logger.error(line);
         } else if (line.contains(WARN)) {
-            outputBuilder.append(line + System.getProperty("line.separator"));
+            builder.append(line);
+            builder.append(System.getProperty("line.separator"));
             logger.warn(line);
         } else if (line.contains(INFO)) {
-            outputBuilder.append(line + System.getProperty("line.separator"));
+            builder.append(line);
+            builder.append(System.getProperty("line.separator"));
             logger.info(line);
         }
+
+        output = builder.toString();
     }
 }
