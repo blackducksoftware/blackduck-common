@@ -23,14 +23,10 @@ public enum DistributionEnum {
     }
 
     public static DistributionEnum getDistributionByDisplayValue(String displayValue) {
-        if (displayValue.equalsIgnoreCase(EXTERNAL.getDisplayValue())) {
-            return DistributionEnum.EXTERNAL;
-        } else if (displayValue.equalsIgnoreCase(SAAS.getDisplayValue())) {
-            return DistributionEnum.SAAS;
-        } else if (displayValue.equalsIgnoreCase(INTERNAL.getDisplayValue())) {
-            return DistributionEnum.INTERNAL;
-        } else if (displayValue.equalsIgnoreCase(OPENSOURCE.getDisplayValue())) {
-            return DistributionEnum.OPENSOURCE;
+        for (DistributionEnum currentEnum : DistributionEnum.values()) {
+            if (currentEnum.getDisplayValue().equalsIgnoreCase(displayValue)) {
+                return currentEnum;
+            }
         }
         return DistributionEnum.UNKNOWNDISTRIBUTION;
     }
