@@ -1236,11 +1236,10 @@ public class HubIntRestService {
         Reader reader = response.getEntity().getReader();
         BufferedReader bufReader = new BufferedReader(reader);
         try {
-            String line = bufReader.readLine();
-            while (line != null) {
+            String line;
+            while ((line = bufReader.readLine()) != null) {
                 sb.append(line);
                 sb.append("\n");
-                line = bufReader.readLine();
             }
         } finally {
             bufReader.close();
