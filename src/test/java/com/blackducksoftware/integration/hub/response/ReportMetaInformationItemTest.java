@@ -130,5 +130,28 @@ public class ReportMetaInformationItemTest {
         assertTrue(metaLink1.hashCode() != metaLink2.hashCode());
         assertEquals(metaLink1.hashCode(), metaLink3.hashCode());
 
+        StringBuilder builder = new StringBuilder();
+        builder.append("ReportMetaInformationItem [reportFormat=");
+        builder.append(item1.getReportFormat());
+        builder.append(", locale=");
+        builder.append(item1.getLocale());
+        builder.append(", fileName=");
+        builder.append(item1.getFileName());
+        builder.append(", fileSize=");
+        builder.append(item1.getFileSize());
+        builder.append(", createdAt=");
+        builder.append(item1.getCreatedAt());
+        builder.append(", updatedAt=");
+        builder.append(item1.getUpdatedAt());
+        builder.append(", finishedAt=");
+        builder.append(item1.getFinishedAt());
+        builder.append(", createdBy=");
+        builder.append(item1.getCreatedBy());
+        builder.append(", _meta=");
+        builder.append(item1.get_meta());
+        builder.append("]");
+
+        assertEquals(builder.toString(), item1.toString());
+
     }
 }

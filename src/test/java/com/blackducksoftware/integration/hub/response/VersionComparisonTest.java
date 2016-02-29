@@ -42,6 +42,19 @@ public class VersionComparisonTest {
 
         assertTrue(item1.hashCode() != item2.hashCode());
         assertEquals(item1.hashCode(), item3.hashCode());
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("VersionComparison [consumerVersion=");
+        builder.append(item1.getConsumerVersion());
+        builder.append(", producerVersion=");
+        builder.append(item1.getProducerVersion());
+        builder.append(", numericResult=");
+        builder.append(item1.getNumericResult());
+        builder.append(", operatorResult=");
+        builder.append(item1.getOperatorResult());
+        builder.append("]");
+
+        assertEquals(builder.toString(), item1.toString());
     }
 
 }

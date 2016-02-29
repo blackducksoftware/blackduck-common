@@ -1,6 +1,7 @@
 package com.blackducksoftware.integration.hub.response.mapping;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -24,12 +25,9 @@ public class ScanHistoryItemTest {
         final String numDirs1 = "numDirs1";
         final String numNonDirFiles1 = "numFiles1";
 
-        final DateTime createdOnTime2 = new DateTime();
-        final DateTime modifiedOnTime2 = new DateTime();
-
         final String scannerVersion2 = "Scanner2";
-        final String lastModifiedOn2 = modifiedOnTime2.toString();
-        final String createdOn2 = createdOnTime2.toString();
+        final String lastModifiedOn2 = null;
+        final String createdOn2 = null;
         final String createdByUserName2 = "Scanner2";
         final ScanStatus status2 = ScanStatus.COMPLETE;
         final String scanSourceType2 = "ScanSource2";
@@ -85,8 +83,8 @@ public class ScanHistoryItemTest {
         assertEquals(createdOnTime1, item1.getCreatedOnTime());
         assertEquals(modifiedOnTime1, item1.getLastModifiedOnTime());
 
-        assertEquals(createdOnTime2, item2.getCreatedOnTime());
-        assertEquals(modifiedOnTime2, item2.getLastModifiedOnTime());
+        assertNull(item2.getCreatedOnTime());
+        assertNull(item2.getLastModifiedOnTime());
 
         assertTrue(!item1.equals(item2));
         assertTrue(item1.equals(item3));
