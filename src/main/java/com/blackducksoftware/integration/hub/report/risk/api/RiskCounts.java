@@ -90,7 +90,7 @@ public class RiskCounts {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("RiskCategory [HIGH=");
+        builder.append("RiskCounts [HIGH=");
         builder.append(HIGH);
         builder.append(", MEDIUM=");
         builder.append(MEDIUM);
