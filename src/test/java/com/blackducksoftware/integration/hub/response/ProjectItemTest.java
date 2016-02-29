@@ -2,6 +2,8 @@ package com.blackducksoftware.integration.hub.response;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
@@ -55,6 +57,8 @@ public class ProjectItemTest {
         assertTrue(!item1.equals(item2));
         assertTrue(item1.equals(item3));
         assertTrue(!item2.equals(item4));
+
+        EqualsVerifier.forClass(ProjectItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
 
         assertTrue(item1.hashCode() != item2.hashCode());
         assertEquals(item1.hashCode(), item3.hashCode());

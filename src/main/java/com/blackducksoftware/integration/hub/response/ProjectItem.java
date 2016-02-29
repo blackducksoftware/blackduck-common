@@ -144,7 +144,7 @@ public class ProjectItem {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof ProjectItem)) {
             return false;
         }
         ProjectItem other = (ProjectItem) obj;

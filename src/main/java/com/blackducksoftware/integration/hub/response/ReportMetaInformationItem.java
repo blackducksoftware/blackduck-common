@@ -117,7 +117,7 @@ public class ReportMetaInformationItem {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof ReportMetaInformationItem)) {
             return false;
         }
         ReportMetaInformationItem other = (ReportMetaInformationItem) obj;
@@ -252,7 +252,7 @@ public class ReportMetaInformationItem {
             if (obj == null) {
                 return false;
             }
-            if (getClass() != obj.getClass()) {
+            if (!(obj instanceof ReportMetaItem)) {
                 return false;
             }
             ReportMetaItem other = (ReportMetaItem) obj;
@@ -338,7 +338,7 @@ public class ReportMetaInformationItem {
             if (obj == null) {
                 return false;
             }
-            if (getClass() != obj.getClass()) {
+            if (!(obj instanceof ReportMetaLinkItem)) {
                 return false;
             }
             ReportMetaLinkItem other = (ReportMetaLinkItem) obj;

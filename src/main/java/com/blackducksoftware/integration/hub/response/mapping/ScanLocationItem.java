@@ -118,7 +118,7 @@ public class ScanLocationItem {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof ScanLocationItem)) {
             return false;
         }
         ScanLocationItem other = (ScanLocationItem) obj;

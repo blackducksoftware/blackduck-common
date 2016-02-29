@@ -215,7 +215,7 @@ public class ReleaseItem {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof ReleaseItem)) {
             return false;
         }
         ReleaseItem other = (ReleaseItem) obj;

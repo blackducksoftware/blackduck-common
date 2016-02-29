@@ -2,6 +2,8 @@ package com.blackducksoftware.integration.hub.response.mapping;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -88,6 +90,8 @@ public class ScanHistoryItemTest {
 
         assertTrue(!item1.equals(item2));
         assertTrue(item1.equals(item3));
+
+        EqualsVerifier.forClass(ScanHistoryItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
 
         assertTrue(item1.hashCode() != item2.hashCode());
         assertEquals(item1.hashCode(), item3.hashCode());

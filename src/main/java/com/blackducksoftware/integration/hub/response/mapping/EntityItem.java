@@ -115,7 +115,7 @@ public class EntityItem {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof EntityItem)) {
             return false;
         }
         EntityItem other = (EntityItem) obj;

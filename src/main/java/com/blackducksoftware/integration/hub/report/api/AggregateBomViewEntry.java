@@ -250,7 +250,7 @@ public class AggregateBomViewEntry {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof AggregateBomViewEntry)) {
             return false;
         }
         AggregateBomViewEntry other = (AggregateBomViewEntry) obj;

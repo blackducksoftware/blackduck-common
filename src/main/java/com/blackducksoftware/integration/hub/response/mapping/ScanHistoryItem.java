@@ -122,7 +122,7 @@ public class ScanHistoryItem {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof ScanHistoryItem)) {
             return false;
         }
         ScanHistoryItem other = (ScanHistoryItem) obj;

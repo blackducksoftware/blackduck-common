@@ -1,5 +1,6 @@
 package com.blackducksoftware.integration.hub.response;
 
+
 public class AutoCompleteItem {
 
     private String value;
@@ -59,7 +60,7 @@ public class AutoCompleteItem {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof AutoCompleteItem)) {
             return false;
         }
         AutoCompleteItem other = (AutoCompleteItem) obj;

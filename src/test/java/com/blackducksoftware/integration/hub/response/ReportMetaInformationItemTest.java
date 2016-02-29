@@ -7,6 +7,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -87,6 +90,8 @@ public class ReportMetaInformationItemTest {
 
         assertTrue(!item1.equals(item2));
         assertTrue(item1.equals(item3));
+
+        EqualsVerifier.forClass(ReportMetaInformationItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
 
         assertTrue(item1.hashCode() != item2.hashCode());
         assertEquals(item1.hashCode(), item3.hashCode());

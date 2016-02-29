@@ -39,7 +39,7 @@ public class UserData {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof UserData)) {
             return false;
         }
         UserData other = (UserData) obj;

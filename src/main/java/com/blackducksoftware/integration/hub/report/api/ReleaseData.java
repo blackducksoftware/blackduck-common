@@ -1,6 +1,5 @@
 package com.blackducksoftware.integration.hub.report.api;
 
-
 public class ReleaseData {
 
     private final String id;
@@ -38,7 +37,7 @@ public class ReleaseData {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof ReleaseData)) {
             return false;
         }
         ReleaseData other = (ReleaseData) obj;

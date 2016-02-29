@@ -2,6 +2,8 @@ package com.blackducksoftware.integration.hub.response.mapping;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
@@ -68,6 +70,8 @@ public class EntityItemTest {
 
         assertTrue(!entity1.equals(entity2));
         assertTrue(entity1.equals(entity3));
+
+        EqualsVerifier.forClass(EntityItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
 
         assertTrue(entity1.hashCode() != entity2.hashCode());
         assertEquals(entity1.hashCode(), entity3.hashCode());

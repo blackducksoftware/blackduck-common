@@ -142,7 +142,7 @@ public class DetailedReleaseSummary {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof DetailedReleaseSummary)) {
             return false;
         }
         DetailedReleaseSummary other = (DetailedReleaseSummary) obj;
@@ -274,7 +274,7 @@ public class DetailedReleaseSummary {
             if (obj == null) {
                 return false;
             }
-            if (getClass() != obj.getClass()) {
+            if (!(obj instanceof URLProvider)) {
                 return false;
             }
             URLProvider other = (URLProvider) obj;

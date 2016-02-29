@@ -1,5 +1,6 @@
 package com.blackducksoftware.integration.hub.response.mapping;
 
+
 public class AssetReferenceItem extends EntityItem {
 
     private EntityItem ownerEntityKey;
@@ -50,7 +51,7 @@ public class AssetReferenceItem extends EntityItem {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof AssetReferenceItem)) {
             return false;
         }
         AssetReferenceItem other = (AssetReferenceItem) obj;

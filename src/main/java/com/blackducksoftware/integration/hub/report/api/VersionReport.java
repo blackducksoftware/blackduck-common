@@ -90,7 +90,7 @@ public class VersionReport {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof VersionReport)) {
             return false;
         }
         VersionReport other = (VersionReport) obj;

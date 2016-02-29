@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Black Duck Software Inc.
  * http://www.blackducksoftware.com/
  * All rights reserved.
- *
+ * 
  * This software is the confidential and proprietary information of
  * Black Duck Software ("Confidential Information"). You shall not
  * disclose such Confidential Information and shall use it only in
@@ -63,7 +63,7 @@ public class RiskProfile {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof RiskProfile)) {
             return false;
         }
         RiskProfile other = (RiskProfile) obj;

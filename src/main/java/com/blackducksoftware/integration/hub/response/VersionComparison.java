@@ -67,7 +67,7 @@ public class VersionComparison {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof VersionComparison)) {
             return false;
         }
         VersionComparison other = (VersionComparison) obj;

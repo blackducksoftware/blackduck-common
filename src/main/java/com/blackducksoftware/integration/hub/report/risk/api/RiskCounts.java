@@ -65,7 +65,7 @@ public class RiskCounts {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof RiskCounts)) {
             return false;
         }
         RiskCounts other = (RiskCounts) obj;

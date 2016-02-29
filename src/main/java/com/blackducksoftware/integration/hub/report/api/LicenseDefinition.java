@@ -85,7 +85,7 @@ public class LicenseDefinition {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof LicenseDefinition)) {
             return false;
         }
         LicenseDefinition other = (LicenseDefinition) obj;

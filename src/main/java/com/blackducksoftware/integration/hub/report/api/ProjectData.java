@@ -1,6 +1,5 @@
 package com.blackducksoftware.integration.hub.report.api;
 
-
 public class ProjectData {
 
     private final String id;
@@ -46,7 +45,7 @@ public class ProjectData {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof ProjectData)) {
             return false;
         }
         ProjectData other = (ProjectData) obj;
