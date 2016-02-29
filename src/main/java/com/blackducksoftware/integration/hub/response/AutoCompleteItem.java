@@ -1,15 +1,10 @@
 package com.blackducksoftware.integration.hub.response;
 
-
 public class AutoCompleteItem {
 
-    private String value;
+    private final String value;
 
-    private String uuid;
-
-    public AutoCompleteItem() {
-
-    }
+    private final String uuid;
 
     public AutoCompleteItem(String value, String uuid) {
         this.value = value;
@@ -20,16 +15,8 @@ public class AutoCompleteItem {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     public String getUuid() {
         return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
     @Override

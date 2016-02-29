@@ -1,7 +1,6 @@
 package com.blackducksoftware.integration.hub.response.mapping;
 
-
-public class AssetReferenceItem extends EntityItem {
+public class AssetReferenceItem {
 
     private EntityItem ownerEntityKey;
 

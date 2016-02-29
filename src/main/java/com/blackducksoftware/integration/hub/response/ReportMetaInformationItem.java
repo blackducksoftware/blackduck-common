@@ -237,7 +237,6 @@ public class ReportMetaInformationItem {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + getOuterType().hashCode();
             result = prime * result + ((allow == null) ? 0 : allow.hashCode());
             result = prime * result + ((href == null) ? 0 : href.hashCode());
             result = prime * result + ((links == null) ? 0 : links.hashCode());
@@ -256,9 +255,6 @@ public class ReportMetaInformationItem {
                 return false;
             }
             ReportMetaItem other = (ReportMetaItem) obj;
-            if (!getOuterType().equals(other.getOuterType())) {
-                return false;
-            }
             if (allow == null) {
                 if (other.allow != null) {
                     return false;
@@ -324,7 +320,6 @@ public class ReportMetaInformationItem {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + getOuterType().hashCode();
             result = prime * result + ((href == null) ? 0 : href.hashCode());
             result = prime * result + ((rel == null) ? 0 : rel.hashCode());
             return result;
@@ -342,9 +337,6 @@ public class ReportMetaInformationItem {
                 return false;
             }
             ReportMetaLinkItem other = (ReportMetaLinkItem) obj;
-            if (!getOuterType().equals(other.getOuterType())) {
-                return false;
-            }
             if (href == null) {
                 if (other.href != null) {
                     return false;

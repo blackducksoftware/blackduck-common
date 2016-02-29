@@ -58,7 +58,7 @@ public class ProjectItemTest {
         assertTrue(item1.equals(item3));
         assertTrue(!item2.equals(item4));
 
-        EqualsVerifier.forClass(ProjectItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
+        EqualsVerifier.forClass(ProjectItem.class).suppress(Warning.NONFINAL_FIELDS).suppress(Warning.STRICT_INHERITANCE).verify();
 
         assertTrue(item1.hashCode() != item2.hashCode());
         assertEquals(item1.hashCode(), item3.hashCode());

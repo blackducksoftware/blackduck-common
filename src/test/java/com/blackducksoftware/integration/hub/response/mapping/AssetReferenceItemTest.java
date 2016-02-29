@@ -50,7 +50,7 @@ public class AssetReferenceItemTest {
         assertTrue(!item1.equals(item2));
         assertTrue(item1.equals(item3));
 
-        EqualsVerifier.forClass(AssetReferenceItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
+        EqualsVerifier.forClass(AssetReferenceItem.class).suppress(Warning.NONFINAL_FIELDS).suppress(Warning.STRICT_INHERITANCE).verify();
 
         assertTrue(item1.hashCode() != item2.hashCode());
         assertEquals(item1.hashCode(), item3.hashCode());
