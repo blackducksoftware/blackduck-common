@@ -92,6 +92,13 @@ public class ScanHistoryItem {
         return new DateTime(createdOn);
     }
 
+    public DateTime getLastModifiedOnTime() {
+        if (StringUtils.isBlank(lastModifiedOn)) {
+            return null;
+        }
+        return new DateTime(lastModifiedOn);
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
