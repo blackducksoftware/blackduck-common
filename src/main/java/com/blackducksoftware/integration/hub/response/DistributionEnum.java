@@ -23,26 +23,21 @@ public enum DistributionEnum {
     }
 
     public static DistributionEnum getDistributionByDisplayValue(String displayValue) {
-        if (displayValue.equalsIgnoreCase(EXTERNAL.getDisplayValue())) {
-            return DistributionEnum.EXTERNAL;
-        } else if (displayValue.equalsIgnoreCase(SAAS.getDisplayValue())) {
-            return DistributionEnum.SAAS;
-        } else if (displayValue.equalsIgnoreCase(INTERNAL.getDisplayValue())) {
-            return DistributionEnum.INTERNAL;
-        } else if (displayValue.equalsIgnoreCase(OPENSOURCE.getDisplayValue())) {
-            return DistributionEnum.OPENSOURCE;
+        for (DistributionEnum currentEnum : DistributionEnum.values()) {
+            if (currentEnum.getDisplayValue().equalsIgnoreCase(displayValue)) {
+                return currentEnum;
+            }
         }
         return DistributionEnum.UNKNOWNDISTRIBUTION;
     }
 
-    public static DistributionEnum getDistributionEnum(String distributionEnum) {
-        if (distributionEnum.equalsIgnoreCase(EXTERNAL.name())) {
-            return DistributionEnum.EXTERNAL;
-        } else if (distributionEnum.equalsIgnoreCase(SAAS.name())) {
-            return DistributionEnum.SAAS;
-        } else if (distributionEnum.equalsIgnoreCase(INTERNAL.name())) {
-            return DistributionEnum.INTERNAL;
+    public static DistributionEnum getDistributionEnum(String distribution) {
+        DistributionEnum distributionEnum = UNKNOWNDISTRIBUTION;
+        try {
+            distributionEnum = DistributionEnum.valueOf(distribution.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // ignore expection
         }
-        return DistributionEnum.UNKNOWNDISTRIBUTION;
+        return distributionEnum;
     }
 }

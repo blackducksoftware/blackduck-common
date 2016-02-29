@@ -12,21 +12,39 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.resource.ClientResource;
 
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
+import com.blackducksoftware.integration.hub.report.api.VersionReport;
 import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.response.DistributionEnum;
 import com.blackducksoftware.integration.hub.response.PhaseEnum;
 import com.blackducksoftware.integration.hub.response.ProjectItem;
 import com.blackducksoftware.integration.hub.response.ReleaseItem;
+import com.blackducksoftware.integration.hub.response.ReportFormatEnum;
+import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
+import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem.ReportMetaLinkItem;
 import com.blackducksoftware.integration.hub.response.VersionComparison;
+import com.blackducksoftware.integration.hub.response.mapping.ScanHistoryItem;
+import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
+import com.blackducksoftware.integration.hub.response.mapping.ScanLocationResults;
+import com.blackducksoftware.integration.hub.response.mapping.ScanStatus;
 import com.blackducksoftware.integration.hub.util.HubIntTestHelper;
 import com.blackducksoftware.integration.hub.util.TestLogger;
+import com.google.gson.Gson;
 
 public class HubIntRestServiceTest {
 
@@ -137,8 +155,8 @@ public class HubIntRestServiceTest {
 
             projectId = restService.createHubProject(testProjectName);
 
-            // Sleep for 1 second, server takes a second before you can start using projects
-            Thread.sleep(2000);
+            // Sleep for 3 second, server takes a second before you can start using projects
+            Thread.sleep(3000);
 
             List<AutoCompleteItem> matches = restService.getProjectMatches(testProjectName);
 
@@ -458,5 +476,502 @@ public class HubIntRestServiceTest {
         assertEquals(">", comparison.getOperatorResult());
 
         assertTrue(logger.getErrorList().isEmpty());
+    }
+
+    @Test
+    public void testGenerateHubReport() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setLogger(logger);
+        restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
+
+        ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
+        List<ReleaseItem> releases = restService.getVersionsForProject(project.getId());
+        ReleaseItem release = null;
+        for (ReleaseItem currentRelease : releases) {
+            if (testProperties.getProperty("TEST_VERSION").equals(currentRelease.getVersion())) {
+                release = currentRelease;
+                break;
+            }
+        }
+        assertNotNull(
+                "In project : " + testProperties.getProperty("TEST_PROJECT") + " , could not find the version : " + testProperties.getProperty("TEST_VERSION"),
+                release);
+        String reportUrl = null;
+        reportUrl = restService.generateHubReport(release.getId(), ReportFormatEnum.JSON);
+
+        assertNotNull(reportUrl, reportUrl);
+        // The project specified in the test properties file will be deleted at the end of the tests
+        // So we dont need to worry about cleaning up the reports
+    }
+
+    @Test
+    public void testGenerateHubReportFormatUNKNOWN() throws Exception {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Can not generate a report of format : ");
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+
+        restService.generateHubReport(null, ReportFormatEnum.UNKNOWN);
+    }
+
+    @Test
+    public void testGenerateHubReportAndReadReport() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setLogger(logger);
+        restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
+
+        ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
+
+        String versionId = restService.createHubVersion("Report Version", project.getId(), PhaseEnum.DEVELOPMENT.name(), DistributionEnum.INTERNAL.name());
+
+        String reportUrl = null;
+        System.err.println(versionId);
+
+        // Give the server a second to recognize the new version
+        Thread.sleep(1000);
+
+        reportUrl = restService.generateHubReport(versionId, ReportFormatEnum.JSON);
+
+        assertNotNull(reportUrl, reportUrl);
+
+        DateTime timeFinished = null;
+        ReportMetaInformationItem reportInfo = null;
+
+        while (timeFinished == null) {
+            Thread.sleep(5000);
+            reportInfo = restService.getReportLinks(reportUrl);
+
+            timeFinished = reportInfo.getTimeFinishedAt();
+        }
+
+        List<ReportMetaLinkItem> links = reportInfo.get_meta().getLinks();
+
+        ReportMetaLinkItem contentLink = null;
+        for (ReportMetaLinkItem link : links) {
+            if (link.getRel().equalsIgnoreCase("content")) {
+                contentLink = link;
+                break;
+            }
+        }
+        assertNotNull("Could not find the content link for the report at : " + reportUrl, contentLink);
+        // The project specified in the test properties file will be deleted at the end of the tests
+        // So we dont need to worry about cleaning up the reports
+
+        VersionReport report = restService.getReportContent(contentLink.getHref());
+        assertNotNull(report);
+        assertNotNull(report.getDetailedReleaseSummary());
+        assertNotNull(report.getDetailedReleaseSummary().getPhase());
+        assertNotNull(report.getDetailedReleaseSummary().getDistribution());
+        assertNotNull(report.getDetailedReleaseSummary().getProjectId());
+        assertNotNull(report.getDetailedReleaseSummary().getProjectName());
+        assertNotNull(report.getDetailedReleaseSummary().getVersionId());
+        assertNotNull(report.getDetailedReleaseSummary().getVersion());
+
+        String reportId = restService.getReportIdFromReportUrl(reportUrl);
+        assertEquals(204, restService.deleteHubReport(versionId, reportId));
+
+    }
+
+    @Test
+    public void testGetReportIdFromReportUrl() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        restService.setLogger(logger);
+        String expectedId = "IDThatShouldBeFound";
+
+        String reportUrl = "test/test/test/id/id/yoyo.yo/" + expectedId;
+        String reportId = restService.getReportIdFromReportUrl(reportUrl);
+        assertEquals(expectedId, reportId);
+
+        reportUrl = "test/test/" + expectedId + "/test/id/id/yoyo.yo/";
+        reportId = restService.getReportIdFromReportUrl(reportUrl);
+        assertEquals("yoyo.yo", reportId);
+    }
+
+    @Test
+    public void testGetCodeLocations() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService("FakeUrl");
+        restService.setLogger(logger);
+
+        final String fakeHost = "TestHost";
+        final String serverPath1 = "/Test/Fake/Path";
+        final String serverPath2 = "/Test/Fake/Path/Child/";
+        final String serverPath3 = "/Test/Fake/File";
+
+        HubIntRestService restServiceSpy = Mockito.spy(restService);
+
+        ClientResource clientResource = new ClientResource("");
+        final ClientResource resourceSpy = Mockito.spy(clientResource);
+
+        Mockito.when(resourceSpy.handle()).then(new Answer<Representation>() {
+            @Override
+            public Representation answer(InvocationOnMock invocation) throws Throwable {
+
+                ScanLocationResults scanLocationResults = new ScanLocationResults();
+                scanLocationResults.setTotalCount(3);
+                ScanLocationItem sl1 = new ScanLocationItem();
+                sl1.setHost(fakeHost);
+                sl1.setPath(serverPath1);
+                ScanLocationItem sl2 = new ScanLocationItem();
+                sl2.setHost(fakeHost);
+                sl2.setPath(serverPath2);
+                ScanLocationItem sl3 = new ScanLocationItem();
+                sl3.setHost(fakeHost);
+                sl3.setPath(serverPath3);
+
+                List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+                items.add(sl1);
+                items.add(sl2);
+                items.add(sl3);
+
+                scanLocationResults.setItems(items);
+
+                String scResults = new Gson().toJson(scanLocationResults);
+                StringRepresentation rep = new StringRepresentation(scResults);
+                Response response = new Response(null);
+                response.setEntity(rep);
+
+                resourceSpy.setResponse(response);
+                return null;
+            }
+        });
+
+        Mockito.when(restServiceSpy.createClientResource()).thenReturn(resourceSpy);
+
+        List<String> scanTargets = new ArrayList<String>();
+        scanTargets.add("Test/Fake/Path/Child");
+        scanTargets.add("Test\\Fake\\File");
+
+        List<ScanLocationItem> codeLocations = restServiceSpy.getScanLocations(fakeHost, scanTargets);
+
+        assertNotNull(codeLocations);
+        assertTrue(codeLocations.size() == 2);
+        assertNotNull(codeLocations.get(0));
+        assertNotNull(codeLocations.get(1));
+    }
+
+    @Test
+    public void testGetCodeLocationsUnmatched() throws Exception {
+        exception.expect(HubIntegrationException.class);
+        exception.expectMessage("Could not determine the code location");
+
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService("FakeUrl");
+        restService.setLogger(logger);
+
+        final String fakeHost = "TestHost";
+
+        HubIntRestService restServiceSpy = Mockito.spy(restService);
+
+        ClientResource clientResource = new ClientResource("");
+        final ClientResource resourceSpy = Mockito.spy(clientResource);
+
+        Mockito.when(resourceSpy.handle()).then(new Answer<Representation>() {
+            @Override
+            public Representation answer(InvocationOnMock invocation) throws Throwable {
+
+                ScanLocationResults scanLocationResults = new ScanLocationResults();
+                scanLocationResults.setTotalCount(0);
+
+                List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+
+                scanLocationResults.setItems(items);
+
+                String scResults = new Gson().toJson(scanLocationResults);
+                StringRepresentation rep = new StringRepresentation(scResults);
+                Response response = new Response(null);
+                response.setEntity(rep);
+
+                resourceSpy.setResponse(response);
+                return null;
+            }
+        });
+
+        Mockito.when(restServiceSpy.createClientResource()).thenReturn(resourceSpy);
+
+        List<String> scanTargets = new ArrayList<String>();
+        scanTargets.add("Test/Fake/Path/Child");
+
+        restServiceSpy.getScanLocations(fakeHost, scanTargets);
+    }
+
+    @Test
+    public void testIsBomUpToDate() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService("FakeUrl");
+        restService.setLogger(logger);
+
+        final DateTime beforeScanTime = new DateTime();
+        Thread.sleep(10);
+        final DateTime startScanTime = new DateTime();
+        Thread.sleep(10);
+        final DateTime inScanTime = new DateTime();
+        Thread.sleep(10);
+        final DateTime endScanTime = new DateTime();
+        Thread.sleep(10);
+        final DateTime afterScanTime = new DateTime();
+
+        final String fakeHost = "TestHost";
+        final String serverPath1 = "/Test/Fake/Path";
+        final String serverPath2 = "/Test/Fake/Path/Child/";
+        final String serverPath3 = "/Test/Fake/File";
+
+        HubIntRestService restServiceSpy = Mockito.spy(restService);
+
+        ClientResource clientResource = new ClientResource("");
+        final ClientResource resourceSpy = Mockito.spy(clientResource);
+
+        Mockito.when(resourceSpy.handle()).then(new Answer<Representation>() {
+            @Override
+            public Representation answer(InvocationOnMock invocation) throws Throwable {
+
+                ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
+                historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
+                historyBeforeScanTime.setStatus(ScanStatus.ERROR);
+
+                ScanHistoryItem historyInScanTime = new ScanHistoryItem();
+                historyInScanTime.setCreatedOn(inScanTime.toString());
+                historyInScanTime.setStatus(ScanStatus.COMPLETE);
+
+                ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
+                historyAfterScanTime.setCreatedOn(afterScanTime.toString());
+                historyAfterScanTime.setStatus(ScanStatus.MATCHING);
+
+                List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+                historyList.add(historyBeforeScanTime);
+                historyList.add(historyInScanTime);
+                historyList.add(historyAfterScanTime);
+
+                ScanLocationResults scanLocationResults = new ScanLocationResults();
+                scanLocationResults.setTotalCount(3);
+                ScanLocationItem sl1 = new ScanLocationItem();
+                sl1.setHost(fakeHost);
+                sl1.setPath(serverPath1);
+                sl1.setScanList(historyList);
+                ScanLocationItem sl2 = new ScanLocationItem();
+                sl2.setHost(fakeHost);
+                sl2.setPath(serverPath2);
+                sl2.setScanList(historyList);
+                ScanLocationItem sl3 = new ScanLocationItem();
+                sl3.setHost(fakeHost);
+                sl3.setPath(serverPath3);
+                sl3.setScanList(historyList);
+
+                List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+                items.add(sl1);
+                items.add(sl2);
+                items.add(sl3);
+
+                scanLocationResults.setItems(items);
+
+                String scResults = new Gson().toJson(scanLocationResults);
+                StringRepresentation rep = new StringRepresentation(scResults);
+                Response response = new Response(null);
+                response.setEntity(rep);
+
+                resourceSpy.setResponse(response);
+                return null;
+            }
+        });
+
+        Mockito.when(restServiceSpy.createClientResource()).thenReturn(resourceSpy);
+
+        List<String> scanTargets = new ArrayList<String>();
+        scanTargets.add("Test/Fake/Path/Child");
+        scanTargets.add("Test\\Fake\\File");
+
+        assertTrue(restServiceSpy.isBomUpToDate(startScanTime, endScanTime, fakeHost, scanTargets, 5000));
+    }
+
+    @Test
+    public void testIsBomUpToDateNotYetUpToDate() throws Exception {
+        exception.expect(HubIntegrationException.class);
+        exception.expectMessage("The Bom has not finished updating from the scan within the specified wait time :");
+
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService("FakeUrl");
+        restService.setLogger(logger);
+
+        final DateTime beforeScanTime = new DateTime();
+        Thread.sleep(10);
+        final DateTime startScanTime = new DateTime();
+        Thread.sleep(10);
+        final DateTime inScanTime = new DateTime();
+        Thread.sleep(10);
+        final DateTime endScanTime = new DateTime();
+        Thread.sleep(10);
+        final DateTime afterScanTime = new DateTime();
+
+        final String fakeHost = "TestHost";
+        final String serverPath1 = "/Test/Fake/Path";
+        final String serverPath2 = "/Test/Fake/Path/Child/";
+        final String serverPath3 = "/Test/Fake/File";
+
+        HubIntRestService restServiceSpy = Mockito.spy(restService);
+
+        ClientResource clientResource = new ClientResource("");
+        final ClientResource resourceSpy = Mockito.spy(clientResource);
+
+        Mockito.when(resourceSpy.handle()).then(new Answer<Representation>() {
+            @Override
+            public Representation answer(InvocationOnMock invocation) throws Throwable {
+
+                ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
+                historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
+                historyBeforeScanTime.setStatus(ScanStatus.ERROR);
+
+                ScanHistoryItem historyInScanTime = new ScanHistoryItem();
+                historyInScanTime.setCreatedOn(inScanTime.toString());
+                historyInScanTime.setStatus(ScanStatus.BUILDING_BOM);
+
+                ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
+                historyAfterScanTime.setCreatedOn(afterScanTime.toString());
+                historyAfterScanTime.setStatus(ScanStatus.MATCHING);
+
+                List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+                historyList.add(historyBeforeScanTime);
+                historyList.add(historyInScanTime);
+                historyList.add(historyAfterScanTime);
+
+                ScanLocationResults scanLocationResults = new ScanLocationResults();
+                scanLocationResults.setTotalCount(3);
+                ScanLocationItem sl1 = new ScanLocationItem();
+                sl1.setHost(fakeHost);
+                sl1.setPath(serverPath1);
+                sl1.setScanList(historyList);
+                ScanLocationItem sl2 = new ScanLocationItem();
+                sl2.setHost(fakeHost);
+                sl2.setPath(serverPath2);
+                sl2.setScanList(historyList);
+                ScanLocationItem sl3 = new ScanLocationItem();
+                sl3.setHost(fakeHost);
+                sl3.setPath(serverPath3);
+                sl3.setScanList(historyList);
+
+                List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+                items.add(sl1);
+                items.add(sl2);
+                items.add(sl3);
+
+                scanLocationResults.setItems(items);
+
+                String scResults = new Gson().toJson(scanLocationResults);
+                StringRepresentation rep = new StringRepresentation(scResults);
+                Response response = new Response(null);
+                response.setEntity(rep);
+
+                resourceSpy.setResponse(response);
+                return null;
+            }
+        });
+
+        Mockito.when(restServiceSpy.createClientResource()).thenReturn(resourceSpy);
+
+        List<String> scanTargets = new ArrayList<String>();
+        scanTargets.add("Test/Fake/Path/Child");
+        scanTargets.add("Test\\Fake\\File");
+
+        assertTrue(restServiceSpy.isBomUpToDate(startScanTime, endScanTime, fakeHost, scanTargets, 1000));
+    }
+
+    @Test
+    public void testIsBomUpToDateError() throws Exception {
+        exception.expect(HubIntegrationException.class);
+        exception.expectMessage("There was a problem with one of the code locations. Error Status :");
+
+        TestLogger logger = new TestLogger();
+
+        HubIntRestService restService = new HubIntRestService("FakeUrl");
+        restService.setLogger(logger);
+
+        final DateTime beforeScanTime = new DateTime();
+        Thread.sleep(10);
+        final DateTime startScanTime = new DateTime();
+        Thread.sleep(10);
+        final DateTime inScanTime = new DateTime();
+        Thread.sleep(10);
+        final DateTime endScanTime = new DateTime();
+        Thread.sleep(10);
+        final DateTime afterScanTime = new DateTime();
+
+        final String fakeHost = "TestHost";
+        final String serverPath1 = "/Test/Fake/Path";
+        final String serverPath2 = "/Test/Fake/Path/Child/";
+        final String serverPath3 = "/Test/Fake/File";
+
+        HubIntRestService restServiceSpy = Mockito.spy(restService);
+
+        ClientResource clientResource = new ClientResource("");
+        final ClientResource resourceSpy = Mockito.spy(clientResource);
+
+        Mockito.when(resourceSpy.handle()).then(new Answer<Representation>() {
+            @Override
+            public Representation answer(InvocationOnMock invocation) throws Throwable {
+
+                ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
+                historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
+                historyBeforeScanTime.setStatus(ScanStatus.ERROR);
+
+                ScanHistoryItem historyInScanTime = new ScanHistoryItem();
+                historyInScanTime.setCreatedOn(inScanTime.toString());
+                historyInScanTime.setStatus(ScanStatus.ERROR);
+
+                ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
+                historyAfterScanTime.setCreatedOn(afterScanTime.toString());
+                historyAfterScanTime.setStatus(ScanStatus.MATCHING);
+
+                List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+                historyList.add(historyBeforeScanTime);
+                historyList.add(historyInScanTime);
+                historyList.add(historyAfterScanTime);
+
+                ScanLocationResults scanLocationResults = new ScanLocationResults();
+                scanLocationResults.setTotalCount(3);
+                ScanLocationItem sl1 = new ScanLocationItem();
+                sl1.setHost(fakeHost);
+                sl1.setPath(serverPath1);
+                sl1.setScanList(historyList);
+                ScanLocationItem sl2 = new ScanLocationItem();
+                sl2.setHost(fakeHost);
+                sl2.setPath(serverPath2);
+                sl2.setScanList(historyList);
+                ScanLocationItem sl3 = new ScanLocationItem();
+                sl3.setHost(fakeHost);
+                sl3.setPath(serverPath3);
+                sl3.setScanList(historyList);
+
+                List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+                items.add(sl1);
+                items.add(sl2);
+                items.add(sl3);
+
+                scanLocationResults.setItems(items);
+
+                String scResults = new Gson().toJson(scanLocationResults);
+                StringRepresentation rep = new StringRepresentation(scResults);
+                Response response = new Response(null);
+                response.setEntity(rep);
+
+                resourceSpy.setResponse(response);
+                return null;
+            }
+        });
+
+        Mockito.when(restServiceSpy.createClientResource()).thenReturn(resourceSpy);
+
+        List<String> scanTargets = new ArrayList<String>();
+        scanTargets.add("Test/Fake/Path/Child");
+        scanTargets.add("Test\\Fake\\File");
+
+        assertTrue(restServiceSpy.isBomUpToDate(startScanTime, endScanTime, fakeHost, scanTargets, 5000));
     }
 }

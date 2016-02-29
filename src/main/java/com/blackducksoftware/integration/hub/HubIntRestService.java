@@ -16,9 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.restlet.Context;
 import org.restlet.Response;
 import org.restlet.data.ChallengeRequest;
@@ -27,6 +29,8 @@ import org.restlet.data.Cookie;
 import org.restlet.data.CookieSetting;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.engine.header.Header;
+import org.restlet.engine.header.HeaderConstants;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
@@ -36,16 +40,24 @@ import org.restlet.util.Series;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
+import com.blackducksoftware.integration.hub.report.api.VersionReport;
 import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.response.ProjectItem;
 import com.blackducksoftware.integration.hub.response.ReleaseItem;
+import com.blackducksoftware.integration.hub.response.ReportFormatEnum;
+import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
 import com.blackducksoftware.integration.hub.response.VersionComparison;
 import com.blackducksoftware.integration.hub.response.mapping.AssetReferenceItem;
 import com.blackducksoftware.integration.hub.response.mapping.EntityItem;
 import com.blackducksoftware.integration.hub.response.mapping.EntityTypeEnum;
+import com.blackducksoftware.integration.hub.response.mapping.ScanHistoryItem;
+import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
+import com.blackducksoftware.integration.hub.response.mapping.ScanLocationResults;
+import com.blackducksoftware.integration.hub.response.mapping.ScanStatus;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
@@ -110,7 +122,7 @@ public class HubIntRestService {
             m.invoke(null, authCachImp);
 
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
@@ -176,7 +188,23 @@ public class HubIntRestService {
      * @throws URISyntaxException
      * @throws MalformedURLException
      */
-    private ClientResource createClientResource() throws URISyntaxException {
+    // Make this protected for testing the getCodeLocations, otherwise we need to use
+    // Powermockito to stub this to use a mock resource OR we would need to setup code
+    // locations on the server and hope they dont get deleted
+    protected ClientResource createClientResource() throws URISyntaxException {
+        return createClientResource(getBaseUrl());
+    }
+
+    /**
+     * Create the Client Resource
+     *
+     * @param url
+     *            String
+     * @return ClientResource
+     * @throws URISyntaxException
+     * @throws MalformedURLException
+     */
+    private ClientResource createClientResource(String providedUrl) throws URISyntaxException {
 
         Context context = new Context();
 
@@ -190,7 +218,8 @@ public class HubIntRestService {
         context.getParameters().add("readTimeout", stringTimeout);
         // Should throw timeout exception after the specified timeout, default is 2 minutes
 
-        ClientResource resource = new ClientResource(context, new URI(getBaseUrl()));
+        ClientResource resource = new ClientResource(context, new URI(providedUrl));
+        resource.getRequest().setCookies(getCookies());
         return resource;
     }
 
@@ -220,21 +249,21 @@ public class HubIntRestService {
 
         String[] splitRawValue = rawValue.split(",");
         for (String currentValue : splitRawValue) {
-            currentValue = currentValue.trim();
-            if (StringUtils.isBlank(proxyChallengeRequest.getRealm()) && currentValue.startsWith("realm=")) {
-                String realm = currentValue.substring("realm=".length());
+            String trimmedCurrentValue = currentValue.trim();
+            if (StringUtils.isBlank(proxyChallengeRequest.getRealm()) && trimmedCurrentValue.startsWith("realm=")) {
+                String realm = trimmedCurrentValue.substring("realm=".length());
                 proxyChallengeRequest.setRealm(realm);
-            } else if (StringUtils.isBlank(proxyChallengeRequest.getServerNonce()) && currentValue.startsWith("nonce=")) {
-                String nonce = currentValue.substring("nonce=".length());
+            } else if (StringUtils.isBlank(proxyChallengeRequest.getServerNonce()) && trimmedCurrentValue.startsWith("nonce=")) {
+                String nonce = trimmedCurrentValue.substring("nonce=".length());
                 proxyChallengeRequest.setServerNonce(nonce);
             } else if ((proxyChallengeRequest.getQualityOptions() == null || proxyChallengeRequest.getQualityOptions().isEmpty())
-                    && currentValue.startsWith("qop=")) {
-                String qop = currentValue.substring("qop=".length());
+                    && trimmedCurrentValue.startsWith("qop=")) {
+                String qop = trimmedCurrentValue.substring("qop=".length());
                 List<String> qualityOptions = new ArrayList<String>();
                 qualityOptions.add(qop);
                 proxyChallengeRequest.setQualityOptions(qualityOptions);
-            } else if (currentValue.startsWith("stale=")) {
-                String stale = currentValue.substring("stale=".length());
+            } else if (trimmedCurrentValue.startsWith("stale=")) {
+                String stale = trimmedCurrentValue.substring("stale=".length());
                 proxyChallengeRequest.setStale(Boolean.valueOf(stale));
             }
         }
@@ -252,30 +281,9 @@ public class HubIntRestService {
      * @throws MalformedURLException
      * @throws HubIntegrationException
      * @throws URISyntaxException
-     */
-    public int setCookies(String hubUserName, String hubPassword) throws HubIntegrationException, URISyntaxException, BDRestException {
-        return setCookies(hubUserName, hubPassword, null, 0);
-    }
-
-    /**
-     * Gets the cookie for the Authorized connection to the Hub server. Returns the response code from the connection.
-     *
-     * @param hubUserName
-     *            String the Username for the Hub server
-     * @param hubPassword
-     *            String the Password for the Hub server
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
-     *
-     * @return int Status code
-     * @throws MalformedURLException
-     * @throws HubIntegrationException
-     * @throws URISyntaxException
      * @throws BDRestException
      */
-    private int setCookies(String hubUserName, String hubPassword, ChallengeRequest proxyChallengeRequest, int attempt) throws HubIntegrationException,
+    public int setCookies(String hubUserName, String hubPassword) throws HubIntegrationException,
             URISyntaxException, BDRestException {
 
         ClientResource resource = createClientResource();
@@ -283,21 +291,13 @@ public class HubIntRestService {
         resource.addQueryParameter("j_username", hubUserName);
         resource.addQueryParameter("j_password", hubPassword);
 
-        if (proxyChallengeRequest != null) {
-            // This should replace the authenticator for the proxy authentication
-            // BUT it doesn't work for Digest authentication
-            parseChallengeRequestRawValue(proxyChallengeRequest);
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
-                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
-                    0, 0L));
-        }
         resource.setMethod(Method.POST);
-        try {
 
-            EmptyRepresentation rep = new EmptyRepresentation();
-
-            resource.post(rep);
+        EmptyRepresentation rep = new EmptyRepresentation();
+        resource.getRequest().setEntity(rep);
+        handleRequest(resource, null, 0);
+        int statusCode = resource.getResponse().getStatus().getCode();
+        if (statusCode == 204) {
             if (cookies == null) {
                 Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
                 if (cookieSettings == null || cookieSettings.size() == 0) {
@@ -320,17 +320,8 @@ public class HubIntRestService {
             // else {
             // cookies already set
             // }
-        } catch (ResourceException e) {
-            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-
-                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
-                if (attempt < 2) {
-                    return setCookies(hubUserName, hubPassword, newChallengeRequest, attempt + 1);
-                } else {
-                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
-                }
-            }
-            throw e;
+        } else {
+            throw new HubIntegrationException(resource.getResponse().getStatus().toString());
         }
 
         return resource.getResponse().getStatus().getCode();
@@ -353,27 +344,6 @@ public class HubIntRestService {
      */
     public List<AutoCompleteItem> getProjectMatches(String hubProjectName) throws IOException,
             BDRestException, URISyntaxException {
-
-        return getProjectMatches(hubProjectName, null, 0);
-    }
-
-    /**
-     * Retrieves a list of Hub Projects that may match the hubProjectName
-     *
-     * @param hubProjectName
-     *            String
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
-     *
-     * @return List<<AutoCompleteItem>>
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     */
-    private List<AutoCompleteItem> getProjectMatches(String hubProjectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
-            BDRestException, URISyntaxException {
         ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
@@ -383,51 +353,19 @@ public class HubIntRestService {
         resource.addQueryParameter("limit", "30");
         resource.addQueryParameter("ownership", "0");
 
-        if (proxyChallengeRequest != null) {
-            // This should replace the authenticator for the proxy authentication
-            // BUT it doesn't work for Digest authentication
-            parseChallengeRequestRawValue(proxyChallengeRequest);
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
-                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
-                    0, 0L));
-        }
-        try {
-            resource.getRequest().setCookies(getCookies());
-            resource.setMethod(Method.GET);
-            resource.get();
-            int responseCode = resource.getResponse().getStatus().getCode();
+        resource.setMethod(Method.GET);
+        handleRequest(resource, null, 0);
+        int responseCode = resource.getResponse().getStatus().getCode();
 
-            if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-                Response resp = resource.getResponse();
-                Reader reader = resp.getEntity().getReader();
-                BufferedReader bufReader = new BufferedReader(reader);
-                StringBuilder sb = new StringBuilder();
-                String line = bufReader.readLine();
-                while (line != null) {
-                    sb.append(line + "\n");
-                    line = bufReader.readLine();
-                }
-                bufReader.close();
+        if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+            String response = readResponseAsString(resource.getResponse());
 
-                Gson gson = new GsonBuilder().create();
-                return gson.fromJson(sb.toString(), new TypeToken<List<AutoCompleteItem>>() {
-                }.getType());
+            Gson gson = new GsonBuilder().create();
+            return gson.fromJson(response, new TypeToken<List<AutoCompleteItem>>() {
+            }.getType());
 
-            } else {
-                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
-            }
-        } catch (ResourceException e) {
-            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-
-                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
-                if (attempt < 2) {
-                    return getProjectMatches(hubProjectName, newChallengeRequest, attempt + 1);
-                } else {
-                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
-                }
-            }
-            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+        } else {
+            throw new BDRestException("There was a problem getting the project matches. Error Code: " + responseCode, resource);
         }
 
     }
@@ -437,7 +375,6 @@ public class HubIntRestService {
      *
      * @param projectId
      *            String
-     *
      * @return ProjectItem
      * @throws IOException
      * @throws BDRestException
@@ -445,76 +382,24 @@ public class HubIntRestService {
      */
     public ProjectItem getProjectById(String projectId) throws IOException,
             BDRestException, URISyntaxException {
-        return getProjectById(projectId, null, 0);
-    }
-
-    /**
-     * Gets the Hub Project that is specified by the projectId
-     *
-     * @param projectId
-     *            String
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
-     *
-     * @return ProjectItem
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     */
-    private ProjectItem getProjectById(String projectId, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
-            BDRestException, URISyntaxException {
         ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
         resource.addSegment("projects");
         resource.addSegment(projectId);
 
-        if (proxyChallengeRequest != null) {
-            // This should replace the authenticator for the proxy authentication
-            // BUT it doesn't work for Digest authentication
-            parseChallengeRequestRawValue(proxyChallengeRequest);
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
-                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
-                    0, 0L));
-        }
-        try {
-            resource.getRequest().setCookies(getCookies());
-            resource.setMethod(Method.GET);
-            resource.get();
-            int responseCode = resource.getResponse().getStatus().getCode();
+        resource.setMethod(Method.GET);
+        handleRequest(resource, null, 0);
+        int responseCode = resource.getResponse().getStatus().getCode();
 
-            if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-                Response resp = resource.getResponse();
-                Reader reader = resp.getEntity().getReader();
-                BufferedReader bufReader = new BufferedReader(reader);
-                StringBuilder sb = new StringBuilder();
-                String line = bufReader.readLine();
-                while (line != null) {
-                    sb.append(line + "\n");
-                    line = bufReader.readLine();
-                }
-                bufReader.close();
-                // logger.info(sb.toString());
-                Gson gson = new GsonBuilder().create();
-                return gson.fromJson(sb.toString(), ProjectItem.class);
+        if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+            String response = readResponseAsString(resource.getResponse());
+            // logger.info(response);
+            Gson gson = new GsonBuilder().create();
+            return gson.fromJson(response, ProjectItem.class);
 
-            } else {
-                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
-            }
-        } catch (ResourceException e) {
-            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-
-                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
-                if (attempt < 2) {
-                    return getProjectById(projectId, newChallengeRequest, attempt + 1);
-                } else {
-                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
-                }
-            }
-            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+        } else {
+            throw new BDRestException("There was a problem getting the project for this Id. Error Code: " + responseCode, resource);
         }
     }
 
@@ -532,76 +417,24 @@ public class HubIntRestService {
      */
     public ProjectItem getProjectByName(String projectName) throws IOException, BDRestException,
             URISyntaxException, ProjectDoesNotExistException {
-        return getProjectByName(projectName, null, 0);
-    }
-
-    /**
-     * Gets the Project that is specified by the projectName
-     *
-     * @param projectName
-     *            String
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
-     *
-     * @return
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     * @throws ProjectDoesNotExistException
-     */
-    private ProjectItem getProjectByName(String projectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException,
-            URISyntaxException, ProjectDoesNotExistException {
         ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
         resource.addSegment("projects");
         resource.addQueryParameter("name", projectName);
+        resource.setMethod(Method.GET);
+        handleRequest(resource, null, 0);
+        int responseCode = resource.getResponse().getStatus().getCode();
 
-        if (proxyChallengeRequest != null) {
-            // This should replace the authenticator for the proxy authentication
-            // BUT it doesn't work for Digest authentication
-            parseChallengeRequestRawValue(proxyChallengeRequest);
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
-                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
-                    0, 0L));
-        }
-        try {
-            resource.getRequest().setCookies(getCookies());
-            resource.setMethod(Method.GET);
-            resource.get();
-            int responseCode = resource.getResponse().getStatus().getCode();
+        if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+            String response = readResponseAsString(resource.getResponse());
+            Gson gson = new GsonBuilder().create();
+            return gson.fromJson(response, ProjectItem.class);
 
-            if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-                Response resp = resource.getResponse();
-                Reader reader = resp.getEntity().getReader();
-                BufferedReader bufReader = new BufferedReader(reader);
-                StringBuilder sb = new StringBuilder();
-                String line = bufReader.readLine();
-                while (line != null) {
-                    sb.append(line + "\n");
-                    line = bufReader.readLine();
-                }
-                bufReader.close();
-                Gson gson = new GsonBuilder().create();
-                return gson.fromJson(sb.toString(), ProjectItem.class);
-
-            } else {
-                throw new BDRestException("This Project does not exist or there is a problem connecting to the Hub server", resource);
-            }
-        } catch (ResourceException e) {
-            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-
-                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
-                if (attempt < 2) {
-                    return getProjectByName(projectName, newChallengeRequest, attempt + 1);
-                } else {
-                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
-                }
-            }
-            throw new ProjectDoesNotExistException("This Project does not exist.", e, resource);
+        } else if (responseCode == 404) {
+            throw new ProjectDoesNotExistException("This Project does not exist.", resource);
+        } else {
+            throw new BDRestException("There was a problem getting a Project by this name.", resource);
         }
     }
 
@@ -662,20 +495,21 @@ public class HubIntRestService {
             InterruptedException, BDRestException, HubIntegrationException, URISyntaxException {
         HashMap<String, Boolean> scanLocationIds = new HashMap<String, Boolean>();
         ClientResource resource = null;
-        String url = null;
         try {
             for (String targetPath : scanTargets) {
+                String correctedTargetPath = targetPath;
+
                 // Scan paths in the Hub only use '/' not '\'
-                if (targetPath.contains("\\")) {
-                    targetPath = targetPath.replace("\\", "/");
+                if (correctedTargetPath.contains("\\")) {
+                    correctedTargetPath = correctedTargetPath.replace("\\", "/");
                 }
                 // and it always starts with a '/'
-                if (!targetPath.startsWith("/")) {
-                    targetPath = "/" + targetPath;
+                if (!correctedTargetPath.startsWith("/")) {
+                    correctedTargetPath = "/" + correctedTargetPath;
                 }
 
                 logger.debug(
-                        "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + targetPath +
+                        "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + correctedTargetPath +
                                 "'");
 
                 resource = createClientResource();
@@ -683,7 +517,7 @@ public class HubIntRestService {
                 resource.addSegment("v1");
                 resource.addSegment("scanlocations");
                 resource.addQueryParameter("host", hostname);
-                resource.addQueryParameter("path", targetPath);
+                resource.addQueryParameter("path", correctedTargetPath);
 
                 if (proxyChallengeRequest != null) {
                     // This should replace the authenticator for the proxy authentication
@@ -695,12 +529,11 @@ public class HubIntRestService {
                             0, 0L));
                 }
 
-                resource.getRequest().setCookies(getCookies());
                 resource.setMethod(Method.GET);
 
                 ScanLocationHandler handler = new ScanLocationHandler(logger);
 
-                handler.getScanLocationIdWithRetry(resource, targetPath, versionId, scanLocationIds);
+                handler.getScanLocationIdWithRetry(resource, correctedTargetPath, versionId, scanLocationIds);
 
             }
         } catch (ResourceException e) {
@@ -713,7 +546,7 @@ public class HubIntRestService {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
             }
-            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+            throw new BDRestException("There was a problem getting the scan locations.", e, resource);
         }
         return scanLocationIds;
     }
@@ -733,109 +566,62 @@ public class HubIntRestService {
      */
     public void mapScansToProjectVersion(Map<String, Boolean> scanLocationIds, String
             versionId) throws BDRestException, URISyntaxException {
-        mapScansToProjectVersion(scanLocationIds, versionId, null, 0);
-    }
-
-    /**
-     * If the scan Id has not already been mapped to the Version then it will make that mapping, otherwise it will not
-     * perform the mapping.
-     *
-     * @param scanLocationIds
-     *            Map<<String, Boolean>>
-     * @param versionId
-     *            String
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
-     *
-     * @throws BDRestException
-     * @throws URISyntaxException
-     * @throws MalformedURLException
-     */
-    private void mapScansToProjectVersion(Map<String, Boolean> scanLocationIds, String
-            versionId, ChallengeRequest proxyChallengeRequest, int attempt) throws BDRestException, URISyntaxException {
         ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
         resource.addSegment("assetreferences");
+        if (!scanLocationIds.isEmpty()) {
+            for (Entry<String, Boolean> scanId : scanLocationIds.entrySet()) {
+                if (!scanId.getValue()) {
+                    // This scan location has not yet been mapped to the project/version
+                    logger.debug(
+                            "Mapping the scan location with id: '" + scanId.getKey() + "', to the Version with Id: '" + versionId +
+                                    "'.");
 
-        if (proxyChallengeRequest != null) {
-            // This should replace the authenticator for the proxy authentication
-            // BUT it doesn't work for Digest authentication
-            parseChallengeRequestRawValue(proxyChallengeRequest);
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
-                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
-                    0, 0L));
-        }
-        try {
-            if (!scanLocationIds.isEmpty()) {
-                for (Entry<String, Boolean> scanId : scanLocationIds.entrySet()) {
-                    if (!scanId.getValue()) {
-                        // This scan location has not yet been mapped to the project/version
+                    AssetReferenceItem assetReference = new AssetReferenceItem();
+
+                    EntityItem ownerEntity = new EntityItem();
+                    ownerEntity.setEntityType(EntityTypeEnum.RL.name());
+                    ownerEntity.setEntityId(versionId);
+
+                    EntityItem assetEntity = new EntityItem();
+
+                    assetEntity.setEntityType(EntityTypeEnum.CL.name());
+                    assetEntity.setEntityId(scanId.getKey());
+
+                    assetReference.setOwnerEntityKey(ownerEntity);
+                    assetReference.setAssetEntityKey(assetEntity);
+
+                    Gson gson = new GsonBuilder().create();
+
+                    logger.debug("Asset reference mapping object : " + gson.toJson(assetReference));
+                    StringRepresentation stringRep = new StringRepresentation(gson.toJson(assetReference));
+                    stringRep.setMediaType(MediaType.APPLICATION_JSON);
+
+                    resource.setMethod(Method.POST);
+                    handleRequest(resource, null, 0);
+                    int responseCode = resource.getResponse().getStatus().getCode();
+
+                    // HashMap<String, Object> responseMap = new HashMap<String, Object>();
+                    if (responseCode == 201) {
+                        // Successful mapping
                         logger.debug(
-                                "Mapping the scan location with id: '" + scanId.getKey() + "', to the Version with Id: '" + versionId +
-                                        "'.");
-
-                        resource.getRequest().setCookies(getCookies());
-                        resource.setMethod(Method.POST);
-
-                        AssetReferenceItem assetReference = new AssetReferenceItem();
-
-                        EntityItem ownerEntity = new EntityItem();
-                        ownerEntity.setEntityType(EntityTypeEnum.RL.name());
-                        ownerEntity.setEntityId(versionId);
-
-                        EntityItem assetEntity = new EntityItem();
-
-                        assetEntity.setEntityType(EntityTypeEnum.CL.name());
-                        assetEntity.setEntityId(scanId.getKey());
-
-                        assetReference.setOwnerEntityKey(ownerEntity);
-                        assetReference.setAssetEntityKey(assetEntity);
-
-                        Gson gson = new GsonBuilder().create();
-
-                        logger.debug("Asset reference mapping object : " + gson.toJson(assetReference));
-                        StringRepresentation stringRep = new StringRepresentation(gson.toJson(assetReference));
-                        stringRep.setMediaType(MediaType.APPLICATION_JSON);
-                        resource.post(stringRep);
-                        int responseCode = resource.getResponse().getStatus().getCode();
-
-                        // HashMap<String, Object> responseMap = new HashMap<String, Object>();
-                        if (responseCode == 201) {
-                            // Successful mapping
-                            logger.debug(
-                                    "Successfully mapped the scan with id: '" + scanId.getKey() + "', to the Version with Id: '" + versionId
-                                            + "'.");
-                        } else {
-                            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode,
-                                    resource);
-                        }
+                                "Successfully mapped the scan with id: '" + scanId.getKey() + "', to the Version with Id: '" + versionId
+                                        + "'.");
                     } else {
-                        logger.debug(
-                                "The scan location with id: '" + scanId.getKey() + "', is already mapped to the Version with Id: '" +
-                                        versionId + "'.");
+                        throw new BDRestException("There was a problem mapping the scan location to the specified version. Error Code: " + responseCode,
+                                resource);
                     }
-                }
-            }
-            else {
-                logger.debug("Could not find any scan Id's to map to the Version.");
-            }
-        } catch (ResourceException e) {
-            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-
-                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
-                if (attempt < 2) {
-                    mapScansToProjectVersion(scanLocationIds, versionId, newChallengeRequest, attempt + 1);
                 } else {
-                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
+                    logger.debug(
+                            "The scan location with id: '" + scanId.getKey() + "', is already mapped to the Version with Id: '" +
+                                    versionId + "'.");
                 }
             }
-            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
-
+        else {
+            logger.debug("Could not find any scan Id's to map to the Version.");
+        }
     }
 
     /**
@@ -843,6 +629,7 @@ public class HubIntRestService {
      *
      * @param projectId
      *            String
+     *
      *
      * @return List<<ReleaseItem>>
      * @throws IOException
@@ -851,83 +638,31 @@ public class HubIntRestService {
      */
     public List<ReleaseItem> getVersionsForProject(String projectId) throws IOException,
             BDRestException, URISyntaxException {
-        return getVersionsForProject(projectId, null, 0);
-    }
-
-    /**
-     * Gets the list of Versions for the specified Project
-     *
-     * @param projectId
-     *            String
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
-     *
-     * @return List<<ReleaseItem>>
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     */
-    private List<ReleaseItem> getVersionsForProject(String projectId, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
-            BDRestException, URISyntaxException {
         ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
         resource.addSegment("projects");
         resource.addSegment(projectId);
         resource.addSegment("releases");
-        if (proxyChallengeRequest != null) {
-            // This should replace the authenticator for the proxy authentication
-            // BUT it doesn't work for Digest authentication
-            parseChallengeRequestRawValue(proxyChallengeRequest);
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
-                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
-                    0, 0L));
-        }
-        try {
-            resource.getRequest().setCookies(getCookies());
-            resource.setMethod(Method.GET);
-            resource.get();
-            int responseCode = resource.getResponse().getStatus().getCode();
 
-            if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+        resource.setMethod(Method.GET);
+        handleRequest(resource, null, 0);
+        int responseCode = resource.getResponse().getStatus().getCode();
 
-                Response resp = resource.getResponse();
-                Reader reader = resp.getEntity().getReader();
-                BufferedReader bufReader = new BufferedReader(reader);
-                StringBuilder sb = new StringBuilder();
-                String line = bufReader.readLine();
-                while (line != null) {
-                    sb.append(line + "\n");
-                    line = bufReader.readLine();
-                }
-                bufReader.close();
-                Gson gson = new GsonBuilder().create();
-                JsonObject releaseListJsonObj = gson.fromJson(sb.toString(), JsonObject.class);
+        if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+            String response = readResponseAsString(resource.getResponse());
+            Gson gson = new GsonBuilder().create();
+            JsonObject releaseListJsonObj = gson.fromJson(response, JsonObject.class);
 
-                Type listType = new TypeToken<ArrayList<ReleaseItem>>() {
-                }.getType();
+            Type listType = new TypeToken<ArrayList<ReleaseItem>>() {
+            }.getType();
 
-                List<ReleaseItem> releasesList = gson.fromJson(releaseListJsonObj.get("items"), listType);
+            List<ReleaseItem> releasesList = gson.fromJson(releaseListJsonObj.get("items"), listType);
 
-                return releasesList;
+            return releasesList;
 
-            } else {
-                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
-            }
-        } catch (ResourceException e) {
-            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-
-                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
-                if (attempt < 2) {
-                    return getVersionsForProject(projectId, newChallengeRequest, attempt + 1);
-                } else {
-                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
-                }
-            }
-            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+        } else {
+            throw new BDRestException("There was a problem getting the versions for this Project. Error Code: " + responseCode, resource);
         }
     }
 
@@ -944,84 +679,33 @@ public class HubIntRestService {
      */
     public String createHubProject(String projectName) throws IOException, BDRestException,
             URISyntaxException {
-        return createHubProject(projectName, null, 0);
-    }
-
-    /**
-     * Creates a Hub Project with the specified name.
-     *
-     * @param projectName
-     *            String
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
-     *
-     * @return (String) ProjectId
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     */
-    private String createHubProject(String projectName, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException,
-            URISyntaxException {
         ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
         resource.addSegment("projects");
 
-        if (proxyChallengeRequest != null) {
-            // This should replace the authenticator for the proxy authentication
-            // BUT it doesn't work for Digest authentication
-            parseChallengeRequestRawValue(proxyChallengeRequest);
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
-                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
-                    0, 0L));
-        }
-        try {
-            resource.getRequest().setCookies(getCookies());
-            resource.setMethod(Method.POST);
+        resource.setMethod(Method.POST);
 
-            ProjectItem newProject = new ProjectItem();
-            newProject.setName(projectName);
+        ProjectItem newProject = new ProjectItem();
+        newProject.setName(projectName);
 
-            Gson gson = new GsonBuilder().create();
-            StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
-            stringRep.setMediaType(MediaType.APPLICATION_JSON);
+        Gson gson = new GsonBuilder().create();
+        StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
+        stringRep.setMediaType(MediaType.APPLICATION_JSON);
 
-            resource.post(stringRep);
-            int responseCode = resource.getResponse().getStatus().getCode();
+        resource.getRequest().setEntity(stringRep);
+        handleRequest(resource, null, 0);
+        int responseCode = resource.getResponse().getStatus().getCode();
 
-            if (responseCode == 201) {
+        if (responseCode == 201) {
 
-                Response resp = resource.getResponse();
-                Reader reader = resp.getEntity().getReader();
-                BufferedReader bufReader = new BufferedReader(reader);
-                StringBuilder sb = new StringBuilder();
-                String line = bufReader.readLine();
-                while (line != null) {
-                    sb.append(line + "\n");
-                    line = bufReader.readLine();
-                }
-                bufReader.close();
-                ProjectItem project = gson.fromJson(sb.toString(), ProjectItem.class);
-                return project.getId();
+            String response = readResponseAsString(resource.getResponse());
+            ProjectItem project = gson.fromJson(response, ProjectItem.class);
+            return project.getId();
 
-            } else {
+        } else {
 
-                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
-            }
-        } catch (ResourceException e) {
-            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-
-                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
-                if (attempt < 2) {
-                    return createHubProject(projectName, newChallengeRequest, attempt + 1);
-                } else {
-                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
-                }
-            }
-            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+            throw new BDRestException("There was a problem creating this Hub Project. Error Code: " + responseCode, resource);
         }
 
     }
@@ -1037,102 +721,45 @@ public class HubIntRestService {
      *            String
      * @param dist
      *            String
-     * @return (String) VersionId
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     */
-    public String createHubVersion(String projectVersion, String projectId, String phase, String dist) throws
-            IOException, BDRestException, URISyntaxException {
-        return createHubVersion(projectVersion, projectId, phase, dist, null, 0);
-    }
-
-    /**
-     * Creates a new Version in the Project specified, using the phase and distribution provided
-     *
-     * @param projectVersion
-     *            String
-     * @param projectId
-     *            String
-     * @param phase
-     *            String
-     * @param dist
-     *            String
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
      *
      * @return (String) VersionId
      * @throws IOException
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    private String createHubVersion(String projectVersion, String projectId, String phase, String dist, ChallengeRequest proxyChallengeRequest, int attempt)
+    public String createHubVersion(String projectVersion, String projectId, String phase, String dist)
             throws IOException, BDRestException, URISyntaxException {
         ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
         resource.addSegment("releases");
 
-        if (proxyChallengeRequest != null) {
-            // This should replace the authenticator for the proxy authentication
-            // BUT it doesn't work for Digest authentication
-            parseChallengeRequestRawValue(proxyChallengeRequest);
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
-                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
-                    0, 0L));
-        }
-
         int responseCode;
-        try {
-            ReleaseItem newRelease = new ReleaseItem();
-            newRelease.setProjectId(projectId);
-            newRelease.setVersion(projectVersion);
-            newRelease.setPhase(phase);
-            newRelease.setDistribution(dist);
+        ReleaseItem newRelease = new ReleaseItem();
+        newRelease.setProjectId(projectId);
+        newRelease.setVersion(projectVersion);
+        newRelease.setPhase(phase);
+        newRelease.setDistribution(dist);
 
-            resource.getRequest().setCookies(getCookies());
-            resource.setMethod(Method.POST);
+        resource.setMethod(Method.POST);
 
-            Gson gson = new GsonBuilder().create();
-            StringRepresentation stringRep = new StringRepresentation(gson.toJson(newRelease));
-            stringRep.setMediaType(MediaType.APPLICATION_JSON);
+        Gson gson = new GsonBuilder().create();
+        StringRepresentation stringRep = new StringRepresentation(gson.toJson(newRelease));
+        stringRep.setMediaType(MediaType.APPLICATION_JSON);
 
-            resource.post(stringRep);
-            responseCode = resource.getResponse().getStatus().getCode();
+        resource.getRequest().setEntity(stringRep);
+        handleRequest(resource, null, 0);
+        responseCode = resource.getResponse().getStatus().getCode();
 
-            if (responseCode == 201) {
+        if (responseCode == 201) {
 
-                Response resp = resource.getResponse();
-                Reader reader = resp.getEntity().getReader();
-                BufferedReader bufReader = new BufferedReader(reader);
-                StringBuilder sb = new StringBuilder();
-                String line = bufReader.readLine();
-                while (line != null) {
-                    sb.append(line + "\n");
-                    line = bufReader.readLine();
-                }
-                bufReader.close();
-                ReleaseItem release = gson.fromJson(sb.toString(), ReleaseItem.class);
-                return release.getId();
-            } else {
-                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
-            }
-
-        } catch (ResourceException e) {
-            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-
-                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
-                if (attempt < 2) {
-                    return createHubVersion(projectVersion, projectId, phase, dist, newChallengeRequest, attempt + 1);
-                } else {
-                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
-                }
-            }
-            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+            String response = readResponseAsString(resource.getResponse());
+            ReleaseItem release = gson.fromJson(response, ReleaseItem.class);
+            return release.getId();
+        } else {
+            throw new BDRestException("There was a problem creating this Version for the specified Hub Project. Error Code: " + responseCode, resource);
         }
+
     }
 
     /**
@@ -1154,96 +781,38 @@ public class HubIntRestService {
      */
     public String createHubProjectAndVersion(String projectName, String versionName, String phase, String dist) throws IOException, BDRestException,
             URISyntaxException {
-        return createHubProjectAndVersion(projectName, versionName, phase, dist, null, 0);
-    }
-
-    /**
-     * Creates a Hub Project and version with the specified information.
-     *
-     * @param projectName
-     *            String
-     * @param versionName
-     *            String
-     * @param phase
-     *            String
-     * @param dist
-     *            String
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
-     *
-     * @return (String) ProjectId
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     */
-    private String createHubProjectAndVersion(String projectName, String versionName, String phase, String dist, ChallengeRequest proxyChallengeRequest,
-            int attempt) throws IOException, BDRestException,
-            URISyntaxException {
         ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
         resource.addSegment("projects");
-        if (proxyChallengeRequest != null) {
-            // This should replace the authenticator for the proxy authentication
-            // BUT it doesn't work for Digest authentication
-            parseChallengeRequestRawValue(proxyChallengeRequest);
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
-                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
-                    0, 0L));
-        }
-        try {
-            ReleaseItem newRelease = new ReleaseItem();
-            newRelease.setVersion(versionName);
-            newRelease.setPhase(phase);
-            newRelease.setDistribution(dist);
 
-            resource.getRequest().setCookies(getCookies());
-            resource.setMethod(Method.POST);
+        ReleaseItem newRelease = new ReleaseItem();
+        newRelease.setVersion(versionName);
+        newRelease.setPhase(phase);
+        newRelease.setDistribution(dist);
 
-            ProjectItem newProject = new ProjectItem();
-            newProject.setName(projectName);
-            newProject.setReleaseItem(newRelease);
+        resource.setMethod(Method.POST);
 
-            Gson gson = new GsonBuilder().create();
-            StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
-            stringRep.setMediaType(MediaType.APPLICATION_JSON);
+        ProjectItem newProject = new ProjectItem();
+        newProject.setName(projectName);
+        newProject.setReleaseItem(newRelease);
 
-            resource.post(stringRep);
-            int responseCode = resource.getResponse().getStatus().getCode();
+        Gson gson = new GsonBuilder().create();
+        StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
+        stringRep.setMediaType(MediaType.APPLICATION_JSON);
+        resource.getRequest().setEntity(stringRep);
+        handleRequest(resource, null, 0);
+        int responseCode = resource.getResponse().getStatus().getCode();
 
-            if (responseCode == 201) {
+        if (responseCode == 201) {
 
-                Response resp = resource.getResponse();
-                Reader reader = resp.getEntity().getReader();
-                BufferedReader bufReader = new BufferedReader(reader);
-                StringBuilder sb = new StringBuilder();
-                String line = bufReader.readLine();
-                while (line != null) {
-                    sb.append(line + "\n");
-                    line = bufReader.readLine();
-                }
-                bufReader.close();
-                ProjectItem project = gson.fromJson(sb.toString(), ProjectItem.class);
-                return project.getId();
+            String response = readResponseAsString(resource.getResponse());
+            ProjectItem project = gson.fromJson(response, ProjectItem.class);
+            return project.getId();
 
-            } else {
+        } else {
 
-                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
-            }
-        } catch (ResourceException e) {
-            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-
-                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
-                if (attempt < 2) {
-                    return createHubProjectAndVersion(projectName, versionName, phase, dist, newChallengeRequest, attempt + 1);
-                } else {
-                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
-                }
-            }
-            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+            throw new BDRestException("There was a problem creating the specified Project and Version. Error Code: " + responseCode, resource);
         }
 
     }
@@ -1257,61 +826,22 @@ public class HubIntRestService {
      * @throws URISyntaxException
      */
     public String getHubVersion() throws IOException, BDRestException, URISyntaxException {
-        return getHubVersion(null, 0);
-    }
-
-    /**
-     * Retrieves the version of the Hub server
-     *
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
-     *
-     * @return String
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     */
-    private String getHubVersion(ChallengeRequest proxyChallengeRequest, int attempt) throws IOException, BDRestException, URISyntaxException {
         ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
         resource.addSegment("current-version");
 
-        if (proxyChallengeRequest != null) {
-            // This should replace the authenticator for the proxy authentication
-            // BUT it doesn't work for Digest authentication
-            parseChallengeRequestRawValue(proxyChallengeRequest);
-            resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-                    proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
-                    null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
-                    0, 0L));
-        }
         int responseCode = 0;
-        try {
-            resource.getRequest().setCookies(getCookies());
-            resource.setMethod(Method.GET);
-            resource.get();
-            responseCode = resource.getResponse().getStatus().getCode();
 
-            if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-                Response resp = resource.getResponse();
-                return resp.getEntityAsText();
-            } else {
-                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
-            }
-        } catch (ResourceException e) {
-            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+        resource.setMethod(Method.GET);
+        handleRequest(resource, null, 0);
+        responseCode = resource.getResponse().getStatus().getCode();
 
-                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
-                if (attempt < 2) {
-                    return getHubVersion(newChallengeRequest, attempt + 1);
-                } else {
-                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
-                }
-            }
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: ", e, resource);
+        if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+            Response resp = resource.getResponse();
+            return resp.getEntityAsText();
+        } else {
+            throw new BDRestException("There was a problem getting the version of the Hub server. Error Code: " + responseCode, resource);
         }
     }
 
@@ -1320,10 +850,6 @@ public class HubIntRestService {
      *
      * @param version
      *            String
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
      *
      * @return VersionComparison
      * @throws IOException
@@ -1332,32 +858,398 @@ public class HubIntRestService {
      */
     public VersionComparison compareWithHubVersion(String version) throws IOException,
             BDRestException, URISyntaxException {
-        return compareWithHubVersion(version, null, 0);
-    }
-
-    /**
-     * Compares the specified version with the actual version of the Hub server.
-     *
-     * @param version
-     *            String
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
-     *
-     * @return VersionComparison
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     */
-    private VersionComparison compareWithHubVersion(String version, ChallengeRequest proxyChallengeRequest, int attempt) throws IOException,
-            BDRestException, URISyntaxException {
 
         ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
         resource.addSegment("current-version-comparison");
         resource.addQueryParameter("version", version);
+
+        int responseCode = 0;
+
+        resource.setMethod(Method.GET);
+        handleRequest(resource, null, 0);
+        responseCode = resource.getResponse().getStatus().getCode();
+
+        if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+
+            String response = readResponseAsString(resource.getResponse());
+            Gson gson = new GsonBuilder().create();
+            VersionComparison comparison = gson.fromJson(response, VersionComparison.class);
+            return comparison;
+        } else {
+            throw new BDRestException("There was a problem comparing the specified version to the version of the Hub server. Error Code: " + responseCode,
+                    resource);
+        }
+    }
+
+    /**
+     * Check the code locations with the host specified and the paths provided. Check the history for the scan history
+     * that falls between the times provided, if the status of that scan history for all code locations is complete then
+     * the bom is up to date with these scan results. Otherwise we try again after 10 sec, and we keep trying until it
+     * is up to date or until we hit the maximum wait time.
+     * If we find a scan history object that has status cancelled or an error type then we throw an exception.
+     *
+     *
+     * @param timeBeforeScan
+     *            DateTime before the Cli was run
+     * @param timeAfterScan
+     *            DateTime after the Cli was run
+     * @param hostname
+     *            String hostname where the Cli was run
+     * @param scanTargets
+     *            List<<String>> the target paths that were scanned
+     * @param maximumWait
+     *            long, maximum time to wait for the Bom to be updated completely
+     * @return True if the bom has been updated with the code locations from this scan
+     * @throws InterruptedException
+     * @throws BDRestException
+     * @throws HubIntegrationException
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public boolean isBomUpToDate(DateTime timeBeforeScan, DateTime timeAfterScan, String hostname, List<String>
+            scanTargets, long maximumWait) throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
+        long startTime = System.currentTimeMillis();
+        long elapsedTime = 0;
+        while (elapsedTime < maximumWait) {
+            // logger.trace("CHECKING CODE LOCATIONS");
+            List<ScanLocationItem> scanLocationsToCheck = getScanLocations(hostname, scanTargets);
+            boolean upToDate = true;
+            for (ScanLocationItem currentCodeLocation : scanLocationsToCheck) {
+                for (ScanHistoryItem currentScanHistory : currentCodeLocation.getScanList()) {
+                    DateTime scanHistoryCreationTime = currentScanHistory.getCreatedOnTime();
+                    if (scanHistoryCreationTime != null && scanHistoryCreationTime.isAfter(timeBeforeScan) && scanHistoryCreationTime.isBefore(timeAfterScan)) {
+                        // This scan history Item came from the scan we executed
+                        if (ScanStatus.isFinishedStatus(currentScanHistory.getStatus())) {
+                            if (ScanStatus.isErrorStatus(currentScanHistory.getStatus())) {
+                                throw new HubIntegrationException("There was a problem with one of the code locations. Error Status : "
+                                        + currentScanHistory.getStatus().name());
+                            }
+                        } else {
+                            // The code location is still updating or matching, etc.
+                            upToDate = false;
+                        }
+                    } else {
+                        // This scan history Item did not come from the scan we executed
+                        continue;
+                    }
+                }
+            }
+            if (upToDate) {
+                // The code locations are all finished, so we know the bom has been updated with our scan results
+                // So we break out of this loop
+                return true;
+            }
+            // wait 10 seconds before checking the status's again
+            Thread.sleep(10000);
+            elapsedTime = System.currentTimeMillis() - startTime;
+        }
+        String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(maximumWait));
+        throw new HubIntegrationException("The Bom has not finished updating from the scan within the specified wait time : " + formattedTime);
+
+    }
+
+    /**
+     * Gets the code locations that match the host and paths provided
+     *
+     * @param hostname
+     *            String
+     * @param scanTargets
+     *            List<<String>>
+     *
+     * @return List<<ScanLocationItem>>
+     * @throws InterruptedException
+     * @throws BDRestException
+     * @throws HubIntegrationException
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws MalformedURLException
+     */
+    public List<ScanLocationItem> getScanLocations(String hostname, List<String>
+            scanTargets) throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
+        List<ScanLocationItem> codeLocations = new ArrayList<ScanLocationItem>();
+
+        ClientResource resource = null;
+        for (String targetPath : scanTargets) {
+            String correctedTargetPath = targetPath;
+
+            // Scan paths in the Hub only use '/' not '\'
+            if (correctedTargetPath.contains("\\")) {
+                correctedTargetPath = correctedTargetPath.replace("\\", "/");
+            }
+            // and it always starts with a '/'
+            if (!correctedTargetPath.startsWith("/")) {
+                correctedTargetPath = "/" + correctedTargetPath;
+            }
+
+            // logger.debug(
+            // "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + correctedTargetPath +
+            // "'");
+
+            resource = createClientResource();
+            resource.addSegment("api");
+            resource.addSegment("v1");
+            resource.addSegment("scanlocations");
+            resource.addQueryParameter("host", hostname);
+            resource.addQueryParameter("path", correctedTargetPath);
+
+            resource.setMethod(Method.GET);
+
+            handleRequest(resource, null, 0);
+
+            int responseCode = resource.getResponse().getStatus().getCode();
+
+            if (responseCode == 200) {
+                String response = readResponseAsString(resource.getResponse());
+                ScanLocationResults results = new Gson().fromJson(response, ScanLocationResults.class);
+                ScanLocationItem currentCodeLocation = getScanLocationMatch(hostname, correctedTargetPath, results);
+                if (currentCodeLocation == null) {
+                    throw new HubIntegrationException("Could not determine the code location for the Host : " + hostname + " and Path : " + correctedTargetPath);
+                }
+
+                codeLocations.add(currentCodeLocation);
+            } else {
+                throw new BDRestException("There was a problem getting the code locations for the host and paths provided. Error Code: " + responseCode,
+                        resource);
+            }
+
+        }
+        return codeLocations;
+    }
+
+    private ScanLocationItem getScanLocationMatch(String hostname, String scanTarget, ScanLocationResults results) {
+        String targetPath = scanTarget;
+
+        if (targetPath.endsWith("/")) {
+            targetPath = targetPath.substring(0, targetPath.length() - 1);
+        }
+
+        for (ScanLocationItem scanMatch : results.getItems()) {
+
+            String path = scanMatch.getPath().trim();
+
+            // Remove trailing slash from both strings
+            if (path.endsWith("/")) {
+                path = path.substring(0, path.length() - 1);
+            }
+            // logger.trace("Comparing target : '" + targetPath + "' with path : '" + path + "'.");
+            if (targetPath.equals(path)) {
+                // logger.trace("MATCHED!");
+                return scanMatch;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Generates a new Hub report for the specified version.
+     *
+     * @param versionId
+     *            String
+     * @param reportFormat
+     *            ReportFormateEnum
+     *
+     *
+     * @return (String) ReportUrl
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    public String generateHubReport(String versionId, ReportFormatEnum reportFormat) throws IOException, BDRestException,
+            URISyntaxException {
+        if (ReportFormatEnum.UNKNOWN == reportFormat) {
+            throw new IllegalArgumentException("Can not generate a report of format : " + reportFormat);
+        }
+
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("versions");
+        resource.addSegment(versionId);
+        resource.addSegment("reports");
+
+        resource.setMethod(Method.POST);
+
+        JsonObject json = new JsonObject();
+        json.addProperty("reportFormat", reportFormat.name());
+
+        Gson gson = new GsonBuilder().create();
+        StringRepresentation stringRep = new StringRepresentation(gson.toJson(json));
+        stringRep.setMediaType(MediaType.APPLICATION_JSON);
+        resource.getRequest().setEntity(stringRep);
+        handleRequest(resource, null, 0);
+
+        int responseCode = resource.getResponse().getStatus().getCode();
+
+        if (responseCode == 201) {
+            if (resource.getResponse().getAttributes() == null || resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
+                throw new BDRestException("Could not get the response headers after creating the report.", resource);
+            }
+            Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+            Header reportUrl = responseHeaders.getFirst("location", true);
+
+            if (reportUrl == null || StringUtils.isBlank(reportUrl.getValue())) {
+                throw new BDRestException("Could not get the report URL from the response headers.", resource);
+            }
+
+            return reportUrl.getValue();
+
+        } else {
+            throw new BDRestException("There was a problem generating a report for this Version. Error Code: " + responseCode, resource);
+        }
+    }
+
+    public String getReportIdFromReportUrl(String reportUrl) {
+        // The report ID should be the last segment of the Url
+        String[] segments = reportUrl.split("/");
+        return segments[segments.length - 1];
+    }
+
+    public int deleteHubReport(String versionId, String reportId) throws IOException, BDRestException,
+            URISyntaxException {
+
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("versions");
+        resource.addSegment(versionId);
+        resource.addSegment("reports");
+        resource.addSegment(reportId);
+
+        resource.setMethod(Method.DELETE);
+
+        handleRequest(resource, null, 0);
+
+        int responseCode = resource.getResponse().getStatus().getCode();
+
+        if (responseCode != 204) {
+            throw new BDRestException("There was a problem deleting this report. Error Code: " + responseCode, resource);
+        }
+        return responseCode;
+    }
+
+    /**
+     * Get the links from the Report Url
+     *
+     * @param reportUrl
+     *            String
+     *
+     * @return (ReportMetaInformationItem) report meta information
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    public ReportMetaInformationItem getReportLinks(String reportUrl) throws IOException, BDRestException,
+            URISyntaxException {
+
+        ClientResource resource = createClientResource(reportUrl);
+
+        Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+        if (requestHeaders == null) {
+            requestHeaders = new Series(Header.class);
+            resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
+        }
+        requestHeaders.add(new Header("Accept", MediaType.APPLICATION_JSON.toString()));
+
+        // Restlet 2.3.4 and higher
+        // resource.accept(MediaType.APPLICATION_JSON);
+
+        resource.setMethod(Method.GET);
+
+        handleRequest(resource, null, 0);
+        int responseCode = resource.getResponse().getStatus().getCode();
+
+        if (responseCode == 200) {
+            String response = readResponseAsString(resource.getResponse());
+
+            return new Gson().fromJson(response, ReportMetaInformationItem.class);
+        } else {
+            throw new BDRestException("There was a problem getting the links for the specified report. Error Code: " + responseCode, resource);
+        }
+
+    }
+
+    /**
+     * Gets the content of the report
+     *
+     * @param reportUrl
+     *            String
+     *
+     * @return (VersionReport) report content
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    public VersionReport getReportContent(String reportContentUrl) throws IOException, BDRestException,
+            URISyntaxException {
+
+        ClientResource resource = createClientResource(reportContentUrl);
+
+        resource.setMethod(Method.GET);
+
+        handleRequest(resource, null, 0);
+        int responseCode = resource.getResponse().getStatus().getCode();
+
+        if (responseCode == 200) {
+            String response = readResponseAsString(resource.getResponse());
+
+            Gson gson = new GsonBuilder().create();
+
+            // FIXME make this less unstable if there are changes, in the response
+            // For some reason the Hub responds with this weird json structure
+            // EX:
+            // {
+            // "reportContent": [
+            // {
+            // "fileName": "CITestProject/CITestVersion1/version.json",
+            // "fileContent": {
+            // "detailedReleaseSummary": {
+            // ...
+            // },
+            // "detailedCodeLocations": [],
+            // "aggregateBomViewEntries": [],
+            // "detailedVulnerabilities": [],
+            // "detailedFileBomViewEntries": []
+            // }
+            // }
+            // ]
+            // }
+
+            JsonObject reportResponse = gson.fromJson(response, JsonObject.class);
+
+            JsonArray reportConentArray = gson.fromJson(reportResponse.get("reportContent"), JsonArray.class);
+
+            JsonObject reportFile = (JsonObject) reportConentArray.get(0);
+
+            VersionReport report = gson.fromJson(reportFile.get("fileContent"), VersionReport.class);
+            // FIXME not serializing the RiskProfile correctly
+
+            return report;
+        } else {
+            throw new BDRestException("There was a problem getting the content of this Report. Error Code: " + responseCode, resource);
+        }
+
+    }
+
+    private String readResponseAsString(Response response) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        Reader reader = response.getEntity().getReader();
+        BufferedReader bufReader = new BufferedReader(reader);
+        try {
+            String line;
+            while ((line = bufReader.readLine()) != null) {
+                sb.append(line);
+                sb.append("\n");
+            }
+        } finally {
+            bufReader.close();
+        }
+        return sb.toString();
+    }
+
+    private void handleRequest(ClientResource resource, ChallengeRequest proxyChallengeRequest,
+            int attempt) throws BDRestException {
+
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
             // BUT it doesn't work for Digest authentication
@@ -1367,43 +1259,20 @@ public class HubIntRestService {
                     null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
                     0, 0L));
         }
-        int responseCode = 0;
         try {
-            resource.getRequest().setCookies(getCookies());
-            resource.setMethod(Method.GET);
-            resource.get();
-            responseCode = resource.getResponse().getStatus().getCode();
-
-            if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-
-                Response resp = resource.getResponse();
-                Reader reader = resp.getEntity().getReader();
-                BufferedReader bufReader = new BufferedReader(reader);
-                StringBuilder sb = new StringBuilder();
-                String line = bufReader.readLine();
-                while (line != null) {
-                    sb.append(line + "\n");
-                    line = bufReader.readLine();
-                }
-                bufReader.close();
-                Gson gson = new GsonBuilder().create();
-                VersionComparison comparison = gson.fromJson(sb.toString(), VersionComparison.class);
-                return comparison;
-            } else {
-                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
-            }
+            resource.handle();
         } catch (ResourceException e) {
-            if (!resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+            if (resource.getProxyChallengeRequests() != null && !resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername)
+                    && StringUtils.isNotBlank(proxyPassword)) {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
                 if (attempt < 2) {
-                    return compareWithHubVersion(version, newChallengeRequest, attempt + 1);
+                    handleRequest(resource, newChallengeRequest, attempt + 1);
                 } else {
                     throw new BDRestException("Too many proxy authentication attempts.", e, resource);
                 }
             }
-            throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: ", e, resource);
+            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
         }
     }
-
 }

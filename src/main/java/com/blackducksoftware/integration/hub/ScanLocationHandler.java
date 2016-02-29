@@ -48,7 +48,7 @@ public class ScanLocationHandler {
      */
     public void getScanLocationIdWithRetry(ClientResource resource, String targetPath, String versionId,
             Map<String, Boolean> scanLocationIds)
-                    throws UnknownHostException, InterruptedException, BDRestException, HubIntegrationException {
+            throws UnknownHostException, InterruptedException, BDRestException, HubIntegrationException {
 
         if (resource == null) {
             throw new IllegalArgumentException("Need to provide a ClientResource in order to get the ScanLocation");
@@ -74,7 +74,7 @@ public class ScanLocationHandler {
             long end = System.currentTimeMillis() - start;
             if (end > 120 * 1000) { // This should check if the loop has been running for 2 minutes. If it has, the
                 // exception is thrown.
-                throw new BDRestException("Can not find the Scan Location after 2 minutes. Try again later.");
+                throw new BDRestException("Can not find the Scan Location after 2 minutes. Try again later.", resource);
             }
             long minutes = TimeUnit.MILLISECONDS.toMinutes(end);
             long seconds = TimeUnit.MILLISECONDS.toSeconds(end) -
@@ -108,7 +108,7 @@ public class ScanLocationHandler {
             throws HubIntegrationException {
         boolean matchFound = false;
         resource.get();
-
+        String remotePath = remoteTargetPath;
         int responseCode = resource.getResponse().getStatus().getCode();
         try {
             ScanLocationResults results = null;
@@ -127,7 +127,7 @@ public class ScanLocationHandler {
                 results = gson.fromJson(sb.toString(), ScanLocationResults.class);
 
             } else {
-                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode);
+                throw new BDRestException("Could not connect to the Hub server with the Given Url and credentials. Error Code: " + responseCode, resource);
             }
 
             if (results != null && results.getTotalCount() > 0 && results.getItems().size() > 0) {
@@ -142,20 +142,20 @@ public class ScanLocationHandler {
                     if (path.endsWith("/")) {
                         path = path.substring(0, path.length() - 1);
                     }
-                    if (remoteTargetPath.endsWith("/")) {
-                        remoteTargetPath = remoteTargetPath.substring(0, remoteTargetPath.length() - 1);
+                    if (remotePath.endsWith("/")) {
+                        remotePath = remotePath.substring(0, remotePath.length() - 1);
                     }
-                    logger.debug("Comparing target : '" + remoteTargetPath + "' with path : '" + path + "'.");
-                    if (remoteTargetPath.equals(path)) {
+                    logger.debug("Comparing target : '" + remotePath + "' with path : '" + path + "'.");
+                    if (remotePath.equals(path)) {
                         logger.debug("MATCHED!");
                         matchFound = true;
-                        handleScanLocationMatch(scanLocationIds, scanMatch, remoteTargetPath, versionId);
+                        handleScanLocationMatch(scanLocationIds, scanMatch, remotePath, versionId);
                         break;
                     }
                 }
             } else {
                 logger.error(
-                        "No Scan Location Id could be found for the scan target : '" + remoteTargetPath + "'.");
+                        "No Scan Location Id could be found for the scan target : '" + remotePath + "'.");
             }
         } catch (IOException e) {
             logger.error(e);
@@ -220,4 +220,5 @@ public class ScanLocationHandler {
         scanLocationIds.put(scanId, false);
 
     }
+
 }
