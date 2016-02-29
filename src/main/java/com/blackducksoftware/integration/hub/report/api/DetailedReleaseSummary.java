@@ -311,10 +311,6 @@ public class DetailedReleaseSummary {
             return true;
         }
 
-        private DetailedReleaseSummary getOuterType() {
-            return DetailedReleaseSummary.this;
-        }
-
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();

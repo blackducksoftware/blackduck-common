@@ -36,6 +36,25 @@ public class ProjectItemTest {
         ProjectItem item3 = new ProjectItem(id1, kb1, name1, restructured1, canonicalReleaseId1, internal1, openSource1, release1);
         ProjectItem item4 = new ProjectItem(id2, kb2, name2, restructured2, canonicalReleaseId2, internal2, openSource2, release3);
 
+        ProjectItem item5 = new ProjectItem();
+        item5.setId(id1);
+        item5.setKb(kb1);
+        item5.setName(name1);
+        item5.setRestructured(restructured1);
+        item5.setCanonicalReleaseId(canonicalReleaseId1);
+        item5.setInternal(internal1);
+        item5.setOpenSource(openSource1);
+        item5.setReleaseItem(release1);
+
+        assertEquals(id1, item5.getId());
+        assertEquals(kb1, item5.getKb());
+        assertEquals(name1, item5.getName());
+        assertEquals(restructured1, item5.getRestructured());
+        assertEquals(canonicalReleaseId1, item5.getCanonicalReleaseId());
+        assertEquals(internal1, item5.getInternal());
+        assertEquals(openSource1, item5.getOpenSource());
+        assertEquals(release1, item5.getReleaseItem());
+
         assertEquals(id1, item1.getId());
         assertEquals(kb1, item1.getKb());
         assertEquals(name1, item1.getName());

@@ -90,6 +90,7 @@ public class DetailedReleaseSummaryTest {
         assertTrue(item1.equals(item3));
 
         EqualsVerifier.forClass(DetailedReleaseSummary.class).suppress(Warning.STRICT_INHERITANCE).verify();
+        EqualsVerifier.forClass(URLProvider.class).suppress(Warning.STRICT_INHERITANCE).verify();
 
         assertTrue(item1.hashCode() != item2.hashCode());
         assertEquals(item1.hashCode(), item3.hashCode());

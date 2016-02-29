@@ -45,7 +45,7 @@ public class AggregateBomViewEntry {
 
     private final List<LicenseDefinition> licenses;
 
-    private RiskProfile riskProfile;
+    private final RiskProfile riskProfile;
 
     public AggregateBomViewEntry(// NOPMD ExcessiveParameterList
             List<String> bomEntryIds,
@@ -83,7 +83,14 @@ public class AggregateBomViewEntry {
     public List<UUID> getBomEntryUUIds() {
         List<UUID> bomEntryUUIds = new ArrayList<UUID>();
         for (String bomEntryId : bomEntryIds) {
-            bomEntryUUIds.add(UUID.fromString(bomEntryId));
+            if (StringUtils.isBlank(bomEntryId)) {
+                continue;
+            }
+            try {
+                bomEntryUUIds.add(UUID.fromString(bomEntryId));
+            } catch (IllegalArgumentException e) {
+                continue;
+            }
         }
         return bomEntryUUIds;
     }
@@ -127,7 +134,9 @@ public class AggregateBomViewEntry {
     public String getLicensesDisplay() {
         // The first license should be the "parent license" and it should have the correct display of all the licenses
         // for this entry
-
+        if (licenses == null || licenses.isEmpty()) {
+            return "";
+        }
         return licenses.get(0).getLicenseDisplay();
     }
 
@@ -187,15 +196,15 @@ public class AggregateBomViewEntry {
         }
     }
 
-    public void setRiskProfile(RiskProfile riskProfile) {
-        this.riskProfile = riskProfile;
-    }
-
     public DateTime getSinceTime() {
         if (StringUtils.isBlank(since)) {
             return null;
         }
-        return new DateTime(since);
+        try {
+            return new DateTime(since);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public ProjectData getProducerProject() {
@@ -208,6 +217,10 @@ public class AggregateBomViewEntry {
 
     public String getProducerReleasesId() {
         // FIXME there should only be a single producer release
+        if (producerReleases == null || producerReleases.isEmpty()) {
+            return "";
+        }
+
         return producerReleases.get(0).getId();
     }
 

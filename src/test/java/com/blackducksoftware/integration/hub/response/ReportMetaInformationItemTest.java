@@ -92,6 +92,8 @@ public class ReportMetaInformationItemTest {
         assertTrue(item1.equals(item3));
 
         EqualsVerifier.forClass(ReportMetaInformationItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
+        EqualsVerifier.forClass(ReportMetaItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
+        EqualsVerifier.forClass(ReportMetaLinkItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
 
         assertTrue(item1.hashCode() != item2.hashCode());
         assertEquals(item1.hashCode(), item3.hashCode());

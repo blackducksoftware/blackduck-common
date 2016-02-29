@@ -46,6 +46,35 @@ public class ReleaseItemTest {
         ReleaseItem item3 = new ReleaseItem(id1, kb1, ohloh1, projectId1, version1, phase1, distribution1,
                 fileBomCodeLocationsUrl1, fileBomEntriesUrl1, codeLocationsUrl1, bomCountsUrl1, vulnerabilityCountsUrl1, riskProfileUrl1);
 
+        ReleaseItem item4 = new ReleaseItem();
+        item4.setId(id1);
+        item4.setKb(kb1);
+        item4.setOhloh(ohloh1);
+        item4.setProjectId(projectId1);
+        item4.setVersion(version1);
+        item4.setPhase(phase1);
+        item4.setDistribution(distribution1);
+        item4.setFileBomCodeLocationsUrl(fileBomCodeLocationsUrl1);
+        item4.setFileBomEntriesUrl(fileBomEntriesUrl1);
+        item4.setCodeLocationsUrl(codeLocationsUrl1);
+        item4.setBomCountsUrl(bomCountsUrl1);
+        item4.setVulnerabilityCountsUrl(vulnerabilityCountsUrl1);
+        item4.setRiskProfileUrl(riskProfileUrl1);
+
+        assertEquals(id1, item4.getId());
+        assertEquals(kb1, item4.getKb());
+        assertEquals(ohloh1, item4.getOhloh());
+        assertEquals(projectId1, item4.getProjectId());
+        assertEquals(version1, item4.getVersion());
+        assertEquals(phase1, item4.getPhase());
+        assertEquals(distribution1, item4.getDistribution());
+        assertEquals(fileBomCodeLocationsUrl1, item4.getFileBomCodeLocationsUrl());
+        assertEquals(fileBomEntriesUrl1, item4.getFileBomEntriesUrl());
+        assertEquals(codeLocationsUrl1, item4.getCodeLocationsUrl());
+        assertEquals(bomCountsUrl1, item4.getBomCountsUrl());
+        assertEquals(vulnerabilityCountsUrl1, item4.getVulnerabilityCountsUrl());
+        assertEquals(riskProfileUrl1, item4.getRiskProfileUrl());
+
         assertEquals(id1, item1.getId());
         assertEquals(kb1, item1.getKb());
         assertEquals(ohloh1, item1.getOhloh());
