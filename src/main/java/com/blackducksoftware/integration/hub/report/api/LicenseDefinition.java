@@ -2,9 +2,11 @@ package com.blackducksoftware.integration.hub.report.api;
 
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class LicenseDefinition {
 
-    private final UUID licenseId;
+    private final String licenseId;
 
     private final String discoveredAs;
 
@@ -18,7 +20,7 @@ public class LicenseDefinition {
 
     private final String licenseDisplay;
 
-    public LicenseDefinition(UUID licenseId,
+    public LicenseDefinition(String licenseId,
             String discoveredAs, String name, String spdxId,
             String ownership, String codeSharing,
             String licenseDisplay) {
@@ -32,8 +34,19 @@ public class LicenseDefinition {
 
     }
 
-    public UUID getLicenseId() {
+    public String getLicenseId() {
         return licenseId;
+    }
+
+    public UUID getLicenseUUId() {
+        if (StringUtils.isBlank(licenseId)) {
+            return null;
+        }
+        try {
+            return UUID.fromString(licenseId);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public String getDiscoveredAs() {
@@ -108,9 +121,6 @@ public class LicenseDefinition {
                 return false;
             }
         } else if (!licenseId.equals(other.licenseId)) {
-            return false;
-        }
-        if (licenseDisplay != other.licenseDisplay) {
             return false;
         }
         if (licenseDisplay == null) {

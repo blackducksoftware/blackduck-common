@@ -2,20 +2,33 @@ package com.blackducksoftware.integration.hub.report.api;
 
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class UserData {
 
-    private final UUID id;
+    private final String id;
 
     private final String username;
 
-    public UserData(UUID id,
+    public UserData(String id,
             String username) {
         this.id = id;
         this.username = username;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
+    }
+
+    public UUID getUUId() {
+        if (StringUtils.isBlank(id)) {
+            return null;
+        }
+        try {
+            return UUID.fromString(id);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public String getUsername() {

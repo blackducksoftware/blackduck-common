@@ -10,7 +10,7 @@ import org.junit.Test;
 public class ReleaseDataTest {
 
     @Test
-    public void testProjectData() {
+    public void testReleaseData() {
         final String id1 = "Id1";
         final String version1 = "version1";
 

@@ -63,11 +63,25 @@ public class DetailedReleaseSummary {
     }
 
     public UUID getProjectUUId() {
-        return UUID.fromString(projectId);
+        if (StringUtils.isBlank(projectId)) {
+            return null;
+        }
+        try {
+            return UUID.fromString(projectId);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public UUID getVersionUUId() {
-        return UUID.fromString(versionId);
+        if (StringUtils.isBlank(versionId)) {
+            return null;
+        }
+        try {
+            return UUID.fromString(versionId);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public String getProjectName() {
@@ -99,10 +113,16 @@ public class DetailedReleaseSummary {
     }
 
     public String getPhaseDisplayValue() {
+        if (StringUtils.isBlank(phase)) {
+            return null;
+        }
         return PhaseEnum.getPhaseEnum(phase).getDisplayValue();
     }
 
     public String getDistributionDisplayValue() {
+        if (StringUtils.isBlank(distribution)) {
+            return null;
+        }
         return DistributionEnum.getDistributionEnum(distribution).getDisplayValue();
     }
 
@@ -110,7 +130,11 @@ public class DetailedReleaseSummary {
         if (StringUtils.isBlank(releasedOn)) {
             return null;
         }
-        return new DateTime(releasedOn);
+        try {
+            return new DateTime(releasedOn);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public URLProvider getUiUrlGenerator() {
@@ -261,7 +285,6 @@ public class DetailedReleaseSummary {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + getOuterType().hashCode();
             result = prime * result + ((baseUrl == null) ? 0 : baseUrl.hashCode());
             return result;
         }
@@ -278,9 +301,6 @@ public class DetailedReleaseSummary {
                 return false;
             }
             URLProvider other = (URLProvider) obj;
-            if (!getOuterType().equals(other.getOuterType())) {
-                return false;
-            }
             if (baseUrl == null) {
                 if (other.baseUrl != null) {
                     return false;
