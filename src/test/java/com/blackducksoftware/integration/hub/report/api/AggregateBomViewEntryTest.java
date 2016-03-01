@@ -283,6 +283,12 @@ public class AggregateBomViewEntryTest {
 
         assertEquals("", item.getLicenseRiskString());
 
+        riskProfile = new RiskProfile(1, null);
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, riskProfile);
+
+        assertEquals("", item.getLicenseRiskString());
+
         item = new AggregateBomViewEntry(null, null, null,
                 null, null, null, null, null, null, null, null, null, null);
 
@@ -343,6 +349,12 @@ public class AggregateBomViewEntryTest {
 
         categories = new RiskCategories(null, null, null, null, null);
         riskProfile = new RiskProfile(1, categories);
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, riskProfile);
+
+        assertEquals("", item.getOperationalRiskString());
+
+        riskProfile = new RiskProfile(1, null);
         item = new AggregateBomViewEntry(null, null, null,
                 null, null, null, null, null, null, null, null, null, riskProfile);
 
