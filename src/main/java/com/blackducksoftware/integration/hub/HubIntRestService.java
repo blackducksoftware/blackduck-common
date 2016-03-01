@@ -25,6 +25,7 @@ import org.restlet.Context;
 import org.restlet.Response;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
+import org.restlet.data.CharacterSet;
 import org.restlet.data.Cookie;
 import org.restlet.data.CookieSetting;
 import org.restlet.data.MediaType;
@@ -605,6 +606,7 @@ public class HubIntRestService {
                     logger.debug("Asset reference mapping object : " + gson.toJson(assetReference));
                     StringRepresentation stringRep = new StringRepresentation(gson.toJson(assetReference));
                     stringRep.setMediaType(MediaType.APPLICATION_JSON);
+                    stringRep.setCharacterSet(CharacterSet.UTF_8);
 
                     resource.setMethod(Method.POST);
                     handleRequest(resource, null, 0);
@@ -700,7 +702,7 @@ public class HubIntRestService {
         Gson gson = new GsonBuilder().create();
         StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
         stringRep.setMediaType(MediaType.APPLICATION_JSON);
-
+        stringRep.setCharacterSet(CharacterSet.UTF_8);
         resource.getRequest().setEntity(stringRep);
         handleRequest(resource, null, 0);
         int responseCode = resource.getResponse().getStatus().getCode();
@@ -754,7 +756,7 @@ public class HubIntRestService {
         Gson gson = new GsonBuilder().create();
         StringRepresentation stringRep = new StringRepresentation(gson.toJson(newRelease));
         stringRep.setMediaType(MediaType.APPLICATION_JSON);
-
+        stringRep.setCharacterSet(CharacterSet.UTF_8);
         resource.getRequest().setEntity(stringRep);
         handleRequest(resource, null, 0);
         responseCode = resource.getResponse().getStatus().getCode();
@@ -808,6 +810,7 @@ public class HubIntRestService {
         Gson gson = new GsonBuilder().create();
         StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
         stringRep.setMediaType(MediaType.APPLICATION_JSON);
+        stringRep.setCharacterSet(CharacterSet.UTF_8);
         resource.getRequest().setEntity(stringRep);
         handleRequest(resource, null, 0);
         int responseCode = resource.getResponse().getStatus().getCode();
@@ -1085,6 +1088,7 @@ public class HubIntRestService {
         Gson gson = new GsonBuilder().create();
         StringRepresentation stringRep = new StringRepresentation(gson.toJson(json));
         stringRep.setMediaType(MediaType.APPLICATION_JSON);
+        stringRep.setCharacterSet(CharacterSet.UTF_8);
         resource.getRequest().setEntity(stringRep);
         handleRequest(resource, null, 0);
 
