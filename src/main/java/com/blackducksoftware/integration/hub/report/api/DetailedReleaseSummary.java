@@ -270,7 +270,7 @@ public class DetailedReleaseSummary {
         return builder.toString();
     }
 
-    public class URLProvider {
+    static public class URLProvider {
         private final String baseUrl;
 
         public URLProvider(String baseUrl) {

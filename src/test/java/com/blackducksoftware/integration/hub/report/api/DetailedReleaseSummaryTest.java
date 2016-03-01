@@ -20,7 +20,6 @@ public class DetailedReleaseSummaryTest {
 
     @Test
     public void testDetailedReleaseSummary() {
-        DetailedReleaseSummary item4 = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, null);
 
         final String projectId1 = "projId1";
         final String versionId1 = "versionId1";
@@ -33,7 +32,7 @@ public class DetailedReleaseSummaryTest {
         final String distribution1 = "dist1";
 
         final String baseUrl1 = "baseurl1";
-        final URLProvider uiUrlGenerator1 = item4.new URLProvider(baseUrl1);
+        final URLProvider uiUrlGenerator1 = new URLProvider(baseUrl1);
 
         final String projectId2 = UUID.randomUUID().toString();
         final String versionId2 = UUID.randomUUID().toString();
@@ -46,7 +45,7 @@ public class DetailedReleaseSummaryTest {
         final String distribution2 = DistributionEnum.EXTERNAL.name();
 
         final String baseUrl2 = "baseurl2";
-        final URLProvider uiUrlGenerator2 = item4.new URLProvider(baseUrl2);
+        final URLProvider uiUrlGenerator2 = new URLProvider(baseUrl2);
 
         DetailedReleaseSummary item1 = new DetailedReleaseSummary(projectId1, versionId1,
                 projectName1, version1, versionComments1, nickname1, releasedOn1, phase1,
@@ -57,6 +56,7 @@ public class DetailedReleaseSummaryTest {
         DetailedReleaseSummary item3 = new DetailedReleaseSummary(projectId1, versionId1,
                 projectName1, version1, versionComments1, nickname1, releasedOn1, phase1,
                 distribution1, uiUrlGenerator1);
+        DetailedReleaseSummary item4 = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, null);
 
         assertEquals(projectId1, item1.getProjectId());
         assertEquals(versionId1, item1.getVersionId());

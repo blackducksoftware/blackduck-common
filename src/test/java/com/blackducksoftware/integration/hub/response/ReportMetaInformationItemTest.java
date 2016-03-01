@@ -20,9 +20,6 @@ public class ReportMetaInformationItemTest {
 
     @Test
     public void testReportMetaInformationItem() {
-        ReportMetaInformationItem testWrapper = new ReportMetaInformationItem("", "",
-                "", 1, "", "", "", "", null);
-
         final String reportFormat1 = "format1";
         final String locale1 = "local1";
         final String fileName1 = "file1";
@@ -34,11 +31,11 @@ public class ReportMetaInformationItemTest {
         final List<ReportMetaLinkItem> links1 = new ArrayList<ReportMetaLinkItem>();
         final String href1 = "href1";
         final String rel1 = "rel1";
-        final ReportMetaLinkItem metaLink1 = testWrapper.new ReportMetaLinkItem(rel1, href1);
+        final ReportMetaLinkItem metaLink1 = new ReportMetaLinkItem(rel1, href1);
         links1.add(metaLink1);
         final List<String> allow1 = new ArrayList<String>();
         allow1.add("GET");
-        final ReportMetaItem _meta1 = testWrapper.new ReportMetaItem(allow1, href1, links1);
+        final ReportMetaItem _meta1 = new ReportMetaItem(allow1, href1, links1);
 
         final DateTime date = new DateTime();
 
@@ -53,13 +50,13 @@ public class ReportMetaInformationItemTest {
         final List<ReportMetaLinkItem> links2 = new ArrayList<ReportMetaLinkItem>();
         final String href2 = "href2";
         final String rel2 = "rel2";
-        final ReportMetaLinkItem metaLink2 = testWrapper.new ReportMetaLinkItem(rel2, href2);
+        final ReportMetaLinkItem metaLink2 = new ReportMetaLinkItem(rel2, href2);
         links2.add(metaLink2);
         final List<String> allow2 = new ArrayList<String>();
-        final ReportMetaItem _meta2 = testWrapper.new ReportMetaItem(allow2, href2, links2);
+        final ReportMetaItem _meta2 = new ReportMetaItem(allow2, href2, links2);
 
-        final ReportMetaItem _meta3 = testWrapper.new ReportMetaItem(allow1, href1, links1);
-        final ReportMetaLinkItem metaLink3 = testWrapper.new ReportMetaLinkItem(rel1, href1);
+        final ReportMetaItem _meta3 = new ReportMetaItem(allow1, href1, links1);
+        final ReportMetaLinkItem metaLink3 = new ReportMetaLinkItem(rel1, href1);
 
         ReportMetaInformationItem item1 = new ReportMetaInformationItem(reportFormat1, locale1,
                 fileName1, fileSize1, createdAt1, updatedAt1, finishedAt1, createdBy1, _meta1);
