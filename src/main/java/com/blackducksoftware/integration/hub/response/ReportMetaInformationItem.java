@@ -279,10 +279,6 @@ public class ReportMetaInformationItem {
             return true;
         }
 
-        private ReportMetaInformationItem getOuterType() {
-            return ReportMetaInformationItem.this;
-        }
-
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();
@@ -352,10 +348,6 @@ public class ReportMetaInformationItem {
                 return false;
             }
             return true;
-        }
-
-        private ReportMetaInformationItem getOuterType() {
-            return ReportMetaInformationItem.this;
         }
 
         @Override

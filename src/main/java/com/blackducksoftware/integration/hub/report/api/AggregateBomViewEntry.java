@@ -145,26 +145,42 @@ public class AggregateBomViewEntry {
     }
 
     public RiskCounts getVulnerabilityRisk() {
+        if (riskProfile == null || riskProfile.getCategories() == null || riskProfile.getCategories().getVULNERABILITY() == null) {
+            return null;
+        }
         return riskProfile.getCategories().getVULNERABILITY();
     }
 
     public RiskCounts getActivityRisk() {
+        if (riskProfile == null || riskProfile.getCategories() == null || riskProfile.getCategories().getACTIVITY() == null) {
+            return null;
+        }
         return riskProfile.getCategories().getACTIVITY();
     }
 
     public RiskCounts getVersionRisk() {
+        if (riskProfile == null || riskProfile.getCategories() == null || riskProfile.getCategories().getVERSION() == null) {
+            return null;
+        }
         return riskProfile.getCategories().getVERSION();
     }
 
     public RiskCounts getLicenseRisk() {
+        if (riskProfile == null || riskProfile.getCategories() == null || riskProfile.getCategories().getLICENSE() == null) {
+            return null;
+        }
         return riskProfile.getCategories().getLICENSE();
     }
 
     /**
-     * Returns the appropriate String for the License Risk type to be used in the UI
+     * Returns the appropriate String for the License Risk type to be used in the UI. If the License
+     * Risk is null it will return an empty String.
      *
      */
     public String getLicenseRiskString() {
+        if (getLicenseRisk() == null) {
+            return "";
+        }
         if (getLicenseRisk().getHIGH() != 0) {
             return "H";
         } else if (getLicenseRisk().getMEDIUM() != 0) {
@@ -177,14 +193,21 @@ public class AggregateBomViewEntry {
     }
 
     public RiskCounts getOperationalRisk() {
+        if (riskProfile == null || riskProfile.getCategories() == null || riskProfile.getCategories().getOPERATIONAL() == null) {
+            return null;
+        }
         return riskProfile.getCategories().getOPERATIONAL();
     }
 
     /**
-     * Returns the appropriate String for the Operational Risk type to be used in the UI
+     * Returns the appropriate String for the Operational Risk type to be used in the UI. If the Operational
+     * Risk is null it will return an empty String.
      *
      */
     public String getOperationalRiskString() {
+        if (getOperationalRisk() == null) {
+            return "";
+        }
         if (getOperationalRisk().getHIGH() != 0) {
             return "H";
         } else if (getOperationalRisk().getMEDIUM() != 0) {
@@ -216,23 +239,19 @@ public class AggregateBomViewEntry {
     }
 
     public String getProducerReleasesId() {
-        // FIXME there should only be a single producer release
+        // There should only be a single producer release
         if (producerReleases == null || producerReleases.isEmpty()) {
             return "";
         }
-
         return producerReleases.get(0).getId();
     }
 
     public String getProducerReleasesDisplay() {
-        StringBuilder versionBuilder = new StringBuilder();
-        for (ReleaseData release : producerReleases) {
-            if (versionBuilder.length() > 0) {
-                versionBuilder.append(", ");
-            }
-            versionBuilder.append(release.getVersion());
+        // There should only be a single producer release
+        if (producerReleases == null || producerReleases.isEmpty()) {
+            return "";
         }
-        return versionBuilder.toString();
+        return producerReleases.get(0).getVersion();
     }
 
     @Override

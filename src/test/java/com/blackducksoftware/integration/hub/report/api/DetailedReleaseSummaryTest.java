@@ -67,6 +67,7 @@ public class DetailedReleaseSummaryTest {
         assertEquals(releasedOn1, item1.getReleasedOn());
         assertEquals(phase1, item1.getPhase());
         assertEquals(distribution1, item1.getDistribution());
+        assertEquals(baseUrl1, uiUrlGenerator1.getBaseUrl());
 
         assertEquals(projectId2, item2.getProjectId());
         assertEquals(versionId2, item2.getVersionId());
