@@ -135,6 +135,8 @@ public class AggregateBomViewEntryTest {
         assertEquals("", item4.getLicensesDisplay());
         assertEquals("", item4.getProducerReleasesId());
 
+        assertEquals("", item4.getProducerReleasesDisplay());
+
         assertTrue(!item1.equals(item2));
         assertTrue(item1.equals(item3));
 
@@ -280,6 +282,11 @@ public class AggregateBomViewEntryTest {
                 null, null, null, null, null, null, null, null, null, riskProfile);
 
         assertEquals("", item.getLicenseRiskString());
+
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, null);
+
+        assertEquals("", item.getLicenseRiskString());
     }
 
     @Test
@@ -340,5 +347,109 @@ public class AggregateBomViewEntryTest {
                 null, null, null, null, null, null, null, null, null, riskProfile);
 
         assertEquals("", item.getOperationalRiskString());
+
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, null);
+
+        assertEquals("", item.getOperationalRiskString());
+    }
+
+    @Test
+    public void testGetActivityRiskString() {
+        final RiskCounts counts = new RiskCounts(1, 1, 1, 1, 1);
+
+        RiskCategories categories = new RiskCategories(null, counts, null, null, null);
+        RiskProfile riskProfile = new RiskProfile(1, categories);
+
+        AggregateBomViewEntry item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, riskProfile);
+
+        assertEquals(counts, item.getActivityRisk());
+
+        categories = new RiskCategories(null, null, null, null, null);
+        riskProfile = new RiskProfile(1, categories);
+
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, riskProfile);
+
+        assertNull(item.getActivityRisk());
+
+        riskProfile = new RiskProfile(1, null);
+
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, riskProfile);
+
+        assertNull(item.getActivityRisk());
+
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, null);
+
+        assertNull(item.getActivityRisk());
+    }
+
+    @Test
+    public void testGetVulnerabilityRiskString() {
+        final RiskCounts counts = new RiskCounts(1, 1, 1, 1, 1);
+
+        RiskCategories categories = new RiskCategories(counts, null, null, null, null);
+        RiskProfile riskProfile = new RiskProfile(1, categories);
+
+        AggregateBomViewEntry item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, riskProfile);
+
+        assertEquals(counts, item.getVulnerabilityRisk());
+
+        categories = new RiskCategories(null, null, null, null, null);
+        riskProfile = new RiskProfile(1, categories);
+
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, riskProfile);
+
+        assertNull(item.getVulnerabilityRisk());
+
+        riskProfile = new RiskProfile(1, null);
+
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, riskProfile);
+
+        assertNull(item.getVulnerabilityRisk());
+
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, null);
+
+        assertNull(item.getVulnerabilityRisk());
+    }
+
+    @Test
+    public void testGetVersionRiskString() {
+        final RiskCounts counts = new RiskCounts(1, 1, 1, 1, 1);
+
+        RiskCategories categories = new RiskCategories(null, null, counts, null, null);
+        RiskProfile riskProfile = new RiskProfile(1, categories);
+
+        AggregateBomViewEntry item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, riskProfile);
+
+        assertEquals(counts, item.getVersionRisk());
+
+        categories = new RiskCategories(null, null, null, null, null);
+        riskProfile = new RiskProfile(1, categories);
+
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, riskProfile);
+
+        assertNull(item.getVersionRisk());
+
+        riskProfile = new RiskProfile(1, null);
+
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, riskProfile);
+
+        assertNull(item.getVersionRisk());
+
+        item = new AggregateBomViewEntry(null, null, null,
+                null, null, null, null, null, null, null, null, null, null);
+
+        assertNull(item.getVersionRisk());
     }
 }

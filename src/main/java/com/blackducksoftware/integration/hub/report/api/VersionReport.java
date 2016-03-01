@@ -33,15 +33,14 @@ public class VersionReport {
     }
 
     public String getReportVersionUrl() {
-        if (StringUtils.isBlank(getBaseUrl()) || detailedReleaseSummary == null
-                || detailedReleaseSummary.getVersionId() == null) {
+        if (detailedReleaseSummary == null || StringUtils.isBlank(getBaseUrl())
+                || StringUtils.isBlank(detailedReleaseSummary.getVersionId())) {
             return null;
         }
 
         URLBuilder builder = new URLBuilder(getBaseUrl());
         builder.setFragment("versions/id:" + detailedReleaseSummary.getVersionId() + "/view:bom");
 
-        String url = builder.buildURL();
         return builder.buildURL();
     }
 
@@ -59,7 +58,7 @@ public class VersionReport {
 
     public String getVersionUrl(AggregateBomViewEntry entry) {
         if (StringUtils.isBlank(getBaseUrl()) || entry == null ||
-                entry.getProducerProject() == null || StringUtils.isBlank(entry.getProducerProject().getId())) {
+                entry.getProducerReleases() == null || StringUtils.isBlank(entry.getProducerReleasesId())) {
             return null;
         }
 
