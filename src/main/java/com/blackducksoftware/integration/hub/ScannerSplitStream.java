@@ -15,7 +15,7 @@ public class ScannerSplitStream extends OutputStream {
 
     private static final int EOF = -1; // End of file
 
-    private static final int ETX = 3; // End of text, should have not more data
+    private static final int ETX = 3; // End of text, should have no more data
 
     private static final int EOT = 4; // End of transmission, no more data
 
@@ -185,7 +185,13 @@ public class ScannerSplitStream extends OutputStream {
         outputFileStream.flush();
 
         // Print whatever is left in the buffer
-        writeToConsole(lineBuffer.toString());
+        writeToConsole(lineBuffer);
+        lineBuffer = "";
+        // Print whatever is left in the buffer
+        if (StringUtils.isNotBlank(currentLine)) {
+            writeToConsole(currentLine);
+            currentLine = "";
+        }
     }
 
     @Override

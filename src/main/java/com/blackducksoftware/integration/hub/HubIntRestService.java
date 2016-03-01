@@ -470,6 +470,8 @@ public class HubIntRestService {
      * matching the hostname and path.
      * Returns a Map of scan Id's, and a Boolean to mark if that has already been mapped to this version or not
      *
+     * @deprecated We dont need this anymore since the CLI now maps scans to versions for us, as of Hub 2.2.0
+     *
      * @param hostname
      *            String
      * @param scanTargets
@@ -489,6 +491,7 @@ public class HubIntRestService {
      * @throws URISyntaxException
      * @throws MalformedURLException
      */
+    @Deprecated
     private Map<String, Boolean> getScanLocationIds(String hostname, List<String>
             scanTargets, String versionId, ChallengeRequest proxyChallengeRequest, int attempt)
             throws UnknownHostException,
@@ -555,6 +558,8 @@ public class HubIntRestService {
      * If the scan Id has not already been mapped to the Version then it will make that mapping, otherwise it will not
      * perform the mapping.
      *
+     * @deprecated We dont need this anymore since the CLI now maps scans to versions for us, as of Hub 2.2.0
+     *
      * @param scanLocationIds
      *            Map<<String, Boolean>>
      * @param versionId
@@ -564,6 +569,7 @@ public class HubIntRestService {
      * @throws URISyntaxException
      * @throws MalformedURLException
      */
+    @Deprecated
     public void mapScansToProjectVersion(Map<String, Boolean> scanLocationIds, String
             versionId) throws BDRestException, URISyntaxException {
         ClientResource resource = createClientResource();

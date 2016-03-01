@@ -22,11 +22,11 @@ public class TestLogger implements IntLogger {
     }
 
     public void resetOutputList() {
-        outputList.clear();
+        outputList = new ArrayList<String>();
     }
 
     public void resetErrorList() {
-        errorList.clear();
+        errorList = new ArrayList<Throwable>();
     }
 
     public void resetAllOutput() {
@@ -39,9 +39,10 @@ public class TestLogger implements IntLogger {
 
             StringBuilder sb = new StringBuilder();
             for (String string : outputList) {
+                if (sb.length() > 0) {
+                    sb.append('\n');
+                }
                 sb.append(string);
-                sb.append('\n');
-
             }
             return sb.toString();
         }
@@ -53,10 +54,12 @@ public class TestLogger implements IntLogger {
 
             StringBuilder sb = new StringBuilder();
             for (Throwable e : errorList) {
+                if (sb.length() > 0) {
+                    sb.append('\n');
+                }
                 StringWriter sw = new StringWriter();
                 e.printStackTrace(new PrintWriter(sw));
                 sb.append(sw.toString());
-                sb.append('\n');
             }
             return sb.toString();
         }

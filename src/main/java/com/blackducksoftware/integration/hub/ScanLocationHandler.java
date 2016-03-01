@@ -21,6 +21,11 @@ import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+/**
+ * @deprecated We dont need this anymore since the CLI now maps scans to versions for us, as of Hub 2.2.0
+ *
+ */
+@Deprecated
 public class ScanLocationHandler {
 
     private final IntLogger logger;
