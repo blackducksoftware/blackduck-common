@@ -215,10 +215,10 @@ public abstract class ScanExecutor {
         this.proxyPassword = proxyPassword;
     }
 
-    @SuppressWarnings(value = { "pmd:SystemPrintln" })
     protected boolean isConfiguredCorrectly(String scanExec, String oneJarPath, String javaExec) {
         if (getLogger() == null) {
             // Need to suppress the sonar rule here.
+            // NOPMD SystemPrintln
             System.out.println("Could not find a logger");
             return false;
         }

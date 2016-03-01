@@ -127,7 +127,7 @@ public class ScannerSplitStream extends OutputStream {
         } else if (isLoggableLine(line)) {
             // next real log message came in, print the log in the buffer
             // print stored lines
-            writeToConsole(lineBuffer.toString());
+            writeToConsole(lineBuffer);
 
             // replace with the current line
             lineBuffer = line;

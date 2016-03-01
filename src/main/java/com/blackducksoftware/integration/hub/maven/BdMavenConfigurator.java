@@ -141,7 +141,6 @@ public class BdMavenConfigurator {
      * @return Boolean
      * @throws IllegalArgumentException
      */
-    @SuppressWarnings(value = { "checkstyle:com.puppycrawl.tools.checkstyle.checks.coding.SimplifyBooleanReturnCheck" })
     public Boolean isMaven30OrLater(String mavenVersion) throws IllegalArgumentException {
         if (StringUtils.isEmpty(mavenVersion)) {
             throw new IllegalArgumentException("No Maven version was supplied");
@@ -158,7 +157,7 @@ public class BdMavenConfigurator {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("The first 2 parts of the version should be integers. Ex : 2.1 , 3.0 , 3.3 , etc.", e);
         }
-
+        // NOPMD com.puppycrawl.tools.checkstyle.checks.coding.SimplifyBooleanReturnCheck
         if (majorVersion < 3) {
             return false;
         } else {

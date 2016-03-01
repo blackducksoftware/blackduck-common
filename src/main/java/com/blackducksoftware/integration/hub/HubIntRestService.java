@@ -540,7 +540,8 @@ public class HubIntRestService {
 
             }
         } catch (ResourceException e) {
-            if (resource.getProxyChallengeRequests() != null && !resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername)
+            if (resource != null && resource.getProxyChallengeRequests() != null && !resource.getProxyChallengeRequests().isEmpty()
+                    && StringUtils.isNotBlank(proxyUsername)
                     && StringUtils.isNotBlank(proxyPassword)) {
 
                 ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
