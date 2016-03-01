@@ -1,6 +1,9 @@
 package com.blackducksoftware.integration.hub;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
 
 import org.junit.Test;
 
@@ -15,6 +18,15 @@ public class BuilderTypeTest {
         assertEquals(BuilderType.MAVEN, BuilderType.getBuilderType(BuilderType.MAVEN.toString()));
         assertEquals(BuilderType.GRADLE, BuilderType.getBuilderType(BuilderType.GRADLE.toString().toLowerCase()));
         assertEquals(BuilderType.GRADLE, BuilderType.getBuilderType(BuilderType.GRADLE.toString()));
+    }
+
+    @Test
+    public void testGetBuilderTypes() {
+        List<BuilderType> builderTypes = BuilderType.getBuilderTypes();
+        assertTrue(builderTypes.contains(BuilderType.ANT));
+        assertTrue(builderTypes.contains(BuilderType.MAVEN));
+        assertTrue(builderTypes.contains(BuilderType.GRADLE));
+        assertTrue(builderTypes.contains(BuilderType.UNKNOWN_BUILDER));
     }
 
 }

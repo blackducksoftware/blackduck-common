@@ -29,6 +29,7 @@ public class ScannerSplitStreamTest {
         assertEquals(notLoggable, stream.buffer.toString());
 
         assertTrue(StringUtils.isBlank(logger.getOutputString()));
+        splitStream.close();
     }
 
     @Test
@@ -51,8 +52,9 @@ public class ScannerSplitStreamTest {
 
         // Should write all the bytes to the TestOutputStream
         assertEquals(loggable, stream.buffer.toString());
-
         assertEquals(loggable, logger.getOutputString());
+        assertTrue(splitStream.hasOutput());
+        assertEquals(loggable, splitStream.getOutput().trim());
 
         stream.resetBuffer();
         logger.resetAllOutput();
@@ -65,6 +67,7 @@ public class ScannerSplitStreamTest {
         assertEquals(notLoggable, stream.buffer.toString());
 
         assertTrue(StringUtils.isBlank(logger.getOutputString()));
+        splitStream.close();
     }
 
     @Test
@@ -83,6 +86,7 @@ public class ScannerSplitStreamTest {
         assertEquals(notLoggable, stream.buffer.toString());
 
         assertTrue(StringUtils.isBlank(logger.getOutputString()));
+        splitStream.close();
     }
 
     @Test
@@ -103,8 +107,9 @@ public class ScannerSplitStreamTest {
 
         // Should write all the bytes to the TestOutputStream
         assertEquals(loggable, stream.buffer.toString());
-
         assertEquals(loggable, logger.getOutputString());
+        assertTrue(splitStream.hasOutput());
+        assertEquals(loggable, splitStream.getOutput().trim());
 
         stream.resetBuffer();
         logger.resetAllOutput();
@@ -115,6 +120,7 @@ public class ScannerSplitStreamTest {
         assertEquals(notLoggable, stream.buffer.toString());
 
         assertTrue(StringUtils.isBlank(logger.getOutputString()));
+        splitStream.close();
     }
 
     @Test
@@ -133,6 +139,7 @@ public class ScannerSplitStreamTest {
         assertEquals(notLoggable, stream.buffer.toString());
 
         assertTrue(StringUtils.isBlank(logger.getOutputString()));
+        splitStream.close();
     }
 
     @Test
@@ -153,8 +160,9 @@ public class ScannerSplitStreamTest {
 
         // Should write all the bytes to the TestOutputStream
         assertEquals(loggable, stream.buffer.toString());
-
         assertEquals(loggable, logger.getOutputString());
+        assertTrue(splitStream.hasOutput());
+        assertEquals(loggable, splitStream.getOutput().trim());
 
         stream.resetBuffer();
         logger.resetAllOutput();
@@ -165,5 +173,6 @@ public class ScannerSplitStreamTest {
         assertEquals(notLoggable, stream.buffer.toString());
 
         assertTrue(StringUtils.isBlank(logger.getOutputString()));
+        splitStream.close();
     }
 }
