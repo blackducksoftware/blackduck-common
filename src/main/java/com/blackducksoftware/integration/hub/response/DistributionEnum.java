@@ -32,11 +32,12 @@ public enum DistributionEnum {
     }
 
     public static DistributionEnum getDistributionEnum(String distribution) {
-        DistributionEnum distributionEnum = UNKNOWNDISTRIBUTION;
+        DistributionEnum distributionEnum;
         try {
             distributionEnum = DistributionEnum.valueOf(distribution.toUpperCase());
         } catch (IllegalArgumentException e) {
             // ignore expection
+            distributionEnum = UNKNOWNDISTRIBUTION;
         }
         return distributionEnum;
     }

@@ -33,11 +33,12 @@ public enum PhaseEnum {
     }
 
     public static PhaseEnum getPhaseEnum(String phase) {
-        PhaseEnum phaseEnum = UNKNOWNPHASE;
+        PhaseEnum phaseEnum;
         try {
             phaseEnum = PhaseEnum.valueOf(phase.toUpperCase());
         } catch (IllegalArgumentException e) {
             // ignore expection
+            phaseEnum = UNKNOWNPHASE;
         }
         return phaseEnum;
     }

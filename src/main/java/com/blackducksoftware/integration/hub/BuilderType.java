@@ -14,11 +14,12 @@ public enum BuilderType {
     UNKNOWN_BUILDER;
 
     public static BuilderType getBuilderType(String builder) {
-        BuilderType entityTypeEnum = UNKNOWN_BUILDER;
+        BuilderType entityTypeEnum;
         try {
             entityTypeEnum = BuilderType.valueOf(builder.toUpperCase());
         } catch (IllegalArgumentException e) {
             // ignore expection
+            entityTypeEnum = UNKNOWN_BUILDER;
         }
         return entityTypeEnum;
     }

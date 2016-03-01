@@ -7,11 +7,12 @@ public enum ReportFormatEnum {
     UNKNOWN;
 
     public static ReportFormatEnum getReportFormatEnum(String reportFormatEnum) {
-        ReportFormatEnum reportFormat = UNKNOWN;
+        ReportFormatEnum reportFormat;
         try {
             reportFormat = ReportFormatEnum.valueOf(reportFormatEnum.toUpperCase());
         } catch (IllegalArgumentException e) {
             // ignore expection
+            reportFormat = UNKNOWN;
         }
         return reportFormat;
     }

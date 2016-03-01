@@ -19,11 +19,12 @@ public enum ScanStatus {
     UNKNOWN;
 
     public static ScanStatus getScanStatus(String scanStatus) {
-        ScanStatus scanStatusEnum = UNKNOWN;
+        ScanStatus scanStatusEnum;
         try {
             scanStatusEnum = ScanStatus.valueOf(scanStatus.toUpperCase());
         } catch (IllegalArgumentException e) {
             // ignore expection
+            scanStatusEnum = UNKNOWN;
         }
         return scanStatusEnum;
     }

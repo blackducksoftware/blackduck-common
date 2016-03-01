@@ -1,6 +1,5 @@
 package com.blackducksoftware.integration.hub.response.mapping;
 
-
 public enum EntityTypeEnum {
 
     RL // Release? Used for owner Entity Type
@@ -10,11 +9,12 @@ public enum EntityTypeEnum {
     UNKNOWNENTITY;
 
     public static EntityTypeEnum getEntityTypeEnum(String entityType) {
-        EntityTypeEnum entityTypeEnum = UNKNOWNENTITY;
+        EntityTypeEnum entityTypeEnum;
         try {
             entityTypeEnum = EntityTypeEnum.valueOf(entityType.toUpperCase());
         } catch (IllegalArgumentException e) {
             // ignore expection
+            entityTypeEnum = UNKNOWNENTITY;
         }
         return entityTypeEnum;
     }
