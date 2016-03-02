@@ -8,6 +8,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.response.VersionComparison;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 
 public class HubSupportHelper {
@@ -67,20 +68,20 @@ public class HubSupportHelper {
         try {
             String hubServerVersion = service.getHubVersion();
 
-            if (compareVersion(hubServerVersion, "3.0.0")) {
+            if (compareVersion(hubServerVersion, "3.0.0", service)) {
                 // The cli did not come packaged with a jre until 3.0.0
                 setJreProvidedSupport(true);
                 setCliStatusReturnSupport(true);
                 setCliMappingSupport(true);
                 setLogOptionSupport(true);
 
-            } else if (compareVersion(hubServerVersion, "2.3.0")) {
+            } else if (compareVersion(hubServerVersion, "2.3.0", service)) {
                 // The cli did not return correct status codes until 2.3.0
                 setJreProvidedSupport(false);
                 setCliStatusReturnSupport(true);
                 setCliMappingSupport(true);
                 setLogOptionSupport(true);
-            } else if (compareVersion(hubServerVersion, "2.2.0")) {
+            } else if (compareVersion(hubServerVersion, "2.2.0", service)) {
                 // The cli did not support mapping scans to versions until 2.2.0
                 setJreProvidedSupport(false);
                 setCliStatusReturnSupport(false);
@@ -128,64 +129,95 @@ public class HubSupportHelper {
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    private boolean compareVersion(String hubServerVersion, String testVersion) throws IOException, BDRestException, URISyntaxException {
-        String[] splitServerVersion = hubServerVersion.split("\\.");
-        String[] splitTestVersion = testVersion.split("\\.");
+    private boolean compareVersion(String hubServerVersion, String testVersion, HubIntRestService service) throws IOException, BDRestException,
+            URISyntaxException {
+        try {
+            String[] splitServerVersion = hubServerVersion.split("\\.");
+            String[] splitTestVersion = testVersion.split("\\.");
 
-        Integer[] serverVersionParts = new Integer[3];
-        Integer[] testVersionParts = new Integer[3];
-        boolean isServerSnapshot = false;
-        for (int i = 0; i < splitServerVersion.length; i++) {
-            String currentServerPart = splitServerVersion[i];
-            String currentTestVersionPart = splitTestVersion[i];
-            if (currentServerPart.contains("-SNAPSHOT")) {
-                isServerSnapshot = true;
-                currentServerPart = currentServerPart.replace("-SNAPSHOT", "");
+            Integer[] serverVersionParts = new Integer[splitServerVersion.length];
+            Integer[] testVersionParts = new Integer[splitTestVersion.length];
+            boolean isServerSnapshot = false;
+            for (int i = 0; i < splitServerVersion.length; i++) {
+                String currentServerPart = splitServerVersion[i];
+                String currentTestVersionPart = splitTestVersion[i];
+                if (currentServerPart.contains("-SNAPSHOT")) {
+                    isServerSnapshot = true;
+                    currentServerPart = currentServerPart.replace("-SNAPSHOT", "");
+                }
+                serverVersionParts[i] = Integer.valueOf(currentServerPart);
+                testVersionParts[i] = Integer.valueOf(currentTestVersionPart);
             }
-            serverVersionParts[i] = Integer.valueOf(currentServerPart);
-            testVersionParts[i] = Integer.valueOf(currentTestVersionPart);
-        }
 
-        if (serverVersionParts[0] > testVersionParts[0]) {
-            // Major part of the server version was greater,
-            // so we know it supports whatever feature we are testing for
-            return true;
-        } else if (serverVersionParts[0] < testVersionParts[0]) {
-            // Major part of the server version was less than the one provided,
-            // so we know it does not support whatever feature we are testing for
-            return false;
-        }
+            if (serverVersionParts[0] > testVersionParts[0]) {
+                // Major part of the server version was greater,
+                // so we know it supports whatever feature we are testing for
+                return true;
+            } else if (serverVersionParts[0] < testVersionParts[0]) {
+                // Major part of the server version was less than the one provided,
+                // so we know it does not support whatever feature we are testing for
+                return false;
+            }
 
-        if (serverVersionParts[1] > testVersionParts[1]) {
-            // Minor part of the server version was greater,
-            // so we know it supports whatever feature we are testing for
-            return true;
-        } else if (serverVersionParts[1] < testVersionParts[1]) {
-            // Minor part of the server version was less than the one provided,
-            // so we know it does not support whatever feature we are testing for
-            return false;
-        }
+            if (serverVersionParts[1] > testVersionParts[1]) {
+                // Minor part of the server version was greater,
+                // so we know it supports whatever feature we are testing for
+                return true;
+            } else if (serverVersionParts[1] < testVersionParts[1]) {
+                // Minor part of the server version was less than the one provided,
+                // so we know it does not support whatever feature we are testing for
+                return false;
+            }
 
-        if (serverVersionParts[2] > testVersionParts[2]) {
-            // Fix version part of the server version was greater,
-            // so we know it supports whatever feature we are testing for
-            return true;
-        } else if (serverVersionParts[2] < testVersionParts[2]) {
-            // Fix version part of the server version was less than the one provided,
-            // so we know it does not support whatever feature we are testing for
-            return false;
-        }
+            if (serverVersionParts[2] > testVersionParts[2]) {
+                // Fix version part of the server version was greater,
+                // so we know it supports whatever feature we are testing for
+                return true;
+            } else if (serverVersionParts[2] < testVersionParts[2]) {
+                // Fix version part of the server version was less than the one provided,
+                // so we know it does not support whatever feature we are testing for
+                return false;
+            }
 
-        // The versions are identical, check if the server is a SNAPSHOT
-        if (isServerSnapshot) {
-            // We assume the SNAPSHOT version is less than the released version
-            return false;
+            // The versions are identical, check if the server is a SNAPSHOT
+            if (isServerSnapshot) {
+                // We assume the SNAPSHOT version is less than the released version
+                return false;
+            }
+
+        } catch (NumberFormatException e) {
+            return fallBackComparison(testVersion, service);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return fallBackComparison(testVersion, service);
         }
 
         return true;
     }
 
-    public static String getLinuxWrapperLink(String hubUrl) throws IllegalArgumentException {
+    /**
+     * We are parsing the versions incorrectly so we let the Hub server compare the test version to the server version.
+     * We return true if the testVersion is less than or equal to the server version
+     * We return false if the testVersion is greater than the server version.
+     *
+     * @param testVersion
+     *            String
+     * @param service
+     *            HubIntRestService
+     * @return
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    private boolean fallBackComparison(String testVersion, HubIntRestService service) throws IOException, BDRestException, URISyntaxException {
+        VersionComparison comparison = service.compareWithHubVersion(testVersion);
+        if (comparison.getNumericResult() <= 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static String getCLIWrapperLink(String hubUrl) throws IllegalArgumentException {
         if (StringUtils.isBlank(hubUrl)) {
             throw new IllegalArgumentException("You must provide a valid Hub URL in order to get the correct link.");
         }
@@ -196,38 +228,33 @@ public class HubSupportHelper {
         }
         urlBuilder.append("download");
         urlBuilder.append("/");
+        return urlBuilder.toString();
+    }
+
+    public static String getLinuxCLIWrapperLink(String hubUrl) throws IllegalArgumentException {
+        String baseUrl = getCLIWrapperLink(hubUrl);
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(baseUrl);
         urlBuilder.append("scan.cli.zip");
         return urlBuilder.toString();
     }
 
-    public static String getWindowsWrapperLink(String hubUrl) throws IllegalArgumentException {
-        if (StringUtils.isBlank(hubUrl)) {
-            throw new IllegalArgumentException("You must provide a valid Hub URL in order to get the correct link.");
-        }
+    public static String getWindowsCLIWrapperLink(String hubUrl) throws IllegalArgumentException {
+        String baseUrl = getCLIWrapperLink(hubUrl);
         StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(hubUrl);
-        if (!hubUrl.endsWith("/")) {
-            urlBuilder.append("/");
-        }
-        urlBuilder.append("download");
-        urlBuilder.append("/");
+        urlBuilder.append(baseUrl);
         // FIXME change to the correct link, when that information is known
+        // FIXME fix the unit tests too
         urlBuilder.append("scan.cli.zip");
         return urlBuilder.toString();
     }
 
-    public static String getOSXWrapperLink(String hubUrl) throws IllegalArgumentException {
-        if (StringUtils.isBlank(hubUrl)) {
-            throw new IllegalArgumentException("You must provide a valid Hub URL in order to get the correct link.");
-        }
+    public static String getOSXCLIWrapperLink(String hubUrl) throws IllegalArgumentException {
+        String baseUrl = getCLIWrapperLink(hubUrl);
         StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(hubUrl);
-        if (!hubUrl.endsWith("/")) {
-            urlBuilder.append("/");
-        }
-        urlBuilder.append("download");
-        urlBuilder.append("/");
+        urlBuilder.append(baseUrl);
         // FIXME change to the correct link, when that information is known
+        // FIXME fix the unit tests too
         urlBuilder.append("scan.cli.zip");
         return urlBuilder.toString();
     }
