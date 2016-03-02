@@ -16,6 +16,17 @@ import com.blackducksoftware.integration.hub.response.mapping.ScanStatus;
 
 public class HubEventPolling {
 
+    private final HubIntRestService service;
+
+    public HubEventPolling(HubIntRestService service) {
+        super();
+        this.service = service;
+    }
+
+    public HubIntRestService getService() {
+        return service;
+    }
+
     /**
      * Check the code locations with the host specified and the paths provided. Check the history for the scan history
      * that falls between the times provided, if the status of that scan history for all code locations is complete then
@@ -42,13 +53,13 @@ public class HubEventPolling {
      * @throws URISyntaxException
      * @throws IOException
      */
-    public static boolean isBomUpToDate(HubIntRestService service, DateTime timeBeforeScan, DateTime timeAfterScan, String hostname, List<String>
+    public boolean isBomUpToDate(DateTime timeBeforeScan, DateTime timeAfterScan, String hostname, List<String>
             scanTargets, long maximumWait) throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         while (elapsedTime < maximumWait) {
             // logger.trace("CHECKING CODE LOCATIONS");
-            List<ScanLocationItem> scanLocationsToCheck = service.getScanLocations(hostname, scanTargets);
+            List<ScanLocationItem> scanLocationsToCheck = getService().getScanLocations(hostname, scanTargets);
             boolean upToDate = true;
             for (ScanLocationItem currentCodeLocation : scanLocationsToCheck) {
                 for (ScanHistoryItem currentScanHistory : currentCodeLocation.getScanList()) {
@@ -99,11 +110,11 @@ public class HubEventPolling {
      * @throws InterruptedException
      * @throws HubIntegrationException
      */
-    public static boolean isReportFinishedGenerating(HubIntRestService service, String reportUrl) throws IOException, BDRestException, URISyntaxException,
+    public boolean isReportFinishedGenerating(String reportUrl) throws IOException, BDRestException, URISyntaxException,
             InterruptedException, HubIntegrationException {
         // maximum wait time of 30 minutes
         final long maximumWait = 1000 * 60 * 30;
-        return isReportFinishedGenerating(service, reportUrl, maximumWait);
+        return isReportFinishedGenerating(reportUrl, maximumWait);
     }
 
     /**
@@ -123,7 +134,7 @@ public class HubEventPolling {
      * @throws InterruptedException
      * @throws HubIntegrationException
      */
-    public static boolean isReportFinishedGenerating(HubIntRestService service, String reportUrl, final long maximumWait) throws IOException, BDRestException,
+    public boolean isReportFinishedGenerating(String reportUrl, final long maximumWait) throws IOException, BDRestException,
             URISyntaxException,
             InterruptedException, HubIntegrationException {
         final long startTime = System.currentTimeMillis();
@@ -132,17 +143,18 @@ public class HubEventPolling {
         ReportMetaInformationItem reportInfo = null;
 
         while (timeFinished == null) {
-            // Wait until the report is done being generated
-            // Retry every 5 seconds
-            Thread.sleep(5000);
-            elapsedTime = System.currentTimeMillis() - startTime;
-            reportInfo = service.getReportLinks(reportUrl);
+            reportInfo = getService().getReportLinks(reportUrl);
             timeFinished = reportInfo.getFinishedAt();
-
+            if (timeFinished != null) {
+                break;
+            }
             if (elapsedTime >= maximumWait) {
                 String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(maximumWait));
                 throw new HubIntegrationException("The Report has not finished generating in : " + formattedTime);
             }
+            // Retry every 5 seconds
+            Thread.sleep(5000);
+            elapsedTime = System.currentTimeMillis() - startTime;
         }
         return true;
     }
