@@ -1136,40 +1136,56 @@ public class HubIntRestService {
 
             Gson gson = new GsonBuilder().create();
 
-            // FIXME make this less unstable if there are changes, in the response
-            // For some reason the Hub responds with this weird json structure
-            // EX:
-            // {
-            // "reportContent": [
-            // {
-            // "fileName": "CITestProject/CITestVersion1/version.json",
-            // "fileContent": {
-            // "detailedReleaseSummary": {
-            // ...
-            // },
-            // "detailedCodeLocations": [],
-            // "aggregateBomViewEntries": [],
-            // "detailedVulnerabilities": [],
-            // "detailedFileBomViewEntries": []
-            // }
-            // }
-            // ]
-            // }
-
             JsonObject reportResponse = gson.fromJson(response, JsonObject.class);
-
             JsonArray reportConentArray = gson.fromJson(reportResponse.get("reportContent"), JsonArray.class);
-
             JsonObject reportFile = (JsonObject) reportConentArray.get(0);
 
             VersionReport report = gson.fromJson(reportFile.get("fileContent"), VersionReport.class);
-            // FIXME not serializing the RiskProfile correctly
 
             return report;
         } else {
             throw new BDRestException("There was a problem getting the content of this Report. Error Code: " + responseCode, resource);
         }
 
+    }
+
+    /**
+     * Generates a new Hub report for the specified version.
+     *
+     * @param versionId
+     *            String
+     *
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    public void getPolicyStatus(String versionId) throws IOException, BDRestException,
+            URISyntaxException {
+        if (StringUtils.isBlank(versionId)) {
+            throw new IllegalArgumentException("Missing the version Id to get the policy status of.");
+        }
+
+        ClientResource resource = createClientResource();
+        resource.addSegment("api");
+        resource.addSegment("version");
+        resource.addSegment(versionId);
+        resource.addSegment("policy-status");
+
+        resource.setMethod(Method.GET);
+
+        handleRequest(resource, null, 0);
+
+        int responseCode = resource.getResponse().getStatus().getCode();
+
+        if (responseCode == 201) {
+            String response = readResponseAsString(resource.getResponse());
+
+            Gson gson = new GsonBuilder().create();
+
+            // TODO turn string into Java Object
+        } else {
+            throw new BDRestException("There was a problem getting the policy status. Error Code: " + responseCode, resource);
+        }
     }
 
     private String readResponseAsString(Response response) throws IOException {
