@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
@@ -182,5 +183,52 @@ public class HubSupportHelper {
         }
 
         return true;
+    }
+
+    public static String getLinuxWrapperLink(String hubUrl) throws IllegalArgumentException {
+        if (StringUtils.isBlank(hubUrl)) {
+            throw new IllegalArgumentException("You must provide a valid Hub URL in order to get the correct link.");
+        }
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(hubUrl);
+        if (!hubUrl.endsWith("/")) {
+            urlBuilder.append("/");
+        }
+        urlBuilder.append("download");
+        urlBuilder.append("/");
+        urlBuilder.append("scan.cli.zip");
+        return urlBuilder.toString();
+    }
+
+    public static String getWindowsWrapperLink(String hubUrl) throws IllegalArgumentException {
+        if (StringUtils.isBlank(hubUrl)) {
+            throw new IllegalArgumentException("You must provide a valid Hub URL in order to get the correct link.");
+        }
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(hubUrl);
+        if (!hubUrl.endsWith("/")) {
+            urlBuilder.append("/");
+        }
+        urlBuilder.append("download");
+        urlBuilder.append("/");
+        // FIXME change to the correct link, when that information is known
+        urlBuilder.append("scan.cli.zip");
+        return urlBuilder.toString();
+    }
+
+    public static String getOSXWrapperLink(String hubUrl) throws IllegalArgumentException {
+        if (StringUtils.isBlank(hubUrl)) {
+            throw new IllegalArgumentException("You must provide a valid Hub URL in order to get the correct link.");
+        }
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(hubUrl);
+        if (!hubUrl.endsWith("/")) {
+            urlBuilder.append("/");
+        }
+        urlBuilder.append("download");
+        urlBuilder.append("/");
+        // FIXME change to the correct link, when that information is known
+        urlBuilder.append("scan.cli.zip");
+        return urlBuilder.toString();
     }
 }
