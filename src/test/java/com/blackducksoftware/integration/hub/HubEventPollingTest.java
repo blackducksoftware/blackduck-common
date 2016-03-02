@@ -88,8 +88,9 @@ public class HubEventPollingTest {
         List<String> scanTargets = new ArrayList<String>();
         scanTargets.add("Test/Fake/Path/Child");
         scanTargets.add("Test\\Fake\\File");
+        HubEventPolling eventPoller = new HubEventPolling(restService);
 
-        assertTrue(HubEventPolling.isBomUpToDate(restService, startScanTime, endScanTime, fakeHost, scanTargets, 5000));
+        assertTrue(eventPoller.isBomUpToDate(startScanTime, endScanTime, fakeHost, scanTargets, 5000));
     }
 
     @Test
@@ -160,8 +161,8 @@ public class HubEventPollingTest {
         List<String> scanTargets = new ArrayList<String>();
         scanTargets.add("Test/Fake/Path/Child");
         scanTargets.add("Test\\Fake\\File");
-
-        HubEventPolling.isBomUpToDate(restService, startScanTime, endScanTime, fakeHost, scanTargets, 1000);
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        eventPoller.isBomUpToDate(startScanTime, endScanTime, fakeHost, scanTargets, 1000);
     }
 
     @Test
@@ -232,8 +233,8 @@ public class HubEventPollingTest {
         List<String> scanTargets = new ArrayList<String>();
         scanTargets.add("Test/Fake/Path/Child");
         scanTargets.add("Test\\Fake\\File");
-
-        HubEventPolling.isBomUpToDate(restService, startScanTime, endScanTime, fakeHost, scanTargets, 5000);
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        eventPoller.isBomUpToDate(startScanTime, endScanTime, fakeHost, scanTargets, 5000);
     }
 
     @Test
@@ -241,8 +242,8 @@ public class HubEventPollingTest {
         exception.expect(HubIntegrationException.class);
         exception.expectMessage("The Report has not finished generating in : ");
 
-        // 20 seconds
-        final long maximumWait = 1000 * 20;
+        // 5 seconds
+        final long maximumWait = 1000 * 5;
 
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
 
@@ -252,14 +253,14 @@ public class HubEventPollingTest {
                 return new ReportMetaInformationItem(null, null, null, 0, null, null, null, null, null);
             }
         });
-
-        HubEventPolling.isReportFinishedGenerating(restService, "", maximumWait);
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        eventPoller.isReportFinishedGenerating("", maximumWait);
     }
 
     @Test
     public void testIsReportDoneGeneratingDone() throws Exception {
-        // 20 seconds
-        final long maximumWait = 1000 * 20;
+        // 5 seconds
+        final long maximumWait = 1000 * 5;
 
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
 
@@ -269,8 +270,8 @@ public class HubEventPollingTest {
                 return new ReportMetaInformationItem(null, null, null, 0, null, null, "test", null, null);
             }
         });
-
-        HubEventPolling.isReportFinishedGenerating(restService, "", maximumWait);
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        eventPoller.isReportFinishedGenerating("", maximumWait);
     }
 
 }
