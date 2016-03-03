@@ -19,7 +19,6 @@ public class HubEventPolling {
     private final HubIntRestService service;
 
     public HubEventPolling(HubIntRestService service) {
-        super();
         this.service = service;
     }
 
