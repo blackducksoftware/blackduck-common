@@ -15,6 +15,9 @@ public enum EntityTypeEnum {
         } catch (IllegalArgumentException e) {
             // ignore expection
             entityTypeEnum = UNKNOWNENTITY;
+        } catch (NullPointerException e) {
+            // ignore expection
+            entityTypeEnum = UNKNOWNENTITY;
         }
         return entityTypeEnum;
     }

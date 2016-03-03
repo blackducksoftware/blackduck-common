@@ -38,6 +38,9 @@ public enum DistributionEnum {
         } catch (IllegalArgumentException e) {
             // ignore expection
             distributionEnum = UNKNOWNDISTRIBUTION;
+        } catch (NullPointerException e) {
+            // ignore expection
+            distributionEnum = UNKNOWNDISTRIBUTION;
         }
         return distributionEnum;
     }

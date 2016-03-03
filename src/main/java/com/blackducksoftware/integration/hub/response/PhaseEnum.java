@@ -39,6 +39,9 @@ public enum PhaseEnum {
         } catch (IllegalArgumentException e) {
             // ignore expection
             phaseEnum = UNKNOWNPHASE;
+        } catch (NullPointerException e) {
+            // ignore expection
+            phaseEnum = UNKNOWNPHASE;
         }
         return phaseEnum;
     }

@@ -13,6 +13,9 @@ public enum ReportFormatEnum {
         } catch (IllegalArgumentException e) {
             // ignore expection
             reportFormat = UNKNOWN;
+        } catch (NullPointerException e) {
+            // ignore expection
+            reportFormat = UNKNOWN;
         }
         return reportFormat;
     }

@@ -42,6 +42,7 @@ public class ScanStatusTest {
         assertEquals(ScanStatus.ERROR, ScanStatus.getScanStatus(ScanStatus.ERROR.toString()));
         assertEquals(ScanStatus.UNKNOWN, ScanStatus.getScanStatus(ScanStatus.UNKNOWN.toString().toLowerCase()));
         assertEquals(ScanStatus.UNKNOWN, ScanStatus.getScanStatus(ScanStatus.UNKNOWN.toString()));
+        assertEquals(ScanStatus.UNKNOWN, ScanStatus.getScanStatus(null));
     }
 
     @Test

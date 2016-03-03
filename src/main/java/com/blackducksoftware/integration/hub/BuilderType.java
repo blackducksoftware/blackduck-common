@@ -20,6 +20,9 @@ public enum BuilderType {
         } catch (IllegalArgumentException e) {
             // ignore expection
             entityTypeEnum = UNKNOWN_BUILDER;
+        } catch (NullPointerException e) {
+            // ignore expection
+            entityTypeEnum = UNKNOWN_BUILDER;
         }
         return entityTypeEnum;
     }

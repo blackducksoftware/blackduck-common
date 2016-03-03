@@ -21,6 +21,7 @@ public class PhaseEnumTest {
         assertEquals(PhaseEnum.RELEASED, PhaseEnum.getPhaseEnum(PhaseEnum.RELEASED.toString()));
         assertEquals(PhaseEnum.UNKNOWNPHASE, PhaseEnum.getPhaseEnum(PhaseEnum.UNKNOWNPHASE.toString().toLowerCase()));
         assertEquals(PhaseEnum.UNKNOWNPHASE, PhaseEnum.getPhaseEnum(PhaseEnum.UNKNOWNPHASE.toString()));
+        assertEquals(PhaseEnum.UNKNOWNPHASE, PhaseEnum.getPhaseEnum(null));
     }
 
     @Test

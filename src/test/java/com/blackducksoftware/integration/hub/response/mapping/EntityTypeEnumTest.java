@@ -15,6 +15,7 @@ public class EntityTypeEnumTest {
         assertEquals(EntityTypeEnum.RL, EntityTypeEnum.getEntityTypeEnum(EntityTypeEnum.RL.toString()));
         assertEquals(EntityTypeEnum.UNKNOWNENTITY, EntityTypeEnum.getEntityTypeEnum(EntityTypeEnum.UNKNOWNENTITY.toString().toLowerCase()));
         assertEquals(EntityTypeEnum.UNKNOWNENTITY, EntityTypeEnum.getEntityTypeEnum(EntityTypeEnum.UNKNOWNENTITY.toString()));
+        assertEquals(EntityTypeEnum.UNKNOWNENTITY, EntityTypeEnum.getEntityTypeEnum(null));
     }
 
 }

@@ -15,5 +15,6 @@ public class ReportFormatEnumTest {
         assertEquals(ReportFormatEnum.JSON, ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.JSON.toString()));
         assertEquals(ReportFormatEnum.UNKNOWN, ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.UNKNOWN.toString()));
         assertEquals(ReportFormatEnum.UNKNOWN, ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.UNKNOWN.toString().toLowerCase()));
+        assertEquals(ReportFormatEnum.UNKNOWN, ReportFormatEnum.getReportFormatEnum(null));
     }
 }

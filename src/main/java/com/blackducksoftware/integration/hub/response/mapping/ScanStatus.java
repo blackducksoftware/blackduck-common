@@ -25,6 +25,9 @@ public enum ScanStatus {
         } catch (IllegalArgumentException e) {
             // ignore expection
             scanStatusEnum = UNKNOWN;
+        } catch (NullPointerException e) {
+            // ignore expection
+            scanStatusEnum = UNKNOWN;
         }
         return scanStatusEnum;
     }
