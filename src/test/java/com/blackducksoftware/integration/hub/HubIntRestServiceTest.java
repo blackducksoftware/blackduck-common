@@ -28,6 +28,8 @@ import org.restlet.resource.ClientResource;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
+import com.blackducksoftware.integration.hub.policy.api.PolicyStatus;
+import com.blackducksoftware.integration.hub.policy.api.PolicyStatusEnum;
 import com.blackducksoftware.integration.hub.report.api.VersionReport;
 import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.response.DistributionEnum;
@@ -698,6 +700,52 @@ public class HubIntRestServiceTest {
         scanTargets.add("Test/Fake/Path/Child");
 
         restServiceSpy.getScanLocations(fakeHost, scanTargets);
+    }
+
+    @Test
+    public void testGetPolicyStatus() throws Exception {
+        TestLogger logger = new TestLogger();
+        HubIntRestService restService = new HubIntRestService("FakeUrl");
+        restService.setLogger(logger);
+
+        final String overallStatus = PolicyStatusEnum.IN_VIOLATION.name();
+        final String updatedAt = new DateTime().toString();
+
+        final PolicyStatus policyStatus = new PolicyStatus(overallStatus, updatedAt, null, null);
+
+        HubIntRestService restServiceSpy = Mockito.spy(restService);
+
+        ClientResource clientResource = new ClientResource("");
+        final ClientResource resourceSpy = Mockito.spy(clientResource);
+
+        Mockito.when(resourceSpy.handle()).then(new Answer<Representation>() {
+            @Override
+            public Representation answer(InvocationOnMock invocation) throws Throwable {
+                String scResults = new Gson().toJson(policyStatus);
+                StringRepresentation rep = new StringRepresentation(scResults);
+                Response response = new Response(null);
+                response.setEntity(rep);
+
+                resourceSpy.setResponse(response);
+                return null;
+            }
+        });
+
+        Mockito.when(restServiceSpy.createClientResource()).thenReturn(resourceSpy);
+
+        assertEquals(policyStatus, restServiceSpy.getPolicyStatus("versionId"));
+
+        try {
+            assertEquals(policyStatus, restServiceSpy.getPolicyStatus(""));
+        } catch (IllegalArgumentException e) {
+            assertEquals("Missing the version Id to get the policy status of.", e.getMessage());
+        }
+
+        try {
+            assertEquals(policyStatus, restServiceSpy.getPolicyStatus(null));
+        } catch (IllegalArgumentException e) {
+            assertEquals("Missing the version Id to get the policy status of.", e.getMessage());
+        }
     }
 
 }
