@@ -1160,14 +1160,19 @@ public class HubIntRestService {
      * @throws BDRestException
      * @throws URISyntaxException
      */
-    public PolicyStatus getPolicyStatus(String versionId) throws IOException, BDRestException,
+    public PolicyStatus getPolicyStatus(String projectId, String versionId) throws IOException, BDRestException,
             URISyntaxException {
+        if (StringUtils.isBlank(projectId)) {
+            throw new IllegalArgumentException("Missing the project Id to get the policy status of.");
+        }
         if (StringUtils.isBlank(versionId)) {
             throw new IllegalArgumentException("Missing the version Id to get the policy status of.");
         }
 
         ClientResource resource = createClientResource();
         resource.addSegment("api");
+        resource.addSegment("projects");
+        resource.addSegment(projectId);
         resource.addSegment("version");
         resource.addSegment(versionId);
         resource.addSegment("policy-status");

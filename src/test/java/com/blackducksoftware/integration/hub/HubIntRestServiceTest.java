@@ -733,16 +733,28 @@ public class HubIntRestServiceTest {
 
         Mockito.when(restServiceSpy.createClientResource()).thenReturn(resourceSpy);
 
-        assertEquals(policyStatus, restServiceSpy.getPolicyStatus("versionId"));
+        assertEquals(policyStatus, restServiceSpy.getPolicyStatus("projectId", "versionId"));
 
         try {
-            assertEquals(policyStatus, restServiceSpy.getPolicyStatus(""));
+            assertEquals(policyStatus, restServiceSpy.getPolicyStatus("", ""));
+        } catch (IllegalArgumentException e) {
+            assertEquals("Missing the project Id to get the policy status of.", e.getMessage());
+        }
+
+        try {
+            assertEquals(policyStatus, restServiceSpy.getPolicyStatus("projectId", ""));
         } catch (IllegalArgumentException e) {
             assertEquals("Missing the version Id to get the policy status of.", e.getMessage());
         }
 
         try {
-            assertEquals(policyStatus, restServiceSpy.getPolicyStatus(null));
+            assertEquals(policyStatus, restServiceSpy.getPolicyStatus(null, null));
+        } catch (IllegalArgumentException e) {
+            assertEquals("Missing the project Id to get the policy status of.", e.getMessage());
+        }
+
+        try {
+            assertEquals(policyStatus, restServiceSpy.getPolicyStatus("projectId", null));
         } catch (IllegalArgumentException e) {
             assertEquals("Missing the version Id to get the policy status of.", e.getMessage());
         }
