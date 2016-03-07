@@ -113,9 +113,13 @@ public class HubSupportHelper {
                 setLogOptionSupport(false);
                 return;
             } else if (resEx != null) {
-                logger.error(resEx.getMessage());
+                if (logger != null) {
+                    logger.error(resEx.getMessage());
+                }
             }
-            logger.error(e.getMessage());
+            if (logger != null) {
+                logger.error(e.getMessage());
+            }
         }
     }
 
