@@ -1173,7 +1173,7 @@ public class HubIntRestService {
         resource.addSegment("api");
         resource.addSegment("projects");
         resource.addSegment(projectId);
-        resource.addSegment("version");
+        resource.addSegment("versions");
         resource.addSegment(versionId);
         resource.addSegment("policy-status");
 
