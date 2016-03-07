@@ -3,13 +3,13 @@ package com.blackducksoftware.integration.hub.policy.api;
 public class PolicyStatusCounts {
     private final String IN_VIOLATION;
 
-    private final String IN_VIOLATION_OVERRIDEN;
+    private final String IN_VIOLATION_OVERRIDDEN;
 
     private final String NOT_IN_VIOLATION;
 
-    public PolicyStatusCounts(String iN_VIOLATION, String iN_VIOLATION_OVERRIDEN, String nOT_IN_VIOLATION) {
+    public PolicyStatusCounts(String iN_VIOLATION, String iN_VIOLATION_OVERRIDDEN, String nOT_IN_VIOLATION) {
         IN_VIOLATION = iN_VIOLATION;
-        IN_VIOLATION_OVERRIDEN = iN_VIOLATION_OVERRIDEN;
+        IN_VIOLATION_OVERRIDDEN = iN_VIOLATION_OVERRIDDEN;
         NOT_IN_VIOLATION = nOT_IN_VIOLATION;
     }
 
@@ -17,8 +17,8 @@ public class PolicyStatusCounts {
         return IN_VIOLATION;
     }
 
-    public String getIN_VIOLATION_OVERRIDEN() {
-        return IN_VIOLATION_OVERRIDEN;
+    public String getIN_VIOLATION_OVERRIDDEN() {
+        return IN_VIOLATION_OVERRIDDEN;
     }
 
     public String getNOT_IN_VIOLATION() {
@@ -30,7 +30,7 @@ public class PolicyStatusCounts {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((IN_VIOLATION == null) ? 0 : IN_VIOLATION.hashCode());
-        result = prime * result + ((IN_VIOLATION_OVERRIDEN == null) ? 0 : IN_VIOLATION_OVERRIDEN.hashCode());
+        result = prime * result + ((IN_VIOLATION_OVERRIDDEN == null) ? 0 : IN_VIOLATION_OVERRIDDEN.hashCode());
         result = prime * result + ((NOT_IN_VIOLATION == null) ? 0 : NOT_IN_VIOLATION.hashCode());
         return result;
     }
@@ -54,11 +54,11 @@ public class PolicyStatusCounts {
         } else if (!IN_VIOLATION.equals(other.IN_VIOLATION)) {
             return false;
         }
-        if (IN_VIOLATION_OVERRIDEN == null) {
-            if (other.IN_VIOLATION_OVERRIDEN != null) {
+        if (IN_VIOLATION_OVERRIDDEN == null) {
+            if (other.IN_VIOLATION_OVERRIDDEN != null) {
                 return false;
             }
-        } else if (!IN_VIOLATION_OVERRIDEN.equals(other.IN_VIOLATION_OVERRIDEN)) {
+        } else if (!IN_VIOLATION_OVERRIDDEN.equals(other.IN_VIOLATION_OVERRIDDEN)) {
             return false;
         }
         if (NOT_IN_VIOLATION == null) {
@@ -76,8 +76,8 @@ public class PolicyStatusCounts {
         StringBuilder builder = new StringBuilder();
         builder.append("PolicyStatusCounts [IN_VIOLATION=");
         builder.append(IN_VIOLATION);
-        builder.append(", IN_VIOLATION_OVERRIDEN=");
-        builder.append(IN_VIOLATION_OVERRIDEN);
+        builder.append(", IN_VIOLATION_OVERRIDDEN=");
+        builder.append(IN_VIOLATION_OVERRIDDEN);
         builder.append(", NOT_IN_VIOLATION=");
         builder.append(NOT_IN_VIOLATION);
         builder.append("]");

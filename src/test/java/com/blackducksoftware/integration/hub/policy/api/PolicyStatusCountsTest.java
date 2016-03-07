@@ -24,11 +24,11 @@ public class PolicyStatusCountsTest {
         PolicyStatusCounts item3 = new PolicyStatusCounts(IN_VIOLATION1, IN_VIOLATION_OVERRIDEN1, NOT_IN_VIOLATION1);
 
         assertEquals(IN_VIOLATION1, item1.getIN_VIOLATION());
-        assertEquals(IN_VIOLATION_OVERRIDEN1, item1.getIN_VIOLATION_OVERRIDEN());
+        assertEquals(IN_VIOLATION_OVERRIDEN1, item1.getIN_VIOLATION_OVERRIDDEN());
         assertEquals(NOT_IN_VIOLATION1, item1.getNOT_IN_VIOLATION());
 
         assertEquals(IN_VIOLATION2, item2.getIN_VIOLATION());
-        assertEquals(IN_VIOLATION_OVERRIDEN2, item2.getIN_VIOLATION_OVERRIDEN());
+        assertEquals(IN_VIOLATION_OVERRIDEN2, item2.getIN_VIOLATION_OVERRIDDEN());
         assertEquals(NOT_IN_VIOLATION2, item2.getNOT_IN_VIOLATION());
 
         assertTrue(!item1.equals(item2));
@@ -43,7 +43,7 @@ public class PolicyStatusCountsTest {
         builder.append("PolicyStatusCounts [IN_VIOLATION=");
         builder.append(item1.getIN_VIOLATION());
         builder.append(", IN_VIOLATION_OVERRIDEN=");
-        builder.append(item1.getIN_VIOLATION_OVERRIDEN());
+        builder.append(item1.getIN_VIOLATION_OVERRIDDEN());
         builder.append(", NOT_IN_VIOLATION=");
         builder.append(item1.getNOT_IN_VIOLATION());
         builder.append("]");
