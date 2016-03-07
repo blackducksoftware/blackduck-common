@@ -49,6 +49,11 @@ public class HubSupportHelper {
         return jreProvidedSupport;
     }
 
+    public boolean isPolicyApiSupport() {
+        // Policy support as well as jre support were added in the same version
+        return jreProvidedSupport;
+    }
+
     private void setJreProvidedSupport(boolean jreProvidedSupport) {
         this.jreProvidedSupport = jreProvidedSupport;
     }
