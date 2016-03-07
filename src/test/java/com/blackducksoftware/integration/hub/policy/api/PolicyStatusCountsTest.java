@@ -42,7 +42,7 @@ public class PolicyStatusCountsTest {
         StringBuilder builder = new StringBuilder();
         builder.append("PolicyStatusCounts [IN_VIOLATION=");
         builder.append(item1.getIN_VIOLATION());
-        builder.append(", IN_VIOLATION_OVERRIDEN=");
+        builder.append(", IN_VIOLATION_OVERRIDDEN=");
         builder.append(item1.getIN_VIOLATION_OVERRIDDEN());
         builder.append(", NOT_IN_VIOLATION=");
         builder.append(item1.getNOT_IN_VIOLATION());

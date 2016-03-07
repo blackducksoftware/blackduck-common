@@ -35,11 +35,11 @@ public class PolicyMetaTest {
         PolicyMeta item2 = new PolicyMeta(allows2, href2, links2);
         PolicyMeta item3 = new PolicyMeta(allows1, href1, links1);
 
-        assertEquals(allow1, item1.getAllow());
+        assertEquals(allows1, item1.getAllow());
         assertEquals(href1, item1.getHref());
         assertEquals(links1, item1.getLinks());
 
-        assertEquals(allow2, item2.getAllow());
+        assertEquals(allows2, item2.getAllow());
         assertEquals(href2, item2.getHref());
         assertEquals(links2, item2.getLinks());
 
