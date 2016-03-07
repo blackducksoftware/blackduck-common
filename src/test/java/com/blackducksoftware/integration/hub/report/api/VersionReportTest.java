@@ -85,6 +85,38 @@ public class VersionReportTest {
     }
 
     @Test
+    public void testGetReportProjectUrl() {
+        final String baseUrl = "http://test";
+        URLProvider uiUrlGenerator = new URLProvider(baseUrl);
+        final String projectId = "projectId";
+        DetailedReleaseSummary releaseSumary = new DetailedReleaseSummary(projectId, null, null, null, null, null, null, null, null, uiUrlGenerator);
+        VersionReport item = new VersionReport(releaseSumary, null);
+
+        assertTrue(StringUtils.isNotBlank(item.getReportProjectUrl()));
+        assertEquals("http://test#projects/id:projectId", item.getReportProjectUrl());
+
+        releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+        item = new VersionReport(releaseSumary, null);
+
+        assertNull(item.getReportProjectUrl());
+
+        uiUrlGenerator = new URLProvider(null);
+        releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+        item = new VersionReport(releaseSumary, null);
+
+        assertNull(item.getReportProjectUrl());
+
+        releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, null);
+        item = new VersionReport(releaseSumary, null);
+
+        assertNull(item.getReportProjectUrl());
+
+        item = new VersionReport(null, null);
+
+        assertNull(item.getReportProjectUrl());
+    }
+
+    @Test
     public void testGetReportVersionUrl() {
         final String baseUrl = "http://test";
         URLProvider uiUrlGenerator = new URLProvider(baseUrl);
@@ -93,6 +125,7 @@ public class VersionReportTest {
         VersionReport item = new VersionReport(releaseSumary, null);
 
         assertTrue(StringUtils.isNotBlank(item.getReportVersionUrl()));
+        assertEquals("http://test#versions/id:versionId/view:bom", item.getReportVersionUrl());
 
         releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
         item = new VersionReport(releaseSumary, null);
