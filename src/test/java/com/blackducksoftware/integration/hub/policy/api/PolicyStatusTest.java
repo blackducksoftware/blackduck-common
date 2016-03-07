@@ -24,11 +24,13 @@ public class PolicyStatusTest {
         final String NOT_IN_VIOLATION1 = "NOT_IN_VIOLATION1";
         PolicyStatusCounts statusCounts1 = new PolicyStatusCounts(IN_VIOLATION1, IN_VIOLATION_OVERRIDEN1, NOT_IN_VIOLATION1);
         final String allow1 = "allow1";
+        final List<String> allows1 = new ArrayList<String>();
+        allows1.add(allow1);
         final String href1 = "href1";
         final String link1 = "link1";
         final List<String> links1 = new ArrayList<String>();
         links1.add(link1);
-        PolicyMeta _meta1 = new PolicyMeta(allow1, href1, links1);
+        PolicyMeta _meta1 = new PolicyMeta(allows1, href1, links1);
 
         final String overallStatus2 = PolicyStatusEnum.IN_VIOLATION.name();
         final String updatedAt2 = new DateTime().toString();
@@ -37,11 +39,13 @@ public class PolicyStatusTest {
         final String NOT_IN_VIOLATION2 = "NOT_IN_VIOLATION2";
         PolicyStatusCounts statusCounts2 = new PolicyStatusCounts(IN_VIOLATION2, IN_VIOLATION_OVERRIDEN2, NOT_IN_VIOLATION2);
         final String allow2 = "allow2";
+        final List<String> allows2 = new ArrayList<String>();
+        allows2.add(allow2);
         final String href2 = "href2";
         final String link2 = "link2";
         final List<String> links2 = new ArrayList<String>();
         links2.add(link2);
-        PolicyMeta _meta2 = new PolicyMeta(allow2, href2, links2);
+        PolicyMeta _meta2 = new PolicyMeta(allows2, href2, links2);
 
         PolicyStatus item1 = new PolicyStatus(overallStatus1, updatedAt1, statusCounts1, _meta1);
         PolicyStatus item2 = new PolicyStatus(overallStatus2, updatedAt2, statusCounts2, _meta2);

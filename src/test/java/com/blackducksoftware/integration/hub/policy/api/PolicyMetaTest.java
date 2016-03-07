@@ -16,20 +16,24 @@ public class PolicyMetaTest {
     @Test
     public void testPolicyMeta() {
         final String allow1 = "allow1";
+        final List<String> allows1 = new ArrayList<String>();
+        allows1.add(allow1);
         final String href1 = "href1";
         final String link1 = "link1";
         final List<String> links1 = new ArrayList<String>();
         links1.add(link1);
 
         final String allow2 = "allow2";
+        final List<String> allows2 = new ArrayList<String>();
+        allows2.add(allow2);
         final String href2 = "href2";
         final String link2 = "link2";
         final List<String> links2 = new ArrayList<String>();
         links1.add(link2);
 
-        PolicyMeta item1 = new PolicyMeta(allow1, href1, links1);
-        PolicyMeta item2 = new PolicyMeta(allow2, href2, links2);
-        PolicyMeta item3 = new PolicyMeta(allow1, href1, links1);
+        PolicyMeta item1 = new PolicyMeta(allows1, href1, links1);
+        PolicyMeta item2 = new PolicyMeta(allows2, href2, links2);
+        PolicyMeta item3 = new PolicyMeta(allows1, href1, links1);
 
         assertEquals(allow1, item1.getAllow());
         assertEquals(href1, item1.getHref());

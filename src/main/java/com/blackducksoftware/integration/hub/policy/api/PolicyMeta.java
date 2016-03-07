@@ -3,19 +3,19 @@ package com.blackducksoftware.integration.hub.policy.api;
 import java.util.List;
 
 public class PolicyMeta {
-    private final String allow;
+    private final List<String> allow;
 
     private final String href;
 
     private final List<String> links;
 
-    public PolicyMeta(String allow, String href, List<String> links) {
+    public PolicyMeta(List<String> allow, String href, List<String> links) {
         this.allow = allow;
         this.href = href;
         this.links = links;
     }
 
-    public String getAllow() {
+    public List<String> getAllow() {
         return allow;
     }
 
