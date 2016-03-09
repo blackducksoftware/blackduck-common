@@ -49,6 +49,11 @@ public class HubSupportHelper {
         return jreProvidedSupport;
     }
 
+    public boolean isPolicyApiSupport() {
+        // Policy support as well as jre support were added in the same version
+        return jreProvidedSupport;
+    }
+
     private void setJreProvidedSupport(boolean jreProvidedSupport) {
         this.jreProvidedSupport = jreProvidedSupport;
     }
@@ -108,9 +113,13 @@ public class HubSupportHelper {
                 setLogOptionSupport(false);
                 return;
             } else if (resEx != null) {
-                logger.error(resEx.getMessage());
+                if (logger != null) {
+                    logger.error(resEx.getMessage());
+                }
             }
-            logger.error(e.getMessage());
+            if (logger != null) {
+                logger.error(e.getMessage());
+            }
         }
     }
 

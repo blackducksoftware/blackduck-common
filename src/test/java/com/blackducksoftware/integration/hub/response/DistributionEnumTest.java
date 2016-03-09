@@ -19,6 +19,7 @@ public class DistributionEnumTest {
         assertEquals(DistributionEnum.SAAS, DistributionEnum.getDistributionEnum(DistributionEnum.SAAS.toString()));
         assertEquals(DistributionEnum.UNKNOWNDISTRIBUTION, DistributionEnum.getDistributionEnum(DistributionEnum.UNKNOWNDISTRIBUTION.toString().toLowerCase()));
         assertEquals(DistributionEnum.UNKNOWNDISTRIBUTION, DistributionEnum.getDistributionEnum(DistributionEnum.UNKNOWNDISTRIBUTION.toString()));
+        assertEquals(DistributionEnum.UNKNOWNDISTRIBUTION, DistributionEnum.getDistributionEnum(null));
     }
 
     @Test

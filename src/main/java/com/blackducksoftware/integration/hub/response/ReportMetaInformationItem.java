@@ -78,7 +78,11 @@ public class ReportMetaInformationItem {
         if (StringUtils.isBlank(dateString)) {
             return null;
         }
-        return new DateTime(dateString);
+        try {
+            return new DateTime(dateString);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public DateTime getTimeCreatedAt() {

@@ -7,6 +7,9 @@ public enum ReportFormatEnum {
     UNKNOWN;
 
     public static ReportFormatEnum getReportFormatEnum(String reportFormatEnum) {
+        if (reportFormatEnum == null) {
+            return ReportFormatEnum.UNKNOWN;
+        }
         ReportFormatEnum reportFormat;
         try {
             reportFormat = ReportFormatEnum.valueOf(reportFormatEnum.toUpperCase());

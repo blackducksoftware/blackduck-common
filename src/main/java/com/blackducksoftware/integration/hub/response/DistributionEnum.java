@@ -1,5 +1,6 @@
 package com.blackducksoftware.integration.hub.response;
 
+
 public enum DistributionEnum {
 
     EXTERNAL("External")
@@ -32,6 +33,9 @@ public enum DistributionEnum {
     }
 
     public static DistributionEnum getDistributionEnum(String distribution) {
+        if (distribution == null) {
+            return DistributionEnum.UNKNOWNDISTRIBUTION;
+        }
         DistributionEnum distributionEnum;
         try {
             distributionEnum = DistributionEnum.valueOf(distribution.toUpperCase());

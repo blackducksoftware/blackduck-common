@@ -20,7 +20,7 @@ public class HubSupportHelperTest {
         return service;
     }
 
-    private HubIntRestService getMockedService(String returnVersion, boolean compareSupported) throws Exception {
+    private HubIntRestService getMockedServiceWithFallBack(String returnVersion, boolean compareSupported) throws Exception {
         HubIntRestService service = getMockedService(returnVersion);
         VersionComparison compare;
         if (compareSupported) {
@@ -40,6 +40,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(supportHelper.isJreProvidedSupport());
+        assertTrue(supportHelper.isPolicyApiSupport());
         assertTrue(supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -50,6 +51,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(supportHelper.isJreProvidedSupport());
+        assertTrue(supportHelper.isPolicyApiSupport());
         assertTrue(supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -60,6 +62,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(supportHelper.isJreProvidedSupport());
+        assertTrue(supportHelper.isPolicyApiSupport());
         assertTrue(supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -70,6 +73,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(supportHelper.isJreProvidedSupport());
+        assertTrue(supportHelper.isPolicyApiSupport());
         assertTrue(supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -80,6 +84,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -93,6 +98,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -103,6 +109,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -113,6 +120,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -123,6 +131,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(!supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -137,6 +146,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(!supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -147,6 +157,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(!supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -157,6 +168,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(!supportHelper.isCliStatusReturnSupport());
         assertTrue(!supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -170,6 +182,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(!supportHelper.isCliStatusReturnSupport());
         assertTrue(!supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -180,6 +193,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(!supportHelper.isCliStatusReturnSupport());
         assertTrue(!supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -190,6 +204,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(!supportHelper.isCliStatusReturnSupport());
         assertTrue(!supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -200,6 +215,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(!supportHelper.isCliStatusReturnSupport());
         assertTrue(!supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -208,22 +224,24 @@ public class HubSupportHelperTest {
 
     @Test
     public void testCheckHubSupportFallback() throws Exception {
-        HubIntRestService service = getMockedService("Two.one.zero", true);
+        HubIntRestService service = getMockedServiceWithFallBack("Two.one.zero", true);
         HubSupportHelper supportHelper = new HubSupportHelper();
         TestLogger logger = new TestLogger();
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(supportHelper.isJreProvidedSupport());
+        assertTrue(supportHelper.isPolicyApiSupport());
         assertTrue(supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
 
-        service = getMockedService("3.0", true);
+        service = getMockedServiceWithFallBack("3.0", true);
         supportHelper = new HubSupportHelper();
         logger = new TestLogger();
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(supportHelper.isJreProvidedSupport());
+        assertTrue(supportHelper.isPolicyApiSupport());
         assertTrue(supportHelper.isCliStatusReturnSupport());
         assertTrue(supportHelper.isCliMappingSupport());
         assertTrue(supportHelper.isLogOptionSupport());
@@ -242,6 +260,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(!supportHelper.isCliStatusReturnSupport());
         assertTrue(!supportHelper.isCliMappingSupport());
         assertTrue(!supportHelper.isLogOptionSupport());
@@ -260,6 +279,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(!supportHelper.isCliStatusReturnSupport());
         assertTrue(!supportHelper.isCliMappingSupport());
         assertTrue(!supportHelper.isLogOptionSupport());
@@ -280,6 +300,7 @@ public class HubSupportHelperTest {
         supportHelper.checkHubSupport(service, logger);
 
         assertTrue(!supportHelper.isJreProvidedSupport());
+        assertTrue(!supportHelper.isPolicyApiSupport());
         assertTrue(!supportHelper.isCliStatusReturnSupport());
         assertTrue(!supportHelper.isCliMappingSupport());
         assertTrue(!supportHelper.isLogOptionSupport());
