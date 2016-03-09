@@ -33,13 +33,13 @@ public enum PhaseEnum {
     }
 
     public static PhaseEnum getPhaseEnum(String phase) {
+        if (phase == null) {
+            return PhaseEnum.UNKNOWNPHASE;
+        }
         PhaseEnum phaseEnum;
         try {
             phaseEnum = PhaseEnum.valueOf(phase.toUpperCase());
         } catch (IllegalArgumentException e) {
-            // ignore expection
-            phaseEnum = UNKNOWNPHASE;
-        } catch (NullPointerException e) {
             // ignore expection
             phaseEnum = UNKNOWNPHASE;
         }

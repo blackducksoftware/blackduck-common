@@ -19,13 +19,13 @@ public enum ScanStatus {
     UNKNOWN;
 
     public static ScanStatus getScanStatus(String scanStatus) {
+        if (scanStatus == null) {
+            return ScanStatus.UNKNOWN;
+        }
         ScanStatus scanStatusEnum;
         try {
             scanStatusEnum = ScanStatus.valueOf(scanStatus.toUpperCase());
         } catch (IllegalArgumentException e) {
-            // ignore expection
-            scanStatusEnum = UNKNOWN;
-        } catch (NullPointerException e) {
             // ignore expection
             scanStatusEnum = UNKNOWN;
         }
