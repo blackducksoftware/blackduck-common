@@ -1,5 +1,7 @@
 package com.blackducksoftware.integration.hub.policy.api;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
@@ -8,14 +10,14 @@ public class PolicyStatus {
 
     private final String updatedAt;
 
-    private final PolicyStatusCounts statusCounts;
+    private final List<ComponentVersionStatusCount> componentVersionStatusCounts;
 
     private final PolicyMeta _meta;
 
-    public PolicyStatus(String overallStatus, String updatedAt, PolicyStatusCounts statusCounts, PolicyMeta _meta) {
+    public PolicyStatus(String overallStatus, String updatedAt, List<ComponentVersionStatusCount> componentVersionStatusCounts, PolicyMeta _meta) {
         this.overallStatus = overallStatus;
         this.updatedAt = updatedAt;
-        this.statusCounts = statusCounts;
+        this.componentVersionStatusCounts = componentVersionStatusCounts;
         this._meta = _meta;
     }
 
@@ -25,6 +27,42 @@ public class PolicyStatus {
 
     public PolicyStatusEnum getOverallStatusEnum() {
         return PolicyStatusEnum.getPolicyStatusEnum(overallStatus);
+    }
+
+    public ComponentVersionStatusCount getCountInViolation() {
+        if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
+            return null;
+        }
+        for (ComponentVersionStatusCount count : componentVersionStatusCounts) {
+            if (count.getPolicyStatusFromName() == PolicyStatusEnum.IN_VIOLATION) {
+                return count;
+            }
+        }
+        return null;
+    }
+
+    public ComponentVersionStatusCount getCountNotInViolation() {
+        if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
+            return null;
+        }
+        for (ComponentVersionStatusCount count : componentVersionStatusCounts) {
+            if (count.getPolicyStatusFromName() == PolicyStatusEnum.NOT_IN_VIOLATION) {
+                return count;
+            }
+        }
+        return null;
+    }
+
+    public ComponentVersionStatusCount getCountInViolationOveridden() {
+        if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
+            return null;
+        }
+        for (ComponentVersionStatusCount count : componentVersionStatusCounts) {
+            if (count.getPolicyStatusFromName() == PolicyStatusEnum.IN_VIOLATION_OVERRIDEN) {
+                return count;
+            }
+        }
+        return null;
     }
 
     public String getUpdatedAt() {
@@ -42,12 +80,12 @@ public class PolicyStatus {
         }
     }
 
-    public PolicyStatusCounts getStatusCounts() {
-        return statusCounts;
-    }
-
     public PolicyMeta get_meta() {
         return _meta;
+    }
+
+    public List<ComponentVersionStatusCount> getComponentVersionStatusCounts() {
+        return componentVersionStatusCounts;
     }
 
     @Override
@@ -55,8 +93,8 @@ public class PolicyStatus {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((_meta == null) ? 0 : _meta.hashCode());
+        result = prime * result + ((componentVersionStatusCounts == null) ? 0 : componentVersionStatusCounts.hashCode());
         result = prime * result + ((overallStatus == null) ? 0 : overallStatus.hashCode());
-        result = prime * result + ((statusCounts == null) ? 0 : statusCounts.hashCode());
         result = prime * result + ((updatedAt == null) ? 0 : updatedAt.hashCode());
         return result;
     }
@@ -80,18 +118,18 @@ public class PolicyStatus {
         } else if (!_meta.equals(other._meta)) {
             return false;
         }
+        if (componentVersionStatusCounts == null) {
+            if (other.componentVersionStatusCounts != null) {
+                return false;
+            }
+        } else if (!componentVersionStatusCounts.equals(other.componentVersionStatusCounts)) {
+            return false;
+        }
         if (overallStatus == null) {
             if (other.overallStatus != null) {
                 return false;
             }
         } else if (!overallStatus.equals(other.overallStatus)) {
-            return false;
-        }
-        if (statusCounts == null) {
-            if (other.statusCounts != null) {
-                return false;
-            }
-        } else if (!statusCounts.equals(other.statusCounts)) {
             return false;
         }
         if (updatedAt == null) {
@@ -111,8 +149,8 @@ public class PolicyStatus {
         builder.append(overallStatus);
         builder.append(", updatedAt=");
         builder.append(updatedAt);
-        builder.append(", statusCounts=");
-        builder.append(statusCounts);
+        builder.append(", componentVersionStatusCounts=");
+        builder.append(componentVersionStatusCounts);
         builder.append(", _meta=");
         builder.append(_meta);
         builder.append("]");
