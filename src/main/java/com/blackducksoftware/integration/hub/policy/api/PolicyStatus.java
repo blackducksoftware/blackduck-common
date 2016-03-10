@@ -53,7 +53,7 @@ public class PolicyStatus {
         return null;
     }
 
-    public ComponentVersionStatusCount getCountInViolationOveridden() {
+    public ComponentVersionStatusCount getCountInViolationOverridden() {
         if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
             return null;
         }

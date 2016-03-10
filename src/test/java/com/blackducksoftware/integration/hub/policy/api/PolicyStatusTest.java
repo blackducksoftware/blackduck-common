@@ -173,7 +173,7 @@ public class PolicyStatusTest {
     public void testGetCountInViolationOveridden() {
         PolicyStatus status = new PolicyStatus(null, null, null, null);
 
-        assertNull(status.getCountInViolationOveridden());
+        assertNull(status.getCountInViolationOverridden());
 
         String name = "name";
         int value = 346;
@@ -183,7 +183,7 @@ public class PolicyStatusTest {
 
         status = new PolicyStatus(null, null, counts, null);
 
-        assertNull(status.getCountInViolationOveridden());
+        assertNull(status.getCountInViolationOverridden());
 
         name = PolicyStatusEnum.NOT_IN_VIOLATION.name();
         value = 435;
@@ -193,7 +193,7 @@ public class PolicyStatusTest {
 
         status = new PolicyStatus(null, null, counts, null);
 
-        assertNull(status.getCountInViolationOveridden());
+        assertNull(status.getCountInViolationOverridden());
 
         name = PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN.name();
         value = 435;
@@ -203,7 +203,7 @@ public class PolicyStatusTest {
 
         status = new PolicyStatus(null, null, counts, null);
 
-        assertEquals(statusCount, status.getCountInViolationOveridden());
+        assertEquals(statusCount, status.getCountInViolationOverridden());
 
     }
 
