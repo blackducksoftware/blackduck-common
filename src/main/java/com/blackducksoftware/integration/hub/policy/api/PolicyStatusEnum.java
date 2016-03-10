@@ -2,7 +2,7 @@ package com.blackducksoftware.integration.hub.policy.api;
 
 public enum PolicyStatusEnum {
     IN_VIOLATION,
-    IN_VIOLATION_OVERRIDEN,
+    IN_VIOLATION_OVERRIDDEN,
     NOT_IN_VIOLATION,
     UNKNOWN;
 

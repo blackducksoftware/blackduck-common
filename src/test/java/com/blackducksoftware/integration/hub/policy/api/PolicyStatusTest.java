@@ -35,7 +35,7 @@ public class PolicyStatusTest {
 
         final String overallStatus2 = PolicyStatusEnum.IN_VIOLATION.name();
         final String updatedAt2 = new DateTime().toString();
-        final String name2 = PolicyStatusEnum.IN_VIOLATION_OVERRIDEN.name();
+        final String name2 = PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN.name();
         final int value2 = 0;
         ComponentVersionStatusCount statusCount2 = new ComponentVersionStatusCount(name2, value2);
         List<ComponentVersionStatusCount> counts2 = new ArrayList<ComponentVersionStatusCount>();
@@ -195,7 +195,7 @@ public class PolicyStatusTest {
 
         assertNull(status.getCountInViolationOveridden());
 
-        name = PolicyStatusEnum.IN_VIOLATION_OVERRIDEN.name();
+        name = PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN.name();
         value = 435;
         statusCount = new ComponentVersionStatusCount(name, value);
         counts = new ArrayList<ComponentVersionStatusCount>();

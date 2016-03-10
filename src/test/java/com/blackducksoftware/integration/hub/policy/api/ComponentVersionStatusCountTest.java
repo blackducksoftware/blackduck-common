@@ -14,7 +14,7 @@ public class ComponentVersionStatusCountTest {
         final String name1 = "name1";
         final int value1 = 324;
 
-        final String name2 = PolicyStatusEnum.IN_VIOLATION_OVERRIDEN.name();
+        final String name2 = PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN.name();
         final int value2 = 0;
 
         ComponentVersionStatusCount item1 = new ComponentVersionStatusCount(name1, value1);
@@ -26,7 +26,7 @@ public class ComponentVersionStatusCountTest {
         assertEquals(value1, item1.getValue());
 
         assertEquals(name2, item2.getName());
-        assertEquals(PolicyStatusEnum.IN_VIOLATION_OVERRIDEN, item2.getPolicyStatusFromName());
+        assertEquals(PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN, item2.getPolicyStatusFromName());
         assertEquals(value2, item2.getValue());
 
         assertTrue(!item1.equals(item2));

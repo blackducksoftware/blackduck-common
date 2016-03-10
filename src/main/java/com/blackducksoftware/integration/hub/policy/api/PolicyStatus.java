@@ -58,7 +58,7 @@ public class PolicyStatus {
             return null;
         }
         for (ComponentVersionStatusCount count : componentVersionStatusCounts) {
-            if (count.getPolicyStatusFromName() == PolicyStatusEnum.IN_VIOLATION_OVERRIDEN) {
+            if (count.getPolicyStatusFromName() == PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN) {
                 return count;
             }
         }
