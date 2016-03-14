@@ -37,6 +37,8 @@ public abstract class ScanExecutor {
 
     private boolean hubSupportLogOption;
 
+    private boolean cliSupportStatusOption;
+
     private boolean cliSupportsMapping;
 
     private boolean shouldParseStatus;
@@ -109,6 +111,14 @@ public abstract class ScanExecutor {
 
     public void setHubSupportLogOption(boolean hubSupportLogOption) {
         this.hubSupportLogOption = hubSupportLogOption;
+    }
+
+    public boolean doesCliSupportStatusOption() {
+        return cliSupportStatusOption;
+    }
+
+    public void setCliSupportStatusOption(boolean cliSupportStatusOption) {
+        this.cliSupportStatusOption = cliSupportStatusOption;
     }
 
     public boolean doesCliSupportsMapping() {
