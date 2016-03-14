@@ -2,12 +2,12 @@ package com.blackducksoftware.integration.hub.scan.status;
 
 import com.blackducksoftware.integration.hub.response.mapping.ScanStatus;
 
-public class ScanStatusCliOutput {
+public class ScanStatusToPoll {
     private final String status;
 
     private final ScanStatusMeta _meta;
 
-    public ScanStatusCliOutput(String status, ScanStatusMeta _meta) {
+    public ScanStatusToPoll(String status, ScanStatusMeta _meta) {
         this.status = status;
         this._meta = _meta;
     }
@@ -41,10 +41,10 @@ public class ScanStatusCliOutput {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof ScanStatusCliOutput)) {
+        if (!(obj instanceof ScanStatusToPoll)) {
             return false;
         }
-        ScanStatusCliOutput other = (ScanStatusCliOutput) obj;
+        ScanStatusToPoll other = (ScanStatusToPoll) obj;
         if (_meta == null) {
             if (other._meta != null) {
                 return false;

@@ -9,10 +9,10 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.response.mapping.ScanStatus;
 
-public class ScanStatusCliOutputTest {
+public class ScanStatusToPollTest {
 
     @Test
-    public void testScanStatusCliOutput() {
+    public void testScanStatusToPoll() {
         final String status1 = "fakeStatus1";
         final String href1 = "href1";
         final ScanStatusMeta meta1 = new ScanStatusMeta(href1);
@@ -21,9 +21,9 @@ public class ScanStatusCliOutputTest {
         final String href2 = "href2";
         final ScanStatusMeta meta2 = new ScanStatusMeta(href2);
 
-        ScanStatusCliOutput item1 = new ScanStatusCliOutput(status1, meta1);
-        ScanStatusCliOutput item2 = new ScanStatusCliOutput(status2, meta2);
-        ScanStatusCliOutput item3 = new ScanStatusCliOutput(status1, meta1);
+        ScanStatusToPoll item1 = new ScanStatusToPoll(status1, meta1);
+        ScanStatusToPoll item2 = new ScanStatusToPoll(status2, meta2);
+        ScanStatusToPoll item3 = new ScanStatusToPoll(status1, meta1);
 
         assertEquals(status1, item1.getStatus());
         assertEquals(ScanStatus.UNKNOWN, item1.getStatusEnum());
@@ -36,7 +36,7 @@ public class ScanStatusCliOutputTest {
         assertTrue(!item1.equals(item2));
         assertTrue(item1.equals(item3));
 
-        EqualsVerifier.forClass(ScanStatusCliOutput.class).suppress(Warning.STRICT_INHERITANCE).verify();
+        EqualsVerifier.forClass(ScanStatusToPoll.class).suppress(Warning.STRICT_INHERITANCE).verify();
 
         assertTrue(item1.hashCode() != item2.hashCode());
         assertEquals(item1.hashCode(), item3.hashCode());

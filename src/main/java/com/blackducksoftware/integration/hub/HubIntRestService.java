@@ -52,6 +52,7 @@ import com.blackducksoftware.integration.hub.response.mapping.EntityItem;
 import com.blackducksoftware.integration.hub.response.mapping.EntityTypeEnum;
 import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanLocationResults;
+import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -1192,6 +1193,36 @@ public class HubIntRestService {
         } else {
             throw new BDRestException("There was a problem getting the policy status. Error Code: " + responseCode, resource);
         }
+    }
+
+    /**
+     * Gets the content of the scanStatus at the provided url
+     *
+     * @throws IOException
+     * @throws BDRestException
+     * @throws URISyntaxException
+     */
+    public ScanStatusToPoll checkScanStatus(String scanStatusUrl) throws IOException, BDRestException,
+            URISyntaxException {
+
+        ClientResource resource = createClientResource(scanStatusUrl);
+
+        resource.setMethod(Method.GET);
+
+        handleRequest(resource, null, 0);
+        int responseCode = resource.getResponse().getStatus().getCode();
+
+        if (responseCode == 200) {
+            String response = readResponseAsString(resource.getResponse());
+
+            Gson gson = new GsonBuilder().create();
+
+            ScanStatusToPoll status = gson.fromJson(response, ScanStatusToPoll.class);
+            return status;
+        } else {
+            throw new BDRestException("There was a problem getting the scan status. Error Code: " + responseCode, resource);
+        }
+
     }
 
     private String readResponseAsString(Response response) throws IOException {

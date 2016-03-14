@@ -420,10 +420,9 @@ public abstract class ScanExecutor {
      * @return String
      * @throws IOException
      */
-    protected String getScanStatusDirectoryPath() throws IOException {
+    public String getScanStatusDirectoryPath() throws IOException {
         String logDirectory = getLogDirectoryPath();
         File scanStatusDirectory = new File(logDirectory);
-        scanStatusDirectory = new File(scanStatusDirectory, "ScanStatus");
         // This directory should never exist as a new one is created for each Build
         if (!scanStatusDirectory.exists() && !scanStatusDirectory.mkdirs()) {
             throw new IOException("Could not create the ScanStatus directory!");

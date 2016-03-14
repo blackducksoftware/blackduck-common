@@ -2,6 +2,7 @@ package com.blackducksoftware.integration.hub;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -13,6 +14,7 @@ import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanStatus;
+import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
 
 public class HubEventPolling {
 
@@ -33,18 +35,6 @@ public class HubEventPolling {
      * is up to date or until we hit the maximum wait time.
      * If we find a scan history object that has status cancelled or an error type then we throw an exception.
      *
-     * @param service
-     *            HubIntRestService
-     * @param timeBeforeScan
-     *            DateTime before the Cli was run
-     * @param timeAfterScan
-     *            DateTime after the Cli was run
-     * @param hostname
-     *            String hostname where the Cli was run
-     * @param scanTargets
-     *            List<<String>> the target paths that were scanned
-     * @param maximumWait
-     *            long, maximum time to wait for the Bom to be updated completely
      * @return True if the bom has been updated with the code locations from this scan
      * @throws InterruptedException
      * @throws BDRestException
@@ -91,18 +81,54 @@ public class HubEventPolling {
         }
         String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(maximumWait));
         throw new HubIntegrationException("The Bom has not finished updating from the scan within the specified wait time : " + formattedTime);
+    }
 
+    /**
+     * Checks the status's in the scan files and polls their URL's, every 10 seconds,
+     * until they have all have status COMPLETE. We keep trying until we hit the maximum wait time.
+     * If we find a scan history object that has status cancelled or an error type then we throw an exception.
+     *
+     * @return True if all of the status are COMPLETE
+     * @throws InterruptedException
+     * @throws BDRestException
+     * @throws HubIntegrationException
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public boolean isBomUpToDate(String scanStatusDirectory, long maximumWait) throws InterruptedException, BDRestException,
+            HubIntegrationException,
+            URISyntaxException,
+            IOException {
+
+        long startTime = System.currentTimeMillis();
+        long elapsedTime = 0;
+        while (elapsedTime < maximumWait) {
+            boolean upToDate = true;
+            for (Iterator<ScanStatusToPoll> iterator = scanStatusList.iterator(); iterator.hasNext();) {
+                ScanStatusToPoll currentStatus = iterator.next();
+                if (currentStatus.getStatusEnum() != ScanStatus.COMPLETE) {
+                    upToDate = false;
+                    ScanStatusToPoll newStatus = service.checkScanStatus(currentStatus.get_meta().getHref());
+                    iterator.remove();
+                    scanStatusList.add(newStatus);
+                }
+            }
+            if (upToDate) {
+                // All scans have completed updating the bom
+                return true;
+            }
+            // wait 10 seconds before checking the status's again
+            Thread.sleep(10000);
+            elapsedTime = System.currentTimeMillis() - startTime;
+        }
+        String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(maximumWait));
+        throw new HubIntegrationException("The Bom has not finished updating from the scan within the specified wait time : " + formattedTime);
     }
 
     /**
      * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done
      * being generated. Throws HubIntegrationException after 30 minutes if the report has not been generated yet.
      *
-     * @param service
-     *            HubIntRestService
-     * @param reportUrl
-     *            String
-     * @return
      * @throws IOException
      * @throws BDRestException
      * @throws URISyntaxException
@@ -120,13 +146,6 @@ public class HubEventPolling {
      * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done
      * being generated. Throws HubIntegrationException after the maximum wait if the report has not been generated yet.
      *
-     * @param service
-     *            HubIntRestService
-     * @param reportUrl
-     *            String
-     * @param maximumWait
-     *            long
-     * @return
      * @throws IOException
      * @throws BDRestException
      * @throws URISyntaxException
