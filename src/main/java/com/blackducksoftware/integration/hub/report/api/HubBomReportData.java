@@ -2,10 +2,11 @@ package com.blackducksoftware.integration.hub.report.api;
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.report.api.AggregateBomViewEntry;
-import com.blackducksoftware.integration.hub.report.api.VersionReport;
+import com.blackducksoftware.integration.util.XStreamHelper;
 
 public class HubBomReportData {
+    private XStreamHelper<HubBomReportData> xStreamHelper = new XStreamHelper<HubBomReportData>();
+
     private VersionReport report;
 
     private int vulnerabilityRiskHighCount;
@@ -78,6 +79,10 @@ public class HubBomReportData {
         vulnerabilityRiskNoneCount = totalBomEntries - vulnerabilityRiskHighCount - vulnerabilityRiskMediumCount - vulnerabilityRiskLowCount;
         licenseRiskNoneCount = totalBomEntries - licenseRiskHighCount - licenseRiskMediumCount - licenseRiskLowCount;
         operationalRiskNoneCount = totalBomEntries - operationalRiskHighCount - operationalRiskMediumCount - operationalRiskLowCount;
+    }
+
+    public XStreamHelper<HubBomReportData> getXStreamHelper() {
+        return xStreamHelper;
     }
 
     public VersionReport getReport() {
