@@ -356,6 +356,16 @@ public abstract class ScanExecutor {
                     cmd.add(logDirectoryPath);
                 }
 
+                if (doesCliSupportStatusOption()) {
+                    // Only add the statusWriteDir option if the Hub supports the statusWriteDir option
+
+                    String scanStatusDirectoryPath = getScanStatusDirectoryPath();
+
+                    cmd.add("--statusWriteDir");
+
+                    cmd.add(scanStatusDirectoryPath);
+                }
+
                 if (doesCliSupportsMapping() && StringUtils.isNotBlank(getProject()) && StringUtils.isNotBlank(getVersion())) {
                     // Only add the project and release options if the Hub supports them
 
@@ -402,6 +412,23 @@ public abstract class ScanExecutor {
         }
 
         return logDirectory.getCanonicalPath();
+    }
+
+    /**
+     * Should determine the path to the scan status directory within the log directory.
+     *
+     * @return String
+     * @throws IOException
+     */
+    protected String getScanStatusDirectoryPath() throws IOException {
+        String logDirectory = getLogDirectoryPath();
+        File scanStatusDirectory = new File(logDirectory);
+        scanStatusDirectory = new File(scanStatusDirectory, "ScanStatus");
+        // This directory should never exist as a new one is created for each Build
+        if (!scanStatusDirectory.exists() && !scanStatusDirectory.mkdirs()) {
+            throw new IOException("Could not create the ScanStatus directory!");
+        }
+        return scanStatusDirectory.getCanonicalPath();
     }
 
     protected abstract Result executeScan(List<String> cmd, String logDirectoryPath) throws HubIntegrationException, InterruptedException;
