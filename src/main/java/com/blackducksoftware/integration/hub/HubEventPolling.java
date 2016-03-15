@@ -1,11 +1,15 @@
 package com.blackducksoftware.integration.hub;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -15,6 +19,9 @@ import com.blackducksoftware.integration.hub.response.mapping.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanStatus;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
+import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class HubEventPolling {
 
@@ -95,23 +102,84 @@ public class HubEventPolling {
      * @throws URISyntaxException
      * @throws IOException
      */
-    public boolean isBomUpToDate(String scanStatusDirectory, long maximumWait) throws InterruptedException, BDRestException,
+    public boolean isBomUpToDate(String scanStatusDirectory, long maximumWait, IntLogger logger) throws InterruptedException, BDRestException,
             HubIntegrationException,
             URISyntaxException,
             IOException {
+        if (StringUtils.isBlank(scanStatusDirectory)) {
+            throw new HubIntegrationException("The scan status directory must be a non empty value.");
+        }
+        File statusDirectory = new File(scanStatusDirectory);
+        if (!statusDirectory.exists()) {
+            throw new HubIntegrationException("The scan status directory does not exist.");
+        }
+        if (!statusDirectory.isDirectory()) {
+            throw new HubIntegrationException("The scan status directory provided is not a directory.");
+        }
+        File[] statusFiles = statusDirectory.listFiles();
+        if (statusFiles == null || statusFiles.length == 0) {
+            throw new HubIntegrationException("Can not find the scan status files in the directory provided.");
+        }
+        logger.info("Checking the directory : " + scanStatusDirectory + " for the scan status's.");
+        List<ScanStatusToPoll> scanStatusList = new ArrayList<ScanStatusToPoll>();
+        for (File currentStatusFile : statusFiles) {
+            String fileContent = readFileAsString(currentStatusFile.getCanonicalPath());
+            Gson gson = new GsonBuilder().create();
+            ScanStatusToPoll status = gson.fromJson(fileContent, ScanStatusToPoll.class);
+            scanStatusList.add(status);
+        }
 
+        logger.debug("Cleaning up the scan staus files at : " + scanStatusDirectory);
+        // We delete the files in a second loop to ensure we have all the scan status's in memory before we start
+        // deleting the files. This way, if there is an exception thrown, the User can go look at the files to see what
+        // went wrong.
+        for (File currentStatusFile : statusFiles) {
+            currentStatusFile.delete();
+        }
+        statusDirectory.delete();
+        return pollScanStatusList(scanStatusList, maximumWait);
+    }
+
+    private String readFileAsString(String file) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader bufReader = new BufferedReader(new FileReader(file));
+        try {
+            String line;
+            while ((line = bufReader.readLine()) != null) {
+                sb.append(line);
+                sb.append("\n");
+            }
+        } finally {
+            bufReader.close();
+        }
+        return sb.toString();
+    }
+
+    private boolean pollScanStatusList(List<ScanStatusToPoll> scanStatusList, long maximumWait) throws InterruptedException, IOException, BDRestException,
+            URISyntaxException, HubIntegrationException {
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
+
+        List<ScanStatusToPoll> newStatusList = scanStatusList;
         while (elapsedTime < maximumWait) {
             boolean upToDate = true;
-            for (Iterator<ScanStatusToPoll> iterator = scanStatusList.iterator(); iterator.hasNext();) {
-                ScanStatusToPoll currentStatus = iterator.next();
-                if (currentStatus.getStatusEnum() != ScanStatus.COMPLETE) {
-                    upToDate = false;
-                    ScanStatusToPoll newStatus = service.checkScanStatus(currentStatus.get_meta().getHref());
-                    iterator.remove();
-                    scanStatusList.add(newStatus);
+            List<ScanStatusToPoll> tmpStatusList = new ArrayList<ScanStatusToPoll>();
+
+            if (newStatusList != null && !newStatusList.isEmpty()) {
+                for (ScanStatusToPoll currentStatus : newStatusList) {
+                    if (ScanStatus.isFinishedStatus(currentStatus.getStatusEnum())) {
+                        if (ScanStatus.isErrorStatus(currentStatus.getStatusEnum())) {
+                            throw new HubIntegrationException("There was a problem with one of the code locations. Error Status : "
+                                    + currentStatus.getStatusEnum().name());
+                        }
+                    } else {
+                        // The code location is still updating or matching, etc.
+                        ScanStatusToPoll newStatus = service.checkScanStatus(currentStatus.get_meta().getHref());
+                        upToDate = false;
+                        tmpStatusList.add(newStatus);
+                    }
                 }
+                newStatusList = tmpStatusList;
             }
             if (upToDate) {
                 // All scans have completed updating the bom

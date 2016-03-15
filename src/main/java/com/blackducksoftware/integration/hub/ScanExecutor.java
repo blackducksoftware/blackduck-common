@@ -359,7 +359,9 @@ public abstract class ScanExecutor {
                 if (doesCliSupportStatusOption()) {
                     // Only add the statusWriteDir option if the Hub supports the statusWriteDir option
 
-                    String scanStatusDirectoryPath = getScanStatusDirectoryPath();
+                    // The scanStatusDirectoryPath is the same as the log directory path
+                    // The CLI will create a subdirectory for the status files
+                    String scanStatusDirectoryPath = getLogDirectoryPath();
 
                     cmd.add("--statusWriteDir");
 
@@ -416,17 +418,14 @@ public abstract class ScanExecutor {
 
     /**
      * Should determine the path to the scan status directory within the log directory.
+     * This should only be used outside of this class to get the path of the satus directory
      *
-     * @return String
      * @throws IOException
      */
     public String getScanStatusDirectoryPath() throws IOException {
         String logDirectory = getLogDirectoryPath();
         File scanStatusDirectory = new File(logDirectory);
-        // This directory should never exist as a new one is created for each Build
-        if (!scanStatusDirectory.exists() && !scanStatusDirectory.mkdirs()) {
-            throw new IOException("Could not create the ScanStatus directory!");
-        }
+        scanStatusDirectory = new File(scanStatusDirectory, "status");
         return scanStatusDirectory.getCanonicalPath();
     }
 

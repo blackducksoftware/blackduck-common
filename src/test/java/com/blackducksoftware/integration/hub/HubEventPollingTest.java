@@ -2,6 +2,9 @@ package com.blackducksoftware.integration.hub;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +12,7 @@ import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -18,11 +22,70 @@ import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanStatus;
+import com.blackducksoftware.integration.hub.scan.status.ScanStatusMeta;
+import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
+import com.blackducksoftware.integration.hub.util.TestLogger;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class HubEventPollingTest {
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+
+    private void writeScanStatusToFile(ScanStatusToPoll status, File file) throws IOException {
+        Gson gson = new GsonBuilder().create();
+
+        String stringStatus = gson.toJson(status);
+
+        FileWriter writer = new FileWriter(file);
+        writer.write(stringStatus);
+        writer.close();
+    }
+
+    @Test
+    public void testIsBomUpToDateStatusFiles() throws Exception {
+        ScanStatusMeta meta = new ScanStatusMeta("link");
+        ScanStatusToPoll status1 = new ScanStatusToPoll(ScanStatus.REQUESTED_MATCH_JOB.name(), meta);
+        ScanStatusToPoll status2 = new ScanStatusToPoll(ScanStatus.BUILDING_BOM.name(), meta);
+        ScanStatusToPoll status3 = new ScanStatusToPoll(ScanStatus.SCANNING.name(), meta);
+        File scanStatusDir = folder.newFolder();
+        File statusFile1 = new File(scanStatusDir, "status1.txt");
+        statusFile1.createNewFile();
+        File statusFile2 = new File(scanStatusDir, "status2.txt");
+        statusFile2.createNewFile();
+        File statusFile3 = new File(scanStatusDir, "status3.txt");
+        statusFile3.createNewFile();
+        writeScanStatusToFile(status1, statusFile1);
+        writeScanStatusToFile(status2, statusFile2);
+        writeScanStatusToFile(status3, statusFile3);
+
+        HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+
+        Mockito.when(restService.checkScanStatus(Mockito.anyString())).then(new Answer<ScanStatusToPoll>() {
+            @Override
+            public ScanStatusToPoll answer(InvocationOnMock invocation) throws Throwable {
+                ScanStatusMeta meta = new ScanStatusMeta("link");
+                ScanStatusToPoll status = new ScanStatusToPoll(ScanStatus.COMPLETE.name(), meta);
+                return status;
+            }
+        });
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        TestLogger logger = new TestLogger();
+        assertTrue(eventPoller.isBomUpToDate(scanStatusDir.getCanonicalPath(), 20000, logger));
+
+        assertTrue(logger.getOutputString(),
+                logger.getOutputString().contains("Checking the directory : " + scanStatusDir.getCanonicalPath() + " for the scan status's."));
+        assertTrue(logger.getOutputString(),
+                logger.getOutputString().contains("Cleaning up the scan staus files at : " + scanStatusDir.getCanonicalPath()));
+        assertTrue(!statusFile1.exists());
+        assertTrue(!statusFile2.exists());
+        assertTrue(!statusFile3.exists());
+        assertTrue(!scanStatusDir.exists());
+    }
 
     @Test
     public void testIsBomUpToDate() throws Exception {
