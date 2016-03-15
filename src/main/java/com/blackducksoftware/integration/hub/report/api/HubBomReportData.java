@@ -1,12 +1,12 @@
 package com.blackducksoftware.integration.hub.report.api;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import com.blackducksoftware.integration.util.XStreamHelper;
 
 public class HubBomReportData {
-    private XStreamHelper<HubBomReportData> xStreamHelper = new XStreamHelper<HubBomReportData>();
-
     private VersionReport report;
 
     private int vulnerabilityRiskHighCount;
@@ -81,8 +81,28 @@ public class HubBomReportData {
         operationalRiskNoneCount = totalBomEntries - operationalRiskHighCount - operationalRiskMediumCount - operationalRiskLowCount;
     }
 
-    public XStreamHelper<HubBomReportData> getXStreamHelper() {
-        return xStreamHelper;
+    public void readFromInputStream(InputStream inputStream) {
+        XStreamHelper<HubBomReportData> xStreamHelper = new XStreamHelper<HubBomReportData>();
+        HubBomReportData that = xStreamHelper.fromXML(inputStream);
+
+        licenseRiskHighCount = that.licenseRiskHighCount;
+        licenseRiskMediumCount = that.licenseRiskMediumCount;
+        licenseRiskLowCount = that.licenseRiskLowCount;
+        licenseRiskNoneCount = that.licenseRiskNoneCount;
+        vulnerabilityRiskHighCount = that.vulnerabilityRiskHighCount;
+        vulnerabilityRiskMediumCount = that.vulnerabilityRiskMediumCount;
+        vulnerabilityRiskLowCount = that.vulnerabilityRiskLowCount;
+        vulnerabilityRiskNoneCount = that.vulnerabilityRiskNoneCount;
+        operationalRiskHighCount = that.operationalRiskHighCount;
+        operationalRiskMediumCount = that.operationalRiskMediumCount;
+        operationalRiskLowCount = that.operationalRiskLowCount;
+        operationalRiskNoneCount = that.operationalRiskNoneCount;
+        report = that.report;
+    }
+
+    public void writeToOutputStream(OutputStream outputStream) {
+        XStreamHelper<HubBomReportData> xStreamHelper = new XStreamHelper<HubBomReportData>();
+        xStreamHelper.toXML(this, outputStream);
     }
 
     public VersionReport getReport() {
