@@ -102,7 +102,8 @@ public class HubEventPolling {
      * @throws URISyntaxException
      * @throws IOException
      */
-    public boolean isBomUpToDate(String scanStatusDirectory, long maximumWait, IntLogger logger) throws InterruptedException, BDRestException,
+    public boolean isBomUpToDate(int expectedNumScans, String scanStatusDirectory, long maximumWait, IntLogger logger) throws InterruptedException,
+            BDRestException,
             HubIntegrationException,
             URISyntaxException,
             IOException {
@@ -119,6 +120,9 @@ public class HubEventPolling {
         File[] statusFiles = statusDirectory.listFiles();
         if (statusFiles == null || statusFiles.length == 0) {
             throw new HubIntegrationException("Can not find the scan status files in the directory provided.");
+        }
+        if (statusFiles.length != expectedNumScans) {
+            throw new HubIntegrationException("There were " + expectedNumScans + " scans configured and we found " + statusFiles.length + " status files.");
         }
         logger.info("Checking the directory : " + scanStatusDirectory + " for the scan status's.");
         List<ScanStatusToPoll> scanStatusList = new ArrayList<ScanStatusToPoll>();
