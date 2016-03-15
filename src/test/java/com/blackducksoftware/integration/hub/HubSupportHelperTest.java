@@ -331,10 +331,10 @@ public class HubSupportHelperTest {
 
     @Test
     public void testGetWindowsCLIWrapperLink() throws Exception {
-        assertEquals("testUrl/download/scan.cli.zip", HubSupportHelper.getWindowsCLIWrapperLink("testUrl"));
-        assertEquals("testUrl/download/scan.cli.zip", HubSupportHelper.getWindowsCLIWrapperLink("testUrl/"));
-        assertEquals("http://testSite/download/scan.cli.zip", HubSupportHelper.getWindowsCLIWrapperLink("http://testSite/"));
-        assertEquals("http://testSite/download/scan.cli.zip", HubSupportHelper.getWindowsCLIWrapperLink("http://testSite"));
+        assertEquals("testUrl/download/scan.cli-win.zip", HubSupportHelper.getWindowsCLIWrapperLink("testUrl"));
+        assertEquals("testUrl/download/scan.cli-win.zip", HubSupportHelper.getWindowsCLIWrapperLink("testUrl/"));
+        assertEquals("http://testSite/download/scan.cli-win.zip", HubSupportHelper.getWindowsCLIWrapperLink("http://testSite/"));
+        assertEquals("http://testSite/download/scan.cli-win.zip", HubSupportHelper.getWindowsCLIWrapperLink("http://testSite"));
 
         try {
             HubSupportHelper.getWindowsCLIWrapperLink(" ");
@@ -353,10 +353,10 @@ public class HubSupportHelperTest {
 
     @Test
     public void testGetOSXCLIWrapperLink() throws Exception {
-        assertEquals("testUrl/download/scan.cli.zip", HubSupportHelper.getOSXCLIWrapperLink("testUrl"));
-        assertEquals("testUrl/download/scan.cli.zip", HubSupportHelper.getOSXCLIWrapperLink("testUrl/"));
-        assertEquals("http://testSite/download/scan.cli.zip", HubSupportHelper.getOSXCLIWrapperLink("http://testSite/"));
-        assertEquals("http://testSite/download/scan.cli.zip", HubSupportHelper.getOSXCLIWrapperLink("http://testSite"));
+        assertEquals("testUrl/download/scan.cli-macosx.zip", HubSupportHelper.getOSXCLIWrapperLink("testUrl"));
+        assertEquals("testUrl/download/scan.cli-macosx.zip", HubSupportHelper.getOSXCLIWrapperLink("testUrl/"));
+        assertEquals("http://testSite/download/scan.cli-macosx.zip", HubSupportHelper.getOSXCLIWrapperLink("http://testSite/"));
+        assertEquals("http://testSite/download/scan.cli-macosx.zip", HubSupportHelper.getOSXCLIWrapperLink("http://testSite"));
 
         try {
             HubSupportHelper.getOSXCLIWrapperLink(" ");

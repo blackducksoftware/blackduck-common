@@ -1,0 +1,14 @@
+<com.blackducksoftware.integration.hub.report.api.HubBomReportData>
+  <vulnerabilityRiskHighCount>13</vulnerabilityRiskHighCount>
+  <vulnerabilityRiskMediumCount>14</vulnerabilityRiskMediumCount>
+  <vulnerabilityRiskLowCount>15</vulnerabilityRiskLowCount>
+  <vulnerabilityRiskNoneCount>16</vulnerabilityRiskNoneCount>
+  <licenseRiskHighCount>17</licenseRiskHighCount>
+  <licenseRiskMediumCount>18</licenseRiskMediumCount>
+  <licenseRiskLowCount>19</licenseRiskLowCount>
+  <licenseRiskNoneCount>20</licenseRiskNoneCount>
+  <operationalRiskHighCount>21</operationalRiskHighCount>
+  <operationalRiskMediumCount>22</operationalRiskMediumCount>
+  <operationalRiskLowCount>23</operationalRiskLowCount>
+  <operationalRiskNoneCount>24</operationalRiskNoneCount>
+</com.blackducksoftware.integration.hub.report.api.HubBomReportData>
