@@ -88,6 +88,165 @@ public class HubEventPollingTest {
     }
 
     @Test
+    public void testIsBomUpToDateStatusFilesNotUpToDate() throws Exception {
+        exception.expect(HubIntegrationException.class);
+        exception.expectMessage("The Bom has not finished updating from the scan within the specified wait time :");
+
+        ScanStatusMeta meta = new ScanStatusMeta("link");
+        ScanStatusToPoll status1 = new ScanStatusToPoll(ScanStatus.REQUESTED_MATCH_JOB.name(), meta);
+        ScanStatusToPoll status2 = new ScanStatusToPoll(ScanStatus.BUILDING_BOM.name(), meta);
+        ScanStatusToPoll status3 = new ScanStatusToPoll(ScanStatus.SCANNING.name(), meta);
+        File scanStatusDir = folder.newFolder();
+        File statusFile1 = new File(scanStatusDir, "status1.txt");
+        statusFile1.createNewFile();
+        File statusFile2 = new File(scanStatusDir, "status2.txt");
+        statusFile2.createNewFile();
+        File statusFile3 = new File(scanStatusDir, "status3.txt");
+        statusFile3.createNewFile();
+        writeScanStatusToFile(status1, statusFile1);
+        writeScanStatusToFile(status2, statusFile2);
+        writeScanStatusToFile(status3, statusFile3);
+
+        HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+
+        Mockito.when(restService.checkScanStatus(Mockito.anyString())).then(new Answer<ScanStatusToPoll>() {
+            @Override
+            public ScanStatusToPoll answer(InvocationOnMock invocation) throws Throwable {
+                ScanStatusMeta meta = new ScanStatusMeta("link");
+                ScanStatusToPoll status = new ScanStatusToPoll(ScanStatus.BUILDING_BOM.name(), meta);
+                return status;
+            }
+        });
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        TestLogger logger = new TestLogger();
+        eventPoller.isBomUpToDate(scanStatusDir.getCanonicalPath(), 15000, logger);
+    }
+
+    @Test
+    public void testIsBomUpToDateStatusFilesError() throws Exception {
+        exception.expect(HubIntegrationException.class);
+        exception.expectMessage("There was a problem with one of the scans. Error Status : ");
+
+        ScanStatusMeta meta = new ScanStatusMeta("link");
+        ScanStatusToPoll status1 = new ScanStatusToPoll(ScanStatus.REQUESTED_MATCH_JOB.name(), meta);
+        ScanStatusToPoll status2 = new ScanStatusToPoll(ScanStatus.BUILDING_BOM.name(), meta);
+        ScanStatusToPoll status3 = new ScanStatusToPoll(ScanStatus.SCANNING.name(), meta);
+        File scanStatusDir = folder.newFolder();
+        File statusFile1 = new File(scanStatusDir, "status1.txt");
+        statusFile1.createNewFile();
+        File statusFile2 = new File(scanStatusDir, "status2.txt");
+        statusFile2.createNewFile();
+        File statusFile3 = new File(scanStatusDir, "status3.txt");
+        statusFile3.createNewFile();
+        writeScanStatusToFile(status1, statusFile1);
+        writeScanStatusToFile(status2, statusFile2);
+        writeScanStatusToFile(status3, statusFile3);
+
+        HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+
+        Mockito.when(restService.checkScanStatus(Mockito.anyString())).then(new Answer<ScanStatusToPoll>() {
+            @Override
+            public ScanStatusToPoll answer(InvocationOnMock invocation) throws Throwable {
+                ScanStatusMeta meta = new ScanStatusMeta("link");
+                ScanStatusToPoll status = new ScanStatusToPoll(ScanStatus.ERROR.name(), meta);
+                return status;
+            }
+        });
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        TestLogger logger = new TestLogger();
+        eventPoller.isBomUpToDate(scanStatusDir.getCanonicalPath(), 20000, logger);
+    }
+
+    @Test
+    public void testIsBomUpToDateStatusFilesIncorrectFileContent() throws Exception {
+        ScanStatusMeta meta = new ScanStatusMeta("link");
+        File scanStatusDir = folder.newFolder();
+        File statusFile1 = new File(scanStatusDir, "status1.txt");
+        statusFile1.createNewFile();
+        Gson gson = new GsonBuilder().create();
+
+        String stringStatus = gson.toJson(meta);
+
+        FileWriter writer = new FileWriter(statusFile1);
+        writer.write(stringStatus);
+        writer.close();
+
+        HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        TestLogger logger = new TestLogger();
+        try {
+            eventPoller.isBomUpToDate(scanStatusDir.getCanonicalPath(), 1000, logger);
+        } catch (Exception e) {
+            assertTrue(e instanceof HubIntegrationException);
+            assertTrue(e.getMessage(), e.getMessage().contains("The scan status file : " + statusFile1.getCanonicalPath()
+                    + " does not contain valid scan status json."));
+        }
+        assertTrue(statusFile1.exists());
+        assertTrue(scanStatusDir.exists());
+    }
+
+    @Test
+    public void testIsBomUpToDateStatusFilesNoScanStatusFiles() throws Exception {
+        exception.expect(HubIntegrationException.class);
+        exception.expectMessage("Can not find the scan status files in the directory provided.");
+
+        File scanStatusDir = folder.newFolder();
+
+        HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        TestLogger logger = new TestLogger();
+        eventPoller.isBomUpToDate(scanStatusDir.getCanonicalPath(), 1000, logger);
+    }
+
+    @Test
+    public void testIsBomUpToDateStatusFilesNotADirectory() throws Exception {
+        exception.expect(HubIntegrationException.class);
+        exception.expectMessage("The scan status directory provided is not a directory.");
+
+        File scanStatusDir = folder.newFile();
+
+        HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        TestLogger logger = new TestLogger();
+        eventPoller.isBomUpToDate(scanStatusDir.getCanonicalPath(), 1000, logger);
+    }
+
+    @Test
+    public void testIsBomUpToDateStatusFilesDirectoryDNE() throws Exception {
+        exception.expect(HubIntegrationException.class);
+        exception.expectMessage("The scan status directory does not exist.");
+
+        File scanStatusDir = new File("/ASSERTFAKE/DOES NOT EXIST/ANYWHERE");
+
+        HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        TestLogger logger = new TestLogger();
+        eventPoller.isBomUpToDate(scanStatusDir.getCanonicalPath(), 1000, logger);
+    }
+
+    @Test
+    public void testIsBomUpToDateStatusFilesDirectoryNotProvided() throws Exception {
+        exception.expect(HubIntegrationException.class);
+        exception.expectMessage("The scan status directory must be a non empty value.");
+
+        HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        TestLogger logger = new TestLogger();
+        eventPoller.isBomUpToDate("", 1000, logger);
+    }
+
+    @Test
+    public void testIsBomUpToDateStatusFilesDirectoryNull() throws Exception {
+        exception.expect(HubIntegrationException.class);
+        exception.expectMessage("The scan status directory must be a non empty value.");
+
+        HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+        HubEventPolling eventPoller = new HubEventPolling(restService);
+        TestLogger logger = new TestLogger();
+        eventPoller.isBomUpToDate(null, 1000, logger);
+    }
+
+    @Test
     public void testIsBomUpToDate() throws Exception {
         final DateTime beforeScanTime = new DateTime();
         Thread.sleep(10);

@@ -126,6 +126,10 @@ public class HubEventPolling {
             String fileContent = readFileAsString(currentStatusFile.getCanonicalPath());
             Gson gson = new GsonBuilder().create();
             ScanStatusToPoll status = gson.fromJson(fileContent, ScanStatusToPoll.class);
+            if (status.get_meta() == null || status.getStatus() == null) {
+                throw new HubIntegrationException("The scan status file : " + currentStatusFile.getCanonicalPath()
+                        + " does not contain valid scan status json.");
+            }
             scanStatusList.add(status);
         }
 
@@ -169,7 +173,7 @@ public class HubEventPolling {
                 for (ScanStatusToPoll currentStatus : newStatusList) {
                     if (ScanStatus.isFinishedStatus(currentStatus.getStatusEnum())) {
                         if (ScanStatus.isErrorStatus(currentStatus.getStatusEnum())) {
-                            throw new HubIntegrationException("There was a problem with one of the code locations. Error Status : "
+                            throw new HubIntegrationException("There was a problem with one of the scans. Error Status : "
                                     + currentStatus.getStatusEnum().name());
                         }
                     } else {
