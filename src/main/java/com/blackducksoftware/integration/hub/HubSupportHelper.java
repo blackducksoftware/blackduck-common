@@ -252,9 +252,7 @@ public class HubSupportHelper {
         String baseUrl = getCLIWrapperLink(hubUrl);
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(baseUrl);
-        // FIXME change to the correct link, when that information is known
-        // FIXME fix the unit tests too
-        urlBuilder.append("scan.cli.zip");
+        urlBuilder.append("scan.cli-win.zip");
         return urlBuilder.toString();
     }
 
@@ -262,9 +260,7 @@ public class HubSupportHelper {
         String baseUrl = getCLIWrapperLink(hubUrl);
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(baseUrl);
-        // FIXME change to the correct link, when that information is known
-        // FIXME fix the unit tests too
-        urlBuilder.append("scan.cli.zip");
+        urlBuilder.append("scan.cli-macosx.zip");
         return urlBuilder.toString();
     }
 }
