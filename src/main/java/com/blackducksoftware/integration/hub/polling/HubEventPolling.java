@@ -175,7 +175,11 @@ public class HubEventPolling {
 
         // check if finished is false then the timeout occurred and we didn't finish processing.
         // if you get here then you have finished.
-        return finished;
+        if (!finished) {
+            throw new HubIntegrationException("The Bom has not finished updating from the scan within the specified wait time");
+        }
+
+        return true;
     }
 
     private String readFileAsString(String file) throws IOException {
