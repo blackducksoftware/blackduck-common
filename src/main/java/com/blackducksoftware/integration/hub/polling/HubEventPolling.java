@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub;
+package com.blackducksoftware.integration.hub.polling;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,11 +7,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
@@ -125,7 +130,9 @@ public class HubEventPolling {
             throw new HubIntegrationException("There were " + expectedNumScans + " scans configured and we found " + statusFiles.length + " status files.");
         }
         logger.info("Checking the directory : " + scanStatusDirectory + " for the scan status's.");
-        List<ScanStatusToPoll> scanStatusList = new ArrayList<ScanStatusToPoll>();
+        CountDownLatch lock = new CountDownLatch(expectedNumScans);
+
+        List<ScanStatusChecker> scanStatusList = new ArrayList<ScanStatusChecker>();
         for (File currentStatusFile : statusFiles) {
             String fileContent = readFileAsString(currentStatusFile.getCanonicalPath());
             Gson gson = new GsonBuilder().create();
@@ -134,8 +141,16 @@ public class HubEventPolling {
                 throw new HubIntegrationException("The scan status file : " + currentStatusFile.getCanonicalPath()
                         + " does not contain valid scan status json.");
             }
-            scanStatusList.add(status);
+            ScanStatusChecker checker = new ScanStatusChecker(service, status, lock);
+            scanStatusList.add(checker);
         }
+        // Now that we have read in all of the scan status's without error lets start polling them.
+        ThreadFactory threadFactory = Executors.defaultThreadFactory();
+        ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
+        for (ScanStatusChecker statusChecker : scanStatusList) {
+            pool.submit(statusChecker);
+        }
+        pool.shutdown();
 
         logger.debug("Cleaning up the scan staus files at : " + scanStatusDirectory);
         // We delete the files in a second loop to ensure we have all the scan status's in memory before we start
@@ -145,7 +160,22 @@ public class HubEventPolling {
             currentStatusFile.delete();
         }
         statusDirectory.delete();
-        return pollScanStatusList(scanStatusList, maximumWait);
+
+        boolean finished = lock.await(maximumWait, TimeUnit.MILLISECONDS);
+
+        for (ScanStatusChecker statusChecker : scanStatusList) {
+            statusChecker.setRunning(false); // force the thread to stop executing because we have timed out or gotten
+                                             // all responses.
+        }
+        for (ScanStatusChecker statusChecker : scanStatusList) {
+            if (statusChecker.hasError() == true) {
+                throw statusChecker.getError();
+            }
+        }
+
+        // check if finished is false then the timeout occurred and we didn't finish processing.
+        // if you get here then you have finished.
+        return finished;
     }
 
     private String readFileAsString(String file) throws IOException {
@@ -161,44 +191,6 @@ public class HubEventPolling {
             bufReader.close();
         }
         return sb.toString();
-    }
-
-    private boolean pollScanStatusList(List<ScanStatusToPoll> scanStatusList, long maximumWait) throws InterruptedException, IOException, BDRestException,
-            URISyntaxException, HubIntegrationException {
-        long startTime = System.currentTimeMillis();
-        long elapsedTime = 0;
-
-        List<ScanStatusToPoll> newStatusList = scanStatusList;
-        while (elapsedTime < maximumWait) {
-            boolean upToDate = true;
-            List<ScanStatusToPoll> tmpStatusList = new ArrayList<ScanStatusToPoll>();
-
-            if (newStatusList != null && !newStatusList.isEmpty()) {
-                for (ScanStatusToPoll currentStatus : newStatusList) {
-                    if (ScanStatus.isFinishedStatus(currentStatus.getStatusEnum())) {
-                        if (ScanStatus.isErrorStatus(currentStatus.getStatusEnum())) {
-                            throw new HubIntegrationException("There was a problem with one of the scans. Error Status : "
-                                    + currentStatus.getStatusEnum().name());
-                        }
-                    } else {
-                        // The code location is still updating or matching, etc.
-                        ScanStatusToPoll newStatus = service.checkScanStatus(currentStatus.get_meta().getHref());
-                        upToDate = false;
-                        tmpStatusList.add(newStatus);
-                    }
-                }
-                newStatusList = tmpStatusList;
-            }
-            if (upToDate) {
-                // All scans have completed updating the bom
-                return true;
-            }
-            // wait 10 seconds before checking the status's again
-            Thread.sleep(10000);
-            elapsedTime = System.currentTimeMillis() - startTime;
-        }
-        String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(maximumWait));
-        throw new HubIntegrationException("The Bom has not finished updating from the scan within the specified wait time : " + formattedTime);
     }
 
     /**
