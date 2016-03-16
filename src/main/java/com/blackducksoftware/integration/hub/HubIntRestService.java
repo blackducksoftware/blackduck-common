@@ -38,6 +38,7 @@ import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.exception.MissingPolicyStatusException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.policy.api.PolicyStatus;
 import com.blackducksoftware.integration.hub.report.api.VersionReport;
@@ -1159,9 +1160,10 @@ public class HubIntRestService {
      * @throws IOException
      * @throws BDRestException
      * @throws URISyntaxException
+     * @throws MissingPolicyStatusException
      */
     public PolicyStatus getPolicyStatus(String projectId, String versionId) throws IOException, BDRestException,
-            URISyntaxException {
+            URISyntaxException, MissingPolicyStatusException {
         if (StringUtils.isBlank(projectId)) {
             throw new IllegalArgumentException("Missing the project Id to get the policy status of.");
         }
@@ -1189,6 +1191,9 @@ public class HubIntRestService {
             Gson gson = new GsonBuilder().create();
             PolicyStatus status = gson.fromJson(response, PolicyStatus.class);
             return status;
+        }
+        if (responseCode == 404) {
+            throw new MissingPolicyStatusException("There was no policy status found for this version. The BOM may be empty.");
         } else {
             throw new BDRestException("There was a problem getting the policy status. Error Code: " + responseCode, resource);
         }
