@@ -176,7 +176,8 @@ public class HubEventPolling {
         // check if finished is false then the timeout occurred and we didn't finish processing.
         // if you get here then you have finished.
         if (!finished) {
-            throw new HubIntegrationException("The Bom has not finished updating from the scan within the specified wait time");
+            String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(maximumWait));
+            throw new HubIntegrationException("The Bom has not finished updating from the scan within the specified wait time : " + formattedTime);
         }
 
         return true;
