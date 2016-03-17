@@ -47,6 +47,7 @@ public class CLIInstaller {
     private String proxyPassword;
 
     public CLIInstaller(File directoryToInstallTo, String localHostName) {
+
         if (directoryToInstallTo == null) {
             throw new IllegalArgumentException("You must provided a directory to install the CLI to.");
         }
@@ -102,8 +103,15 @@ public class CLIInstaller {
     }
 
     public File getCLIHome() {
+
         File cliHome = getCLIInstallDir();
+        if (cliHome == null) {
+            return null;
+        }
         File[] installDirFiles = cliHome.listFiles();
+        if (installDirFiles == null) {
+            return null;
+        }
         if (installDirFiles.length == 1) {
             return installDirFiles[0];
         } else {
@@ -113,6 +121,7 @@ public class CLIInstaller {
 
     public void performInstallation(IntLogger logger, HubIntRestService restService) throws IOException,
             InterruptedException, BDRestException, URISyntaxException, HubIntegrationException {
+
         String cliDownloadUrl = getCLIDownloadUrl(logger, restService);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
             customInstall(new URL(cliDownloadUrl), restService.getHubVersion(), logger);
@@ -122,6 +131,7 @@ public class CLIInstaller {
     }
 
     public String getCLIDownloadUrl(IntLogger logger, HubIntRestService restService) throws IOException, InterruptedException {
+
         try {
             HubSupportHelper hubSupport = new HubSupportHelper();
 
@@ -141,6 +151,7 @@ public class CLIInstaller {
     }
 
     private boolean customInstall(URL archive, String hubVersion, IntLogger logger) throws IOException, InterruptedException, HubIntegrationException {
+
         try {
             if (!directoryToInstallTo.exists() && !directoryToInstallTo.mkdirs()) {
                 throw new HubIntegrationException("Could not create the directory : " + directoryToInstallTo.getCanonicalPath());
@@ -238,6 +249,7 @@ public class CLIInstaller {
     }
 
     public void deleteFilesRecursive(File[] files) {
+
         if (files != null && files.length > 0) {
             for (File currentFile : files) {
                 if (currentFile != null && currentFile.exists()) {
@@ -253,6 +265,7 @@ public class CLIInstaller {
     }
 
     private void unzip(File dir, InputStream in, IntLogger logger) throws IOException {
+
         File tmpFile = File.createTempFile("tmpzip", null); // uses java.io.tmpdir
         try {
             copyInputStreamToFile(in, tmpFile);
@@ -263,6 +276,7 @@ public class CLIInstaller {
     }
 
     private void unzip(File dir, File zipFile, IntLogger logger) throws IOException {
+
         dir = dir.getAbsoluteFile(); // without absolutization, getParentFile below seems to fail
         ZipFile zip = new ZipFile(zipFile);
         @SuppressWarnings("unchecked")
@@ -293,6 +307,7 @@ public class CLIInstaller {
     }
 
     private void copyInputStreamToFile(InputStream in, File f) throws IOException {
+
         FileOutputStream fos = new FileOutputStream(f);
         try {
             org.apache.commons.io.IOUtils.copy(in, fos);
@@ -310,6 +325,7 @@ public class CLIInstaller {
      * @throws InterruptedException
      */
     public File getProvidedJavaHome() throws IOException, InterruptedException {
+
         File cliHomeFile = getCLIHome();
         if (cliHomeFile == null) {
             return null;
@@ -349,7 +365,11 @@ public class CLIInstaller {
      * @throws InterruptedException
      */
     public boolean getCLIExists(IntLogger logger) throws IOException, InterruptedException {
+
         File cliHomeFile = getCLIHome();
+        if (cliHomeFile == null) {
+            return false;
+        }
         // find the lib folder in the iScan directory
         logger.debug("BlackDuck scan directory: " + cliHomeFile.getCanonicalPath());
         File[] files = cliHomeFile.listFiles();
@@ -375,21 +395,14 @@ public class CLIInstaller {
                     }
                 };
                 File[] cliFiles = libFolder.listFiles(nameFilter);
+
                 File hubScanJar = null;
-                if (cliFiles == null || cliFiles.length == 0) {
+                if (cliFiles.length == 0) {
                     return false;
                 } else {
-                    for (File file : cliFiles) {
-                        logger.debug("BlackDuck scan lib file: " + file.getCanonicalPath());
-                        if (file.getName().contains("scan.cli")) {
-                            hubScanJar = file;
-                            break;
-                        }
-                    }
+                    hubScanJar = cliFiles[0];
                 }
-                if (hubScanJar == null) {
-                    return false;
-                }
+
                 return hubScanJar.exists();
             } else {
                 logger.error("No files found in the BlackDuck scan directory.");
@@ -413,7 +426,11 @@ public class CLIInstaller {
      * @throws InterruptedException
      */
     public File getCLI() throws IOException, InterruptedException {
+
         File cliHomeFile = getCLIHome();
+        if (cliHomeFile == null) {
+            return null;
+        }
         File[] files = cliHomeFile.listFiles();
         if (files != null && files.length > 0) {
             File libFolder = null;
@@ -433,29 +450,24 @@ public class CLIInstaller {
                 }
             };
             File[] cliFiles = libFolder.listFiles(nameFilter);
-            File cliFile = null;
-            if (cliFiles == null) {
+            if (cliFiles.length == 0) {
                 return null;
             } else {
-                for (File file : cliFiles) {
-                    if (file.getName().contains("scan.cli")) {
-                        cliFile = file;
-                        break;
-                    }
-                }
+                return cliFiles[0];
             }
-            return cliFile;
         } else {
             return null;
         }
     }
 
     public File getOneJarFile() {
+
         File cliHomeFile = getCLIHome();
+        if (cliHomeFile == null) {
+            return null;
+        }
         File oneJarFile = new File(cliHomeFile, "lib");
-
         oneJarFile = new File(oneJarFile, "cache");
-
         oneJarFile = new File(oneJarFile, "scan.cli.impl-standalone.jar");
         return oneJarFile;
     }
