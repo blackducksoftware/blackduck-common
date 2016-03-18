@@ -202,13 +202,9 @@ public class HubEventPolling {
      * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done
      * being generated. Throws HubIntegrationException after 30 minutes if the report has not been generated yet.
      *
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     * @throws InterruptedException
-     * @throws HubIntegrationException
      */
-    public boolean isReportFinishedGenerating(String reportUrl) throws IOException, BDRestException, URISyntaxException, InterruptedException,
+    public ReportMetaInformationItem isReportFinishedGenerating(String reportUrl) throws IOException, BDRestException, URISyntaxException,
+            InterruptedException,
             HubIntegrationException {
         // maximum wait time of 30 minutes
         final long maximumWait = 1000 * 60 * 30;
@@ -219,13 +215,9 @@ public class HubEventPolling {
      * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done
      * being generated. Throws HubIntegrationException after the maximum wait if the report has not been generated yet.
      *
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     * @throws InterruptedException
-     * @throws HubIntegrationException
      */
-    public boolean isReportFinishedGenerating(String reportUrl, final long maximumWait) throws IOException, BDRestException, URISyntaxException,
+    public ReportMetaInformationItem isReportFinishedGenerating(String reportUrl, final long maximumWait) throws IOException, BDRestException,
+            URISyntaxException,
             InterruptedException, HubIntegrationException {
         final long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
@@ -246,7 +238,7 @@ public class HubEventPolling {
             Thread.sleep(5000);
             elapsedTime = System.currentTimeMillis() - startTime;
         }
-        return true;
+        return reportInfo;
     }
 
 }

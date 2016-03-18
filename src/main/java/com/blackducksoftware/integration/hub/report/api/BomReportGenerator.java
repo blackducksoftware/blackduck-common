@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.joda.time.DateTime;
-
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -43,16 +41,7 @@ public class BomReportGenerator {
         logger.debug("The bom has been updated, generating the report.");
         String reportUrl = hubReportGenerationInfo.getService().generateHubReport(hubReportGenerationInfo.getVersionId(), ReportFormatEnum.JSON);
 
-        DateTime timeFinished = null;
-        ReportMetaInformationItem reportInfo = null;
-
-        while (timeFinished == null) {
-            // Wait until the report is done being generated and retry every 5 seconds
-            Thread.sleep(5000);
-            reportInfo = hubReportGenerationInfo.getService().getReportLinks(reportUrl);
-
-            timeFinished = reportInfo.getTimeFinishedAt();
-        }
+        ReportMetaInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl, hubReportGenerationInfo.getMaximumWaitTime());
 
         List<ReportMetaLinkItem> links = reportInfo.get_meta().getLinks();
 
