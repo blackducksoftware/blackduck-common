@@ -37,6 +37,8 @@ public abstract class ScanExecutor {
 
     private boolean hubSupportLogOption;
 
+    private boolean cliSupportStatusOption;
+
     private boolean cliSupportsMapping;
 
     private boolean shouldParseStatus;
@@ -109,6 +111,14 @@ public abstract class ScanExecutor {
 
     public void setHubSupportLogOption(boolean hubSupportLogOption) {
         this.hubSupportLogOption = hubSupportLogOption;
+    }
+
+    public boolean doesCliSupportStatusOption() {
+        return cliSupportStatusOption;
+    }
+
+    public void setCliSupportStatusOption(boolean cliSupportStatusOption) {
+        this.cliSupportStatusOption = cliSupportStatusOption;
     }
 
     public boolean doesCliSupportsMapping() {
@@ -346,6 +356,18 @@ public abstract class ScanExecutor {
                     cmd.add(logDirectoryPath);
                 }
 
+                if (doesCliSupportStatusOption()) {
+                    // Only add the statusWriteDir option if the Hub supports the statusWriteDir option
+
+                    // The scanStatusDirectoryPath is the same as the log directory path
+                    // The CLI will create a subdirectory for the status files
+                    String scanStatusDirectoryPath = getLogDirectoryPath();
+
+                    cmd.add("--statusWriteDir");
+
+                    cmd.add(scanStatusDirectoryPath);
+                }
+
                 if (doesCliSupportsMapping() && StringUtils.isNotBlank(getProject()) && StringUtils.isNotBlank(getVersion())) {
                     // Only add the project and release options if the Hub supports them
 
@@ -392,6 +414,19 @@ public abstract class ScanExecutor {
         }
 
         return logDirectory.getCanonicalPath();
+    }
+
+    /**
+     * Should determine the path to the scan status directory within the log directory.
+     * This should only be used outside of this class to get the path of the satus directory
+     *
+     * @throws IOException
+     */
+    public String getScanStatusDirectoryPath() throws IOException {
+        String logDirectory = getLogDirectoryPath();
+        File scanStatusDirectory = new File(logDirectory);
+        scanStatusDirectory = new File(scanStatusDirectory, "status");
+        return scanStatusDirectory.getCanonicalPath();
     }
 
     protected abstract Result executeScan(List<String> cmd, String logDirectoryPath) throws HubIntegrationException, InterruptedException;
