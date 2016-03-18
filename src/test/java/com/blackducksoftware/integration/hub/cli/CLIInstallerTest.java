@@ -6,10 +6,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -405,6 +407,85 @@ public class CLIInstallerTest {
     }
 
     @Test
+    public void testPerformInstallationUpdating() throws Exception {
+        File installDir = folder.newFolder();
+        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        TestLogger logger = new TestLogger();
+        HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        service = Mockito.spy(service);
+        Mockito.doReturn("3.0.0").when(service).getHubVersion();
+        installer.performInstallation(logger, service);
+
+        File file = new File(installDir, CLIInstaller.VERSION_FILE_NAME);
+
+        assertTrue(file.exists());
+        String storedVersion = IOUtils.toString(new FileInputStream(file));
+        assertEquals("3.0.0", storedVersion);
+        assertTrue(installer.getCLIExists(logger));
+        assertNotNull(installer.getCLI());
+
+        // Upgrade to 4.0.0
+        Mockito.doReturn("4.0.0").when(service).getHubVersion();
+        installer.performInstallation(logger, service);
+
+        assertTrue(file.exists());
+        storedVersion = IOUtils.toString(new FileInputStream(file));
+        assertEquals("4.0.0", storedVersion);
+        assertTrue(installer.getCLIExists(logger));
+        assertNotNull(installer.getCLI());
+
+        // Upgrade to 4.1.0
+        Mockito.doReturn("4.1.0").when(service).getHubVersion();
+        installer.performInstallation(logger, service);
+
+        assertTrue(file.exists());
+        storedVersion = IOUtils.toString(new FileInputStream(file));
+        assertEquals("4.1.0", storedVersion);
+        assertTrue(installer.getCLIExists(logger));
+        assertNotNull(installer.getCLI());
+
+        // Upgrade to 4.1.1
+        Mockito.doReturn("4.1.1").when(service).getHubVersion();
+        installer.performInstallation(logger, service);
+
+        assertTrue(file.exists());
+        storedVersion = IOUtils.toString(new FileInputStream(file));
+        assertEquals("4.1.1", storedVersion);
+        assertTrue(installer.getCLIExists(logger));
+        assertNotNull(installer.getCLI());
+
+        // Downgrade to 4.0.1
+        Mockito.doReturn("4.0.1").when(service).getHubVersion();
+        installer.performInstallation(logger, service);
+
+        assertTrue(file.exists());
+        storedVersion = IOUtils.toString(new FileInputStream(file));
+        assertEquals("4.0.1", storedVersion);
+        assertTrue(installer.getCLIExists(logger));
+        assertNotNull(installer.getCLI());
+
+        // Downgrade to 4.0.0
+        Mockito.doReturn("4.0.0").when(service).getHubVersion();
+        installer.performInstallation(logger, service);
+
+        assertTrue(file.exists());
+        storedVersion = IOUtils.toString(new FileInputStream(file));
+        assertEquals("4.0.0", storedVersion);
+        assertTrue(installer.getCLIExists(logger));
+        assertNotNull(installer.getCLI());
+
+        // Downgrade to 2.0.0
+        Mockito.doReturn("2.0.0").when(service).getHubVersion();
+        installer.performInstallation(logger, service);
+
+        assertTrue(file.exists());
+        storedVersion = IOUtils.toString(new FileInputStream(file));
+        assertEquals("2.0.0", storedVersion);
+        assertTrue(installer.getCLIExists(logger));
+        assertNotNull(installer.getCLI());
+    }
+
+    @Test
     public void testPerformInstallation() throws Exception {
         File installDir = folder.newFolder();
         CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
@@ -412,9 +493,13 @@ public class CLIInstallerTest {
         HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
         service.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
         installer.performInstallation(logger, service);
+
+        File file = new File(installDir, CLIInstaller.VERSION_FILE_NAME);
+
+        assertTrue(file.exists());
+
         String output = logger.getOutputString();
         assertTrue(output, output.contains("Unpacking "));
-
         assertTrue(installer.getCLIExists(logger));
         output = logger.getOutputString();
         assertTrue(output, output.contains("BlackDuck scan directory: "));
@@ -422,9 +507,6 @@ public class CLIInstallerTest {
         assertTrue(output, output.contains("BlackDuck scan lib directory: "));
 
         assertNotNull(installer.getCLI());
-
-        // TODO add checks to this and the following tests
-        // TODO test error cases
     }
 
     @Test
@@ -438,9 +520,12 @@ public class CLIInstallerTest {
         HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
         service.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
         installer.performInstallation(logger, service);
+
+        File file = new File(installDir, CLIInstaller.VERSION_FILE_NAME);
+
+        assertTrue(file.exists());
         String output = logger.getOutputString();
         assertTrue(output, output.contains("Unpacking "));
-
         assertTrue(installer.getCLIExists(logger));
         output = logger.getOutputString();
         assertTrue(output, output.contains("BlackDuck scan directory: "));
@@ -463,9 +548,12 @@ public class CLIInstallerTest {
         HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
         service.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
         installer.performInstallation(logger, service);
+
+        File file = new File(installDir, CLIInstaller.VERSION_FILE_NAME);
+
+        assertTrue(file.exists());
         String output = logger.getOutputString();
         assertTrue(output, output.contains("Unpacking "));
-
         assertTrue(installer.getCLIExists(logger));
         output = logger.getOutputString();
         assertTrue(output, output.contains("BlackDuck scan directory: "));
@@ -488,9 +576,12 @@ public class CLIInstallerTest {
         HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
         service.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
         installer.performInstallation(logger, service);
+
+        File file = new File(installDir, CLIInstaller.VERSION_FILE_NAME);
+
+        assertTrue(file.exists());
         String output = logger.getOutputString();
         assertTrue(output, output.contains("Unpacking "));
-
         assertTrue(installer.getCLIExists(logger));
         output = logger.getOutputString();
         assertTrue(output, output.contains("BlackDuck scan directory: "));
