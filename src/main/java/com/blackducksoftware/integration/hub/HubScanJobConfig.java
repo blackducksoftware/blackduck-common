@@ -32,30 +32,35 @@ public class HubScanJobConfig {
     public HubScanJobConfig() {
     }
 
-    public HubScanJobConfig(String projectName, String version, String phase, String distribution) {
+    public HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory) {
         setProjectName(projectName);
         setVersion(version);
         setPhase(phase);
         setDistribution(distribution);
+        setWorkingDirectory(workingDirectory);
     }
 
-    public HubScanJobConfig(String projectName, String version, String phase, String distribution, int scanMemory, boolean shouldGenerateRiskReport,
+    public HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory, int scanMemory,
+            boolean shouldGenerateRiskReport,
             int maxWaitTimeForRiskReport) {
         setProjectName(projectName);
         setVersion(version);
         setPhase(phase);
         setDistribution(distribution);
+        setWorkingDirectory(workingDirectory);
         setScanMemory(scanMemory);
         setShouldGenerateRiskReport(shouldGenerateRiskReport);
         setMaxWaitTimeForRiskReport(maxWaitTimeForRiskReport);
     }
 
-    public HubScanJobConfig(String projectName, String version, String phase, String distribution, String scanMemory, String shouldGenerateRiskReport,
+    public HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory, String scanMemory,
+            String shouldGenerateRiskReport,
             String maxWaitTimeForRiskReport) {
         setProjectName(projectName);
         setVersion(version);
         setPhase(phase);
         setDistribution(distribution);
+        setWorkingDirectory(workingDirectory);
         setScanMemory(scanMemory);
         setShouldGenerateRiskReport(shouldGenerateRiskReport);
         setMaxWaitTimeForRiskReport(maxWaitTimeForRiskReport);
@@ -123,6 +128,10 @@ public class HubScanJobConfig {
         return maxWaitTimeForRiskReport;
     }
 
+    public long getMaxWaitTimeForRiskReportInMilliseconds() {
+        return maxWaitTimeForRiskReport * 60 * 1000;
+    }
+
     public void setMaxWaitTimeForRiskReport(int maxWaitTimeForRiskReport) {
         this.maxWaitTimeForRiskReport = maxWaitTimeForRiskReport;
         if (maxWaitTimeForRiskReport <= 0) {
@@ -158,8 +167,12 @@ public class HubScanJobConfig {
         return scanTargetPaths;
     }
 
-    public void setScanTargetPaths(List<String> scanTargetPaths) {
-        this.scanTargetPaths = scanTargetPaths;
+    public void addScanTargetPath(String scanTargetPath) {
+        scanTargetPaths.add(scanTargetPath);
+    }
+
+    public void addAllScanTargetPaths(List<String> scanTargetPaths) {
+        this.scanTargetPaths.addAll(scanTargetPaths);
     }
 
     public String getWorkingDirectory() {
