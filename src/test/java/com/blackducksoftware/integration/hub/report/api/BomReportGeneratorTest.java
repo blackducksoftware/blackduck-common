@@ -247,8 +247,6 @@ public class BomReportGeneratorTest {
         generator.generateHubReport(logger).getReport();
     }
 
-    // TODO
-
     @Test
     public void generateReportWithCodeLocations() throws Exception {
         HubIntRestService service = new HubIntRestService("FakeHubUrl");
