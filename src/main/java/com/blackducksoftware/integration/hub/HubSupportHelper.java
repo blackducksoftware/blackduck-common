@@ -54,6 +54,11 @@ public class HubSupportHelper {
         return jreProvidedSupport;
     }
 
+    public boolean isCliStatusDirOptionSupport() {
+        // the --statusWriteDir option was added in the same version as the jreProvidedSupport
+        return jreProvidedSupport;
+    }
+
     private void setJreProvidedSupport(boolean jreProvidedSupport) {
         this.jreProvidedSupport = jreProvidedSupport;
     }

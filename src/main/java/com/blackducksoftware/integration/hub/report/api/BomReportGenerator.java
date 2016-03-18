@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-import com.blackducksoftware.integration.hub.HubEventPolling;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.polling.HubEventPolling;
 import com.blackducksoftware.integration.hub.response.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
 import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem.ReportMetaLinkItem;
