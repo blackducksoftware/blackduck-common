@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.polling.HubEventPolling;
@@ -15,19 +16,29 @@ import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem.
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 
 public class BomReportGenerator {
-    private HubReportGenerationInfo hubReportGenerationInfo;
+    private final HubReportGenerationInfo hubReportGenerationInfo;
 
-    public BomReportGenerator(HubReportGenerationInfo hubReportGenerationInfo) {
+    private final HubSupportHelper supportHelper;
+
+    /**
+     * Make sure supportHelper.checkHubSupport() has already been run before passing in the supportHelper.
+     *
+     */
+    public BomReportGenerator(HubReportGenerationInfo hubReportGenerationInfo, HubSupportHelper supportHelper) {
         this.hubReportGenerationInfo = hubReportGenerationInfo;
+        this.supportHelper = supportHelper;
     }
 
     public HubBomReportData generateHubReport(IntLogger logger) throws IOException, BDRestException, URISyntaxException, InterruptedException,
             HubIntegrationException {
-        // logger.debug("Time before scan : " + hubReportGenerationInfo.getBeforeScanTime().toString());
-        // logger.debug("Time after scan : " + hubReportGenerationInfo.getAfterScanTime().toString());
         logger.debug("Waiting for the bom to be updated with the scan results.");
         HubEventPolling hubEventPolling = new HubEventPolling(hubReportGenerationInfo.getService());
-        hubEventPolling.assertBomUpToDate(hubReportGenerationInfo);
+
+        if (supportHelper.isCliStatusDirOptionSupport()) {
+            hubEventPolling.assertBomUpToDate(hubReportGenerationInfo, logger);
+        } else {
+            hubEventPolling.assertBomUpToDate(hubReportGenerationInfo);
+        }
 
         logger.debug("The bom has been updated, generating the report.");
         String reportUrl = hubReportGenerationInfo.getService().generateHubReport(hubReportGenerationInfo.getVersionId(), ReportFormatEnum.JSON);
