@@ -19,7 +19,7 @@ import org.mockito.stubbing.Answer;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.polling.HubEventPolling;
+import com.blackducksoftware.integration.hub.report.api.HubReportGenerationInfo;
 import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
@@ -341,7 +341,14 @@ public class HubEventPollingTest {
         scanTargets.add("Test\\Fake\\File");
         HubEventPolling eventPoller = new HubEventPolling(restService);
 
-        assertTrue(eventPoller.isBomUpToDate(startScanTime, endScanTime, fakeHost, scanTargets, 5000));
+        HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
+        hubReportGenerationInfo.setBeforeScanTime(startScanTime);
+        hubReportGenerationInfo.setAfterScanTime(endScanTime);
+        hubReportGenerationInfo.setHostname(fakeHost);
+        hubReportGenerationInfo.setScanTargets(scanTargets);
+        hubReportGenerationInfo.setMaximumWaitTime(5000);
+
+        eventPoller.assertBomUpToDate(hubReportGenerationInfo);
     }
 
     @Test
@@ -413,7 +420,15 @@ public class HubEventPollingTest {
         scanTargets.add("Test/Fake/Path/Child");
         scanTargets.add("Test\\Fake\\File");
         HubEventPolling eventPoller = new HubEventPolling(restService);
-        eventPoller.isBomUpToDate(startScanTime, endScanTime, fakeHost, scanTargets, 1000);
+
+        HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
+        hubReportGenerationInfo.setBeforeScanTime(startScanTime);
+        hubReportGenerationInfo.setAfterScanTime(endScanTime);
+        hubReportGenerationInfo.setHostname(fakeHost);
+        hubReportGenerationInfo.setScanTargets(scanTargets);
+        hubReportGenerationInfo.setMaximumWaitTime(1000);
+
+        eventPoller.assertBomUpToDate(hubReportGenerationInfo);
     }
 
     @Test
@@ -485,7 +500,15 @@ public class HubEventPollingTest {
         scanTargets.add("Test/Fake/Path/Child");
         scanTargets.add("Test\\Fake\\File");
         HubEventPolling eventPoller = new HubEventPolling(restService);
-        eventPoller.isBomUpToDate(startScanTime, endScanTime, fakeHost, scanTargets, 5000);
+
+        HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
+        hubReportGenerationInfo.setBeforeScanTime(startScanTime);
+        hubReportGenerationInfo.setAfterScanTime(endScanTime);
+        hubReportGenerationInfo.setHostname(fakeHost);
+        hubReportGenerationInfo.setScanTargets(scanTargets);
+        hubReportGenerationInfo.setMaximumWaitTime(5000);
+
+        eventPoller.assertBomUpToDate(hubReportGenerationInfo);
     }
 
     @Test

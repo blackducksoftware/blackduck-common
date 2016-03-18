@@ -19,6 +19,7 @@ import org.joda.time.DateTime;
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.report.api.HubReportGenerationInfo;
 import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
@@ -29,7 +30,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class HubEventPolling {
-
     private final HubIntRestService service;
 
     public HubEventPolling(HubIntRestService service) {
@@ -46,16 +46,15 @@ public class HubEventPolling {
      * the bom is up to date with these scan results. Otherwise we try again after 10 sec, and we keep trying until it
      * is up to date or until we hit the maximum wait time.
      * If we find a scan history object that has status cancelled or an error type then we throw an exception.
-     *
-     * @return True if the bom has been updated with the code locations from this scan
-     * @throws InterruptedException
-     * @throws BDRestException
-     * @throws HubIntegrationException
-     * @throws URISyntaxException
-     * @throws IOException
      */
-    public boolean isBomUpToDate(DateTime timeBeforeScan, DateTime timeAfterScan, String hostname, List<String>
-            scanTargets, long maximumWait) throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
+    public void assertBomUpToDate(HubReportGenerationInfo hubReportGenerationInfo) throws InterruptedException, BDRestException, HubIntegrationException,
+            URISyntaxException, IOException {
+        long maximumWait = hubReportGenerationInfo.getMaximumWaitTime();
+        DateTime timeBeforeScan = hubReportGenerationInfo.getBeforeScanTime();
+        DateTime timeAfterScan = hubReportGenerationInfo.getAfterScanTime();
+        String hostname = hubReportGenerationInfo.getHostname();
+        List<String> scanTargets = hubReportGenerationInfo.getScanTargets();
+
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         while (elapsedTime < maximumWait) {
@@ -63,10 +62,12 @@ public class HubEventPolling {
             List<ScanLocationItem> scanLocationsToCheck = getService().getScanLocations(hostname, scanTargets);
             boolean upToDate = true;
             for (ScanLocationItem currentCodeLocation : scanLocationsToCheck) {
+                if (!upToDate) {
+                    break;
+                }
                 for (ScanHistoryItem currentScanHistory : currentCodeLocation.getScanList()) {
                     DateTime scanHistoryCreationTime = currentScanHistory.getCreatedOnTime();
-                    if (scanHistoryCreationTime != null && scanHistoryCreationTime.isAfter(timeBeforeScan) && scanHistoryCreationTime.isBefore(timeAfterScan)) {
-                        // This scan history Item came from the scan we executed
+                    if (scanHistoryItemWithinOurScanBoundaries(scanHistoryCreationTime, timeBeforeScan, timeAfterScan)) {
                         if (ScanStatus.isFinishedStatus(currentScanHistory.getStatus())) {
                             if (ScanStatus.isErrorStatus(currentScanHistory.getStatus())) {
                                 throw new HubIntegrationException("There was a problem with one of the code locations. Error Status : "
@@ -75,24 +76,27 @@ public class HubEventPolling {
                         } else {
                             // The code location is still updating or matching, etc.
                             upToDate = false;
+                            break;
                         }
-                    } else {
-                        // This scan history Item did not come from the scan we executed
-                        continue;
                     }
                 }
             }
             if (upToDate) {
                 // The code locations are all finished, so we know the bom has been updated with our scan results
                 // So we break out of this loop
-                return true;
+                return;
             }
             // wait 10 seconds before checking the status's again
             Thread.sleep(10000);
             elapsedTime = System.currentTimeMillis() - startTime;
         }
+
         String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(maximumWait));
         throw new HubIntegrationException("The Bom has not finished updating from the scan within the specified wait time : " + formattedTime);
+    }
+
+    private boolean scanHistoryItemWithinOurScanBoundaries(DateTime scanHistoryCreationTime, DateTime timeBeforeScan, DateTime timeAfterScan) {
+        return (scanHistoryCreationTime != null && scanHistoryCreationTime.isAfter(timeBeforeScan) && scanHistoryCreationTime.isBefore(timeAfterScan));
     }
 
     /**
@@ -208,8 +212,8 @@ public class HubEventPolling {
      * @throws InterruptedException
      * @throws HubIntegrationException
      */
-    public boolean isReportFinishedGenerating(String reportUrl) throws IOException, BDRestException, URISyntaxException,
-            InterruptedException, HubIntegrationException {
+    public boolean isReportFinishedGenerating(String reportUrl) throws IOException, BDRestException, URISyntaxException, InterruptedException,
+            HubIntegrationException {
         // maximum wait time of 30 minutes
         final long maximumWait = 1000 * 60 * 30;
         return isReportFinishedGenerating(reportUrl, maximumWait);
@@ -225,8 +229,7 @@ public class HubEventPolling {
      * @throws InterruptedException
      * @throws HubIntegrationException
      */
-    public boolean isReportFinishedGenerating(String reportUrl, final long maximumWait) throws IOException, BDRestException,
-            URISyntaxException,
+    public boolean isReportFinishedGenerating(String reportUrl, final long maximumWait) throws IOException, BDRestException, URISyntaxException,
             InterruptedException, HubIntegrationException {
         final long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
