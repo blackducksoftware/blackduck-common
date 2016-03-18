@@ -117,6 +117,7 @@ public class CLIInstaller {
         } else {
             return null;
         }
+
     }
 
     public void performInstallation(IntLogger logger, HubIntRestService restService) throws IOException,
@@ -128,6 +129,7 @@ public class CLIInstaller {
         } else {
             logger.error("Could not find the correct Hub CLI download URL.");
         }
+
     }
 
     public String getCLIDownloadUrl(IntLogger logger, HubIntRestService restService) throws IOException, InterruptedException {
@@ -148,6 +150,7 @@ public class CLIInstaller {
             logger.error(e.getMessage(), e);
         }
         return null;
+
     }
 
     private boolean customInstall(URL archive, String hubVersion, IntLogger logger) throws IOException, InterruptedException, HubIntegrationException {
@@ -246,6 +249,7 @@ public class CLIInstaller {
         } catch (IOException e) {
             throw new IOException("Failed to install " + archive + " to " + directoryToInstallTo.getCanonicalPath(), e);
         }
+
     }
 
     public void deleteFilesRecursive(File[] files) {
@@ -273,6 +277,7 @@ public class CLIInstaller {
         } finally {
             tmpFile.delete();
         }
+
     }
 
     private void unzip(File dir, File zipFile, IntLogger logger) throws IOException {
