@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,12 +67,20 @@ public class CLIInstallerTest {
         File cliInstallDir = new File(dirToInstallTo, CLIInstaller.CLI_UNZIP_DIR);
         File cliUnzipDir = new File(cliInstallDir, "scan.cli");
         File jre = new File(cliUnzipDir, "jre");
-        File bin = new File(jre, "bin");
+        File bin = null;
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            bin = new File(jre, "Contents");
+            bin = new File(bin, "Home");
+            bin = new File(bin, "bin");
+        } else {
+            bin = new File(jre, "bin");
+        }
         bin.mkdirs();
-        File lib = new File(jre, "lib");
-        lib.mkdirs();
         File java = new File(bin, "java");
         java.createNewFile();
+
+        File lib = new File(jre, "lib");
+        lib.mkdirs();
         return dirToInstallTo;
     }
 
@@ -177,52 +186,59 @@ public class CLIInstallerTest {
     }
 
     @Test
-    public void testGetProvidedJavaHome() throws Exception {
+    public void testGetProvidedJavaExec() throws Exception {
         File installDir = setupFakeCliStructureWithJre();
         CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
         file = new File(file, "jre");
-        assertEquals(file.getAbsolutePath(), installer.getProvidedJavaHome().getAbsolutePath());
-        assertTrue(installer.getProvidedJavaHome().exists());
+        file = new File(file, "Contents");
+        file = new File(file, "Home");
+        file = new File(file, "bin");
+        file = new File(file, "java");
+        assertEquals(file.getAbsolutePath(), installer.getProvidedJavaExec().getAbsolutePath());
+        assertTrue(installer.getProvidedJavaExec().exists());
     }
 
     @Test
-    public void testGetProvidedJavaHomeJavaDNE() throws Exception {
+    public void testGetProvidedJavaExecJavaDNE() throws Exception {
         File installDir = setupFakeCliStructureWithJre();
         CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
         file = new File(file, "jre");
+        file = new File(file, "Contents");
+        file = new File(file, "Home");
         file = new File(file, "bin");
         file = new File(file, "java");
         file.delete();
-        assertNull(installer.getProvidedJavaHome());
+        assertNull(installer.getProvidedJavaExec());
     }
 
     @Test
-    public void testGetProvidedJavaHomeJavaNoBin() throws Exception {
+    public void testGetProvidedJavaExecJavaNoBin() throws Exception {
         File installDir = setupFakeCliStructureWithJre();
         CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
         file = new File(file, "jre");
-        file = new File(file, "bin");
+        file = new File(file, "Contents");
+        file = new File(file, "Home");
         installer.deleteFilesRecursive(file.listFiles());
-        assertNull(installer.getProvidedJavaHome());
+        assertNull(installer.getProvidedJavaExec());
     }
 
     @Test
-    public void testGetProvidedJavaHomeJavaNoJreFolder() throws Exception {
+    public void testGetProvidedJavaExecJavaNoJreFolder() throws Exception {
         File installDir = setupFakeCliStructure();
         CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
-        assertNull(installer.getProvidedJavaHome());
+        assertNull(installer.getProvidedJavaExec());
     }
 
     @Test
-    public void testGetProvidedJavaHomeJavaNoInstallDir() throws Exception {
+    public void testGetProvidedJavaExecJavaNoInstallDir() throws Exception {
         CLIInstaller installer = new CLIInstaller(folder.newFolder(), "TestHost");
-        assertNull(installer.getProvidedJavaHome());
+        assertNull(installer.getProvidedJavaExec());
     }
 
     @Test

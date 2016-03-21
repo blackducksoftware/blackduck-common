@@ -329,7 +329,7 @@ public class CLIInstaller {
      * @throws IOException
      * @throws InterruptedException
      */
-    public File getProvidedJavaHome() throws IOException, InterruptedException {
+    public File getProvidedJavaExec() throws IOException, InterruptedException {
 
         File cliHomeFile = getCLIHome();
         if (cliHomeFile == null) {
@@ -345,14 +345,22 @@ public class CLIInstaller {
                 }
             }
             if (jreFolder != null) {
-                File javaExec = new File(jreFolder, "bin");
+                File javaExec = null;
+                if (SystemUtils.IS_OS_MAC_OSX) {
+                    javaExec = new File(jreFolder, "Contents");
+                    javaExec = new File(javaExec, "Home");
+                    javaExec = new File(javaExec, "bin");
+                } else {
+                    javaExec = new File(jreFolder, "bin");
+                }
+
                 if (SystemUtils.IS_OS_WINDOWS) {
                     javaExec = new File(javaExec, "java.exe");
                 } else {
                     javaExec = new File(javaExec, "java");
                 }
                 if (javaExec.exists()) {
-                    return jreFolder;
+                    return javaExec;
                 }
             }
         }
