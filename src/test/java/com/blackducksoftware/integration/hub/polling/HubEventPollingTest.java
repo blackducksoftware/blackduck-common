@@ -131,9 +131,6 @@ public class HubEventPollingTest {
         });
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-<<<<<<< HEAD
-        eventPoller.assertBomUpToDate(3, scanStatusDir.getCanonicalPath(), 15000, logger);
-=======
 
         HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
         List<String> scanTargets = new ArrayList<String>();
@@ -145,7 +142,6 @@ public class HubEventPollingTest {
         hubReportGenerationInfo.setMaximumWaitTime(15000);
 
         eventPoller.assertBomUpToDate(hubReportGenerationInfo, logger);
->>>>>>> 9365310eeaeeda9ed660a3c31e97f1ebc379e88c
     }
 
     @Test
@@ -180,9 +176,6 @@ public class HubEventPollingTest {
         });
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-<<<<<<< HEAD
-        eventPoller.assertBomUpToDate(3, scanStatusDir.getCanonicalPath(), 20000, logger);
-=======
 
         HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
         List<String> scanTargets = new ArrayList<String>();
@@ -194,7 +187,6 @@ public class HubEventPollingTest {
         hubReportGenerationInfo.setMaximumWaitTime(20000);
 
         eventPoller.assertBomUpToDate(hubReportGenerationInfo, logger);
->>>>>>> 9365310eeaeeda9ed660a3c31e97f1ebc379e88c
     }
 
     @Test
@@ -215,9 +207,6 @@ public class HubEventPollingTest {
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
         try {
-<<<<<<< HEAD
-            eventPoller.assertBomUpToDate(1, scanStatusDir.getCanonicalPath(), 1000, logger);
-=======
             HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
             List<String> scanTargets = new ArrayList<String>();
             scanTargets.add("1");
@@ -226,7 +215,6 @@ public class HubEventPollingTest {
             hubReportGenerationInfo.setMaximumWaitTime(1000);
 
             eventPoller.assertBomUpToDate(hubReportGenerationInfo, logger);
->>>>>>> 9365310eeaeeda9ed660a3c31e97f1ebc379e88c
         } catch (Exception e) {
             assertTrue(e instanceof HubIntegrationException);
             assertTrue(e.getMessage(), e.getMessage().contains("The scan status file : " + statusFile1.getCanonicalPath()
@@ -260,9 +248,6 @@ public class HubEventPollingTest {
 
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-<<<<<<< HEAD
-        eventPoller.assertBomUpToDate(5, scanStatusDir.getCanonicalPath(), 20000, logger);
-=======
 
         HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
         List<String> scanTargets = new ArrayList<String>();
@@ -276,7 +261,6 @@ public class HubEventPollingTest {
         hubReportGenerationInfo.setMaximumWaitTime(20000);
 
         eventPoller.assertBomUpToDate(hubReportGenerationInfo, logger);
->>>>>>> 9365310eeaeeda9ed660a3c31e97f1ebc379e88c
     }
 
     @Test
@@ -289,9 +273,6 @@ public class HubEventPollingTest {
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-<<<<<<< HEAD
-        eventPoller.assertBomUpToDate(0, scanStatusDir.getCanonicalPath(), 1000, logger);
-=======
 
         HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
         List<String> scanTargets = new ArrayList<String>();
@@ -300,7 +281,6 @@ public class HubEventPollingTest {
         hubReportGenerationInfo.setMaximumWaitTime(1000);
 
         eventPoller.assertBomUpToDate(hubReportGenerationInfo, logger);
->>>>>>> 9365310eeaeeda9ed660a3c31e97f1ebc379e88c
     }
 
     @Test
@@ -313,9 +293,6 @@ public class HubEventPollingTest {
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-<<<<<<< HEAD
-        eventPoller.assertBomUpToDate(0, scanStatusDir.getCanonicalPath(), 1000, logger);
-=======
 
         HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
         List<String> scanTargets = new ArrayList<String>();
@@ -324,7 +301,6 @@ public class HubEventPollingTest {
         hubReportGenerationInfo.setMaximumWaitTime(1000);
 
         eventPoller.assertBomUpToDate(hubReportGenerationInfo, logger);
->>>>>>> 9365310eeaeeda9ed660a3c31e97f1ebc379e88c
     }
 
     @Test
@@ -337,9 +313,7 @@ public class HubEventPollingTest {
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-<<<<<<< HEAD
-        eventPoller.assertBomUpToDate(0, scanStatusDir.getCanonicalPath(), 1000, logger);
-=======
+
         HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
         List<String> scanTargets = new ArrayList<String>();
         hubReportGenerationInfo.setScanTargets(scanTargets);
@@ -347,7 +321,6 @@ public class HubEventPollingTest {
         hubReportGenerationInfo.setMaximumWaitTime(1000);
 
         eventPoller.assertBomUpToDate(hubReportGenerationInfo, logger);
->>>>>>> 9365310eeaeeda9ed660a3c31e97f1ebc379e88c
     }
 
     @Test
@@ -358,9 +331,6 @@ public class HubEventPollingTest {
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-<<<<<<< HEAD
-        eventPoller.assertBomUpToDate(0, "", 1000, logger);
-=======
 
         HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
         List<String> scanTargets = new ArrayList<String>();
@@ -369,7 +339,6 @@ public class HubEventPollingTest {
         hubReportGenerationInfo.setMaximumWaitTime(1000);
 
         eventPoller.assertBomUpToDate(hubReportGenerationInfo, logger);
->>>>>>> 9365310eeaeeda9ed660a3c31e97f1ebc379e88c
     }
 
     @Test
@@ -380,9 +349,6 @@ public class HubEventPollingTest {
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-<<<<<<< HEAD
-        eventPoller.assertBomUpToDate(0, null, 1000, logger);
-=======
 
         HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
         List<String> scanTargets = new ArrayList<String>();
@@ -391,7 +357,6 @@ public class HubEventPollingTest {
         hubReportGenerationInfo.setMaximumWaitTime(1000);
 
         eventPoller.assertBomUpToDate(hubReportGenerationInfo, logger);
->>>>>>> 9365310eeaeeda9ed660a3c31e97f1ebc379e88c
     }
 
     @Test
