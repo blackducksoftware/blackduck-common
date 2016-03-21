@@ -177,8 +177,10 @@ public class CLIInstallerTest {
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
         file = new File(file, "jre");
-        file = new File(file, "Contents");
-        file = new File(file, "Home");
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            file = new File(file, "Contents");
+            file = new File(file, "Home");
+        }
         file = new File(file, "bin");
         file = new File(file, "java");
         assertEquals(file.getAbsolutePath(), installer.getProvidedJavaExec().getAbsolutePath());
@@ -192,8 +194,10 @@ public class CLIInstallerTest {
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
         file = new File(file, "jre");
-        file = new File(file, "Contents");
-        file = new File(file, "Home");
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            file = new File(file, "Contents");
+            file = new File(file, "Home");
+        }
         file = new File(file, "bin");
         file = new File(file, "java");
         file.delete();
@@ -207,8 +211,10 @@ public class CLIInstallerTest {
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
         file = new File(file, "jre");
-        file = new File(file, "Contents");
-        file = new File(file, "Home");
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            file = new File(file, "Contents");
+            file = new File(file, "Home");
+        }
         installer.deleteFilesRecursive(file.listFiles());
         assertNull(installer.getProvidedJavaExec());
     }
