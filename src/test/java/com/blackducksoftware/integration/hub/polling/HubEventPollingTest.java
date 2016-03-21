@@ -77,6 +77,7 @@ public class HubEventPollingTest {
         });
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
+
         HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
         List<String> scanTargets = new ArrayList<String>();
         scanTargets.add("1");
@@ -312,6 +313,7 @@ public class HubEventPollingTest {
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
+
         HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
         List<String> scanTargets = new ArrayList<String>();
         hubReportGenerationInfo.setScanTargets(scanTargets);

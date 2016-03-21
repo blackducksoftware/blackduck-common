@@ -117,6 +117,20 @@ public class HubScanJobConfig {
         return scanTargetPathsValid;
     }
 
+    public void assertValid() throws HubIntegrationException {
+        if (maxWaitTimeForRiskReport <= 0) {
+            throw new HubIntegrationException("The maximum wait time for the risk report must be > 0.");
+        }
+
+        if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES) {
+            throw new HubIntegrationException("The minimum Hub Scan Memory is 256 MB.");
+        }
+
+        if (null == projectName || null == version && shouldGenerateRiskReport) {
+            throw new HubIntegrationException("You can not generate the Black Duck Risk Report without providing a Project Name or Version.");
+        }
+    }
+
     public String getProjectName() {
         return projectName;
     }
