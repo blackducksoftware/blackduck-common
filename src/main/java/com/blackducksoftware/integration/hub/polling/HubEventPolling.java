@@ -104,22 +104,16 @@ public class HubEventPolling {
      * until they have all have status COMPLETE. We keep trying until we hit the maximum wait time.
      * If we find a scan history object that has status cancelled or an error type then we throw an exception.
      *
-     * @return True if all of the status are COMPLETE
-     * @throws InterruptedException
-     * @throws BDRestException
-     * @throws HubIntegrationException
-     * @throws URISyntaxException
-     * @throws IOException
      */
-    public boolean isBomUpToDate(int expectedNumScans, String scanStatusDirectory, long maximumWait, IntLogger logger) throws InterruptedException,
+    public void assertBomUpToDate(HubReportGenerationInfo hubReportGenerationInfo, IntLogger logger) throws InterruptedException,
             BDRestException,
             HubIntegrationException,
             URISyntaxException,
             IOException {
-        if (StringUtils.isBlank(scanStatusDirectory)) {
+        if (StringUtils.isBlank(hubReportGenerationInfo.getScanStatusDirectory())) {
             throw new HubIntegrationException("The scan status directory must be a non empty value.");
         }
-        File statusDirectory = new File(scanStatusDirectory);
+        File statusDirectory = new File(hubReportGenerationInfo.getScanStatusDirectory());
         if (!statusDirectory.exists()) {
             throw new HubIntegrationException("The scan status directory does not exist.");
         }
@@ -130,10 +124,14 @@ public class HubEventPolling {
         if (statusFiles == null || statusFiles.length == 0) {
             throw new HubIntegrationException("Can not find the scan status files in the directory provided.");
         }
+        int expectedNumScans = 0;
+        if (hubReportGenerationInfo.getScanTargets() != null && !hubReportGenerationInfo.getScanTargets().isEmpty()) {
+            expectedNumScans = hubReportGenerationInfo.getScanTargets().size();
+        }
         if (statusFiles.length != expectedNumScans) {
             throw new HubIntegrationException("There were " + expectedNumScans + " scans configured and we found " + statusFiles.length + " status files.");
         }
-        logger.info("Checking the directory : " + scanStatusDirectory + " for the scan status's.");
+        logger.info("Checking the directory : " + statusDirectory.getCanonicalPath() + " for the scan status's.");
         CountDownLatch lock = new CountDownLatch(expectedNumScans);
 
         List<ScanStatusChecker> scanStatusList = new ArrayList<ScanStatusChecker>();
@@ -156,7 +154,7 @@ public class HubEventPolling {
         }
         pool.shutdown();
 
-        logger.debug("Cleaning up the scan staus files at : " + scanStatusDirectory);
+        logger.debug("Cleaning up the scan staus files at : " + statusDirectory.getCanonicalPath());
         // We delete the files in a second loop to ensure we have all the scan status's in memory before we start
         // deleting the files. This way, if there is an exception thrown, the User can go look at the files to see what
         // went wrong.
@@ -165,7 +163,7 @@ public class HubEventPolling {
         }
         statusDirectory.delete();
 
-        boolean finished = lock.await(maximumWait, TimeUnit.MILLISECONDS);
+        boolean finished = lock.await(hubReportGenerationInfo.getMaximumWaitTime(), TimeUnit.MILLISECONDS);
 
         for (ScanStatusChecker statusChecker : scanStatusList) {
             statusChecker.setRunning(false); // force the thread to stop executing because we have timed out or gotten
@@ -180,11 +178,9 @@ public class HubEventPolling {
         // check if finished is false then the timeout occurred and we didn't finish processing.
         // if you get here then you have finished.
         if (!finished) {
-            String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(maximumWait));
+            String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(hubReportGenerationInfo.getMaximumWaitTime()));
             throw new HubIntegrationException("The Bom has not finished updating from the scan within the specified wait time : " + formattedTime);
         }
-
-        return true;
     }
 
     private String readFileAsString(String file) throws IOException {
@@ -206,13 +202,9 @@ public class HubEventPolling {
      * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done
      * being generated. Throws HubIntegrationException after 30 minutes if the report has not been generated yet.
      *
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     * @throws InterruptedException
-     * @throws HubIntegrationException
      */
-    public boolean isReportFinishedGenerating(String reportUrl) throws IOException, BDRestException, URISyntaxException, InterruptedException,
+    public ReportMetaInformationItem isReportFinishedGenerating(String reportUrl) throws IOException, BDRestException, URISyntaxException,
+            InterruptedException,
             HubIntegrationException {
         // maximum wait time of 30 minutes
         final long maximumWait = 1000 * 60 * 30;
@@ -223,13 +215,9 @@ public class HubEventPolling {
      * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done
      * being generated. Throws HubIntegrationException after the maximum wait if the report has not been generated yet.
      *
-     * @throws IOException
-     * @throws BDRestException
-     * @throws URISyntaxException
-     * @throws InterruptedException
-     * @throws HubIntegrationException
      */
-    public boolean isReportFinishedGenerating(String reportUrl, final long maximumWait) throws IOException, BDRestException, URISyntaxException,
+    public ReportMetaInformationItem isReportFinishedGenerating(String reportUrl, final long maximumWait) throws IOException, BDRestException,
+            URISyntaxException,
             InterruptedException, HubIntegrationException {
         final long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
@@ -250,7 +238,7 @@ public class HubEventPolling {
             Thread.sleep(5000);
             elapsedTime = System.currentTimeMillis() - startTime;
         }
-        return true;
+        return reportInfo;
     }
 
 }
