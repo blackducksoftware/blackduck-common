@@ -36,8 +36,6 @@ public class CLIInstaller {
 
     private final File directoryToInstallTo;
 
-    private final String localHostName;
-
     private String proxyHost;
 
     private Integer proxyPort;
@@ -46,16 +44,12 @@ public class CLIInstaller {
 
     private String proxyPassword;
 
-    public CLIInstaller(File directoryToInstallTo, String localHostName) {
+    public CLIInstaller(File directoryToInstallTo) {
 
         if (directoryToInstallTo == null) {
             throw new IllegalArgumentException("You must provided a directory to install the CLI to.");
         }
-        if (StringUtils.isBlank(localHostName)) {
-            throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
-        }
         this.directoryToInstallTo = directoryToInstallTo;
-        this.localHostName = localHostName;
     }
 
     public String getProxyHost() {
@@ -90,10 +84,6 @@ public class CLIInstaller {
         this.proxyPassword = proxyPassword;
     }
 
-    public String getLocalHostName() {
-        return localHostName;
-    }
-
     public File getDirectoryToInstallTo() {
         return directoryToInstallTo;
     }
@@ -120,12 +110,15 @@ public class CLIInstaller {
 
     }
 
-    public void performInstallation(IntLogger logger, HubIntRestService restService) throws IOException,
+    public void performInstallation(IntLogger logger, HubIntRestService restService, String localHostName) throws IOException,
             InterruptedException, BDRestException, URISyntaxException, HubIntegrationException {
+        if (StringUtils.isBlank(localHostName)) {
+            throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
+        }
 
         String cliDownloadUrl = getCLIDownloadUrl(logger, restService);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
-            customInstall(new URL(cliDownloadUrl), restService.getHubVersion(), logger);
+            customInstall(new URL(cliDownloadUrl), restService.getHubVersion(), localHostName, logger);
         } else {
             logger.error("Could not find the correct Hub CLI download URL.");
         }
@@ -153,7 +146,8 @@ public class CLIInstaller {
 
     }
 
-    private boolean customInstall(URL archive, String hubVersion, IntLogger logger) throws IOException, InterruptedException, HubIntegrationException {
+    private boolean customInstall(URL archive, String hubVersion, String localHostName, IntLogger logger) throws IOException, InterruptedException,
+            HubIntegrationException {
 
         try {
             if (!directoryToInstallTo.exists() && !directoryToInstallTo.mkdirs()) {
@@ -234,7 +228,7 @@ public class CLIInstaller {
             // return false;
             // }
 
-            logger.info("Unpacking " + archive.toString() + " to " + cliInstallDirectory.getCanonicalPath() + " on " + getLocalHostName());
+            logger.info("Unpacking " + archive.toString() + " to " + cliInstallDirectory.getCanonicalPath() + " on " + localHostName);
 
             InputStream in = connection.getInputStream();
             CountingInputStream cis = new CountingInputStream(in);

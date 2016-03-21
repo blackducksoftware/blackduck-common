@@ -88,28 +88,13 @@ public class CLIInstallerTest {
     public void testConstructorNull() throws Exception {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("You must provided a directory to install the CLI to.");
-        new CLIInstaller(null, null);
-    }
-
-    @Test
-    public void testConstructorNullLocalHost() throws Exception {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("You must provided the hostName of the machine this is running on.");
-        new CLIInstaller(folder.newFolder(), null);
-    }
-
-    @Test
-    public void testConstructorEmptyLocalHost() throws Exception {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("You must provided the hostName of the machine this is running on.");
-        new CLIInstaller(folder.newFolder(), "");
+        new CLIInstaller(null);
     }
 
     @Test
     public void testConstructor() throws Exception {
         File dir = folder.newFolder();
-        CLIInstaller installer = new CLIInstaller(dir, "TestHost");
-        assertEquals("TestHost", installer.getLocalHostName());
+        CLIInstaller installer = new CLIInstaller(dir);
         assertEquals(dir, installer.getDirectoryToInstallTo());
 
         File unzipDir = new File(dir, CLIInstaller.CLI_UNZIP_DIR);
@@ -127,7 +112,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetCLIDownloadUrl() throws Exception {
         File dir = folder.newFolder();
-        CLIInstaller installer = new CLIInstaller(dir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(dir);
         TestLogger logger = new TestLogger();
         HubIntRestService service = new HubIntRestService("TestUrl");
         service = Mockito.spy(service);
@@ -141,7 +126,7 @@ public class CLIInstallerTest {
     @Test
     public void testDeleteRecursively() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         installer.deleteFilesRecursive(installDir.listFiles());
         assertTrue(installDir.exists());
         assertTrue(installDir.listFiles().length == 0);
@@ -150,7 +135,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetCLIHome() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
         assertEquals(file.getAbsolutePath(), installer.getCLIHome().getAbsolutePath());
@@ -160,7 +145,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetCLIHomeEmpty() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         installer.deleteFilesRecursive(file.listFiles());
         assertNull(installer.getCLIHome());
@@ -168,14 +153,14 @@ public class CLIInstallerTest {
 
     @Test
     public void testGetCLIHomeEmptyInstallDir() throws Exception {
-        CLIInstaller installer = new CLIInstaller(folder.newFolder(), "TestHost");
+        CLIInstaller installer = new CLIInstaller(folder.newFolder());
         assertNull(installer.getCLIHome());
     }
 
     @Test
     public void testGetOneJarFile() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
         file = new File(file, "lib");
@@ -188,7 +173,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetProvidedJavaExec() throws Exception {
         File installDir = setupFakeCliStructureWithJre();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
         file = new File(file, "jre");
@@ -203,7 +188,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetProvidedJavaExecJavaDNE() throws Exception {
         File installDir = setupFakeCliStructureWithJre();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
         file = new File(file, "jre");
@@ -218,7 +203,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetProvidedJavaExecJavaNoBin() throws Exception {
         File installDir = setupFakeCliStructureWithJre();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
         file = new File(file, "jre");
@@ -231,20 +216,20 @@ public class CLIInstallerTest {
     @Test
     public void testGetProvidedJavaExecJavaNoJreFolder() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         assertNull(installer.getProvidedJavaExec());
     }
 
     @Test
     public void testGetProvidedJavaExecJavaNoInstallDir() throws Exception {
-        CLIInstaller installer = new CLIInstaller(folder.newFolder(), "TestHost");
+        CLIInstaller installer = new CLIInstaller(folder.newFolder());
         assertNull(installer.getProvidedJavaExec());
     }
 
     @Test
     public void testGetCli() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
 
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
@@ -259,7 +244,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetCliDNE() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
 
         File lib = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         lib = new File(lib, "scan.cli");
@@ -280,7 +265,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetCliLibInvalid() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
 
         File lib = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         lib = new File(lib, "scan.cli");
@@ -297,7 +282,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetCliCliHomeEmpty() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
 
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
@@ -309,7 +294,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetCliCliHomeDNE() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
 
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         installer.deleteFilesRecursive(file.listFiles());
@@ -320,7 +305,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetCliExists() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
 
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
@@ -338,7 +323,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetCliExistsDNE() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
 
         File lib = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         lib = new File(lib, "scan.cli");
@@ -369,7 +354,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetCliExistsLibInvalid() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
 
         File lib = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         lib = new File(lib, "scan.cli");
@@ -397,7 +382,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetCliExistsCliHomeEmpty() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
 
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         file = new File(file, "scan.cli");
@@ -414,7 +399,7 @@ public class CLIInstallerTest {
     @Test
     public void testGetCliExistsCliHomeDNE() throws Exception {
         File installDir = setupFakeCliStructure();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
 
         File file = new File(installDir, CLIInstaller.CLI_UNZIP_DIR);
         installer.deleteFilesRecursive(file.listFiles());
@@ -423,14 +408,38 @@ public class CLIInstallerTest {
     }
 
     @Test
+    public void testPerformInstallationNullHost() throws Exception {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("You must provided the hostName of the machine this is running on.");
+        File installDir = folder.newFolder();
+        CLIInstaller installer = new CLIInstaller(installDir);
+        TestLogger logger = new TestLogger();
+        HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        service = Mockito.spy(service);
+        installer.performInstallation(logger, service, null);
+    }
+
+    @Test
+    public void testPerformInstallationUpdatingEmptyHost() throws Exception {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("You must provided the hostName of the machine this is running on.");
+        File installDir = folder.newFolder();
+        CLIInstaller installer = new CLIInstaller(installDir);
+        TestLogger logger = new TestLogger();
+        HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+        service = Mockito.spy(service);
+        installer.performInstallation(logger, service, "");
+    }
+
+    @Test
     public void testPerformInstallationUpdating() throws Exception {
         File installDir = folder.newFolder();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         TestLogger logger = new TestLogger();
         HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
         service = Mockito.spy(service);
         Mockito.doReturn("3.0.0").when(service).getHubVersion();
-        installer.performInstallation(logger, service);
+        installer.performInstallation(logger, service, "TestHost");
 
         File file = new File(installDir, CLIInstaller.VERSION_FILE_NAME);
 
@@ -442,7 +451,7 @@ public class CLIInstallerTest {
 
         // Upgrade to 4.0.0
         Mockito.doReturn("4.0.0").when(service).getHubVersion();
-        installer.performInstallation(logger, service);
+        installer.performInstallation(logger, service, "TestHost");
 
         assertTrue(file.exists());
         storedVersion = IOUtils.toString(new FileInputStream(file));
@@ -452,7 +461,7 @@ public class CLIInstallerTest {
 
         // Upgrade to 4.1.0
         Mockito.doReturn("4.1.0").when(service).getHubVersion();
-        installer.performInstallation(logger, service);
+        installer.performInstallation(logger, service, "TestHost");
 
         assertTrue(file.exists());
         storedVersion = IOUtils.toString(new FileInputStream(file));
@@ -462,7 +471,7 @@ public class CLIInstallerTest {
 
         // Upgrade to 4.1.1
         Mockito.doReturn("4.1.1").when(service).getHubVersion();
-        installer.performInstallation(logger, service);
+        installer.performInstallation(logger, service, "TestHost");
 
         assertTrue(file.exists());
         storedVersion = IOUtils.toString(new FileInputStream(file));
@@ -472,7 +481,7 @@ public class CLIInstallerTest {
 
         // Downgrade to 4.0.1
         Mockito.doReturn("4.0.1").when(service).getHubVersion();
-        installer.performInstallation(logger, service);
+        installer.performInstallation(logger, service, "TestHost");
 
         assertTrue(file.exists());
         storedVersion = IOUtils.toString(new FileInputStream(file));
@@ -482,7 +491,7 @@ public class CLIInstallerTest {
 
         // Downgrade to 4.0.0
         Mockito.doReturn("4.0.0").when(service).getHubVersion();
-        installer.performInstallation(logger, service);
+        installer.performInstallation(logger, service, "TestHost");
 
         assertTrue(file.exists());
         storedVersion = IOUtils.toString(new FileInputStream(file));
@@ -492,7 +501,7 @@ public class CLIInstallerTest {
 
         // Downgrade to 2.0.0
         Mockito.doReturn("2.0.0").when(service).getHubVersion();
-        installer.performInstallation(logger, service);
+        installer.performInstallation(logger, service, "TestHost");
 
         assertTrue(file.exists());
         storedVersion = IOUtils.toString(new FileInputStream(file));
@@ -504,11 +513,11 @@ public class CLIInstallerTest {
     @Test
     public void testPerformInstallation() throws Exception {
         File installDir = folder.newFolder();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         TestLogger logger = new TestLogger();
         HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
         service.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
-        installer.performInstallation(logger, service);
+        installer.performInstallation(logger, service, "TestHost");
 
         File file = new File(installDir, CLIInstaller.VERSION_FILE_NAME);
 
@@ -528,14 +537,14 @@ public class CLIInstallerTest {
     @Test
     public void testPerformInstallationPassThroughProxy() throws Exception {
         File installDir = folder.newFolder();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         installer.setProxyHost(testProperties.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
         installer.setProxyPort(Integer.valueOf(testProperties.getProperty("TEST_PROXY_PORT_PASSTHROUGH")));
 
         TestLogger logger = new TestLogger();
         HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
         service.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
-        installer.performInstallation(logger, service);
+        installer.performInstallation(logger, service, "TestHost");
 
         File file = new File(installDir, CLIInstaller.VERSION_FILE_NAME);
 
@@ -554,7 +563,7 @@ public class CLIInstallerTest {
     @Test
     public void testPerformInstallationBasicProxy() throws Exception {
         File installDir = folder.newFolder();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         installer.setProxyHost(testProperties.getProperty("TEST_PROXY_HOST_BASIC"));
         installer.setProxyPort(Integer.valueOf(testProperties.getProperty("TEST_PROXY_PORT_BASIC")));
         installer.setProxyUserName(testProperties.getProperty("TEST_PROXY_USER_BASIC"));
@@ -563,7 +572,7 @@ public class CLIInstallerTest {
         TestLogger logger = new TestLogger();
         HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
         service.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
-        installer.performInstallation(logger, service);
+        installer.performInstallation(logger, service, "TestHost");
 
         File file = new File(installDir, CLIInstaller.VERSION_FILE_NAME);
 
@@ -582,7 +591,7 @@ public class CLIInstallerTest {
     @Test
     public void testPerformInstallationDigestProxy() throws Exception {
         File installDir = folder.newFolder();
-        CLIInstaller installer = new CLIInstaller(installDir, "TestHost");
+        CLIInstaller installer = new CLIInstaller(installDir);
         installer.setProxyHost(testProperties.getProperty("TEST_PROXY_HOST_DIGEST"));
         installer.setProxyPort(Integer.valueOf(testProperties.getProperty("TEST_PROXY_PORT_DIGEST")));
         installer.setProxyUserName(testProperties.getProperty("TEST_PROXY_USER_DIGEST"));
@@ -591,7 +600,7 @@ public class CLIInstallerTest {
         TestLogger logger = new TestLogger();
         HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
         service.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
-        installer.performInstallation(logger, service);
+        installer.performInstallation(logger, service, "TestHost");
 
         File file = new File(installDir, CLIInstaller.VERSION_FILE_NAME);
 
