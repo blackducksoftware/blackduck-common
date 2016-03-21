@@ -23,6 +23,8 @@ public class HubReportGenerationInfo {
 
     private DateTime afterScanTime;
 
+    private String scanStatusDirectory;
+
     public HubIntRestService getService() {
         return service;
     }
@@ -85,6 +87,14 @@ public class HubReportGenerationInfo {
 
     public void setAfterScanTime(DateTime afterScanTime) {
         this.afterScanTime = afterScanTime;
+    }
+
+    public String getScanStatusDirectory() {
+        return scanStatusDirectory;
+    }
+
+    public void setScanStatusDirectory(String scanStatusDirectory) {
+        this.scanStatusDirectory = scanStatusDirectory;
     }
 
 }

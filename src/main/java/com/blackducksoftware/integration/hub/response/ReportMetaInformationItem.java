@@ -212,7 +212,7 @@ public class ReportMetaInformationItem {
         return builder.toString();
     }
 
-    static public class ReportMetaItem {
+    public static class ReportMetaItem {
         private final List<String> allow;
 
         private final String href;
@@ -298,7 +298,7 @@ public class ReportMetaInformationItem {
 
     }
 
-    static public class ReportMetaLinkItem {
+    public static class ReportMetaLinkItem {
         private final String rel;
 
         private final String href;
