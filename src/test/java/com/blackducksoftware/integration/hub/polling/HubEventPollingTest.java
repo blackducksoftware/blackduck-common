@@ -77,7 +77,7 @@ public class HubEventPollingTest {
         });
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-        assertTrue(eventPoller.isBomUpToDate(3, scanStatusDir.getCanonicalPath(), 20000, logger));
+        eventPoller.assertBomUpToDate(3, scanStatusDir.getCanonicalPath(), 20000, logger);
 
         assertTrue(logger.getOutputString(),
                 logger.getOutputString().contains("Checking the directory : " + scanStatusDir.getCanonicalPath() + " for the scan status's."));
@@ -121,7 +121,7 @@ public class HubEventPollingTest {
         });
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-        eventPoller.isBomUpToDate(3, scanStatusDir.getCanonicalPath(), 15000, logger);
+        eventPoller.assertBomUpToDate(3, scanStatusDir.getCanonicalPath(), 15000, logger);
     }
 
     @Test
@@ -156,7 +156,7 @@ public class HubEventPollingTest {
         });
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-        eventPoller.isBomUpToDate(3, scanStatusDir.getCanonicalPath(), 20000, logger);
+        eventPoller.assertBomUpToDate(3, scanStatusDir.getCanonicalPath(), 20000, logger);
     }
 
     @Test
@@ -177,7 +177,7 @@ public class HubEventPollingTest {
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
         try {
-            eventPoller.isBomUpToDate(1, scanStatusDir.getCanonicalPath(), 1000, logger);
+            eventPoller.assertBomUpToDate(1, scanStatusDir.getCanonicalPath(), 1000, logger);
         } catch (Exception e) {
             assertTrue(e instanceof HubIntegrationException);
             assertTrue(e.getMessage(), e.getMessage().contains("The scan status file : " + statusFile1.getCanonicalPath()
@@ -211,7 +211,7 @@ public class HubEventPollingTest {
 
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-        eventPoller.isBomUpToDate(5, scanStatusDir.getCanonicalPath(), 20000, logger);
+        eventPoller.assertBomUpToDate(5, scanStatusDir.getCanonicalPath(), 20000, logger);
     }
 
     @Test
@@ -224,7 +224,7 @@ public class HubEventPollingTest {
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-        eventPoller.isBomUpToDate(0, scanStatusDir.getCanonicalPath(), 1000, logger);
+        eventPoller.assertBomUpToDate(0, scanStatusDir.getCanonicalPath(), 1000, logger);
     }
 
     @Test
@@ -237,7 +237,7 @@ public class HubEventPollingTest {
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-        eventPoller.isBomUpToDate(0, scanStatusDir.getCanonicalPath(), 1000, logger);
+        eventPoller.assertBomUpToDate(0, scanStatusDir.getCanonicalPath(), 1000, logger);
     }
 
     @Test
@@ -250,7 +250,7 @@ public class HubEventPollingTest {
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-        eventPoller.isBomUpToDate(0, scanStatusDir.getCanonicalPath(), 1000, logger);
+        eventPoller.assertBomUpToDate(0, scanStatusDir.getCanonicalPath(), 1000, logger);
     }
 
     @Test
@@ -261,7 +261,7 @@ public class HubEventPollingTest {
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-        eventPoller.isBomUpToDate(0, "", 1000, logger);
+        eventPoller.assertBomUpToDate(0, "", 1000, logger);
     }
 
     @Test
@@ -272,7 +272,7 @@ public class HubEventPollingTest {
         HubIntRestService restService = Mockito.mock(HubIntRestService.class);
         HubEventPolling eventPoller = new HubEventPolling(restService);
         TestLogger logger = new TestLogger();
-        eventPoller.isBomUpToDate(0, null, 1000, logger);
+        eventPoller.assertBomUpToDate(0, null, 1000, logger);
     }
 
     @Test

@@ -103,15 +103,8 @@ public class HubEventPolling {
      * Checks the status's in the scan files and polls their URL's, every 10 seconds,
      * until they have all have status COMPLETE. We keep trying until we hit the maximum wait time.
      * If we find a scan history object that has status cancelled or an error type then we throw an exception.
-     *
-     * @return True if all of the status are COMPLETE
-     * @throws InterruptedException
-     * @throws BDRestException
-     * @throws HubIntegrationException
-     * @throws URISyntaxException
-     * @throws IOException
      */
-    public boolean isBomUpToDate(int expectedNumScans, String scanStatusDirectory, long maximumWait, IntLogger logger) throws InterruptedException,
+    public void assertBomUpToDate(int expectedNumScans, String scanStatusDirectory, long maximumWait, IntLogger logger) throws InterruptedException,
             BDRestException,
             HubIntegrationException,
             URISyntaxException,
@@ -183,8 +176,6 @@ public class HubEventPolling {
             String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(maximumWait));
             throw new HubIntegrationException("The Bom has not finished updating from the scan within the specified wait time : " + formattedTime);
         }
-
-        return true;
     }
 
     private String readFileAsString(String file) throws IOException {
