@@ -10,10 +10,8 @@ import com.blackducksoftware.integration.hub.util.TestLogger;
 import com.blackducksoftware.integration.hub.util.TestOutputStream;
 
 public class ScannerSplitStreamTest {
-
     @Test
     public void testWriteBytes() throws Exception {
-
         TestLogger logger = new TestLogger();
         TestOutputStream stream = new TestOutputStream();
 

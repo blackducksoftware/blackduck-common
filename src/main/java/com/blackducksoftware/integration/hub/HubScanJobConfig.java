@@ -1,127 +1,144 @@
 package com.blackducksoftware.integration.hub;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 
 public class HubScanJobConfig {
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
 
     public static final int DEFAULT_REPORT_WAIT_TIME_IN_MINUTES = 5;
 
-    private String projectName;
+    public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
-    private String version;
+    private final String projectName;
 
-    private String phase;
+    private final String version;
 
-    private String distribution;
+    private final String phase;
 
-    private boolean shouldGenerateRiskReport;
+    private final String distribution;
 
-    private int maxWaitTimeForRiskReport;
+    private final String workingDirectory;
 
-    private int scanMemory;
+    private final boolean shouldGenerateRiskReport;
 
-    private List<String> scanTargetPaths = new ArrayList<String>();
+    private final int maxWaitTimeForRiskReport;
 
-    private String workingDirectory;
+    private final int scanMemory;
 
-    public HubScanJobConfig() {
+    private final List<String> scanTargetPaths;
+
+    /**
+     * We don't want to instantiate this from anything but the HubScanJobConfigBuilder.
+     */
+    HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory, int scanMemory,
+            boolean shouldGenerateRiskReport, int maxWaitTimeForRiskReport, List<String> scanTargetPaths) {
+        this.projectName = projectName;
+        this.version = version;
+        this.phase = phase;
+        this.distribution = distribution;
+        this.workingDirectory = workingDirectory;
+        this.shouldGenerateRiskReport = shouldGenerateRiskReport;
+        this.maxWaitTimeForRiskReport = maxWaitTimeForRiskReport;
+        this.scanMemory = scanMemory;
+        this.scanTargetPaths = scanTargetPaths;
     }
 
-    public HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory) {
-        setProjectName(projectName);
-        setVersion(version);
-        setPhase(phase);
-        setDistribution(distribution);
-        setWorkingDirectory(workingDirectory);
+    public void assertValid(IntLogger logger) throws HubIntegrationException, IOException {
+        boolean valid = true;
+        // scan paths
+        // name
+        // version
+        // scanmemory
+        if (null == projectName && null == version) {
+            logger.warn("No Project name or Version were found. Any scans run will not be mapped to a Version.");
+        } else if (null == projectName) {
+            valid = false;
+            logger.error("No Project name was found.");
+        } else if (null == version) {
+            valid = false;
+            logger.error("No Version was found.");
+        }
+
+        if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES) {
+            valid = false;
+            logger.error("The minimum amount of memory for the scan is " + MINIMUM_MEMORY_IN_MEGABYTES + " MB.");
+        }
+
+        if (null == projectName || null == version && shouldGenerateRiskReport) {
+            valid = false;
+            logger.error("To generate the Risk Report, you need to provide a Project name or version.");
+        }
+
+        if (shouldGenerateRiskReport && maxWaitTimeForRiskReport <= 0) {
+            valid = false;
+            logger.error("The maximum wait time for the Risk Report must be greater than 0.");
+        }
+
+        if (scanTargetPaths.isEmpty()) {
+            valid = false;
+            logger.error("No scan targets configured.");
+        } else {
+            if (!validateScanTargetPaths(logger)) {
+                valid = false;
+            }
+        }
+
+        if (!valid) {
+            throw new HubIntegrationException("The configuration is not valid - please check the log for the specific issues.");
+        }
     }
 
-    public HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory, int scanMemory,
-            boolean shouldGenerateRiskReport,
-            int maxWaitTimeForRiskReport) {
-        setProjectName(projectName);
-        setVersion(version);
-        setPhase(phase);
-        setDistribution(distribution);
-        setWorkingDirectory(workingDirectory);
-        setScanMemory(scanMemory);
-        setShouldGenerateRiskReport(shouldGenerateRiskReport);
-        setMaxWaitTimeForRiskReport(maxWaitTimeForRiskReport);
-    }
+    private boolean validateScanTargetPaths(IntLogger logger) throws IOException {
+        boolean scanTargetPathsValid = true;
+        for (String targetAbsolutePath : scanTargetPaths) {
+            if (null == targetAbsolutePath) {
+                logger.error("Can not scan null target.");
+                scanTargetPathsValid = false;
+            }
 
-    public HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory, String scanMemory,
-            String shouldGenerateRiskReport,
-            String maxWaitTimeForRiskReport) {
-        setProjectName(projectName);
-        setVersion(version);
-        setPhase(phase);
-        setDistribution(distribution);
-        setWorkingDirectory(workingDirectory);
-        setScanMemory(scanMemory);
-        setShouldGenerateRiskReport(shouldGenerateRiskReport);
-        setMaxWaitTimeForRiskReport(maxWaitTimeForRiskReport);
+            File target = new File(targetAbsolutePath);
+            if (null == target || !target.exists()) {
+                logger.error("The scan target '" + target.getAbsolutePath() + "' does not exist.");
+                scanTargetPathsValid = false;
+            }
+
+            String targetCanonicalPath = target.getCanonicalPath();
+            if (!targetCanonicalPath.startsWith(workingDirectory)) {
+                logger.error("Can not scan targets outside the working directory.");
+                scanTargetPathsValid = false;
+            }
+        }
+
+        return scanTargetPathsValid;
     }
 
     public String getProjectName() {
         return projectName;
     }
 
-    public void setProjectName(String projectName) {
-        if (StringUtils.isNotBlank(projectName)) {
-            this.projectName = projectName.trim();
-        } else {
-            this.projectName = null;
-        }
-    }
-
     public String getVersion() {
         return version;
-    }
-
-    public void setVersion(String version) {
-        if (StringUtils.isNotBlank(version)) {
-            this.version = version.trim();
-        } else {
-            this.version = null;
-        }
     }
 
     public String getPhase() {
         return phase;
     }
 
-    public void setPhase(String phase) {
-        this.phase = phase;
-    }
-
     public String getDistribution() {
         return distribution;
     }
 
-    public void setDistribution(String distribution) {
-        this.distribution = distribution;
+    public String getWorkingDirectory() {
+        return workingDirectory;
     }
 
     public boolean isShouldGenerateRiskReport() {
         return shouldGenerateRiskReport;
-    }
-
-    public void setShouldGenerateRiskReport(boolean shouldGenerateRiskReport) {
-        if (null == projectName || null == version) {
-            // Dont want to generate the report if they have not provided a Project name or version
-            this.shouldGenerateRiskReport = false;
-        } else {
-            this.shouldGenerateRiskReport = shouldGenerateRiskReport;
-        }
-    }
-
-    public void setShouldGenerateRiskReport(String shouldGenerateRiskReport) {
-        boolean shouldGenerateRiskReportValue = Boolean.valueOf(shouldGenerateRiskReport);
-        setShouldGenerateRiskReport(shouldGenerateRiskReportValue);
     }
 
     public int getMaxWaitTimeForRiskReport() {
@@ -132,55 +149,12 @@ public class HubScanJobConfig {
         return maxWaitTimeForRiskReport * 60 * 1000;
     }
 
-    public void setMaxWaitTimeForRiskReport(int maxWaitTimeForRiskReport) {
-        this.maxWaitTimeForRiskReport = maxWaitTimeForRiskReport;
-        if (maxWaitTimeForRiskReport <= 0) {
-            this.maxWaitTimeForRiskReport = DEFAULT_REPORT_WAIT_TIME_IN_MINUTES;
-        } else {
-            this.maxWaitTimeForRiskReport = maxWaitTimeForRiskReport;
-        }
-    }
-
-    public void setMaxWaitTimeForRiskReport(String maxWaitTimeForRiskReport) {
-        int maxWaitTimeForRiskReportValue = NumberUtils.toInt(maxWaitTimeForRiskReport, DEFAULT_REPORT_WAIT_TIME_IN_MINUTES);
-        setMaxWaitTimeForRiskReport(maxWaitTimeForRiskReportValue);
-    }
-
     public int getScanMemory() {
         return scanMemory;
     }
 
-    public void setScanMemory(int scanMemory) {
-        if (scanMemory <= 0) {
-            this.scanMemory = DEFAULT_MEMORY_IN_MEGABYTES;
-        } else {
-            this.scanMemory = scanMemory;
-        }
-    }
-
-    public void setScanMemory(String scanMemory) {
-        int scanMemoryValue = NumberUtils.toInt(scanMemory, DEFAULT_MEMORY_IN_MEGABYTES);
-        setScanMemory(scanMemoryValue);
-    }
-
     public List<String> getScanTargetPaths() {
         return scanTargetPaths;
-    }
-
-    public void addScanTargetPath(String scanTargetPath) {
-        scanTargetPaths.add(scanTargetPath);
-    }
-
-    public void addAllScanTargetPaths(List<String> scanTargetPaths) {
-        this.scanTargetPaths.addAll(scanTargetPaths);
-    }
-
-    public String getWorkingDirectory() {
-        return workingDirectory;
-    }
-
-    public void setWorkingDirectory(String workingDirectory) {
-        this.workingDirectory = workingDirectory;
     }
 
 }
