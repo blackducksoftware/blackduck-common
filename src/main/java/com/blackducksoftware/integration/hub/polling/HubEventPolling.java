@@ -103,7 +103,6 @@ public class HubEventPolling {
      * Checks the status's in the scan files and polls their URL's, every 10 seconds,
      * until they have all have status COMPLETE. We keep trying until we hit the maximum wait time.
      * If we find a scan history object that has status cancelled or an error type then we throw an exception.
-     *
      */
     public void assertBomUpToDate(HubReportGenerationInfo hubReportGenerationInfo, IntLogger logger) throws InterruptedException,
             BDRestException,

@@ -6,8 +6,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+
 public class HubScanJobConfig {
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
+
+    public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
     public static final int DEFAULT_REPORT_WAIT_TIME_IN_MINUTES = 5;
 
@@ -66,16 +70,26 @@ public class HubScanJobConfig {
         setMaxWaitTimeForRiskReport(maxWaitTimeForRiskReport);
     }
 
+    public void assertValid() throws HubIntegrationException {
+        if (maxWaitTimeForRiskReport <= 0) {
+            throw new HubIntegrationException("The maximum wait time for the risk report must be > 0.");
+        }
+
+        if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES) {
+            throw new HubIntegrationException("The minimum Hub Scan Memory is 256 MB.");
+        }
+
+        if (null == projectName || null == version && shouldGenerateRiskReport) {
+            throw new HubIntegrationException("You can not generate the Black Duck Risk Report without providing a Project Name or Version.");
+        }
+    }
+
     public String getProjectName() {
         return projectName;
     }
 
     public void setProjectName(String projectName) {
-        if (StringUtils.isNotBlank(projectName)) {
-            this.projectName = projectName.trim();
-        } else {
-            this.projectName = null;
-        }
+        this.projectName = StringUtils.trimToNull(projectName);
     }
 
     public String getVersion() {
@@ -83,11 +97,7 @@ public class HubScanJobConfig {
     }
 
     public void setVersion(String version) {
-        if (StringUtils.isNotBlank(version)) {
-            this.version = version.trim();
-        } else {
-            this.version = null;
-        }
+        this.version = StringUtils.trimToNull(version);
     }
 
     public String getPhase() {
@@ -111,12 +121,7 @@ public class HubScanJobConfig {
     }
 
     public void setShouldGenerateRiskReport(boolean shouldGenerateRiskReport) {
-        if (null == projectName || null == version) {
-            // Dont want to generate the report if they have not provided a Project name or version
-            this.shouldGenerateRiskReport = false;
-        } else {
-            this.shouldGenerateRiskReport = shouldGenerateRiskReport;
-        }
+        this.shouldGenerateRiskReport = shouldGenerateRiskReport;
     }
 
     public void setShouldGenerateRiskReport(String shouldGenerateRiskReport) {
@@ -134,15 +139,10 @@ public class HubScanJobConfig {
 
     public void setMaxWaitTimeForRiskReport(int maxWaitTimeForRiskReport) {
         this.maxWaitTimeForRiskReport = maxWaitTimeForRiskReport;
-        if (maxWaitTimeForRiskReport <= 0) {
-            this.maxWaitTimeForRiskReport = DEFAULT_REPORT_WAIT_TIME_IN_MINUTES;
-        } else {
-            this.maxWaitTimeForRiskReport = maxWaitTimeForRiskReport;
-        }
     }
 
     public void setMaxWaitTimeForRiskReport(String maxWaitTimeForRiskReport) {
-        int maxWaitTimeForRiskReportValue = NumberUtils.toInt(maxWaitTimeForRiskReport, DEFAULT_REPORT_WAIT_TIME_IN_MINUTES);
+        int maxWaitTimeForRiskReportValue = NumberUtils.toInt(maxWaitTimeForRiskReport);
         setMaxWaitTimeForRiskReport(maxWaitTimeForRiskReportValue);
     }
 
@@ -151,15 +151,11 @@ public class HubScanJobConfig {
     }
 
     public void setScanMemory(int scanMemory) {
-        if (scanMemory <= 0) {
-            this.scanMemory = DEFAULT_MEMORY_IN_MEGABYTES;
-        } else {
-            this.scanMemory = scanMemory;
-        }
+        this.scanMemory = scanMemory;
     }
 
     public void setScanMemory(String scanMemory) {
-        int scanMemoryValue = NumberUtils.toInt(scanMemory, DEFAULT_MEMORY_IN_MEGABYTES);
+        int scanMemoryValue = NumberUtils.toInt(scanMemory);
         setScanMemory(scanMemoryValue);
     }
 
