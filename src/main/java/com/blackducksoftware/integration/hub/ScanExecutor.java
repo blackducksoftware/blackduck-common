@@ -258,7 +258,7 @@ public abstract class ScanExecutor {
         else {
             File javaExecFile = new File(javaExec);
             if (!javaExecFile.exists()) {
-                getLogger().error("The Java home provided does not exist.");
+                getLogger().error("The Java executable provided does not exist at : " + javaExecFile.getAbsolutePath());
                 return false;
             }
         }
