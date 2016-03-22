@@ -4,6 +4,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 import com.blackducksoftware.integration.suite.sdk.logging.LogLevel;
 
@@ -34,24 +36,12 @@ public class TestLogger implements IntLogger {
     }
 
     public String getOutputString() {
-        if (outputList != null && !outputList.isEmpty()) {
-
-            StringBuilder sb = new StringBuilder();
-            for (String string : outputList) {
-                if (sb.length() > 0) {
-                    sb.append('\n');
-                }
-                sb.append(string);
-            }
-            return sb.toString();
-        }
-        return "";
+        return StringUtils.join(outputList, '\n');
     }
 
     public String getErrorOutputString() {
+        StringBuilder sb = new StringBuilder();
         if (errorList != null && !errorList.isEmpty()) {
-
-            StringBuilder sb = new StringBuilder();
             for (Throwable e : errorList) {
                 if (sb.length() > 0) {
                     sb.append('\n');
@@ -60,15 +50,13 @@ public class TestLogger implements IntLogger {
                 e.printStackTrace(new PrintWriter(sw));
                 sb.append(sw.toString());
             }
-            return sb.toString();
         }
-        return "";
+        return sb.toString();
     }
 
     @Override
     public void debug(String txt) {
         outputList.add(txt);
-
     }
 
     @Override
@@ -85,7 +73,6 @@ public class TestLogger implements IntLogger {
     @Override
     public void error(String txt) {
         outputList.add(txt);
-
     }
 
     @Override
@@ -97,13 +84,11 @@ public class TestLogger implements IntLogger {
     @Override
     public void info(String txt) {
         outputList.add(txt);
-
     }
 
     @Override
     public void trace(String txt) {
         outputList.add(txt);
-
     }
 
     @Override
@@ -115,18 +100,15 @@ public class TestLogger implements IntLogger {
     @Override
     public void warn(String txt) {
         outputList.add(txt);
-
     }
 
     @Override
     public void setLogLevel(LogLevel level) {
-
     }
 
     @Override
     public LogLevel getLogLevel() {
         return null;
-
     }
 
 }

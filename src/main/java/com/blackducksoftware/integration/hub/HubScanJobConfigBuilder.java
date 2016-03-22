@@ -66,7 +66,7 @@ public class HubScanJobConfigBuilder {
             logger.error("The minimum amount of memory for the scan is " + MINIMUM_MEMORY_IN_MEGABYTES + " MB.");
         }
 
-        if (null == projectName || null == version && shouldGenerateRiskReport) {
+        if ((null == projectName || null == version) && shouldGenerateRiskReport) {
             valid = false;
             logger.error("To generate the Risk Report, you need to provide a Project name or version.");
         }
@@ -171,8 +171,8 @@ public class HubScanJobConfigBuilder {
         this.workingDirectory = workingDirectory;
     }
 
-    public void setDisableScanTargetPathExistenceCheck(boolean disableScanTargetPathExistence) {
-
+    public void disableScanTargetPathExistenceCheck() {
+        disableScanTargetPathExistenceCheck = true;
     }
 
 }
