@@ -8,7 +8,6 @@ import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 import com.blackducksoftware.integration.suite.sdk.logging.LogLevel;
 
 public class TestLogger implements IntLogger {
-
     private ArrayList<String> outputList = new ArrayList<String>();
 
     private ArrayList<Throwable> errorList = new ArrayList<Throwable>();
