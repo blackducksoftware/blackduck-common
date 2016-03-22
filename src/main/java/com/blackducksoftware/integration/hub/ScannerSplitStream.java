@@ -65,7 +65,6 @@ public class ScannerSplitStream extends OutputStream {
         outputFileStream.write(b);
 
         String stringAcii = new String(Character.toChars(b));
-
         StringBuilder builder = new StringBuilder();
         builder.append(currentLine);
         switch (b) {
@@ -95,25 +94,25 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     private Boolean isLoggableLine(String line) {
-        if (line.contains(ERROR)) {
+        if (StringUtils.containsIgnoreCase(line, ERROR)) {
             return true;
         }
-        if (line.contains(WARN)) {
+        if (StringUtils.containsIgnoreCase(line, WARN)) {
             return true;
         }
-        if (line.contains(INFO)) {
+        if (StringUtils.containsIgnoreCase(line, INFO)) {
             return true;
         }
-        if (line.contains(DEBUG)) {
+        if (StringUtils.containsIgnoreCase(line, DEBUG)) {
             return true;
         }
-        if (line.contains(TRACE)) {
+        if (StringUtils.containsIgnoreCase(line, TRACE)) {
             return true;
         }
-        if (line.contains(EXCEPTION)) {
+        if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
             return true;
         }
-        if (line.contains(FINISHED)) {
+        if (StringUtils.containsIgnoreCase(line, FINISHED)) {
             return true;
         }
         return false;
@@ -123,7 +122,6 @@ public class ScannerSplitStream extends OutputStream {
         if (lineBuffer.length() == 0) {
             // First log line found, put it in the buffer
             lineBuffer = line;
-
         } else if (isLoggableLine(line)) {
             // next real log message came in, print the log in the buffer
             // print stored lines
@@ -135,7 +133,6 @@ public class ScannerSplitStream extends OutputStream {
         } else {
             // We assume that each new log starts with the log level, if this line does not contain a log level it
             // must only be a piece of a log
-
             // needs to be added into the buffer
             StringBuilder builder = new StringBuilder();
             builder.append(lineBuffer);
@@ -151,7 +148,7 @@ public class ScannerSplitStream extends OutputStream {
         outputFileStream.write(byteArray);
 
         String currentLine = new String(byteArray, "UTF-8");
-
+        logger.info(currentLine);
         if (currentLine.contains(System.getProperty("line.separator"))) {
             String[] splitLines = currentLine.split(System.getProperty("line.separator"));
 
@@ -168,7 +165,7 @@ public class ScannerSplitStream extends OutputStream {
         outputFileStream.write(byteArray, offset, length);
 
         String currentLine = new String(byteArray, offset, length, "UTF-8");
-
+        logger.info(currentLine);
         if (currentLine.contains(System.getProperty("line.separator"))) {
             String[] splitLines = currentLine.split(System.getProperty("line.separator"));
 
@@ -205,24 +202,24 @@ public class ScannerSplitStream extends OutputStream {
         StringBuilder builder = new StringBuilder();
         builder.append(output);
 
-        if (line.contains(EXCEPTION)) {
+        if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
             // looking for 'Exception in thread' type messages
             builder.append(line);
             builder.append(System.getProperty("line.separator"));
             logger.error(line);
-        } else if (line.contains(FINISHED)) {
+        } else if (StringUtils.containsIgnoreCase(line, FINISHED)) {
             builder.append(line);
             builder.append(System.getProperty("line.separator"));
             logger.info(line);
-        } else if (line.contains(ERROR)) {
+        } else if (StringUtils.containsIgnoreCase(line, ERROR)) {
             builder.append(line);
             builder.append(System.getProperty("line.separator"));
             logger.error(line);
-        } else if (line.contains(WARN)) {
+        } else if (StringUtils.containsIgnoreCase(line, WARN)) {
             builder.append(line);
             builder.append(System.getProperty("line.separator"));
             logger.warn(line);
-        } else if (line.contains(INFO)) {
+        } else if (StringUtils.containsIgnoreCase(line, INFO)) {
             builder.append(line);
             builder.append(System.getProperty("line.separator"));
             logger.info(line);

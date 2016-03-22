@@ -276,7 +276,7 @@ public class ScanExecutorTest {
         assertEquals(Result.FAILURE, result);
 
         String output = logger.getOutputString();
-        assertTrue(output, output.contains("The Java home provided does not exist."));
+        assertTrue(output, output.contains("The Java executable provided does not exist at : "));
     }
 
     @Test
