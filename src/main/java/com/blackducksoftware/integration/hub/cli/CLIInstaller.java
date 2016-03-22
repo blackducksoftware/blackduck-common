@@ -102,7 +102,15 @@ public class CLIInstaller {
         if (installDirFiles == null) {
             return null;
         }
-        if (installDirFiles.length == 1) {
+        if (installDirFiles.length > 1) {
+            // The cli is currently packed with an extra directory "scan.cli-windows-X.X.X-SNAPSHOT"
+            for (File currentFile : installDirFiles) {
+                if (!currentFile.getName().contains("windows")) {
+                    return currentFile;
+                }
+            }
+            return null;
+        } else if (installDirFiles.length == 1) {
             return installDirFiles[0];
         } else {
             return null;
@@ -131,14 +139,14 @@ public class CLIInstaller {
             HubSupportHelper hubSupport = new HubSupportHelper();
 
             hubSupport.checkHubSupport(restService, logger);
-            //
-            // if (SystemUtils.IS_OS_MAC_OSX && hubSupport.isJreProvidedSupport()) {
-            // return HubSupportHelper.getOSXCLIWrapperLink(restService.getBaseUrl());
-            // } else if (SystemUtils.IS_OS_WINDOWS && hubSupport.isJreProvidedSupport()) {
-            // return HubSupportHelper.getWindowsCLIWrapperLink(restService.getBaseUrl());
-            // } else {
-            return HubSupportHelper.getLinuxCLIWrapperLink(restService.getBaseUrl());
-            // }
+
+            if (SystemUtils.IS_OS_MAC_OSX && hubSupport.isJreProvidedSupport()) {
+                return HubSupportHelper.getOSXCLIWrapperLink(restService.getBaseUrl());
+            } else if (SystemUtils.IS_OS_WINDOWS && hubSupport.isJreProvidedSupport()) {
+                return HubSupportHelper.getWindowsCLIWrapperLink(restService.getBaseUrl());
+            } else {
+                return HubSupportHelper.getLinuxCLIWrapperLink(restService.getBaseUrl());
+            }
         } catch (URISyntaxException e) {
             logger.error(e.getMessage(), e);
         }

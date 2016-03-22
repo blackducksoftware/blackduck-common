@@ -153,7 +153,7 @@ public class HubEventPolling {
         }
         pool.shutdown();
 
-        logger.debug("Cleaning up the scan staus files at : " + statusDirectory.getCanonicalPath());
+        logger.debug("Cleaning up the scan status files at : " + statusDirectory.getCanonicalPath());
         // We delete the files in a second loop to ensure we have all the scan status's in memory before we start
         // deleting the files. This way, if there is an exception thrown, the User can go look at the files to see what
         // went wrong.
