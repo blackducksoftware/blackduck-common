@@ -1,19 +1,10 @@
 package com.blackducksoftware.integration.hub;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
+import com.google.common.collect.ImmutableList;
 
 public class HubScanJobConfig {
-    public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
-
-    public static final int DEFAULT_REPORT_WAIT_TIME_IN_MINUTES = 5;
-
-    public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
-
     private final String projectName;
 
     private final String version;
@@ -30,13 +21,13 @@ public class HubScanJobConfig {
 
     private final int scanMemory;
 
-    private final List<String> scanTargetPaths;
+    private final ImmutableList<String> scanTargetPaths;
 
     /**
      * We don't want to instantiate this from anything but the HubScanJobConfigBuilder.
      */
     HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory, int scanMemory,
-            boolean shouldGenerateRiskReport, int maxWaitTimeForRiskReport, List<String> scanTargetPaths) {
+            boolean shouldGenerateRiskReport, int maxWaitTimeForRiskReport, ImmutableList<String> scanTargetPaths) {
         this.projectName = projectName;
         this.version = version;
         this.phase = phase;
@@ -46,89 +37,6 @@ public class HubScanJobConfig {
         this.maxWaitTimeForRiskReport = maxWaitTimeForRiskReport;
         this.scanMemory = scanMemory;
         this.scanTargetPaths = scanTargetPaths;
-    }
-
-    public void assertValid(IntLogger logger) throws HubIntegrationException, IOException {
-        boolean valid = true;
-        // scan paths
-        // name
-        // version
-        // scanmemory
-        if (null == projectName && null == version) {
-            logger.warn("No Project name or Version were found. Any scans run will not be mapped to a Version.");
-        } else if (null == projectName) {
-            valid = false;
-            logger.error("No Project name was found.");
-        } else if (null == version) {
-            valid = false;
-            logger.error("No Version was found.");
-        }
-
-        if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES) {
-            valid = false;
-            logger.error("The minimum amount of memory for the scan is " + MINIMUM_MEMORY_IN_MEGABYTES + " MB.");
-        }
-
-        if (null == projectName || null == version && shouldGenerateRiskReport) {
-            valid = false;
-            logger.error("To generate the Risk Report, you need to provide a Project name or version.");
-        }
-
-        if (shouldGenerateRiskReport && maxWaitTimeForRiskReport <= 0) {
-            valid = false;
-            logger.error("The maximum wait time for the Risk Report must be greater than 0.");
-        }
-
-        if (scanTargetPaths.isEmpty()) {
-            valid = false;
-            logger.error("No scan targets configured.");
-        } else {
-            if (!validateScanTargetPaths(logger)) {
-                valid = false;
-            }
-        }
-
-        if (!valid) {
-            throw new HubIntegrationException("The configuration is not valid - please check the log for the specific issues.");
-        }
-    }
-
-    private boolean validateScanTargetPaths(IntLogger logger) throws IOException {
-        boolean scanTargetPathsValid = true;
-        for (String targetAbsolutePath : scanTargetPaths) {
-            if (null == targetAbsolutePath) {
-                logger.error("Can not scan null target.");
-                scanTargetPathsValid = false;
-            }
-
-            File target = new File(targetAbsolutePath);
-            if (null == target || !target.exists()) {
-                logger.error("The scan target '" + target.getAbsolutePath() + "' does not exist.");
-                scanTargetPathsValid = false;
-            }
-
-            String targetCanonicalPath = target.getCanonicalPath();
-            if (!targetCanonicalPath.startsWith(workingDirectory)) {
-                logger.error("Can not scan targets outside the working directory.");
-                scanTargetPathsValid = false;
-            }
-        }
-
-        return scanTargetPathsValid;
-    }
-
-    public void assertValid() throws HubIntegrationException {
-        if (maxWaitTimeForRiskReport <= 0) {
-            throw new HubIntegrationException("The maximum wait time for the risk report must be > 0.");
-        }
-
-        if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES) {
-            throw new HubIntegrationException("The minimum Hub Scan Memory is 256 MB.");
-        }
-
-        if (null == projectName || null == version && shouldGenerateRiskReport) {
-            throw new HubIntegrationException("You can not generate the Black Duck Risk Report without providing a Project Name or Version.");
-        }
     }
 
     public String getProjectName() {
@@ -169,6 +77,95 @@ public class HubScanJobConfig {
 
     public List<String> getScanTargetPaths() {
         return scanTargetPaths;
+    }
+
+    @Override
+    public String toString() {
+        return "HubScanJobConfig [projectName=" + projectName + ", version=" + version + ", phase=" + phase + ", distribution=" + distribution
+                + ", workingDirectory=" + workingDirectory + ", shouldGenerateRiskReport=" + shouldGenerateRiskReport + ", maxWaitTimeForRiskReport="
+                + maxWaitTimeForRiskReport + ", scanMemory=" + scanMemory + ", scanTargetPaths=" + scanTargetPaths + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((distribution == null) ? 0 : distribution.hashCode());
+        result = prime * result + maxWaitTimeForRiskReport;
+        result = prime * result + ((phase == null) ? 0 : phase.hashCode());
+        result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
+        result = prime * result + scanMemory;
+        result = prime * result + ((scanTargetPaths == null) ? 0 : scanTargetPaths.hashCode());
+        result = prime * result + (shouldGenerateRiskReport ? 1231 : 1237);
+        result = prime * result + ((version == null) ? 0 : version.hashCode());
+        result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        HubScanJobConfig other = (HubScanJobConfig) obj;
+        if (distribution == null) {
+            if (other.distribution != null) {
+                return false;
+            }
+        } else if (!distribution.equals(other.distribution)) {
+            return false;
+        }
+        if (maxWaitTimeForRiskReport != other.maxWaitTimeForRiskReport) {
+            return false;
+        }
+        if (phase == null) {
+            if (other.phase != null) {
+                return false;
+            }
+        } else if (!phase.equals(other.phase)) {
+            return false;
+        }
+        if (projectName == null) {
+            if (other.projectName != null) {
+                return false;
+            }
+        } else if (!projectName.equals(other.projectName)) {
+            return false;
+        }
+        if (scanMemory != other.scanMemory) {
+            return false;
+        }
+        if (scanTargetPaths == null) {
+            if (other.scanTargetPaths != null) {
+                return false;
+            }
+        } else if (!scanTargetPaths.equals(other.scanTargetPaths)) {
+            return false;
+        }
+        if (shouldGenerateRiskReport != other.shouldGenerateRiskReport) {
+            return false;
+        }
+        if (version == null) {
+            if (other.version != null) {
+                return false;
+            }
+        } else if (!version.equals(other.version)) {
+            return false;
+        }
+        if (workingDirectory == null) {
+            if (other.workingDirectory != null) {
+                return false;
+            }
+        } else if (!workingDirectory.equals(other.workingDirectory)) {
+            return false;
+        }
+        return true;
     }
 
 }
