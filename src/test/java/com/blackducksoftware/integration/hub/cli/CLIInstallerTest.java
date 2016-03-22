@@ -444,64 +444,54 @@ public class CLIInstallerTest {
         TestLogger logger = new TestLogger();
         HubIntRestService service = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
         service = Mockito.spy(service);
-        Mockito.doReturn("3.0.0").when(service).getHubVersion();
+        Mockito.doReturn("1.0.0").when(service).getHubVersion();
         installer.performInstallation(logger, service, "TestHost");
 
         File file = new File(installDir, CLIInstaller.VERSION_FILE_NAME);
 
         assertTrue(file.exists());
         String storedVersion = IOUtils.toString(new FileInputStream(file));
-        assertEquals("3.0.0", storedVersion);
+        assertEquals("1.0.0", storedVersion);
         assertTrue(installer.getCLIExists(logger));
         assertNotNull(installer.getCLI());
 
-        // Upgrade to 4.0.0
-        Mockito.doReturn("4.0.0").when(service).getHubVersion();
+        // Upgrade to 2.0.0
+        Mockito.doReturn("2.0.0").when(service).getHubVersion();
         installer.performInstallation(logger, service, "TestHost");
 
         assertTrue(file.exists());
         storedVersion = IOUtils.toString(new FileInputStream(file));
-        assertEquals("4.0.0", storedVersion);
+        assertEquals("2.0.0", storedVersion);
         assertTrue(installer.getCLIExists(logger));
         assertNotNull(installer.getCLI());
 
-        // Upgrade to 4.1.0
-        Mockito.doReturn("4.1.0").when(service).getHubVersion();
+        // Upgrade to 2.1.0
+        Mockito.doReturn("2.1.0").when(service).getHubVersion();
         installer.performInstallation(logger, service, "TestHost");
 
         assertTrue(file.exists());
         storedVersion = IOUtils.toString(new FileInputStream(file));
-        assertEquals("4.1.0", storedVersion);
+        assertEquals("2.1.0", storedVersion);
         assertTrue(installer.getCLIExists(logger));
         assertNotNull(installer.getCLI());
 
-        // Upgrade to 4.1.1
-        Mockito.doReturn("4.1.1").when(service).getHubVersion();
+        // Upgrade to 2.1.1
+        Mockito.doReturn("2.1.1").when(service).getHubVersion();
         installer.performInstallation(logger, service, "TestHost");
 
         assertTrue(file.exists());
         storedVersion = IOUtils.toString(new FileInputStream(file));
-        assertEquals("4.1.1", storedVersion);
+        assertEquals("2.1.1", storedVersion);
         assertTrue(installer.getCLIExists(logger));
         assertNotNull(installer.getCLI());
 
-        // Downgrade to 4.0.1
-        Mockito.doReturn("4.0.1").when(service).getHubVersion();
+        // Downgrade to 2.0.1
+        Mockito.doReturn("2.0.1").when(service).getHubVersion();
         installer.performInstallation(logger, service, "TestHost");
 
         assertTrue(file.exists());
         storedVersion = IOUtils.toString(new FileInputStream(file));
-        assertEquals("4.0.1", storedVersion);
-        assertTrue(installer.getCLIExists(logger));
-        assertNotNull(installer.getCLI());
-
-        // Downgrade to 4.0.0
-        Mockito.doReturn("4.0.0").when(service).getHubVersion();
-        installer.performInstallation(logger, service, "TestHost");
-
-        assertTrue(file.exists());
-        storedVersion = IOUtils.toString(new FileInputStream(file));
-        assertEquals("4.0.0", storedVersion);
+        assertEquals("2.0.1", storedVersion);
         assertTrue(installer.getCLIExists(logger));
         assertNotNull(installer.getCLI());
 
@@ -512,6 +502,16 @@ public class CLIInstallerTest {
         assertTrue(file.exists());
         storedVersion = IOUtils.toString(new FileInputStream(file));
         assertEquals("2.0.0", storedVersion);
+        assertTrue(installer.getCLIExists(logger));
+        assertNotNull(installer.getCLI());
+
+        // Downgrade to 1.0.0
+        Mockito.doReturn("1.0.0").when(service).getHubVersion();
+        installer.performInstallation(logger, service, "TestHost");
+
+        assertTrue(file.exists());
+        storedVersion = IOUtils.toString(new FileInputStream(file));
+        assertEquals("1.0.0", storedVersion);
         assertTrue(installer.getCLIExists(logger));
         assertNotNull(installer.getCLI());
     }
