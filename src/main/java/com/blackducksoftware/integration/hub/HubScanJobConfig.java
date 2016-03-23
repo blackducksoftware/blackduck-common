@@ -1,132 +1,66 @@
 package com.blackducksoftware.integration.hub;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.google.common.collect.ImmutableList;
 
 public class HubScanJobConfig {
-    public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
+    private final String projectName;
 
-    public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
+    private final String version;
 
-    public static final int DEFAULT_REPORT_WAIT_TIME_IN_MINUTES = 5;
+    private final String phase;
 
-    private String projectName;
+    private final String distribution;
 
-    private String version;
+    private final String workingDirectory;
 
-    private String phase;
+    private final boolean shouldGenerateRiskReport;
 
-    private String distribution;
+    private final int maxWaitTimeForRiskReport;
 
-    private boolean shouldGenerateRiskReport;
+    private final int scanMemory;
 
-    private int maxWaitTimeForRiskReport;
+    private final ImmutableList<String> scanTargetPaths;
 
-    private int scanMemory;
-
-    private List<String> scanTargetPaths = new ArrayList<String>();
-
-    private String workingDirectory;
-
-    public HubScanJobConfig() {
-    }
-
-    public HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory) {
-        setProjectName(projectName);
-        setVersion(version);
-        setPhase(phase);
-        setDistribution(distribution);
-        setWorkingDirectory(workingDirectory);
-    }
-
-    public HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory, int scanMemory,
-            boolean shouldGenerateRiskReport,
-            int maxWaitTimeForRiskReport) {
-        setProjectName(projectName);
-        setVersion(version);
-        setPhase(phase);
-        setDistribution(distribution);
-        setWorkingDirectory(workingDirectory);
-        setScanMemory(scanMemory);
-        setShouldGenerateRiskReport(shouldGenerateRiskReport);
-        setMaxWaitTimeForRiskReport(maxWaitTimeForRiskReport);
-    }
-
-    public HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory, String scanMemory,
-            String shouldGenerateRiskReport,
-            String maxWaitTimeForRiskReport) {
-        setProjectName(projectName);
-        setVersion(version);
-        setPhase(phase);
-        setDistribution(distribution);
-        setWorkingDirectory(workingDirectory);
-        setScanMemory(scanMemory);
-        setShouldGenerateRiskReport(shouldGenerateRiskReport);
-        setMaxWaitTimeForRiskReport(maxWaitTimeForRiskReport);
-    }
-
-    public void assertValid() throws HubIntegrationException {
-        if (maxWaitTimeForRiskReport <= 0) {
-            throw new HubIntegrationException("The maximum wait time for the risk report must be > 0.");
-        }
-
-        if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES) {
-            throw new HubIntegrationException("The minimum Hub Scan Memory is 256 MB.");
-        }
-
-        if (null == projectName || null == version && shouldGenerateRiskReport) {
-            throw new HubIntegrationException("You can not generate the Black Duck Risk Report without providing a Project Name or Version.");
-        }
+    /**
+     * We don't want to instantiate this from anything but the HubScanJobConfigBuilder.
+     */
+    HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory, int scanMemory,
+            boolean shouldGenerateRiskReport, int maxWaitTimeForRiskReport, ImmutableList<String> scanTargetPaths) {
+        this.projectName = projectName;
+        this.version = version;
+        this.phase = phase;
+        this.distribution = distribution;
+        this.workingDirectory = workingDirectory;
+        this.shouldGenerateRiskReport = shouldGenerateRiskReport;
+        this.maxWaitTimeForRiskReport = maxWaitTimeForRiskReport;
+        this.scanMemory = scanMemory;
+        this.scanTargetPaths = scanTargetPaths;
     }
 
     public String getProjectName() {
         return projectName;
     }
 
-    public void setProjectName(String projectName) {
-        this.projectName = StringUtils.trimToNull(projectName);
-    }
-
     public String getVersion() {
         return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = StringUtils.trimToNull(version);
     }
 
     public String getPhase() {
         return phase;
     }
 
-    public void setPhase(String phase) {
-        this.phase = phase;
-    }
-
     public String getDistribution() {
         return distribution;
     }
 
-    public void setDistribution(String distribution) {
-        this.distribution = distribution;
+    public String getWorkingDirectory() {
+        return workingDirectory;
     }
 
     public boolean isShouldGenerateRiskReport() {
         return shouldGenerateRiskReport;
-    }
-
-    public void setShouldGenerateRiskReport(boolean shouldGenerateRiskReport) {
-        this.shouldGenerateRiskReport = shouldGenerateRiskReport;
-    }
-
-    public void setShouldGenerateRiskReport(String shouldGenerateRiskReport) {
-        boolean shouldGenerateRiskReportValue = Boolean.valueOf(shouldGenerateRiskReport);
-        setShouldGenerateRiskReport(shouldGenerateRiskReportValue);
     }
 
     public int getMaxWaitTimeForRiskReport() {
@@ -137,46 +71,101 @@ public class HubScanJobConfig {
         return maxWaitTimeForRiskReport * 60 * 1000;
     }
 
-    public void setMaxWaitTimeForRiskReport(int maxWaitTimeForRiskReport) {
-        this.maxWaitTimeForRiskReport = maxWaitTimeForRiskReport;
-    }
-
-    public void setMaxWaitTimeForRiskReport(String maxWaitTimeForRiskReport) {
-        int maxWaitTimeForRiskReportValue = NumberUtils.toInt(maxWaitTimeForRiskReport);
-        setMaxWaitTimeForRiskReport(maxWaitTimeForRiskReportValue);
-    }
-
     public int getScanMemory() {
         return scanMemory;
-    }
-
-    public void setScanMemory(int scanMemory) {
-        this.scanMemory = scanMemory;
-    }
-
-    public void setScanMemory(String scanMemory) {
-        int scanMemoryValue = NumberUtils.toInt(scanMemory);
-        setScanMemory(scanMemoryValue);
     }
 
     public List<String> getScanTargetPaths() {
         return scanTargetPaths;
     }
 
-    public void addScanTargetPath(String scanTargetPath) {
-        scanTargetPaths.add(scanTargetPath);
+    @Override
+    public String toString() {
+        return "HubScanJobConfig [projectName=" + projectName + ", version=" + version + ", phase=" + phase + ", distribution=" + distribution
+                + ", workingDirectory=" + workingDirectory + ", shouldGenerateRiskReport=" + shouldGenerateRiskReport + ", maxWaitTimeForRiskReport="
+                + maxWaitTimeForRiskReport + ", scanMemory=" + scanMemory + ", scanTargetPaths=" + scanTargetPaths + "]";
     }
 
-    public void addAllScanTargetPaths(List<String> scanTargetPaths) {
-        this.scanTargetPaths.addAll(scanTargetPaths);
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((distribution == null) ? 0 : distribution.hashCode());
+        result = prime * result + maxWaitTimeForRiskReport;
+        result = prime * result + ((phase == null) ? 0 : phase.hashCode());
+        result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
+        result = prime * result + scanMemory;
+        result = prime * result + ((scanTargetPaths == null) ? 0 : scanTargetPaths.hashCode());
+        result = prime * result + (shouldGenerateRiskReport ? 1231 : 1237);
+        result = prime * result + ((version == null) ? 0 : version.hashCode());
+        result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
+        return result;
     }
 
-    public String getWorkingDirectory() {
-        return workingDirectory;
-    }
-
-    public void setWorkingDirectory(String workingDirectory) {
-        this.workingDirectory = workingDirectory;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        HubScanJobConfig other = (HubScanJobConfig) obj;
+        if (distribution == null) {
+            if (other.distribution != null) {
+                return false;
+            }
+        } else if (!distribution.equals(other.distribution)) {
+            return false;
+        }
+        if (maxWaitTimeForRiskReport != other.maxWaitTimeForRiskReport) {
+            return false;
+        }
+        if (phase == null) {
+            if (other.phase != null) {
+                return false;
+            }
+        } else if (!phase.equals(other.phase)) {
+            return false;
+        }
+        if (projectName == null) {
+            if (other.projectName != null) {
+                return false;
+            }
+        } else if (!projectName.equals(other.projectName)) {
+            return false;
+        }
+        if (scanMemory != other.scanMemory) {
+            return false;
+        }
+        if (scanTargetPaths == null) {
+            if (other.scanTargetPaths != null) {
+                return false;
+            }
+        } else if (!scanTargetPaths.equals(other.scanTargetPaths)) {
+            return false;
+        }
+        if (shouldGenerateRiskReport != other.shouldGenerateRiskReport) {
+            return false;
+        }
+        if (version == null) {
+            if (other.version != null) {
+                return false;
+            }
+        } else if (!version.equals(other.version)) {
+            return false;
+        }
+        if (workingDirectory == null) {
+            if (other.workingDirectory != null) {
+                return false;
+            }
+        } else if (!workingDirectory.equals(other.workingDirectory)) {
+            return false;
+        }
+        return true;
     }
 
 }
