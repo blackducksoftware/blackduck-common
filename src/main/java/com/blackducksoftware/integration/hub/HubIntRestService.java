@@ -10,12 +10,8 @@ import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,9 +44,6 @@ import com.blackducksoftware.integration.hub.response.ReleaseItem;
 import com.blackducksoftware.integration.hub.response.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
 import com.blackducksoftware.integration.hub.response.VersionComparison;
-import com.blackducksoftware.integration.hub.response.mapping.AssetReferenceItem;
-import com.blackducksoftware.integration.hub.response.mapping.EntityItem;
-import com.blackducksoftware.integration.hub.response.mapping.EntityTypeEnum;
 import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
 import com.blackducksoftware.integration.hub.response.mapping.ScanLocationResults;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
@@ -228,7 +221,6 @@ public class HubIntRestService {
      * I.E. https.proxyHost, https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
      *
      */
-    @SuppressWarnings("restriction")
     private void cleanUpOldProxySettings() {
         System.clearProperty("https.proxyHost");
         System.clearProperty("https.proxyPort");
@@ -435,201 +427,6 @@ public class HubIntRestService {
             throw new ProjectDoesNotExistException("This Project does not exist.", resource);
         } else {
             throw new BDRestException("There was a problem getting a Project by this name.", resource);
-        }
-    }
-
-    /**
-     * Gets the scan Id for each scan target, it searches the list of scans and gets the latest scan Id for the scan
-     * matching the hostname and path.
-     * Returns a Map of scan Id's, and a Boolean to mark if that has already been mapped to this version or not
-     *
-     * @param hostname
-     *            String
-     * @param scanTargets
-     *            List<<String>>
-     * @param versionId
-     *            String
-     *
-     * @return Map<<String, Boolean>>
-     * @throws UnknownHostException
-     * @throws InterruptedException
-     * @throws BDRestException
-     * @throws HubIntegrationException
-     * @throws URISyntaxException
-     * @throws MalformedURLException
-     */
-    public Map<String, Boolean> getScanLocationIds(String hostname, List<String>
-            scanTargets, String versionId)
-            throws UnknownHostException,
-            InterruptedException, BDRestException, HubIntegrationException, URISyntaxException {
-        return getScanLocationIds(hostname, scanTargets, versionId, null, 0);
-    }
-
-    /**
-     * Gets the scan Id for each scan target, it searches the list of scans and gets the latest scan Id for the scan
-     * matching the hostname and path.
-     * Returns a Map of scan Id's, and a Boolean to mark if that has already been mapped to this version or not
-     *
-     * @deprecated We dont need this anymore since the CLI now maps scans to versions for us, as of Hub 2.2.0
-     *
-     * @param hostname
-     *            String
-     * @param scanTargets
-     *            List<<String>>
-     * @param versionId
-     *            String
-     * @param proxyChallengeRequest
-     *            ChallengeRequest proxyChallenge to get the correct authentication
-     * @param attempt
-     *            Integer authentication attempt number
-     *
-     * @return Map<<String, Boolean>>
-     * @throws UnknownHostException
-     * @throws InterruptedException
-     * @throws BDRestException
-     * @throws HubIntegrationException
-     * @throws URISyntaxException
-     * @throws MalformedURLException
-     */
-    @Deprecated
-    private Map<String, Boolean> getScanLocationIds(String hostname, List<String>
-            scanTargets, String versionId, ChallengeRequest proxyChallengeRequest, int attempt)
-            throws UnknownHostException,
-            InterruptedException, BDRestException, HubIntegrationException, URISyntaxException {
-        HashMap<String, Boolean> scanLocationIds = new HashMap<String, Boolean>();
-        ClientResource resource = null;
-        try {
-            for (String targetPath : scanTargets) {
-                String correctedTargetPath = targetPath;
-
-                // Scan paths in the Hub only use '/' not '\'
-                if (correctedTargetPath.contains("\\")) {
-                    correctedTargetPath = correctedTargetPath.replace("\\", "/");
-                }
-                // and it always starts with a '/'
-                if (!correctedTargetPath.startsWith("/")) {
-                    correctedTargetPath = "/" + correctedTargetPath;
-                }
-
-                logger.debug(
-                        "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + correctedTargetPath +
-                                "'");
-
-                resource = createClientResource();
-                resource.addSegment("api");
-                resource.addSegment("v1");
-                resource.addSegment("scanlocations");
-                resource.addQueryParameter("host", hostname);
-                resource.addQueryParameter("path", correctedTargetPath);
-
-                if (proxyChallengeRequest != null) {
-                    // This should replace the authenticator for the proxy authentication
-                    // BUT it doesn't work for Digest authentication
-                    parseChallengeRequestRawValue(proxyChallengeRequest);
-                    resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-                            proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
-                            null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
-                            0, 0L));
-                }
-
-                resource.setMethod(Method.GET);
-
-                ScanLocationHandler handler = new ScanLocationHandler(logger);
-
-                handler.getScanLocationIdWithRetry(resource, correctedTargetPath, versionId, scanLocationIds);
-
-            }
-        } catch (ResourceException e) {
-            if (resource != null && resource.getProxyChallengeRequests() != null && !resource.getProxyChallengeRequests().isEmpty()
-                    && StringUtils.isNotBlank(proxyUsername)
-                    && StringUtils.isNotBlank(proxyPassword)) {
-
-                ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
-                if (attempt < 2) {
-                    return getScanLocationIds(hostname, scanTargets, versionId, newChallengeRequest, attempt + 1);
-                } else {
-                    throw new BDRestException("Too many proxy authentication attempts.", e, resource);
-                }
-            }
-            throw new BDRestException("There was a problem getting the scan locations.", e, resource);
-        }
-        return scanLocationIds;
-    }
-
-    /**
-     * If the scan Id has not already been mapped to the Version then it will make that mapping, otherwise it will not
-     * perform the mapping.
-     *
-     * @deprecated We dont need this anymore since the CLI now maps scans to versions for us, as of Hub 2.2.0
-     *
-     * @param scanLocationIds
-     *            Map<<String, Boolean>>
-     * @param versionId
-     *            String
-     *
-     * @throws BDRestException
-     * @throws URISyntaxException
-     * @throws MalformedURLException
-     */
-    @Deprecated
-    public void mapScansToProjectVersion(Map<String, Boolean> scanLocationIds, String
-            versionId) throws BDRestException, URISyntaxException {
-        ClientResource resource = createClientResource();
-        resource.addSegment("api");
-        resource.addSegment("v1");
-        resource.addSegment("assetreferences");
-        if (!scanLocationIds.isEmpty()) {
-            for (Entry<String, Boolean> scanId : scanLocationIds.entrySet()) {
-                if (!scanId.getValue()) {
-                    // This scan location has not yet been mapped to the project/version
-                    logger.debug(
-                            "Mapping the scan location with id: '" + scanId.getKey() + "', to the Version with Id: '" + versionId +
-                                    "'.");
-
-                    AssetReferenceItem assetReference = new AssetReferenceItem();
-
-                    EntityItem ownerEntity = new EntityItem();
-                    ownerEntity.setEntityType(EntityTypeEnum.RL.name());
-                    ownerEntity.setEntityId(versionId);
-
-                    EntityItem assetEntity = new EntityItem();
-
-                    assetEntity.setEntityType(EntityTypeEnum.CL.name());
-                    assetEntity.setEntityId(scanId.getKey());
-
-                    assetReference.setOwnerEntityKey(ownerEntity);
-                    assetReference.setAssetEntityKey(assetEntity);
-
-                    Gson gson = new GsonBuilder().create();
-
-                    logger.debug("Asset reference mapping object : " + gson.toJson(assetReference));
-                    StringRepresentation stringRep = new StringRepresentation(gson.toJson(assetReference));
-                    stringRep.setMediaType(MediaType.APPLICATION_JSON);
-                    stringRep.setCharacterSet(CharacterSet.UTF_8);
-
-                    resource.setMethod(Method.POST);
-                    handleRequest(resource, null, 0);
-                    int responseCode = resource.getResponse().getStatus().getCode();
-
-                    // HashMap<String, Object> responseMap = new HashMap<String, Object>();
-                    if (responseCode == 201) {
-                        // Successful mapping
-                        logger.debug(
-                                "Successfully mapped the scan with id: '" + scanId.getKey() + "', to the Version with Id: '" + versionId
-                                        + "'.");
-                    } else {
-                        throw new BDRestException("There was a problem mapping the scan location to the specified version. Error Code: " + responseCode,
-                                resource);
-                    }
-                } else {
-                    logger.debug(
-                            "The scan location with id: '" + scanId.getKey() + "', is already mapped to the Version with Id: '" +
-                                    versionId + "'.");
-                }
-            }
-        }
-        else {
-            logger.debug("Could not find any scan Id's to map to the Version.");
         }
     }
 
@@ -1090,7 +887,7 @@ public class HubIntRestService {
 
         Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
         if (requestHeaders == null) {
-            requestHeaders = new Series(Header.class);
+            requestHeaders = new Series<Header>(Header.class);
             resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
         }
         requestHeaders.add(new Header("Accept", MediaType.APPLICATION_JSON.toString()));

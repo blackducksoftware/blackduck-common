@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -13,54 +12,32 @@ import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 
 public class HubSupportHelper {
 
-    private boolean logOptionSupport = false;
+    private boolean hasBeenChecked = false;
 
-    private boolean cliMappingSupport = false;
-
-    private boolean cliStatusReturnSupport = false;
-
-    private boolean jreProvidedSupport = false;
-
-    public boolean isLogOptionSupport() {
-        return logOptionSupport;
-    }
-
-    private void setLogOptionSupport(boolean logOptionSupport) {
-        this.logOptionSupport = logOptionSupport;
-    }
-
-    public boolean isCliMappingSupport() {
-        return cliMappingSupport;
-    }
-
-    private void setCliMappingSupport(boolean cliMappingSupport) {
-        this.cliMappingSupport = cliMappingSupport;
-    }
-
-    public boolean isCliStatusReturnSupport() {
-        return cliStatusReturnSupport;
-    }
-
-    private void setCliStatusReturnSupport(boolean cliStatusReturnSupport) {
-        this.cliStatusReturnSupport = cliStatusReturnSupport;
-    }
+    private boolean hub3_0Support = false;
 
     public boolean isJreProvidedSupport() {
-        return jreProvidedSupport;
+        return hub3_0Support;
     }
 
     public boolean isPolicyApiSupport() {
-        // Policy support as well as jre support were added in the same version
-        return jreProvidedSupport;
+        return hub3_0Support;
     }
 
     public boolean isCliStatusDirOptionSupport() {
-        // the --statusWriteDir option was added in the same version as the jreProvidedSupport
-        return jreProvidedSupport;
+        return hub3_0Support;
     }
 
-    private void setJreProvidedSupport(boolean jreProvidedSupport) {
-        this.jreProvidedSupport = jreProvidedSupport;
+    private void setHub3_0Support(boolean hub3_0Support) {
+        this.hub3_0Support = hub3_0Support;
+    }
+
+    public boolean isHasBeenChecked() {
+        return hasBeenChecked;
+    }
+
+    public void setHasBeenChecked(boolean hasBeenChecked) {
+        this.hasBeenChecked = hasBeenChecked;
     }
 
     /**
@@ -79,45 +56,18 @@ public class HubSupportHelper {
             String hubServerVersion = service.getHubVersion();
 
             if (compareVersion(hubServerVersion, "3.0.0", service)) {
-                // The cli did not come packaged with a jre until 3.0.0
-                setJreProvidedSupport(true);
-                setCliStatusReturnSupport(true);
-                setCliMappingSupport(true);
-                setLogOptionSupport(true);
+                setHub3_0Support(true);
 
-            } else if (compareVersion(hubServerVersion, "2.3.0", service)) {
-                // The cli did not return correct status codes until 2.3.0
-                setJreProvidedSupport(false);
-                setCliStatusReturnSupport(true);
-                setCliMappingSupport(true);
-                setLogOptionSupport(true);
-            } else if (compareVersion(hubServerVersion, "2.2.0", service)) {
-                // The cli did not support mapping scans to versions until 2.2.0
-                setJreProvidedSupport(false);
-                setCliStatusReturnSupport(false);
-                setCliMappingSupport(true);
-                setLogOptionSupport(true);
             } else {
-                // The logDir option and this version api weren't added until Hub version 2.0.1
-                // So if this api call works we know the log option is supported
-                setJreProvidedSupport(false);
-                setCliStatusReturnSupport(false);
-                setCliMappingSupport(false);
-                setLogOptionSupport(true);
+                setHub3_0Support(false);
             }
+            setHasBeenChecked(true);
         } catch (BDRestException e) {
             ResourceException resEx = null;
             if (e.getCause() != null && e.getCause() instanceof ResourceException) {
                 resEx = (ResourceException) e.getCause();
             }
-            if (resEx != null && resEx.getStatus().equals(Status.CLIENT_ERROR_NOT_FOUND)) {
-                // The Hub server is version 2.0.0 and the version endpoint does not exist
-                setJreProvidedSupport(false);
-                setCliStatusReturnSupport(false);
-                setCliMappingSupport(false);
-                setLogOptionSupport(false);
-                return;
-            } else if (resEx != null) {
+            if (resEx != null) {
                 if (logger != null) {
                     logger.error(resEx.getMessage());
                 }
