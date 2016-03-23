@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.response.mapping;
+package com.blackducksoftware.integration.hub.scan.status;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

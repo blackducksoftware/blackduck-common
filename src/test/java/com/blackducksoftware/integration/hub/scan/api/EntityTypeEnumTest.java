@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.response.mapping;
+package com.blackducksoftware.integration.hub.scan.api;
 
 import static org.junit.Assert.assertEquals;
 
