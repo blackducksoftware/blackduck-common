@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 
 public class ScannerSplitStream extends OutputStream {
-
     // https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
 
     private static final int EOF = -1; // End of file
@@ -129,7 +128,6 @@ public class ScannerSplitStream extends OutputStream {
 
             // replace with the current line
             lineBuffer = line;
-
         } else {
             // We assume that each new log starts with the log level, if this line does not contain a log level it
             // must only be a piece of a log
@@ -148,7 +146,6 @@ public class ScannerSplitStream extends OutputStream {
         outputFileStream.write(byteArray);
 
         String currentLine = new String(byteArray, "UTF-8");
-        logger.info(currentLine);
         if (currentLine.contains(System.getProperty("line.separator"))) {
             String[] splitLines = currentLine.split(System.getProperty("line.separator"));
 
@@ -165,7 +162,6 @@ public class ScannerSplitStream extends OutputStream {
         outputFileStream.write(byteArray, offset, length);
 
         String currentLine = new String(byteArray, offset, length, "UTF-8");
-        logger.info(currentLine);
         if (currentLine.contains(System.getProperty("line.separator"))) {
             String[] splitLines = currentLine.split(System.getProperty("line.separator"));
 
@@ -227,4 +223,5 @@ public class ScannerSplitStream extends OutputStream {
 
         output = builder.toString();
     }
+
 }

@@ -70,7 +70,6 @@ public class ScannerSplitStreamTest {
 
     @Test
     public void testWriteByteArray() throws Exception {
-
         TestLogger logger = new TestLogger();
         TestOutputStream stream = new TestOutputStream();
 
