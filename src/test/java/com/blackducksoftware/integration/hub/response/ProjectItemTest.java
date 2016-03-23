@@ -7,6 +7,9 @@ import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.project.api.ProjectItem;
+import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
+
 public class ProjectItemTest {
 
     @Test

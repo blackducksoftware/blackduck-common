@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
+
 public class ScanStatusTest {
 
     @Test

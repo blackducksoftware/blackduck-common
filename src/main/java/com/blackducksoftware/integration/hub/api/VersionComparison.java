@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.response;
+package com.blackducksoftware.integration.hub.api;
 
 public class VersionComparison {
 

@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.scan.api.EntityTypeEnum;
+
 public class EntityTypeEnumTest {
 
     @Test

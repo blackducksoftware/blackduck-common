@@ -1,6 +1,5 @@
 package com.blackducksoftware.integration.hub.scan.status;
 
-import com.blackducksoftware.integration.hub.response.mapping.ScanStatus;
 
 public class ScanStatusToPoll {
     private final String status;

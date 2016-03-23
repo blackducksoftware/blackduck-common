@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.response;
+package com.blackducksoftware.integration.hub.report.api;
 
 import java.util.List;
 

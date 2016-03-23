@@ -1,7 +1,9 @@
-package com.blackducksoftware.integration.hub.response.mapping;
+package com.blackducksoftware.integration.hub.scan.api;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+
+import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 
 public class ScanHistoryItem {
 

@@ -6,8 +6,8 @@ import java.net.URISyntaxException;
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.resource.ResourceException;
 
+import com.blackducksoftware.integration.hub.api.VersionComparison;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.response.VersionComparison;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 
 public class HubSupportHelper {
@@ -16,14 +16,26 @@ public class HubSupportHelper {
 
     private boolean hub3_0Support = false;
 
+    /**
+     * CLI wrappers were packaged with OS specific Jre's since Hub 3.0.0
+     *
+     */
     public boolean isJreProvidedSupport() {
         return hub3_0Support;
     }
 
+    /**
+     * Policy Api's were added since Hub 3.0.0
+     *
+     */
     public boolean isPolicyApiSupport() {
         return hub3_0Support;
     }
 
+    /**
+     * The CLI started supporting an option to print status files to a directory since Hub 3.0.0
+     *
+     */
     public boolean isCliStatusDirOptionSupport() {
         return hub3_0Support;
     }

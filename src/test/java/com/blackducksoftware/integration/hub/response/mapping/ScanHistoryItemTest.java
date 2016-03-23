@@ -9,6 +9,9 @@ import nl.jqno.equalsverifier.Warning;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.scan.api.ScanHistoryItem;
+import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
+
 public class ScanHistoryItemTest {
 
     @Test

@@ -7,6 +7,8 @@ import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.project.api.AutoCompleteItem;
+
 public class AutoCompleteItemTest {
 
     @Test

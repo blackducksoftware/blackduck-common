@@ -1,4 +1,6 @@
-package com.blackducksoftware.integration.hub.response;
+package com.blackducksoftware.integration.hub.project.api;
+
+import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
 
 public class ProjectItem {
 

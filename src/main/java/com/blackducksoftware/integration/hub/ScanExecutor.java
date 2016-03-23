@@ -73,6 +73,8 @@ public abstract class ScanExecutor {
         }
         if (supportHelper == null) {
             throw new IllegalArgumentException("No HubSupportHelper provided.");
+        } else if (!supportHelper.isHasBeenChecked()) {
+            throw new IllegalArgumentException("The HubSupportHelper has not been checked yet.");
         }
         this.hubUrl = hubUrl;
         this.hubUsername = hubUsername;

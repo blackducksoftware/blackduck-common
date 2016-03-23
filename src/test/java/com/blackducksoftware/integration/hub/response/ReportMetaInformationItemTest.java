@@ -13,8 +13,9 @@ import nl.jqno.equalsverifier.Warning;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem.ReportMetaItem;
-import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem.ReportMetaLinkItem;
+import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationItem;
+import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationItem.ReportMetaItem;
+import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationItem.ReportMetaLinkItem;
 
 public class ReportMetaInformationItemTest {
 

@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.response.mapping;
+package com.blackducksoftware.integration.hub.scan.status;
 
 public enum ScanStatus {
     UNSTARTED,
