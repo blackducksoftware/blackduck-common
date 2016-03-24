@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,24 +25,24 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 
+import com.blackducksoftware.integration.hub.api.VersionComparison;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.policy.api.PolicyStatus;
 import com.blackducksoftware.integration.hub.policy.api.PolicyStatusEnum;
+import com.blackducksoftware.integration.hub.project.api.AutoCompleteItem;
+import com.blackducksoftware.integration.hub.project.api.ProjectItem;
+import com.blackducksoftware.integration.hub.report.api.ReportFormatEnum;
+import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationItem;
+import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationItem.ReportMetaLinkItem;
 import com.blackducksoftware.integration.hub.report.api.VersionReport;
-import com.blackducksoftware.integration.hub.response.AutoCompleteItem;
-import com.blackducksoftware.integration.hub.response.DistributionEnum;
-import com.blackducksoftware.integration.hub.response.PhaseEnum;
-import com.blackducksoftware.integration.hub.response.ProjectItem;
-import com.blackducksoftware.integration.hub.response.ReleaseItem;
-import com.blackducksoftware.integration.hub.response.ReportFormatEnum;
-import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
-import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem.ReportMetaLinkItem;
-import com.blackducksoftware.integration.hub.response.VersionComparison;
-import com.blackducksoftware.integration.hub.response.mapping.ScanLocationItem;
-import com.blackducksoftware.integration.hub.response.mapping.ScanLocationResults;
+import com.blackducksoftware.integration.hub.scan.api.ScanLocationItem;
+import com.blackducksoftware.integration.hub.scan.api.ScanLocationResults;
 import com.blackducksoftware.integration.hub.util.HubIntTestHelper;
 import com.blackducksoftware.integration.hub.util.TestLogger;
+import com.blackducksoftware.integration.hub.version.api.DistributionEnum;
+import com.blackducksoftware.integration.hub.version.api.PhaseEnum;
+import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
 import com.google.gson.Gson;
 
 public class HubIntRestServiceTest {
@@ -245,36 +244,6 @@ public class HubIntRestServiceTest {
         assertEquals(testProperties.getProperty("TEST_PROJECT"), project.getName());
         assertEquals(id, project.getId());
         assertTrue(logger.getErrorList().isEmpty());
-    }
-
-    @Test
-    public void testGetScanLocationIds() throws Exception {
-        TestLogger logger = new TestLogger();
-
-        HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
-        restService.setLogger(logger);
-        restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
-
-        List<String> paths = new ArrayList<String>();
-        paths.add(testProperties.getProperty("TEST_PATH"));
-        Map<String, Boolean> response = null;
-        try {
-            response = restService.getScanLocationIds("jrichardMac", paths,
-                    "5003bbc7-fc7a-4ba5-9070-d2c3a260b7b8");
-
-            assertNotNull(response);
-            assertTrue(!response.isEmpty());
-
-            String output = logger.getOutputString();
-            assertTrue(output, output.contains("Checking for the scan location with Host name:"));
-            assertTrue(output, output.contains("Attempt # 1"));
-            assertTrue(output, output.contains("Comparing target :"));
-            assertTrue(output, output.contains("MATCHED!"));
-            assertTrue(output, output.contains("The scan target :"));
-        } finally {
-            assertTrue(!logger.getOutputList().isEmpty());
-            assertTrue(logger.getErrorList().isEmpty());
-        }
     }
 
     @Test
