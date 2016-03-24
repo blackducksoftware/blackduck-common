@@ -362,6 +362,10 @@ public class CLIInstaller {
                     javaExec = new File(javaExec, "java");
                 }
                 if (javaExec.exists()) {
+                    // when unpacking the bin directory files may not be executable
+                    if (!javaExec.canExecute()) {
+                        javaExec.setExecutable(true);
+                    }
                     return javaExec;
                 }
             }
@@ -468,7 +472,13 @@ public class CLIInstaller {
             if (cliFiles.length == 0) {
                 return null;
             } else {
-                return cliFiles[0];
+                File file = cliFiles[0];
+
+                if (!file.canExecute()) {
+                    file.setExecutable(true);
+                }
+
+                return file;
             }
         } else {
             return null;
@@ -484,6 +494,11 @@ public class CLIInstaller {
         File oneJarFile = new File(cliHomeFile, "lib");
         oneJarFile = new File(oneJarFile, "cache");
         oneJarFile = new File(oneJarFile, "scan.cli.impl-standalone.jar");
+
+        if (!oneJarFile.canExecute()) {
+            oneJarFile.setExecutable(true);
+        }
+
         return oneJarFile;
     }
 }
