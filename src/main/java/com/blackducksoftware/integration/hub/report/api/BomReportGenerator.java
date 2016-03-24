@@ -8,9 +8,7 @@ import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.polling.HubEventPolling;
-import com.blackducksoftware.integration.hub.response.ReportFormatEnum;
-import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem;
-import com.blackducksoftware.integration.hub.response.ReportMetaInformationItem.ReportMetaLinkItem;
+import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationItem.ReportMetaLinkItem;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 
 public class BomReportGenerator {

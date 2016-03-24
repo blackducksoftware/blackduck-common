@@ -5,8 +5,8 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
-import com.blackducksoftware.integration.hub.response.DistributionEnum;
-import com.blackducksoftware.integration.hub.response.PhaseEnum;
+import com.blackducksoftware.integration.hub.version.api.DistributionEnum;
+import com.blackducksoftware.integration.hub.version.api.PhaseEnum;
 
 /**
  * Detailed release summary.
