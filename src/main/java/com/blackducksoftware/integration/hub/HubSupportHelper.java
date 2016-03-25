@@ -219,7 +219,7 @@ public class HubSupportHelper {
         String baseUrl = getCLIWrapperLink(hubUrl);
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(baseUrl);
-        urlBuilder.append("scan.cli-win.zip");
+        urlBuilder.append("scan.cli-windows.zip");
         return urlBuilder.toString();
     }
 
