@@ -23,10 +23,7 @@ public class HubScanJobConfig {
 
     private final ImmutableList<String> scanTargetPaths;
 
-    /**
-     * We don't want to instantiate this from anything but the HubScanJobConfigBuilder.
-     */
-    HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory, int scanMemory,
+    public HubScanJobConfig(String projectName, String version, String phase, String distribution, String workingDirectory, int scanMemory,
             boolean shouldGenerateRiskReport, int maxWaitTimeForRiskReport, ImmutableList<String> scanTargetPaths) {
         this.projectName = projectName;
         this.version = version;
