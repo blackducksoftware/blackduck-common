@@ -8,8 +8,8 @@ import org.mockito.Mockito;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
+import com.blackducksoftware.integration.hub.api.VersionComparison;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.response.VersionComparison;
 import com.blackducksoftware.integration.hub.util.TestLogger;
 
 public class HubSupportHelperTest {
@@ -39,187 +39,59 @@ public class HubSupportHelperTest {
         TestLogger logger = new TestLogger();
         supportHelper.checkHubSupport(service, logger);
 
+        assertTrue(supportHelper.isHasBeenChecked());
         assertTrue(supportHelper.isJreProvidedSupport());
         assertTrue(supportHelper.isPolicyApiSupport());
-        assertTrue(supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
 
         service = getMockedService("3.0.1");
         supportHelper = new HubSupportHelper();
         logger = new TestLogger();
         supportHelper.checkHubSupport(service, logger);
 
+        assertTrue(supportHelper.isHasBeenChecked());
         assertTrue(supportHelper.isJreProvidedSupport());
         assertTrue(supportHelper.isPolicyApiSupport());
-        assertTrue(supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
+        assertTrue(supportHelper.isCliStatusDirOptionSupport());
 
         service = getMockedService("3.1.0");
         supportHelper = new HubSupportHelper();
         logger = new TestLogger();
         supportHelper.checkHubSupport(service, logger);
 
+        assertTrue(supportHelper.isHasBeenChecked());
         assertTrue(supportHelper.isJreProvidedSupport());
         assertTrue(supportHelper.isPolicyApiSupport());
-        assertTrue(supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
+        assertTrue(supportHelper.isCliStatusDirOptionSupport());
 
         service = getMockedService("4.0.0");
         supportHelper = new HubSupportHelper();
         logger = new TestLogger();
         supportHelper.checkHubSupport(service, logger);
 
+        assertTrue(supportHelper.isHasBeenChecked());
         assertTrue(supportHelper.isJreProvidedSupport());
         assertTrue(supportHelper.isPolicyApiSupport());
-        assertTrue(supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
+        assertTrue(supportHelper.isCliStatusDirOptionSupport());
 
         service = getMockedService("3.0.0-SNAPSHOT");
         supportHelper = new HubSupportHelper();
         logger = new TestLogger();
         supportHelper.checkHubSupport(service, logger);
 
+        assertTrue(supportHelper.isHasBeenChecked());
         assertTrue(!supportHelper.isJreProvidedSupport());
         assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
-    }
+        assertTrue(!supportHelper.isCliStatusDirOptionSupport());
 
-    @Test
-    public void testCLIReturnsCorrectStatusCode() throws Exception {
-        HubIntRestService service = getMockedService("2.3.0");
-        HubSupportHelper supportHelper = new HubSupportHelper();
-        TestLogger logger = new TestLogger();
-        supportHelper.checkHubSupport(service, logger);
-
-        assertTrue(!supportHelper.isJreProvidedSupport());
-        assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
-
-        service = getMockedService("2.3.1");
+        service = getMockedService("2.9.9");
         supportHelper = new HubSupportHelper();
         logger = new TestLogger();
         supportHelper.checkHubSupport(service, logger);
 
+        assertTrue(supportHelper.isHasBeenChecked());
         assertTrue(!supportHelper.isJreProvidedSupport());
         assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
-
-        service = getMockedService("2.4.0");
-        supportHelper = new HubSupportHelper();
-        logger = new TestLogger();
-        supportHelper.checkHubSupport(service, logger);
-
-        assertTrue(!supportHelper.isJreProvidedSupport());
-        assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
-
-        service = getMockedService("2.3.0-SNAPSHOT");
-        supportHelper = new HubSupportHelper();
-        logger = new TestLogger();
-        supportHelper.checkHubSupport(service, logger);
-
-        assertTrue(!supportHelper.isJreProvidedSupport());
-        assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(!supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
-
-    }
-
-    @Test
-    public void testCLISupportsMapping() throws Exception {
-        HubIntRestService service = getMockedService("2.2.0");
-        HubSupportHelper supportHelper = new HubSupportHelper();
-        TestLogger logger = new TestLogger();
-        supportHelper.checkHubSupport(service, logger);
-
-        assertTrue(!supportHelper.isJreProvidedSupport());
-        assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(!supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
-
-        service = getMockedService("2.2.1");
-        supportHelper = new HubSupportHelper();
-        logger = new TestLogger();
-        supportHelper.checkHubSupport(service, logger);
-
-        assertTrue(!supportHelper.isJreProvidedSupport());
-        assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(!supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
-
-        service = getMockedService("2.2.0-SNAPSHOT");
-        supportHelper = new HubSupportHelper();
-        logger = new TestLogger();
-        supportHelper.checkHubSupport(service, logger);
-
-        assertTrue(!supportHelper.isJreProvidedSupport());
-        assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(!supportHelper.isCliStatusReturnSupport());
-        assertTrue(!supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
-    }
-
-    @Test
-    public void testLogOptionSupported() throws Exception {
-        HubIntRestService service = getMockedService("2.0.1");
-        HubSupportHelper supportHelper = new HubSupportHelper();
-        TestLogger logger = new TestLogger();
-        supportHelper.checkHubSupport(service, logger);
-
-        assertTrue(!supportHelper.isJreProvidedSupport());
-        assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(!supportHelper.isCliStatusReturnSupport());
-        assertTrue(!supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
-
-        service = getMockedService("2.1.0");
-        supportHelper = new HubSupportHelper();
-        logger = new TestLogger();
-        supportHelper.checkHubSupport(service, logger);
-
-        assertTrue(!supportHelper.isJreProvidedSupport());
-        assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(!supportHelper.isCliStatusReturnSupport());
-        assertTrue(!supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
-
-        service = getMockedService("2.0.1-SNAPSHOT");
-        supportHelper = new HubSupportHelper();
-        logger = new TestLogger();
-        supportHelper.checkHubSupport(service, logger);
-
-        assertTrue(!supportHelper.isJreProvidedSupport());
-        assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(!supportHelper.isCliStatusReturnSupport());
-        assertTrue(!supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
-
-        service = getMockedService("1.1.1");
-        supportHelper = new HubSupportHelper();
-        logger = new TestLogger();
-        supportHelper.checkHubSupport(service, logger);
-
-        assertTrue(!supportHelper.isJreProvidedSupport());
-        assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(!supportHelper.isCliStatusReturnSupport());
-        assertTrue(!supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
-
+        assertTrue(!supportHelper.isCliStatusDirOptionSupport());
     }
 
     @Test
@@ -231,9 +103,6 @@ public class HubSupportHelperTest {
 
         assertTrue(supportHelper.isJreProvidedSupport());
         assertTrue(supportHelper.isPolicyApiSupport());
-        assertTrue(supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
 
         service = getMockedServiceWithFallBack("3.0", true);
         supportHelper = new HubSupportHelper();
@@ -242,9 +111,6 @@ public class HubSupportHelperTest {
 
         assertTrue(supportHelper.isJreProvidedSupport());
         assertTrue(supportHelper.isPolicyApiSupport());
-        assertTrue(supportHelper.isCliStatusReturnSupport());
-        assertTrue(supportHelper.isCliMappingSupport());
-        assertTrue(supportHelper.isLogOptionSupport());
 
     }
 
@@ -261,9 +127,7 @@ public class HubSupportHelperTest {
 
         assertTrue(!supportHelper.isJreProvidedSupport());
         assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(!supportHelper.isCliStatusReturnSupport());
-        assertTrue(!supportHelper.isCliMappingSupport());
-        assertTrue(!supportHelper.isLogOptionSupport());
+
     }
 
     @Test
@@ -280,9 +144,7 @@ public class HubSupportHelperTest {
 
         assertTrue(!supportHelper.isJreProvidedSupport());
         assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(!supportHelper.isCliStatusReturnSupport());
-        assertTrue(!supportHelper.isCliMappingSupport());
-        assertTrue(!supportHelper.isLogOptionSupport());
+
         assertTrue(logger.getOutputString().contains(errorMessage));
         assertTrue(logger.getOutputString().contains(Status.CLIENT_ERROR_PAYMENT_REQUIRED.getReasonPhrase()));
     }
@@ -301,9 +163,6 @@ public class HubSupportHelperTest {
 
         assertTrue(!supportHelper.isJreProvidedSupport());
         assertTrue(!supportHelper.isPolicyApiSupport());
-        assertTrue(!supportHelper.isCliStatusReturnSupport());
-        assertTrue(!supportHelper.isCliMappingSupport());
-        assertTrue(!supportHelper.isLogOptionSupport());
         assertTrue(logger.getOutputString().contains(errorMessage));
     }
 

@@ -4,7 +4,7 @@ import java.util.concurrent.CountDownLatch;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.response.mapping.ScanStatus;
+import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
 
 public class ScanStatusChecker implements Runnable {

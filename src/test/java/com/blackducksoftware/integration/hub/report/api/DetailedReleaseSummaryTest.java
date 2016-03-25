@@ -13,8 +13,8 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.report.api.DetailedReleaseSummary.URLProvider;
-import com.blackducksoftware.integration.hub.response.DistributionEnum;
-import com.blackducksoftware.integration.hub.response.PhaseEnum;
+import com.blackducksoftware.integration.hub.version.api.DistributionEnum;
+import com.blackducksoftware.integration.hub.version.api.PhaseEnum;
 
 public class DetailedReleaseSummaryTest {
 

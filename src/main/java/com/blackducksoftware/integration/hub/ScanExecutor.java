@@ -31,17 +31,11 @@ public abstract class ScanExecutor {
 
     private final int buildNumber;
 
+    private final HubSupportHelper supportHelper;
+
     private int scanMemory;
 
     private IntLogger logger;
-
-    private boolean hubSupportLogOption;
-
-    private boolean cliSupportStatusOption;
-
-    private boolean cliSupportsMapping;
-
-    private boolean shouldParseStatus;
 
     private String project;
 
@@ -61,8 +55,7 @@ public abstract class ScanExecutor {
 
     private boolean verboseRun;
 
-    protected ScanExecutor(String hubUrl, String hubUsername, String hubPassword, List<String> scanTargets, Integer buildNumber) {
-
+    protected ScanExecutor(String hubUrl, String hubUsername, String hubPassword, List<String> scanTargets, Integer buildNumber, HubSupportHelper supportHelper) {
         if (StringUtils.isBlank(hubUrl)) {
             throw new IllegalArgumentException("No Hub URL provided.");
         }
@@ -78,11 +71,17 @@ public abstract class ScanExecutor {
         if (buildNumber == null) {
             throw new IllegalArgumentException("No build number provided.");
         }
+        if (supportHelper == null) {
+            throw new IllegalArgumentException("No HubSupportHelper provided.");
+        } else if (!supportHelper.isHasBeenChecked()) {
+            throw new IllegalArgumentException("The HubSupportHelper has not been checked yet.");
+        }
         this.hubUrl = hubUrl;
         this.hubUsername = hubUsername;
         this.hubPassword = hubPassword;
         this.scanTargets = scanTargets;
         this.buildNumber = buildNumber;
+        this.supportHelper = supportHelper;
     }
 
     public IntLogger getLogger() {
@@ -103,38 +102,6 @@ public abstract class ScanExecutor {
 
     public void setScanMemory(Integer scanMemory) {
         this.scanMemory = scanMemory;
-    }
-
-    public boolean doesHubSupportLogOption() {
-        return hubSupportLogOption;
-    }
-
-    public void setHubSupportLogOption(boolean hubSupportLogOption) {
-        this.hubSupportLogOption = hubSupportLogOption;
-    }
-
-    public boolean doesCliSupportStatusOption() {
-        return cliSupportStatusOption;
-    }
-
-    public void setCliSupportStatusOption(boolean cliSupportStatusOption) {
-        this.cliSupportStatusOption = cliSupportStatusOption;
-    }
-
-    public boolean doesCliSupportsMapping() {
-        return cliSupportsMapping;
-    }
-
-    public void setCliSupportsMapping(boolean cliSupportsMapping) {
-        this.cliSupportsMapping = cliSupportsMapping;
-    }
-
-    public boolean shouldParseStatus() {
-        return shouldParseStatus;
-    }
-
-    public void setShouldParseStatus(boolean shouldParseStatus) {
-        this.shouldParseStatus = shouldParseStatus;
     }
 
     public String getProject() {
@@ -343,20 +310,12 @@ public abstract class ScanExecutor {
                     cmd.add("-v");
                 }
 
-                String logDirectoryPath = null;
+                String logDirectoryPath = getLogDirectoryPath();
+                cmd.add("--logDir");
 
-                if (doesHubSupportLogOption()) {
-                    // Only add the logDir option if the Hub supports the logDir option
+                cmd.add(logDirectoryPath);
 
-                    logDirectoryPath = getLogDirectoryPath();
-                    // Need to only add this option if version 2.0.1 or later,
-                    // this is the pro-active approach to the log problem
-                    cmd.add("--logDir");
-
-                    cmd.add(logDirectoryPath);
-                }
-
-                if (doesCliSupportStatusOption()) {
+                if (supportHelper.isCliStatusDirOptionSupport()) {
                     // Only add the statusWriteDir option if the Hub supports the statusWriteDir option
 
                     // The scanStatusDirectoryPath is the same as the log directory path
@@ -368,10 +327,7 @@ public abstract class ScanExecutor {
                     cmd.add(scanStatusDirectoryPath);
                 }
 
-                if (doesCliSupportsMapping() && StringUtils.isNotBlank(getProject()) && StringUtils.isNotBlank(getVersion())) {
-                    // Only add the project and release options if the Hub supports them
-
-                    // Need to only add this option if version 2.2.? or later
+                if (StringUtils.isNotBlank(getProject()) && StringUtils.isNotBlank(getVersion())) {
                     cmd.add("--project");
 
                     cmd.add(getProject());
