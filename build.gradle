@@ -19,6 +19,10 @@ persistVersion{
     versionPropertiesFile = 'pom.xml' as File
 }
 
+checkoutParentBranch{
+    releaseBranching=true
+}
+
 bumpVersionNumber{
     versionMap = ['int-hub-ci': ['pom.xml': ['version': 3]]]
 }
