@@ -331,10 +331,10 @@ public class HubSupportHelperTest {
 
     @Test
     public void testGetWindowsCLIWrapperLink() throws Exception {
-        assertEquals("testUrl/download/scan.cli-win.zip", HubSupportHelper.getWindowsCLIWrapperLink("testUrl"));
-        assertEquals("testUrl/download/scan.cli-win.zip", HubSupportHelper.getWindowsCLIWrapperLink("testUrl/"));
-        assertEquals("http://testSite/download/scan.cli-win.zip", HubSupportHelper.getWindowsCLIWrapperLink("http://testSite/"));
-        assertEquals("http://testSite/download/scan.cli-win.zip", HubSupportHelper.getWindowsCLIWrapperLink("http://testSite"));
+        assertEquals("testUrl/download/scan.cli-windows.zip", HubSupportHelper.getWindowsCLIWrapperLink("testUrl"));
+        assertEquals("testUrl/download/scan.cli-windows.zip", HubSupportHelper.getWindowsCLIWrapperLink("testUrl/"));
+        assertEquals("http://testSite/download/scan.cli-windows.zip", HubSupportHelper.getWindowsCLIWrapperLink("http://testSite/"));
+        assertEquals("http://testSite/download/scan.cli-windows.zip", HubSupportHelper.getWindowsCLIWrapperLink("http://testSite"));
 
         try {
             HubSupportHelper.getWindowsCLIWrapperLink(" ");
