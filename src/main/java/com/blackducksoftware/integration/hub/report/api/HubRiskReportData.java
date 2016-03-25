@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.blackducksoftware.integration.util.XStreamHelper;
 
-public class HubBomReportData {
+public class HubRiskReportData {
     private VersionReport report;
 
     private int vulnerabilityRiskHighCount;
@@ -82,8 +82,8 @@ public class HubBomReportData {
     }
 
     public void readFromInputStream(InputStream inputStream) {
-        XStreamHelper<HubBomReportData> xStreamHelper = new XStreamHelper<HubBomReportData>();
-        HubBomReportData that = xStreamHelper.fromXML(inputStream);
+        XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<HubRiskReportData>();
+        HubRiskReportData that = xStreamHelper.fromXML(inputStream);
 
         licenseRiskHighCount = that.licenseRiskHighCount;
         licenseRiskMediumCount = that.licenseRiskMediumCount;
@@ -101,7 +101,7 @@ public class HubBomReportData {
     }
 
     public void writeToOutputStream(OutputStream outputStream) {
-        XStreamHelper<HubBomReportData> xStreamHelper = new XStreamHelper<HubBomReportData>();
+        XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<HubRiskReportData>();
         xStreamHelper.toXML(this, outputStream);
     }
 

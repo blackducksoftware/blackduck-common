@@ -14,7 +14,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.report.api.HubBomReportData;
+import com.blackducksoftware.integration.hub.report.api.HubRiskReportData;
 import com.blackducksoftware.integration.util.XStreamHelper;
 
 public class XStreamHelperTest {
@@ -41,27 +41,27 @@ public class XStreamHelperTest {
 
     @Test
     public void testWritingXmlToOutputStream() throws IOException {
-        HubBomReportData hubBomReportData = new HubBomReportData();
-        TestUtils.setValue(HubBomReportData.class, hubBomReportData, "vulnerabilityRiskHighCount", 1);
-        TestUtils.setValue(HubBomReportData.class, hubBomReportData, "vulnerabilityRiskMediumCount", 2);
-        TestUtils.setValue(HubBomReportData.class, hubBomReportData, "vulnerabilityRiskLowCount", 3);
-        TestUtils.setValue(HubBomReportData.class, hubBomReportData, "vulnerabilityRiskNoneCount", 4);
-        TestUtils.setValue(HubBomReportData.class, hubBomReportData, "licenseRiskHighCount", 5);
-        TestUtils.setValue(HubBomReportData.class, hubBomReportData, "licenseRiskMediumCount", 6);
-        TestUtils.setValue(HubBomReportData.class, hubBomReportData, "licenseRiskLowCount", 7);
-        TestUtils.setValue(HubBomReportData.class, hubBomReportData, "licenseRiskNoneCount", 8);
-        TestUtils.setValue(HubBomReportData.class, hubBomReportData, "operationalRiskHighCount", 9);
-        TestUtils.setValue(HubBomReportData.class, hubBomReportData, "operationalRiskMediumCount", 10);
-        TestUtils.setValue(HubBomReportData.class, hubBomReportData, "operationalRiskLowCount", 11);
-        TestUtils.setValue(HubBomReportData.class, hubBomReportData, "operationalRiskNoneCount", 12);
+        HubRiskReportData hubRiskReportData = new HubRiskReportData();
+        TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskHighCount", 1);
+        TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskMediumCount", 2);
+        TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskLowCount", 3);
+        TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskNoneCount", 4);
+        TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskHighCount", 5);
+        TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskMediumCount", 6);
+        TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskLowCount", 7);
+        TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskNoneCount", 8);
+        TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskHighCount", 9);
+        TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskMediumCount", 10);
+        TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskLowCount", 11);
+        TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskNoneCount", 12);
 
-        XStreamHelper<HubBomReportData> xStreamHelper = new XStreamHelper<HubBomReportData>();
-        String xml = xStreamHelper.toXML(hubBomReportData);
+        XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<HubRiskReportData>();
+        String xml = xStreamHelper.toXML(hubRiskReportData);
         assertFalse(xml.isEmpty());
 
         // write to output file
         OutputStream outputStream = TestUtils.getOutputStreamFromClasspathFile(toWriteClasspathEntry);
-        xStreamHelper.toXML(hubBomReportData, outputStream);
+        xStreamHelper.toXML(hubRiskReportData, outputStream);
         IOUtils.closeQuietly(outputStream);
 
         // test that output file is no longer empty
@@ -77,24 +77,24 @@ public class XStreamHelperTest {
 
     @Test
     public void testReadingXmlFromInputStream() {
-        XStreamHelper<HubBomReportData> xStreamHelper = new XStreamHelper<HubBomReportData>();
+        XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<HubRiskReportData>();
         InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(toReadClasspathEntry);
-        HubBomReportData hubBomReportData = xStreamHelper.fromXML(inputStream);
+        HubRiskReportData hubRiskReportData = xStreamHelper.fromXML(inputStream);
         IOUtils.closeQuietly(inputStream);
 
-        assertNull(hubBomReportData.getReport());
-        assertEquals(13, hubBomReportData.getVulnerabilityRiskHighCount());
-        assertEquals(14, hubBomReportData.getVulnerabilityRiskMediumCount());
-        assertEquals(15, hubBomReportData.getVulnerabilityRiskLowCount());
-        assertEquals(16, hubBomReportData.getVulnerabilityRiskNoneCount());
-        assertEquals(17, hubBomReportData.getLicenseRiskHighCount());
-        assertEquals(18, hubBomReportData.getLicenseRiskMediumCount());
-        assertEquals(19, hubBomReportData.getLicenseRiskLowCount());
-        assertEquals(20, hubBomReportData.getLicenseRiskNoneCount());
-        assertEquals(21, hubBomReportData.getOperationalRiskHighCount());
-        assertEquals(22, hubBomReportData.getOperationalRiskMediumCount());
-        assertEquals(23, hubBomReportData.getOperationalRiskLowCount());
-        assertEquals(24, hubBomReportData.getOperationalRiskNoneCount());
+        assertNull(hubRiskReportData.getReport());
+        assertEquals(13, hubRiskReportData.getVulnerabilityRiskHighCount());
+        assertEquals(14, hubRiskReportData.getVulnerabilityRiskMediumCount());
+        assertEquals(15, hubRiskReportData.getVulnerabilityRiskLowCount());
+        assertEquals(16, hubRiskReportData.getVulnerabilityRiskNoneCount());
+        assertEquals(17, hubRiskReportData.getLicenseRiskHighCount());
+        assertEquals(18, hubRiskReportData.getLicenseRiskMediumCount());
+        assertEquals(19, hubRiskReportData.getLicenseRiskLowCount());
+        assertEquals(20, hubRiskReportData.getLicenseRiskNoneCount());
+        assertEquals(21, hubRiskReportData.getOperationalRiskHighCount());
+        assertEquals(22, hubRiskReportData.getOperationalRiskMediumCount());
+        assertEquals(23, hubRiskReportData.getOperationalRiskLowCount());
+        assertEquals(24, hubRiskReportData.getOperationalRiskNoneCount());
     }
 
 }
