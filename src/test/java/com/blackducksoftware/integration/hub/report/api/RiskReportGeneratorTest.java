@@ -94,8 +94,8 @@ public class RiskReportGeneratorTest {
         RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         assertEquals(report, generator.generateHubReport(logger).getReport());
         String output = logger.getOutputString();
-        assertTrue(output, output.contains("Waiting for the Risk to be updated with the scan results."));
-        assertTrue(output, output.contains("The Risk has been updated, generating the report."));
+        assertTrue(output, output.contains("Waiting for the bom to be updated with the scan results."));
+        assertTrue(output, output.contains("The bom has been updated, generating the report."));
         assertTrue(output, output.contains("Finished retrieving the report."));
     }
 
@@ -204,7 +204,7 @@ public class RiskReportGeneratorTest {
     @Test
     public void generateReportWithScanStatusFilesRiskNotUpToDate() throws Exception {
         exception.expect(HubIntegrationException.class);
-        exception.expectMessage("The Risk has not finished updating from the scan within the specified wait time : ");
+        exception.expectMessage("The Bom has not finished updating from the scan within the specified wait time : ");
 
         HubIntRestService service = new HubIntRestService("FakeHubUrl");
         service = Mockito.spy(service);
@@ -348,8 +348,8 @@ public class RiskReportGeneratorTest {
         RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         assertEquals(report, generator.generateHubReport(logger).getReport());
         String output = logger.getOutputString();
-        assertTrue(output, output.contains("Waiting for the Risk to be updated with the scan results."));
-        assertTrue(output, output.contains("The Risk has been updated, generating the report."));
+        assertTrue(output, output.contains("Waiting for the bom to be updated with the scan results."));
+        assertTrue(output, output.contains("The bom has been updated, generating the report."));
         assertTrue(output, output.contains("Finished retrieving the report."));
     }
 
@@ -556,7 +556,7 @@ public class RiskReportGeneratorTest {
     @Test
     public void generateReportWithCodeLocationsRiskNotUpToDate() throws Exception {
         exception.expect(HubIntegrationException.class);
-        exception.expectMessage("The Risk has not finished updating from the scan within the specified wait time : ");
+        exception.expectMessage("The Bom has not finished updating from the scan within the specified wait time : ");
 
         HubIntRestService service = new HubIntRestService("FakeHubUrl");
         service = Mockito.spy(service);
