@@ -195,9 +195,12 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     private void writeToConsole(String line) {
+        if (StringUtils.containsIgnoreCase(line, DEBUG) || StringUtils.containsIgnoreCase(line, TRACE)) {
+            // We dont want to print Debug or Trace logs to the Build output
+            return;
+        }
         StringBuilder builder = new StringBuilder();
         builder.append(output);
-
         if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
             // looking for 'Exception in thread' type messages
             builder.append(line);
