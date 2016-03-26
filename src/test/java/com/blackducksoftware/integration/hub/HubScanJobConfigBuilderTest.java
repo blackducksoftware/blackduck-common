@@ -195,6 +195,20 @@ public class HubScanJobConfigBuilderTest {
     }
 
     @Test
+    public void testConfigValidWithEmptyProjectNameAndVersion() throws HubIntegrationException, IOException {
+        expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
+
+        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+
+        setBuilderDefaults(builder);
+
+        builder.setProjectName(" ");
+        builder.setVersion(" ");
+
+        builder.build(logger);
+    }
+
+    @Test
     public void testConfigInvalidWithNonExistingFiles() throws HubIntegrationException, IOException {
         String nonExistingFilePath = "giraffe";
         File nonExistingFile = new File(nonExistingFilePath);

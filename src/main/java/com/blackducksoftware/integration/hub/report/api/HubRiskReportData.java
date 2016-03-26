@@ -4,10 +4,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import com.blackducksoftware.integration.util.XStreamHelper;
 
-public class HubBomReportData {
+public class HubRiskReportData {
     private VersionReport report;
+
+    private int totalBomEntries;
 
     private int vulnerabilityRiskHighCount;
 
@@ -75,15 +80,16 @@ public class HubBomReportData {
             }
         }
 
-        int totalBomEntries = bomEntries.size();
+        totalBomEntries = bomEntries.size();
+
         vulnerabilityRiskNoneCount = totalBomEntries - vulnerabilityRiskHighCount - vulnerabilityRiskMediumCount - vulnerabilityRiskLowCount;
         licenseRiskNoneCount = totalBomEntries - licenseRiskHighCount - licenseRiskMediumCount - licenseRiskLowCount;
         operationalRiskNoneCount = totalBomEntries - operationalRiskHighCount - operationalRiskMediumCount - operationalRiskLowCount;
     }
 
     public void readFromInputStream(InputStream inputStream) {
-        XStreamHelper<HubBomReportData> xStreamHelper = new XStreamHelper<HubBomReportData>();
-        HubBomReportData that = xStreamHelper.fromXML(inputStream);
+        XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<HubRiskReportData>();
+        HubRiskReportData that = xStreamHelper.fromXML(inputStream);
 
         licenseRiskHighCount = that.licenseRiskHighCount;
         licenseRiskMediumCount = that.licenseRiskMediumCount;
@@ -101,8 +107,28 @@ public class HubBomReportData {
     }
 
     public void writeToOutputStream(OutputStream outputStream) {
-        XStreamHelper<HubBomReportData> xStreamHelper = new XStreamHelper<HubBomReportData>();
+        XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<HubRiskReportData>();
         xStreamHelper.toXML(this, outputStream);
+    }
+
+    public double getPercentage(double count) {
+        double totalCount = totalBomEntries;
+        double percentage = 0;
+        if (totalCount > 0 && count > 0) {
+            percentage = (count / totalCount) * 100;
+        }
+        return percentage;
+    }
+
+    public String htmlEscape(String valueToEscape) {
+        if (StringUtils.isBlank(valueToEscape)) {
+            return null;
+        }
+        return StringEscapeUtils.escapeHtml4(valueToEscape);
+    }
+
+    public List<AggregateBomViewEntry> getBomEntries() {
+        return report.getAggregateBomViewEntries();
     }
 
     public VersionReport getReport() {

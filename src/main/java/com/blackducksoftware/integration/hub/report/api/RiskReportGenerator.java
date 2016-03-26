@@ -11,7 +11,7 @@ import com.blackducksoftware.integration.hub.polling.HubEventPolling;
 import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationItem.ReportMetaLinkItem;
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 
-public class BomReportGenerator {
+public class RiskReportGenerator {
     private final HubReportGenerationInfo hubReportGenerationInfo;
 
     private final HubSupportHelper supportHelper;
@@ -20,12 +20,12 @@ public class BomReportGenerator {
      * Make sure supportHelper.checkHubSupport() has already been run before passing in the supportHelper.
      *
      */
-    public BomReportGenerator(HubReportGenerationInfo hubReportGenerationInfo, HubSupportHelper supportHelper) {
+    public RiskReportGenerator(HubReportGenerationInfo hubReportGenerationInfo, HubSupportHelper supportHelper) {
         this.hubReportGenerationInfo = hubReportGenerationInfo;
         this.supportHelper = supportHelper;
     }
 
-    public HubBomReportData generateHubReport(IntLogger logger) throws IOException, BDRestException, URISyntaxException, InterruptedException,
+    public HubRiskReportData generateHubReport(IntLogger logger) throws IOException, BDRestException, URISyntaxException, InterruptedException,
             HubIntegrationException {
         logger.debug("Waiting for the bom to be updated with the scan results.");
         HubEventPolling hubEventPolling = new HubEventPolling(hubReportGenerationInfo.getService());
@@ -54,15 +54,15 @@ public class BomReportGenerator {
             throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
         }
 
-        HubBomReportData hubBomReportData = new HubBomReportData();
+        HubRiskReportData hubRiskReportData = new HubRiskReportData();
         VersionReport report = hubReportGenerationInfo.getService().getReportContent(contentLink.getHref());
-        hubBomReportData.setReport(report);
+        hubRiskReportData.setReport(report);
         logger.debug("Finished retrieving the report.");
 
         hubReportGenerationInfo.getService().deleteHubReport(hubReportGenerationInfo.getVersionId(),
                 hubReportGenerationInfo.getService().getReportIdFromReportUrl(reportUrl));
 
-        return hubBomReportData;
+        return hubRiskReportData;
     }
 
 }

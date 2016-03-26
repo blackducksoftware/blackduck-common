@@ -31,8 +31,7 @@ import com.blackducksoftware.integration.hub.util.TestLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class BomReportGeneratorTest {
-
+public class RiskReportGeneratorTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
@@ -92,7 +91,7 @@ public class BomReportGeneratorTest {
         Mockito.doReturn("3.0.0").when(service).getHubVersion();
         supportHelper.checkHubSupport(service, logger);
 
-        BomReportGenerator generator = new BomReportGenerator(generatorInfo, supportHelper);
+        RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         assertEquals(report, generator.generateHubReport(logger).getReport());
         String output = logger.getOutputString();
         assertTrue(output, output.contains("Waiting for the bom to be updated with the scan results."));
@@ -148,7 +147,7 @@ public class BomReportGeneratorTest {
         Mockito.doReturn("3.0.0").when(service).getHubVersion();
         supportHelper.checkHubSupport(service, logger);
 
-        BomReportGenerator generator = new BomReportGenerator(generatorInfo, supportHelper);
+        RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         generator.generateHubReport(logger).getReport();
     }
 
@@ -198,12 +197,12 @@ public class BomReportGeneratorTest {
         Mockito.doReturn("3.0.0").when(service).getHubVersion();
         supportHelper.checkHubSupport(service, logger);
 
-        BomReportGenerator generator = new BomReportGenerator(generatorInfo, supportHelper);
+        RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         generator.generateHubReport(logger).getReport();
     }
 
     @Test
-    public void generateReportWithScanStatusFilesBomNotUpToDate() throws Exception {
+    public void generateReportWithScanStatusFilesRiskNotUpToDate() throws Exception {
         exception.expect(HubIntegrationException.class);
         exception.expectMessage("The Bom has not finished updating from the scan within the specified wait time : ");
 
@@ -241,7 +240,7 @@ public class BomReportGeneratorTest {
         Mockito.doReturn("3.0.0").when(service).getHubVersion();
         supportHelper.checkHubSupport(service, logger);
 
-        BomReportGenerator generator = new BomReportGenerator(generatorInfo, supportHelper);
+        RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         generator.generateHubReport(logger).getReport();
     }
 
@@ -332,8 +331,8 @@ public class BomReportGeneratorTest {
 
         Mockito.doReturn(reportInfo).when(service).getReportLinks(Mockito.anyString());
 
-        List<AggregateBomViewEntry> bomEntries = new ArrayList<AggregateBomViewEntry>();
-        VersionReport report = new VersionReport(null, bomEntries);
+        List<AggregateBomViewEntry> RiskEntries = new ArrayList<AggregateBomViewEntry>();
+        VersionReport report = new VersionReport(null, RiskEntries);
 
         Mockito.doReturn(report).when(service).getReportContent(Mockito.anyString());
         Mockito.doReturn(204).when(service).deleteHubReport(Mockito.anyString(), Mockito.anyString());
@@ -346,7 +345,7 @@ public class BomReportGeneratorTest {
         Mockito.doReturn("2.0.0").when(service).getHubVersion();
         supportHelper.checkHubSupport(service, logger);
 
-        BomReportGenerator generator = new BomReportGenerator(generatorInfo, supportHelper);
+        RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         assertEquals(report, generator.generateHubReport(logger).getReport());
         String output = logger.getOutputString();
         assertTrue(output, output.contains("Waiting for the bom to be updated with the scan results."));
@@ -452,7 +451,7 @@ public class BomReportGeneratorTest {
         Mockito.doReturn("2.0.0").when(service).getHubVersion();
         supportHelper.checkHubSupport(service, logger);
 
-        BomReportGenerator generator = new BomReportGenerator(generatorInfo, supportHelper);
+        RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         generator.generateHubReport(logger).getReport();
     }
 
@@ -550,12 +549,12 @@ public class BomReportGeneratorTest {
         Mockito.doReturn("2.0.0").when(service).getHubVersion();
         supportHelper.checkHubSupport(service, logger);
 
-        BomReportGenerator generator = new BomReportGenerator(generatorInfo, supportHelper);
+        RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         generator.generateHubReport(logger).getReport();
     }
 
     @Test
-    public void generateReportWithCodeLocationsBomNotUpToDate() throws Exception {
+    public void generateReportWithCodeLocationsRiskNotUpToDate() throws Exception {
         exception.expect(HubIntegrationException.class);
         exception.expectMessage("The Bom has not finished updating from the scan within the specified wait time : ");
 
@@ -642,7 +641,7 @@ public class BomReportGeneratorTest {
         Mockito.doReturn("2.0.0").when(service).getHubVersion();
         supportHelper.checkHubSupport(service, logger);
 
-        BomReportGenerator generator = new BomReportGenerator(generatorInfo, supportHelper);
+        RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         generator.generateHubReport(logger).getReport();
     }
 
