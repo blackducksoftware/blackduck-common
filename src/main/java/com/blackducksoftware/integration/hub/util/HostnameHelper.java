@@ -9,7 +9,7 @@
  * accordance with the terms of the license agreement you entered into
  * with Black Duck Software.
  */
-package com.blackducksoftware.integration.util;
+package com.blackducksoftware.integration.hub.util;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;

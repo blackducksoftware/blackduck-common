@@ -15,7 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.report.api.HubRiskReportData;
-import com.blackducksoftware.integration.util.XStreamHelper;
+import com.blackducksoftware.integration.hub.util.XStreamHelper;
 
 public class XStreamHelperTest {
     public static final String toWriteClasspathEntry = "com/blackducksoftware/integration/hub/util/XStreamHelperTestToWriteTo.xml";

@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.util.XStreamHelper;
+import com.blackducksoftware.integration.hub.util.XStreamHelper;
 
 public class HubRiskReportData {
     private VersionReport report;
