@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.util;
+package com.blackducksoftware.integration.hub.util;
 
 import java.io.InputStream;
 import java.io.OutputStream;
