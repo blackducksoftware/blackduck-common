@@ -180,20 +180,6 @@ public class CLIInstaller {
 				writer.write(hubVersion);
 				writer.close();
 			}
-
-			final File cliInstallDirectory = getCLIInstallDir();
-			if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
-				if (!cliMismatch)
-				{
-					return false; // already up to date
-				}
-
-				// delete directory contents
-				deleteFilesRecursive(cliInstallDirectory.listFiles());
-			} else {
-				cliInstallDirectory.mkdir();
-			}
-
 			URLConnection connection = null;
 			try {
 				Proxy proxy = null;
@@ -229,12 +215,18 @@ public class CLIInstaller {
 				return false;
 			}
 
-			// if (connection instanceof HttpURLConnection
-			// && ((HttpURLConnection) connection).getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
-			// // This may be useful if the Hub gets the Cli download to return the correct modified headers
-			// // and if they separate the CLI updates from the Hub releases
-			// return false;
-			// }
+			final File cliInstallDirectory = getCLIInstallDir();
+			if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
+				if (!cliMismatch)
+				{
+					return false; // already up to date
+				}
+
+				// delete directory contents
+				deleteFilesRecursive(cliInstallDirectory.listFiles());
+			} else {
+				cliInstallDirectory.mkdir();
+			}
 
 			logger.info("Unpacking " + archive.toString() + " to " + cliInstallDirectory.getCanonicalPath() + " on " + localHostName);
 

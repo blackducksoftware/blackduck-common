@@ -15,7 +15,7 @@ public class ScanStatusChecker implements Runnable {
 
 	private final HubIntRestService service;
 
-	private HubIntegrationException exception = null;
+	private HubIntegrationException exception;
 
 	private boolean running;
 
