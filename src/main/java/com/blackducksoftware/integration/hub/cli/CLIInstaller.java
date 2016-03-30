@@ -286,7 +286,6 @@ public class CLIInstaller {
 
 		dir = dir.getAbsoluteFile(); // without absolutization, getParentFile below seems to fail
 		final ZipFile zip = new ZipFile(zipFile);
-		@SuppressWarnings("unchecked")
 		final
 		Enumeration<ZipEntry> entries = zip.getEntries();
 		try {

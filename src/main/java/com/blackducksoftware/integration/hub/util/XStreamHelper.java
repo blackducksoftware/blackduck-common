@@ -21,10 +21,12 @@ public class XStreamHelper<T extends Object> {
 		xStream.toXML(obj, outputStream);
 	}
 
+	@SuppressWarnings("unchecked")
 	public T fromXML(final String s) {
 		return (T) xStream.fromXML(s);
 	}
 
+	@SuppressWarnings("unchecked")
 	public T fromXML(final InputStream inputStream) {
 		return (T) xStream.fromXML(inputStream);
 	}

@@ -710,6 +710,7 @@ public class HubIntRestService {
 			if (resource.getResponse().getAttributes() == null || resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
 				throw new BDRestException("Could not get the response headers after creating the report.", resource);
 			}
+			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header reportUrl = responseHeaders.getFirst("location", true);
 
@@ -761,6 +762,7 @@ public class HubIntRestService {
 
 		final ClientResource resource = createClientResource(reportUrl);
 
+		@SuppressWarnings("unchecked")
 		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
 		if (requestHeaders == null) {
 			requestHeaders = new Series<Header>(Header.class);
