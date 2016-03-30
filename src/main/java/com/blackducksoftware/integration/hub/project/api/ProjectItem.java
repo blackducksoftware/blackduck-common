@@ -4,209 +4,209 @@ import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
 
 public class ProjectItem {
 
-    private String id;
+	private String id;
 
-    private Boolean kb;
+	private Boolean kb;
 
-    private String name;
+	private String name;
 
-    private Boolean restructured;
+	private Boolean restructured;
 
-    private String canonicalReleaseId;
+	private String canonicalReleaseId;
 
-    private Boolean internal;
+	private Boolean internal;
 
-    private Boolean openSource;
+	private Boolean openSource;
 
-    private ReleaseItem release;
+	private ReleaseItem release;
 
-    public ProjectItem() {
+	public ProjectItem() {
 
-    }
+	}
 
-    public ProjectItem(String id, Boolean kb, String name, Boolean restructured, String canonicalReleaseId, Boolean internal, Boolean openSource,
-            ReleaseItem release) {
-        this.id = id;
-        this.kb = kb;
-        this.name = name;
-        this.restructured = restructured;
-        this.canonicalReleaseId = canonicalReleaseId;
-        this.internal = internal;
-        this.openSource = openSource;
-        this.release = release;
-    }
+	public ProjectItem(final String id, final Boolean kb, final String name, final Boolean restructured, final String canonicalReleaseId, final Boolean internal, final Boolean openSource,
+			final ReleaseItem release) {
+		this.id = id;
+		this.kb = kb;
+		this.name = name;
+		this.restructured = restructured;
+		this.canonicalReleaseId = canonicalReleaseId;
+		this.internal = internal;
+		this.openSource = openSource;
+		this.release = release;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(final String id) {
+		this.id = id;
+	}
 
-    public Boolean getKb() {
-        return kb;
-    }
+	public Boolean getKb() {
+		return kb;
+	}
 
-    public void setKb(Boolean kb) {
-        this.kb = kb;
-    }
+	public void setKb(final Boolean kb) {
+		this.kb = kb;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(final String name) {
+		this.name = name;
+	}
 
-    public Boolean getRestructured() {
-        return restructured;
-    }
+	public Boolean getRestructured() {
+		return restructured;
+	}
 
-    public void setRestructured(Boolean restructured) {
-        this.restructured = restructured;
-    }
+	public void setRestructured(final Boolean restructured) {
+		this.restructured = restructured;
+	}
 
-    public String getCanonicalReleaseId() {
-        return canonicalReleaseId;
-    }
+	public String getCanonicalReleaseId() {
+		return canonicalReleaseId;
+	}
 
-    public void setCanonicalReleaseId(String canonicalReleaseId) {
-        this.canonicalReleaseId = canonicalReleaseId;
-    }
+	public void setCanonicalReleaseId(final String canonicalReleaseId) {
+		this.canonicalReleaseId = canonicalReleaseId;
+	}
 
-    public Boolean getInternal() {
-        return internal;
-    }
+	public Boolean getInternal() {
+		return internal;
+	}
 
-    public void setInternal(Boolean internal) {
-        this.internal = internal;
-    }
+	public void setInternal(final Boolean internal) {
+		this.internal = internal;
+	}
 
-    public Boolean getOpenSource() {
-        return openSource;
-    }
+	public Boolean getOpenSource() {
+		return openSource;
+	}
 
-    public void setOpenSource(Boolean openSource) {
-        this.openSource = openSource;
-    }
+	public void setOpenSource(final Boolean openSource) {
+		this.openSource = openSource;
+	}
 
-    public ReleaseItem getReleaseItem() {
-        return release;
-    }
+	public ReleaseItem getReleaseItem() {
+		return release;
+	}
 
-    public void setReleaseItem(ReleaseItem release) {
-        this.release = release;
-    }
+	public void setReleaseItem(final ReleaseItem release) {
+		this.release = release;
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("ProjectItem [id=");
-        builder.append(id);
-        builder.append(", kb=");
-        builder.append(kb);
-        builder.append(", name=");
-        builder.append(name);
-        builder.append(", restructured=");
-        builder.append(restructured);
-        builder.append(", canonicalReleaseId=");
-        builder.append(canonicalReleaseId);
-        builder.append(", internal=");
-        builder.append(internal);
-        builder.append(", openSource=");
-        builder.append(openSource);
-        builder.append(", release=");
-        builder.append(release);
-        builder.append("]");
-        return builder.toString();
-    }
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("ProjectItem [id=");
+		builder.append(id);
+		builder.append(", kb=");
+		builder.append(kb);
+		builder.append(", name=");
+		builder.append(name);
+		builder.append(", restructured=");
+		builder.append(restructured);
+		builder.append(", canonicalReleaseId=");
+		builder.append(canonicalReleaseId);
+		builder.append(", internal=");
+		builder.append(internal);
+		builder.append(", openSource=");
+		builder.append(openSource);
+		builder.append(", release=");
+		builder.append(release);
+		builder.append("]");
+		return builder.toString();
+	}
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((canonicalReleaseId == null) ? 0 : canonicalReleaseId.hashCode());
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((internal == null) ? 0 : internal.hashCode());
-        result = prime * result + ((kb == null) ? 0 : kb.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((openSource == null) ? 0 : openSource.hashCode());
-        result = prime * result + ((release == null) ? 0 : release.hashCode());
-        result = prime * result + ((restructured == null) ? 0 : restructured.hashCode());
-        return result;
-    }
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((canonicalReleaseId == null) ? 0 : canonicalReleaseId.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((internal == null) ? 0 : internal.hashCode());
+		result = prime * result + ((kb == null) ? 0 : kb.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((openSource == null) ? 0 : openSource.hashCode());
+		result = prime * result + ((release == null) ? 0 : release.hashCode());
+		result = prime * result + ((restructured == null) ? 0 : restructured.hashCode());
+		return result;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof ProjectItem)) {
-            return false;
-        }
-        ProjectItem other = (ProjectItem) obj;
-        if (canonicalReleaseId == null) {
-            if (other.canonicalReleaseId != null) {
-                return false;
-            }
-        } else if (!canonicalReleaseId.equals(other.canonicalReleaseId)) {
-            return false;
-        }
-        if (id == null) {
-            if (other.id != null) {
-                return false;
-            }
-        } else if (!id.equals(other.id)) {
-            return false;
-        }
-        if (internal == null) {
-            if (other.internal != null) {
-                return false;
-            }
-        } else if (!internal.equals(other.internal)) {
-            return false;
-        }
-        if (kb == null) {
-            if (other.kb != null) {
-                return false;
-            }
-        } else if (!kb.equals(other.kb)) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (openSource == null) {
-            if (other.openSource != null) {
-                return false;
-            }
-        } else if (!openSource.equals(other.openSource)) {
-            return false;
-        }
-        if (release == null) {
-            if (other.release != null) {
-                return false;
-            }
-        } else if (!release.equals(other.release)) {
-            return false;
-        }
-        if (restructured == null) {
-            if (other.restructured != null) {
-                return false;
-            }
-        } else if (!restructured.equals(other.restructured)) {
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof ProjectItem)) {
+			return false;
+		}
+		final ProjectItem other = (ProjectItem) obj;
+		if (canonicalReleaseId == null) {
+			if (other.canonicalReleaseId != null) {
+				return false;
+			}
+		} else if (!canonicalReleaseId.equals(other.canonicalReleaseId)) {
+			return false;
+		}
+		if (id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!id.equals(other.id)) {
+			return false;
+		}
+		if (internal == null) {
+			if (other.internal != null) {
+				return false;
+			}
+		} else if (!internal.equals(other.internal)) {
+			return false;
+		}
+		if (kb == null) {
+			if (other.kb != null) {
+				return false;
+			}
+		} else if (!kb.equals(other.kb)) {
+			return false;
+		}
+		if (name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!name.equals(other.name)) {
+			return false;
+		}
+		if (openSource == null) {
+			if (other.openSource != null) {
+				return false;
+			}
+		} else if (!openSource.equals(other.openSource)) {
+			return false;
+		}
+		if (release == null) {
+			if (other.release != null) {
+				return false;
+			}
+		} else if (!release.equals(other.release)) {
+			return false;
+		}
+		if (restructured == null) {
+			if (other.restructured != null) {
+				return false;
+			}
+		} else if (!restructured.equals(other.restructured)) {
+			return false;
+		}
+		return true;
+	}
 
 }

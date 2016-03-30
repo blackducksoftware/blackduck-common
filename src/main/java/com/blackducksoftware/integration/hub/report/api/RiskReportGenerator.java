@@ -12,57 +12,57 @@ import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationIte
 import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 
 public class RiskReportGenerator {
-    private final HubReportGenerationInfo hubReportGenerationInfo;
+	private final HubReportGenerationInfo hubReportGenerationInfo;
 
-    private final HubSupportHelper supportHelper;
+	private final HubSupportHelper supportHelper;
 
-    /**
-     * Make sure supportHelper.checkHubSupport() has already been run before passing in the supportHelper.
-     *
-     */
-    public RiskReportGenerator(HubReportGenerationInfo hubReportGenerationInfo, HubSupportHelper supportHelper) {
-        this.hubReportGenerationInfo = hubReportGenerationInfo;
-        this.supportHelper = supportHelper;
-    }
+	/**
+	 * Make sure supportHelper.checkHubSupport() has already been run before passing in the supportHelper.
+	 *
+	 */
+	public RiskReportGenerator(final HubReportGenerationInfo hubReportGenerationInfo, final HubSupportHelper supportHelper) {
+		this.hubReportGenerationInfo = hubReportGenerationInfo;
+		this.supportHelper = supportHelper;
+	}
 
-    public HubRiskReportData generateHubReport(IntLogger logger) throws IOException, BDRestException, URISyntaxException, InterruptedException,
-            HubIntegrationException {
-        logger.debug("Waiting for the bom to be updated with the scan results.");
-        HubEventPolling hubEventPolling = new HubEventPolling(hubReportGenerationInfo.getService());
+	public HubRiskReportData generateHubReport(final IntLogger logger) throws IOException, BDRestException, URISyntaxException, InterruptedException,
+	HubIntegrationException {
+		logger.debug("Waiting for the bom to be updated with the scan results.");
+		final HubEventPolling hubEventPolling = new HubEventPolling(hubReportGenerationInfo.getService());
 
-        if (supportHelper.isCliStatusDirOptionSupport()) {
-            hubEventPolling.assertBomUpToDate(hubReportGenerationInfo, logger);
-        } else {
-            hubEventPolling.assertBomUpToDate(hubReportGenerationInfo);
-        }
+		if (supportHelper.isCliStatusDirOptionSupport()) {
+			hubEventPolling.assertBomUpToDate(hubReportGenerationInfo, logger);
+		} else {
+			hubEventPolling.assertBomUpToDate(hubReportGenerationInfo);
+		}
 
-        logger.debug("The bom has been updated, generating the report.");
-        String reportUrl = hubReportGenerationInfo.getService().generateHubReport(hubReportGenerationInfo.getVersionId(), ReportFormatEnum.JSON);
+		logger.debug("The bom has been updated, generating the report.");
+		final String reportUrl = hubReportGenerationInfo.getService().generateHubReport(hubReportGenerationInfo.getVersionId(), ReportFormatEnum.JSON);
 
-        ReportMetaInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl, hubReportGenerationInfo.getMaximumWaitTime());
+		final ReportMetaInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl, hubReportGenerationInfo.getMaximumWaitTime());
 
-        List<ReportMetaLinkItem> links = reportInfo.get_meta().getLinks();
+		final List<ReportMetaLinkItem> links = reportInfo.get_meta().getLinks();
 
-        ReportMetaLinkItem contentLink = null;
-        for (ReportMetaLinkItem link : links) {
-            if (link.getRel().equalsIgnoreCase("content")) {
-                contentLink = link;
-                break;
-            }
-        }
-        if (contentLink == null) {
-            throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
-        }
+		ReportMetaLinkItem contentLink = null;
+		for (final ReportMetaLinkItem link : links) {
+			if (link.getRel().equalsIgnoreCase("content")) {
+				contentLink = link;
+				break;
+			}
+		}
+		if (contentLink == null) {
+			throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
+		}
 
-        HubRiskReportData hubRiskReportData = new HubRiskReportData();
-        VersionReport report = hubReportGenerationInfo.getService().getReportContent(contentLink.getHref());
-        hubRiskReportData.setReport(report);
-        logger.debug("Finished retrieving the report.");
+		final HubRiskReportData hubRiskReportData = new HubRiskReportData();
+		final VersionReport report = hubReportGenerationInfo.getService().getReportContent(contentLink.getHref());
+		hubRiskReportData.setReport(report);
+		logger.debug("Finished retrieving the report.");
 
-        hubReportGenerationInfo.getService().deleteHubReport(hubReportGenerationInfo.getVersionId(),
-                hubReportGenerationInfo.getService().getReportIdFromReportUrl(reportUrl));
+		hubReportGenerationInfo.getService().deleteHubReport(hubReportGenerationInfo.getVersionId(),
+				hubReportGenerationInfo.getService().getReportIdFromReportUrl(reportUrl));
 
-        return hubRiskReportData;
-    }
+		return hubRiskReportData;
+	}
 
 }
