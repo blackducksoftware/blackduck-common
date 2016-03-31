@@ -2,8 +2,9 @@ package com.blackducksoftware.integration.hub;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -35,7 +36,7 @@ public class HubScanJobConfigBuilder {
 
     private int scanMemory;
 
-    private final List<String> scanTargetPaths = new ArrayList<String>();
+    private final Set<String> scanTargetPaths = new HashSet<String>();
 
     private boolean disableScanTargetPathExistenceCheck;
 
@@ -76,7 +77,7 @@ public class HubScanJobConfigBuilder {
             logger.error("The maximum wait time for the Risk Report must be greater than 0.");
         }
 
-        if (!validateScanTargetPaths(logger, scanTargetPaths)) {
+        if (!validateScanTargetPaths(logger, workingDirectory)) {
             valid = false;
         }
 
@@ -85,32 +86,36 @@ public class HubScanJobConfigBuilder {
         }
     }
 
-    public boolean validateScanTargetPaths(final IntLogger logger, final List<String> scanTargetPaths) throws IOException {
-        return validateScanTargetPaths(logger, scanTargetPaths, false);
+    /**
+     * If running this validation outside of a Build, make sure you run disableScanTargetPathExistenceCheck() because
+     * the targets may not exist yet.
+     *
+     */
+    public boolean validateScanTargetPaths(final IntLogger logger) throws IOException {
+        return validateScanTargetPaths(logger, null);
     }
 
-    private boolean validateScanTargetPaths(final IntLogger logger, final List<String> scanTargetPaths, final boolean shouldUseDefault) throws IOException {
+    private boolean validateScanTargetPaths(final IntLogger logger, final String defaultTargetPath) throws IOException {
         boolean scanTargetPathsValid = true;
-        if (scanTargetPaths.isEmpty()) {
-            if (shouldUseDefault) {
-                scanTargetPathsValid = false;
-                logger.error("No scan targets configured.");
-            } else {
-                scanTargetPaths.add(workingDirectory);
-            }
-        } else {
-            for (final String targetAbsolutePath : scanTargetPaths) {
-                if (StringUtils.isBlank(targetAbsolutePath)) {
-                    if (shouldUseDefault) {
-                        // ??????
-                    } else {
-                        logger.error("Can not scan null target.");
-                        scanTargetPathsValid = false;
-                    }
-                }
+        if (scanTargetPaths.isEmpty() && defaultTargetPath != null) {
+            scanTargetPaths.add(defaultTargetPath);
+        }
 
-                if (!disableScanTargetPathExistenceCheck) {
-                    final File target = new File(targetAbsolutePath);
+        final Set<String> targetPaths = new HashSet<String>();
+        for (final String currentTargetPath : scanTargetPaths) {
+            String targetPath;
+            if (StringUtils.isBlank(currentTargetPath) && defaultTargetPath != null) {
+                targetPath = defaultTargetPath;
+            } else {
+                targetPath = currentTargetPath;
+            }
+            targetPaths.add(targetPath);
+
+            if (!disableScanTargetPathExistenceCheck) {
+                if (StringUtils.isNotBlank(targetPath)) {
+                    // If the targetPath is blank then it will be set to the defaultTargetPath during the build
+                    // Since we dont know the defaultTargetPath at this point we only validate non blank entries
+                    final File target = new File(targetPath);
                     if (null == target || !target.exists()) {
                         logger.error("The scan target '" + target.getAbsolutePath() + "' does not exist.");
                         scanTargetPathsValid = false;
@@ -124,6 +129,8 @@ public class HubScanJobConfigBuilder {
                 }
             }
         }
+        scanTargetPaths.clear();
+        scanTargetPaths.addAll(targetPaths);
 
         return scanTargetPathsValid;
     }
