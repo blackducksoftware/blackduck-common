@@ -52,6 +52,34 @@ public class HubScanJobConfigBuilder {
     public void assertValid(final IntLogger logger) throws HubIntegrationException, IOException {
         boolean valid = true;
 
+        if (validateProjectAndVersion(logger)) {
+            valid = false;
+        }
+
+        if (validateScanMemory(logger, DEFAULT_MEMORY_IN_MEGABYTES)) {
+            valid = false;
+        }
+
+        if (validateShouldGenerateRiskReport(logger)) {
+            valid = false;
+        }
+
+        if (validateMaxWaitTimeForRiskReport(logger, DEFAULT_REPORT_WAIT_TIME_IN_MINUTES)) {
+            valid = false;
+        }
+
+        if (validateScanTargetPaths(logger, workingDirectory)) {
+            valid = false;
+        }
+
+        if (!valid) {
+            throw new HubIntegrationException("The configuration is not valid - please check the log for the specific issues.");
+        }
+    }
+
+    public boolean validateProjectAndVersion(final IntLogger logger) throws IOException {
+        boolean valid = true;
+
         if (null == projectName && null == version) {
             logger.warn("No Project name or Version were found. Any scans run will not be mapped to a Version.");
         } else if (null == projectName) {
@@ -62,28 +90,56 @@ public class HubScanJobConfigBuilder {
             logger.error("No Version was found.");
         }
 
+        return valid;
+    }
+
+    public boolean validateScanMemory(final IntLogger logger) throws IOException {
+        return validateScanMemory(logger, null);
+    }
+
+    private boolean validateScanMemory(final IntLogger logger, final Integer defaultScanMemory) throws IOException {
+        boolean scanMemoryValid = true;
+
+        if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES && defaultScanMemory != null) {
+            scanMemory = defaultScanMemory;
+        }
+
         if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES) {
-            valid = false;
+            scanMemoryValid = false;
             logger.error("The minimum amount of memory for the scan is " + MINIMUM_MEMORY_IN_MEGABYTES + " MB.");
         }
 
+        return scanMemoryValid;
+    }
+
+    public boolean validateShouldGenerateRiskReport(final IntLogger logger) throws IOException {
+        boolean shouldGenerateReportValid = true;
+
         if ((null == projectName || null == version) && shouldGenerateRiskReport) {
-            valid = false;
+            shouldGenerateReportValid = false;
             logger.error("To generate the Risk Report, you need to provide a Project name or version.");
         }
 
+        return shouldGenerateReportValid;
+    }
+
+    public boolean validateMaxWaitTimeForRiskReport(final IntLogger logger) throws IOException {
+        return validateMaxWaitTimeForRiskReport(logger, null);
+    }
+
+    private boolean validateMaxWaitTimeForRiskReport(final IntLogger logger, final Integer defaultMaxWaitTime) throws IOException {
+        boolean waitTimeValid = true;
+
         if (shouldGenerateRiskReport && maxWaitTimeForRiskReport <= 0) {
-            valid = false;
-            logger.error("The maximum wait time for the Risk Report must be greater than 0.");
+            if (defaultMaxWaitTime != null) {
+                maxWaitTimeForRiskReport = defaultMaxWaitTime;
+            } else {
+                waitTimeValid = false;
+                logger.error("The maximum wait time for the Risk Report must be greater than 0.");
+            }
         }
 
-        if (!validateScanTargetPaths(logger, workingDirectory)) {
-            valid = false;
-        }
-
-        if (!valid) {
-            throw new HubIntegrationException("The configuration is not valid - please check the log for the specific issues.");
-        }
+        return waitTimeValid;
     }
 
     /**
