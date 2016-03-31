@@ -52,23 +52,23 @@ public class HubScanJobConfigBuilder {
     public void assertValid(final IntLogger logger) throws HubIntegrationException, IOException {
         boolean valid = true;
 
-        if (validateProjectAndVersion(logger)) {
+        if (!validateProjectAndVersion(logger)) {
             valid = false;
         }
 
-        if (validateScanMemory(logger, DEFAULT_MEMORY_IN_MEGABYTES)) {
+        if (!validateScanMemory(logger, DEFAULT_MEMORY_IN_MEGABYTES)) {
             valid = false;
         }
 
-        if (validateShouldGenerateRiskReport(logger)) {
+        if (!validateShouldGenerateRiskReport(logger)) {
             valid = false;
         }
 
-        if (validateMaxWaitTimeForRiskReport(logger, DEFAULT_REPORT_WAIT_TIME_IN_MINUTES)) {
+        if (!validateMaxWaitTimeForRiskReport(logger, DEFAULT_REPORT_WAIT_TIME_IN_MINUTES)) {
             valid = false;
         }
 
-        if (validateScanTargetPaths(logger, workingDirectory)) {
+        if (!validateScanTargetPaths(logger, workingDirectory)) {
             valid = false;
         }
 
