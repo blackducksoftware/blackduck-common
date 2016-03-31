@@ -256,7 +256,7 @@ public class HubIntRestService implements Serializable {
      *
      */
     public int setCookies(final String hubUserName, final String hubPassword) throws HubIntegrationException,
-            URISyntaxException, BDRestException {
+    URISyntaxException, BDRestException {
 
         final ClientResource resource = createClientResource();
         resource.addSegment("j_spring_security_check");
@@ -308,7 +308,7 @@ public class HubIntRestService implements Serializable {
      *
      */
     public List<AutoCompleteItem> getProjectMatches(final String hubProjectName) throws IOException,
-            BDRestException, URISyntaxException {
+    BDRestException, URISyntaxException {
         final ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
@@ -340,7 +340,7 @@ public class HubIntRestService implements Serializable {
      *
      */
     public ProjectItem getProjectById(final String projectId) throws IOException,
-            BDRestException, URISyntaxException {
+    BDRestException, URISyntaxException {
         final ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
@@ -367,7 +367,7 @@ public class HubIntRestService implements Serializable {
      *
      */
     public ProjectItem getProjectByName(final String projectName) throws IOException, BDRestException,
-            URISyntaxException, ProjectDoesNotExistException {
+    URISyntaxException, ProjectDoesNotExistException {
         final ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
@@ -394,7 +394,8 @@ public class HubIntRestService implements Serializable {
      *
      */
     public List<ReleaseItem> getVersionsForProject(final String projectId) throws IOException,
-            BDRestException, URISyntaxException {
+    BDRestException, URISyntaxException {
+
         final ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
@@ -428,7 +429,9 @@ public class HubIntRestService implements Serializable {
      *
      */
     public String createHubProject(final String projectName) throws IOException, BDRestException,
-            URISyntaxException {
+
+    URISyntaxException {
+
         final ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
@@ -504,8 +507,7 @@ public class HubIntRestService implements Serializable {
      *
      */
     public String createHubProjectAndVersion(final String projectName, final String versionName, final String phase, final String dist) throws IOException,
-            BDRestException,
-            URISyntaxException {
+            BDRestException, URISyntaxException {
         final ClientResource resource = createClientResource();
         resource.addSegment("api");
         resource.addSegment("v1");
@@ -602,7 +604,8 @@ public class HubIntRestService implements Serializable {
      *
      */
     public List<ScanLocationItem> getScanLocations(final String hostname, final List<String>
-            scanTargets) throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
+
+    scanTargets) throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
         final List<ScanLocationItem> codeLocations = new ArrayList<ScanLocationItem>();
 
         ClientResource resource = null;
@@ -760,6 +763,7 @@ public class HubIntRestService implements Serializable {
      *
      */
     public ReportMetaInformationItem getReportLinks(final String reportUrl) throws IOException, BDRestException,
+
             URISyntaxException {
 
         final ClientResource resource = createClientResource(reportUrl);
@@ -827,7 +831,7 @@ public class HubIntRestService implements Serializable {
      *
      */
     public PolicyStatus getPolicyStatus(final String projectId, final String versionId) throws IOException, BDRestException,
-            URISyntaxException, MissingPolicyStatusException {
+    URISyntaxException, MissingPolicyStatusException {
         if (StringUtils.isBlank(projectId)) {
             throw new IllegalArgumentException("Missing the project Id to get the policy status of.");
         }
@@ -907,7 +911,6 @@ public class HubIntRestService implements Serializable {
 
     private void handleRequest(final ClientResource resource, final ChallengeRequest proxyChallengeRequest,
             final int attempt) throws BDRestException {
-
         if (proxyChallengeRequest != null) {
             // This should replace the authenticator for the proxy authentication
             // BUT it doesn't work for Digest authentication
