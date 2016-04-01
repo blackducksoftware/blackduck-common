@@ -3,7 +3,6 @@ package com.blackducksoftware.integration.hub;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.net.Authenticator;
@@ -37,6 +36,7 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.MissingPolicyStatusException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
+import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.policy.api.PolicyStatus;
 import com.blackducksoftware.integration.hub.project.api.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.project.api.ProjectItem;
@@ -47,14 +47,14 @@ import com.blackducksoftware.integration.hub.scan.api.ScanLocationItem;
 import com.blackducksoftware.integration.hub.scan.api.ScanLocationResults;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
 import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-public class HubIntRestService implements Serializable {
+public class HubIntRestService {
+
 	private Series<Cookie> cookies;
 
 	private final String baseUrl;
@@ -343,7 +343,7 @@ public class HubIntRestService implements Serializable {
 	BDRestException, URISyntaxException {
 		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
-		resource.addSegment("v1");
+		// TODO		resource.addSegment("v1");
 		resource.addSegment("projects");
 		resource.addSegment(projectId);
 
@@ -370,9 +370,9 @@ public class HubIntRestService implements Serializable {
 	URISyntaxException, ProjectDoesNotExistException {
 		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
-		resource.addSegment("v1");
+		//TODO resource.addSegment("v1");
 		resource.addSegment("projects");
-		resource.addQueryParameter("name", projectName);
+		resource.addQueryParameter("q", "name:" + projectName);
 		resource.setMethod(Method.GET);
 		handleRequest(resource, null, 0);
 		final int responseCode = resource.getResponse().getStatus().getCode();
@@ -381,6 +381,67 @@ public class HubIntRestService implements Serializable {
 			final String response = readResponseAsString(resource.getResponse());
 			final Gson gson = new GsonBuilder().create();
 			return gson.fromJson(response, ProjectItem.class);
+
+			//Public api now returns the following
+			//			{
+			//				  "totalCount": 1,
+			//				  "items": [
+			//				    {
+			//				      "name": "CITestProject",
+			//				      "source": "CUSTOM",
+			//				      "_meta": {
+			//				        "allow": [
+			//				          "GET",
+			//				          "PUT",
+			//				          "DELETE"
+			//				        ],
+			//				        "href": "http://integration-hub/api/projects/b504232a-85a8-456e-926b-61ca9f89d1d8",
+			//				        "links": [
+			//				          {
+			//				            "rel": "versions",
+			//				            "href": "http://integration-hub/api/projects/b504232a-85a8-456e-926b-61ca9f89d1d8/versions"
+			//				          },
+			//				          {
+			//				            "rel": "canonicalVersion",
+			//				            "href": "http://integration-hub/api/projects/b504232a-85a8-456e-926b-61ca9f89d1d8/versions/4a86d9a7-f66c-4d94-99b9-8d365f1bb6ea"
+			//				          }
+			//				        ]
+			//				      }
+			//				    }
+			//				  ]
+			//				}
+
+
+			//Versions link returns
+			//			{
+			//				"totalCount": 1,
+			//				"items": [
+			//				{
+			//				"versionName": "CITestVersion1",
+			//				"phase": "PLANNING",
+			//				"distribution": "INTERNAL",
+			//				"source": "CUSTOM",
+			//				"_meta": {
+			//				"allow": [
+			//				"GET",
+			//				"PUT",
+			//				"DELETE"
+			//				],
+			//				"href": "http://integration-hub/api/projects/b504232a-85a8-456e-926b-61ca9f89d1d8/versions/4a86d9a7-f66c-4d94-99b9-8d365f1bb6ea",
+			//				"links": [
+			//				{
+			//				"rel": "versionReport",
+			//				"href": "http://integration-hub/api/versions/4a86d9a7-f66c-4d94-99b9-8d365f1bb6ea/reports"
+			//				},
+			//				{
+			//				"rel": "riskProfile",
+			//				"href": "http://integration-hub/api/projects/b504232a-85a8-456e-926b-61ca9f89d1d8/versions/4a86d9a7-f66c-4d94-99b9-8d365f1bb6ea/risk-profile"
+			//				}
+			//				]
+			//				}
+			//				}
+			//				]
+			//				}
 
 		} else if (responseCode == 404) {
 			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName, resource);
@@ -398,7 +459,7 @@ public class HubIntRestService implements Serializable {
 
 		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
-		resource.addSegment("v1");
+		//TODO		resource.addSegment("v1");
 		resource.addSegment("projects");
 		resource.addSegment(projectId);
 		resource.addSegment("releases");
@@ -434,7 +495,7 @@ public class HubIntRestService implements Serializable {
 
 		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
-		resource.addSegment("v1");
+		//TODO	resource.addSegment("v1");
 		resource.addSegment("projects");
 
 		resource.setMethod(Method.POST);
@@ -471,7 +532,7 @@ public class HubIntRestService implements Serializable {
 			throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
-		resource.addSegment("v1");
+		//TODO 	resource.addSegment("v1");
 		resource.addSegment("releases");
 
 		int responseCode;
