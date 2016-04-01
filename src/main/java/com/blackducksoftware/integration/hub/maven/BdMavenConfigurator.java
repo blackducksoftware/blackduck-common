@@ -27,7 +27,7 @@ import com.blackducksoftware.integration.build.BuildInfo;
 import com.blackducksoftware.integration.build.extractor.Recorder_3_0_Loader;
 import com.blackducksoftware.integration.build.extractor.Recorder_3_1_Loader;
 import com.blackducksoftware.integration.hub.exception.BDMavenRetrieverException;
-import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
+import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.google.gson.Gson;
 
 public class BdMavenConfigurator {

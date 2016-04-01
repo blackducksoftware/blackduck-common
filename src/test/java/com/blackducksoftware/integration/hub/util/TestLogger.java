@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
-import com.blackducksoftware.integration.suite.sdk.logging.LogLevel;
+import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.hub.logging.LogLevel;
 
 public class TestLogger implements IntLogger {
     private ArrayList<String> outputList = new ArrayList<String>();

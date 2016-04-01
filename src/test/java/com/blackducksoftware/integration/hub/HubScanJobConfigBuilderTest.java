@@ -34,30 +34,157 @@ public class HubScanJobConfigBuilderTest {
 
     @After
     public void tearDown() {
-        List<String> outputList = logger.getOutputList();
-        String outputString = logger.getOutputString();
+        final List<String> outputList = logger.getOutputList();
+        final String outputString = logger.getOutputString();
         assertEquals("Too many/not enough messages expected: \n" + outputString, expectedMessages.size(), outputList.size());
 
-        for (String expectedMessage : expectedMessages) {
+        for (final String expectedMessage : expectedMessages) {
             assertTrue(outputList.contains(expectedMessage));
         }
     }
 
     @Test
-    public void testEmptyConfigIsInvalid() throws HubIntegrationException, IOException {
+    public void testEmptyConfigValidations() throws HubIntegrationException, IOException {
         expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
         expectedMessages.add("The minimum amount of memory for the scan is 256 MB.");
-        expectedMessages.add("No scan targets configured.");
 
-        thrown.expect(HubIntegrationException.class);
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        assertTrue(builder.validateProjectAndVersion(logger));
+        assertTrue(!builder.validateScanMemory(logger));
+        assertTrue(builder.validateScanTargetPaths(logger));
+        assertTrue(builder.validateMaxWaitTimeForRiskReport(logger));
+        assertTrue(builder.validateShouldGenerateRiskReport(logger));
+    }
 
-        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+    @Test
+    public void testValidateProjectAndVersionNoVersion() throws HubIntegrationException, IOException {
+        expectedMessages.add("No Version was found.");
+
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        builder.setProjectName("TestProject");
+
+        assertTrue(!builder.validateProjectAndVersion(logger));
+    }
+
+    @Test
+    public void testValidateProjectAndVersionNoProject() throws HubIntegrationException, IOException {
+        expectedMessages.add("No Project name was found.");
+
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        builder.setVersion("Version");
+
+        assertTrue(!builder.validateProjectAndVersion(logger));
+    }
+
+    @Test
+    public void testRiskReportValidationsNoProjectNameOrVersion() throws HubIntegrationException, IOException {
+        expectedMessages.add("To generate the Risk Report, you need to provide a Project name or version.");
+
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        builder.setShouldGenerateRiskReport(true);
+
+        assertTrue(!builder.validateShouldGenerateRiskReport(logger));
+    }
+
+    @Test
+    public void testRiskReportValidationsNoVersion() throws HubIntegrationException, IOException {
+        expectedMessages.add("To generate the Risk Report, you need to provide a Project name or version.");
+
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        builder.setShouldGenerateRiskReport(true);
+        builder.setProjectName("TestProject");
+
+        assertTrue(!builder.validateShouldGenerateRiskReport(logger));
+    }
+
+    @Test
+    public void testRiskReportValidationsNoProject() throws HubIntegrationException, IOException {
+        expectedMessages.add("To generate the Risk Report, you need to provide a Project name or version.");
+
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        builder.setShouldGenerateRiskReport(true);
+        builder.setVersion("Version");
+
+        assertTrue(!builder.validateShouldGenerateRiskReport(logger));
+    }
+
+    @Test
+    public void testValidateMaxWaitTimeForRiskReport() throws HubIntegrationException, IOException {
+        expectedMessages.add("The maximum wait time for the Risk Report must be greater than 0.");
+
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        builder.setShouldGenerateRiskReport(true);
+
+        assertTrue(!builder.validateMaxWaitTimeForRiskReport(logger));
+    }
+
+    @Test
+    public void testValidateMaxWaitTimeForRiskReportValid() throws HubIntegrationException, IOException {
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        builder.setShouldGenerateRiskReport(true);
+        builder.setMaxWaitTimeForRiskReport(HubScanJobConfigBuilder.DEFAULT_REPORT_WAIT_TIME_IN_MINUTES);
+
+        assertTrue(builder.validateMaxWaitTimeForRiskReport(logger));
+    }
+
+    @Test
+    public void testValidateScanTargetPathsNullTarget() throws HubIntegrationException, IOException {
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+
+        setBuilderDefaults(builder);
+
+        builder.addScanTargetPath(null);
+
+        assertTrue(builder.validateScanTargetPaths(logger));
+    }
+
+    @Test
+    public void testValidateScanTargetPathsOutsideWorkingDirectory() throws HubIntegrationException, IOException {
+        expectedMessages.add("Can not scan targets outside the working directory.");
+
+        final String relativeClasspathResourcePath = "com/blackducksoftware/integration/hub/existingFileForTestingScanPaths.txt";
+        final URL url = HubScanJobConfigBuilder.class.getClassLoader().getResource(relativeClasspathResourcePath);
+        final File existingFile = new File(url.getFile());
+        final String absolutePath = existingFile.getAbsolutePath();
+
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+
+        setBuilderDefaultsBasic(builder);
+
+        builder.addScanTargetPath(absolutePath);
+
+        assertTrue(!builder.validateScanTargetPaths(logger));
+    }
+
+    @Test
+    public void testValidateScanTargetPathsWithExistingFiles() throws HubIntegrationException, IOException {
+        final String relativeClasspathResourcePath = "com/blackducksoftware/integration/hub/existingFileForTestingScanPaths.txt";
+        final URL url = HubScanJobConfigBuilder.class.getClassLoader().getResource(relativeClasspathResourcePath);
+        final File existingFile = new File(url.getFile());
+        final String absolutePath = existingFile.getAbsolutePath();
+        final String workingDirectoryPath = absolutePath.replace(relativeClasspathResourcePath, "");
+
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+
+        setBuilderDefaultsBasic(builder);
+
+        builder.setWorkingDirectory(workingDirectoryPath);
+        builder.addScanTargetPath(absolutePath);
+
+        assertTrue(builder.validateScanTargetPaths(logger));
+    }
+
+    @Test
+    public void testEmptyConfigIsInvalid() throws HubIntegrationException, IOException {
+        expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
+
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
         builder.build(logger);
     }
 
     @Test
     public void testValidConfig() throws HubIntegrationException, IOException {
-        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 
         setBuilderDefaults(builder);
 
@@ -70,7 +197,7 @@ public class HubScanJobConfigBuilderTest {
 
         thrown.expect(HubIntegrationException.class);
 
-        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 
         setBuilderDefaults(builder);
 
@@ -85,7 +212,7 @@ public class HubScanJobConfigBuilderTest {
 
         thrown.expect(HubIntegrationException.class);
 
-        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 
         setBuilderDefaults(builder);
 
@@ -96,7 +223,7 @@ public class HubScanJobConfigBuilderTest {
 
     @Test
     public void testConfigValidGeneratingReport() throws HubIntegrationException, IOException {
-        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 
         setBuilderDefaults(builder);
 
@@ -108,11 +235,7 @@ public class HubScanJobConfigBuilderTest {
 
     @Test
     public void testConfigInvalidGeneratingReportInvalidWaitTime() throws HubIntegrationException, IOException {
-        expectedMessages.add("The maximum wait time for the Risk Report must be greater than 0.");
-
-        thrown.expect(HubIntegrationException.class);
-
-        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 
         setBuilderDefaults(builder);
 
@@ -129,7 +252,7 @@ public class HubScanJobConfigBuilderTest {
 
         thrown.expect(HubIntegrationException.class);
 
-        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 
         setBuilderDefaults(builder);
 
@@ -142,12 +265,8 @@ public class HubScanJobConfigBuilderTest {
     }
 
     @Test
-    public void testNullScanTargetsInvalid() throws HubIntegrationException, IOException {
-        expectedMessages.add("Can not scan null target.");
-
-        thrown.expect(HubIntegrationException.class);
-
-        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+    public void testNullScanTargets() throws HubIntegrationException, IOException {
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 
         setBuilderDefaults(builder);
 
@@ -162,12 +281,12 @@ public class HubScanJobConfigBuilderTest {
 
         thrown.expect(HubIntegrationException.class);
 
-        String relativeClasspathResourcePath = "com/blackducksoftware/integration/hub/existingFileForTestingScanPaths.txt";
-        URL url = HubScanJobConfigBuilder.class.getClassLoader().getResource(relativeClasspathResourcePath);
-        File existingFile = new File(url.getFile());
-        String absolutePath = existingFile.getAbsolutePath();
+        final String relativeClasspathResourcePath = "com/blackducksoftware/integration/hub/existingFileForTestingScanPaths.txt";
+        final URL url = HubScanJobConfigBuilder.class.getClassLoader().getResource(relativeClasspathResourcePath);
+        final File existingFile = new File(url.getFile());
+        final String absolutePath = existingFile.getAbsolutePath();
 
-        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 
         setBuilderDefaultsBasic(builder);
 
@@ -178,13 +297,13 @@ public class HubScanJobConfigBuilderTest {
 
     @Test
     public void testConfigValidWithExistingFiles() throws HubIntegrationException, IOException {
-        String relativeClasspathResourcePath = "com/blackducksoftware/integration/hub/existingFileForTestingScanPaths.txt";
-        URL url = HubScanJobConfigBuilder.class.getClassLoader().getResource(relativeClasspathResourcePath);
-        File existingFile = new File(url.getFile());
-        String absolutePath = existingFile.getAbsolutePath();
-        String workingDirectoryPath = absolutePath.replace(relativeClasspathResourcePath, "");
+        final String relativeClasspathResourcePath = "com/blackducksoftware/integration/hub/existingFileForTestingScanPaths.txt";
+        final URL url = HubScanJobConfigBuilder.class.getClassLoader().getResource(relativeClasspathResourcePath);
+        final File existingFile = new File(url.getFile());
+        final String absolutePath = existingFile.getAbsolutePath();
+        final String workingDirectoryPath = absolutePath.replace(relativeClasspathResourcePath, "");
 
-        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 
         setBuilderDefaultsBasic(builder);
 
@@ -198,7 +317,7 @@ public class HubScanJobConfigBuilderTest {
     public void testConfigValidWithEmptyProjectNameAndVersion() throws HubIntegrationException, IOException {
         expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
 
-        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 
         setBuilderDefaults(builder);
 
@@ -210,14 +329,14 @@ public class HubScanJobConfigBuilderTest {
 
     @Test
     public void testConfigInvalidWithNonExistingFiles() throws HubIntegrationException, IOException {
-        String nonExistingFilePath = "giraffe";
-        File nonExistingFile = new File(nonExistingFilePath);
+        final String nonExistingFilePath = "giraffe";
+        final File nonExistingFile = new File(nonExistingFilePath);
         expectedMessages.add("The scan target '" + nonExistingFile.getAbsolutePath() + "' does not exist.");
         expectedMessages.add("Can not scan targets outside the working directory.");
 
         thrown.expect(HubIntegrationException.class);
 
-        HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
+        final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 
         setBuilderDefaultsBasic(builder);
 
@@ -226,14 +345,14 @@ public class HubScanJobConfigBuilderTest {
         builder.build(logger);
     }
 
-    private void setBuilderDefaults(HubScanJobConfigBuilder builder) {
+    private void setBuilderDefaults(final HubScanJobConfigBuilder builder) {
         setBuilderDefaultsBasic(builder);
 
         builder.addScanTargetPath("testPath");
         builder.disableScanTargetPathExistenceCheck();
     }
 
-    private void setBuilderDefaultsBasic(HubScanJobConfigBuilder builder) {
+    private void setBuilderDefaultsBasic(final HubScanJobConfigBuilder builder) {
         builder.setProjectName("projectName");
         builder.setVersion("version");
         builder.setPhase("phase");

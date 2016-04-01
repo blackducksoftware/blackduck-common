@@ -9,7 +9,7 @@ import org.restlet.resource.ResourceException;
 
 import com.blackducksoftware.integration.hub.api.VersionComparison;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
+import com.blackducksoftware.integration.hub.logging.IntLogger;
 
 public class HubSupportHelper implements Serializable {
 

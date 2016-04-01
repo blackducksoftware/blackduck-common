@@ -93,6 +93,21 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.blackducksoftware.integration</groupId>
+			<artifactId>build-info</artifactId>
+			<version>${build.info.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.blackducksoftware.integration.maven.maven30</groupId>
+			<artifactId>build-info-recorder-mvn30</artifactId>
+			<version>${build.info.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.blackducksoftware.integration.maven.maven31</groupId>
+			<artifactId>build-info-recorder-mvn31</artifactId>
+			<version>${build.info.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.5</version>
@@ -113,19 +128,9 @@
 			<version>18.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.blackducksoftware.integration</groupId>
-			<artifactId>build-info</artifactId>
-			<version>${build.info.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.blackducksoftware.integration.maven.maven30</groupId>
-			<artifactId>build-info-recorder-mvn30</artifactId>
-			<version>${build.info.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.blackducksoftware.integration.maven.maven31</groupId>
-			<artifactId>build-info-recorder-mvn31</artifactId>
-			<version>${build.info.version}</version>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -151,11 +156,6 @@
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
 			<version>1.4.3</version>
-		</dependency>
-		<dependency>
-			<groupId>com.blackducksoftware.integration</groupId>
-			<artifactId>int-suite-sdk-shared</artifactId>
-			<version>1.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

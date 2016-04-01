@@ -1,8 +1,6 @@
 package com.blackducksoftware.integration.hub.polling;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -13,19 +11,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.report.api.HubReportGenerationInfo;
 import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationItem;
 import com.blackducksoftware.integration.hub.scan.api.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.scan.api.ScanLocationItem;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
-import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -105,10 +104,7 @@ public class HubEventPolling {
 	 * If we find a scan history object that has status cancelled or an error type then we throw an exception.
 	 */
 	public void assertBomUpToDate(final HubReportGenerationInfo hubReportGenerationInfo, final IntLogger logger) throws InterruptedException,
-	BDRestException,
-	HubIntegrationException,
-	URISyntaxException,
-	IOException {
+	BDRestException, HubIntegrationException, URISyntaxException, IOException {
 		if (StringUtils.isBlank(hubReportGenerationInfo.getScanStatusDirectory())) {
 			throw new HubIntegrationException("The scan status directory must be a non empty value.");
 		}
@@ -132,10 +128,9 @@ public class HubEventPolling {
 		}
 		logger.info("Checking the directory : " + statusDirectory.getCanonicalPath() + " for the scan status's.");
 		final CountDownLatch lock = new CountDownLatch(expectedNumScans);
-
 		final List<ScanStatusChecker> scanStatusList = new ArrayList<ScanStatusChecker>();
 		for (final File currentStatusFile : statusFiles) {
-			final String fileContent = readFileAsString(currentStatusFile.getCanonicalPath());
+			final String fileContent = FileUtils.readFileToString(currentStatusFile);
 			final Gson gson = new GsonBuilder().create();
 			final ScanStatusToPoll status = gson.fromJson(fileContent, ScanStatusToPoll.class);
 			if (status.get_meta() == null || status.getStatus() == null) {
@@ -145,13 +140,6 @@ public class HubEventPolling {
 			final ScanStatusChecker checker = new ScanStatusChecker(service, status, lock);
 			scanStatusList.add(checker);
 		}
-		// Now that we have read in all of the scan status's without error lets start polling them.
-		final ThreadFactory threadFactory = Executors.defaultThreadFactory();
-		final ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
-		for (final ScanStatusChecker statusChecker : scanStatusList) {
-			pool.submit(statusChecker);
-		}
-		pool.shutdown();
 
 		logger.debug("Cleaning up the scan status files at : " + statusDirectory.getCanonicalPath());
 		// We delete the files in a second loop to ensure we have all the scan status's in memory before we start
@@ -161,6 +149,19 @@ public class HubEventPolling {
 			currentStatusFile.delete();
 		}
 		statusDirectory.delete();
+
+		pollScanStatusChecker(lock,hubReportGenerationInfo,scanStatusList);
+	}
+
+	public void pollScanStatusChecker(final CountDownLatch lock, final HubReportGenerationInfo hubReportGenerationInfo,final List<ScanStatusChecker> scanStatusList) throws InterruptedException, HubIntegrationException{
+		// Now that we have read in all of the scan status's without error lets start polling them.
+		final ThreadFactory threadFactory = Executors.defaultThreadFactory();
+		final ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
+		for (final ScanStatusChecker statusChecker : scanStatusList) {
+			pool.submit(statusChecker);
+		}
+		pool.shutdown();
+
 
 		final boolean finished = lock.await(hubReportGenerationInfo.getMaximumWaitTime(), TimeUnit.MILLISECONDS);
 
@@ -182,20 +183,6 @@ public class HubEventPolling {
 		}
 	}
 
-	private String readFileAsString(final String file) throws IOException {
-		final StringBuilder sb = new StringBuilder();
-		final BufferedReader bufReader = new BufferedReader(new FileReader(file));
-		try {
-			String line;
-			while ((line = bufReader.readLine()) != null) {
-				sb.append(line);
-				sb.append("\n");
-			}
-		} finally {
-			bufReader.close();
-		}
-		return sb.toString();
-	}
 
 	/**
 	 * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done

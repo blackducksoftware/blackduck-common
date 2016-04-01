@@ -3,7 +3,6 @@ package com.blackducksoftware.integration.hub.report.api;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.opensaml.util.URLBuilder;
 
 /**
  * Version report.
@@ -38,10 +37,14 @@ public class VersionReport {
 			return null;
 		}
 
-		final URLBuilder builder = new URLBuilder(getBaseUrl());
-		builder.setFragment("projects/id:" + detailedReleaseSummary.getProjectId());
+		final StringBuilder urlBuilder = new StringBuilder();
+		urlBuilder.append(getBaseUrl());
+		urlBuilder.append("#");
+		urlBuilder.append("projects/id:");
+		urlBuilder.append(detailedReleaseSummary.getProjectId());
 
-		return builder.buildURL();
+
+		return urlBuilder.toString();
 	}
 
 	public String getReportVersionUrl() {
@@ -50,10 +53,15 @@ public class VersionReport {
 			return null;
 		}
 
-		final URLBuilder builder = new URLBuilder(getBaseUrl());
-		builder.setFragment("versions/id:" + detailedReleaseSummary.getVersionId() + "/view:bom");
+		final StringBuilder urlBuilder = new StringBuilder();
+		urlBuilder.append(getBaseUrl());
+		urlBuilder.append("#");
+		urlBuilder.append("versions/id:");
+		urlBuilder.append(detailedReleaseSummary.getVersionId());
+		urlBuilder.append("/view:bom");
 
-		return builder.buildURL();
+
+		return urlBuilder.toString();
 	}
 
 	public String getComponentUrl(final AggregateBomViewEntry entry) {
@@ -62,10 +70,13 @@ public class VersionReport {
 			return null;
 		}
 
-		final URLBuilder builder = new URLBuilder(getBaseUrl());
-		builder.setFragment("projects/id:" + entry.getProducerProject().getId());
+		final StringBuilder urlBuilder = new StringBuilder();
+		urlBuilder.append(getBaseUrl());
+		urlBuilder.append("#");
+		urlBuilder.append("projects/id:");
+		urlBuilder.append(entry.getProducerProject().getId());
 
-		return builder.buildURL();
+		return urlBuilder.toString();
 	}
 
 	public String getVersionUrl(final AggregateBomViewEntry entry) {
@@ -74,10 +85,14 @@ public class VersionReport {
 			return null;
 		}
 
-		final URLBuilder builder = new URLBuilder(getBaseUrl());
-		builder.setFragment("versions/id:" + entry.getProducerReleasesId());
+		final StringBuilder urlBuilder = new StringBuilder();
+		urlBuilder.append(getBaseUrl());
+		urlBuilder.append("#");
+		urlBuilder.append("versions/id:");
+		urlBuilder.append(entry.getProducerReleasesId());
 
-		return builder.buildURL();
+
+		return urlBuilder.toString();
 	}
 
 	public List<AggregateBomViewEntry> getAggregateBomViewEntries() {
