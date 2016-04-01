@@ -7,7 +7,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
+import com.blackducksoftware.integration.hub.logging.IntLogger;
 
 public class ScannerSplitStream extends OutputStream {
 	// https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html

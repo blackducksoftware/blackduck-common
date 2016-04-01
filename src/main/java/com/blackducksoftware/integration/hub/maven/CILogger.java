@@ -2,8 +2,8 @@ package com.blackducksoftware.integration.hub.maven;
 
 import org.slf4j.Logger;
 
-import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
-import com.blackducksoftware.integration.suite.sdk.logging.LogLevel;
+import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.hub.logging.LogLevel;
 
 /**
  * This logger class is meant to simplify the logging the Common code project. This logger will not be particularly

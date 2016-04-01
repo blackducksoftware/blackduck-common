@@ -25,7 +25,7 @@ import com.blackducksoftware.integration.hub.scan.api.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.scan.api.ScanLocationItem;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
-import com.blackducksoftware.integration.suite.sdk.logging.IntLogger;
+import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
