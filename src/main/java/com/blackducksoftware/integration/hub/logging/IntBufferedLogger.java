@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class BufferedLogger implements IntLogger {
+public class IntBufferedLogger implements IntLogger {
 	private static final Map<LogLevel, List<String>> outputMap = new HashMap<LogLevel, List<String>>();
 
 	static {
@@ -41,14 +41,9 @@ public class BufferedLogger implements IntLogger {
 	}
 
 	public String getErrorOutputString(final Throwable e) {
-		final StringBuilder sb = new StringBuilder();
-		if (sb.length() > 0) {
-			sb.append('\n');
-		}
 		final StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
-		sb.append(sw.toString());
-		return sb.toString();
+		return sw.toString();
 	}
 
 	@Override

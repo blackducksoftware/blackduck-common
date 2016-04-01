@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.polling.HubEventPolling;
 import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationItem.ReportMetaLinkItem;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
 
 public class RiskReportGenerator {
 	private final HubReportGenerationInfo hubReportGenerationInfo;
@@ -28,7 +29,7 @@ public class RiskReportGenerator {
 	public HubRiskReportData generateHubReport(final IntLogger logger) throws IOException, BDRestException, URISyntaxException, InterruptedException,
 	HubIntegrationException {
 		logger.debug("Waiting for the bom to be updated with the scan results.");
-		final HubEventPolling hubEventPolling = new HubEventPolling(hubReportGenerationInfo.getService());
+		final HubEventPolling hubEventPolling = getHubEventPolling(hubReportGenerationInfo.getService());
 
 		if (supportHelper.isCliStatusDirOptionSupport()) {
 			hubEventPolling.assertBomUpToDate(hubReportGenerationInfo, logger);
@@ -63,6 +64,10 @@ public class RiskReportGenerator {
 				hubReportGenerationInfo.getService().getReportIdFromReportUrl(reportUrl));
 
 		return hubRiskReportData;
+	}
+
+	public HubEventPolling getHubEventPolling(final HubIntRestService service){
+		return new HubEventPolling(service);
 	}
 
 }
