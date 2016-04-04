@@ -131,15 +131,16 @@
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>2.3</version>
-		</dependency>
-		<!-- From: http://www.joda.org/joda-time/upgradeto260.html 
-		Joda-Time uses annotations from Joda-Convert.  In the Java programming language,
-		this dependency is optional.  For BlackDuck this dependency can get picked up by the maven-bundle-plugin 
-		when creating an OSGI package so it should be declared. -->
-		<dependency>
-			<groupId>org.joda</groupId>
-			<artifactId>joda-convert</artifactId>
-			<version>1.6</version>
+			<exclusions>
+				<exclusion>
+				<!-- From: http://www.joda.org/joda-time/upgradeto260.html 
+					Joda-Time uses annotations from Joda-Convert.  In the Java programming language,
+					this dependency is optional.  For BlackDuck this dependency can get picked up by the maven-bundle-plugin 
+					when creating an OSGI package so it should be declared as optional. -->
+					<groupId>org.joda</groupId>
+					<artifactId>joda-convert</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
