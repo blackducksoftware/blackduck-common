@@ -1,209 +1,77 @@
 package com.blackducksoftware.integration.hub.version.api;
 
+import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.hub.meta.MetaLink;
+
 public class ReleaseItem {
 
-	private String id;
+	public static final String VERSION_REPORT_LINK = "versionReport";
 
-	private Boolean kb;
+	public static final String RISK_PROFILE_LINK = "riskProfile";
 
-	private Boolean ohloh;
+	public static final String POLICY_STATUS_LINK = "policy-status";
 
-	private String projectId;
+	private final String versionName;
 
-	private String version;
+	private final String phase;
 
-	private String phase;
+	private final String distribution;
 
-	private String distribution;
+	private final String source;
 
-	private String fileBomCodeLocationsUrl;
+	private final MetaInformation _meta;
 
-	private String fileBomEntriesUrl;
-
-	private String codeLocationsUrl;
-
-	private String bomCountsUrl;
-
-	private String vulnerabilityCountsUrl;
-
-	private String riskProfileUrl;
-
-	public ReleaseItem() {
-
-	}
-
-	public ReleaseItem(final String id, final Boolean kb, final Boolean ohloh, final String projectId, final String version, final String phase, final String distribution,
-			final String fileBomCodeLocationsUrl, final String fileBomEntriesUrl, final String codeLocationsUrl, final String bomCountsUrl, final String vulnerabilityCountsUrl,
-			final String riskProfileUrl) {
-		this.id = id;
-		this.kb = kb;
-		this.ohloh = ohloh;
-		this.projectId = projectId;
-		this.version = version;
+	public ReleaseItem(final String versionName, final String phase, final String distribution,
+			final String source, final MetaInformation _meta) {
+		this.versionName = versionName;
 		this.phase = phase;
 		this.distribution = distribution;
-		this.fileBomCodeLocationsUrl = fileBomCodeLocationsUrl;
-		this.fileBomEntriesUrl = fileBomEntriesUrl;
-		this.codeLocationsUrl = codeLocationsUrl;
-		this.bomCountsUrl = bomCountsUrl;
-		this.vulnerabilityCountsUrl = vulnerabilityCountsUrl;
-		this.riskProfileUrl = riskProfileUrl;
+		this.source = source;
+		this._meta = _meta;
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(final String id) {
-		this.id = id;
-	}
-
-	public Boolean getKb() {
-		return kb;
-	}
-
-	public void setKb(final Boolean kb) {
-		this.kb = kb;
-	}
-
-	public Boolean getOhloh() {
-		return ohloh;
-	}
-
-	public void setOhloh(final Boolean ohloh) {
-		this.ohloh = ohloh;
-	}
-
-	public String getProjectId() {
-		return projectId;
-	}
-
-	public void setProjectId(final String projectId) {
-		this.projectId = projectId;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(final String version) {
-		this.version = version;
+	public String getVersionName() {
+		return versionName;
 	}
 
 	public String getPhase() {
 		return phase;
 	}
 
-	public void setPhase(final String phase) {
-		this.phase = phase;
-	}
-
 	public String getDistribution() {
 		return distribution;
 	}
 
-	public void setDistribution(final String distribution) {
-		this.distribution = distribution;
+	public String getSource() {
+		return source;
 	}
 
-	public String getFileBomCodeLocationsUrl() {
-		return fileBomCodeLocationsUrl;
+	public MetaInformation get_meta() {
+		return _meta;
 	}
 
-	public void setFileBomCodeLocationsUrl(final String fileBomCodeLocationsUrl) {
-		this.fileBomCodeLocationsUrl = fileBomCodeLocationsUrl;
-	}
-
-	public String getFileBomEntriesUrl() {
-		return fileBomEntriesUrl;
-	}
-
-	public void setFileBomEntriesUrl(final String fileBomEntriesUrl) {
-		this.fileBomEntriesUrl = fileBomEntriesUrl;
-	}
-
-	public String getCodeLocationsUrl() {
-		return codeLocationsUrl;
-	}
-
-	public void setCodeLocationsUrl(final String codeLocationsUrl) {
-		this.codeLocationsUrl = codeLocationsUrl;
-	}
-
-	public String getBomCountsUrl() {
-		return bomCountsUrl;
-	}
-
-	public void setBomCountsUrl(final String bomCountsUrl) {
-		this.bomCountsUrl = bomCountsUrl;
-	}
-
-	public String getVulnerabilityCountsUrl() {
-		return vulnerabilityCountsUrl;
-	}
-
-	public void setVulnerabilityCountsUrl(final String vulnerabilityCountsUrl) {
-		this.vulnerabilityCountsUrl = vulnerabilityCountsUrl;
-	}
-
-	public String getRiskProfileUrl() {
-		return riskProfileUrl;
-	}
-
-	public void setRiskProfileUrl(final String riskProfileUrl) {
-		this.riskProfileUrl = riskProfileUrl;
-	}
-
-	@Override
-	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("ReleaseItem [id=");
-		builder.append(id);
-		builder.append(", kb=");
-		builder.append(kb);
-		builder.append(", ohloh=");
-		builder.append(ohloh);
-		builder.append(", projectId=");
-		builder.append(projectId);
-		builder.append(", version=");
-		builder.append(version);
-		builder.append(", phase=");
-		builder.append(phase);
-		builder.append(", distribution=");
-		builder.append(distribution);
-		builder.append(", fileBomCodeLocationsUrl=");
-		builder.append(fileBomCodeLocationsUrl);
-		builder.append(", fileBomEntriesUrl=");
-		builder.append(fileBomEntriesUrl);
-		builder.append(", codeLocationsUrl=");
-		builder.append(codeLocationsUrl);
-		builder.append(", bomCountsUrl=");
-		builder.append(bomCountsUrl);
-		builder.append(", vulnerabilityCountsUrl=");
-		builder.append(vulnerabilityCountsUrl);
-		builder.append(", riskProfileUrl=");
-		builder.append(riskProfileUrl);
-		builder.append("]");
-		return builder.toString();
+	public String getLink(final String linkRel){
+		if(get_meta() != null && get_meta().getLinks() != null && !get_meta().getLinks().isEmpty()){
+			for(final MetaLink link : get_meta().getLinks()){
+				if(link.getRel().equalsIgnoreCase(linkRel)){
+					return link.getHref();
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((bomCountsUrl == null) ? 0 : bomCountsUrl.hashCode());
-		result = prime * result + ((codeLocationsUrl == null) ? 0 : codeLocationsUrl.hashCode());
-		result = prime * result + ((distribution == null) ? 0 : distribution.hashCode());
-		result = prime * result + ((fileBomCodeLocationsUrl == null) ? 0 : fileBomCodeLocationsUrl.hashCode());
-		result = prime * result + ((fileBomEntriesUrl == null) ? 0 : fileBomEntriesUrl.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((kb == null) ? 0 : kb.hashCode());
-		result = prime * result + ((ohloh == null) ? 0 : ohloh.hashCode());
+		result = prime * result + ((_meta == null) ? 0 : _meta.hashCode());
+		result = prime * result
+				+ ((distribution == null) ? 0 : distribution.hashCode());
 		result = prime * result + ((phase == null) ? 0 : phase.hashCode());
-		result = prime * result + ((projectId == null) ? 0 : projectId.hashCode());
-		result = prime * result + ((riskProfileUrl == null) ? 0 : riskProfileUrl.hashCode());
-		result = prime * result + ((version == null) ? 0 : version.hashCode());
-		result = prime * result + ((vulnerabilityCountsUrl == null) ? 0 : vulnerabilityCountsUrl.hashCode());
+		result = prime * result + ((source == null) ? 0 : source.hashCode());
+		result = prime * result
+				+ ((versionName == null) ? 0 : versionName.hashCode());
 		return result;
 	}
 
@@ -219,18 +87,11 @@ public class ReleaseItem {
 			return false;
 		}
 		final ReleaseItem other = (ReleaseItem) obj;
-		if (bomCountsUrl == null) {
-			if (other.bomCountsUrl != null) {
+		if (_meta == null) {
+			if (other._meta != null) {
 				return false;
 			}
-		} else if (!bomCountsUrl.equals(other.bomCountsUrl)) {
-			return false;
-		}
-		if (codeLocationsUrl == null) {
-			if (other.codeLocationsUrl != null) {
-				return false;
-			}
-		} else if (!codeLocationsUrl.equals(other.codeLocationsUrl)) {
+		} else if (!_meta.equals(other._meta)) {
 			return false;
 		}
 		if (distribution == null) {
@@ -240,41 +101,6 @@ public class ReleaseItem {
 		} else if (!distribution.equals(other.distribution)) {
 			return false;
 		}
-		if (fileBomCodeLocationsUrl == null) {
-			if (other.fileBomCodeLocationsUrl != null) {
-				return false;
-			}
-		} else if (!fileBomCodeLocationsUrl.equals(other.fileBomCodeLocationsUrl)) {
-			return false;
-		}
-		if (fileBomEntriesUrl == null) {
-			if (other.fileBomEntriesUrl != null) {
-				return false;
-			}
-		} else if (!fileBomEntriesUrl.equals(other.fileBomEntriesUrl)) {
-			return false;
-		}
-		if (id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!id.equals(other.id)) {
-			return false;
-		}
-		if (kb == null) {
-			if (other.kb != null) {
-				return false;
-			}
-		} else if (!kb.equals(other.kb)) {
-			return false;
-		}
-		if (ohloh == null) {
-			if (other.ohloh != null) {
-				return false;
-			}
-		} else if (!ohloh.equals(other.ohloh)) {
-			return false;
-		}
 		if (phase == null) {
 			if (other.phase != null) {
 				return false;
@@ -282,35 +108,38 @@ public class ReleaseItem {
 		} else if (!phase.equals(other.phase)) {
 			return false;
 		}
-		if (projectId == null) {
-			if (other.projectId != null) {
+		if (source == null) {
+			if (other.source != null) {
 				return false;
 			}
-		} else if (!projectId.equals(other.projectId)) {
+		} else if (!source.equals(other.source)) {
 			return false;
 		}
-		if (riskProfileUrl == null) {
-			if (other.riskProfileUrl != null) {
+		if (versionName == null) {
+			if (other.versionName != null) {
 				return false;
 			}
-		} else if (!riskProfileUrl.equals(other.riskProfileUrl)) {
-			return false;
-		}
-		if (version == null) {
-			if (other.version != null) {
-				return false;
-			}
-		} else if (!version.equals(other.version)) {
-			return false;
-		}
-		if (vulnerabilityCountsUrl == null) {
-			if (other.vulnerabilityCountsUrl != null) {
-				return false;
-			}
-		} else if (!vulnerabilityCountsUrl.equals(other.vulnerabilityCountsUrl)) {
+		} else if (!versionName.equals(other.versionName)) {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("ReleaseItem [versionName=");
+		builder.append(versionName);
+		builder.append(", phase=");
+		builder.append(phase);
+		builder.append(", distribution=");
+		builder.append(distribution);
+		builder.append(", source=");
+		builder.append(source);
+		builder.append(", _meta=");
+		builder.append(_meta);
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

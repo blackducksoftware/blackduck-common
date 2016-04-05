@@ -1,140 +1,56 @@
 package com.blackducksoftware.integration.hub.project.api;
 
-import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
+import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.hub.meta.MetaLink;
 
 public class ProjectItem {
 
-	private String id;
+	public static final String VERSION_LINK = "versions";
 
-	private Boolean kb;
+	public static final String CANONICAL_VERSION_LINK = "canonicalVersion";
 
-	private String name;
+	private final String name;
 
-	private Boolean restructured;
+	private final String source;
 
-	private String canonicalReleaseId;
+	private final MetaInformation _meta;
 
-	private Boolean internal;
-
-	private Boolean openSource;
-
-	private ReleaseItem release;
-
-	public ProjectItem() {
-
-	}
-
-	public ProjectItem(final String id, final Boolean kb, final String name, final Boolean restructured, final String canonicalReleaseId, final Boolean internal, final Boolean openSource,
-			final ReleaseItem release) {
-		this.id = id;
-		this.kb = kb;
+	public ProjectItem(final String name, final String source, final MetaInformation _meta) {
 		this.name = name;
-		this.restructured = restructured;
-		this.canonicalReleaseId = canonicalReleaseId;
-		this.internal = internal;
-		this.openSource = openSource;
-		this.release = release;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(final String id) {
-		this.id = id;
-	}
-
-	public Boolean getKb() {
-		return kb;
-	}
-
-	public void setKb(final Boolean kb) {
-		this.kb = kb;
+		this.source = source;
+		this._meta = _meta;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(final String name) {
-		this.name = name;
+	public String getSource() {
+		return source;
 	}
 
-	public Boolean getRestructured() {
-		return restructured;
+	public MetaInformation get_meta() {
+		return _meta;
 	}
 
-	public void setRestructured(final Boolean restructured) {
-		this.restructured = restructured;
-	}
-
-	public String getCanonicalReleaseId() {
-		return canonicalReleaseId;
-	}
-
-	public void setCanonicalReleaseId(final String canonicalReleaseId) {
-		this.canonicalReleaseId = canonicalReleaseId;
-	}
-
-	public Boolean getInternal() {
-		return internal;
-	}
-
-	public void setInternal(final Boolean internal) {
-		this.internal = internal;
-	}
-
-	public Boolean getOpenSource() {
-		return openSource;
-	}
-
-	public void setOpenSource(final Boolean openSource) {
-		this.openSource = openSource;
-	}
-
-	public ReleaseItem getReleaseItem() {
-		return release;
-	}
-
-	public void setReleaseItem(final ReleaseItem release) {
-		this.release = release;
-	}
-
-	@Override
-	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("ProjectItem [id=");
-		builder.append(id);
-		builder.append(", kb=");
-		builder.append(kb);
-		builder.append(", name=");
-		builder.append(name);
-		builder.append(", restructured=");
-		builder.append(restructured);
-		builder.append(", canonicalReleaseId=");
-		builder.append(canonicalReleaseId);
-		builder.append(", internal=");
-		builder.append(internal);
-		builder.append(", openSource=");
-		builder.append(openSource);
-		builder.append(", release=");
-		builder.append(release);
-		builder.append("]");
-		return builder.toString();
+	public String getLink(final String linkRel){
+		if(get_meta() != null && get_meta().getLinks() != null && !get_meta().getLinks().isEmpty()){
+			for(final MetaLink link : get_meta().getLinks()){
+				if(link.getRel().equalsIgnoreCase(linkRel)){
+					return link.getHref();
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((canonicalReleaseId == null) ? 0 : canonicalReleaseId.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((internal == null) ? 0 : internal.hashCode());
-		result = prime * result + ((kb == null) ? 0 : kb.hashCode());
+		result = prime * result + ((_meta == null) ? 0 : _meta.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((openSource == null) ? 0 : openSource.hashCode());
-		result = prime * result + ((release == null) ? 0 : release.hashCode());
-		result = prime * result + ((restructured == null) ? 0 : restructured.hashCode());
+		result = prime * result + ((source == null) ? 0 : source.hashCode());
 		return result;
 	}
 
@@ -150,32 +66,11 @@ public class ProjectItem {
 			return false;
 		}
 		final ProjectItem other = (ProjectItem) obj;
-		if (canonicalReleaseId == null) {
-			if (other.canonicalReleaseId != null) {
+		if (_meta == null) {
+			if (other._meta != null) {
 				return false;
 			}
-		} else if (!canonicalReleaseId.equals(other.canonicalReleaseId)) {
-			return false;
-		}
-		if (id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!id.equals(other.id)) {
-			return false;
-		}
-		if (internal == null) {
-			if (other.internal != null) {
-				return false;
-			}
-		} else if (!internal.equals(other.internal)) {
-			return false;
-		}
-		if (kb == null) {
-			if (other.kb != null) {
-				return false;
-			}
-		} else if (!kb.equals(other.kb)) {
+		} else if (!_meta.equals(other._meta)) {
 			return false;
 		}
 		if (name == null) {
@@ -185,28 +80,28 @@ public class ProjectItem {
 		} else if (!name.equals(other.name)) {
 			return false;
 		}
-		if (openSource == null) {
-			if (other.openSource != null) {
+		if (source == null) {
+			if (other.source != null) {
 				return false;
 			}
-		} else if (!openSource.equals(other.openSource)) {
-			return false;
-		}
-		if (release == null) {
-			if (other.release != null) {
-				return false;
-			}
-		} else if (!release.equals(other.release)) {
-			return false;
-		}
-		if (restructured == null) {
-			if (other.restructured != null) {
-				return false;
-			}
-		} else if (!restructured.equals(other.restructured)) {
+		} else if (!source.equals(other.source)) {
 			return false;
 		}
 		return true;
+	}
+
+
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("ProjectItem [name=");
+		builder.append(name);
+		builder.append(", source=");
+		builder.append(source);
+		builder.append(", _meta=");
+		builder.append(_meta);
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

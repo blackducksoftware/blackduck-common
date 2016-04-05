@@ -1,12 +1,14 @@
 package com.blackducksoftware.integration.hub.scan.status;
 
+import com.blackducksoftware.integration.hub.meta.MetaInformation;
+
 
 public class ScanStatusToPoll {
 	private final String status;
 
-	private final ScanStatusMeta _meta;
+	private final MetaInformation _meta;
 
-	public ScanStatusToPoll(final String status, final ScanStatusMeta _meta) {
+	public ScanStatusToPoll(final String status, final MetaInformation _meta) {
 		this.status = status;
 		this._meta = _meta;
 	}
@@ -19,7 +21,7 @@ public class ScanStatusToPoll {
 		return ScanStatus.getScanStatus(status);
 	}
 
-	public ScanStatusMeta get_meta() {
+	public MetaInformation get_meta() {
 		return _meta;
 	}
 
@@ -64,7 +66,7 @@ public class ScanStatusToPoll {
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("ScanStatusCliOutput [status=");
+		builder.append("ScanStatusToPoll [status=");
 		builder.append(status);
 		builder.append(", _meta=");
 		builder.append(_meta);

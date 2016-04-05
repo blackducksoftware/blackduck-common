@@ -1,11 +1,11 @@
 package com.blackducksoftware.integration.hub.report.api;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
-public class ReportMetaInformationItem {
+import com.blackducksoftware.integration.hub.meta.MetaInformation;
+
+public class ReportInformationItem {
 
 	private final String reportFormat;
 
@@ -23,10 +23,10 @@ public class ReportMetaInformationItem {
 
 	private final String createdBy;
 
-	private final ReportMetaItem _meta;
+	private final MetaInformation _meta;
 
-	public ReportMetaInformationItem(final String reportFormat, final String locale, final String fileName, final int fileSize, final String createdAt, final String updatedAt, final String finishedAt,
-			final String createdBy, final ReportMetaItem _meta) {
+	public ReportInformationItem(final String reportFormat, final String locale, final String fileName, final int fileSize, final String createdAt, final String updatedAt, final String finishedAt,
+			final String createdBy, final MetaInformation _meta) {
 		this.reportFormat = reportFormat;
 		this.locale = locale;
 		this.fileName = fileName;
@@ -70,7 +70,7 @@ public class ReportMetaInformationItem {
 		return createdBy;
 	}
 
-	public ReportMetaItem get_meta() {
+	public MetaInformation get_meta() {
 		return _meta;
 	}
 
@@ -121,10 +121,10 @@ public class ReportMetaInformationItem {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof ReportMetaInformationItem)) {
+		if (!(obj instanceof ReportInformationItem)) {
 			return false;
 		}
-		final ReportMetaInformationItem other = (ReportMetaInformationItem) obj;
+		final ReportInformationItem other = (ReportInformationItem) obj;
 		if (_meta == null) {
 			if (other._meta != null) {
 				return false;
@@ -210,160 +210,5 @@ public class ReportMetaInformationItem {
 		builder.append(_meta);
 		builder.append("]");
 		return builder.toString();
-	}
-
-	public static class ReportMetaItem {
-		private final List<String> allow;
-
-		private final String href;
-
-		private final List<ReportMetaLinkItem> links;
-
-		public ReportMetaItem(final List<String> allow, final String href, final List<ReportMetaLinkItem> links) {
-			this.allow = allow;
-			this.href = href;
-			this.links = links;
-		}
-
-		public List<String> getAllow() {
-			return allow;
-		}
-
-		public String getHref() {
-			return href;
-		}
-
-		public List<ReportMetaLinkItem> getLinks() {
-			return links;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((allow == null) ? 0 : allow.hashCode());
-			result = prime * result + ((href == null) ? 0 : href.hashCode());
-			result = prime * result + ((links == null) ? 0 : links.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(final Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (obj == null) {
-				return false;
-			}
-			if (!(obj instanceof ReportMetaItem)) {
-				return false;
-			}
-			final ReportMetaItem other = (ReportMetaItem) obj;
-			if (allow == null) {
-				if (other.allow != null) {
-					return false;
-				}
-			} else if (!allow.equals(other.allow)) {
-				return false;
-			}
-			if (href == null) {
-				if (other.href != null) {
-					return false;
-				}
-			} else if (!href.equals(other.href)) {
-				return false;
-			}
-			if (links == null) {
-				if (other.links != null) {
-					return false;
-				}
-			} else if (!links.equals(other.links)) {
-				return false;
-			}
-			return true;
-		}
-
-		@Override
-		public String toString() {
-			final StringBuilder builder = new StringBuilder();
-			builder.append("ReportMetaItem [allow=");
-			builder.append(allow);
-			builder.append(", href=");
-			builder.append(href);
-			builder.append(", links=");
-			builder.append(links);
-			builder.append("]");
-			return builder.toString();
-		}
-
-	}
-
-	public static class ReportMetaLinkItem {
-		private final String rel;
-
-		private final String href;
-
-		public ReportMetaLinkItem(final String rel, final String href) {
-			this.rel = rel;
-			this.href = href;
-		}
-
-		public String getRel() {
-			return rel;
-		}
-
-		public String getHref() {
-			return href;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((href == null) ? 0 : href.hashCode());
-			result = prime * result + ((rel == null) ? 0 : rel.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(final Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (obj == null) {
-				return false;
-			}
-			if (!(obj instanceof ReportMetaLinkItem)) {
-				return false;
-			}
-			final ReportMetaLinkItem other = (ReportMetaLinkItem) obj;
-			if (href == null) {
-				if (other.href != null) {
-					return false;
-				}
-			} else if (!href.equals(other.href)) {
-				return false;
-			}
-			if (rel == null) {
-				if (other.rel != null) {
-					return false;
-				}
-			} else if (!rel.equals(other.rel)) {
-				return false;
-			}
-			return true;
-		}
-
-		@Override
-		public String toString() {
-			final StringBuilder builder = new StringBuilder();
-			builder.append("ReportMetaLinkItem [rel=");
-			builder.append(rel);
-			builder.append(", href=");
-			builder.append(href);
-			builder.append("]");
-			return builder.toString();
-		}
-
 	}
 }

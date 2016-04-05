@@ -9,8 +9,8 @@ import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.hub.meta.MetaLink;
 import com.blackducksoftware.integration.hub.polling.HubEventPolling;
-import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationItem.ReportMetaLinkItem;
 
 public class RiskReportGenerator {
 	private final HubReportGenerationInfo hubReportGenerationInfo;
@@ -40,12 +40,12 @@ public class RiskReportGenerator {
 		logger.debug("The bom has been updated, generating the report.");
 		final String reportUrl = hubReportGenerationInfo.getService().generateHubReport(hubReportGenerationInfo.getVersionId(), ReportFormatEnum.JSON);
 
-		final ReportMetaInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl, hubReportGenerationInfo.getMaximumWaitTime());
+		final ReportInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl, hubReportGenerationInfo.getMaximumWaitTime());
 
-		final List<ReportMetaLinkItem> links = reportInfo.get_meta().getLinks();
+		final List<MetaLink> links = reportInfo.get_meta().getLinks();
 
-		ReportMetaLinkItem contentLink = null;
-		for (final ReportMetaLinkItem link : links) {
+		MetaLink contentLink = null;
+		for (final MetaLink link : links) {
 			if (link.getRel().equalsIgnoreCase("content")) {
 				contentLink = link;
 				break;

@@ -1,15 +1,15 @@
-package com.blackducksoftware.integration.hub.policy.api;
+package com.blackducksoftware.integration.hub.meta;
 
 import java.util.List;
 
-public class PolicyMeta {
+public class MetaInformation {
 	private final List<String> allow;
 
 	private final String href;
 
-	private final List<String> links;
+	private final List<MetaLink> links;
 
-	public PolicyMeta(final List<String> allow, final String href, final List<String> links) {
+	public MetaInformation(final List<String> allow, final String href, final List<MetaLink> links) {
 		this.allow = allow;
 		this.href = href;
 		this.links = links;
@@ -23,7 +23,7 @@ public class PolicyMeta {
 		return href;
 	}
 
-	public List<String> getLinks() {
+	public List<MetaLink> getLinks() {
 		return links;
 	}
 
@@ -45,10 +45,10 @@ public class PolicyMeta {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof PolicyMeta)) {
+		if (!(obj instanceof MetaInformation)) {
 			return false;
 		}
-		final PolicyMeta other = (PolicyMeta) obj;
+		final MetaInformation other = (MetaInformation) obj;
 		if (allow == null) {
 			if (other.allow != null) {
 				return false;
@@ -76,7 +76,7 @@ public class PolicyMeta {
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("PolicyMeta [allow=");
+		builder.append("MetaInformation [allow=");
 		builder.append(allow);
 		builder.append(", href=");
 		builder.append(href);
