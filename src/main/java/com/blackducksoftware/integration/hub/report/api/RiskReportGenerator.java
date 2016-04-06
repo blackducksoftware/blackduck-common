@@ -38,7 +38,8 @@ public class RiskReportGenerator {
 		}
 
 		logger.debug("The bom has been updated, generating the report.");
-		final String reportUrl = hubReportGenerationInfo.getService().generateHubReport(hubReportGenerationInfo.getVersionId(), ReportFormatEnum.JSON);
+		final String reportUrl = hubReportGenerationInfo.getService()
+				.generateHubReport(hubReportGenerationInfo.getVersion(), ReportFormatEnum.JSON);
 
 		final ReportInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl, hubReportGenerationInfo.getMaximumWaitTime());
 
@@ -60,8 +61,7 @@ public class RiskReportGenerator {
 		hubRiskReportData.setReport(report);
 		logger.debug("Finished retrieving the report.");
 
-		hubReportGenerationInfo.getService().deleteHubReport(hubReportGenerationInfo.getVersionId(),
-				hubReportGenerationInfo.getService().getReportIdFromReportUrl(reportUrl));
+		hubReportGenerationInfo.getService().deleteHubReport(reportUrl);
 
 		return hubRiskReportData;
 	}

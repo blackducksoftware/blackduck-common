@@ -3,9 +3,14 @@ package com.blackducksoftware.integration.hub.report.api;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.meta.AbstractLinkedResource;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
-public class ReportInformationItem {
+public class ReportInformationItem extends AbstractLinkedResource {
+
+	public static final String REPORT_CONTENT_LINK = "content";
+
+	public static final String REPORT_DOWNLOAD_LINK = "download";
 
 	private final String reportFormat;
 
@@ -23,10 +28,10 @@ public class ReportInformationItem {
 
 	private final String createdBy;
 
-	private final MetaInformation _meta;
 
 	public ReportInformationItem(final String reportFormat, final String locale, final String fileName, final int fileSize, final String createdAt, final String updatedAt, final String finishedAt,
 			final String createdBy, final MetaInformation _meta) {
+		super(_meta);
 		this.reportFormat = reportFormat;
 		this.locale = locale;
 		this.fileName = fileName;
@@ -35,7 +40,6 @@ public class ReportInformationItem {
 		this.updatedAt = updatedAt;
 		this.finishedAt = finishedAt;
 		this.createdBy = createdBy;
-		this._meta = _meta;
 	}
 
 	public String getReportFormat() {
@@ -70,10 +74,6 @@ public class ReportInformationItem {
 		return createdBy;
 	}
 
-	public MetaInformation get_meta() {
-		return _meta;
-	}
-
 	private DateTime stringToDateTime(final String dateString) {
 		if (StringUtils.isBlank(dateString)) {
 			return null;
@@ -100,8 +100,7 @@ public class ReportInformationItem {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((_meta == null) ? 0 : _meta.hashCode());
+		int result = super.hashCode();
 		result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
 		result = prime * result + ((createdBy == null) ? 0 : createdBy.hashCode());
 		result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
@@ -110,6 +109,7 @@ public class ReportInformationItem {
 		result = prime * result + ((locale == null) ? 0 : locale.hashCode());
 		result = prime * result + ((reportFormat == null) ? 0 : reportFormat.hashCode());
 		result = prime * result + ((updatedAt == null) ? 0 : updatedAt.hashCode());
+		result = prime * result + ((get_meta() == null) ? 0 : get_meta().hashCode());
 		return result;
 	}
 
@@ -118,18 +118,18 @@ public class ReportInformationItem {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
+		if (!super.equals(obj)) {
 			return false;
 		}
 		if (!(obj instanceof ReportInformationItem)) {
 			return false;
 		}
 		final ReportInformationItem other = (ReportInformationItem) obj;
-		if (_meta == null) {
-			if (other._meta != null) {
+		if (get_meta() == null) {
+			if (other.get_meta() != null) {
 				return false;
 			}
-		} else if (!_meta.equals(other._meta)) {
+		} else if (!get_meta().equals(other.get_meta())) {
 			return false;
 		}
 		if (createdAt == null) {
@@ -190,7 +190,7 @@ public class ReportInformationItem {
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("ReportMetaInformationItem [reportFormat=");
+		builder.append("ReportInformationItem [reportFormat=");
 		builder.append(reportFormat);
 		builder.append(", locale=");
 		builder.append(locale);
@@ -207,8 +207,9 @@ public class ReportInformationItem {
 		builder.append(", createdBy=");
 		builder.append(createdBy);
 		builder.append(", _meta=");
-		builder.append(_meta);
+		builder.append(get_meta());
 		builder.append("]");
 		return builder.toString();
 	}
+
 }

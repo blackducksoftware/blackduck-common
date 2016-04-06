@@ -1,9 +1,9 @@
 package com.blackducksoftware.integration.hub.version.api;
 
+import com.blackducksoftware.integration.hub.meta.AbstractLinkedResource;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
-import com.blackducksoftware.integration.hub.meta.MetaLink;
 
-public class ReleaseItem {
+public class ReleaseItem extends AbstractLinkedResource {
 
 	public static final String VERSION_REPORT_LINK = "versionReport";
 
@@ -19,15 +19,14 @@ public class ReleaseItem {
 
 	private final String source;
 
-	private final MetaInformation _meta;
 
 	public ReleaseItem(final String versionName, final String phase, final String distribution,
 			final String source, final MetaInformation _meta) {
+		super(_meta);
 		this.versionName = versionName;
 		this.phase = phase;
 		this.distribution = distribution;
 		this.source = source;
-		this._meta = _meta;
 	}
 
 	public String getVersionName() {
@@ -38,40 +37,31 @@ public class ReleaseItem {
 		return phase;
 	}
 
+	public PhaseEnum getPhaseEnum() {
+		return PhaseEnum.valueOf(phase);
+	}
+
 	public String getDistribution() {
 		return distribution;
+	}
+
+	public DistributionEnum getDistributionEnum() {
+		return DistributionEnum.valueOf(distribution);
 	}
 
 	public String getSource() {
 		return source;
 	}
 
-	public MetaInformation get_meta() {
-		return _meta;
-	}
-
-	public String getLink(final String linkRel){
-		if(get_meta() != null && get_meta().getLinks() != null && !get_meta().getLinks().isEmpty()){
-			for(final MetaLink link : get_meta().getLinks()){
-				if(link.getRel().equalsIgnoreCase(linkRel)){
-					return link.getHref();
-				}
-			}
-		}
-		return null;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((_meta == null) ? 0 : _meta.hashCode());
-		result = prime * result
-				+ ((distribution == null) ? 0 : distribution.hashCode());
+		int result = super.hashCode();
+		result = prime * result + ((distribution == null) ? 0 : distribution.hashCode());
 		result = prime * result + ((phase == null) ? 0 : phase.hashCode());
 		result = prime * result + ((source == null) ? 0 : source.hashCode());
-		result = prime * result
-				+ ((versionName == null) ? 0 : versionName.hashCode());
+		result = prime * result + ((versionName == null) ? 0 : versionName.hashCode());
+		result = prime * result + ((get_meta() == null) ? 0 : get_meta().hashCode());
 		return result;
 	}
 
@@ -80,18 +70,18 @@ public class ReleaseItem {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
+		if (!super.equals(obj)) {
 			return false;
 		}
 		if (!(obj instanceof ReleaseItem)) {
 			return false;
 		}
 		final ReleaseItem other = (ReleaseItem) obj;
-		if (_meta == null) {
-			if (other._meta != null) {
+		if (get_meta() == null) {
+			if (other.get_meta() != null) {
 				return false;
 			}
-		} else if (!_meta.equals(other._meta)) {
+		} else if (!get_meta().equals(other.get_meta())) {
 			return false;
 		}
 		if (distribution == null) {
@@ -137,7 +127,7 @@ public class ReleaseItem {
 		builder.append(", source=");
 		builder.append(source);
 		builder.append(", _meta=");
-		builder.append(_meta);
+		builder.append(get_meta());
 		builder.append("]");
 		return builder.toString();
 	}

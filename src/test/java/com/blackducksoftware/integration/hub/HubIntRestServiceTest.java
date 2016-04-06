@@ -28,10 +28,10 @@ import org.restlet.resource.ClientResource;
 import com.blackducksoftware.integration.hub.api.VersionComparison;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
+import com.blackducksoftware.integration.hub.exception.VersionDoesNotExistException;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 import com.blackducksoftware.integration.hub.policy.api.PolicyStatus;
 import com.blackducksoftware.integration.hub.policy.api.PolicyStatusEnum;
-import com.blackducksoftware.integration.hub.project.api.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.project.api.ProjectItem;
 import com.blackducksoftware.integration.hub.report.api.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.report.api.ReportInformationItem;
@@ -76,22 +76,16 @@ public class HubIntRestServiceTest {
 		try {
 			final ProjectItem project = helper.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
 
-			final List<ReleaseItem> projectVersions = helper.getVersionsForProject(project.getId());
-			boolean versionExists = false;
-			for (final ReleaseItem release : projectVersions) {
-				if (testProperties.getProperty("TEST_VERSION").equals(release.getVersion())) {
-					versionExists = true;
-					break;
-				}
+			try {
+				helper.getVersion(project, testProperties.getProperty("TEST_VERSION"));
+			} catch (final VersionDoesNotExistException e) {
+				helper.createHubVersion(project, testProperties.getProperty("TEST_VERSION"),
+						testProperties.getProperty("TEST_PHASE"), testProperties.getProperty("TEST_DISTRIBUTION"));
 			}
-			if (!versionExists) {
-				helper.createHubVersion(testProperties.getProperty("TEST_VERSION"), project.getId(),
-						testProperties.getProperty("TEST_PHASE"),
-						testProperties.getProperty("TEST_DISTRIBUTION"));
-			}
-
 		} catch (final ProjectDoesNotExistException e) {
-			helper.createHubProjectAndVersion(testProperties.getProperty("TEST_PROJECT"), testProperties.getProperty("TEST_VERSION"),
+			final String projectUrl = helper.createHubProject(testProperties.getProperty("TEST_PROJECT"));
+			final ProjectItem project = helper.getProject(projectUrl);
+			helper.createHubVersion(project, testProperties.getProperty("TEST_VERSION"),
 					testProperties.getProperty("TEST_PHASE"), testProperties.getProperty("TEST_DISTRIBUTION"));
 		}
 	}
@@ -100,11 +94,10 @@ public class HubIntRestServiceTest {
 	public static void testTeardown() {
 		try {
 			final ProjectItem project = helper.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
-			helper.deleteHubProject(project.getId());
+			helper.deleteHubProject(project);
 		} catch (final Exception e) {
 
 		}
-
 	}
 
 	@Test
@@ -149,22 +142,22 @@ public class HubIntRestServiceTest {
 		restService.setLogger(logger);
 		restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
 		final String testProjectName = "TESTNAME";
-		String projectId = null;
+		String projectUrl = null;
 		try {
 
-			projectId = restService.createHubProject(testProjectName);
+			projectUrl = restService.createHubProject(testProjectName);
 
 			// Sleep for 3 second, server takes a second before you can start using projects
 			Thread.sleep(3000);
 
-			final List<AutoCompleteItem> matches = restService.getProjectMatches(testProjectName);
+			final List<ProjectItem> matches = restService.getProjectMatches(testProjectName);
 
 			assertNotNull("matches must be not null", matches);
 			assertTrue(!matches.isEmpty());
 			assertTrue("error log expected to be empty", logger.getErrorList().isEmpty());
 		} finally {
-			if (StringUtils.isNotBlank(projectId)) {
-				helper.deleteHubProject(projectId);
+			if (StringUtils.isNotBlank(projectUrl)) {
+				helper.deleteHubProject(projectUrl);
 			}
 		}
 	}
@@ -193,12 +186,12 @@ public class HubIntRestServiceTest {
 		final HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
 		restService.setLogger(logger);
 		restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
-		String projectId = null;
+		String projectURL = null;
 		try {
 
-			projectId = restService.createHubProject(projectName);
+			projectURL = restService.createHubProject(projectName);
 
-			assertTrue(StringUtils.isNotBlank(projectId));
+			assertTrue(StringUtils.isNotBlank(projectURL));
 
 			final ProjectItem project = restService.getProjectByName(projectName);
 
@@ -207,44 +200,12 @@ public class HubIntRestServiceTest {
 			assertTrue(logger.getErrorList().isEmpty());
 
 		} finally {
-			if (StringUtils.isBlank(projectId)) {
-				try {
-					final ProjectItem project = restService.getProjectByName(projectName);
-					projectId = project.getId();
-				} catch (final Exception e) {
-					// ignore exception
-				}
-			}
-			if (StringUtils.isNotBlank(projectId)) {
-				helper.deleteHubProject(projectId);
-			}
+			helper.deleteHubProject(projectURL);
 		}
 
 		assertTrue(logger.getErrorList().isEmpty());
 	}
 
-	@Test
-	public void testGetProjectById() throws Exception {
-		final TestLogger logger = new TestLogger();
-
-		final HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
-		restService.setLogger(logger);
-		restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
-
-		ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
-
-		assertNotNull(project);
-		assertEquals(testProperties.getProperty("TEST_PROJECT"), project.getName());
-		assertTrue(logger.getErrorList().isEmpty());
-
-		final String id = project.getId();
-		project = restService.getProjectById(id);
-
-		assertNotNull(project);
-		assertEquals(testProperties.getProperty("TEST_PROJECT"), project.getName());
-		assertEquals(id, project.getId());
-		assertTrue(logger.getErrorList().isEmpty());
-	}
 
 	@Test
 	public void testGetVersionsForProject() throws Exception {
@@ -260,19 +221,9 @@ public class HubIntRestServiceTest {
 		assertEquals(testProperties.getProperty("TEST_PROJECT"), project.getName());
 		assertTrue(logger.getErrorList().isEmpty());
 
-		final String id = project.getId();
-		final List<ReleaseItem> releases = restService.getVersionsForProject(id);
+		final ReleaseItem release = restService.getVersion(project, testProperties.getProperty("TEST_VERSION"));
 
-		assertNotNull(releases);
-		assertTrue(!releases.isEmpty());
-
-		boolean foundRelease = false;
-		for (final ReleaseItem release : releases) {
-			if (release.getVersion().equals(testProperties.getProperty("TEST_VERSION"))) {
-				foundRelease = true;
-			}
-		}
-		assertTrue(foundRelease);
+		assertNotNull(release);
 
 		assertTrue(logger.getErrorList().isEmpty());
 	}
@@ -285,24 +236,14 @@ public class HubIntRestServiceTest {
 		restService.setLogger(logger);
 		restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
 		// TEST_CREATE_PROJECT
-		String projectId = null;
+		String projectURL = null;
 		try {
 
-			projectId = restService.createHubProject(testProperties.getProperty("TEST_CREATE_PROJECT"));
+			projectURL = restService.createHubProject(testProperties.getProperty("TEST_CREATE_PROJECT"));
 
-			assertTrue(StringUtils.isNotBlank(projectId));
+			assertTrue(StringUtils.isNotBlank(projectURL));
 		} finally {
-			if (StringUtils.isBlank(projectId)) {
-				try {
-					final ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
-					projectId = project.getId();
-				} catch (final Exception e) {
-					// ignore exception
-				}
-			}
-			if (StringUtils.isNotBlank(projectId)) {
-				helper.deleteHubProject(projectId);
-			}
+			helper.deleteHubProject(projectURL);
 		}
 
 		assertTrue(logger.getErrorList().isEmpty());
@@ -317,61 +258,19 @@ public class HubIntRestServiceTest {
 		final HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
 		restService.setLogger(logger);
 		restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
-		String projectId = null;
+		String projectURL = null;
 		try {
 
-			projectId = restService.createHubProject(projectName);
+			projectURL = restService.createHubProject(projectName);
 
-			assertTrue(StringUtils.isNotBlank(projectId));
+			assertTrue(StringUtils.isNotBlank(projectURL));
 		} finally {
-			if (StringUtils.isBlank(projectId)) {
-				try {
-					final ProjectItem project = restService.getProjectByName(projectName);
-					projectId = project.getId();
-				} catch (final Exception e) {
-					// ignore exception
-				}
-			}
-			if (StringUtils.isNotBlank(projectId)) {
-				helper.deleteHubProject(projectId);
-			}
+			helper.deleteHubProject(projectURL);
 		}
 
 		assertTrue(logger.getErrorList().isEmpty());
 	}
 
-	@Test
-	public void testCreateHubProjectAndVersion() throws Exception {
-		final TestLogger logger = new TestLogger();
-
-		final HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
-		restService.setLogger(logger);
-		restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
-		// TEST_CREATE_PROJECT
-		String projectId = null;
-		try {
-
-			projectId = restService.createHubProjectAndVersion(testProperties.getProperty("TEST_CREATE_PROJECT"),
-					testProperties.getProperty("TEST_CREATE_VERSION"), PhaseEnum.DEVELOPMENT.name(),
-					DistributionEnum.INTERNAL.name());
-
-			assertTrue(StringUtils.isNotBlank(projectId));
-		} finally {
-			if (StringUtils.isBlank(projectId)) {
-				try {
-					final ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
-					projectId = project.getId();
-				} catch (final Exception e) {
-					// ignore exception
-				}
-			}
-			if (StringUtils.isNotBlank(projectId)) {
-				helper.deleteHubProject(projectId);
-			}
-		}
-
-		assertTrue(logger.getErrorList().isEmpty());
-	}
 
 	@Test
 	public void testCreateHubVersion() throws Exception {
@@ -381,28 +280,21 @@ public class HubIntRestServiceTest {
 		restService.setLogger(logger);
 		restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
 		// TEST_CREATE_PROJECT
-		String projectId = null;
+		String projectURL = null;
 		try {
 
-			projectId = restService.createHubProject(testProperties.getProperty("TEST_CREATE_PROJECT"));
-			assertTrue(StringUtils.isNotBlank(projectId));
+			projectURL = restService.createHubProject(testProperties.getProperty("TEST_CREATE_PROJECT"));
+			assertTrue(StringUtils.isNotBlank(projectURL));
 
-			final String versionId = restService.createHubVersion(testProperties.getProperty("TEST_CREATE_VERSION"), projectId, PhaseEnum.DEVELOPMENT.name(),
+			final ProjectItem project = restService.getProject(projectURL);
+
+			final String versionURL = restService.createHubVersion(project,
+					testProperties.getProperty("TEST_CREATE_VERSION"), PhaseEnum.DEVELOPMENT.name(),
 					DistributionEnum.INTERNAL.name());
 
-			assertTrue(StringUtils.isNotBlank(versionId));
+			assertTrue(StringUtils.isNotBlank(versionURL));
 		} finally {
-			if (StringUtils.isBlank(projectId)) {
-				try {
-					final ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_CREATE_PROJECT"));
-					projectId = project.getId();
-				} catch (final Exception e) {
-					// ignore exception
-				}
-			}
-			if (StringUtils.isNotBlank(projectId)) {
-				helper.deleteHubProject(projectId);
-			}
+			helper.deleteHubProject(projectURL);
 		}
 
 		assertTrue(logger.getErrorList().isEmpty());
@@ -456,19 +348,14 @@ public class HubIntRestServiceTest {
 		restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
 
 		final ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
-		final List<ReleaseItem> releases = restService.getVersionsForProject(project.getId());
-		ReleaseItem release = null;
-		for (final ReleaseItem currentRelease : releases) {
-			if (testProperties.getProperty("TEST_VERSION").equals(currentRelease.getVersion())) {
-				release = currentRelease;
-				break;
-			}
-		}
+		final ReleaseItem release = restService.getVersion(project, testProperties.getProperty("TEST_VERSION"));
+
 		assertNotNull(
 				"In project : " + testProperties.getProperty("TEST_PROJECT") + " , could not find the version : " + testProperties.getProperty("TEST_VERSION"),
 				release);
 		String reportUrl = null;
-		reportUrl = restService.generateHubReport(release.getId(), ReportFormatEnum.JSON);
+		reportUrl = restService.generateHubReport(release,
+				ReportFormatEnum.JSON);
 
 		assertNotNull(reportUrl, reportUrl);
 		// The project specified in the test properties file will be deleted at the end of the tests
@@ -494,7 +381,10 @@ public class HubIntRestServiceTest {
 
 		final ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
 
-		final String versionId = restService.createHubVersion("Report Version", project.getId(), PhaseEnum.DEVELOPMENT.name(), DistributionEnum.INTERNAL.name());
+		final String versionId = restService.createHubVersion(project, "Report Version", PhaseEnum.DEVELOPMENT.name(),
+				DistributionEnum.INTERNAL.name());
+
+		final ReleaseItem release = restService.getVersion(project, "Report Version");
 
 		String reportUrl = null;
 		System.err.println(versionId);
@@ -502,7 +392,7 @@ public class HubIntRestServiceTest {
 		// Give the server a second to recognize the new version
 		Thread.sleep(1000);
 
-		reportUrl = restService.generateHubReport(versionId, ReportFormatEnum.JSON);
+		reportUrl = restService.generateHubReport(release, ReportFormatEnum.JSON);
 
 		assertNotNull(reportUrl, reportUrl);
 
@@ -511,7 +401,7 @@ public class HubIntRestServiceTest {
 
 		while (timeFinished == null) {
 			Thread.sleep(5000);
-			reportInfo = restService.getReportLinks(reportUrl);
+			reportInfo = restService.getReportInformation(reportUrl);
 
 			timeFinished = reportInfo.getTimeFinishedAt();
 		}
@@ -539,26 +429,8 @@ public class HubIntRestServiceTest {
 		assertNotNull(report.getDetailedReleaseSummary().getVersionId());
 		assertNotNull(report.getDetailedReleaseSummary().getVersion());
 
-		final String reportId = restService.getReportIdFromReportUrl(reportUrl);
-		assertEquals(204, restService.deleteHubReport(versionId, reportId));
+		assertEquals(204, restService.deleteHubReport(reportUrl));
 
-	}
-
-	@Test
-	public void testGetReportIdFromReportUrl() throws Exception {
-		final TestLogger logger = new TestLogger();
-
-		final HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
-		restService.setLogger(logger);
-		final String expectedId = "IDThatShouldBeFound";
-
-		String reportUrl = "test/test/test/id/id/yoyo.yo/" + expectedId;
-		String reportId = restService.getReportIdFromReportUrl(reportUrl);
-		assertEquals(expectedId, reportId);
-
-		reportUrl = "test/test/" + expectedId + "/test/id/id/yoyo.yo/";
-		reportId = restService.getReportIdFromReportUrl(reportUrl);
-		assertEquals("yoyo.yo", reportId);
 	}
 
 	@Test

@@ -1,9 +1,9 @@
 package com.blackducksoftware.integration.hub.project.api;
 
+import com.blackducksoftware.integration.hub.meta.AbstractLinkedResource;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
-import com.blackducksoftware.integration.hub.meta.MetaLink;
 
-public class ProjectItem {
+public class ProjectItem extends AbstractLinkedResource {
 
 	public static final String VERSION_LINK = "versions";
 
@@ -13,12 +13,11 @@ public class ProjectItem {
 
 	private final String source;
 
-	private final MetaInformation _meta;
 
 	public ProjectItem(final String name, final String source, final MetaInformation _meta) {
+		super(_meta);
 		this.name = name;
 		this.source = source;
-		this._meta = _meta;
 	}
 
 	public String getName() {
@@ -29,28 +28,13 @@ public class ProjectItem {
 		return source;
 	}
 
-	public MetaInformation get_meta() {
-		return _meta;
-	}
-
-	public String getLink(final String linkRel){
-		if(get_meta() != null && get_meta().getLinks() != null && !get_meta().getLinks().isEmpty()){
-			for(final MetaLink link : get_meta().getLinks()){
-				if(link.getRel().equalsIgnoreCase(linkRel)){
-					return link.getHref();
-				}
-			}
-		}
-		return null;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((_meta == null) ? 0 : _meta.hashCode());
+		int result = super.hashCode();
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((source == null) ? 0 : source.hashCode());
+		result = prime * result + ((get_meta() == null) ? 0 : get_meta().hashCode());
 		return result;
 	}
 
@@ -59,18 +43,18 @@ public class ProjectItem {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
+		if (!super.equals(obj)) {
 			return false;
 		}
 		if (!(obj instanceof ProjectItem)) {
 			return false;
 		}
 		final ProjectItem other = (ProjectItem) obj;
-		if (_meta == null) {
-			if (other._meta != null) {
+		if (get_meta() == null) {
+			if (other.get_meta() != null) {
 				return false;
 			}
-		} else if (!_meta.equals(other._meta)) {
+		} else if (!get_meta().equals(other.get_meta())) {
 			return false;
 		}
 		if (name == null) {
@@ -90,7 +74,6 @@ public class ProjectItem {
 		return true;
 	}
 
-
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
@@ -99,7 +82,7 @@ public class ProjectItem {
 		builder.append(", source=");
 		builder.append(source);
 		builder.append(", _meta=");
-		builder.append(_meta);
+		builder.append(get_meta());
 		builder.append("]");
 		return builder.toString();
 	}

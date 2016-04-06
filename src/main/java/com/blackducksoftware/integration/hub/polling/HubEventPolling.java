@@ -135,7 +135,7 @@ public class HubEventPolling {
 			final ScanStatusToPoll status = gson.fromJson(fileContent, ScanStatusToPoll.class);
 			if (status.get_meta() == null || status.getStatus() == null) {
 				throw new HubIntegrationException("The scan status file : " + currentStatusFile.getCanonicalPath()
-						+ " does not contain valid scan status json.");
+				+ " does not contain valid scan status json.");
 			}
 			final ScanStatusChecker checker = new ScanStatusChecker(service, status, lock);
 			scanStatusList.add(checker);
@@ -211,7 +211,7 @@ public class HubEventPolling {
 		ReportInformationItem reportInfo = null;
 
 		while (timeFinished == null) {
-			reportInfo = getService().getReportLinks(reportUrl);
+			reportInfo = getService().getReportInformation(reportUrl);
 			timeFinished = reportInfo.getFinishedAt();
 			if (timeFinished != null) {
 				break;
