@@ -100,7 +100,7 @@ public class ReportInformationItem extends AbstractLinkedResource {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
+		int result = 1;
 		result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
 		result = prime * result + ((createdBy == null) ? 0 : createdBy.hashCode());
 		result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
@@ -118,7 +118,7 @@ public class ReportInformationItem extends AbstractLinkedResource {
 		if (this == obj) {
 			return true;
 		}
-		if (!super.equals(obj)) {
+		if (obj == null) {
 			return false;
 		}
 		if (!(obj instanceof ReportInformationItem)) {

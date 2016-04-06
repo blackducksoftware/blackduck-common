@@ -31,7 +31,7 @@ public class ProjectItem extends AbstractLinkedResource {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
+		int result = 1;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((source == null) ? 0 : source.hashCode());
 		result = prime * result + ((get_meta() == null) ? 0 : get_meta().hashCode());
@@ -43,7 +43,7 @@ public class ProjectItem extends AbstractLinkedResource {
 		if (this == obj) {
 			return true;
 		}
-		if (!super.equals(obj)) {
+		if (obj == null) {
 			return false;
 		}
 		if (!(obj instanceof ProjectItem)) {

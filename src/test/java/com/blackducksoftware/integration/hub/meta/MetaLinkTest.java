@@ -2,10 +2,11 @@ package com.blackducksoftware.integration.hub.meta;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class MetaLinkTest {
 
@@ -34,7 +35,6 @@ public class MetaLinkTest {
 
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());
-
 
 		final StringBuilder builder = new StringBuilder();
 		builder.append("MetaLink [rel=");

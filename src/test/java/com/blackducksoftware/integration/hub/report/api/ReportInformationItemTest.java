@@ -7,14 +7,14 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-
 import org.joda.time.DateTime;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class ReportInformationItemTest {
 
@@ -89,8 +89,6 @@ public class ReportInformationItemTest {
 		assertTrue(item1.equals(item3));
 
 		EqualsVerifier.forClass(ReportInformationItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
-		EqualsVerifier.forClass(MetaInformation.class).suppress(Warning.STRICT_INHERITANCE).verify();
-		EqualsVerifier.forClass(MetaLink.class).suppress(Warning.STRICT_INHERITANCE).verify();
 
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());
@@ -130,7 +128,7 @@ public class ReportInformationItemTest {
 		assertEquals(metaLink1.hashCode(), metaLink3.hashCode());
 
 		final StringBuilder builder = new StringBuilder();
-		builder.append("ReportMetaInformationItem [reportFormat=");
+		builder.append("ReportInformationItem [reportFormat=");
 		builder.append(item1.getReportFormat());
 		builder.append(", locale=");
 		builder.append(item1.getLocale());

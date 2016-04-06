@@ -183,6 +183,8 @@ public class AggregateBomViewEntryTest {
 		builder.append(item1.getLicenses());
 		builder.append(", riskProfile=");
 		builder.append(item1.getRiskProfile());
+		builder.append(", policyApprovalStatus=");
+		builder.append(item1.getPolicyApprovalStatus());
 		builder.append("]");
 		assertEquals(builder.toString(), item1.toString());
 	}

@@ -56,7 +56,7 @@ public class ReleaseItem extends AbstractLinkedResource {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
+		int result = 1;
 		result = prime * result + ((distribution == null) ? 0 : distribution.hashCode());
 		result = prime * result + ((phase == null) ? 0 : phase.hashCode());
 		result = prime * result + ((source == null) ? 0 : source.hashCode());
@@ -69,9 +69,6 @@ public class ReleaseItem extends AbstractLinkedResource {
 	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
-		}
-		if (!super.equals(obj)) {
-			return false;
 		}
 		if (!(obj instanceof ReleaseItem)) {
 			return false;
