@@ -637,12 +637,13 @@ public class HubIntRestService {
 	/**
 	 * Gets the code locations that match the host and paths provided
 	 *
+	 * @deprecated with Hub 3.0 should use the status files from the CLI
+	 *             instead. The CLI option is --statusWriteDir
 	 */
+	@Deprecated
 	public List<ScanLocationItem> getScanLocations(final String hostname, final List<String>
-
 	scanTargets) throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
 		final List<ScanLocationItem> codeLocations = new ArrayList<ScanLocationItem>();
-
 		ClientResource resource = null;
 		for (final String targetPath : scanTargets) {
 			String correctedTargetPath = targetPath;
