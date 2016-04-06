@@ -63,7 +63,7 @@ public class HubReportGenerationInfo {
 		this.service = service;
 	}
 
-	public void setProjectId(final ProjectItem project) {
+	public void setProject(final ProjectItem project) {
 		this.project = project;
 	}
 

@@ -218,7 +218,7 @@ public class HubEventPollingTest {
 		} catch (final Exception e) {
 			assertTrue(e instanceof HubIntegrationException);
 			assertTrue(e.getMessage(), e.getMessage().contains("The scan status file : " + statusFile1.getCanonicalPath()
-					+ " does not contain valid scan status json."));
+			+ " does not contain valid scan status json."));
 		}
 		assertTrue(statusFile1.exists());
 		assertTrue(scanStatusDir.exists());
@@ -605,7 +605,7 @@ public class HubEventPollingTest {
 
 		final HubIntRestService restService = Mockito.mock(HubIntRestService.class);
 
-		Mockito.when(restService.getReportLinks(Mockito.anyString())).then(new Answer<ReportInformationItem>() {
+		Mockito.when(restService.getReportInformation(Mockito.anyString())).then(new Answer<ReportInformationItem>() {
 			@Override
 			public ReportInformationItem answer(final InvocationOnMock invocation) throws Throwable {
 				return new ReportInformationItem(null, null, null, 0, null, null, null, null, null);
@@ -622,7 +622,7 @@ public class HubEventPollingTest {
 
 		final HubIntRestService restService = Mockito.mock(HubIntRestService.class);
 
-		Mockito.when(restService.getReportLinks(Mockito.anyString())).then(new Answer<ReportInformationItem>() {
+		Mockito.when(restService.getReportInformation(Mockito.anyString())).then(new Answer<ReportInformationItem>() {
 			@Override
 			public ReportInformationItem answer(final InvocationOnMock invocation) throws Throwable {
 				return new ReportInformationItem(null, null, null, 0, null, null, "test", null, null);
