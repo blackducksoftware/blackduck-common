@@ -372,7 +372,26 @@ public class HubIntRestService {
 			return gson.fromJson(response, ProjectItem.class);
 
 		} else {
-			throw new BDRestException("There was a problem getting the project matches. Error Code: " + responseCode,
+			throw new BDRestException("There was a problem getting the project. Error Code: " + responseCode,
+					resource);
+		}
+
+	}
+
+	public ReleaseItem getProjectVersion(final String versionUrl)
+			throws IOException, BDRestException, URISyntaxException {
+		final ClientResource resource = createClientResource(versionUrl);
+		resource.setMethod(Method.GET);
+		handleRequest(resource, null, 0);
+		final int responseCode = resource.getResponse().getStatus().getCode();
+
+		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+			final String response = readResponseAsString(resource.getResponse());
+			final Gson gson = new GsonBuilder().create();
+			return gson.fromJson(response, ReleaseItem.class);
+
+		} else {
+			throw new BDRestException("There was a problem getting the version. Error Code: " + responseCode,
 					resource);
 		}
 
@@ -759,22 +778,14 @@ public class HubIntRestService {
 	 * Generates a new Hub report for the specified version.
 	 *
 	 */
-	public PolicyStatus getPolicyStatus(final String projectId, final String versionId) throws IOException, BDRestException,
-	URISyntaxException, MissingPolicyStatusException {
-		if (StringUtils.isBlank(projectId)) {
-			throw new IllegalArgumentException("Missing the project Id to get the policy status of.");
-		}
-		if (StringUtils.isBlank(versionId)) {
-			throw new IllegalArgumentException("Missing the version Id to get the policy status of.");
+	public PolicyStatus getPolicyStatus(final String policyStatusUrl)
+			throws IOException, BDRestException,
+			URISyntaxException, MissingPolicyStatusException {
+		if (StringUtils.isBlank(policyStatusUrl)) {
+			throw new IllegalArgumentException("Missing the policy status URL.");
 		}
 
-		final ClientResource resource = createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("projects");
-		resource.addSegment(projectId);
-		resource.addSegment("versions");
-		resource.addSegment(versionId);
-		resource.addSegment("policy-status");
+		final ClientResource resource = createClientResource(policyStatusUrl);
 
 		resource.setMethod(Method.GET);
 
