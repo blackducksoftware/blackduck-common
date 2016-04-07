@@ -88,12 +88,6 @@ public class HubIntRestService {
 
 	private void attemptResetProxyCache() {
 		try {
-			// works, and resets the cache when using sun classes
-			// sun.net.www.protocol.http.AuthCacheValue.setAuthCache(new
-			// sun.net.www.protocol.http.AuthCacheImpl());
-
-			// Attempt the same thing using reflection in case they are not using a jdk with sun classes
-
 			Class<?> sunAuthCacheValue;
 			Class<?> sunAuthCache;
 			Class<?> sunAuthCacheImpl;
@@ -119,7 +113,6 @@ public class HubIntRestService {
 	}
 
 	/**
-	 * Sets the Proxy settings that the User may have configured.
 	 * The proxy settings get set as System properties.
 	 * I.E. https.proxyHost, https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
 	 *
@@ -583,10 +576,6 @@ public class HubIntRestService {
 				correctedTargetPath = "/" + correctedTargetPath;
 			}
 
-			// logger.debug(
-			// "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + correctedTargetPath +
-			// "'");
-
 			resource = createClientResource();
 			resource.addSegment("api");
 			resource.addSegment("v1");
@@ -633,9 +622,7 @@ public class HubIntRestService {
 			if (path.endsWith("/")) {
 				path = path.substring(0, path.length() - 1);
 			}
-			// logger.trace("Comparing target : '" + targetPath + "' with path : '" + path + "'.");
 			if (targetPath.equals(path)) {
-				// logger.trace("MATCHED!");
 				return scanMatch;
 			}
 		}
