@@ -48,12 +48,13 @@ public class HubScanJobConfigBuilderTest {
 	public void testEmptyConfigValidations() throws HubIntegrationException, IOException {
 		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
 		expectedMessages.add("The minimum amount of memory for the scan is 256 MB.");
+		expectedMessages.add("The maximum wait time for the BOM Update must be greater than 0.");
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 		assertTrue(builder.validateProjectAndVersion(logger));
 		assertTrue(!builder.validateScanMemory(logger));
 		assertTrue(builder.validateScanTargetPaths(logger));
-		assertTrue(builder.validateMaxWaitTimeForRiskReport(logger));
+		assertTrue(!builder.validateMaxWaitTimeForBomUpdate(logger));
 		assertTrue(builder.validateShouldGenerateRiskReport(logger));
 	}
 
@@ -111,21 +112,21 @@ public class HubScanJobConfigBuilderTest {
 
 	@Test
 	public void testValidateMaxWaitTimeForRiskReport() throws HubIntegrationException, IOException {
-		expectedMessages.add("The maximum wait time for the Risk Report must be greater than 0.");
+		expectedMessages.add("The maximum wait time for the BOM Update must be greater than 0.");
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 		builder.setShouldGenerateRiskReport(true);
 
-		assertTrue(!builder.validateMaxWaitTimeForRiskReport(logger));
+		assertTrue(!builder.validateMaxWaitTimeForBomUpdate(logger));
 	}
 
 	@Test
 	public void testValidateMaxWaitTimeForRiskReportValid() throws HubIntegrationException, IOException {
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 		builder.setShouldGenerateRiskReport(true);
-		builder.setMaxWaitTimeForRiskReport(HubScanJobConfigBuilder.DEFAULT_REPORT_WAIT_TIME_IN_MINUTES);
+		builder.setMaxWaitTimeForBomUpdate(HubScanJobConfigBuilder.DEFAULT_REPORT_WAIT_TIME_IN_MINUTES);
 
-		assertTrue(builder.validateMaxWaitTimeForRiskReport(logger));
+		assertTrue(builder.validateMaxWaitTimeForBomUpdate(logger));
 	}
 
 	@Test
@@ -229,7 +230,7 @@ public class HubScanJobConfigBuilderTest {
 		setBuilderDefaults(builder);
 
 		builder.setShouldGenerateRiskReport(true);
-		builder.setMaxWaitTimeForRiskReport(5);
+		builder.setMaxWaitTimeForBomUpdate(5);
 
 		builder.build(logger);
 	}
@@ -241,7 +242,7 @@ public class HubScanJobConfigBuilderTest {
 		setBuilderDefaults(builder);
 
 		builder.setShouldGenerateRiskReport(true);
-		builder.setMaxWaitTimeForRiskReport(0);
+		builder.setMaxWaitTimeForBomUpdate(0);
 
 		builder.build(logger);
 	}
@@ -258,7 +259,7 @@ public class HubScanJobConfigBuilderTest {
 		setBuilderDefaults(builder);
 
 		builder.setShouldGenerateRiskReport(true);
-		builder.setMaxWaitTimeForRiskReport(5);
+		builder.setMaxWaitTimeForBomUpdate(5);
 		builder.setProjectName(" ");
 		builder.setVersion(null);
 
