@@ -359,37 +359,6 @@ public class HubIntRestService {
 					return project;
 				}
 			}
-
-			//Versions link returns
-			//			{
-			//				"totalCount": 1,
-			//				"items": [
-			//				{
-			//				"versionName": "CITestVersion1",
-			//				"phase": "PLANNING",
-			//				"distribution": "INTERNAL",
-			//				"source": "CUSTOM",
-			//				"_meta": {
-			//				"allow": [
-			//				"GET",
-			//				"PUT",
-			//				"DELETE"
-			//				],
-			//				"href": "http://integration-hub/api/projects/b504232a-85a8-456e-926b-61ca9f89d1d8/versions/4a86d9a7-f66c-4d94-99b9-8d365f1bb6ea",
-			//				"links": [
-			//				{
-			//				"rel": "versionReport",
-			//				"href": "http://integration-hub/api/versions/4a86d9a7-f66c-4d94-99b9-8d365f1bb6ea/reports"
-			//				},
-			//				{
-			//				"rel": "riskProfile",
-			//				"href": "http://integration-hub/api/projects/b504232a-85a8-456e-926b-61ca9f89d1d8/versions/4a86d9a7-f66c-4d94-99b9-8d365f1bb6ea/risk-profile"
-			//				}
-			//				]
-			//				}
-			//				}
-			//				]
-			//				}
 			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName, resource);
 		} else if (responseCode == 404) {
 			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName, resource);
@@ -536,49 +505,6 @@ public class HubIntRestService {
 		}
 
 	}
-
-	//	/**
-	//	 * Creates a Hub Project and version with the specified information.
-	//	 *
-	//	 */
-	//	public String createHubProjectAndVersion(final String projectName, final String versionName, final String phase, final String dist) throws IOException,
-	//	BDRestException, URISyntaxException {
-	//		final ClientResource resource = createClientResource();
-	//		resource.addSegment("api");
-	//		resource.addSegment("v1");
-	//		resource.addSegment("projects");
-	//
-	//		final ReleaseItem newRelease = new ReleaseItem();
-	//		newRelease.setVersion(versionName);
-	//		newRelease.setPhase(phase);
-	//		newRelease.setDistribution(dist);
-	//
-	//		resource.setMethod(Method.POST);
-	//
-	//		final ProjectItemOld newProject = new ProjectItemOld();
-	//		newProject.setName(projectName);
-	//		newProject.setReleaseItem(newRelease);
-	//
-	//		final Gson gson = new GsonBuilder().create();
-	//		final StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
-	//		stringRep.setMediaType(MediaType.APPLICATION_JSON);
-	//		stringRep.setCharacterSet(CharacterSet.UTF_8);
-	//		resource.getRequest().setEntity(stringRep);
-	//		handleRequest(resource, null, 0);
-	//		final int responseCode = resource.getResponse().getStatus().getCode();
-	//
-	//		if (responseCode == 201) {
-	//
-	//			final String response = readResponseAsString(resource.getResponse());
-	//			final ProjectItemOld project = gson.fromJson(response, ProjectItemOld.class);
-	//			return project.getId();
-	//
-	//		} else {
-	//
-	//			throw new BDRestException("There was a problem creating the specified Project and Version. Error Code: " + responseCode, resource);
-	//		}
-	//
-	//	}
 
 	/**
 	 * Retrieves the version of the Hub server
