@@ -136,7 +136,7 @@ public class HubScanJobConfigBuilder {
 				maxWaitTimeForBomUpdate = defaultMaxWaitTime;
 			} else {
 				waitTimeValid = false;
-				logger.error("The maximum wait time for the Risk Report must be greater than 0.");
+				logger.error("The maximum wait time for the BOM Update must be greater than 0.");
 			}
 		}
 
