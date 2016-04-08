@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Black Duck Software Suite SDK
+ * Copyright (C) 2016 Black Duck Software, Inc.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ *******************************************************************************/
 package com.blackducksoftware.integration.hub;
 
 import java.io.File;
@@ -194,8 +212,6 @@ public abstract class ScanExecutor {
 
 	protected boolean isConfiguredCorrectly(final String scanExec, final String oneJarPath, final String javaExec) {
 		if (getLogger() == null) {
-			// Need to suppress the sonar rule here.
-			// NOPMD SystemPrintln
 			System.out.println("Could not find a logger");
 			return false;
 		}
@@ -257,8 +273,6 @@ public abstract class ScanExecutor {
 				if (StringUtils.isNotBlank(getProxyHost()) && getProxyPort() != null) {
 					cmd.add("-Dhttp.proxyHost=" + getProxyHost());
 					cmd.add("-Dhttp.proxyPort=" + getProxyPort());
-					// cmd.add("-Dhttps.proxyHost=" + getProxyHost());
-					// cmd.add("-Dhttps.proxyPort=" + getProxyPort());
 
 					if (getNoProxyHosts() != null) {
 						final StringBuilder noProxyHosts = new StringBuilder();
@@ -274,8 +288,6 @@ public abstract class ScanExecutor {
 					if (StringUtils.isNotBlank(getProxyUsername()) && StringUtils.isNotBlank(getProxyPassword())) {
 						cmd.add("-Dhttp.proxyUser=" + getProxyUsername());
 						cmd.add("-Dhttp.proxyPassword=" + getProxyPassword());
-						// cmd.add("-Dhttps.proxyUser=" + getProxyUsername());
-						// cmd.add("-Dhttps.proxyPassword=" + getProxyPassword());
 					}
 				}
 

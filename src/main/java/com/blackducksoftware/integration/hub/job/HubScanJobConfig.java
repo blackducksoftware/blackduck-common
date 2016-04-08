@@ -1,4 +1,22 @@
-package com.blackducksoftware.integration.hub;
+/*******************************************************************************
+ * Black Duck Software Suite SDK
+ * Copyright (C) 2016 Black Duck Software, Inc.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ *******************************************************************************/
+package com.blackducksoftware.integration.hub.job;
 
 import java.util.List;
 
@@ -17,21 +35,22 @@ public class HubScanJobConfig {
 
 	private final boolean shouldGenerateRiskReport;
 
-	private final int maxWaitTimeForRiskReport;
+	private final int maxWaitTimeForBomUpdate;
 
 	private final int scanMemory;
 
 	private final ImmutableList<String> scanTargetPaths;
 
 	public HubScanJobConfig(final String projectName, final String version, final String phase, final String distribution, final String workingDirectory, final int scanMemory,
-			final boolean shouldGenerateRiskReport, final int maxWaitTimeForRiskReport, final ImmutableList<String> scanTargetPaths) {
+			final boolean shouldGenerateRiskReport, final int maxWaitTimeForBomUpdate,
+			final ImmutableList<String> scanTargetPaths) {
 		this.projectName = projectName;
 		this.version = version;
 		this.phase = phase;
 		this.distribution = distribution;
 		this.workingDirectory = workingDirectory;
 		this.shouldGenerateRiskReport = shouldGenerateRiskReport;
-		this.maxWaitTimeForRiskReport = maxWaitTimeForRiskReport;
+		this.maxWaitTimeForBomUpdate = maxWaitTimeForBomUpdate;
 		this.scanMemory = scanMemory;
 		this.scanTargetPaths = scanTargetPaths;
 	}
@@ -60,12 +79,12 @@ public class HubScanJobConfig {
 		return shouldGenerateRiskReport;
 	}
 
-	public int getMaxWaitTimeForRiskReport() {
-		return maxWaitTimeForRiskReport;
+	public int getMaxWaitTimeForBomUpdate() {
+		return maxWaitTimeForBomUpdate;
 	}
 
-	public long getMaxWaitTimeForRiskReportInMilliseconds() {
-		return maxWaitTimeForRiskReport * 60 * 1000;
+	public long getMaxWaitTimeForBomUpdateInMilliseconds() {
+		return maxWaitTimeForBomUpdate * 60 * 1000;
 	}
 
 	public int getScanMemory() {
@@ -76,11 +95,30 @@ public class HubScanJobConfig {
 		return scanTargetPaths;
 	}
 
+
 	@Override
 	public String toString() {
-		return "HubScanJobConfig [projectName=" + projectName + ", version=" + version + ", phase=" + phase + ", distribution=" + distribution
-				+ ", workingDirectory=" + workingDirectory + ", shouldGenerateRiskReport=" + shouldGenerateRiskReport + ", maxWaitTimeForRiskReport="
-				+ maxWaitTimeForRiskReport + ", scanMemory=" + scanMemory + ", scanTargetPaths=" + scanTargetPaths + "]";
+		final StringBuilder builder = new StringBuilder();
+		builder.append("HubScanJobConfig [projectName=");
+		builder.append(projectName);
+		builder.append(", version=");
+		builder.append(version);
+		builder.append(", phase=");
+		builder.append(phase);
+		builder.append(", distribution=");
+		builder.append(distribution);
+		builder.append(", workingDirectory=");
+		builder.append(workingDirectory);
+		builder.append(", shouldGenerateRiskReport=");
+		builder.append(shouldGenerateRiskReport);
+		builder.append(", maxWaitTimeForBomUpdate=");
+		builder.append(maxWaitTimeForBomUpdate);
+		builder.append(", scanMemory=");
+		builder.append(scanMemory);
+		builder.append(", scanTargetPaths=");
+		builder.append(scanTargetPaths);
+		builder.append("]");
+		return builder.toString();
 	}
 
 	@Override
@@ -88,7 +126,7 @@ public class HubScanJobConfig {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((distribution == null) ? 0 : distribution.hashCode());
-		result = prime * result + maxWaitTimeForRiskReport;
+		result = prime * result + maxWaitTimeForBomUpdate;
 		result = prime * result + ((phase == null) ? 0 : phase.hashCode());
 		result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
 		result = prime * result + scanMemory;
@@ -107,7 +145,7 @@ public class HubScanJobConfig {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (!(obj instanceof HubScanJobConfig)) {
 			return false;
 		}
 		final HubScanJobConfig other = (HubScanJobConfig) obj;
@@ -118,7 +156,7 @@ public class HubScanJobConfig {
 		} else if (!distribution.equals(other.distribution)) {
 			return false;
 		}
-		if (maxWaitTimeForRiskReport != other.maxWaitTimeForRiskReport) {
+		if (maxWaitTimeForBomUpdate != other.maxWaitTimeForBomUpdate) {
 			return false;
 		}
 		if (phase == null) {
