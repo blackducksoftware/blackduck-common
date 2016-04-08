@@ -94,12 +94,6 @@
       <groupId>org.apache.ant</groupId>
       <artifactId>ant</artifactId>
       <version>1.9.6</version>
-      <exclusions>
-      	<exclusion>
-      	 	<groupId>org.apache.ant</groupId>
-  			<artifactId>ant-launcher</artifactId>
-      	</exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
