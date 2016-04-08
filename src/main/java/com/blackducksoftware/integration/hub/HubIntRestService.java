@@ -164,22 +164,11 @@ public class HubIntRestService {
 		}
 	}
 
-	/**
-	 * Create the Client Resource
-	 *
-	 */
-	// Make this protected for testing the getCodeLocations, otherwise we need to use
-	// Powermockito to stub this to use a mock resource OR we would need to setup code
-	// locations on the server and hope they dont get deleted
-	protected ClientResource createClientResource() throws URISyntaxException {
+	public ClientResource createClientResource() throws URISyntaxException {
 		return createClientResource(getBaseUrl());
 	}
 
-	/**
-	 * Create the Client Resource
-	 *
-	 */
-	private ClientResource createClientResource(final String providedUrl) throws URISyntaxException {
+	public ClientResource createClientResource(final String providedUrl) throws URISyntaxException {
 
 		final Context context = new Context();
 
@@ -440,8 +429,9 @@ public class HubIntRestService {
 	}
 
 	/**
-	 * Creates a Hub Project with the specified name. Returns project URL.
+	 * Creates a Hub Project with the specified name.
 	 *
+	 * @return the project URL.
 	 */
 	public String createHubProject(final String projectName) throws IOException, BDRestException,
 	URISyntaxException {
@@ -479,7 +469,10 @@ public class HubIntRestService {
 	}
 
 	/**
-	 * Creates a new Version in the Project specified, using the phase and distribution provided. Returns the version URL
+	 * Creates a new Version in the Project specified, using the phase and
+	 * distribution provided.
+	 *
+	 * @return the version URL
 	 *
 	 */
 	public String createHubVersion(final ProjectItem project, final String versionName, final String phase,
@@ -652,6 +645,8 @@ public class HubIntRestService {
 	/**
 	 * Generates a new Hub report for the specified version.
 	 *
+	 * @return the Report URL
+	 *
 	 */
 	public String generateHubReport(final ReleaseItem version, final ReportFormatEnum reportFormat)
 			throws IOException, BDRestException,
@@ -784,7 +779,6 @@ public class HubIntRestService {
 		if (StringUtils.isBlank(policyStatusUrl)) {
 			throw new IllegalArgumentException("Missing the policy status URL.");
 		}
-
 		final ClientResource resource = createClientResource(policyStatusUrl);
 
 		resource.setMethod(Method.GET);

@@ -559,6 +559,13 @@ public class HubIntRestServiceTest {
 		final ClientResource clientResource = new ClientResource("");
 		final ClientResource resourceSpy = Mockito.spy(clientResource);
 
+		final String scResults = new Gson().toJson(policyStatus);
+		final StringRepresentation rep = new StringRepresentation(scResults);
+		final Response response = new Response(null);
+		response.setEntity(rep);
+
+		resourceSpy.setResponse(response);
+
 		Mockito.when(resourceSpy.handle()).then(new Answer<Representation>() {
 			@Override
 			public Representation answer(final InvocationOnMock invocation) throws Throwable {
@@ -572,32 +579,14 @@ public class HubIntRestServiceTest {
 			}
 		});
 
-		Mockito.when(restServiceSpy.createClientResource()).thenReturn(resourceSpy);
+		Mockito.when(restServiceSpy.createClientResource(Mockito.anyString())).thenReturn(resourceSpy);
 
-		assertEquals(policyStatus, restServiceSpy.getPolicyStatus("projectId", "versionId"));
-
-		try {
-			assertEquals(policyStatus, restServiceSpy.getPolicyStatus("", ""));
-		} catch (final IllegalArgumentException e) {
-			assertEquals("Missing the project Id to get the policy status of.", e.getMessage());
-		}
+		assertEquals(policyStatus, restServiceSpy.getPolicyStatus("policyUrl"));
 
 		try {
-			assertEquals(policyStatus, restServiceSpy.getPolicyStatus("projectId", ""));
+			restServiceSpy.getPolicyStatus("");
 		} catch (final IllegalArgumentException e) {
-			assertEquals("Missing the version Id to get the policy status of.", e.getMessage());
-		}
-
-		try {
-			assertEquals(policyStatus, restServiceSpy.getPolicyStatus(null, null));
-		} catch (final IllegalArgumentException e) {
-			assertEquals("Missing the project Id to get the policy status of.", e.getMessage());
-		}
-
-		try {
-			assertEquals(policyStatus, restServiceSpy.getPolicyStatus("projectId", null));
-		} catch (final IllegalArgumentException e) {
-			assertEquals("Missing the version Id to get the policy status of.", e.getMessage());
+			assertEquals("Missing the policy status URL.", e.getMessage());
 		}
 	}
 
