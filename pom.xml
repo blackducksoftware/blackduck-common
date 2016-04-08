@@ -40,6 +40,10 @@
 		<id>bintray-bds-integration</id>
 		<url>http://dl.bintray.com/bds/integration/</url>
 	</repository>
+	 <repository>
+		<id>bds-int-public</id>
+		<url>https://updates.suite.blackducksoftware.com/bdosvr/</url>
+	</repository>
   </repositories>
   
   <distributionManagement>
