@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
-package com.blackducksoftware.integration.hub;
+package com.blackducksoftware.integration.hub.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.job.HubScanJobConfigBuilder;
 import com.blackducksoftware.integration.hub.util.TestLogger;
 
 public class HubScanJobConfigBuilderTest {

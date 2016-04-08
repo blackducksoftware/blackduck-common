@@ -63,7 +63,6 @@ public class CLIInstaller {
 	private String proxyPassword;
 
 	public CLIInstaller(final File directoryToInstallTo) {
-
 		if (directoryToInstallTo == null) {
 			throw new IllegalArgumentException("You must provided a directory to install the CLI to.");
 		}
@@ -111,7 +110,6 @@ public class CLIInstaller {
 	}
 
 	public File getCLIHome() {
-
 		final File cliHome = getCLIInstallDir();
 		if (cliHome == null) {
 			return null;
@@ -121,7 +119,6 @@ public class CLIInstaller {
 			return null;
 		}
 		if (installDirFiles.length > 1) {
-			// The cli is currently packed with an extra directory "scan.cli-windows-X.X.X-SNAPSHOT"
 			for (final File currentFile : installDirFiles) {
 				if (!currentFile.getName().contains("windows")) {
 					return currentFile;
@@ -181,7 +178,7 @@ public class CLIInstaller {
 			}
 
 			boolean cliMismatch = true;
-			// For some reason the Hub returns the Version inside ""'s
+			// For some reason the Hub returns the Version inside quotes
 			hubVersion = hubVersion.replace("\"", "");
 			final File hubVersionFile = new File(directoryToInstallTo, VERSION_FILE_NAME);
 			if (hubVersionFile.exists()) {

@@ -288,9 +288,6 @@ public class HubIntRestService {
 
 				cookies = requestCookies;
 			}
-			// else {
-			// cookies already set
-			// }
 		} else {
 			throw new HubIntegrationException(resource.getResponse().getStatus().toString());
 		}

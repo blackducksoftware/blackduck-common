@@ -82,8 +82,8 @@ public class ScannerSplitStream extends OutputStream {
 		outputFileStream.write(b);
 
 		final String stringAcii = new String(Character.toChars(b));
-		final StringBuilder builder = new StringBuilder();
-		builder.append(currentLine);
+		final StringBuilder outputBuilder = new StringBuilder();
+		outputBuilder.append(currentLine);
 		switch (b) {
 		case ETX:
 			processLine(currentLine);
@@ -104,8 +104,8 @@ public class ScannerSplitStream extends OutputStream {
 		case EOF:
 			throw new EOFException();
 		default:
-			builder.append(stringAcii);
-			currentLine = builder.toString();
+			outputBuilder.append(stringAcii);
+			currentLine = outputBuilder.toString();
 			return;
 		}
 	}
@@ -214,35 +214,35 @@ public class ScannerSplitStream extends OutputStream {
 
 	private void writeToConsole(final String line) {
 		if (StringUtils.containsIgnoreCase(line, DEBUG) || StringUtils.containsIgnoreCase(line, TRACE)) {
-			// We dont want to print Debug or Trace logs to the Build output
+			// We dont want to print Debug or Trace logs to the logger
 			return;
 		}
-		final StringBuilder builder = new StringBuilder();
-		builder.append(output);
+		final StringBuilder outputBuilder = new StringBuilder();
+		outputBuilder.append(output);
 		if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
 			// looking for 'Exception in thread' type messages
-			builder.append(line);
-			builder.append(System.getProperty("line.separator"));
+			outputBuilder.append(line);
+			outputBuilder.append(System.getProperty("line.separator"));
 			logger.error(line);
 		} else if (StringUtils.containsIgnoreCase(line, FINISHED)) {
-			builder.append(line);
-			builder.append(System.getProperty("line.separator"));
+			outputBuilder.append(line);
+			outputBuilder.append(System.getProperty("line.separator"));
 			logger.info(line);
 		} else if (StringUtils.containsIgnoreCase(line, ERROR)) {
-			builder.append(line);
-			builder.append(System.getProperty("line.separator"));
+			outputBuilder.append(line);
+			outputBuilder.append(System.getProperty("line.separator"));
 			logger.error(line);
 		} else if (StringUtils.containsIgnoreCase(line, WARN)) {
-			builder.append(line);
-			builder.append(System.getProperty("line.separator"));
+			outputBuilder.append(line);
+			outputBuilder.append(System.getProperty("line.separator"));
 			logger.warn(line);
 		} else if (StringUtils.containsIgnoreCase(line, INFO)) {
-			builder.append(line);
-			builder.append(System.getProperty("line.separator"));
+			outputBuilder.append(line);
+			outputBuilder.append(System.getProperty("line.separator"));
 			logger.info(line);
 		}
 
-		output = builder.toString();
+		output = outputBuilder.toString();
 	}
 
 }

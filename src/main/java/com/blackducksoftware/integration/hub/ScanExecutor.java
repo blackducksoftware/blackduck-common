@@ -212,8 +212,6 @@ public abstract class ScanExecutor {
 
 	protected boolean isConfiguredCorrectly(final String scanExec, final String oneJarPath, final String javaExec) {
 		if (getLogger() == null) {
-			// Need to suppress the sonar rule here.
-			// NOPMD SystemPrintln
 			System.out.println("Could not find a logger");
 			return false;
 		}
@@ -275,8 +273,6 @@ public abstract class ScanExecutor {
 				if (StringUtils.isNotBlank(getProxyHost()) && getProxyPort() != null) {
 					cmd.add("-Dhttp.proxyHost=" + getProxyHost());
 					cmd.add("-Dhttp.proxyPort=" + getProxyPort());
-					// cmd.add("-Dhttps.proxyHost=" + getProxyHost());
-					// cmd.add("-Dhttps.proxyPort=" + getProxyPort());
 
 					if (getNoProxyHosts() != null) {
 						final StringBuilder noProxyHosts = new StringBuilder();
@@ -292,8 +288,6 @@ public abstract class ScanExecutor {
 					if (StringUtils.isNotBlank(getProxyUsername()) && StringUtils.isNotBlank(getProxyPassword())) {
 						cmd.add("-Dhttp.proxyUser=" + getProxyUsername());
 						cmd.add("-Dhttp.proxyPassword=" + getProxyPassword());
-						// cmd.add("-Dhttps.proxyUser=" + getProxyUsername());
-						// cmd.add("-Dhttps.proxyPassword=" + getProxyPassword());
 					}
 				}
 
