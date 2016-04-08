@@ -55,23 +55,22 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <build.info.version>2.0.2-SNAPSHOT</build.info.version>
-    <nuget.build.info>1.0.0-SNAPSHOT</nuget.build.info>
+    <build.info.version>2.0.2</build.info.version>
   </properties>
   
   <dependencies>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
-      <artifactId>build-info</artifactId>
+      <artifactId>build-info-common</artifactId>
       <version>${build.info.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.blackducksoftware.integration.maven.maven30</groupId>
+      <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>build-info-recorder-mvn30</artifactId>
       <version>${build.info.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.blackducksoftware.integration.maven.maven31</groupId>
+      <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>build-info-recorder-mvn31</artifactId>
       <version>${build.info.version}</version>
     </dependency>
