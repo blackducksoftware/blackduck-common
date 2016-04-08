@@ -1,19 +1,19 @@
 ## Overview ##
-The int-hub-common library supplies convenient communication with a Hub server through rest Api's as well as providing convenient ways to download the CLI and execute it.
+The hub-common library supplies convenient communication with a Hub server through rest Api's as well as providing convenient ways to download the CLI and execute it.
 
 ## Build ##
 
-[![Build Status](https://travis-ci.org/blackducksoftware/int-hub-common.svg?branch=master)](https://travis-ci.org/blackducksoftware/int-hub-common)
+[![Build Status](https://travis-ci.org/blackducksoftware/hub-common.svg?branch=master)](https://travis-ci.org/blackducksoftware/hub-common)
 
 ## Where can I get the latest release? ##
-You can download the latest source from GitHub: https://github.com/blackducksoftware/int-hub-common. 
+You can download the latest source from GitHub: https://github.com/blackducksoftware/hub-common. 
 
-You can download the latest artifact through your preferred dependency management system from BinTray: https://bintray.com/bds/integration/int-hub-common/view
+You can download the latest artifact through your preferred dependency management system from BinTray: https://bintray.com/bds/integration/hub-common/view
 
 Lastly, release tab on GitHub will contain the latest artifacts.
 
 ## Documentation ##
-All documentation for int-hub-common can be found on the base project:  https://github.com/blackducksoftware/int-hub-common/wiki
+All documentation for hub-common can be found on the base project:  https://github.com/blackducksoftware/hub-common/wiki
 
 ## License ##
 GNU Lesser General Public License v2.1 only
