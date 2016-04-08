@@ -42,27 +42,9 @@
       <url>http://maven.restlet.org</url>
     </repository>
     <repository>
-      <id>integration.artifactory.blackducksoftware.com</id>
-      <name>integration-releases</name>
-      <url>http://artifactory.blackducksoftware.com:8081/artifactory/integration</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>integration-snapshots.artifactory.blackducksoftware.com</id>
-      <name>integration-snapshots</name>
-      <url>http://artifactory.blackducksoftware.com:8081/artifactory/integration-snapshot</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
+		<id>bintray-bds-integration</id>
+		<url>http://dl.bintray.com/bds/integration/</url>
+	</repository>
   </repositories>
   <distributionManagement>
     <repository>
