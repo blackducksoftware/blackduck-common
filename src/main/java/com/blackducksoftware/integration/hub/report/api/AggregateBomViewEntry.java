@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.policy.api.PolicyStatusEnum;
 import com.blackducksoftware.integration.hub.report.risk.api.RiskCounts;
 import com.blackducksoftware.integration.hub.report.risk.api.RiskProfile;
 
@@ -34,9 +35,6 @@ public class AggregateBomViewEntry {
 
 	private final List<UserData> createdByUsers;
 
-	/**
-	 * minimal of since of all entries
-	 */
 	private final String since;
 
 	private final ProjectData producerProject;
@@ -46,6 +44,8 @@ public class AggregateBomViewEntry {
 	private final List<LicenseDefinition> licenses;
 
 	private final RiskProfile riskProfile;
+
+	private final String policyApprovalStatus;
 
 	public AggregateBomViewEntry(// NOPMD ExcessiveParameterList
 			final List<String> bomEntryIds,
@@ -60,7 +60,7 @@ public class AggregateBomViewEntry {
 			final ProjectData producerProject,
 			final List<ReleaseData> producerReleases,
 			final List<LicenseDefinition> licenses,
-			final RiskProfile riskProfile) {
+			final RiskProfile riskProfile, final String policyApprovalStatus) {
 		this.bomEntryIds = bomEntryIds;
 		this.bomViewEntryIds = bomViewEntryIds;
 		this.matchTypes = matchTypes;
@@ -74,6 +74,15 @@ public class AggregateBomViewEntry {
 		this.producerReleases = producerReleases;
 		this.licenses = licenses;
 		this.riskProfile = riskProfile;
+		this.policyApprovalStatus = policyApprovalStatus;
+	}
+
+	public String getPolicyApprovalStatus() {
+		return policyApprovalStatus;
+	}
+
+	public PolicyStatusEnum getPolicyApprovalStatusEnum() {
+		return PolicyStatusEnum.valueOf(policyApprovalStatus);
 	}
 
 	public List<String> getBomEntryIds() {
@@ -265,6 +274,7 @@ public class AggregateBomViewEntry {
 		result = prime * result + ((inUses == null) ? 0 : inUses.hashCode());
 		result = prime * result + ((licenses == null) ? 0 : licenses.hashCode());
 		result = prime * result + ((matchTypes == null) ? 0 : matchTypes.hashCode());
+		result = prime * result + ((policyApprovalStatus == null) ? 0 : policyApprovalStatus.hashCode());
 		result = prime * result + ((producerMatchTypes == null) ? 0 : producerMatchTypes.hashCode());
 		result = prime * result + ((producerProject == null) ? 0 : producerProject.hashCode());
 		result = prime * result + ((producerReleases == null) ? 0 : producerReleases.hashCode());
@@ -333,6 +343,13 @@ public class AggregateBomViewEntry {
 				return false;
 			}
 		} else if (!matchTypes.equals(other.matchTypes)) {
+			return false;
+		}
+		if (policyApprovalStatus == null) {
+			if (other.policyApprovalStatus != null) {
+				return false;
+			}
+		} else if (!policyApprovalStatus.equals(other.policyApprovalStatus)) {
 			return false;
 		}
 		if (producerMatchTypes == null) {
@@ -409,6 +426,8 @@ public class AggregateBomViewEntry {
 		builder.append(licenses);
 		builder.append(", riskProfile=");
 		builder.append(riskProfile);
+		builder.append(", policyApprovalStatus=");
+		builder.append(policyApprovalStatus);
 		builder.append("]");
 		return builder.toString();
 	}

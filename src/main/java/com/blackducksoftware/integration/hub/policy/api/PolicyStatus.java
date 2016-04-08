@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.meta.MetaInformation;
+
 public class PolicyStatus {
 	private final String overallStatus;
 
@@ -12,9 +14,9 @@ public class PolicyStatus {
 
 	private final List<ComponentVersionStatusCount> componentVersionStatusCounts;
 
-	private final PolicyMeta _meta;
+	private final MetaInformation _meta;
 
-	public PolicyStatus(final String overallStatus, final String updatedAt, final List<ComponentVersionStatusCount> componentVersionStatusCounts, final PolicyMeta _meta) {
+	public PolicyStatus(final String overallStatus, final String updatedAt, final List<ComponentVersionStatusCount> componentVersionStatusCounts, final MetaInformation _meta) {
 		this.overallStatus = overallStatus;
 		this.updatedAt = updatedAt;
 		this.componentVersionStatusCounts = componentVersionStatusCounts;
@@ -80,7 +82,7 @@ public class PolicyStatus {
 		}
 	}
 
-	public PolicyMeta get_meta() {
+	public MetaInformation get_meta() {
 		return _meta;
 	}
 

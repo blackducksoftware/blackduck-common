@@ -20,7 +20,7 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.report.api.HubReportGenerationInfo;
-import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationItem;
+import com.blackducksoftware.integration.hub.report.api.ReportInformationItem;
 import com.blackducksoftware.integration.hub.scan.api.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.scan.api.ScanLocationItem;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
@@ -135,7 +135,7 @@ public class HubEventPolling {
 			final ScanStatusToPoll status = gson.fromJson(fileContent, ScanStatusToPoll.class);
 			if (status.get_meta() == null || status.getStatus() == null) {
 				throw new HubIntegrationException("The scan status file : " + currentStatusFile.getCanonicalPath()
-						+ " does not contain valid scan status json.");
+				+ " does not contain valid scan status json.");
 			}
 			final ScanStatusChecker checker = new ScanStatusChecker(service, status, lock);
 			scanStatusList.add(checker);
@@ -189,7 +189,7 @@ public class HubEventPolling {
 	 * being generated. Throws HubIntegrationException after 30 minutes if the report has not been generated yet.
 	 *
 	 */
-	public ReportMetaInformationItem isReportFinishedGenerating(final String reportUrl) throws IOException, BDRestException, URISyntaxException,
+	public ReportInformationItem isReportFinishedGenerating(final String reportUrl) throws IOException, BDRestException, URISyntaxException,
 	InterruptedException,
 	HubIntegrationException {
 		// maximum wait time of 30 minutes
@@ -202,16 +202,16 @@ public class HubEventPolling {
 	 * being generated. Throws HubIntegrationException after the maximum wait if the report has not been generated yet.
 	 *
 	 */
-	public ReportMetaInformationItem isReportFinishedGenerating(final String reportUrl, final long maximumWait) throws IOException, BDRestException,
+	public ReportInformationItem isReportFinishedGenerating(final String reportUrl, final long maximumWait) throws IOException, BDRestException,
 	URISyntaxException,
 	InterruptedException, HubIntegrationException {
 		final long startTime = System.currentTimeMillis();
 		long elapsedTime = 0;
 		String timeFinished = null;
-		ReportMetaInformationItem reportInfo = null;
+		ReportInformationItem reportInfo = null;
 
 		while (timeFinished == null) {
-			reportInfo = getService().getReportLinks(reportUrl);
+			reportInfo = getService().getReportInformation(reportUrl);
 			timeFinished = reportInfo.getFinishedAt();
 			if (timeFinished != null) {
 				break;

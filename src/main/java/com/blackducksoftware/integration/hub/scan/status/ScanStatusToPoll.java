@@ -1,14 +1,16 @@
 package com.blackducksoftware.integration.hub.scan.status;
 
+import com.blackducksoftware.integration.hub.meta.AbstractLinkedResource;
+import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
-public class ScanStatusToPoll {
+
+public class ScanStatusToPoll extends AbstractLinkedResource {
 	private final String status;
 
-	private final ScanStatusMeta _meta;
 
-	public ScanStatusToPoll(final String status, final ScanStatusMeta _meta) {
+	public ScanStatusToPoll(final String status, final MetaInformation _meta) {
+		super(_meta);
 		this.status = status;
-		this._meta = _meta;
 	}
 
 	public String getStatus() {
@@ -19,15 +21,11 @@ public class ScanStatusToPoll {
 		return ScanStatus.getScanStatus(status);
 	}
 
-	public ScanStatusMeta get_meta() {
-		return _meta;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((_meta == null) ? 0 : _meta.hashCode());
+		result = prime * result + ((get_meta() == null) ? 0 : get_meta().hashCode());
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		return result;
 	}
@@ -44,11 +42,11 @@ public class ScanStatusToPoll {
 			return false;
 		}
 		final ScanStatusToPoll other = (ScanStatusToPoll) obj;
-		if (_meta == null) {
-			if (other._meta != null) {
+		if (get_meta() == null) {
+			if (other.get_meta() != null) {
 				return false;
 			}
-		} else if (!_meta.equals(other._meta)) {
+		} else if (!get_meta().equals(other.get_meta())) {
 			return false;
 		}
 		if (status == null) {
@@ -64,10 +62,10 @@ public class ScanStatusToPoll {
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("ScanStatusCliOutput [status=");
+		builder.append("ScanStatusToPoll [status=");
 		builder.append(status);
 		builder.append(", _meta=");
-		builder.append(_meta);
+		builder.append(get_meta());
 		builder.append("]");
 		return builder.toString();
 	}

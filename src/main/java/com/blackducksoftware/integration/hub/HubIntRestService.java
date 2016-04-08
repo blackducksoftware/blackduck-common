@@ -3,9 +3,7 @@ package com.blackducksoftware.integration.hub;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.Serializable;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Type;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
@@ -37,24 +35,25 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.MissingPolicyStatusException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
+import com.blackducksoftware.integration.hub.exception.VersionDoesNotExistException;
+import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.policy.api.PolicyStatus;
-import com.blackducksoftware.integration.hub.project.api.AutoCompleteItem;
 import com.blackducksoftware.integration.hub.project.api.ProjectItem;
 import com.blackducksoftware.integration.hub.report.api.ReportFormatEnum;
-import com.blackducksoftware.integration.hub.report.api.ReportMetaInformationItem;
+import com.blackducksoftware.integration.hub.report.api.ReportInformationItem;
 import com.blackducksoftware.integration.hub.report.api.VersionReport;
 import com.blackducksoftware.integration.hub.scan.api.ScanLocationItem;
 import com.blackducksoftware.integration.hub.scan.api.ScanLocationResults;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
 import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-public class HubIntRestService implements Serializable {
+public class HubIntRestService {
+
 	private Series<Cookie> cookies;
 
 	private final String baseUrl;
@@ -89,12 +88,6 @@ public class HubIntRestService implements Serializable {
 
 	private void attemptResetProxyCache() {
 		try {
-			// works, and resets the cache when using sun classes
-			// sun.net.www.protocol.http.AuthCacheValue.setAuthCache(new
-			// sun.net.www.protocol.http.AuthCacheImpl());
-
-			// Attempt the same thing using reflection in case they are not using a jdk with sun classes
-
 			Class<?> sunAuthCacheValue;
 			Class<?> sunAuthCache;
 			Class<?> sunAuthCacheImpl;
@@ -120,7 +113,6 @@ public class HubIntRestService implements Serializable {
 	}
 
 	/**
-	 * Sets the Proxy settings that the User may have configured.
 	 * The proxy settings get set as System properties.
 	 * I.E. https.proxyHost, https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
 	 *
@@ -172,22 +164,11 @@ public class HubIntRestService implements Serializable {
 		}
 	}
 
-	/**
-	 * Create the Client Resource
-	 *
-	 */
-	// Make this protected for testing the getCodeLocations, otherwise we need to use
-	// Powermockito to stub this to use a mock resource OR we would need to setup code
-	// locations on the server and hope they dont get deleted
-	protected ClientResource createClientResource() throws URISyntaxException {
+	public ClientResource createClientResource() throws URISyntaxException {
 		return createClientResource(getBaseUrl());
 	}
 
-	/**
-	 * Create the Client Resource
-	 *
-	 */
-	private ClientResource createClientResource(final String providedUrl) throws URISyntaxException {
+	public ClientResource createClientResource(final String providedUrl) throws URISyntaxException {
 
 		final Context context = new Context();
 
@@ -307,60 +288,31 @@ public class HubIntRestService implements Serializable {
 	 * Retrieves a list of Hub Projects that may match the hubProjectName
 	 *
 	 */
-	public List<AutoCompleteItem> getProjectMatches(final String hubProjectName) throws IOException,
-	BDRestException, URISyntaxException {
+	public List<ProjectItem> getProjectMatches(final String projectName)
+			throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
-		resource.addSegment("v1");
-		resource.addSegment("autocomplete");
-		resource.addSegment("PROJECT");
-		resource.addQueryParameter("text", hubProjectName);
-		resource.addQueryParameter("limit", "30");
-		resource.addQueryParameter("ownership", "0");
-
+		resource.addSegment("projects");
+		resource.addQueryParameter("q", "name:" + projectName);
+		resource.addQueryParameter("limit", "15");
 		resource.setMethod(Method.GET);
 		handleRequest(resource, null, 0);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
 			final String response = readResponseAsString(resource.getResponse());
-
 			final Gson gson = new GsonBuilder().create();
-			return gson.fromJson(response, new TypeToken<List<AutoCompleteItem>>() {
+			final JsonObject json = gson.fromJson(response, JsonObject.class);
+			return gson.fromJson(json.get("items"), new TypeToken<List<ProjectItem>>() {
 			}.getType());
 
 		} else {
-			throw new BDRestException("There was a problem getting the project matches. Error Code: " + responseCode, resource);
+			throw new BDRestException("There was a problem getting the project matches. Error Code: " + responseCode,
+					resource);
 		}
 
 	}
 
-	/**
-	 * Gets the Hub Project that is specified by the projectId
-	 *
-	 */
-	public ProjectItem getProjectById(final String projectId) throws IOException,
-	BDRestException, URISyntaxException {
-		final ClientResource resource = createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("v1");
-		resource.addSegment("projects");
-		resource.addSegment(projectId);
-
-		resource.setMethod(Method.GET);
-		handleRequest(resource, null, 0);
-		final int responseCode = resource.getResponse().getStatus().getCode();
-
-		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-			final String response = readResponseAsString(resource.getResponse());
-			// logger.info(response);
-			final Gson gson = new GsonBuilder().create();
-			return gson.fromJson(response, ProjectItem.class);
-
-		} else {
-			throw new BDRestException("There was a problem getting the project for this Id. Error Code: " + responseCode, resource);
-		}
-	}
 
 	/**
 	 * Gets the Project that is specified by the projectName
@@ -370,9 +322,35 @@ public class HubIntRestService implements Serializable {
 	URISyntaxException, ProjectDoesNotExistException {
 		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
-		resource.addSegment("v1");
 		resource.addSegment("projects");
-		resource.addQueryParameter("name", projectName);
+		resource.addQueryParameter("q", "name:" + projectName);
+		resource.addQueryParameter("limit", "15");
+		resource.setMethod(Method.GET);
+		handleRequest(resource, null, 0);
+		final int responseCode = resource.getResponse().getStatus().getCode();
+
+		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+			final String response = readResponseAsString(resource.getResponse());
+			final Gson gson = new GsonBuilder().create();
+			final JsonObject json = gson.fromJson(response, JsonObject.class);
+			final List<ProjectItem> projects = gson.fromJson(json.get("items"), new TypeToken<List<ProjectItem>>() {
+			}.getType());
+
+			for (final ProjectItem project : projects) {
+				if (project.getName().equals(projectName)) {
+					return project;
+				}
+			}
+			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName, resource);
+		} else if (responseCode == 404) {
+			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName, resource);
+		} else {
+			throw new BDRestException("There was a problem getting a Project by this name. Project : " + projectName, resource);
+		}
+	}
+
+	public ProjectItem getProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
+		final ClientResource resource = createClientResource(projectUrl);
 		resource.setMethod(Method.GET);
 		handleRequest(resource, null, 0);
 		final int responseCode = resource.getResponse().getStatus().getCode();
@@ -382,27 +360,16 @@ public class HubIntRestService implements Serializable {
 			final Gson gson = new GsonBuilder().create();
 			return gson.fromJson(response, ProjectItem.class);
 
-		} else if (responseCode == 404) {
-			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName, resource);
 		} else {
-			throw new BDRestException("There was a problem getting a Project by this name. Project : " + projectName, resource);
+			throw new BDRestException("There was a problem getting the project. Error Code: " + responseCode,
+					resource);
 		}
+
 	}
 
-	/**
-	 * Gets the list of Versions for the specified Project
-	 *
-	 */
-	public List<ReleaseItem> getVersionsForProject(final String projectId) throws IOException,
-	BDRestException, URISyntaxException {
-
-		final ClientResource resource = createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("v1");
-		resource.addSegment("projects");
-		resource.addSegment(projectId);
-		resource.addSegment("releases");
-
+	public ReleaseItem getProjectVersion(final String versionUrl)
+			throws IOException, BDRestException, URISyntaxException {
+		final ClientResource resource = createClientResource(versionUrl);
 		resource.setMethod(Method.GET);
 		handleRequest(resource, null, 0);
 		final int responseCode = resource.getResponse().getStatus().getCode();
@@ -410,14 +377,51 @@ public class HubIntRestService implements Serializable {
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
 			final String response = readResponseAsString(resource.getResponse());
 			final Gson gson = new GsonBuilder().create();
-			final JsonObject releaseListJsonObj = gson.fromJson(response, JsonObject.class);
+			return gson.fromJson(response, ReleaseItem.class);
 
-			final Type listType = new TypeToken<ArrayList<ReleaseItem>>() {
-			}.getType();
+		} else {
+			throw new BDRestException("There was a problem getting the version. Error Code: " + responseCode,
+					resource);
+		}
 
-			final List<ReleaseItem> releasesList = gson.fromJson(releaseListJsonObj.get("items"), listType);
+	}
 
-			return releasesList;
+	/**
+	 * Gets the list of Versions for the specified Project
+	 *
+	 */
+	public ReleaseItem getVersion(final ProjectItem project, final String versionName)
+			throws IOException, BDRestException, URISyntaxException, VersionDoesNotExistException {
+		final List<ReleaseItem> versions = getVersionsForProject(project);
+		for (final ReleaseItem version : versions) {
+			if (version.getVersionName().equals(versionName)) {
+				return version;
+			}
+		}
+		throw new VersionDoesNotExistException(
+				"This Version does not exist. Project : " + project.getName() + " Version : " + versionName);
+	}
+
+	/**
+	 * Gets the list of Versions for the specified Project
+	 *
+	 */
+	public List<ReleaseItem> getVersionsForProject(final ProjectItem project)
+			throws IOException, BDRestException, URISyntaxException {
+		final ClientResource resource = createClientResource(project.getLink(ProjectItem.VERSION_LINK));
+		resource.setMethod(Method.GET);
+		handleRequest(resource, null, 0);
+		final int responseCode = resource.getResponse().getStatus().getCode();
+
+		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+			final String response = readResponseAsString(resource.getResponse());
+			final Gson gson = new GsonBuilder().create();
+
+			final JsonObject json = gson.fromJson(response, JsonObject.class);
+			final List<ReleaseItem> versions = gson.fromJson(json.get("items"), new TypeToken<List<ReleaseItem>>() {
+			}.getType());
+
+			return versions;
 
 		} else {
 			throw new BDRestException("There was a problem getting the versions for this Project. Error Code: " + responseCode, resource);
@@ -427,21 +431,16 @@ public class HubIntRestService implements Serializable {
 	/**
 	 * Creates a Hub Project with the specified name.
 	 *
+	 * @return the project URL.
 	 */
 	public String createHubProject(final String projectName) throws IOException, BDRestException,
-
 	URISyntaxException {
-
 		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
-		resource.addSegment("v1");
 		resource.addSegment("projects");
-
 		resource.setMethod(Method.POST);
 
-		final ProjectItem newProject = new ProjectItem();
-		newProject.setName(projectName);
-
+		final ProjectItem newProject = new ProjectItem(projectName, null, null);
 		final Gson gson = new GsonBuilder().create();
 		final StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
 		stringRep.setMediaType(MediaType.APPLICATION_JSON);
@@ -451,11 +450,17 @@ public class HubIntRestService implements Serializable {
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 201) {
+			if (resource.getResponse().getAttributes() == null || resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
+				throw new BDRestException("Could not get the response headers after creating the Project.", resource);
+			}
+			@SuppressWarnings("unchecked")
+			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+			final Header projectUrl = responseHeaders.getFirst("location", true);
 
-			final String response = readResponseAsString(resource.getResponse());
-			final ProjectItem project = gson.fromJson(response, ProjectItem.class);
-			return project.getId();
-
+			if (projectUrl == null || StringUtils.isBlank(projectUrl.getValue())) {
+				throw new BDRestException("Could not get the project URL from the response headers.", resource);
+			}
+			return projectUrl.getValue();
 		} else {
 
 			throw new BDRestException("There was a problem creating this Hub Project. Error Code: " + responseCode, resource);
@@ -464,22 +469,19 @@ public class HubIntRestService implements Serializable {
 	}
 
 	/**
-	 * Creates a new Version in the Project specified, using the phase and distribution provided
+	 * Creates a new Version in the Project specified, using the phase and
+	 * distribution provided.
+	 *
+	 * @return the version URL
 	 *
 	 */
-	public String createHubVersion(final String projectVersion, final String projectId, final String phase, final String dist)
-			throws IOException, BDRestException, URISyntaxException {
-		final ClientResource resource = createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("v1");
-		resource.addSegment("releases");
+	public String createHubVersion(final ProjectItem project, final String versionName, final String phase,
+			final String dist)
+					throws IOException, BDRestException, URISyntaxException {
+		final ClientResource resource = createClientResource(project.getLink(ProjectItem.VERSION_LINK));
 
 		int responseCode;
-		final ReleaseItem newRelease = new ReleaseItem();
-		newRelease.setProjectId(projectId);
-		newRelease.setVersion(projectVersion);
-		newRelease.setPhase(phase);
-		newRelease.setDistribution(dist);
+		final ReleaseItem newRelease = new ReleaseItem(versionName, phase, dist, null, null);
 
 		resource.setMethod(Method.POST);
 
@@ -492,55 +494,19 @@ public class HubIntRestService implements Serializable {
 		responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 201) {
+			if (resource.getResponse().getAttributes() == null || resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
+				throw new BDRestException("Could not get the response headers after creating the Version.", resource);
+			}
+			@SuppressWarnings("unchecked")
+			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+			final Header versionUrl = responseHeaders.getFirst("location", true);
 
-			final String response = readResponseAsString(resource.getResponse());
-			final ReleaseItem release = gson.fromJson(response, ReleaseItem.class);
-			return release.getId();
+			if (versionUrl == null || StringUtils.isBlank(versionUrl.getValue())) {
+				throw new BDRestException("Could not get the version URL from the response headers.", resource);
+			}
+			return versionUrl.getValue();
 		} else {
 			throw new BDRestException("There was a problem creating this Version for the specified Hub Project. Error Code: " + responseCode, resource);
-		}
-
-	}
-
-	/**
-	 * Creates a Hub Project and version with the specified information.
-	 *
-	 */
-	public String createHubProjectAndVersion(final String projectName, final String versionName, final String phase, final String dist) throws IOException,
-	BDRestException, URISyntaxException {
-		final ClientResource resource = createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("v1");
-		resource.addSegment("projects");
-
-		final ReleaseItem newRelease = new ReleaseItem();
-		newRelease.setVersion(versionName);
-		newRelease.setPhase(phase);
-		newRelease.setDistribution(dist);
-
-		resource.setMethod(Method.POST);
-
-		final ProjectItem newProject = new ProjectItem();
-		newProject.setName(projectName);
-		newProject.setReleaseItem(newRelease);
-
-		final Gson gson = new GsonBuilder().create();
-		final StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
-		stringRep.setMediaType(MediaType.APPLICATION_JSON);
-		stringRep.setCharacterSet(CharacterSet.UTF_8);
-		resource.getRequest().setEntity(stringRep);
-		handleRequest(resource, null, 0);
-		final int responseCode = resource.getResponse().getStatus().getCode();
-
-		if (responseCode == 201) {
-
-			final String response = readResponseAsString(resource.getResponse());
-			final ProjectItem project = gson.fromJson(response, ProjectItem.class);
-			return project.getId();
-
-		} else {
-
-			throw new BDRestException("There was a problem creating the specified Project and Version. Error Code: " + responseCode, resource);
 		}
 
 	}
@@ -602,12 +568,13 @@ public class HubIntRestService implements Serializable {
 	/**
 	 * Gets the code locations that match the host and paths provided
 	 *
+	 * @deprecated with Hub 3.0 should use the status files from the CLI
+	 *             instead. The CLI option is --statusWriteDir
 	 */
+	@Deprecated
 	public List<ScanLocationItem> getScanLocations(final String hostname, final List<String>
-
 	scanTargets) throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
 		final List<ScanLocationItem> codeLocations = new ArrayList<ScanLocationItem>();
-
 		ClientResource resource = null;
 		for (final String targetPath : scanTargets) {
 			String correctedTargetPath = targetPath;
@@ -620,10 +587,6 @@ public class HubIntRestService implements Serializable {
 			if (!correctedTargetPath.startsWith("/")) {
 				correctedTargetPath = "/" + correctedTargetPath;
 			}
-
-			// logger.debug(
-			// "Checking for the scan location with Host name: '" + hostname + "' and Path: '" + correctedTargetPath +
-			// "'");
 
 			resource = createClientResource();
 			resource.addSegment("api");
@@ -671,9 +634,7 @@ public class HubIntRestService implements Serializable {
 			if (path.endsWith("/")) {
 				path = path.substring(0, path.length() - 1);
 			}
-			// logger.trace("Comparing target : '" + targetPath + "' with path : '" + path + "'.");
 			if (targetPath.equals(path)) {
-				// logger.trace("MATCHED!");
 				return scanMatch;
 			}
 		}
@@ -684,18 +645,17 @@ public class HubIntRestService implements Serializable {
 	/**
 	 * Generates a new Hub report for the specified version.
 	 *
+	 * @return the Report URL
+	 *
 	 */
-	public String generateHubReport(final String versionId, final ReportFormatEnum reportFormat) throws IOException, BDRestException,
-	URISyntaxException {
+	public String generateHubReport(final ReleaseItem version, final ReportFormatEnum reportFormat)
+			throws IOException, BDRestException,
+			URISyntaxException {
 		if (ReportFormatEnum.UNKNOWN == reportFormat) {
 			throw new IllegalArgumentException("Can not generate a report of format : " + reportFormat);
 		}
 
-		final ClientResource resource = createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("versions");
-		resource.addSegment(versionId);
-		resource.addSegment("reports");
+		final ClientResource resource = createClientResource(version.getLink(ReleaseItem.VERSION_REPORT_LINK));
 
 		resource.setMethod(Method.POST);
 
@@ -730,40 +690,23 @@ public class HubIntRestService implements Serializable {
 		}
 	}
 
-	public String getReportIdFromReportUrl(final String reportUrl) {
-		// The report ID should be the last segment of the Url
-		final String[] segments = reportUrl.split("/");
-		return segments[segments.length - 1];
-	}
 
-	public int deleteHubReport(final String versionId, final String reportId) throws IOException, BDRestException,
+
+	public int deleteHubReport(final String reportUrl) throws IOException, BDRestException,
 	URISyntaxException {
 
-		final ClientResource resource = createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("versions");
-		resource.addSegment(versionId);
-		resource.addSegment("reports");
-		resource.addSegment(reportId);
-
+		final ClientResource resource = createClientResource(reportUrl);
 		resource.setMethod(Method.DELETE);
-
 		handleRequest(resource, null, 0);
 
 		final int responseCode = resource.getResponse().getStatus().getCode();
-
 		if (responseCode != 204) {
 			throw new BDRestException("There was a problem deleting this report. Error Code: " + responseCode, resource);
 		}
 		return responseCode;
 	}
 
-	/**
-	 * Get the links from the Report Url
-	 *
-	 */
-	public ReportMetaInformationItem getReportLinks(final String reportUrl) throws IOException, BDRestException,
-
+	public ReportInformationItem getReportInformation(final String reportUrl) throws IOException, BDRestException,
 	URISyntaxException {
 
 		final ClientResource resource = createClientResource(reportUrl);
@@ -787,7 +730,7 @@ public class HubIntRestService implements Serializable {
 		if (responseCode == 200) {
 			final String response = readResponseAsString(resource.getResponse());
 
-			return new Gson().fromJson(response, ReportMetaInformationItem.class);
+			return new Gson().fromJson(response, ReportInformationItem.class);
 		} else {
 			throw new BDRestException("There was a problem getting the links for the specified report. Error Code: " + responseCode, resource);
 		}
@@ -830,22 +773,13 @@ public class HubIntRestService implements Serializable {
 	 * Generates a new Hub report for the specified version.
 	 *
 	 */
-	public PolicyStatus getPolicyStatus(final String projectId, final String versionId) throws IOException, BDRestException,
-	URISyntaxException, MissingPolicyStatusException {
-		if (StringUtils.isBlank(projectId)) {
-			throw new IllegalArgumentException("Missing the project Id to get the policy status of.");
+	public PolicyStatus getPolicyStatus(final String policyStatusUrl)
+			throws IOException, BDRestException,
+			URISyntaxException, MissingPolicyStatusException {
+		if (StringUtils.isBlank(policyStatusUrl)) {
+			throw new IllegalArgumentException("Missing the policy status URL.");
 		}
-		if (StringUtils.isBlank(versionId)) {
-			throw new IllegalArgumentException("Missing the version Id to get the policy status of.");
-		}
-
-		final ClientResource resource = createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("projects");
-		resource.addSegment(projectId);
-		resource.addSegment("versions");
-		resource.addSegment(versionId);
-		resource.addSegment("policy-status");
+		final ClientResource resource = createClientResource(policyStatusUrl);
 
 		resource.setMethod(Method.GET);
 
