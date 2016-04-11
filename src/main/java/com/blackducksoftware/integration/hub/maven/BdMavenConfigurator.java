@@ -18,7 +18,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.maven;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -29,6 +28,7 @@ import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.Map;
 import java.util.Properties;
 import java.util.jar.JarFile;
@@ -88,7 +88,7 @@ public class BdMavenConfigurator {
 			if (resource == null) {
 				throw new BDMavenRetrieverException("Couldn't find maven version information in '" +
 						mavenHomeFile.getCanonicalPath()
-						+ "'. This may not be a valid Maven Home.");
+				+ "'. This may not be a valid Maven Home.");
 			}
 			logger.trace(resource.toString());
 			inputStream = resource.openStream();
@@ -187,7 +187,7 @@ public class BdMavenConfigurator {
 		}
 		if (!mavenHome.exists()) {
 			throw new IllegalArgumentException("mavenHome '" + mavenHome.getPath()
-					+ "' doesn't seem to exist on this node (or you don't have sufficient rights to access it)");
+			+ "' doesn't seem to exist on this node (or you don't have sufficient rights to access it)");
 		}
 		ClassWorld world = new ClassWorld();
 		if (classWorld != null) {
@@ -256,7 +256,7 @@ public class BdMavenConfigurator {
 			// OC4J apparently uses this. See http://www.nabble.com/Hudson-on-OC4J-tt16702113.html
 			resURL = resURL.substring("code-source:/".length(), resURL.lastIndexOf('!')); // cut off jar: and the file
 			// name portion
-			return new File(decode(new URL("file:/" + resURL).getPath()));
+			return new File(URLDecoder.decode(new URL("file:/" + resURL).getPath(), "UTF-8"));
 		}
 
 		if (resURL.startsWith("zip:")) {
@@ -264,7 +264,7 @@ public class BdMavenConfigurator {
 			// also see http://www.nabble.com/Re%3A-Hudson-on-Weblogic-10.3-td25038378.html#a25043415
 			resURL = resURL.substring("zip:".length(), resURL.lastIndexOf('!')); // cut off zip: and the file name
 			// portion
-			return new File(decode(new URL("file:" + resURL).getPath()));
+			return new File(URLDecoder.decode(new URL("file:" + resURL).getPath(), "UTF-8"));
 		}
 
 		if (resURL.startsWith("file:")) {
@@ -283,7 +283,7 @@ public class BdMavenConfigurator {
 			// won't work if res URL contains '%20'
 			// return new File(new URL(res).toURI());
 
-			return new File(decode(new URL(resURL).getPath()));
+			return new File(URLDecoder.decode(new URL(resURL).getPath(), "UTF-8"));
 		}
 
 		if (resURL.startsWith("vfszip:")) {
@@ -348,54 +348,9 @@ public class BdMavenConfigurator {
 		final String usableUrl = resURL.substring(resURL.indexOf(':') + 1, resURL.lastIndexOf('!')); // cut off "scheme:" and
 		// the file
 		// name portion
-		return new File(decode(new URL(usableUrl).getPath()));
+		return new File(URLDecoder.decode(new URL(usableUrl).getPath(), "UTF-8"));
 	}
 
-	/**
-	 * Code taken from : https://github.com/jenkinsci/lib-jenkins-maven-embedder.git
-	 *
-	 *
-	 */
-	private String decode(final String s) throws UnsupportedEncodingException {
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-		Character[] hexChars = new Character[2];
-		boolean isHex = false;
-
-		for (int i = 0; i < s.length(); i++) {
-			final char ch = s.charAt(i);
-			if (ch == '%') {
-				// The next 2 characters should be the hex value
-				isHex = true;
-				continue;
-			} else if (isHex) {
-				if (hexChars[0] == null) {
-					// First hex character
-					hexChars[0] = ch;
-					continue;
-				}
-				// Second hex character
-				hexChars[1] = ch;
-				baos.write(hexToInt(hexChars[0]) * 16 + hexToInt(hexChars[1]));
-				// Reset the buffer and boolean after we write the converted hex
-				hexChars = new Character[2];
-				isHex = false;
-				continue;
-
-			}
-
-			baos.write(ch);
-		}
-		return new String(baos.toByteArray(), "UTF-8");
-	}
-
-	/**
-	 * Code taken from : https://github.com/jenkinsci/lib-jenkins-maven-embedder.git
-	 *
-	 */
-	private int hexToInt(final int ch) {
-		return Character.getNumericValue(ch);
-	}
 
 	/**
 	 * Locates the necessary jars, workspace, and build Id that will be needed to build the build-info.json files. Will
@@ -412,9 +367,6 @@ public class BdMavenConfigurator {
 			File dependencyRecorderJar = null;
 			File buildInfo = null;
 			File slf4jJar = null;
-			// File log4jJar = null;
-			// File slf4jJDKBindingJar = null;
-			// File commonApiJar = null;
 			File gsonJar = null;
 			String propertyBuildId = null;
 			String propertyWorkingDirectory = null;
@@ -464,7 +416,6 @@ public class BdMavenConfigurator {
 				System.setProperty(propertyWorkingDirectory, workDirectory + File.separator + checkoutDirectory);
 			}
 
-			// log4jJar = jarFile(Logger.class);
 			buildInfo = jarFile(BuildInfo.class);
 			gsonJar = jarFile(Gson.class);
 
@@ -477,9 +428,6 @@ public class BdMavenConfigurator {
 			if (slf4jJar != null) {
 				appendClasspath(slf4jJar.getCanonicalPath(), mavenExtClasspath);
 			}
-			// if (log4jJar != null) {
-			// appendClasspath(log4jJar.getCanonicalPath(), mavenExtClasspath);
-			// }
 			if (gsonJar != null) {
 				appendClasspath(gsonJar.getCanonicalPath(), mavenExtClasspath);
 			}
