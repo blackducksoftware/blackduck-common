@@ -1,0 +1,10 @@
+language: java
+notifications:
+  email:
+    recipients:
+      - akamen@blackducksoftware.com
+      - jrichard@blackducksoftware.com
+      
+install: true
+script:
+  - mvn package
