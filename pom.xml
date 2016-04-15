@@ -34,24 +34,22 @@
       <url>http://maven.restlet.org</url>
     </repository>
     <repository>
-      <id>bintray-bds-integration</id>
-      <url>http://dl.bintray.com/bds/integration/</url>
-    </repository>
-    <repository>
-      <id>bds-int-public</id>
-      <url>https://updates.suite.blackducksoftware.com/bdosvr/</url>
+        <id>bds-int-public</id>
+        <url>https://updates.suite.blackducksoftware.com/integrations/</url>
     </repository>
   </repositories>
+
   <distributionManagement>
     <repository>
-      <id>bds-int-public</id>
-      <url>https://updates.suite.blackducksoftware.com/bdosvr/</url>
+        <id>bds-int-public</id>
+        <url>https://updates.suite.blackducksoftware.com/integrations/</url>
     </repository>
     <snapshotRepository>
-      <id>bds-int-public</id>
-      <url>https://updates.suite.blackducksoftware.com/bdosvr/</url>
+        <id>bds-int-public</id>
+        <url>https://updates.suite.blackducksoftware.com/integrations/</url>
     </snapshotRepository>
   </distributionManagement>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <build.info.version>2.0.2</build.info.version>
@@ -73,8 +71,8 @@
       <version>${build.info.version}</version>
       <exclusions>
         <exclusion>
-          <groupId>org.eclipse.aether</groupId>
-          <artifactId>aether-api</artifactId>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -168,12 +166,41 @@
           <configuration>
             <classpathContainers>
               <classpathContainer>
-								org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6
-							</classpathContainer>
+                                org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6
+                            </classpathContainer>
             </classpathContainers>
             <source>1.6</source>
             <target>1.6</target>
           </configuration>
+        </plugin>
+        <plugin>
+            <!--This plugin's configuration is used to store Eclipse m2e settings 
+                only. It has no influence on the Maven build itself. -->
+            <groupId>org.eclipse.m2e</groupId>
+            <artifactId>lifecycle-mapping</artifactId>
+            <version>1.0.0</version>
+            <configuration>
+                <lifecycleMappingMetadata>
+                    <pluginExecutions>
+                        <pluginExecution>
+                            <pluginExecutionFilter>
+                                <groupId>org.jacoco</groupId>
+                                <artifactId>jacoco-maven-plugin</artifactId>
+                                <versionRange>[0.5,)
+                                </versionRange>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </pluginExecutionFilter>
+                            <action>
+                                <!-- m2e doesn't know what to do with jacoco, let's ignore it or 
+                                    annoying error markers appear see http://wiki.eclipse.org/M2E_plugin_execution_not_covered -->
+                                <ignore />
+                            </action>
+                        </pluginExecution>
+                    </pluginExecutions>
+                </lifecycleMappingMetadata>
+            </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -204,23 +231,23 @@
           </executions>
         </plugin>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.10</version>
-          <executions>
-            <execution>
-              <id>copy-dependencies</id>
-              <phase>package</phase>
-              <goals>
-                <goal>copy-dependencies</goal>
-              </goals>
-              <configuration>
-                <includeScope>compile</includeScope>
-                <useSubDirectoryPerScope>true</useSubDirectoryPerScope>
-                <outputDirectory>${project.build.directory}/libs</outputDirectory>
-              </configuration>
-            </execution>
-          </executions>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.10</version>
+            <executions>
+                <execution>
+                    <id>copy-dependencies</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>copy-dependencies</goal>
+                    </goals>
+                    <configuration>
+                        <includeScope>compile</includeScope>
+                        <useSubDirectoryPerScope>true</useSubDirectoryPerScope>
+                        <outputDirectory>${project.build.directory}/libs</outputDirectory>
+                    </configuration>
+                </execution>
+            </executions>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -245,32 +272,32 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>2.4</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.1</version>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+       <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.4</version>
+            <executions>
+                <execution>
+                    <id>attach-sources</id>
+                    <goals>
+                        <goal>jar</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.10.1</version>
+            <executions>
+                <execution>
+                    <id>attach-javadocs</id>
+                    <goals>
+                        <goal>jar</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
