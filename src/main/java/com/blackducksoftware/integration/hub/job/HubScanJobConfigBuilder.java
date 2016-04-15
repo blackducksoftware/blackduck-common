@@ -61,10 +61,11 @@ public class HubScanJobConfigBuilder {
 	public HubScanJobConfig build(final IntLogger logger) throws HubIntegrationException, IOException {
 		assertValid(logger);
 
-		final ImmutableList<String> immutableScanTargetPaths = new ImmutableList.Builder<String>().addAll(scanTargetPaths).build();
+		final ImmutableList<String> immutableScanTargetPaths = new ImmutableList.Builder<String>()
+				.addAll(scanTargetPaths).build();
 
-		return new HubScanJobConfig(projectName, version, phase, distribution, workingDirectory, scanMemory, shouldGenerateRiskReport,
-				maxWaitTimeForBomUpdate, immutableScanTargetPaths);
+		return new HubScanJobConfig(projectName, version, phase, distribution, workingDirectory, scanMemory,
+				shouldGenerateRiskReport, maxWaitTimeForBomUpdate, immutableScanTargetPaths);
 	}
 
 	public void assertValid(final IntLogger logger) throws HubIntegrationException, IOException {
@@ -91,7 +92,8 @@ public class HubScanJobConfigBuilder {
 		}
 
 		if (!valid) {
-			throw new HubIntegrationException("The configuration is not valid - please check the log for the specific issues.");
+			throw new HubIntegrationException(
+					"The configuration is not valid - please check the log for the specific issues.");
 		}
 	}
 
@@ -100,10 +102,30 @@ public class HubScanJobConfigBuilder {
 
 		if (null == projectName && null == version) {
 			logger.warn("No Project name or Version were found. Any scans run will not be mapped to a Version.");
-		} else if (null == projectName) {
+		} else if (!validateProject(logger)) {
+			valid = false;
+		} else if (!validateVersion(logger)) {
+			valid = false;
+		}
+
+		return valid;
+	}
+
+	public boolean validateProject(final IntLogger logger) throws IOException {
+		boolean valid = true;
+
+		if (null == projectName) {
 			valid = false;
 			logger.error("No Project name was found.");
-		} else if (null == version) {
+		}
+
+		return valid;
+	}
+
+	public boolean validateVersion(final IntLogger logger) throws IOException {
+		boolean valid = true;
+
+		if (null == version) {
 			valid = false;
 			logger.error("No Version was found.");
 		}
@@ -162,8 +184,9 @@ public class HubScanJobConfigBuilder {
 	}
 
 	/**
-	 * If running this validation outside of a Build, make sure you run disableScanTargetPathExistenceCheck() because
-	 * the targets may not exist yet.
+	 * If running this validation outside of a Build, make sure you run
+	 * disableScanTargetPathExistenceCheck() because the targets may not exist
+	 * yet.
 	 *
 	 */
 	public boolean validateScanTargetPaths(final IntLogger logger) throws IOException {
@@ -188,8 +211,10 @@ public class HubScanJobConfigBuilder {
 
 			if (!disableScanTargetPathExistenceCheck) {
 				if (StringUtils.isNotBlank(targetPath)) {
-					// If the targetPath is blank then it will be set to the defaultTargetPath during the build
-					// Since we dont know the defaultTargetPath at this point we only validate non blank entries
+					// If the targetPath is blank then it will be set to the
+					// defaultTargetPath during the build
+					// Since we dont know the defaultTargetPath at this point we
+					// only validate non blank entries
 					final File target = new File(targetPath);
 					if (null == target || !target.exists()) {
 						logger.error("The scan target '" + target.getAbsolutePath() + "' does not exist.");

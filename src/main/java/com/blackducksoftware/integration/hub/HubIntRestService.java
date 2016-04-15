@@ -68,6 +68,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class HubIntRestService {
@@ -114,7 +115,8 @@ public class HubIntRestService {
 				sunAuthCache = Class.forName("sun.net.www.protocol.http.AuthCache");
 				sunAuthCacheImpl = Class.forName("sun.net.www.protocol.http.AuthCacheImpl");
 			} catch (final Exception e) {
-				// Must not be using a JDK with sun classes so we abandon this reset since it is sun specific
+				// Must not be using a JDK with sun classes so we abandon this
+				// reset since it is sun specific
 				return;
 			}
 
@@ -131,12 +133,12 @@ public class HubIntRestService {
 	}
 
 	/**
-	 * The proxy settings get set as System properties.
-	 * I.E. https.proxyHost, https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
+	 * The proxy settings get set as System properties. I.E. https.proxyHost,
+	 * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
 	 *
 	 */
-	public void setProxyProperties(final String proxyHost, final int proxyPort, final List<Pattern> noProxyHosts, final String proxyUsername,
-			final String proxyPassword) {
+	public void setProxyProperties(final String proxyHost, final int proxyPort, final List<Pattern> noProxyHosts,
+			final String proxyUsername, final String proxyPassword) {
 
 		cleanUpOldProxySettings();
 
@@ -190,7 +192,8 @@ public class HubIntRestService {
 
 		final Context context = new Context();
 
-		// the socketTimeout parameter is used in the httpClient extension that we do not use
+		// the socketTimeout parameter is used in the httpClient extension that
+		// we do not use
 		// We can probably remove this parameter
 		final String stringTimeout = String.valueOf(timeout);
 
@@ -198,7 +201,8 @@ public class HubIntRestService {
 
 		context.getParameters().add("socketConnectTimeoutMs", stringTimeout);
 		context.getParameters().add("readTimeout", stringTimeout);
-		// Should throw timeout exception after the specified timeout, default is 2 minutes
+		// Should throw timeout exception after the specified timeout, default
+		// is 2 minutes
 
 		final ClientResource resource = new ClientResource(context, new URI(providedUrl));
 		resource.getRequest().setCookies(getCookies());
@@ -206,8 +210,8 @@ public class HubIntRestService {
 	}
 
 	/**
-	 * Clears the previously set System properties
-	 * I.E. https.proxyHost, https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
+	 * Clears the previously set System properties I.E. https.proxyHost,
+	 * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
 	 *
 	 */
 	private void cleanUpOldProxySettings() {
@@ -234,11 +238,12 @@ public class HubIntRestService {
 			if (StringUtils.isBlank(proxyChallengeRequest.getRealm()) && trimmedCurrentValue.startsWith("realm=")) {
 				final String realm = trimmedCurrentValue.substring("realm=".length());
 				proxyChallengeRequest.setRealm(realm);
-			} else if (StringUtils.isBlank(proxyChallengeRequest.getServerNonce()) && trimmedCurrentValue.startsWith("nonce=")) {
+			} else if (StringUtils.isBlank(proxyChallengeRequest.getServerNonce())
+					&& trimmedCurrentValue.startsWith("nonce=")) {
 				final String nonce = trimmedCurrentValue.substring("nonce=".length());
 				proxyChallengeRequest.setServerNonce(nonce);
-			} else if ((proxyChallengeRequest.getQualityOptions() == null || proxyChallengeRequest.getQualityOptions().isEmpty())
-					&& trimmedCurrentValue.startsWith("qop=")) {
+			} else if ((proxyChallengeRequest.getQualityOptions() == null
+					|| proxyChallengeRequest.getQualityOptions().isEmpty()) && trimmedCurrentValue.startsWith("qop=")) {
 				final String qop = trimmedCurrentValue.substring("qop=".length());
 				final List<String> qualityOptions = new ArrayList<String>();
 				qualityOptions.add(qop);
@@ -251,11 +256,12 @@ public class HubIntRestService {
 	}
 
 	/**
-	 * Gets the cookie for the Authorized connection to the Hub server. Returns the response code from the connection.
+	 * Gets the cookie for the Authorized connection to the Hub server. Returns
+	 * the response code from the connection.
 	 *
 	 */
-	public int setCookies(final String hubUserName, final String hubPassword) throws HubIntegrationException,
-	URISyntaxException, BDRestException {
+	public int setCookies(final String hubUserName, final String hubPassword)
+			throws HubIntegrationException, URISyntaxException, BDRestException {
 
 		final ClientResource resource = createClientResource();
 		resource.addSegment("j_spring_security_check");
@@ -272,7 +278,8 @@ public class HubIntRestService {
 			if (cookies == null) {
 				final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
 				if (cookieSettings == null || cookieSettings.size() == 0) {
-					throw new HubIntegrationException("Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
+					throw new HubIntegrationException(
+							"Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
 				}
 
 				final Series<Cookie> requestCookies = resource.getRequest().getCookies();
@@ -317,7 +324,8 @@ public class HubIntRestService {
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
 			final String response = readResponseAsString(resource.getResponse());
 			final Gson gson = new GsonBuilder().create();
-			final JsonObject json = gson.fromJson(response, JsonObject.class);
+			final JsonParser parser = new JsonParser();
+			final JsonObject json = parser.parse(response).getAsJsonObject();
 			return gson.fromJson(json.get("items"), new TypeToken<List<ProjectItem>>() {
 			}.getType());
 
@@ -328,13 +336,12 @@ public class HubIntRestService {
 
 	}
 
-
 	/**
 	 * Gets the Project that is specified by the projectName
 	 *
 	 */
-	public ProjectItem getProjectByName(final String projectName) throws IOException, BDRestException,
-	URISyntaxException, ProjectDoesNotExistException {
+	public ProjectItem getProjectByName(final String projectName)
+			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
 		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
 		resource.addSegment("projects");
@@ -347,7 +354,8 @@ public class HubIntRestService {
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
 			final String response = readResponseAsString(resource.getResponse());
 			final Gson gson = new GsonBuilder().create();
-			final JsonObject json = gson.fromJson(response, JsonObject.class);
+			final JsonParser parser = new JsonParser();
+			final JsonObject json = parser.parse(response).getAsJsonObject();
 			final List<ProjectItem> projects = gson.fromJson(json.get("items"), new TypeToken<List<ProjectItem>>() {
 			}.getType());
 
@@ -357,10 +365,13 @@ public class HubIntRestService {
 				}
 			}
 			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName, resource);
-		} else if (responseCode == 404) {
+		} else if (responseCode == 404)
+
+		{
 			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName, resource);
 		} else {
-			throw new BDRestException("There was a problem getting a Project by this name. Project : " + projectName, resource);
+			throw new BDRestException("There was a problem getting a Project by this name. Project : " + projectName,
+					resource);
 		}
 	}
 
@@ -376,8 +387,7 @@ public class HubIntRestService {
 			return gson.fromJson(response, ProjectItem.class);
 
 		} else {
-			throw new BDRestException("There was a problem getting the project. Error Code: " + responseCode,
-					resource);
+			throw new BDRestException("There was a problem getting the project. Error Code: " + responseCode, resource);
 		}
 
 	}
@@ -395,8 +405,7 @@ public class HubIntRestService {
 			return gson.fromJson(response, ReleaseItem.class);
 
 		} else {
-			throw new BDRestException("There was a problem getting the version. Error Code: " + responseCode,
-					resource);
+			throw new BDRestException("There was a problem getting the version. Error Code: " + responseCode, resource);
 		}
 
 	}
@@ -430,16 +439,18 @@ public class HubIntRestService {
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
 			final String response = readResponseAsString(resource.getResponse());
-			final Gson gson = new GsonBuilder().create();
 
-			final JsonObject json = gson.fromJson(response, JsonObject.class);
+			final Gson gson = new GsonBuilder().create();
+			final JsonParser parser = new JsonParser();
+			final JsonObject json = parser.parse(response).getAsJsonObject();
 			final List<ReleaseItem> versions = gson.fromJson(json.get("items"), new TypeToken<List<ReleaseItem>>() {
 			}.getType());
 
 			return versions;
 
 		} else {
-			throw new BDRestException("There was a problem getting the versions for this Project. Error Code: " + responseCode, resource);
+			throw new BDRestException(
+					"There was a problem getting the versions for this Project. Error Code: " + responseCode, resource);
 		}
 	}
 
@@ -448,8 +459,7 @@ public class HubIntRestService {
 	 *
 	 * @return the project URL.
 	 */
-	public String createHubProject(final String projectName) throws IOException, BDRestException,
-	URISyntaxException {
+	public String createHubProject(final String projectName) throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
 		resource.addSegment("projects");
@@ -465,11 +475,13 @@ public class HubIntRestService {
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 201) {
-			if (resource.getResponse().getAttributes() == null || resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
+			if (resource.getResponse().getAttributes() == null
+					|| resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
 				throw new BDRestException("Could not get the response headers after creating the Project.", resource);
 			}
 			@SuppressWarnings("unchecked")
-			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header projectUrl = responseHeaders.getFirst("location", true);
 
 			if (projectUrl == null || StringUtils.isBlank(projectUrl.getValue())) {
@@ -478,7 +490,8 @@ public class HubIntRestService {
 			return projectUrl.getValue();
 		} else {
 
-			throw new BDRestException("There was a problem creating this Hub Project. Error Code: " + responseCode, resource);
+			throw new BDRestException("There was a problem creating this Hub Project. Error Code: " + responseCode,
+					resource);
 		}
 
 	}
@@ -491,8 +504,7 @@ public class HubIntRestService {
 	 *
 	 */
 	public String createHubVersion(final ProjectItem project, final String versionName, final String phase,
-			final String dist)
-					throws IOException, BDRestException, URISyntaxException {
+			final String dist) throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = createClientResource(project.getLink(ProjectItem.VERSION_LINK));
 
 		int responseCode;
@@ -509,11 +521,13 @@ public class HubIntRestService {
 		responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 201) {
-			if (resource.getResponse().getAttributes() == null || resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
+			if (resource.getResponse().getAttributes() == null
+					|| resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
 				throw new BDRestException("Could not get the response headers after creating the Version.", resource);
 			}
 			@SuppressWarnings("unchecked")
-			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header versionUrl = responseHeaders.getFirst("location", true);
 
 			if (versionUrl == null || StringUtils.isBlank(versionUrl.getValue())) {
@@ -521,7 +535,10 @@ public class HubIntRestService {
 			}
 			return versionUrl.getValue();
 		} else {
-			throw new BDRestException("There was a problem creating this Version for the specified Hub Project. Error Code: " + responseCode, resource);
+			throw new BDRestException(
+					"There was a problem creating this Version for the specified Hub Project. Error Code: "
+							+ responseCode,
+					resource);
 		}
 
 	}
@@ -545,7 +562,8 @@ public class HubIntRestService {
 			final Response resp = resource.getResponse();
 			return resp.getEntityAsText();
 		} else {
-			throw new BDRestException("There was a problem getting the version of the Hub server. Error Code: " + responseCode, resource);
+			throw new BDRestException(
+					"There was a problem getting the version of the Hub server. Error Code: " + responseCode, resource);
 		}
 	}
 
@@ -553,8 +571,8 @@ public class HubIntRestService {
 	 * Compares the specified version with the actual version of the Hub server.
 	 *
 	 */
-	public VersionComparison compareWithHubVersion(final String version) throws IOException,
-	BDRestException, URISyntaxException {
+	public VersionComparison compareWithHubVersion(final String version)
+			throws IOException, BDRestException, URISyntaxException {
 
 		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
@@ -575,7 +593,9 @@ public class HubIntRestService {
 			final VersionComparison comparison = gson.fromJson(response, VersionComparison.class);
 			return comparison;
 		} else {
-			throw new BDRestException("There was a problem comparing the specified version to the version of the Hub server. Error Code: " + responseCode,
+			throw new BDRestException(
+					"There was a problem comparing the specified version to the version of the Hub server. Error Code: "
+							+ responseCode,
 					resource);
 		}
 	}
@@ -587,8 +607,8 @@ public class HubIntRestService {
 	 *             instead. The CLI option is --statusWriteDir
 	 */
 	@Deprecated
-	public List<ScanLocationItem> getScanLocations(final String hostname, final List<String>
-	scanTargets) throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
+	public List<ScanLocationItem> getScanLocations(final String hostname, final List<String> scanTargets)
+			throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
 		final List<ScanLocationItem> codeLocations = new ArrayList<ScanLocationItem>();
 		ClientResource resource = null;
 		for (final String targetPath : scanTargets) {
@@ -619,14 +639,18 @@ public class HubIntRestService {
 			if (responseCode == 200) {
 				final String response = readResponseAsString(resource.getResponse());
 				final ScanLocationResults results = new Gson().fromJson(response, ScanLocationResults.class);
-				final ScanLocationItem currentCodeLocation = getScanLocationMatch(hostname, correctedTargetPath, results);
+				final ScanLocationItem currentCodeLocation = getScanLocationMatch(hostname, correctedTargetPath,
+						results);
 				if (currentCodeLocation == null) {
-					throw new HubIntegrationException("Could not determine the code location for the Host : " + hostname + " and Path : " + correctedTargetPath);
+					throw new HubIntegrationException("Could not determine the code location for the Host : " + hostname
+							+ " and Path : " + correctedTargetPath);
 				}
 
 				codeLocations.add(currentCodeLocation);
 			} else {
-				throw new BDRestException("There was a problem getting the code locations for the host and paths provided. Error Code: " + responseCode,
+				throw new BDRestException(
+						"There was a problem getting the code locations for the host and paths provided. Error Code: "
+								+ responseCode,
 						resource);
 			}
 
@@ -634,7 +658,8 @@ public class HubIntRestService {
 		return codeLocations;
 	}
 
-	private ScanLocationItem getScanLocationMatch(final String hostname, final String scanTarget, final ScanLocationResults results) {
+	private ScanLocationItem getScanLocationMatch(final String hostname, final String scanTarget,
+			final ScanLocationResults results) {
 		String targetPath = scanTarget;
 
 		if (targetPath.endsWith("/")) {
@@ -664,8 +689,7 @@ public class HubIntRestService {
 	 *
 	 */
 	public String generateHubReport(final ReleaseItem version, final ReportFormatEnum reportFormat)
-			throws IOException, BDRestException,
-			URISyntaxException {
+			throws IOException, BDRestException, URISyntaxException {
 		if (ReportFormatEnum.UNKNOWN == reportFormat) {
 			throw new IllegalArgumentException("Can not generate a report of format : " + reportFormat);
 		}
@@ -687,11 +711,13 @@ public class HubIntRestService {
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 201) {
-			if (resource.getResponse().getAttributes() == null || resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
+			if (resource.getResponse().getAttributes() == null
+					|| resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
 				throw new BDRestException("Could not get the response headers after creating the report.", resource);
 			}
 			@SuppressWarnings("unchecked")
-			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header reportUrl = responseHeaders.getFirst("location", true);
 
 			if (reportUrl == null || StringUtils.isBlank(reportUrl.getValue())) {
@@ -701,14 +727,12 @@ public class HubIntRestService {
 			return reportUrl.getValue();
 
 		} else {
-			throw new BDRestException("There was a problem generating a report for this Version. Error Code: " + responseCode, resource);
+			throw new BDRestException(
+					"There was a problem generating a report for this Version. Error Code: " + responseCode, resource);
 		}
 	}
 
-
-
-	public int deleteHubReport(final String reportUrl) throws IOException, BDRestException,
-	URISyntaxException {
+	public int deleteHubReport(final String reportUrl) throws IOException, BDRestException, URISyntaxException {
 
 		final ClientResource resource = createClientResource(reportUrl);
 		resource.setMethod(Method.DELETE);
@@ -716,18 +740,20 @@ public class HubIntRestService {
 
 		final int responseCode = resource.getResponse().getStatus().getCode();
 		if (responseCode != 204) {
-			throw new BDRestException("There was a problem deleting this report. Error Code: " + responseCode, resource);
+			throw new BDRestException("There was a problem deleting this report. Error Code: " + responseCode,
+					resource);
 		}
 		return responseCode;
 	}
 
-	public ReportInformationItem getReportInformation(final String reportUrl) throws IOException, BDRestException,
-	URISyntaxException {
+	public ReportInformationItem getReportInformation(final String reportUrl)
+			throws IOException, BDRestException, URISyntaxException {
 
 		final ClientResource resource = createClientResource(reportUrl);
 
 		@SuppressWarnings("unchecked")
-		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
+				.get(HeaderConstants.ATTRIBUTE_HEADERS);
 		if (requestHeaders == null) {
 			requestHeaders = new Series<Header>(Header.class);
 			resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
@@ -747,7 +773,9 @@ public class HubIntRestService {
 
 			return new Gson().fromJson(response, ReportInformationItem.class);
 		} else {
-			throw new BDRestException("There was a problem getting the links for the specified report. Error Code: " + responseCode, resource);
+			throw new BDRestException(
+					"There was a problem getting the links for the specified report. Error Code: " + responseCode,
+					resource);
 		}
 
 	}
@@ -756,8 +784,8 @@ public class HubIntRestService {
 	 * Gets the content of the report
 	 *
 	 */
-	public VersionReport getReportContent(final String reportContentUrl) throws IOException, BDRestException,
-	URISyntaxException {
+	public VersionReport getReportContent(final String reportContentUrl)
+			throws IOException, BDRestException, URISyntaxException {
 
 		final ClientResource resource = createClientResource(reportContentUrl);
 
@@ -779,7 +807,8 @@ public class HubIntRestService {
 
 			return report;
 		} else {
-			throw new BDRestException("There was a problem getting the content of this Report. Error Code: " + responseCode, resource);
+			throw new BDRestException(
+					"There was a problem getting the content of this Report. Error Code: " + responseCode, resource);
 		}
 
 	}
@@ -789,8 +818,7 @@ public class HubIntRestService {
 	 *
 	 */
 	public PolicyStatus getPolicyStatus(final String policyStatusUrl)
-			throws IOException, BDRestException,
-			URISyntaxException, MissingPolicyStatusException {
+			throws IOException, BDRestException, URISyntaxException, MissingPolicyStatusException {
 		if (StringUtils.isBlank(policyStatusUrl)) {
 			throw new IllegalArgumentException("Missing the policy status URL.");
 		}
@@ -810,17 +838,19 @@ public class HubIntRestService {
 			return status;
 		}
 		if (responseCode == 404) {
-			throw new MissingPolicyStatusException("There was no policy status found for this version. The BOM may be empty.");
+			throw new MissingPolicyStatusException(
+					"There was no policy status found for this version. The BOM may be empty.");
 		} else {
-			throw new BDRestException("There was a problem getting the policy status. Error Code: " + responseCode, resource);
+			throw new BDRestException("There was a problem getting the policy status. Error Code: " + responseCode,
+					resource);
 		}
 	}
 
 	/**
 	 * Gets the content of the scanStatus at the provided url
 	 */
-	public ScanStatusToPoll checkScanStatus(final String scanStatusUrl) throws IOException, BDRestException,
-	URISyntaxException {
+	public ScanStatusToPoll checkScanStatus(final String scanStatusUrl)
+			throws IOException, BDRestException, URISyntaxException {
 
 		final ClientResource resource = createClientResource(scanStatusUrl);
 
@@ -837,7 +867,8 @@ public class HubIntRestService {
 			final ScanStatusToPoll status = gson.fromJson(response, ScanStatusToPoll.class);
 			return status;
 		} else {
-			throw new BDRestException("There was a problem getting the scan status. Error Code: " + responseCode, resource);
+			throw new BDRestException("There was a problem getting the scan status. Error Code: " + responseCode,
+					resource);
 		}
 
 	}
@@ -861,19 +892,20 @@ public class HubIntRestService {
 	private void handleRequest(final ClientResource resource, final ChallengeRequest proxyChallengeRequest,
 			final int attempt) throws BDRestException {
 		if (proxyChallengeRequest != null) {
-			// This should replace the authenticator for the proxy authentication
+			// This should replace the authenticator for the proxy
+			// authentication
 			// BUT it doesn't work for Digest authentication
 			parseChallengeRequestRawValue(proxyChallengeRequest);
 			resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-					proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null,
-					null, proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(),
-					0, 0L));
+					proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null, null,
+					proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(), 0,
+					0L));
 		}
 		try {
 			resource.handle();
 		} catch (final ResourceException e) {
-			if (resource.getProxyChallengeRequests() != null && !resource.getProxyChallengeRequests().isEmpty() && StringUtils.isNotBlank(proxyUsername)
-					&& StringUtils.isNotBlank(proxyPassword)) {
+			if (resource.getProxyChallengeRequests() != null && !resource.getProxyChallengeRequests().isEmpty()
+					&& StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
 
 				final ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
 				if (attempt < 2) {
