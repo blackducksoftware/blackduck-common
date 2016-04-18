@@ -37,7 +37,6 @@ import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.Cookie;
-import org.restlet.data.CookieSetting;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.engine.header.Header;
@@ -276,26 +275,11 @@ public class HubIntRestService {
 		final int statusCode = resource.getResponse().getStatus().getCode();
 		if (statusCode == 204) {
 			if (cookies == null) {
-				final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
-				if (cookieSettings == null || cookieSettings.size() == 0) {
+				final Series<Cookie> requestCookies = resource.getRequest().getCookies();
+				if (requestCookies == null || requestCookies.size() == 0) {
 					throw new HubIntegrationException(
 							"Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
 				}
-
-				final Series<Cookie> requestCookies = resource.getRequest().getCookies();
-				for (final CookieSetting ck : cookieSettings) {
-					if (ck == null) {
-						continue;
-					}
-					final Cookie cookie = new Cookie();
-					cookie.setName(ck.getName());
-					cookie.setDomain(ck.getDomain());
-					cookie.setPath(ck.getPath());
-					cookie.setValue(ck.getValue());
-					cookie.setVersion(ck.getVersion());
-					requestCookies.add(cookie);
-				}
-
 				cookies = requestCookies;
 			}
 		} else {
