@@ -19,16 +19,13 @@
 package com.blackducksoftware.integration.hub.exception;
 
 public class VersionDoesNotExistException extends Exception {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -8995234287320903940L;
 
-
-	public VersionDoesNotExistException(final String message)
-	{
+	public VersionDoesNotExistException(final String message) {
 		super(message);
 	}
 
-	public VersionDoesNotExistException(final String message, final Throwable cause)
-	{
+	public VersionDoesNotExistException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 
