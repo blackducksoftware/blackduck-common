@@ -259,11 +259,12 @@ public class HubScanJobConfigBuilder {
 	}
 
 	public void setMaxWaitTimeForBomUpdate(final String maxWaitTimeForBomUpdate) {
+		final String maxWaitTimeForBomUpdateString = StringUtils.trimToNull(maxWaitTimeForBomUpdate);
 		try {
-			final Integer maxWaitTimeForBomUpdateValue = Integer.valueOf(maxWaitTimeForBomUpdate);
+			final Integer maxWaitTimeForBomUpdateValue = Integer.valueOf(maxWaitTimeForBomUpdateString);
 			setMaxWaitTimeForBomUpdate(maxWaitTimeForBomUpdateValue);
 		} catch (final NumberFormatException e) {
-			throw new IllegalArgumentException("The String : " + maxWaitTimeForBomUpdate + " , is not an Integer.");
+			throw new IllegalArgumentException("The String : " + maxWaitTimeForBomUpdate + " , is not an Integer.", e);
 		}
 	}
 
@@ -272,11 +273,12 @@ public class HubScanJobConfigBuilder {
 	}
 
 	public void setScanMemory(final String scanMemory) {
+		final String scanMemoryString = StringUtils.trimToNull(scanMemory);
 		try {
-			final Integer scanMemoryValue = Integer.valueOf(scanMemory);
+			final Integer scanMemoryValue = Integer.valueOf(scanMemoryString);
 			setScanMemory(scanMemoryValue);
 		} catch (final NumberFormatException e) {
-			throw new IllegalArgumentException("The String : " + scanMemory + " , is not an Integer.");
+			throw new IllegalArgumentException("The String : " + scanMemory + " , is not an Integer.", e);
 		}
 	}
 

@@ -28,9 +28,10 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 public class IntBufferedLogger implements IntLogger {
-	private static final Map<LogLevel, List<String>> outputMap = new HashMap<LogLevel, List<String>>();
+	private final Map<LogLevel, List<String>> outputMap = new HashMap<LogLevel, List<String>>();
 
-	static {
+
+	public IntBufferedLogger(){
 		outputMap.put(LogLevel.ERROR, new ArrayList<String>());
 		outputMap.put(LogLevel.WARN, new ArrayList<String>());
 		outputMap.put(LogLevel.INFO, new ArrayList<String>());
