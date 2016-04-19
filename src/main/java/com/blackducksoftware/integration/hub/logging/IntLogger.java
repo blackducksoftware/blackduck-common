@@ -19,7 +19,6 @@
 package com.blackducksoftware.integration.hub.logging;
 
 public interface IntLogger {
-
 	void info(String txt);
 
 	void error(Throwable e);

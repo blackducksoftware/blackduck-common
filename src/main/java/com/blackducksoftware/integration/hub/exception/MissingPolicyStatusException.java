@@ -19,24 +19,21 @@
 package com.blackducksoftware.integration.hub.exception;
 
 public class MissingPolicyStatusException extends Exception {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 7166777484921137980L;
 
 	public MissingPolicyStatusException() {
-
 	}
 
-	public MissingPolicyStatusException(final String message)
-	{
+	public MissingPolicyStatusException(final String message) {
 		super(message);
 	}
 
-	public MissingPolicyStatusException(final Throwable cause)
-	{
+	public MissingPolicyStatusException(final Throwable cause) {
 		super(cause);
 	}
 
-	public MissingPolicyStatusException(final String message, final Throwable cause)
-	{
+	public MissingPolicyStatusException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
+
 }
