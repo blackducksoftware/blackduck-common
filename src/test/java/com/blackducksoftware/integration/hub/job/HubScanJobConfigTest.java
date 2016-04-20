@@ -36,24 +36,24 @@ public class HubScanJobConfigTest {
 
 		final String projectName1 = "projectName1";
 		final String version1 = "version1";
-		final String phase1 = "projectName1";
-		final String dist1 = "projectName1";
-		final String workingDir1 = "projectName1";
+		final String phase1 = "phase1";
+		final String dist1 = "dist1";
+		final String workingDir1 = "workingDir1";
 		final int scanMemory1 = 0;
 		final boolean shouldGenReport1 = false;
 		final int waitTime1 = 0;
-		final String target1 = "projectName1";
+		final String target1 = "target1";
 		final ImmutableList<String> targets1 = new ImmutableList.Builder<String>().add(target1).build();
 
 		final String projectName2 = "projectName2";
 		final String version2 = "version2";
-		final String phase2 = "projectName2";
-		final String dist2 = "projectName2";
-		final String workingDir2 = "projectName2";
+		final String phase2 = "phase2";
+		final String dist2 = "dist2";
+		final String workingDir2 = "workingDir2";
 		final int scanMemory2 = 1342;
 		final boolean shouldGenReport2 = false;
 		final int waitTime2 = 1234;
-		final String target2 = "projectName2";
+		final String target2 = "target2";
 		final ImmutableList<String> targets2 = new ImmutableList.Builder<String>().add(target2).build();
 
 

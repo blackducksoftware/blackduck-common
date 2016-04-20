@@ -56,7 +56,7 @@ public class IntBufferedLogger implements IntLogger {
 	}
 
 	public String getOutputString(final LogLevel level) {
-		return StringUtils.join(outputMap.get(level), '\n');
+		return StringUtils.trimToNull(StringUtils.join(outputMap.get(level), '\n'));
 	}
 
 	public String getErrorOutputString(final Throwable e) {

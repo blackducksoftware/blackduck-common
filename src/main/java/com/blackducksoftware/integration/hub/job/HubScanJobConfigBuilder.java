@@ -259,13 +259,7 @@ public class HubScanJobConfigBuilder {
 	}
 
 	public void setMaxWaitTimeForBomUpdate(final String maxWaitTimeForBomUpdate) {
-		final String maxWaitTimeForBomUpdateString = StringUtils.trimToNull(maxWaitTimeForBomUpdate);
-		try {
-			final Integer maxWaitTimeForBomUpdateValue = Integer.valueOf(maxWaitTimeForBomUpdateString);
-			setMaxWaitTimeForBomUpdate(maxWaitTimeForBomUpdateValue);
-		} catch (final NumberFormatException e) {
-			throw new IllegalArgumentException("The String : " + maxWaitTimeForBomUpdate + " , is not an Integer.", e);
-		}
+		setMaxWaitTimeForBomUpdate(stringToInteger(maxWaitTimeForBomUpdate));
 	}
 
 	public void setScanMemory(final int scanMemory) {
@@ -273,13 +267,7 @@ public class HubScanJobConfigBuilder {
 	}
 
 	public void setScanMemory(final String scanMemory) {
-		final String scanMemoryString = StringUtils.trimToNull(scanMemory);
-		try {
-			final Integer scanMemoryValue = Integer.valueOf(scanMemoryString);
-			setScanMemory(scanMemoryValue);
-		} catch (final NumberFormatException e) {
-			throw new IllegalArgumentException("The String : " + scanMemory + " , is not an Integer.", e);
-		}
+		setScanMemory(stringToInteger(scanMemory));
 	}
 
 	public void addScanTargetPath(final String scanTargetPath) {
@@ -296,6 +284,15 @@ public class HubScanJobConfigBuilder {
 
 	public void disableScanTargetPathExistenceCheck() {
 		disableScanTargetPathExistenceCheck = true;
+	}
+
+	private Integer stringToInteger(final String integer) {
+		final String integerString = StringUtils.trimToNull(integer);
+		try {
+			return Integer.valueOf(integerString);
+		} catch (final NumberFormatException e) {
+			throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.", e);
+		}
 	}
 
 }
