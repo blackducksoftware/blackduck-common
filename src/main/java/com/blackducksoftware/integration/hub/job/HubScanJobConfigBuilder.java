@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
@@ -139,27 +138,22 @@ public class HubScanJobConfigBuilder {
 
 	private boolean validateScanMemory(final IntLogger logger, final Integer defaultScanMemory) throws IOException {
 		boolean scanMemoryValid = true;
-
 		if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES && defaultScanMemory != null) {
 			scanMemory = defaultScanMemory;
 		}
-
 		if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES) {
 			scanMemoryValid = false;
 			logger.error("The minimum amount of memory for the scan is " + MINIMUM_MEMORY_IN_MEGABYTES + " MB.");
 		}
-
 		return scanMemoryValid;
 	}
 
 	public boolean validateShouldGenerateRiskReport(final IntLogger logger) throws IOException {
 		boolean shouldGenerateReportValid = true;
-
 		if ((null == projectName || null == version) && shouldGenerateRiskReport) {
 			shouldGenerateReportValid = false;
 			logger.error("To generate the Risk Report, you need to provide a Project name or version.");
 		}
-
 		return shouldGenerateReportValid;
 	}
 
@@ -170,7 +164,6 @@ public class HubScanJobConfigBuilder {
 	private boolean validateMaxWaitTimeForBomUpdate(final IntLogger logger, final Integer defaultMaxWaitTime)
 			throws IOException {
 		boolean waitTimeValid = true;
-
 		if (maxWaitTimeForBomUpdate <= 0) {
 			if (defaultMaxWaitTime != null) {
 				maxWaitTimeForBomUpdate = defaultMaxWaitTime;
@@ -178,8 +171,9 @@ public class HubScanJobConfigBuilder {
 				waitTimeValid = false;
 				logger.error("The maximum wait time for the BOM Update must be greater than 0.");
 			}
+		} else if (maxWaitTimeForBomUpdate < 2) {
+			logger.warn("This wait time may be too short.");
 		}
-
 		return waitTimeValid;
 	}
 
@@ -265,8 +259,7 @@ public class HubScanJobConfigBuilder {
 	}
 
 	public void setMaxWaitTimeForBomUpdate(final String maxWaitTimeForBomUpdate) {
-		final int maxWaitTimeForBomUpdateValue = NumberUtils.toInt(maxWaitTimeForBomUpdate);
-		setMaxWaitTimeForBomUpdate(maxWaitTimeForBomUpdateValue);
+		setMaxWaitTimeForBomUpdate(stringToInteger(maxWaitTimeForBomUpdate));
 	}
 
 	public void setScanMemory(final int scanMemory) {
@@ -274,8 +267,7 @@ public class HubScanJobConfigBuilder {
 	}
 
 	public void setScanMemory(final String scanMemory) {
-		final int scanMemoryValue = NumberUtils.toInt(scanMemory);
-		setScanMemory(scanMemoryValue);
+		setScanMemory(stringToInteger(scanMemory));
 	}
 
 	public void addScanTargetPath(final String scanTargetPath) {
@@ -292,6 +284,15 @@ public class HubScanJobConfigBuilder {
 
 	public void disableScanTargetPathExistenceCheck() {
 		disableScanTargetPathExistenceCheck = true;
+	}
+
+	private Integer stringToInteger(final String integer) {
+		final String integerString = StringUtils.trimToNull(integer);
+		try {
+			return Integer.valueOf(integerString);
+		} catch (final NumberFormatException e) {
+			throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.", e);
+		}
 	}
 
 }

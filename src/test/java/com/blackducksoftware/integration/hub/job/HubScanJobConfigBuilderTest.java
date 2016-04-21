@@ -35,7 +35,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.job.HubScanJobConfigBuilder;
 import com.blackducksoftware.integration.hub.util.TestLogger;
 
 public class HubScanJobConfigBuilderTest {
@@ -59,7 +58,7 @@ public class HubScanJobConfigBuilderTest {
 		assertEquals("Too many/not enough messages expected: \n" + outputString, expectedMessages.size(), outputList.size());
 
 		for (final String expectedMessage : expectedMessages) {
-			assertTrue(outputList.contains(expectedMessage));
+			assertTrue("Did not find the expected message : " + expectedMessage, outputList.contains(expectedMessage));
 		}
 	}
 
