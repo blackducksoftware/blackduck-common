@@ -22,15 +22,11 @@ import com.blackducksoftware.integration.hub.meta.AbstractLinkedResource;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ProjectItem extends AbstractLinkedResource {
-
 	public static final String VERSION_LINK = "versions";
-
 	public static final String CANONICAL_VERSION_LINK = "canonicalVersion";
 
 	private final String name;
-
 	private final String source;
-
 
 	public ProjectItem(final String name, final String source, final MetaInformation _meta) {
 		super(_meta);

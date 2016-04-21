@@ -21,7 +21,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
 
 public class EncryptionUtils {
 	public static final Charset UTF8 = Charset.forName("UTF-8");
@@ -33,13 +32,13 @@ public class EncryptionUtils {
 	private static final char[] KEY_PASS = { 'b', 'l', 'a', 'c', 'k', 'd', 'u', 'c', 'k', '1', '2', '3', 'I', 'n', 't',
 			'e', 'g', 'r', 'a', 't', 'i', 'o', 'n' };
 
-	public String alterString(final IntLogger logger, final String password, final String absolutePathForKeyFile,
-			final int cipherMode) throws EncryptionException {
+	public String alterString(final String password, final String absolutePathForKeyFile, final int cipherMode)
+			throws EncryptionException {
 		assertValidPassword(password);
 
-		final Key key = getKey(logger, absolutePathForKeyFile);
+		final Key key = getKey(absolutePathForKeyFile);
 
-		final String alteredString = getAlteredString(logger, password, cipherMode, key);
+		final String alteredString = getAlteredString(password, cipherMode, key);
 		return alteredString;
 	}
 
@@ -49,14 +48,14 @@ public class EncryptionUtils {
 		}
 	}
 
-	private Key getKey(final IntLogger logger, final String absolutePathForKey) throws EncryptionException {
+	private Key getKey(final String absolutePathForKey) throws EncryptionException {
 		Key key = null;
 		if (StringUtils.isNotBlank(absolutePathForKey)) {
 			try {
 				final FileInputStream fileInputStream = new FileInputStream(absolutePathForKey);
 				key = retrieveKeyFromInputStream(fileInputStream);
 			} catch (final Exception e) {
-				logger.error("Failed to retrieve the encryption key from file: " + absolutePathForKey);
+				throw new EncryptionException("Failed to retrieve the encryption key from file: " + absolutePathForKey);
 			}
 		} else {
 			try {
@@ -67,7 +66,7 @@ public class EncryptionUtils {
 					final InputStream inputStream = EncryptionUtils.class.getResourceAsStream(EMBEDDED_IBM_KEY_FILE);
 					key = retrieveKeyFromInputStream(inputStream);
 				} catch (final Exception e1) {
-					logger.error("Failed to retrieve the encryption key from classpath", e);
+					throw new EncryptionException("Failed to retrieve the encryption key from classpath", e);
 				}
 			}
 		}
@@ -79,8 +78,8 @@ public class EncryptionUtils {
 		return key;
 	}
 
-	private String getAlteredString(final IntLogger logger, final String original, final int cipherMode,
-			final Key key) {
+	private String getAlteredString(final String original, final int cipherMode, final Key key)
+			throws EncryptionException {
 		String alteredString = null;
 		try {
 			byte[] bytes = null;
@@ -96,7 +95,7 @@ public class EncryptionUtils {
 				alteredString = decrypt(cipher, bytes);
 			}
 		} catch (final Exception e) {
-			logger.error(e);
+			throw new EncryptionException(e);
 		}
 
 		return alteredString;
