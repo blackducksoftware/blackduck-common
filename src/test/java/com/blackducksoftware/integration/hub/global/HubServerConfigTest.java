@@ -19,7 +19,6 @@
 package com.blackducksoftware.integration.hub.global;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
@@ -29,8 +28,6 @@ import java.util.regex.Pattern;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
-import com.blackducksoftware.integration.hub.logging.IntBufferedLogger;
-import com.blackducksoftware.integration.hub.logging.LogLevel;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -61,12 +58,9 @@ public class HubServerConfigTest {
 		final Integer timeout2 = 2;
 		final String hubUser2 = "hubUser2";
 
-		final IntBufferedLogger logger = new IntBufferedLogger();
 		final String hubPass2Clear = "hubPass2";
-		final String hubPass2 = PasswordEncrypter.encrypt(logger, hubPass2Clear);
+		final String hubPass2 = PasswordEncrypter.encrypt(hubPass2Clear);
 
-		assertNull(logger.getOutputString(LogLevel.ERROR));
-		assertNull(logger.getOutputString(LogLevel.WARN));
 
 		final String host2 = "host2";
 		final Integer port2 = 2;
@@ -99,7 +93,7 @@ public class HubServerConfigTest {
 		assertTrue(!item1.equals(item2));
 
 		EqualsVerifier.forClass(HubServerConfig.class).withPrefabValues(URL.class, hubUrl1, hubUrl2)
-				.suppress(Warning.STRICT_INHERITANCE).verify();
+		.suppress(Warning.STRICT_INHERITANCE).verify();
 
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());

@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.encryption.PasswordDecrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
 
 public class HubCredentials implements Serializable {
 
@@ -71,13 +70,13 @@ public class HubCredentials implements Serializable {
 		}
 	}
 
-	public String getDecryptedPassword(final IntLogger logger)
+	public String getDecryptedPassword()
 			throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
 			EncryptionException {
 		if (StringUtils.isBlank(hubPass)) {
 			return null;
 		}
-		return PasswordDecrypter.decrypt(logger, hubPass);
+		return PasswordDecrypter.decrypt(hubPass);
 	}
 
 	public boolean isEmpty() {

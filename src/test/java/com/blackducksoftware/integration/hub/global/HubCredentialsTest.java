@@ -19,7 +19,6 @@
 package com.blackducksoftware.integration.hub.global;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
@@ -28,8 +27,6 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.logging.IntBufferedLogger;
-import com.blackducksoftware.integration.hub.logging.LogLevel;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -44,13 +41,10 @@ public class HubCredentialsTest {
 
 		final String hubUser2 = "hubUser2";
 
-		final IntBufferedLogger logger = new IntBufferedLogger();
 
 		final String hubPass2Clear = "hubPass2";
-		final String hubPass2 = PasswordEncrypter.encrypt(logger, hubPass2Clear);
+		final String hubPass2 = PasswordEncrypter.encrypt(hubPass2Clear);
 
-		assertNull(logger.getOutputString(LogLevel.ERROR));
-		assertNull(logger.getOutputString(LogLevel.WARN));
 
 		final HubCredentials item1 = new HubCredentials(hubUser1, hubPass1, hubPass1.length());
 		final HubCredentials item2 = new HubCredentials(hubUser2, hubPass2, hubPass2Clear.length());
@@ -63,11 +57,9 @@ public class HubCredentialsTest {
 		assertEquals(hubUser2, item2.getHubUser());
 		assertEquals(hubPass2, item2.getEncryptedPassword());
 
-		assertEquals(hubPass2Clear, item2.getDecryptedPassword(logger));
+		assertEquals(hubPass2Clear, item2.getDecryptedPassword());
 		assertEquals("********", item2.getMaskedPassword());
 
-		assertNull(logger.getOutputString(LogLevel.ERROR));
-		assertNull(logger.getOutputString(LogLevel.WARN));
 
 		assertTrue(item1.equals(item3));
 		assertTrue(!item1.equals(item2));

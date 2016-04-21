@@ -97,6 +97,11 @@ public class HubServerConfigBuilder {
 
 	public boolean validateHubUrl(final IntLogger logger) {
 		boolean valid = true;
+		if (hubUrl == null) {
+			logger.error("No Hub Url was found.");
+			return false;
+		}
+
 		URL hubURL = null;
 		try {
 			hubURL = new URL(hubUrl);
@@ -137,10 +142,10 @@ public class HubServerConfigBuilder {
 			}
 			connection.getContent();
 		} catch (final IOException ioe) {
-			logger.error("Can not reach this server : " + hubUrl);
+			logger.error("Can not reach this server : " + hubUrl, ioe);
 			valid = false;
 		} catch (final RuntimeException e) {
-			logger.error("This is not a valid URL : " + hubUrl);
+			logger.error("This is not a valid URL : " + hubUrl, e);
 			valid = false;
 		}
 		return valid;
@@ -214,12 +219,12 @@ public class HubServerConfigBuilder {
 		this.hubUser = StringUtils.trimToNull(hubUser);
 	}
 
-	public void setHubPass(final IntLogger logger, final String hubPass)
+	public void setHubPass(final String hubPass)
 			throws IllegalArgumentException, EncryptionException {
 		final String password = StringUtils.trimToNull(hubPass);
 		if (password != null) {
 			setActualPasswordLength(password.length());
-			this.hubPass = PasswordEncrypter.encrypt(logger, password);
+			this.hubPass = PasswordEncrypter.encrypt(password);
 		}
 	}
 
@@ -282,6 +287,10 @@ public class HubServerConfigBuilder {
 
 	public void setHubUrlIgnored(final boolean hubUrlIgnored) {
 		this.hubUrlIgnored = hubUrlIgnored;
+	}
+
+	public boolean isHubUrlIgnored() {
+		return hubUrlIgnored;
 	}
 
 	private int stringToInteger(final String integer) {
