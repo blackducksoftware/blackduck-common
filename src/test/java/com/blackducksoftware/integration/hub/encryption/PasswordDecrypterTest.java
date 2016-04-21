@@ -13,8 +13,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.blackducksoftware.integration.hub.util.TestLogger;
-
 public class PasswordDecrypterTest {
 	private static Properties encryptedUserPassword = null;
 
@@ -35,15 +33,13 @@ public class PasswordDecrypterTest {
 
 	@Test
 	public void testPasswordDecryption() throws Exception {
-		final TestLogger testLogger = new TestLogger();
-		assertEquals("super", PasswordDecrypter.decrypt(testLogger, encryptedUserPassword.getProperty("super")));
+		assertEquals("super", PasswordDecrypter.decrypt(encryptedUserPassword.getProperty("super")));
 	}
 
 	@Test
 	public void testPasswordDecryptionAgain() throws Exception {
-		final TestLogger testLogger = new TestLogger();
 		assertEquals("testing",
-				PasswordDecrypter.decrypt(testLogger, encryptedUserPassword.getProperty("test@blackducksoftware.com")));
+				PasswordDecrypter.decrypt(encryptedUserPassword.getProperty("test@blackducksoftware.com")));
 	}
 
 	@Test
@@ -51,8 +47,7 @@ public class PasswordDecrypterTest {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("Please provide a non-blank password.");
 
-		final TestLogger testLogger = new TestLogger();
-		assertNull(PasswordDecrypter.decrypt(testLogger, ""));
+		assertNull(PasswordDecrypter.decrypt(""));
 	}
 
 	@Test
@@ -60,8 +55,7 @@ public class PasswordDecrypterTest {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("Please provide a non-blank password.");
 
-		final TestLogger testLogger = new TestLogger();
-		assertNull(PasswordDecrypter.decrypt(testLogger, null));
+		assertNull(PasswordDecrypter.decrypt(null));
 	}
 
 }
