@@ -16,29 +16,24 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.logging;
+package com.blackducksoftware.integration.hub.exception;
 
-public interface IntLogger {
-	void info(String txt);
+public class HubIntegrationRuntimeException extends RuntimeException {
+	private static final long serialVersionUID = 2570112458159228339L;
 
-	void error(Throwable t);
+	public HubIntegrationRuntimeException() {
+	}
 
-	void error(String txt, Throwable t);
+	public HubIntegrationRuntimeException(final String message) {
+		super(message);
+	}
 
-	void error(String txt);
+	public HubIntegrationRuntimeException(final Throwable cause) {
+		super(cause);
+	}
 
-	void warn(String txt);
-
-	void trace(String txt);
-
-	void trace(String txt, Throwable t);
-
-	void debug(String txt);
-
-	void debug(String txt, Throwable t);
-
-	void setLogLevel(LogLevel logLevel);
-
-	LogLevel getLogLevel();
+	public HubIntegrationRuntimeException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
 
 }
