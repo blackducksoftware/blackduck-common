@@ -4,8 +4,9 @@ import com.blackducksoftware.integration.hub.ValidationMessageEnum;
 import com.blackducksoftware.integration.hub.exception.ValidationException;
 
 /**
- * This logger will only have implementation for the error() invocations, which
- * should all simply throw a RuntimeException with the appropriate details.
+ * This logger will only have implementation for the error() and warn()
+ * invocations, which should all simply throw a ValidationException with the
+ * appropriate ValidationMessageEnum.
  */
 public class IntExceptionLogger implements IntLogger {
 	public static final IntLogger LOGGER = new IntExceptionLogger();
