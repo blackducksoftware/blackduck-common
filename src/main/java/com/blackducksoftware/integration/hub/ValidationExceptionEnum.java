@@ -16,29 +16,9 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.logging;
+package com.blackducksoftware.integration.hub;
 
-public interface IntLogger {
-	void info(String txt);
-
-	void error(Throwable t);
-
-	void error(String txt, Throwable t);
-
-	void error(String txt);
-
-	void warn(String txt);
-
-	void trace(String txt);
-
-	void trace(String txt, Throwable t);
-
-	void debug(String txt);
-
-	void debug(String txt, Throwable t);
-
-	void setLogLevel(LogLevel logLevel);
-
-	LogLevel getLogLevel();
+public enum ValidationExceptionEnum {
+	ERROR, WARN
 
 }

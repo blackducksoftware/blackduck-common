@@ -172,8 +172,8 @@
           <configuration>
             <classpathContainers>
               <classpathContainer>
-								org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6
-							</classpathContainer>
+                                org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6
+                            </classpathContainer>
             </classpathContainers>
             <source>1.6</source>
             <target>1.6</target>
@@ -191,7 +191,7 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <versionRange>[0.5,)
-										</versionRange>
+                                        </versionRange>
                     <goals>
                       <goal>prepare-agent</goal>
                     </goals>

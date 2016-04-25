@@ -18,19 +18,35 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.exception;
 
-public class EncryptionException extends Exception {
-	private static final long serialVersionUID = 1026414965559049728L;
+import com.blackducksoftware.integration.hub.ValidationExceptionEnum;
 
-	public EncryptionException(final String message) {
+public class ValidationException extends RuntimeException {
+	private static final long serialVersionUID = 9001308081326471943L;
+
+	private final ValidationExceptionEnum validationMessageType;
+
+	public ValidationException(final ValidationExceptionEnum validationMessageType) {
+		this.validationMessageType = validationMessageType;
+	}
+
+	public ValidationException(final ValidationExceptionEnum validationMessageType, final String message) {
 		super(message);
+		this.validationMessageType = validationMessageType;
 	}
 
-	public EncryptionException(final Throwable cause) {
+	public ValidationException(final ValidationExceptionEnum validationMessageType, final Throwable cause) {
 		super(cause);
+		this.validationMessageType = validationMessageType;
 	}
 
-	public EncryptionException(final String message, final Throwable cause) {
+	public ValidationException(final ValidationExceptionEnum validationMessageType, final String message,
+			final Throwable cause) {
 		super(message, cause);
+		this.validationMessageType = validationMessageType;
+	}
+
+	public ValidationExceptionEnum getValidationMessage() {
+		return validationMessageType;
 	}
 
 }
