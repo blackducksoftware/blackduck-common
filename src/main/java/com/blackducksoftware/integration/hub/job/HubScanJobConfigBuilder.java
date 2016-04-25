@@ -32,29 +32,18 @@ import com.google.common.collect.ImmutableList;
 
 public class HubScanJobConfigBuilder {
 	public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
-
 	public static final int DEFAULT_REPORT_WAIT_TIME_IN_MINUTES = 5;
-
 	public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
 	private String projectName;
-
 	private String version;
-
 	private String phase;
-
 	private String distribution;
-
 	private String workingDirectory;
-
 	private boolean shouldGenerateRiskReport;
-
 	private int maxWaitTimeForBomUpdate;
-
 	private int scanMemory;
-
 	private final Set<String> scanTargetPaths = new HashSet<String>();
-
 	private boolean disableScanTargetPathExistenceCheck;
 
 	public HubScanJobConfig build(final IntLogger logger) throws HubIntegrationException, IOException {

@@ -16,11 +16,13 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.job;
+package com.blackducksoftware.integration.hub.validate;
 
 import java.io.IOException;
 
+import com.blackducksoftware.integration.hub.ValidationExceptionEnum;
 import com.blackducksoftware.integration.hub.exception.ValidationException;
+import com.blackducksoftware.integration.hub.job.HubScanJobConfigBuilder;
 import com.blackducksoftware.integration.hub.logging.IntExceptionLogger;
 
 public abstract class HubScanJobConfigValidator<T> {
@@ -35,6 +37,8 @@ public abstract class HubScanJobConfigValidator<T> {
 			builder.validateScanMemory(IntExceptionLogger.LOGGER);
 		} catch (final ValidationException e) {
 			return handleValidationException(e);
+		} catch (final IllegalArgumentException e) {
+			return handleValidationException(new ValidationException(ValidationExceptionEnum.ERROR, e.getMessage(), e));
 		}
 
 		return handleSuccess();
@@ -47,6 +51,8 @@ public abstract class HubScanJobConfigValidator<T> {
 			builder.validateMaxWaitTimeForBomUpdate(IntExceptionLogger.LOGGER);
 		} catch (final ValidationException e) {
 			return handleValidationException(e);
+		} catch (final IllegalArgumentException e) {
+			return handleValidationException(new ValidationException(ValidationExceptionEnum.ERROR, e.getMessage(), e));
 		}
 
 		return handleSuccess();

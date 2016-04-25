@@ -22,39 +22,19 @@ import java.io.Serializable;
 import java.net.URL;
 
 public class HubServerConfig implements Serializable {
-
 	private static final long serialVersionUID = -1581638027683631935L;
 
 	private final URL hubUrl;
-
 	private final int timeout;
-
-	private final HubCredentials hubCredentials;
-
+	private final HubCredentials credentials;
 	private final HubProxyInfo proxyInfo;
 
-	public HubServerConfig(final URL url, final int timeout, final HubCredentials hubCredentials,
+	public HubServerConfig(final URL url, final int timeout, final HubCredentials credentials,
 			final HubProxyInfo proxyInfo) {
 		this.hubUrl = url;
 		this.timeout = timeout;
-		this.hubCredentials = hubCredentials;
+		this.credentials = credentials;
 		this.proxyInfo = proxyInfo;
-	}
-
-	public URL getHubUrl() {
-		return hubUrl;
-	}
-
-	public HubCredentials getGlobalCredentials() {
-		return hubCredentials;
-	}
-
-	public HubProxyInfo getProxyInfo() {
-		return proxyInfo;
-	}
-
-	public int getTimeout() {
-		return timeout;
 	}
 
 	@Override
@@ -65,7 +45,7 @@ public class HubServerConfig implements Serializable {
 		builder.append(", timeout=");
 		builder.append(timeout);
 		builder.append(", hubCredentials=");
-		builder.append(hubCredentials);
+		builder.append(credentials);
 		builder.append(", proxyInfo=");
 		builder.append(proxyInfo);
 		builder.append("]");
@@ -76,7 +56,7 @@ public class HubServerConfig implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((hubCredentials == null) ? 0 : hubCredentials.hashCode());
+		result = prime * result + ((credentials == null) ? 0 : credentials.hashCode());
 		result = prime * result + ((hubUrl == null) ? 0 : hubUrl.hashCode());
 		result = prime * result + ((proxyInfo == null) ? 0 : proxyInfo.hashCode());
 		result = prime * result + timeout;
@@ -95,11 +75,11 @@ public class HubServerConfig implements Serializable {
 			return false;
 		}
 		final HubServerConfig other = (HubServerConfig) obj;
-		if (hubCredentials == null) {
-			if (other.hubCredentials != null) {
+		if (credentials == null) {
+			if (other.credentials != null) {
 				return false;
 			}
-		} else if (!hubCredentials.equals(other.hubCredentials)) {
+		} else if (!credentials.equals(other.credentials)) {
 			return false;
 		}
 		if (hubUrl == null) {
@@ -120,6 +100,22 @@ public class HubServerConfig implements Serializable {
 			return false;
 		}
 		return true;
+	}
+
+	public URL getHubUrl() {
+		return hubUrl;
+	}
+
+	public HubCredentials getGlobalCredentials() {
+		return credentials;
+	}
+
+	public HubProxyInfo getProxyInfo() {
+		return proxyInfo;
+	}
+
+	public int getTimeout() {
+		return timeout;
 	}
 
 }
