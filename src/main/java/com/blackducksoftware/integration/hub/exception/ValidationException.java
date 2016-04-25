@@ -23,30 +23,30 @@ import com.blackducksoftware.integration.hub.ValidationExceptionEnum;
 public class ValidationException extends RuntimeException {
 	private static final long serialVersionUID = 9001308081326471943L;
 
-	private final ValidationExceptionEnum validationMessageType;
+	private final ValidationExceptionEnum validationExceptionEnum;
 
-	public ValidationException(final ValidationExceptionEnum validationMessageType) {
-		this.validationMessageType = validationMessageType;
+	public ValidationException(final ValidationExceptionEnum validationExceptionEnum) {
+		this.validationExceptionEnum = validationExceptionEnum;
 	}
 
-	public ValidationException(final ValidationExceptionEnum validationMessageType, final String message) {
+	public ValidationException(final ValidationExceptionEnum validationExceptionEnum, final String message) {
 		super(message);
-		this.validationMessageType = validationMessageType;
+		this.validationExceptionEnum = validationExceptionEnum;
 	}
 
-	public ValidationException(final ValidationExceptionEnum validationMessageType, final Throwable cause) {
+	public ValidationException(final ValidationExceptionEnum validationExceptionEnum, final Throwable cause) {
 		super(cause);
-		this.validationMessageType = validationMessageType;
+		this.validationExceptionEnum = validationExceptionEnum;
 	}
 
-	public ValidationException(final ValidationExceptionEnum validationMessageType, final String message,
+	public ValidationException(final ValidationExceptionEnum validationExceptionEnum, final String message,
 			final Throwable cause) {
 		super(message, cause);
-		this.validationMessageType = validationMessageType;
+		this.validationExceptionEnum = validationExceptionEnum;
 	}
 
-	public ValidationExceptionEnum getValidationMessage() {
-		return validationMessageType;
+	public ValidationExceptionEnum getValidationExceptionEnum() {
+		return validationExceptionEnum;
 	}
 
 }
