@@ -18,49 +18,34 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.exception;
 
-import com.blackducksoftware.integration.hub.ValidationMessageEnum;
+import com.blackducksoftware.integration.hub.ValidationExceptionEnum;
 
 public class ValidationException extends RuntimeException {
 	private static final long serialVersionUID = 9001308081326471943L;
 
-	private ValidationMessageEnum validationMessageType;
+	private final ValidationExceptionEnum validationMessageType;
 
-	public ValidationException() {
-	}
-
-	public ValidationException(final String message) {
-		super(message);
-	}
-
-	public ValidationException(final Throwable cause) {
-		super(cause);
-	}
-
-	public ValidationException(final String message, final Throwable cause) {
-		super(message, cause);
-	}
-
-	public ValidationException(final ValidationMessageEnum validationMessageType) {
+	public ValidationException(final ValidationExceptionEnum validationMessageType) {
 		this.validationMessageType = validationMessageType;
 	}
 
-	public ValidationException(final ValidationMessageEnum validationMessageType, final String message) {
+	public ValidationException(final ValidationExceptionEnum validationMessageType, final String message) {
 		super(message);
 		this.validationMessageType = validationMessageType;
 	}
 
-	public ValidationException(final ValidationMessageEnum validationMessageType, final Throwable cause) {
+	public ValidationException(final ValidationExceptionEnum validationMessageType, final Throwable cause) {
 		super(cause);
 		this.validationMessageType = validationMessageType;
 	}
 
-	public ValidationException(final ValidationMessageEnum validationMessageType, final String message,
+	public ValidationException(final ValidationExceptionEnum validationMessageType, final String message,
 			final Throwable cause) {
 		super(message, cause);
 		this.validationMessageType = validationMessageType;
 	}
 
-	public ValidationMessageEnum getValidationMessage() {
+	public ValidationExceptionEnum getValidationMessage() {
 		return validationMessageType;
 	}
 

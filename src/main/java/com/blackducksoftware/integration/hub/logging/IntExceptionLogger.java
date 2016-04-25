@@ -18,7 +18,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.logging;
 
-import com.blackducksoftware.integration.hub.ValidationMessageEnum;
+import com.blackducksoftware.integration.hub.ValidationExceptionEnum;
 import com.blackducksoftware.integration.hub.exception.ValidationException;
 
 /**
@@ -35,22 +35,22 @@ public class IntExceptionLogger implements IntLogger {
 
 	@Override
 	public void error(final Throwable t) {
-		throw new ValidationException(ValidationMessageEnum.ERROR, t);
+		throw new ValidationException(ValidationExceptionEnum.ERROR, t);
 	}
 
 	@Override
 	public void error(final String txt, final Throwable t) {
-		throw new ValidationException(ValidationMessageEnum.ERROR, txt, t);
+		throw new ValidationException(ValidationExceptionEnum.ERROR, txt, t);
 	}
 
 	@Override
 	public void error(final String txt) {
-		throw new ValidationException(ValidationMessageEnum.ERROR, txt);
+		throw new ValidationException(ValidationExceptionEnum.ERROR, txt);
 	}
 
 	@Override
 	public void warn(final String txt) {
-		throw new ValidationException(ValidationMessageEnum.WARN, txt);
+		throw new ValidationException(ValidationExceptionEnum.WARN, txt);
 	}
 
 	@Override

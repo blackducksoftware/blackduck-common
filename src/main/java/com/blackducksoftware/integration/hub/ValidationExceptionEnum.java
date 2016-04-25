@@ -18,7 +18,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub;
 
-public enum ValidationMessageEnum {
+public enum ValidationExceptionEnum {
 	ERROR, WARN
 
 }
