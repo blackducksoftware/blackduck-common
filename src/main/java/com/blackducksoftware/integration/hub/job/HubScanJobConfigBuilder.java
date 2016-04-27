@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableList;
 public class HubScanJobConfigBuilder {
 	public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
 
-	public static final int DEFAULT_REPORT_WAIT_TIME_IN_MINUTES = 5;
+	public static final int DEFAULT_BOM_UPDATE_WAIT_TIME_IN_MINUTES = 5;
 
 	public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
@@ -82,7 +82,7 @@ public class HubScanJobConfigBuilder {
 			valid = false;
 		}
 
-		if (!validateMaxWaitTimeForBomUpdate(logger, DEFAULT_REPORT_WAIT_TIME_IN_MINUTES)) {
+		if (!validateMaxWaitTimeForBomUpdate(logger, DEFAULT_BOM_UPDATE_WAIT_TIME_IN_MINUTES)) {
 			valid = false;
 		}
 

@@ -142,7 +142,7 @@ public class HubScanJobConfigBuilderTest {
 	public void testValidateMaxWaitTimeForRiskReportValid() throws HubIntegrationException, IOException {
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 		builder.setShouldGenerateRiskReport(true);
-		builder.setMaxWaitTimeForBomUpdate(HubScanJobConfigBuilder.DEFAULT_REPORT_WAIT_TIME_IN_MINUTES);
+		builder.setMaxWaitTimeForBomUpdate(HubScanJobConfigBuilder.DEFAULT_BOM_UPDATE_WAIT_TIME_IN_MINUTES);
 
 		assertTrue(builder.validateMaxWaitTimeForBomUpdate(logger));
 	}
