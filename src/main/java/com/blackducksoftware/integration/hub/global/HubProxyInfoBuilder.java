@@ -1,5 +1,7 @@
 package com.blackducksoftware.integration.hub.global;
 
+import com.blackducksoftware.integration.hub.exception.EncryptionException;
+
 public class HubProxyInfoBuilder {
 	private String host;
 	private int port;
@@ -7,7 +9,7 @@ public class HubProxyInfoBuilder {
 	private String password;
 	private String ignoredProxyHosts;
 
-	public HubProxyInfo build() {
+	public HubProxyInfo build() throws IllegalArgumentException, EncryptionException {
 		return new HubProxyInfo(host, port, username, password, ignoredProxyHosts);
 	}
 

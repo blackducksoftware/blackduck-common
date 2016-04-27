@@ -22,35 +22,20 @@ import java.io.IOException;
 
 import com.blackducksoftware.integration.hub.ValidationExceptionEnum;
 import com.blackducksoftware.integration.hub.exception.ValidationException;
-import com.blackducksoftware.integration.hub.global.HubProxyInfo;
-import com.blackducksoftware.integration.hub.global.HubServerConfigBuilder;
+import com.blackducksoftware.integration.hub.global.HubCredentialsBuilder;
 import com.blackducksoftware.integration.hub.logging.IntExceptionLogger;
 
-public abstract class HubServerConfigValidator<T> {
+public abstract class HubCredentialsValidator<T> {
 	public abstract T handleValidationException(ValidationException e);
 
 	public abstract T handleSuccess();
 
-	public T validateServerUrl(final String serverUrl, final HubProxyInfo proxyInfo) throws IOException {
+	public T validateCredentials(final String username, final String password) throws IOException {
 		try {
-			final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-			builder.setHubUrl(serverUrl);
-			builder.setProxyInfo(proxyInfo);
-			builder.validateHubUrl(IntExceptionLogger.LOGGER);
-		} catch (final ValidationException e) {
-			return handleValidationException(e);
-		} catch (final IllegalArgumentException e) {
-			return handleValidationException(new ValidationException(ValidationExceptionEnum.ERROR, e.getMessage(), e));
-		}
-
-		return handleSuccess();
-	}
-
-	public T validateTimeout(final String timeout) throws IOException {
-		try {
-			final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-			builder.setTimeout(timeout);
-			builder.validateTimeout(IntExceptionLogger.LOGGER);
+			final HubCredentialsBuilder builder = new HubCredentialsBuilder();
+			builder.setUsername(username);
+			builder.setPassword(password);
+			builder.validateCredentials(IntExceptionLogger.LOGGER);
 		} catch (final ValidationException e) {
 			return handleValidationException(e);
 		} catch (final IllegalArgumentException e) {

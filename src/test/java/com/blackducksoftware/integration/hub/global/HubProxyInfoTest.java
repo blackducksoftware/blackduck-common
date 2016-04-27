@@ -19,19 +19,18 @@
 package com.blackducksoftware.integration.hub.global;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.net.URL;
-
 import org.junit.Test;
+
+import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
 public class HubProxyInfoTest {
 	@Test
-	public void testHubProxyInfo() {
+	public void testHubProxyInfo() throws Exception {
 		final String host1 = "host1";
 		final int port1 = 1;
 		final String noProxyHosts1 = "noProxyHosts1";
@@ -52,13 +51,15 @@ public class HubProxyInfoTest {
 		assertEquals(port1, item1.getPort());
 		assertEquals(noProxyHosts1, item1.getIgnoredProxyHosts());
 		assertEquals(proxyUsername1, item1.getUsername());
-		assertEquals(proxyPassword1, item1.getPassword());
+		assertEquals(PasswordEncrypter.encrypt(proxyPassword1), item1.getEncryptedPassword());
+		assertEquals("**************", item1.getMaskedPassword());
 
 		assertEquals(host2, item2.getHost());
 		assertEquals(port2, item2.getPort());
 		assertEquals(noProxyHosts2, item2.getIgnoredProxyHosts());
 		assertEquals(proxyUsername2, item2.getUsername());
-		assertEquals(proxyPassword2, item2.getPassword());
+		assertEquals(PasswordEncrypter.encrypt(proxyPassword2), item2.getEncryptedPassword());
+		assertEquals("**************", item2.getMaskedPassword());
 
 		assertTrue(item1.equals(item3));
 		assertTrue(!item1.equals(item2));
@@ -75,8 +76,10 @@ public class HubProxyInfoTest {
 		builder.append(item1.getPort());
 		builder.append(", username=");
 		builder.append(item1.getUsername());
-		builder.append(", password=");
-		builder.append(item1.getPassword());
+		builder.append(", encryptedPassword=");
+		builder.append(item1.getEncryptedPassword());
+		builder.append(", actualPasswordLength=");
+		builder.append(item1.getActualPasswordLength());
 		builder.append(", ignoredProxyHosts=");
 		builder.append(item1.getIgnoredProxyHosts());
 		builder.append("]");
@@ -94,26 +97,5 @@ public class HubProxyInfoTest {
 
 	}
 
-	@Test
-	public void testValidateProxyConfigHubUrlIgnored() throws Exception {
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setIgnoredProxyHosts("google");
-
-		final HubProxyInfo proxyInfo = builder.build();
-		final boolean useProxy = proxyInfo.shouldUseProxyForUrl(new URL("https://google.com"));
-
-		assertFalse(useProxy);
-	}
-
-	@Test
-	public void testValidateProxyConfigHubUrlNotIgnored() throws Exception {
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setIgnoredProxyHosts("test");
-
-		final HubProxyInfo proxyInfo = builder.build();
-		final boolean useProxy = proxyInfo.shouldUseProxyForUrl(new URL("https://google.com"));
-
-		assertTrue(useProxy);
-	}
 
 }

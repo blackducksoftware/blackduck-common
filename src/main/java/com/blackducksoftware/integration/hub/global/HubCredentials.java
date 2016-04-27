@@ -19,7 +19,6 @@
 package com.blackducksoftware.integration.hub.global;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import com.blackducksoftware.integration.hub.encryption.PasswordDecrypter;
@@ -40,15 +39,13 @@ public class HubCredentials implements Serializable {
 		this.encryptedPassword = PasswordEncrypter.encrypt(password);
 	}
 
-	public String getMaskedPassword() throws IllegalArgumentException, NoSuchMethodException, IllegalAccessException,
-			InvocationTargetException, EncryptionException {
+	public String getMaskedPassword() {
 		final char[] array = new char[actualPasswordLength];
 		Arrays.fill(array, '*');
 		return new String(array);
 	}
 
-	public String getDecryptedPassword() throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException, EncryptionException {
+	public String getDecryptedPassword() throws IllegalArgumentException, EncryptionException {
 		return PasswordDecrypter.decrypt(encryptedPassword);
 	}
 

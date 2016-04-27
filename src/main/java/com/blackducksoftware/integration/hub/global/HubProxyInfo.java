@@ -27,11 +27,16 @@ import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.blackducksoftware.integration.hub.encryption.PasswordDecrypter;
+import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
+import com.blackducksoftware.integration.hub.exception.EncryptionException;
 
 public class HubProxyInfo implements Serializable {
 	private static final long serialVersionUID = 8813395288911907788L;
@@ -39,15 +44,22 @@ public class HubProxyInfo implements Serializable {
 	private final String host;
 	private final int port;
 	private final String username;
-	private final String password;
+	private final String encryptedPassword;
+	private final int actualPasswordLength;
 	private final String ignoredProxyHosts;
 
 	public HubProxyInfo(final String host, final int port, final String username, final String password,
-			final String ignoredProxyHosts) {
+			final String ignoredProxyHosts) throws IllegalArgumentException, EncryptionException {
 		this.host = host;
 		this.port = port;
 		this.username = username;
-		this.password = password;
+		if (StringUtils.isNotBlank(password)) {
+			actualPasswordLength = password.length();
+			this.encryptedPassword = PasswordEncrypter.encrypt(password);
+		} else {
+			actualPasswordLength = 0;
+			this.encryptedPassword = null;
+		}
 		this.ignoredProxyHosts = ignoredProxyHosts;
 	}
 
@@ -68,11 +80,16 @@ public class HubProxyInfo implements Serializable {
 	}
 
 	public void setDefaultAuthenticator() {
-		if (username != null && password != null) {
+		if (username != null && encryptedPassword != null) {
 			Authenticator.setDefault(new Authenticator() {
 				@Override
 				public PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(username, password.toCharArray());
+					try {
+						return new PasswordAuthentication(username,
+								PasswordDecrypter.decrypt(encryptedPassword).toCharArray());
+					} catch (final Exception e) {
+					}
+					return null;
 				}
 			});
 		} else {
@@ -126,8 +143,10 @@ public class HubProxyInfo implements Serializable {
 		builder.append(port);
 		builder.append(", username=");
 		builder.append(username);
-		builder.append(", password=");
-		builder.append(password);
+		builder.append(", encryptedPassword=");
+		builder.append(encryptedPassword);
+		builder.append(", actualPasswordLength=");
+		builder.append(actualPasswordLength);
 		builder.append(", ignoredProxyHosts=");
 		builder.append(ignoredProxyHosts);
 		builder.append("]");
@@ -138,9 +157,10 @@ public class HubProxyInfo implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + actualPasswordLength;
+		result = prime * result + ((encryptedPassword == null) ? 0 : encryptedPassword.hashCode());
 		result = prime * result + ((host == null) ? 0 : host.hashCode());
 		result = prime * result + ((ignoredProxyHosts == null) ? 0 : ignoredProxyHosts.hashCode());
-		result = prime * result + ((password == null) ? 0 : password.hashCode());
 		result = prime * result + port;
 		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
@@ -158,6 +178,16 @@ public class HubProxyInfo implements Serializable {
 			return false;
 		}
 		final HubProxyInfo other = (HubProxyInfo) obj;
+		if (actualPasswordLength != other.actualPasswordLength) {
+			return false;
+		}
+		if (encryptedPassword == null) {
+			if (other.encryptedPassword != null) {
+				return false;
+			}
+		} else if (!encryptedPassword.equals(other.encryptedPassword)) {
+			return false;
+		}
 		if (host == null) {
 			if (other.host != null) {
 				return false;
@@ -170,13 +200,6 @@ public class HubProxyInfo implements Serializable {
 				return false;
 			}
 		} else if (!ignoredProxyHosts.equals(other.ignoredProxyHosts)) {
-			return false;
-		}
-		if (password == null) {
-			if (other.password != null) {
-				return false;
-			}
-		} else if (!password.equals(other.password)) {
 			return false;
 		}
 		if (port != other.port) {
@@ -204,12 +227,23 @@ public class HubProxyInfo implements Serializable {
 		return username;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getEncryptedPassword() {
+		return encryptedPassword;
+	}
+
+	public String getMaskedPassword() {
+		final char[] array = new char[actualPasswordLength];
+		Arrays.fill(array, '*');
+		return new String(array);
+	}
+
+	public int getActualPasswordLength() {
+		return actualPasswordLength;
 	}
 
 	public String getIgnoredProxyHosts() {
 		return ignoredProxyHosts;
 	}
+
 
 }
