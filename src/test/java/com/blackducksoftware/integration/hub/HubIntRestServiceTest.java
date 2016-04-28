@@ -97,12 +97,32 @@ public class HubIntRestServiceTest {
 			try {
 				helper.getVersion(project, testProperties.getProperty("TEST_VERSION"));
 			} catch (final VersionDoesNotExistException e) {
+				helper.createHubVersion(project, "1", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+				helper.createHubVersion(project, "2", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+				helper.createHubVersion(project, "3", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+				helper.createHubVersion(project, "4", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+				helper.createHubVersion(project, "5", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+				helper.createHubVersion(project, "6", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+				helper.createHubVersion(project, "7", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+				helper.createHubVersion(project, "8", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+				helper.createHubVersion(project, "9", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+				helper.createHubVersion(project, "10", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
 				helper.createHubVersion(project, testProperties.getProperty("TEST_VERSION"),
 						testProperties.getProperty("TEST_PHASE"), testProperties.getProperty("TEST_DISTRIBUTION"));
 			}
 		} catch (final ProjectDoesNotExistException e) {
 			final String projectUrl = helper.createHubProject(testProperties.getProperty("TEST_PROJECT"));
 			final ProjectItem project = helper.getProject(projectUrl);
+			helper.createHubVersion(project, "1", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+			helper.createHubVersion(project, "2", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+			helper.createHubVersion(project, "3", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+			helper.createHubVersion(project, "4", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+			helper.createHubVersion(project, "5", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+			helper.createHubVersion(project, "6", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+			helper.createHubVersion(project, "7", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+			helper.createHubVersion(project, "8", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+			helper.createHubVersion(project, "9", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
+			helper.createHubVersion(project, "10", PhaseEnum.ARCHIVED.name(), DistributionEnum.INTERNAL.name());
 			helper.createHubVersion(project, testProperties.getProperty("TEST_VERSION"),
 					testProperties.getProperty("TEST_PHASE"), testProperties.getProperty("TEST_DISTRIBUTION"));
 		}
@@ -263,7 +283,7 @@ public class HubIntRestServiceTest {
 		final List<ReleaseItem> releaseList = restService.getVersionsForProject(project);
 
 		assertNotNull(releaseList);
-		assertTrue(releaseList.size() > 0);
+		assertTrue(releaseList.size() > 10);
 
 		assertTrue(logger.getErrorList().isEmpty());
 	}
