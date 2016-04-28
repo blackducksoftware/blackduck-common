@@ -31,6 +31,19 @@ public abstract class HubServerConfigValidator<T> {
 
 	public abstract T handleSuccess();
 
+	public T validateServerUrl(final String serverUrl) throws IOException {
+		try {
+			final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+			builder.setHubUrl(serverUrl);
+			builder.validateHubUrl(IntExceptionLogger.LOGGER);
+		} catch (final ValidationException e) {
+			return handleValidationException(e);
+		} catch (final IllegalArgumentException e) {
+			return handleValidationException(new ValidationException(ValidationExceptionEnum.ERROR, e.getMessage(), e));
+		}
+		return handleSuccess();
+	}
+
 	public T validateServerUrl(final String serverUrl, final HubProxyInfo proxyInfo) throws IOException {
 		try {
 			final HubServerConfigBuilder builder = new HubServerConfigBuilder();

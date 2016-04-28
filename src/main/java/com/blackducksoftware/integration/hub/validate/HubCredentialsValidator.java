@@ -45,4 +45,32 @@ public abstract class HubCredentialsValidator<T> {
 		return handleSuccess();
 	}
 
+	public T validateUserName(final String username) throws IOException {
+		try {
+			final HubCredentialsBuilder builder = new HubCredentialsBuilder();
+			builder.setUsername(username);
+			builder.validateUsername(IntExceptionLogger.LOGGER);
+		} catch (final ValidationException e) {
+			return handleValidationException(e);
+		} catch (final IllegalArgumentException e) {
+			return handleValidationException(new ValidationException(ValidationExceptionEnum.ERROR, e.getMessage(), e));
+		}
+
+		return handleSuccess();
+	}
+
+	public T validatePassword(final String password) throws IOException {
+		try {
+			final HubCredentialsBuilder builder = new HubCredentialsBuilder();
+			builder.setPassword(password);
+			builder.validatePassword(IntExceptionLogger.LOGGER);
+		} catch (final ValidationException e) {
+			return handleValidationException(e);
+		} catch (final IllegalArgumentException e) {
+			return handleValidationException(new ValidationException(ValidationExceptionEnum.ERROR, e.getMessage(), e));
+		}
+
+		return handleSuccess();
+	}
+
 }
