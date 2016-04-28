@@ -439,6 +439,7 @@ public class HubIntRestService {
 	public List<ReleaseItem> getVersionsForProject(final ProjectItem project)
 			throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = createClientResource(project.getLink(ProjectItem.VERSION_LINK));
+		resource.addQueryParameter("limit", "10000000");
 		resource.setMethod(Method.GET);
 		handleRequest(resource, null, 0);
 		final int responseCode = resource.getResponse().getStatus().getCode();

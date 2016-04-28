@@ -226,7 +226,7 @@ public class HubIntRestServiceTest {
 
 
 	@Test
-	public void testGetVersionsForProject() throws Exception {
+	public void testGetVersionForProject() throws Exception {
 		final TestLogger logger = new TestLogger();
 
 		final HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
@@ -245,6 +245,29 @@ public class HubIntRestServiceTest {
 
 		assertTrue(logger.getErrorList().isEmpty());
 	}
+
+	@Test
+	public void testGetVersionsForProject() throws Exception {
+		final TestLogger logger = new TestLogger();
+
+		final HubIntRestService restService = new HubIntRestService(testProperties.getProperty("TEST_HUB_SERVER_URL"));
+		restService.setLogger(logger);
+		restService.setCookies(testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"));
+
+		final ProjectItem project = restService.getProjectByName(testProperties.getProperty("TEST_PROJECT"));
+
+		assertNotNull(project);
+		assertEquals(testProperties.getProperty("TEST_PROJECT"), project.getName());
+		assertTrue(logger.getErrorList().isEmpty());
+
+		final List<ReleaseItem> releaseList = restService.getVersionsForProject(project);
+
+		assertNotNull(releaseList);
+		assertTrue(releaseList.size() > 0);
+
+		assertTrue(logger.getErrorList().isEmpty());
+	}
+
 
 	@Test
 	public void testCreateHubProject() throws Exception {
