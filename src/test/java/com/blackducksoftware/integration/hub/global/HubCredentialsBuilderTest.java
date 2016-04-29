@@ -14,6 +14,11 @@ import org.junit.Test;
 import com.blackducksoftware.integration.hub.util.TestLogger;
 
 public class HubCredentialsBuilderTest {
+	private static final String VALID_PASSWORD = "Password";
+	private static final String VALID_USERNAME = "User";
+	private static final String ERROR_MSG_NO_PASSWORD_FOUND = "No Hub Password was found.";
+	private static final String ERROR_MSG_NO_USER_FOUND = "No Hub Username was found.";
+
 	private List<String> expectedMessages;
 
 	private TestLogger logger;
@@ -38,8 +43,8 @@ public class HubCredentialsBuilderTest {
 
 	@Test
 	public void testvalidateCredentialsNull() throws Exception {
-		expectedMessages.add("No Hub Username was found.");
-		expectedMessages.add("No Hub Password was found.");
+		expectedMessages.add(ERROR_MSG_NO_USER_FOUND);
+		expectedMessages.add(ERROR_MSG_NO_PASSWORD_FOUND);
 
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 
@@ -48,8 +53,8 @@ public class HubCredentialsBuilderTest {
 
 	@Test
 	public void testvalidateCredentialsEmpty() throws Exception {
-		expectedMessages.add("No Hub Username was found.");
-		expectedMessages.add("No Hub Password was found.");
+		expectedMessages.add(ERROR_MSG_NO_USER_FOUND);
+		expectedMessages.add(ERROR_MSG_NO_PASSWORD_FOUND);
 
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 		builder.setUsername("");
@@ -61,15 +66,15 @@ public class HubCredentialsBuilderTest {
 	@Test
 	public void testvalidateCredentials() throws Exception {
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
-		builder.setUsername("User");
-		builder.setPassword("Password");
+		builder.setUsername(VALID_USERNAME);
+		builder.setPassword(VALID_PASSWORD);
 
 		assertTrue(builder.validateCredentials(logger));
 	}
 
 	@Test
 	public void testValidateHubUserNull() throws Exception {
-		expectedMessages.add("No Hub Username was found.");
+		expectedMessages.add(ERROR_MSG_NO_USER_FOUND);
 
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 
@@ -79,13 +84,13 @@ public class HubCredentialsBuilderTest {
 	@Test
 	public void testValidateHubUser() throws Exception {
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
-		builder.setUsername("User");
+		builder.setUsername(VALID_USERNAME);
 		assertTrue(builder.validateUsername(logger));
 	}
 
 	@Test
 	public void testValidateHubPasswordNull() throws Exception {
-		expectedMessages.add("No Hub Password was found.");
+		expectedMessages.add(ERROR_MSG_NO_PASSWORD_FOUND);
 
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 
@@ -95,7 +100,7 @@ public class HubCredentialsBuilderTest {
 	@Test
 	public void testValidateHubPassword() throws Exception {
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
-		builder.setPassword("Password");
+		builder.setPassword(VALID_PASSWORD);
 		assertTrue(builder.validatePassword(logger));
 	}
 

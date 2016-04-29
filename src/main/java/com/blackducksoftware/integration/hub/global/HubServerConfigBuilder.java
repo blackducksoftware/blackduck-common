@@ -30,6 +30,11 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 
 public class HubServerConfigBuilder {
+	public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
+	public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
+	public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
+	public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
+
 	public static int DEFAULT_TIMEOUT = 120;
 
 	private String hubUrl;
@@ -63,7 +68,7 @@ public class HubServerConfigBuilder {
 	public boolean validateHubUrl(final IntLogger logger) {
 		boolean valid = true;
 		if (hubUrl == null) {
-			logger.error("No Hub Url was found.");
+			logger.error(ERROR_MSG_URL_NOT_FOUND);
 			return false;
 		}
 
@@ -72,10 +77,10 @@ public class HubServerConfigBuilder {
 			hubURL = new URL(hubUrl);
 			hubURL.toURI();
 		} catch (final MalformedURLException e) {
-			logger.error("The Hub Url is not a valid URL.");
+			logger.error(ERROR_MSG_URL_NOT_VALID);
 			valid = false;
 		} catch (final URISyntaxException e) {
-			logger.error("The Hub Url is not a valid URL.");
+			logger.error(ERROR_MSG_URL_NOT_VALID);
 			valid = false;
 		}
 
@@ -92,10 +97,10 @@ public class HubServerConfigBuilder {
 			}
 			connection.getContent();
 		} catch (final IOException ioe) {
-			logger.error("Can not reach this server : " + hubUrl, ioe);
+			logger.error(ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, ioe);
 			valid = false;
 		} catch (final RuntimeException e) {
-			logger.error("This is not a valid URL : " + hubUrl, e);
+			logger.error(ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl, e);
 			valid = false;
 		}
 
