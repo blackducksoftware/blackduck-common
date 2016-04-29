@@ -129,7 +129,7 @@ public class HubServerConfigBuilderTest {
 		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
 		proxyBuilder.setHost("FakeHost");
 		proxyBuilder.setPort(3128);
-		final HubProxyInfo proxyInfo = proxyBuilder.build();
+		final HubProxyInfo proxyInfo = proxyBuilder.build(logger);
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl("https://google.com");
@@ -142,7 +142,7 @@ public class HubServerConfigBuilderTest {
 	public void testValidateHubUrlValidThroughPassThroughProxy() throws Exception {
 		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
 		setProxyBuilderDefaults(proxyBuilder);
-		final HubProxyInfo proxyInfo = proxyBuilder.build();
+		final HubProxyInfo proxyInfo = proxyBuilder.build(logger);
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		setBuilderDefaults(builder);
@@ -230,7 +230,7 @@ public class HubServerConfigBuilderTest {
 	public void testValidConfigWithProxies() throws Exception {
 		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
 		setProxyBuilderDefaults(proxyBuilder);
-		final HubProxyInfo proxyInfo = proxyBuilder.build();
+		final HubProxyInfo proxyInfo = proxyBuilder.build(logger);
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		setBuilderDefaults(builder);
@@ -250,7 +250,7 @@ public class HubServerConfigBuilderTest {
 		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
 		setProxyBuilderDefaults(proxyBuilder);
 		proxyBuilder.setIgnoredProxyHosts("google");
-		final HubProxyInfo proxyInfo = proxyBuilder.build();
+		final HubProxyInfo proxyInfo = proxyBuilder.build(logger);
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		setBuilderDefaults(builder);
