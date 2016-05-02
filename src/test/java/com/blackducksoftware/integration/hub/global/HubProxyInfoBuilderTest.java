@@ -1,3 +1,22 @@
+/*******************************************************************************
+ * Black Duck Software Suite SDK
+ * Copyright (C) 2016 Black Duck Software, Inc.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ *******************************************************************************/
+
 package com.blackducksoftware.integration.hub.global;
 
 import static org.junit.Assert.assertEquals;
@@ -87,10 +106,11 @@ public class HubProxyInfoBuilderTest {
 	@Test
 	public void testValidateProxyPortNoHost() throws Exception {
 		expectedMessages.add(HubProxyInfoBuilder.WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
+		expectedMessages.add(HubProxyInfoBuilder.ERROR_MSG_PROXY_HOST_REQUIRED);
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost("");
 		builder.setPort(VALID_PORT);
-		assertTrue(builder.validatePort(logger));
+		assertFalse(builder.validatePort(logger));
 	}
 
 	@Test
@@ -187,6 +207,9 @@ public class HubProxyInfoBuilderTest {
 		expectedMessages.add(HubProxyInfoBuilder.WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
 		expectedMessages.add(HubProxyInfoBuilder.WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
 		expectedMessages.add(HubProxyInfoBuilder.WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
+		expectedMessages.add(HubProxyInfoBuilder.ERROR_MSG_PROXY_HOST_REQUIRED);
+		exception.expect(HubIntegrationException.class);
+		exception.expectMessage(HubProxyInfoBuilder.MSG_PROXY_INVALID_CONFIG);
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost("");
 		builder.setPort(VALID_PORT);
@@ -202,7 +225,7 @@ public class HubProxyInfoBuilderTest {
 		exception.expectMessage(HubProxyInfoBuilder.MSG_PROXY_INVALID_CONFIG);
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost(VALID_HOST);
-		builder.setPort(0);
+		builder.setPort(-1);
 		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
 
 		builder.assertValid(logger);
