@@ -20,57 +20,50 @@ package com.blackducksoftware.integration.hub.validate;
 
 import java.io.IOException;
 
-import com.blackducksoftware.integration.hub.ValidationExceptionEnum;
-import com.blackducksoftware.integration.hub.exception.ValidationException;
 import com.blackducksoftware.integration.hub.global.HubCredentialsBuilder;
-import com.blackducksoftware.integration.hub.logging.IntExceptionLogger;
 
-public abstract class HubCredentialsValidator<T> {
-	public abstract T handleValidationException(ValidationException e);
-
-	public abstract T handleSuccess();
+public abstract class HubCredentialsValidator<T> extends AbstractValidator<T> {
 
 	public T validateCredentials(final String username, final String password) throws IOException {
+		ValidationResult result;
 		try {
 			final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 			builder.setUsername(username);
 			builder.setPassword(password);
-			builder.validateCredentials(IntExceptionLogger.LOGGER);
-		} catch (final ValidationException e) {
-			return handleValidationException(e);
+			builder.validateCredentials(getValidationLogger());
+			result = createResult();
 		} catch (final IllegalArgumentException e) {
-			return handleValidationException(new ValidationException(ValidationExceptionEnum.ERROR, e.getMessage(), e));
+			result = handleValidationException(e);
 		}
-
-		return handleSuccess();
+		return processResult(result);
 	}
 
 	public T validateUserName(final String username) throws IOException {
+		ValidationResult result;
 		try {
 			final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 			builder.setUsername(username);
-			builder.validateUsername(IntExceptionLogger.LOGGER);
-		} catch (final ValidationException e) {
-			return handleValidationException(e);
+			builder.validateUsername(getValidationLogger());
+			result = createResult();
 		} catch (final IllegalArgumentException e) {
-			return handleValidationException(new ValidationException(ValidationExceptionEnum.ERROR, e.getMessage(), e));
+			result = handleValidationException(e);
 		}
 
-		return handleSuccess();
+		return processResult(result);
 	}
 
 	public T validatePassword(final String password) throws IOException {
+		ValidationResult result;
 		try {
 			final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 			builder.setPassword(password);
-			builder.validatePassword(IntExceptionLogger.LOGGER);
-		} catch (final ValidationException e) {
-			return handleValidationException(e);
+			builder.validatePassword(getValidationLogger());
+			result = createResult();
 		} catch (final IllegalArgumentException e) {
-			return handleValidationException(new ValidationException(ValidationExceptionEnum.ERROR, e.getMessage(), e));
+			result = handleValidationException(e);
 		}
 
-		return handleSuccess();
+		return processResult(result);
 	}
 
 }

@@ -20,57 +20,48 @@ package com.blackducksoftware.integration.hub.validate;
 
 import java.io.IOException;
 
-import com.blackducksoftware.integration.hub.ValidationExceptionEnum;
-import com.blackducksoftware.integration.hub.exception.ValidationException;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfigBuilder;
-import com.blackducksoftware.integration.hub.logging.IntExceptionLogger;
 
-public abstract class HubServerConfigValidator<T> {
-	public abstract T handleValidationException(ValidationException e);
-
-	public abstract T handleSuccess();
+public abstract class HubServerConfigValidator<T> extends AbstractValidator<T> {
 
 	public T validateServerUrl(final String serverUrl) throws IOException {
+		ValidationResult result;
 		try {
 			final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 			builder.setHubUrl(serverUrl);
-			builder.validateHubUrl(IntExceptionLogger.LOGGER);
-		} catch (final ValidationException e) {
-			return handleValidationException(e);
+			builder.validateHubUrl(getValidationLogger());
+			result = createResult();
 		} catch (final IllegalArgumentException e) {
-			return handleValidationException(new ValidationException(ValidationExceptionEnum.ERROR, e.getMessage(), e));
+			result = handleValidationException(e);
 		}
-		return handleSuccess();
+		return processResult(result);
 	}
 
 	public T validateServerUrl(final String serverUrl, final HubProxyInfo proxyInfo) throws IOException {
+		ValidationResult result;
 		try {
 			final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 			builder.setHubUrl(serverUrl);
 			builder.setProxyInfo(proxyInfo);
-			builder.validateHubUrl(IntExceptionLogger.LOGGER);
-		} catch (final ValidationException e) {
-			return handleValidationException(e);
+			builder.validateHubUrl(getValidationLogger());
+			result = createResult();
 		} catch (final IllegalArgumentException e) {
-			return handleValidationException(new ValidationException(ValidationExceptionEnum.ERROR, e.getMessage(), e));
+			result = handleValidationException(e);
 		}
-
-		return handleSuccess();
+		return processResult(result);
 	}
 
 	public T validateTimeout(final String timeout) throws IOException {
+		ValidationResult result;
 		try {
 			final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 			builder.setTimeout(timeout);
-			builder.validateTimeout(IntExceptionLogger.LOGGER);
-		} catch (final ValidationException e) {
-			return handleValidationException(e);
+			builder.validateTimeout(getValidationLogger());
+			result = createResult();
 		} catch (final IllegalArgumentException e) {
-			return handleValidationException(new ValidationException(ValidationExceptionEnum.ERROR, e.getMessage(), e));
+			result = handleValidationException(e);
 		}
-
-		return handleSuccess();
+		return processResult(result);
 	}
-
 }

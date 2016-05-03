@@ -18,19 +18,18 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.util;
 
-import com.blackducksoftware.integration.hub.exception.ValidationException;
 import com.blackducksoftware.integration.hub.validate.HubCredentialsValidator;
+import com.blackducksoftware.integration.hub.validate.ValidationResult;
+import com.blackducksoftware.integration.hub.validate.ValidationResultEnum;
 
 public class TestCredentialsValidator extends HubCredentialsValidator<Boolean> {
 
 	@Override
-	public Boolean handleValidationException(final ValidationException e) {
-
-		return Boolean.FALSE;
-	}
-
-	@Override
-	public Boolean handleSuccess() {
-		return Boolean.TRUE;
+	public Boolean processResult(final ValidationResult result) {
+		if (result.getResultType() != ValidationResultEnum.OK) {
+			return Boolean.FALSE;
+		} else {
+			return Boolean.TRUE;
+		}
 	}
 }

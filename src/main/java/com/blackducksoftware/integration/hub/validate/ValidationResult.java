@@ -16,20 +16,22 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.util;
+package com.blackducksoftware.integration.hub.validate;
 
-import com.blackducksoftware.integration.hub.validate.HubProxyInfoValidator;
-import com.blackducksoftware.integration.hub.validate.ValidationResult;
-import com.blackducksoftware.integration.hub.validate.ValidationResultEnum;
+public class ValidationResult {
+	private final ValidationResultEnum resultType;
+	private final String message;
 
-public class TestProxyInfoValidator extends HubProxyInfoValidator<Boolean> {
+	public ValidationResult(final ValidationResultEnum resultType, final String message) {
+		this.resultType = resultType;
+		this.message = message;
+	}
 
-	@Override
-	public Boolean processResult(final ValidationResult result) {
-		if (result.getResultType() != ValidationResultEnum.OK) {
-			return Boolean.FALSE;
-		} else {
-			return Boolean.TRUE;
-		}
+	public ValidationResultEnum getResultType() {
+		return resultType;
+	}
+
+	public String getMessage() {
+		return message;
 	}
 }
