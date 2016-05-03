@@ -39,6 +39,13 @@ public class HubCredentials implements Serializable {
 		this.encryptedPassword = PasswordEncrypter.encrypt(password);
 	}
 
+	public HubCredentials(final String username, final String encryptedPassword, final int actualPasswordLength)
+			throws IllegalArgumentException, EncryptionException {
+		this.username = username;
+		this.actualPasswordLength = actualPasswordLength;
+		this.encryptedPassword = encryptedPassword;
+	}
+
 	public String getMaskedPassword() {
 		final char[] array = new char[actualPasswordLength];
 		Arrays.fill(array, '*');
