@@ -48,12 +48,26 @@ public class HubProxyInfo implements Serializable {
 
 	public HubProxyInfo(final String host, final int port, final String username, final String password,
 			final String ignoredProxyHosts)
-			throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+					throws IllegalArgumentException, EncryptionException, HubIntegrationException {
 		this.host = host;
 		this.port = port;
 
 		if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
 			proxyCredentials = new HubCredentials(username, password);
+		} else {
+			proxyCredentials = null;
+		}
+		this.ignoredProxyHosts = ignoredProxyHosts;
+	}
+
+	public HubProxyInfo(final String host, final int port, final String username, final String encryptedPassword,
+			final int actualPasswordLength, final String ignoredProxyHosts)
+					throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+		this.host = host;
+		this.port = port;
+
+		if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(encryptedPassword)) {
+			proxyCredentials = new HubCredentials(username, encryptedPassword, actualPasswordLength);
 		} else {
 			proxyCredentials = null;
 		}
