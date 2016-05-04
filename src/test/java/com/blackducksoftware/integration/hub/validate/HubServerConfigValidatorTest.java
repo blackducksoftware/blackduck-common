@@ -29,8 +29,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.builder.HubProxyInfoBuilder;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
-import com.blackducksoftware.integration.hub.global.HubProxyInfoBuilder;
 import com.blackducksoftware.integration.hub.util.TestLogger;
 import com.blackducksoftware.integration.hub.util.TestServerConfigValidator;
 

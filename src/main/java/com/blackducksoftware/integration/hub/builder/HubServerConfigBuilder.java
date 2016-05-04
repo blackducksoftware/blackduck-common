@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.global;
+package com.blackducksoftware.integration.hub.builder;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -26,9 +26,9 @@ import java.net.URLConnection;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.logging.IntLogger;
-import com.blackducksoftware.integration.hub.validate.AbstractBuilder;
-import com.blackducksoftware.integration.hub.validate.ValidationResult;
+import com.blackducksoftware.integration.hub.global.HubCredentials;
+import com.blackducksoftware.integration.hub.global.HubProxyInfo;
+import com.blackducksoftware.integration.hub.global.HubServerConfig;
 
 public class HubServerConfigBuilder extends AbstractBuilder {
 
@@ -44,13 +44,9 @@ public class HubServerConfigBuilder extends AbstractBuilder {
 	private HubCredentials credentials;
 	private HubProxyInfo proxyInfo;
 
-	public HubServerConfigBuilder(final boolean shouldEatSetterExceptions) {
-		super(shouldEatSetterExceptions);
-	}
-
 	@Override
-	public ValidationResult build(final IntLogger logger) {
-		assertValid(logger);
+	public ValidationResult build() {
+		final ValidationResult result = assertValid();
 		URL hubURL = null;
 		try {
 			hubURL = new URL(hubUrl);
@@ -58,30 +54,26 @@ public class HubServerConfigBuilder extends AbstractBuilder {
 			e.printStackTrace();
 		}
 		new HubServerConfig(hubURL, timeout, credentials, proxyInfo);
-		return null;
+		return result;
 	}
 
 	@Override
-	public ValidationResult assertValid(final IntLogger logger) {
-		boolean valid = true;
+	public ValidationResult assertValid() {
+		final ValidationResult result = null;
 
-		if (!validateHubUrl(logger)) {
-			valid = false;
-		}
+		validateHubUrl(result);
 
-		if (!validateTimeout(logger, DEFAULT_TIMEOUT)) {
-			valid = false;
-		}
+		validateTimeout(result, DEFAULT_TIMEOUT);
 
-		if (!valid) {
-			// throw new HubIntegrationException(
-			// "The server configuration is not valid - please check the log for
-			// the specific issues.");
-		}
-		return null;
+		// if (!valid) {
+		// // throw new HubIntegrationException(
+		// // "The server configuration is not valid - please check the log for
+		// // the specific issues.");
+		// }
+		return result;
 	}
 
-	public boolean validateHubUrl(final IntLogger logger) {
+	public boolean validateHubUrl(final ValidationResult result) {
 		boolean valid = true;
 		if (hubUrl == null) {
 			logger.error(ERROR_MSG_URL_NOT_FOUND);
@@ -123,11 +115,11 @@ public class HubServerConfigBuilder extends AbstractBuilder {
 		return valid;
 	}
 
-	public boolean validateTimeout(final IntLogger logger) {
-		return validateTimeout(logger, null);
+	public boolean validateTimeout(final ValidationResult result) {
+		return validateTimeout(result, null);
 	}
 
-	private boolean validateTimeout(final IntLogger logger, final Integer defaultTimeout) {
+	private boolean validateTimeout(final ValidationResult result, final Integer defaultTimeout) {
 		boolean valid = true;
 		if (defaultTimeout != null && timeout <= 0) {
 			timeout = defaultTimeout;

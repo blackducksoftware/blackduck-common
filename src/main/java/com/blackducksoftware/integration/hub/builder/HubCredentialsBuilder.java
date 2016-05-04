@@ -16,28 +16,23 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.global;
+package com.blackducksoftware.integration.hub.builder;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
-import com.blackducksoftware.integration.hub.validate.AbstractBuilder;
-import com.blackducksoftware.integration.hub.validate.ValidationResult;
+import com.blackducksoftware.integration.hub.global.HubCredentials;
 
 public class HubCredentialsBuilder extends AbstractBuilder {
 
 	private String username;
 	private String password;
 
-	public HubCredentialsBuilder() {
-		super(false);
-	}
 
 	@Override
-	public ValidationResult build(final IntLogger logger){
-		assertValid(logger);
+	public ValidationResult build() {
+		final ValidationResult result = assertValid();
 		String encryptedPassword = null;
 		try {
 			encryptedPassword = PasswordEncrypter.encrypt(password);
@@ -49,36 +44,27 @@ public class HubCredentialsBuilder extends AbstractBuilder {
 	}
 
 	@Override
-	public ValidationResult assertValid(final IntLogger logger) {
-		boolean valid = true;
+	public ValidationResult assertValid() {
+		final ValidationResult result = null;
 
-		if (!validateCredentials(logger)) {
-			valid = false;
-		}
+		validateCredentials(result);
 
-		if (!valid) {
-			// throw new HubIntegrationException(
-			// "The credentials are not valid - please check the log for the
-			// specific issues.");
-		}
+		// if (!valid) {
+		// // throw new HubIntegrationException(
+		// // "The credentials are not valid - please check the log for the
+		// // specific issues.");
+		// }
 		return null;
 	}
 
-	public boolean validateCredentials(final IntLogger logger) {
-		boolean valid = true;
+	public void validateCredentials(final ValidationResult result) {
 
-		if (!validateUsername(logger)) {
-			valid = false;
-		}
+		validateUsername(result);
+		validatePassword(result);
 
-		if (!validatePassword(logger)) {
-			valid = false;
-		}
-
-		return valid;
 	}
 
-	public boolean validateUsername(final IntLogger logger) {
+	public boolean validateUsername(final ValidationResult result) {
 		boolean valid = true;
 		if (StringUtils.isBlank(username)) {
 			valid = false;
@@ -87,7 +73,7 @@ public class HubCredentialsBuilder extends AbstractBuilder {
 		return valid;
 	}
 
-	public boolean validatePassword(final IntLogger logger) {
+	public boolean validatePassword(final ValidationResult result) {
 		boolean valid = true;
 		if (StringUtils.isBlank(password)) {
 			valid = false;

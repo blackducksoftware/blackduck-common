@@ -18,9 +18,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.util;
 
-import com.blackducksoftware.integration.hub.validate.HubCredentialsValidator;
-import com.blackducksoftware.integration.hub.validate.ValidationResult;
-import com.blackducksoftware.integration.hub.validate.ValidationResultEnum;
+import com.blackducksoftware.integration.hub.builder.HubCredentialsValidator;
+import com.blackducksoftware.integration.hub.builder.ValidationResult;
+import com.blackducksoftware.integration.hub.builder.ValidationResultEnum;
 
 public class TestCredentialsValidator extends HubCredentialsValidator<Boolean> {
 

@@ -16,22 +16,8 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.validate;
+package com.blackducksoftware.integration.hub.builder;
 
-public class ValidationResult {
-	private final ValidationResultEnum resultType;
-	private final String message;
-
-	public ValidationResult(final ValidationResultEnum resultType, final String message) {
-		this.resultType = resultType;
-		this.message = message;
-	}
-
-	public ValidationResultEnum getResultType() {
-		return resultType;
-	}
-
-	public String getMessage() {
-		return message;
-	}
+public enum ValidationResultEnum {
+	ERROR, OK, WARN;
 }

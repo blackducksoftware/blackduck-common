@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.global;
+package com.blackducksoftware.integration.hub.builder;
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -25,9 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
-import com.blackducksoftware.integration.hub.validate.AbstractBuilder;
-import com.blackducksoftware.integration.hub.validate.ValidationResult;
+import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 
 public class HubProxyInfoBuilder extends AbstractBuilder {
 
@@ -44,13 +42,9 @@ public class HubProxyInfoBuilder extends AbstractBuilder {
 	private String password;
 	private String ignoredProxyHosts;
 
-	public HubProxyInfoBuilder(final boolean shouldEatSetterExceptions) {
-		super(shouldEatSetterExceptions);
-	}
-
 	@Override
-	public ValidationResult build(final IntLogger logger) {
-		assertValid(logger);
+	public ValidationResult build() {
+		final ValidationResult result = assertValid();
 		String encryptedProxyPass = null;
 		try {
 			encryptedProxyPass = PasswordEncrypter.encrypt(password);
@@ -60,32 +54,26 @@ public class HubProxyInfoBuilder extends AbstractBuilder {
 			e.printStackTrace();
 		}
 		new HubProxyInfo(host, port, username, encryptedProxyPass, password.length(), ignoredProxyHosts);
-		return null;
+		return result;
 	}
 
 	@Override
-	public ValidationResult assertValid(final IntLogger logger) {
-		boolean valid = true;
+	public ValidationResult assertValid() {
+		final ValidationResult result = null;
 
-		if (!validatePort(logger)) {
-			valid = false;
-		}
+		validatePort(result);
 
-		if (!validateCredentials(logger)) {
-			valid = false;
-		}
+		validateCredentials(result);
 
-		if (!validateIgnoreHosts(logger)) {
-			valid = false;
-		}
+		validateIgnoreHosts(result);
 
-		if (!valid) {
-			// throw new HubIntegrationException(MSG_PROXY_INVALID_CONFIG);
-		}
+		// if (!valid) {
+		// // throw new HubIntegrationException(MSG_PROXY_INVALID_CONFIG);
+		// }
 		return null;
 	}
 
-	public boolean validatePort(final IntLogger logger) {
+	public boolean validatePort(final ValidationResult result) {
 		boolean valid = true;
 		if (StringUtils.isBlank(host)) {
 			logger.warn(WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
@@ -101,7 +89,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder {
 		return valid;
 	}
 
-	public boolean validateCredentials(final IntLogger logger) {
+	public boolean validateCredentials(final ValidationResult result) {
 		boolean valid = true;
 
 		if (StringUtils.isBlank(host)) {
@@ -120,7 +108,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder {
 		return valid;
 	}
 
-	public boolean validateIgnoreHosts(final IntLogger logger) {
+	public boolean validateIgnoreHosts(final ValidationResult result) {
 		boolean valid = true;
 
 		if (StringUtils.isBlank(host)) {

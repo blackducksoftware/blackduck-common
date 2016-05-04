@@ -16,39 +16,27 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.validate;
+package com.blackducksoftware.integration.hub.builder;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.logging.IntLogger;
-
 public abstract class AbstractBuilder {
 
-	private final boolean shouldEatSetterExceptions;
+	public abstract ValidationResult build();
 
-	public AbstractBuilder(final boolean shouldEatSetterExceptions) {
-		this.shouldEatSetterExceptions = shouldEatSetterExceptions;
-	}
+	public abstract ValidationResult assertValid();
 
-	public boolean isShouldEatSetterExceptions() {
-		return shouldEatSetterExceptions;
-	}
-
-	public abstract ValidationResult build(final IntLogger logger);
-
-	public abstract ValidationResult assertValid(final IntLogger logger);
-
-	protected int stringToInteger(final String integer) {
+	protected int stringToInteger(final String integer, final Integer defaultInt) {
 		final String integerString = StringUtils.trimToNull(integer);
 		if (integerString != null) {
 			try {
 				return Integer.valueOf(integerString);
 			} catch (final NumberFormatException e) {
-				if (!isShouldEatSetterExceptions()) {
+				if (defaultInt != null) {
 					throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.", e);
 				}
 			}
 		}
-		return 0;
+		return defaultInt;
 	}
 }
