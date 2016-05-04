@@ -18,20 +18,40 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.builder;
 
-public class ValidationResult {
-	private final ValidationResultEnum resultType;
-	private final String message;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
-	public ValidationResult(final ValidationResultEnum resultType, final String message) {
-		this.resultType = resultType;
-		this.message = message;
+public class ValidationResults<Key, Type> {
+
+	private Type constructedObject;
+	private final Map<Key, List<ValidationResult>> resultMap;
+
+	public ValidationResults() {
+		resultMap = new HashMap<Key, List<ValidationResult>>();
 	}
 
-	public ValidationResultEnum getResultType() {
-		return resultType;
+	public void addResult(final Key fieldKey, final ValidationResult result) {
+		final List<ValidationResult> resultList;
+
+		if (resultMap.containsKey(fieldKey)) {
+			resultList = resultMap.get(fieldKey);
+		} else {
+			resultList = new Vector<ValidationResult>();
+			resultMap.put(fieldKey, resultList);
+		}
+
+		resultList.add(result);
 	}
 
-	public String getMessage() {
-		return message;
+	public Type getConstructedObject() {
+		return constructedObject;
 	}
+
+	public void setConstructedObject(final Type constructedObject) {
+		this.constructedObject = constructedObject;
+	}
+	// add methods to check for errors, warnings, construct messages.
+
 }
