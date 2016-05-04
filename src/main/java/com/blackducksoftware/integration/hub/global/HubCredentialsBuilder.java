@@ -20,22 +20,36 @@ package com.blackducksoftware.integration.hub.global;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.hub.validate.AbstractBuilder;
+import com.blackducksoftware.integration.hub.validate.ValidationResult;
 
-public class HubCredentialsBuilder {
+public class HubCredentialsBuilder extends AbstractBuilder {
+
 	private String username;
 	private String password;
 
-	public HubCredentials build(final IntLogger logger)
-			throws HubIntegrationException, IllegalArgumentException, EncryptionException {
-		assertValid(logger);
-
-		return new HubCredentials(username, password);
+	public HubCredentialsBuilder() {
+		super(false);
 	}
 
-	public void assertValid(final IntLogger logger) throws HubIntegrationException {
+	@Override
+	public ValidationResult build(final IntLogger logger){
+		assertValid(logger);
+		String encryptedPassword = null;
+		try {
+			encryptedPassword = PasswordEncrypter.encrypt(password);
+		} catch (final EncryptionException e) {
+			e.printStackTrace();
+		}
+		new HubCredentials(username, encryptedPassword, password.length());
+		return null;
+	}
+
+	@Override
+	public ValidationResult assertValid(final IntLogger logger) {
 		boolean valid = true;
 
 		if (!validateCredentials(logger)) {
@@ -43,9 +57,11 @@ public class HubCredentialsBuilder {
 		}
 
 		if (!valid) {
-			throw new HubIntegrationException(
-					"The credentials are not valid - please check the log for the specific issues.");
+			// throw new HubIntegrationException(
+			// "The credentials are not valid - please check the log for the
+			// specific issues.");
 		}
+		return null;
 	}
 
 	public boolean validateCredentials(final IntLogger logger) {

@@ -61,8 +61,7 @@ public class HubProxyInfo implements Serializable {
 	}
 
 	public HubProxyInfo(final String host, final int port, final String username, final String encryptedPassword,
-			final int actualPasswordLength, final String ignoredProxyHosts)
-					throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+			final int actualPasswordLength, final String ignoredProxyHosts) {
 		this.host = host;
 		this.port = port;
 

@@ -23,11 +23,14 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.hub.validate.AbstractBuilder;
+import com.blackducksoftware.integration.hub.validate.ValidationResult;
 
-public class HubProxyInfoBuilder {
+public class HubProxyInfoBuilder extends AbstractBuilder {
+
 	public static final String MSG_PROXY_INVALID_CONFIG = "The proxy information not valid - please check the log for the specific issues.";
 	public static final String ERROR_MSG_IGNORE_HOSTS_INVALID = "Proxy ignore hosts does not compile to a valid regular expression.";
 	public static final String ERROR_MSG_CREDENTIALS_INVALID = "Proxy username and password must both be populated or both be empty.";
@@ -41,13 +44,27 @@ public class HubProxyInfoBuilder {
 	private String password;
 	private String ignoredProxyHosts;
 
-	public HubProxyInfo build(final IntLogger logger)
-			throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-		assertValid(logger);
-		return new HubProxyInfo(host, port, username, password, ignoredProxyHosts);
+	public HubProxyInfoBuilder(final boolean shouldEatSetterExceptions) {
+		super(shouldEatSetterExceptions);
 	}
 
-	public void assertValid(final IntLogger logger) throws HubIntegrationException {
+	@Override
+	public ValidationResult build(final IntLogger logger) {
+		assertValid(logger);
+		String encryptedProxyPass = null;
+		try {
+			encryptedProxyPass = PasswordEncrypter.encrypt(password);
+		} catch (final IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (final EncryptionException e) {
+			e.printStackTrace();
+		}
+		new HubProxyInfo(host, port, username, encryptedProxyPass, password.length(), ignoredProxyHosts);
+		return null;
+	}
+
+	@Override
+	public ValidationResult assertValid(final IntLogger logger) {
 		boolean valid = true;
 
 		if (!validatePort(logger)) {
@@ -63,8 +80,9 @@ public class HubProxyInfoBuilder {
 		}
 
 		if (!valid) {
-			throw new HubIntegrationException(MSG_PROXY_INVALID_CONFIG);
+			// throw new HubIntegrationException(MSG_PROXY_INVALID_CONFIG);
 		}
+		return null;
 	}
 
 	public boolean validatePort(final IntLogger logger) {
@@ -142,6 +160,10 @@ public class HubProxyInfoBuilder {
 
 	public void setPort(final int port) {
 		this.port = port;
+	}
+
+	public void setPort(final String port) {
+		this.port = stringToInteger(port);
 	}
 
 	public String getUsername() {

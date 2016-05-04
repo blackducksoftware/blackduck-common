@@ -26,10 +26,12 @@ import java.net.URLConnection;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.hub.validate.AbstractBuilder;
+import com.blackducksoftware.integration.hub.validate.ValidationResult;
 
-public class HubServerConfigBuilder {
+public class HubServerConfigBuilder extends AbstractBuilder {
+
 	public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
 	public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
 	public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
@@ -42,13 +44,25 @@ public class HubServerConfigBuilder {
 	private HubCredentials credentials;
 	private HubProxyInfo proxyInfo;
 
-	public HubServerConfig build(final IntLogger logger) throws HubIntegrationException, MalformedURLException {
-		assertValid(logger);
-
-		return new HubServerConfig(new URL(hubUrl), timeout, credentials, proxyInfo);
+	public HubServerConfigBuilder(final boolean shouldEatSetterExceptions) {
+		super(shouldEatSetterExceptions);
 	}
 
-	public void assertValid(final IntLogger logger) throws HubIntegrationException {
+	@Override
+	public ValidationResult build(final IntLogger logger) {
+		assertValid(logger);
+		URL hubURL = null;
+		try {
+			hubURL = new URL(hubUrl);
+		} catch (final MalformedURLException e) {
+			e.printStackTrace();
+		}
+		new HubServerConfig(hubURL, timeout, credentials, proxyInfo);
+		return null;
+	}
+
+	@Override
+	public ValidationResult assertValid(final IntLogger logger) {
 		boolean valid = true;
 
 		if (!validateHubUrl(logger)) {
@@ -60,9 +74,11 @@ public class HubServerConfigBuilder {
 		}
 
 		if (!valid) {
-			throw new HubIntegrationException(
-					"The server configuration is not valid - please check the log for the specific issues.");
+			// throw new HubIntegrationException(
+			// "The server configuration is not valid - please check the log for
+			// the specific issues.");
 		}
+		return null;
 	}
 
 	public boolean validateHubUrl(final IntLogger logger) {
@@ -156,18 +172,6 @@ public class HubServerConfigBuilder {
 
 	public String getHubUrl() {
 		return hubUrl;
-	}
-
-	private int stringToInteger(final String integer) {
-		final String integerString = StringUtils.trimToNull(integer);
-		if (integerString != null) {
-			try {
-				return Integer.valueOf(integerString);
-			} catch (final NumberFormatException e) {
-				throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.", e);
-			}
-		}
-		return 0;
 	}
 
 }
