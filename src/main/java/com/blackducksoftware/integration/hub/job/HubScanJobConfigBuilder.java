@@ -38,23 +38,14 @@ public class HubScanJobConfigBuilder {
 	public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
 	private String projectName;
-
 	private String version;
-
 	private String phase;
-
 	private String distribution;
-
 	private String workingDirectory;
-
 	private boolean shouldGenerateRiskReport;
-
 	private int maxWaitTimeForBomUpdate;
-
 	private int scanMemory;
-
 	private final Set<String> scanTargetPaths = new HashSet<String>();
-
 	private boolean disableScanTargetPathExistenceCheck;
 
 	public HubScanJobConfig build(final IntLogger logger) throws HubIntegrationException, IOException {

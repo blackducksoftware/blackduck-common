@@ -18,67 +18,131 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.global;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.Authenticator;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.blackducksoftware.integration.hub.encryption.PasswordDecrypter;
+import com.blackducksoftware.integration.hub.exception.EncryptionException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 
 public class HubProxyInfo implements Serializable {
 
-	private static final long serialVersionUID = 8813395288911907788L;
+	private static final long serialVersionUID = -7476704373593358472L;
 
 	private final String host;
-
-	private final Integer port;
-
-	private final String proxyUsername;
-
-	private final String proxyPassword;
-
+	private final int port;
+	private final HubCredentials proxyCredentials;
 	private final String ignoredProxyHosts;
 
-	private final List<Pattern> ignoredProxyHostPatterns;
-
-	private final boolean hubUrlIgnored;
-
-
-	public HubProxyInfo(final String host, final Integer port, final String noProxyHosts,
-			final List<Pattern> noProxyHostsPatterns, final String proxyUsername, final String proxyPassword,
-			final boolean hubUrlIgnored) {
+	public HubProxyInfo(final String host, final int port, final String username, final String password,
+			final String ignoredProxyHosts)
+					throws IllegalArgumentException, EncryptionException, HubIntegrationException {
 		this.host = host;
 		this.port = port;
-		this.ignoredProxyHosts = noProxyHosts;
-		this.ignoredProxyHostPatterns = noProxyHostsPatterns;
-		this.proxyUsername = proxyUsername;
-		this.proxyPassword = proxyPassword;
-		this.hubUrlIgnored = hubUrlIgnored;
+
+		if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+			proxyCredentials = new HubCredentials(username, password);
+		} else {
+			proxyCredentials = null;
+		}
+		this.ignoredProxyHosts = ignoredProxyHosts;
 	}
 
-	public String getHost() {
-		return host;
+	public HubProxyInfo(final String host, final int port, final String username, final String encryptedPassword,
+			final int actualPasswordLength, final String ignoredProxyHosts)
+					throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+		this.host = host;
+		this.port = port;
+
+		if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(encryptedPassword)) {
+			proxyCredentials = new HubCredentials(username, encryptedPassword, actualPasswordLength);
+		} else {
+			proxyCredentials = null;
+		}
+		this.ignoredProxyHosts = ignoredProxyHosts;
 	}
 
-	public Integer getPort() {
-		return port;
+	public URLConnection openConnection(final URL url) throws IOException {
+		if (shouldUseProxyForUrl(url)) {
+			final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
+			setDefaultAuthenticator();
+
+			return url.openConnection(proxy);
+		}
+
+		return url.openConnection();
 	}
 
-	public String getProxyUsername() {
-		return proxyUsername;
+	public boolean shouldUseProxyForUrl(final URL url) {
+		final List<Pattern> ignoredProxyHostPatterns = getIgnoredProxyHostPatterns();
+		return !shouldIgnoreHost(url.getHost(), ignoredProxyHostPatterns);
 	}
 
-	public String getProxyPassword() {
-		return proxyPassword;
+	public void setDefaultAuthenticator() {
+		if (getUsername() != null && getEncryptedPassword() != null) {
+			Authenticator.setDefault(new Authenticator() {
+				@Override
+				public PasswordAuthentication getPasswordAuthentication() {
+					try {
+						return new PasswordAuthentication(getProxyCredentials().getUsername(),
+								PasswordDecrypter.decrypt(getProxyCredentials().getEncryptedPassword()).toCharArray());
+					} catch (final Exception e) {
+					}
+					return null;
+				}
+			});
+		} else {
+			Authenticator.setDefault(null);
+		}
 	}
 
-	public String getIgnoredProxyHosts() {
-		return ignoredProxyHosts;
+	/**
+	 * Checks the list of user defined host names that should be connected to
+	 * directly and not go through the proxy. If the hostToMatch matches any of
+	 * these hose names then this method returns true.
+	 *
+	 */
+	private boolean shouldIgnoreHost(final String hostToMatch, final List<Pattern> ignoredProxyHostPatterns) {
+		if (StringUtils.isBlank(hostToMatch) || null == ignoredProxyHostPatterns
+				|| ignoredProxyHostPatterns.isEmpty()) {
+			return false;
+		}
+
+		for (final Pattern ignoredProxyHostPattern : ignoredProxyHostPatterns) {
+			final Matcher m = ignoredProxyHostPattern.matcher(hostToMatch);
+			return m.find();
+		}
+		return false;
 	}
 
-	public List<Pattern> getIgnoredProxyHostPatterns() {
+	private List<Pattern> getIgnoredProxyHostPatterns() {
+		final List<Pattern> ignoredProxyHostPatterns = new ArrayList<Pattern>();
+		if (StringUtils.isNotBlank(ignoredProxyHosts)) {
+			String[] ignoreHosts = null;
+			if (ignoredProxyHosts.contains(",")) {
+				ignoreHosts = ignoredProxyHosts.split(",");
+				for (final String ignoreHost : ignoreHosts) {
+					final Pattern pattern = Pattern.compile(ignoreHost.trim());
+					ignoredProxyHostPatterns.add(pattern);
+				}
+			} else {
+				final Pattern pattern = Pattern.compile(ignoredProxyHosts);
+				ignoredProxyHostPatterns.add(pattern);
+			}
+		}
 		return ignoredProxyHostPatterns;
-	}
-
-	public boolean isHubUrlIgnored() {
-		return hubUrlIgnored;
 	}
 
 	@Override
@@ -88,16 +152,14 @@ public class HubProxyInfo implements Serializable {
 		builder.append(host);
 		builder.append(", port=");
 		builder.append(port);
-		builder.append(", proxyUsername=");
-		builder.append(proxyUsername);
-		builder.append(", proxyPassword=");
-		builder.append(proxyPassword);
+		builder.append(", username=");
+		builder.append(getUsername());
+		builder.append(", encryptedPassword=");
+		builder.append(getEncryptedPassword());
+		builder.append(", actualPasswordLength=");
+		builder.append(getActualPasswordLength());
 		builder.append(", ignoredProxyHosts=");
 		builder.append(ignoredProxyHosts);
-		builder.append(", ignoredProxyHostPatterns=");
-		builder.append(ignoredProxyHostPatterns);
-		builder.append(", hubUrlIgnored=");
-		builder.append(hubUrlIgnored);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -106,13 +168,10 @@ public class HubProxyInfo implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((proxyCredentials == null) ? 0 : proxyCredentials.hashCode());
 		result = prime * result + ((host == null) ? 0 : host.hashCode());
-		result = prime * result + (hubUrlIgnored ? 1231 : 1237);
-		result = prime * result + ((ignoredProxyHostPatterns == null) ? 0 : ignoredProxyHostPatterns.hashCode());
 		result = prime * result + ((ignoredProxyHosts == null) ? 0 : ignoredProxyHosts.hashCode());
-		result = prime * result + ((port == null) ? 0 : port.hashCode());
-		result = prime * result + ((proxyPassword == null) ? 0 : proxyPassword.hashCode());
-		result = prime * result + ((proxyUsername == null) ? 0 : proxyUsername.hashCode());
+		result = prime * result + port;
 		return result;
 	}
 
@@ -128,21 +187,19 @@ public class HubProxyInfo implements Serializable {
 			return false;
 		}
 		final HubProxyInfo other = (HubProxyInfo) obj;
+		if (getProxyCredentials() == null) {
+			if (other.getProxyCredentials() != null) {
+				return false;
+			}
+		} else if (!getProxyCredentials().equals(other.getProxyCredentials())) {
+			return false;
+		}
+
 		if (host == null) {
 			if (other.host != null) {
 				return false;
 			}
 		} else if (!host.equals(other.host)) {
-			return false;
-		}
-		if (hubUrlIgnored != other.hubUrlIgnored) {
-			return false;
-		}
-		if (ignoredProxyHostPatterns == null) {
-			if (other.ignoredProxyHostPatterns != null) {
-				return false;
-			}
-		} else if (!ignoredProxyHostPatterns.equals(other.ignoredProxyHostPatterns)) {
 			return false;
 		}
 		if (ignoredProxyHosts == null) {
@@ -152,28 +209,67 @@ public class HubProxyInfo implements Serializable {
 		} else if (!ignoredProxyHosts.equals(other.ignoredProxyHosts)) {
 			return false;
 		}
-		if (port == null) {
-			if (other.port != null) {
-				return false;
-			}
-		} else if (!port.equals(other.port)) {
+		if (port != other.port) {
 			return false;
 		}
-		if (proxyPassword == null) {
-			if (other.proxyPassword != null) {
-				return false;
-			}
-		} else if (!proxyPassword.equals(other.proxyPassword)) {
-			return false;
-		}
-		if (proxyUsername == null) {
-			if (other.proxyUsername != null) {
-				return false;
-			}
-		} else if (!proxyUsername.equals(other.proxyUsername)) {
-			return false;
-		}
+
 		return true;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public String getUsername() {
+		if (getProxyCredentials() == null) {
+			return null;
+		} else {
+			return getProxyCredentials().getUsername();
+		}
+	}
+
+	public String getEncryptedPassword() {
+		if (getProxyCredentials() == null) {
+			return null;
+		} else {
+			return getProxyCredentials().getEncryptedPassword();
+		}
+	}
+
+	public String getDecryptedPassword() throws IllegalArgumentException, EncryptionException {
+		if (getProxyCredentials() == null) {
+			return null;
+		} else {
+			return getProxyCredentials().getDecryptedPassword();
+		}
+	}
+
+	public String getMaskedPassword() {
+		if (getProxyCredentials() == null) {
+			return null;
+		} else {
+			return getProxyCredentials().getMaskedPassword();
+		}
+	}
+
+	public int getActualPasswordLength() {
+		if (getProxyCredentials() == null) {
+			return 0;
+		} else {
+			return getProxyCredentials().getActualPasswordLength();
+		}
+	}
+
+	public String getIgnoredProxyHosts() {
+		return ignoredProxyHosts;
+	}
+
+	private HubCredentials getProxyCredentials() {
+		return proxyCredentials;
 	}
 
 }

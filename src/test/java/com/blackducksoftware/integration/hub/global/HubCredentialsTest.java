@@ -16,6 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
+
 package com.blackducksoftware.integration.hub.global;
 
 import static org.junit.Assert.assertEquals;
@@ -27,39 +28,49 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.util.TestLogger;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
 public class HubCredentialsTest {
-
 	@Test
 	public void testHubCredentials() throws IllegalArgumentException, EncryptionException, NoSuchMethodException,
-	IllegalAccessException, InvocationTargetException {
+			IllegalAccessException, InvocationTargetException, HubIntegrationException {
+		final TestLogger logger = new TestLogger();
+
 		final String hubUser1 = "hubUser1";
 		final String hubPass1 = "hubPass1";
 
 		final String hubUser2 = "hubUser2";
-
-
 		final String hubPass2Clear = "hubPass2";
 		final String hubPass2 = PasswordEncrypter.encrypt(hubPass2Clear);
 
+		HubCredentialsBuilder builder = new HubCredentialsBuilder();
+		builder.setUsername(hubUser1);
+		builder.setPassword(hubPass1);
+		final HubCredentials item1 = builder.build(logger);
 
-		final HubCredentials item1 = new HubCredentials(hubUser1, hubPass1, hubPass1.length());
-		final HubCredentials item2 = new HubCredentials(hubUser2, hubPass2, hubPass2Clear.length());
-		final HubCredentials item3 = new HubCredentials(hubUser1, hubPass1, hubPass1.length());
+		builder = new HubCredentialsBuilder();
+		builder.setUsername(hubUser2);
+		builder.setPassword(hubPass2Clear);
+		final HubCredentials item2 = builder.build(logger);
 
-		assertEquals(hubUser1, item1.getHubUser());
-		assertEquals(hubPass1, item1.getEncryptedPassword());
+		builder = new HubCredentialsBuilder();
+		builder.setUsername(hubUser1);
+		builder.setPassword(hubPass1);
+		final HubCredentials item3 = builder.build(logger);
+
+		assertEquals(hubUser1, item1.getUsername());
+		assertEquals(hubPass1, item1.getDecryptedPassword());
 		assertEquals("********", item1.getMaskedPassword());
 
-		assertEquals(hubUser2, item2.getHubUser());
+		assertEquals(hubUser2, item2.getUsername());
 		assertEquals(hubPass2, item2.getEncryptedPassword());
 
 		assertEquals(hubPass2Clear, item2.getDecryptedPassword());
 		assertEquals("********", item2.getMaskedPassword());
-
 
 		assertTrue(item1.equals(item3));
 		assertTrue(!item1.equals(item2));
@@ -69,15 +80,9 @@ public class HubCredentialsTest {
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());
 
-
-		final StringBuilder builder = new StringBuilder();
-		builder.append("HubCredentials [hubUser=");
-		builder.append(item1.getHubUser());
-		builder.append(", hubPass=");
-		builder.append(item1.getEncryptedPassword());
-		builder.append("]");
-
-		assertEquals(builder.toString(), item1.toString());
-
+		final String expected = "HubCredentials [username=" + item1.getUsername() + ", encryptedPassword="
+				+ item1.getEncryptedPassword() + ", actualPasswordLength=" + item1.getActualPasswordLength() + "]";
+		assertEquals(expected, item1.toString());
 	}
+
 }

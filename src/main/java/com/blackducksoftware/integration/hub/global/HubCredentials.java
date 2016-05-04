@@ -19,77 +19,52 @@
 package com.blackducksoftware.integration.hub.global;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.hub.encryption.PasswordDecrypter;
+import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
 
 public class HubCredentials implements Serializable {
-
 	private static final long serialVersionUID = 7924589951692259151L;
 
-	private final String hubUser;
+	private final String username;
+	private final String encryptedPassword;
+	private final int actualPasswordLength;
 
-	private final String hubPass;
+	public HubCredentials(final String username, final String password)
+			throws IllegalArgumentException, EncryptionException {
+		this.username = username;
+		this.actualPasswordLength = password.length();
+		this.encryptedPassword = PasswordEncrypter.encrypt(password);
+	}
 
-	private final Integer actualPasswordLength;
-
-	/**
-	 * The password should be encrypted when passed into this constructor.
-	 *
-	 */
-	public HubCredentials(final String hubUser, final String encryptedPassword, final Integer actualPasswordLength) {
-		this.hubUser = hubUser;
-		hubPass = encryptedPassword;
+	public HubCredentials(final String username, final String encryptedPassword, final int actualPasswordLength)
+			throws IllegalArgumentException, EncryptionException {
+		this.username = username;
 		this.actualPasswordLength = actualPasswordLength;
+		this.encryptedPassword = encryptedPassword;
 	}
 
-	public String getHubUser() {
-		return hubUser;
+	public String getMaskedPassword() {
+		final char[] array = new char[actualPasswordLength];
+		Arrays.fill(array, '*');
+		return new String(array);
 	}
 
-	public String getEncryptedPassword() {
-		return hubPass;
-	}
-
-	public String getMaskedPassword()
-			throws IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
-			EncryptionException {
-		if (StringUtils.isBlank(hubPass)) {
-			return null;
-		}
-		if (actualPasswordLength != null) {
-			final char[] array = new char[actualPasswordLength];
-			Arrays.fill(array, '*');
-			return new String(array);
-		} else {
-			return null;
-		}
-	}
-
-	public String getDecryptedPassword()
-			throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-			EncryptionException {
-		if (StringUtils.isBlank(hubPass)) {
-			return null;
-		}
-		return PasswordDecrypter.decrypt(hubPass);
-	}
-
-	public boolean isEmpty() {
-		return StringUtils.isBlank(hubUser) && StringUtils.isBlank(hubPass);
+	public String getDecryptedPassword() throws IllegalArgumentException, EncryptionException {
+		return PasswordDecrypter.decrypt(encryptedPassword);
 	}
 
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("HubCredentials [hubUser=");
-		builder.append(hubUser);
-		builder.append(", hubPass=");
-		builder.append(hubPass);
+		builder.append("HubCredentials [username=");
+		builder.append(username);
+		builder.append(", encryptedPassword=");
+		builder.append(encryptedPassword);
+		builder.append(", actualPasswordLength=");
+		builder.append(actualPasswordLength);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -98,9 +73,9 @@ public class HubCredentials implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((actualPasswordLength == null) ? 0 : actualPasswordLength.hashCode());
-		result = prime * result + ((hubPass == null) ? 0 : hubPass.hashCode());
-		result = prime * result + ((hubUser == null) ? 0 : hubUser.hashCode());
+		result = prime * result + actualPasswordLength;
+		result = prime * result + ((encryptedPassword == null) ? 0 : encryptedPassword.hashCode());
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
 
@@ -116,29 +91,36 @@ public class HubCredentials implements Serializable {
 			return false;
 		}
 		final HubCredentials other = (HubCredentials) obj;
-		if (actualPasswordLength == null) {
-			if (other.actualPasswordLength != null) {
-				return false;
-			}
-		} else if (!actualPasswordLength.equals(other.actualPasswordLength)) {
+		if (actualPasswordLength != other.actualPasswordLength) {
 			return false;
 		}
-		if (hubPass == null) {
-			if (other.hubPass != null) {
+		if (encryptedPassword == null) {
+			if (other.encryptedPassword != null) {
 				return false;
 			}
-		} else if (!hubPass.equals(other.hubPass)) {
+		} else if (!encryptedPassword.equals(other.encryptedPassword)) {
 			return false;
 		}
-		if (hubUser == null) {
-			if (other.hubUser != null) {
+		if (username == null) {
+			if (other.username != null) {
 				return false;
 			}
-		} else if (!hubUser.equals(other.hubUser)) {
+		} else if (!username.equals(other.username)) {
 			return false;
 		}
 		return true;
 	}
 
+	public String getUsername() {
+		return username;
+	}
+
+	public String getEncryptedPassword() {
+		return encryptedPassword;
+	}
+
+	public int getActualPasswordLength() {
+		return actualPasswordLength;
+	}
 
 }

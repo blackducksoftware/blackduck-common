@@ -19,76 +19,46 @@
 package com.blackducksoftware.integration.hub.global;
 
 import java.io.IOException;
-import java.net.Authenticator;
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
-import java.net.Proxy;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
-import com.blackducksoftware.integration.hub.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 
 public class HubServerConfigBuilder {
+	public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
+	public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
+	public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
+	public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
+
 	public static int DEFAULT_TIMEOUT = 120;
 
 	private String hubUrl;
-
-	private String hubUser;
-
-	private String hubPass;
-
-	private int actualPasswordLength;
-
 	private int timeout;
-
-	private String proxyHost;
-
-	private int proxyPort;
-
-	private String proxyUsername;
-
-	private String proxyPassword;
-
-	private String ignoredProxyHosts;
-
-	private List<Pattern> ignoredProxyHostPatterns;
-
-	private boolean hubUrlIgnored;
+	private HubCredentials credentials;
+	private HubProxyInfo proxyInfo;
 
 	public HubServerConfig build(final IntLogger logger) throws HubIntegrationException, MalformedURLException {
 		assertValid(logger);
 
-		final HubProxyInfo proxyInfo = new HubProxyInfo(proxyHost, proxyPort, ignoredProxyHosts,
-				ignoredProxyHostPatterns, proxyUsername, proxyPassword, hubUrlIgnored);
-		final HubCredentials credentials = new HubCredentials(hubUser, hubPass, actualPasswordLength);
 		return new HubServerConfig(new URL(hubUrl), timeout, credentials, proxyInfo);
 	}
 
 	public void assertValid(final IntLogger logger) throws HubIntegrationException {
 		boolean valid = true;
-		if (!validateProxyConfig(logger)) {
-			valid = false;
-		}
+
 		if (!validateHubUrl(logger)) {
 			valid = false;
 		}
-		if (!validateHubCredentials(logger)) {
-			valid = false;
-		}
+
 		if (!validateTimeout(logger, DEFAULT_TIMEOUT)) {
 			valid = false;
 		}
+
 		if (!valid) {
 			throw new HubIntegrationException(
 					"The server configuration is not valid - please check the log for the specific issues.");
@@ -98,7 +68,7 @@ public class HubServerConfigBuilder {
 	public boolean validateHubUrl(final IntLogger logger) {
 		boolean valid = true;
 		if (hubUrl == null) {
-			logger.error("No Hub Url was found.");
+			logger.error(ERROR_MSG_URL_NOT_FOUND);
 			return false;
 		}
 
@@ -107,76 +77,33 @@ public class HubServerConfigBuilder {
 			hubURL = new URL(hubUrl);
 			hubURL.toURI();
 		} catch (final MalformedURLException e) {
-			logger.error("The Hub Url is not a valid URL.");
+			logger.error(ERROR_MSG_URL_NOT_VALID);
 			valid = false;
 		} catch (final URISyntaxException e) {
-			logger.error("The Hub Url is not a valid URL.");
+			logger.error(ERROR_MSG_URL_NOT_VALID);
 			valid = false;
 		}
+
 		if (hubURL == null) {
 			return valid;
 		}
-		try {
-			Proxy proxy = null;
-			if (proxyHost != null && proxyPort != 0 && !hubUrlIgnored) {
-				proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
-				if (proxy != null && proxy != Proxy.NO_PROXY) {
 
-					if (proxyUsername != null && proxyPassword != null) {
-						Authenticator.setDefault(new Authenticator() {
-							@Override
-							public PasswordAuthentication getPasswordAuthentication() {
-								return new PasswordAuthentication(proxyUsername, proxyPassword.toCharArray());
-							}
-						});
-					} else {
-						Authenticator.setDefault(null);
-					}
-				}
-			}
+		try {
 			URLConnection connection = null;
-			if (proxy != null) {
-				connection = hubURL.openConnection(proxy);
+			if (null != proxyInfo) {
+				connection = proxyInfo.openConnection(hubURL);
 			} else {
 				connection = hubURL.openConnection();
 			}
 			connection.getContent();
 		} catch (final IOException ioe) {
-			logger.error("Can not reach this server : " + hubUrl, ioe);
+			logger.error(ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, ioe);
 			valid = false;
 		} catch (final RuntimeException e) {
-			logger.error("This is not a valid URL : " + hubUrl, e);
+			logger.error(ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl, e);
 			valid = false;
 		}
-		return valid;
-	}
 
-	public boolean validateHubCredentials(final IntLogger logger) {
-		boolean valid = true;
-		if (!validateHubUser(logger)) {
-			valid = false;
-		}
-		if (!validateHubPassword(logger)) {
-			valid = false;
-		}
-		return valid;
-	}
-
-	public boolean validateHubUser(final IntLogger logger) {
-		boolean valid = true;
-		if (null == hubUser) {
-			valid = false;
-			logger.error("No Hub Username was found.");
-		}
-		return valid;
-	}
-
-	public boolean validateHubPassword(final IntLogger logger) {
-		boolean valid = true;
-		if (null == hubPass) {
-			valid = false;
-			logger.error("No Hub Password was found.");
-		}
 		return valid;
 	}
 
@@ -195,102 +122,40 @@ public class HubServerConfigBuilder {
 		return valid;
 	}
 
-	public boolean validateProxyConfig(final IntLogger logger) {
-		boolean valid = true;
-		if (hubUrl != null && ignoredProxyHostPatterns != null && !ignoredProxyHostPatterns.isEmpty()) {
-			try {
-				final URL hubURL = new URL(hubUrl);
-				if (checkMatchingNoProxyHostPatterns(hubURL.getHost(), ignoredProxyHostPatterns)) {
-					setHubUrlIgnored(true);
-				}
-			} catch (final Exception e) {
-				logger.error(e);
-				valid = false;
-			}
-		}
-		return valid;
-	}
-
 	public void setHubUrl(final String hubUrl) {
 		this.hubUrl = StringUtils.trimToNull(hubUrl);
-	}
-
-	public void setHubUser(final String hubUser) {
-		this.hubUser = StringUtils.trimToNull(hubUser);
-	}
-
-	public void setHubPass(final String hubPass)
-			throws IllegalArgumentException, EncryptionException {
-		final String password = StringUtils.trimToNull(hubPass);
-		if (password != null) {
-			setActualPasswordLength(password.length());
-			this.hubPass = PasswordEncrypter.encrypt(password);
-		}
-	}
-
-	public void setHubPassEncrypted(final String hubPassEncrypted, final int actualPasswordLength) {
-		this.hubPass = hubPassEncrypted;
-		setActualPasswordLength(actualPasswordLength);
-	}
-
-	private void setActualPasswordLength(final int actualPasswordLength) {
-		this.actualPasswordLength = actualPasswordLength;
-	}
-
-	public void setTimeout(final int timeout) {
-		this.timeout = timeout;
 	}
 
 	public void setTimeout(final String timeout) {
 		setTimeout(stringToInteger(timeout));
 	}
 
-	public void setProxyHost(final String proxyHost) {
-		this.proxyHost = StringUtils.trimToNull(proxyHost);
+	public int getTimeout() {
+		return timeout;
 	}
 
-	public void setProxyPort(final int proxyPort) {
-		this.proxyPort = proxyPort;
+	public void setTimeout(final int timeout) {
+		this.timeout = timeout;
 	}
 
-	public void setProxyPort(final String proxyPort) {
-		setProxyPort(stringToInteger(proxyPort));
+	public HubCredentials getCredentials() {
+		return credentials;
 	}
 
-	public void setProxyUsername(final String proxyUsername) {
-		this.proxyUsername = StringUtils.trimToNull(proxyUsername);
+	public void setCredentials(final HubCredentials credentials) {
+		this.credentials = credentials;
 	}
 
-	public void setProxyPassword(final String proxyPassword) {
-		this.proxyPassword = StringUtils.trimToNull(proxyPassword);
+	public HubProxyInfo getProxyInfo() {
+		return proxyInfo;
 	}
 
-	public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
-		this.ignoredProxyHosts = StringUtils.trimToNull(ignoredProxyHosts);
-		ignoredProxyHostPatterns = getNoProxyHostPatterns();
+	public void setProxyInfo(final HubProxyInfo proxyInfo) {
+		this.proxyInfo = proxyInfo;
 	}
 
-	public void setIgnoredProxyHosts(final List<Pattern> noProxyHostsPatterns) {
-		ignoredProxyHostPatterns = noProxyHostsPatterns;
-		final StringBuilder builder = new StringBuilder();
-		if (noProxyHostsPatterns != null && !noProxyHostsPatterns.isEmpty()) {
-			for (final Pattern pattern : noProxyHostsPatterns) {
-				if (builder.length() == 0) {
-					builder.append(pattern.pattern());
-				} else {
-					builder.append("," + pattern.pattern());
-				}
-			}
-		}
-		ignoredProxyHosts = StringUtils.trimToNull(builder.toString());
-	}
-
-	public void setHubUrlIgnored(final boolean hubUrlIgnored) {
-		this.hubUrlIgnored = hubUrlIgnored;
-	}
-
-	public boolean isHubUrlIgnored() {
-		return hubUrlIgnored;
+	public String getHubUrl() {
+		return hubUrl;
 	}
 
 	private int stringToInteger(final String integer) {
@@ -303,54 +168,6 @@ public class HubServerConfigBuilder {
 			}
 		}
 		return 0;
-	}
-
-	public List<Pattern> getNoProxyHostPatterns() {
-		final List<Pattern> noProxyHostsPatterns = new ArrayList<Pattern>();
-		if (StringUtils.isNotBlank(ignoredProxyHosts)) {
-			String[] ignoreHosts = null;
-			if (StringUtils.isNotBlank(ignoredProxyHosts)) {
-				if (ignoredProxyHosts.contains(",")) {
-					ignoreHosts = ignoredProxyHosts.split(",");
-					for (final String ignoreHost : ignoreHosts) {
-						final Pattern pattern = Pattern.compile(ignoreHost.trim());
-						noProxyHostsPatterns.add(pattern);
-					}
-				} else {
-					final Pattern pattern = Pattern.compile(ignoredProxyHosts);
-					noProxyHostsPatterns.add(pattern);
-				}
-			}
-		}
-		return noProxyHostsPatterns;
-	}
-
-	/**
-	 * Checks the list of user defined host names that should be connected to
-	 * directly and not go through the proxy. If the hostToMatch matches any of
-	 * these hose names then this method returns true.
-	 *
-	 */
-	public boolean checkMatchingNoProxyHostPatterns(final String hostToMatch, final List<Pattern> noProxyHosts) {
-		if (noProxyHosts == null || noProxyHosts.isEmpty()) {
-			// User did not specify any hosts to ignore the proxy
-			return false;
-		}
-		boolean match = false;
-		if (!StringUtils.isBlank(hostToMatch) && !noProxyHosts.isEmpty()) {
-
-			for (final Pattern pattern : noProxyHosts) {
-				final Matcher m = pattern.matcher(hostToMatch);
-				while (m.find()) {
-					match = true;
-					break;
-				}
-				if (match) {
-					break;
-				}
-			}
-		}
-		return match;
 	}
 
 }

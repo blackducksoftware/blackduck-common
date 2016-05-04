@@ -16,18 +16,15 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
+
 package com.blackducksoftware.integration.hub.global;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import org.junit.Test;
-
-import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -39,41 +36,27 @@ public class HubServerConfigTest {
 		final URL hubUrl1 = new URL("https://www.blackducksoftware.com/");
 		final Integer timeout1 = 1;
 
-		final String hubUser1 = "hubUser1";
-		final String hubPass1 = "hubPass1";
+		final HubCredentials credentials1 = new HubCredentials("hubUser1", "hubPass1");
 
 		final String host1 = "host1";
 		final Integer port1 = 1;
 		final String noProxyHosts1 = "noProxyHosts1";
-		final List<Pattern> noProxyHostsPatterns1 = null;
 		final String proxyUsername1 = "proxyUsername1";
 		final String proxyPassword1 = "proxyPassword1";
-		final boolean hubUrlIgnored1 = true;
 
-		final HubCredentials credentials1 = new HubCredentials(hubUser1, hubPass1, hubPass1.length());
-		final HubProxyInfo proxy1 = new HubProxyInfo(host1, port1, noProxyHosts1, noProxyHostsPatterns1, proxyUsername1,
-				proxyPassword1, hubUrlIgnored1);
+		final HubProxyInfo proxy1 = new HubProxyInfo(host1, port1, noProxyHosts1, proxyUsername1, proxyPassword1);
 
 		final URL hubUrl2 = new URL("http://google.com");
 		final Integer timeout2 = 2;
-		final String hubUser2 = "hubUser2";
-
-		final String hubPass2Clear = "hubPass2";
-		final String hubPass2 = PasswordEncrypter.encrypt(hubPass2Clear);
-
 
 		final String host2 = "host2";
 		final Integer port2 = 2;
 		final String noProxyHosts2 = "noProxyHosts2";
-		final List<Pattern> noProxyHostsPatterns2 = null;
 		final String proxyUsername2 = "proxyUsername2";
 		final String proxyPassword2 = "proxyPassword2";
-		final boolean hubUrlIgnored2 = false;
 
-		final HubCredentials credentials2 = new HubCredentials(hubUser2, hubPass2, hubPass2.length());
-		final HubProxyInfo proxy2 = new HubProxyInfo(host2, port2, noProxyHosts2, noProxyHostsPatterns2, proxyUsername2,
-				proxyPassword2, hubUrlIgnored2);
-
+		final HubCredentials credentials2 = new HubCredentials("hubUser2", "hubPass2");
+		final HubProxyInfo proxy2 = new HubProxyInfo(host2, port2, noProxyHosts2, proxyUsername2, proxyPassword2);
 
 		final HubServerConfig item1 = new HubServerConfig(hubUrl1, timeout1, credentials1, proxy1);
 		final HubServerConfig item2 = new HubServerConfig(hubUrl2, timeout2, credentials2, proxy2);
@@ -93,11 +76,10 @@ public class HubServerConfigTest {
 		assertTrue(!item1.equals(item2));
 
 		EqualsVerifier.forClass(HubServerConfig.class).withPrefabValues(URL.class, hubUrl1, hubUrl2)
-		.suppress(Warning.STRICT_INHERITANCE).verify();
+				.suppress(Warning.STRICT_INHERITANCE).verify();
 
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());
-
 
 		final StringBuilder builder = new StringBuilder();
 		builder.append("HubServerConfig [hubUrl=");
@@ -111,6 +93,6 @@ public class HubServerConfigTest {
 		builder.append("]");
 
 		assertEquals(builder.toString(), item1.toString());
-
 	}
+
 }

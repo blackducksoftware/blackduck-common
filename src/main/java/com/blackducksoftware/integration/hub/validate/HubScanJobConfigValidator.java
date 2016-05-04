@@ -16,40 +16,37 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.job;
+package com.blackducksoftware.integration.hub.validate;
 
 import java.io.IOException;
 
-import com.blackducksoftware.integration.hub.exception.ValidationException;
-import com.blackducksoftware.integration.hub.logging.IntExceptionLogger;
+import com.blackducksoftware.integration.hub.job.HubScanJobConfigBuilder;
 
-public abstract class HubScanJobConfigValidator<T> {
-	public abstract T handleValidationException(ValidationException e);
-
-	public abstract T handleSuccess();
+public abstract class HubScanJobConfigValidator<T> extends AbstractValidator<T> {
 
 	public T validateScanMemory(final String scanMemory) throws IOException {
+		ValidationResult result;
 		try {
 			final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 			builder.setScanMemory(scanMemory);
-			builder.validateScanMemory(IntExceptionLogger.LOGGER);
-		} catch (final ValidationException e) {
-			return handleValidationException(e);
+			builder.validateScanMemory(getValidationLogger());
+			result = createResult();
+		} catch (final IllegalArgumentException e) {
+			result = handleValidationException(e);
 		}
-
-		return handleSuccess();
+		return processResult(result);
 	}
 
 	public T validateMaxWaitTimeForBomUpdate(final String bomUpdateMaxiumWaitTime) throws IOException {
+		ValidationResult result;
 		try {
 			final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder();
 			builder.setMaxWaitTimeForBomUpdate(bomUpdateMaxiumWaitTime);
-			builder.validateMaxWaitTimeForBomUpdate(IntExceptionLogger.LOGGER);
-		} catch (final ValidationException e) {
-			return handleValidationException(e);
+			builder.validateMaxWaitTimeForBomUpdate(getValidationLogger());
+			result = createResult();
+		} catch (final IllegalArgumentException e) {
+			result = handleValidationException(e);
 		}
-
-		return handleSuccess();
+		return processResult(result);
 	}
-
 }
