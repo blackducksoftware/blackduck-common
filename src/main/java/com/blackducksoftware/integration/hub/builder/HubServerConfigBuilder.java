@@ -45,8 +45,8 @@ public class HubServerConfigBuilder extends AbstractBuilder {
 	private HubProxyInfo proxyInfo;
 
 	@Override
-	public ValidationResult build() {
-		final ValidationResult result = assertValid();
+	public ValidationResult<HubServerConfig> build() {
+		final ValidationResult<HubServerConfig> result = assertValid();
 		URL hubURL = null;
 		try {
 			hubURL = new URL(hubUrl);
@@ -58,8 +58,8 @@ public class HubServerConfigBuilder extends AbstractBuilder {
 	}
 
 	@Override
-	public ValidationResult assertValid() {
-		final ValidationResult result = null;
+	public ValidationResult<HubServerConfig> assertValid() {
+		final ValidationResult<HubServerConfig> result = null;
 
 		validateHubUrl(result);
 
@@ -73,7 +73,7 @@ public class HubServerConfigBuilder extends AbstractBuilder {
 		return result;
 	}
 
-	public boolean validateHubUrl(final ValidationResult result) {
+	public boolean validateHubUrl(final ValidationResult<HubServerConfig> result) {
 		boolean valid = true;
 		if (hubUrl == null) {
 			logger.error(ERROR_MSG_URL_NOT_FOUND);
@@ -115,11 +115,11 @@ public class HubServerConfigBuilder extends AbstractBuilder {
 		return valid;
 	}
 
-	public boolean validateTimeout(final ValidationResult result) {
+	public boolean validateTimeout(final ValidationResult<HubServerConfig> result) {
 		return validateTimeout(result, null);
 	}
 
-	private boolean validateTimeout(final ValidationResult result, final Integer defaultTimeout) {
+	private boolean validateTimeout(final ValidationResult<HubServerConfig> result, final Integer defaultTimeout) {
 		boolean valid = true;
 		if (defaultTimeout != null && timeout <= 0) {
 			timeout = defaultTimeout;
@@ -134,8 +134,8 @@ public class HubServerConfigBuilder extends AbstractBuilder {
 		this.hubUrl = StringUtils.trimToNull(hubUrl);
 	}
 
-	public void setTimeout(final String timeout) {
-		setTimeout(stringToInteger(timeout));
+	public void setTimeout(final String timeout, final Integer defaultPort) {
+		setTimeout(stringToInteger(timeout, defaultPort));
 	}
 
 	public int getTimeout() {

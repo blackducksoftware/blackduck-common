@@ -43,8 +43,8 @@ public class HubProxyInfoBuilder extends AbstractBuilder {
 	private String ignoredProxyHosts;
 
 	@Override
-	public ValidationResult build() {
-		final ValidationResult result = assertValid();
+	public ValidationResult<HubProxyInfo> build() {
+		final ValidationResult<HubProxyInfo> result = assertValid();
 		String encryptedProxyPass = null;
 		try {
 			encryptedProxyPass = PasswordEncrypter.encrypt(password);
@@ -58,8 +58,8 @@ public class HubProxyInfoBuilder extends AbstractBuilder {
 	}
 
 	@Override
-	public ValidationResult assertValid() {
-		final ValidationResult result = null;
+	public ValidationResult<HubProxyInfo> assertValid() {
+		final ValidationResult<HubProxyInfo> result = null;
 
 		validatePort(result);
 
@@ -73,7 +73,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder {
 		return null;
 	}
 
-	public boolean validatePort(final ValidationResult result) {
+	public boolean validatePort(final ValidationResult<HubProxyInfo> result) {
 		boolean valid = true;
 		if (StringUtils.isBlank(host)) {
 			logger.warn(WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
@@ -89,7 +89,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder {
 		return valid;
 	}
 
-	public boolean validateCredentials(final ValidationResult result) {
+	public boolean validateCredentials(final ValidationResult<HubProxyInfo> result) {
 		boolean valid = true;
 
 		if (StringUtils.isBlank(host)) {
@@ -108,7 +108,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder {
 		return valid;
 	}
 
-	public boolean validateIgnoreHosts(final ValidationResult result) {
+	public boolean validateIgnoreHosts(final ValidationResult<HubProxyInfo> result) {
 		boolean valid = true;
 
 		if (StringUtils.isBlank(host)) {
@@ -150,8 +150,8 @@ public class HubProxyInfoBuilder extends AbstractBuilder {
 		this.port = port;
 	}
 
-	public void setPort(final String port) {
-		this.port = stringToInteger(port);
+	public void setPort(final String port, final Integer defaultPort) {
+		this.port = stringToInteger(port, defaultPort);
 	}
 
 	public String getUsername() {
