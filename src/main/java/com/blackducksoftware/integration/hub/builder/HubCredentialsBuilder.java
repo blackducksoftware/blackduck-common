@@ -31,8 +31,8 @@ public class HubCredentialsBuilder extends AbstractBuilder {
 
 
 	@Override
-	public ValidationResult build() {
-		final ValidationResult result = assertValid();
+	public ValidationResult<HubCredentials> build() {
+		final ValidationResult<HubCredentials> result = assertValid();
 		String encryptedPassword = null;
 		try {
 			encryptedPassword = PasswordEncrypter.encrypt(password);
@@ -40,12 +40,12 @@ public class HubCredentialsBuilder extends AbstractBuilder {
 			e.printStackTrace();
 		}
 		new HubCredentials(username, encryptedPassword, password.length());
-		return null;
+		return result;
 	}
 
 	@Override
-	public ValidationResult assertValid() {
-		final ValidationResult result = null;
+	public ValidationResult<HubCredentials> assertValid() {
+		final ValidationResult<HubCredentials> result = null;
 
 		validateCredentials(result);
 
@@ -57,14 +57,14 @@ public class HubCredentialsBuilder extends AbstractBuilder {
 		return null;
 	}
 
-	public void validateCredentials(final ValidationResult result) {
+	public void validateCredentials(final ValidationResult<HubCredentials> result) {
 
 		validateUsername(result);
 		validatePassword(result);
 
 	}
 
-	public boolean validateUsername(final ValidationResult result) {
+	public boolean validateUsername(final ValidationResult<HubCredentials> result) {
 		boolean valid = true;
 		if (StringUtils.isBlank(username)) {
 			valid = false;
@@ -73,7 +73,7 @@ public class HubCredentialsBuilder extends AbstractBuilder {
 		return valid;
 	}
 
-	public boolean validatePassword(final ValidationResult result) {
+	public boolean validatePassword(final ValidationResult<HubCredentials> result) {
 		boolean valid = true;
 		if (StringUtils.isBlank(password)) {
 			valid = false;
