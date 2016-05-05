@@ -34,6 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.blackducksoftware.integration.hub.builder.HubScanJobConfigBuilder;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.util.TestLogger;
 

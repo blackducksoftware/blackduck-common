@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.job;
+package com.blackducksoftware.integration.hub.builder;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,11 +26,11 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.hub.job.HubScanJobConfig;
+import com.blackducksoftware.integration.hub.job.HubScanJobFieldEnum;
 import com.google.common.collect.ImmutableList;
 
-public class HubScanJobConfigBuilder {
+public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum, HubScanJobConfig> {
 	public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
 
 	public static final int DEFAULT_BOM_UPDATE_WAIT_TIME_IN_MINUTES = 5;
@@ -48,124 +48,117 @@ public class HubScanJobConfigBuilder {
 	private final Set<String> scanTargetPaths = new HashSet<String>();
 	private boolean disableScanTargetPathExistenceCheck;
 
-	public HubScanJobConfig build(final IntLogger logger) throws HubIntegrationException, IOException {
-		assertValid(logger);
+	public HubScanJobConfigBuilder(final boolean eatExceptionsOnSetters) {
+		super(eatExceptionsOnSetters);
+	}
 
+	@Override
+	public ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> build() {
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = assertValid();
 		final ImmutableList<String> immutableScanTargetPaths = new ImmutableList.Builder<String>()
 				.addAll(scanTargetPaths).build();
 
-		return new HubScanJobConfig(projectName, version, phase, distribution, workingDirectory, scanMemory,
-				shouldGenerateRiskReport, maxWaitTimeForBomUpdate, immutableScanTargetPaths);
+		result.setConstructedObject(new HubScanJobConfig(projectName, version, phase, distribution, workingDirectory,
+				scanMemory, shouldGenerateRiskReport, maxWaitTimeForBomUpdate, immutableScanTargetPaths));
+
+		return result;
 	}
 
-	public void assertValid(final IntLogger logger) throws HubIntegrationException, IOException {
-		boolean valid = true;
+	@Override
+	public ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> assertValid() {
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
 
-		if (!validateProjectAndVersion(logger)) {
-			valid = false;
-		}
+		validateProjectAndVersion(result);
 
-		if (!validateScanMemory(logger, DEFAULT_MEMORY_IN_MEGABYTES)) {
-			valid = false;
-		}
+		validateScanMemory(result, DEFAULT_MEMORY_IN_MEGABYTES);
 
-		if (!validateShouldGenerateRiskReport(logger)) {
-			valid = false;
-		}
+		validateShouldGenerateRiskReport(result);
 
-		if (!validateMaxWaitTimeForBomUpdate(logger, DEFAULT_BOM_UPDATE_WAIT_TIME_IN_MINUTES)) {
-			valid = false;
-		}
+		validateMaxWaitTimeForBomUpdate(result, DEFAULT_BOM_UPDATE_WAIT_TIME_IN_MINUTES);
 
-		if (!validateScanTargetPaths(logger, workingDirectory)) {
-			valid = false;
-		}
+		validateScanTargetPaths(result, workingDirectory);
 
-		if (!valid) {
-			throw new HubIntegrationException(
-					"The configuration is not valid - please check the log for the specific issues.");
-		}
+		return result;
 	}
 
-	public boolean validateProjectAndVersion(final IntLogger logger) throws IOException {
-		boolean valid = true;
+
+	public void validateProjectAndVersion(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result) {
 
 		if (null == projectName && null == version) {
-			logger.warn("No Project name or Version were found. Any scans run will not be mapped to a Version.");
-		} else if (!validateProject(logger)) {
-			valid = false;
-		} else if (!validateVersion(logger)) {
-			valid = false;
+			result.addResult(HubScanJobFieldEnum.PROJECT, new ValidationResult(ValidationResultEnum.WARN,
+					"No Project name or Version were found. Any scans run will not be mapped to a Version."));
+			result.addResult(HubScanJobFieldEnum.VERSION, new ValidationResult(ValidationResultEnum.WARN,
+					"No Project name or Version were found. Any scans run will not be mapped to a Version."));
+		} else {
+			validateProject(result);
+			validateVersion(result);
 		}
-
-		return valid;
 	}
 
-	public boolean validateProject(final IntLogger logger) throws IOException {
-		boolean valid = true;
-
+	public void validateProject(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result)
+	{
 		if (null == projectName) {
-			valid = false;
-			logger.error("No Project name was found.");
+			result.addResult(HubScanJobFieldEnum.PROJECT,
+					new ValidationResult(ValidationResultEnum.ERROR, "No Project name was found."));
+		} else {
+			result.addResult(HubScanJobFieldEnum.PROJECT, new ValidationResult(ValidationResultEnum.OK, ""));
 		}
-
-		return valid;
 	}
 
-	public boolean validateVersion(final IntLogger logger) throws IOException {
-		boolean valid = true;
-
+	public void validateVersion(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result)
+	{
 		if (null == version) {
-			valid = false;
-			logger.error("No Version was found.");
+			result.addResult(HubScanJobFieldEnum.VERSION,
+					new ValidationResult(ValidationResultEnum.ERROR, "No Version was found."));
+		} else {
+			result.addResult(HubScanJobFieldEnum.VERSION, new ValidationResult(ValidationResultEnum.OK, ""));
 		}
-
-		return valid;
 	}
 
-	public boolean validateScanMemory(final IntLogger logger) throws IOException {
-		return validateScanMemory(logger, null);
+	public void validateScanMemory(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result)
+	{
+		validateScanMemory(result, null);
 	}
 
-	private boolean validateScanMemory(final IntLogger logger, final Integer defaultScanMemory) throws IOException {
-		boolean scanMemoryValid = true;
+	private void validateScanMemory(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result,
+			final Integer defaultScanMemory) {
 		if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES && defaultScanMemory != null) {
 			scanMemory = defaultScanMemory;
 		}
 		if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES) {
-			scanMemoryValid = false;
-			logger.error("The minimum amount of memory for the scan is " + MINIMUM_MEMORY_IN_MEGABYTES + " MB.");
+			result.addResult(HubScanJobFieldEnum.SCANMEMORY, new ValidationResult(ValidationResultEnum.ERROR,
+					"The minimum amount of memory for the scan is " + MINIMUM_MEMORY_IN_MEGABYTES + " MB."));
 		}
-		return scanMemoryValid;
 	}
 
-	public boolean validateShouldGenerateRiskReport(final IntLogger logger) throws IOException {
-		boolean shouldGenerateReportValid = true;
+	public void validateShouldGenerateRiskReport(
+			final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result) {
 		if ((null == projectName || null == version) && shouldGenerateRiskReport) {
-			shouldGenerateReportValid = false;
-			logger.error("To generate the Risk Report, you need to provide a Project name or version.");
+			result.addResult(HubScanJobFieldEnum.GENERATE_RISK_REPORT, new ValidationResult(ValidationResultEnum.ERROR,
+					"To generate the Risk Report, you need to provide a Project name or version."));
 		}
-		return shouldGenerateReportValid;
 	}
 
-	public boolean validateMaxWaitTimeForBomUpdate(final IntLogger logger) throws IOException {
-		return validateMaxWaitTimeForBomUpdate(logger, null);
+	public void validateMaxWaitTimeForBomUpdate(
+			final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result) {
+		validateMaxWaitTimeForBomUpdate(result, null);
 	}
 
-	private boolean validateMaxWaitTimeForBomUpdate(final IntLogger logger, final Integer defaultMaxWaitTime)
-			throws IOException {
-		boolean waitTimeValid = true;
+	private void validateMaxWaitTimeForBomUpdate(
+			final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result, final Integer defaultMaxWaitTime)
+	{
 		if (maxWaitTimeForBomUpdate <= 0) {
 			if (defaultMaxWaitTime != null) {
 				maxWaitTimeForBomUpdate = defaultMaxWaitTime;
 			} else {
-				waitTimeValid = false;
-				logger.error("The maximum wait time for the BOM Update must be greater than 0.");
+				result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
+						new ValidationResult(ValidationResultEnum.ERROR,
+								"The maximum wait time for the BOM Update must be greater than 0."));
 			}
 		} else if (maxWaitTimeForBomUpdate < 2) {
-			logger.warn("This wait time may be too short.");
+			result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
+					new ValidationResult(ValidationResultEnum.WARN, "This wait time may be too short."));
 		}
-		return waitTimeValid;
 	}
 
 	/**
@@ -174,12 +167,13 @@ public class HubScanJobConfigBuilder {
 	 * yet.
 	 *
 	 */
-	public boolean validateScanTargetPaths(final IntLogger logger) throws IOException {
-		return validateScanTargetPaths(logger, null);
+	public void validateScanTargetPaths(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result)
+	{
+		validateScanTargetPaths(result, null);
 	}
 
-	private boolean validateScanTargetPaths(final IntLogger logger, final String defaultTargetPath) throws IOException {
-		boolean scanTargetPathsValid = true;
+	private void validateScanTargetPaths(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result,
+			final String defaultTargetPath) {
 		if (scanTargetPaths.isEmpty() && defaultTargetPath != null) {
 			scanTargetPaths.add(defaultTargetPath);
 		}
@@ -202,14 +196,21 @@ public class HubScanJobConfigBuilder {
 					// only validate non blank entries
 					final File target = new File(targetPath);
 					if (null == target || !target.exists()) {
-						logger.error("The scan target '" + target.getAbsolutePath() + "' does not exist.");
-						scanTargetPathsValid = false;
+						result.addResult(HubScanJobFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
+								"The scan target '" + target.getAbsolutePath() + "' does not exist."));
 					}
 
-					final String targetCanonicalPath = target.getCanonicalPath();
-					if (!targetCanonicalPath.startsWith(workingDirectory)) {
-						logger.error("Can not scan targets outside the working directory.");
-						scanTargetPathsValid = false;
+					String targetCanonicalPath;
+					try {
+						targetCanonicalPath = target.getCanonicalPath();
+						if (!targetCanonicalPath.startsWith(workingDirectory)) {
+							result.addResult(HubScanJobFieldEnum.TARGETS,
+									new ValidationResult(ValidationResultEnum.ERROR,
+									"Can not scan targets outside the working directory."));
+						}
+					} catch (final IOException e) {
+						result.addResult(HubScanJobFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
+								"Could not get the canonical path for Target : " + targetPath));
 					}
 				}
 			}
@@ -217,7 +218,6 @@ public class HubScanJobConfigBuilder {
 		scanTargetPaths.clear();
 		scanTargetPaths.addAll(targetPaths);
 
-		return scanTargetPathsValid;
 	}
 
 	public void setProjectName(final String projectName) {
@@ -275,15 +275,6 @@ public class HubScanJobConfigBuilder {
 
 	public void disableScanTargetPathExistenceCheck() {
 		disableScanTargetPathExistenceCheck = true;
-	}
-
-	private Integer stringToInteger(final String integer) {
-		final String integerString = StringUtils.trimToNull(integer);
-		try {
-			return Integer.valueOf(integerString);
-		} catch (final NumberFormatException e) {
-			throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.", e);
-		}
 	}
 
 }
