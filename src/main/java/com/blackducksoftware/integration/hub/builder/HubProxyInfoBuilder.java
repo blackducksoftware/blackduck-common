@@ -41,6 +41,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 	private int port;
 	private String username;
 	private String password;
+	private int passwordLength;
 	private String ignoredProxyHosts;
 
 	public HubProxyInfoBuilder() {
@@ -55,20 +56,18 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 	public ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> build() {
 		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = assertValid();
 		HubProxyInfo proxyInfo;
-		if (StringUtils.isNotBlank(password)) {
+		if (StringUtils.isNotBlank(password) && passwordLength != 0) {
+			proxyInfo = new HubProxyInfo(host, port, username, password, passwordLength, ignoredProxyHosts);
+		} else {
 			String encryptedProxyPass = null;
 			try {
 				encryptedProxyPass = PasswordEncrypter.encrypt(password);
-			} catch (final IllegalArgumentException e) {
-				e.printStackTrace();
 			} catch (final EncryptionException e) {
-				e.printStackTrace();
+				result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD,
+						new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
 			}
 			proxyInfo = new HubProxyInfo(host, port, username, encryptedProxyPass, password.length(),
 					ignoredProxyHosts);
-		} else {
-
-			proxyInfo = new HubProxyInfo(host, port, username, null, 0, ignoredProxyHosts);
 		}
 
 		result.setConstructedObject(proxyInfo);
@@ -202,6 +201,14 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 
 	public void setPassword(final String password) {
 		this.password = password;
+	}
+
+	public int getPasswordLength() {
+		return passwordLength;
+	}
+
+	public void setPasswordLength(final int passwordLength) {
+		this.passwordLength = passwordLength;
 	}
 
 	public String getIgnoredProxyHosts() {
