@@ -170,6 +170,7 @@ public class HubProxyInfoBuilderTest {
 	@Test
 	public void testValidateCredentialsUserOnly() throws Exception {
 		expectedMessages.add(HubProxyInfoBuilder.ERROR_MSG_CREDENTIALS_INVALID);
+		expectedMessages.add(HubProxyInfoBuilder.ERROR_MSG_CREDENTIALS_INVALID);
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost(VALID_HOST);
 		builder.setUsername(VALID_USERNAME);
@@ -183,6 +184,7 @@ public class HubProxyInfoBuilderTest {
 
 	@Test
 	public void testValidateCredentialsPasswordOnly() throws Exception {
+		expectedMessages.add(HubProxyInfoBuilder.ERROR_MSG_CREDENTIALS_INVALID);
 		expectedMessages.add(HubProxyInfoBuilder.ERROR_MSG_CREDENTIALS_INVALID);
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost(VALID_HOST);
@@ -286,6 +288,7 @@ public class HubProxyInfoBuilderTest {
 	@Test
 	public void testAssertWithInvalidUser() throws Exception {
 		expectedMessages.add(HubProxyInfoBuilder.ERROR_MSG_CREDENTIALS_INVALID);
+		expectedMessages.add(HubProxyInfoBuilder.ERROR_MSG_CREDENTIALS_INVALID);
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost(VALID_HOST);
 		builder.setPort(VALID_PORT);
@@ -300,6 +303,7 @@ public class HubProxyInfoBuilderTest {
 
 	@Test
 	public void testAssertWithInvalidPassword() throws Exception {
+		expectedMessages.add(HubProxyInfoBuilder.ERROR_MSG_CREDENTIALS_INVALID);
 		expectedMessages.add(HubProxyInfoBuilder.ERROR_MSG_CREDENTIALS_INVALID);
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost(VALID_HOST);

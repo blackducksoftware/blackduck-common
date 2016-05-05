@@ -57,8 +57,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = assertValid();
 		HubProxyInfo proxyInfo;
 		if (StringUtils.isNotBlank(password) && passwordLength != 0) {
-			proxyInfo = new HubProxyInfo(host, port, username, password, passwordLength, ignoredProxyHosts);
-		} else {
+
 			String encryptedProxyPass = null;
 			try {
 				encryptedProxyPass = PasswordEncrypter.encrypt(password);
@@ -68,6 +67,8 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 			}
 			proxyInfo = new HubProxyInfo(host, port, username, encryptedProxyPass, password.length(),
 					ignoredProxyHosts);
+		} else {
+			proxyInfo = new HubProxyInfo(host, port, username, password, passwordLength, ignoredProxyHosts);
 		}
 
 		result.setConstructedObject(proxyInfo);
