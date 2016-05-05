@@ -90,7 +90,7 @@ public class HubServerConfigBuilderTest {
 		// expectedMessages.add("No Hub Url was found.");
 		// expectedMessages.add("The Timeout must be greater than 0.");
 
-		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 
 		assertFalse(builder.validateHubUrl(result));
@@ -178,7 +178,7 @@ public class HubServerConfigBuilderTest {
 	public void testValidateHubTimeoutNull() throws Exception {
 		// expectedMessages.add("The Timeout must be greater than 0.");
 
-		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 		builder.validateTimeout(result);
 
@@ -189,8 +189,8 @@ public class HubServerConfigBuilderTest {
 	public void testValidateHubTimeoutEmpty() throws Exception {
 		// expectedMessages.add("The Timeout must be greater than 0.");
 
-		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-		builder.setTimeout("  ", null);
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
+		builder.setTimeout("  ");
 		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 		builder.validateTimeout(result);
 
@@ -203,14 +203,14 @@ public class HubServerConfigBuilderTest {
 		thrown.expectMessage("The String : Not Integer , is not an Integer.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-		builder.setTimeout("Not Integer", null);
+		builder.setTimeout("Not Integer");
 	}
 
 	@Test
 	public void testValidateHubTimeoutNegative() throws Exception {
 		// expectedMessages.add("The Timeout must be greater than 0.");
 
-		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setTimeout(-1200);
 		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 		builder.validateTimeout(result);
@@ -220,7 +220,7 @@ public class HubServerConfigBuilderTest {
 
 	@Test
 	public void testValidateHubTimeout() throws Exception {
-		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setTimeout(1200);
 		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 		builder.validateTimeout(result);
@@ -232,7 +232,7 @@ public class HubServerConfigBuilderTest {
 	public void testValidateHubTimeoutString() throws Exception {
 		// expectedMessages.add("The Timeout must be greater than 0.");
 
-		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 		builder.validateTimeout(result);
 
@@ -247,7 +247,7 @@ public class HubServerConfigBuilderTest {
 		// expectedMessages.add("No Hub Url was found.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-		assertTrue(builder.build().isSuccess());
+		assertFalse(builder.build().isSuccess());
 	}
 
 	@Test
@@ -309,7 +309,7 @@ public class HubServerConfigBuilderTest {
 		final HubCredentials credentials = credentialsBuilder.build().getConstructedObject();
 
 		builder.setHubUrl("https://google.com");
-		builder.setTimeout("100", null);
+		builder.setTimeout("100");
 		builder.setCredentials(credentials);
 	}
 

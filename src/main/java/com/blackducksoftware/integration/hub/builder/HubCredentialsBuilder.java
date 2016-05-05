@@ -29,6 +29,14 @@ public class HubCredentialsBuilder extends AbstractBuilder<String, HubCredential
 	private String username;
 	private String password;
 
+	public HubCredentialsBuilder() {
+		super(false);
+	}
+
+	public HubCredentialsBuilder(final boolean eatExceptionsOnSetters) {
+		super(eatExceptionsOnSetters);
+	}
+
 	@Override
 	public ValidationResults<String, HubCredentials> build() {
 		final ValidationResults<String, HubCredentials> result = assertValid();
@@ -38,7 +46,8 @@ public class HubCredentialsBuilder extends AbstractBuilder<String, HubCredential
 		} catch (final EncryptionException e) {
 			e.printStackTrace();
 		}
-		result.setConstructedObject(new HubCredentials(username, encryptedPassword, password.length()));
+		final HubCredentials creds = new HubCredentials(username, encryptedPassword, password.length());
+		result.setConstructedObject(creds);
 		return result;
 	}
 

@@ -44,6 +44,14 @@ public class HubServerConfigBuilder extends AbstractBuilder<String, HubServerCon
 	private HubCredentials credentials;
 	private HubProxyInfo proxyInfo;
 
+	public HubServerConfigBuilder() {
+		super(false);
+	}
+
+	public HubServerConfigBuilder(final boolean eatExceptionsOnSetters) {
+		super(eatExceptionsOnSetters);
+	}
+
 	@Override
 	public ValidationResults<String, HubServerConfig> build() {
 		final ValidationResults<String, HubServerConfig> result = assertValid();
@@ -53,7 +61,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<String, HubServerCon
 		} catch (final MalformedURLException e) {
 			e.printStackTrace();
 		}
-		result.setConstructedObject(new HubServerConfig(hubURL, timeout, credentials, proxyInfo));
+		final HubServerConfig config = new HubServerConfig(hubURL, timeout, credentials, proxyInfo);
+		result.setConstructedObject(config);
 		return result;
 	}
 
@@ -139,8 +148,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<String, HubServerCon
 		this.hubUrl = StringUtils.trimToNull(hubUrl);
 	}
 
-	public void setTimeout(final String timeout, final Integer defaultTimeout) {
-		setTimeout(stringToInteger(timeout, defaultTimeout));
+	public void setTimeout(final String timeout) {
+		setTimeout(stringToInteger(timeout));
 	}
 
 	public int getTimeout() {

@@ -42,19 +42,35 @@ public class HubProxyInfoBuilder extends AbstractBuilder<String, HubProxyInfo> {
 	private String password;
 	private String ignoredProxyHosts;
 
+	public HubProxyInfoBuilder() {
+		super(false);
+	}
+
+	public HubProxyInfoBuilder(final boolean eatExceptionsOnSetters) {
+		super(eatExceptionsOnSetters);
+	}
+
 	@Override
 	public ValidationResults<String, HubProxyInfo> build() {
 		final ValidationResults<String, HubProxyInfo> result = assertValid();
-		String encryptedProxyPass = null;
-		try {
-			encryptedProxyPass = PasswordEncrypter.encrypt(password);
-		} catch (final IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (final EncryptionException e) {
-			e.printStackTrace();
+		HubProxyInfo proxyInfo;
+		if (StringUtils.isNotBlank(password)) {
+			String encryptedProxyPass = null;
+			try {
+				encryptedProxyPass = PasswordEncrypter.encrypt(password);
+			} catch (final IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (final EncryptionException e) {
+				e.printStackTrace();
+			}
+			proxyInfo = new HubProxyInfo(host, port, username, encryptedProxyPass, password.length(),
+					ignoredProxyHosts);
+		} else {
+
+			proxyInfo = new HubProxyInfo(host, port, username, null, 0, ignoredProxyHosts);
 		}
-		result.setConstructedObject(
-				new HubProxyInfo(host, port, username, encryptedProxyPass, password.length(), ignoredProxyHosts));
+
+		result.setConstructedObject(proxyInfo);
 		return result;
 	}
 
@@ -164,7 +180,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder<String, HubProxyInfo> {
 	}
 
 	public void setPort(final String port, final Integer defaultPort) {
-		this.port = stringToInteger(port, defaultPort);
+		this.port = stringToInteger(port);
 	}
 
 	public String getUsername() {

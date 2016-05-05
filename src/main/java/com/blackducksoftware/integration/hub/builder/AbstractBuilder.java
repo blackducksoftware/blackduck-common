@@ -22,21 +22,37 @@ import org.apache.commons.lang3.StringUtils;
 
 public abstract class AbstractBuilder<Key, Type> {
 
+	private final boolean eatExceptionsOnSetters;
+
+	public AbstractBuilder(final boolean eatExceptionsOnSetters) {
+		this.eatExceptionsOnSetters = eatExceptionsOnSetters;
+	}
+
 	public abstract ValidationResults<Key, Type> build();
 
 	public abstract ValidationResults<Key, Type> assertValid();
 
-	protected int stringToInteger(final String integer, final Integer defaultInt) {
+	protected int stringToInteger(final String integer) {
 		final String integerString = StringUtils.trimToNull(integer);
 		if (integerString != null) {
 			try {
 				return Integer.valueOf(integerString);
 			} catch (final NumberFormatException e) {
-				if (defaultInt != null) {
+				if (!eatExceptionsOnSetters) {
 					throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.", e);
 				}
 			}
+		} else {
+			if (!eatExceptionsOnSetters) {
+				throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.");
+			} else {
+				return -1;
+			}
 		}
-		return defaultInt;
+		return -1;
+	}
+
+	public boolean shouldEatExceptionsOnSetters() {
+		return eatExceptionsOnSetters;
 	}
 }
