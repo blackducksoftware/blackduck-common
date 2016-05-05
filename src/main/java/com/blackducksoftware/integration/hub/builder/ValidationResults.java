@@ -50,6 +50,18 @@ public class ValidationResults<Key, Type> {
 		resultList.add(result);
 	}
 
+	public Map<Key, List<ValidationResult>> getResultMap() {
+		return resultMap;
+	}
+
+	public List<ValidationResult> getResultList(final Key fieldKey) {
+		if (resultMap.containsKey(fieldKey)) {
+			return resultMap.get(fieldKey);
+		} else {
+			return new Vector<ValidationResult>();
+		}
+	}
+
 	public Type getConstructedObject() {
 		return constructedObject;
 	}
@@ -73,5 +85,9 @@ public class ValidationResults<Key, Type> {
 
 	public boolean isSuccess() {
 		return (status.size() == 1 && status.contains(ValidationResultEnum.OK));
+	}
+
+	public boolean isEmpty() {
+		return status.isEmpty();
 	}
 }
