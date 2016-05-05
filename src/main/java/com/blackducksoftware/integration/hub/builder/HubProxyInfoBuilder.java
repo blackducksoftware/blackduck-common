@@ -184,7 +184,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 		this.port = port;
 	}
 
-	public void setPort(final String port, final Integer defaultPort) {
+	public void setPort(final String port) {
 		this.port = stringToInteger(port);
 	}
 
