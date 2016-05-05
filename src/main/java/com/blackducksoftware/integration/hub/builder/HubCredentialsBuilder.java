@@ -29,6 +29,7 @@ public class HubCredentialsBuilder extends AbstractBuilder<HubCredentialsFieldEn
 
 	private String username;
 	private String password;
+	private int passwordLength;
 
 	public HubCredentialsBuilder() {
 		super(false);
@@ -41,13 +42,19 @@ public class HubCredentialsBuilder extends AbstractBuilder<HubCredentialsFieldEn
 	@Override
 	public ValidationResults<HubCredentialsFieldEnum, HubCredentials> build() {
 		final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result = assertValid();
-		String encryptedPassword = null;
-		try {
-			encryptedPassword = PasswordEncrypter.encrypt(password);
-		} catch (final EncryptionException e) {
-			e.printStackTrace();
+		HubCredentials creds = null;
+		if (StringUtils.isNotBlank(password) && passwordLength != 0) {
+			creds = new HubCredentials(username, password, passwordLength);
+		} else {
+			String encryptedPassword = null;
+			try {
+				encryptedPassword = PasswordEncrypter.encrypt(password);
+			} catch (final EncryptionException e) {
+				e.printStackTrace();
+			}
+			creds = new HubCredentials(username, encryptedPassword, password.length());
 		}
-		final HubCredentials creds = new HubCredentials(username, encryptedPassword, password.length());
+
 		result.setConstructedObject(creds);
 		return result;
 	}
@@ -110,6 +117,14 @@ public class HubCredentialsBuilder extends AbstractBuilder<HubCredentialsFieldEn
 
 	public void setPassword(final String password) {
 		this.password = password;
+	}
+
+	public int getPasswordLength() {
+		return passwordLength;
+	}
+
+	public void setPasswordLength(final int passwordLength) {
+		this.passwordLength = passwordLength;
 	}
 
 }
