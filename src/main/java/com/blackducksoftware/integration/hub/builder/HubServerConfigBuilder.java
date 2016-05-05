@@ -78,12 +78,11 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfigField
 		return result;
 	}
 
-	public boolean validateHubUrl(final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result) {
-		boolean valid = true;
+	public void validateHubUrl(final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result) {
 		if (hubUrl == null) {
 			result.addResult(HubServerConfigFieldEnum.HUBURL,
 					new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_FOUND));
-			return false;
+			return;
 		}
 
 		URL hubURL = null;
@@ -93,15 +92,13 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfigField
 		} catch (final MalformedURLException e) {
 			result.addResult(HubServerConfigFieldEnum.HUBURL,
 					new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
-			valid = false;
 		} catch (final URISyntaxException e) {
 			result.addResult(HubServerConfigFieldEnum.HUBURL,
 					new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
-			valid = false;
 		}
 
 		if (hubURL == null) {
-			return valid;
+			return;
 		}
 
 		try {
@@ -114,38 +111,31 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfigField
 			connection.getContent();
 		} catch (final IOException ioe) {
 			result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR,
-					ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ioe.getMessage()));
-			valid = false;
+					ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, ioe));
+			return;
 		} catch (final RuntimeException e) {
 			result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR,
-					ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl + e.getMessage()));
-			valid = false;
+					ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl, e));
+			return;
 		}
 
-		if (valid) {
-			result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.OK, ""));
-		}
-
-		return valid;
+		result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.OK, ""));
 	}
 
-	public boolean validateTimeout(final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result) {
-		return validateTimeout(result, null);
+	public void validateTimeout(final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result) {
+		validateTimeout(result, null);
 	}
 
-	private boolean validateTimeout(final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result,
+	private void validateTimeout(final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result,
 			final Integer defaultTimeout) {
-		boolean valid = true;
 		if (defaultTimeout != null && timeout <= 0) {
 			timeout = defaultTimeout;
 		} else if (timeout <= 0) {
 			result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
 					new ValidationResult(ValidationResultEnum.ERROR, "The Timeout must be greater than 0."));
-			valid = false;
 		} else {
 			result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT, new ValidationResult(ValidationResultEnum.OK, ""));
 		}
-		return valid;
 	}
 
 	public void setHubUrl(final String hubUrl) {

@@ -32,7 +32,7 @@ public abstract class AbstractBuilder<Key, Type> {
 
 	public abstract ValidationResults<Key, Type> assertValid();
 
-	protected int stringToInteger(final String integer) {
+	protected int stringToInteger(final String integer) throws IllegalArgumentException {
 		final String integerString = StringUtils.trimToNull(integer);
 		if (integerString != null) {
 			try {
