@@ -67,7 +67,7 @@ public class HubCredentialsBuilderTest {
 		// expectedMessages.add(ERROR_MSG_NO_PASSWORD_FOUND);
 
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
-		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result = new ValidationResults<HubCredentialsFieldEnum, HubCredentials>();
 		builder.validateCredentials(result);
 		assertFalse(result.isSuccess());
 	}
@@ -80,7 +80,7 @@ public class HubCredentialsBuilderTest {
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 		builder.setUsername("");
 		builder.setPassword("   ");
-		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result = new ValidationResults<HubCredentialsFieldEnum, HubCredentials>();
 		builder.validateCredentials(result);
 		assertFalse(result.isSuccess());
 	}
@@ -90,7 +90,7 @@ public class HubCredentialsBuilderTest {
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 		builder.setUsername(VALID_USERNAME);
 		builder.setPassword(VALID_PASSWORD);
-		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result = new ValidationResults<HubCredentialsFieldEnum, HubCredentials>();
 		builder.validateCredentials(result);
 		assertTrue(result.isSuccess());
 	}
@@ -100,7 +100,7 @@ public class HubCredentialsBuilderTest {
 		// expectedMessages.add(ERROR_MSG_NO_USER_FOUND);
 
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
-		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result = new ValidationResults<HubCredentialsFieldEnum, HubCredentials>();
 		builder.validateUsername(result);
 		assertFalse(result.isSuccess());
 	}
@@ -109,7 +109,7 @@ public class HubCredentialsBuilderTest {
 	public void testValidateHubUser() throws Exception {
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 		builder.setUsername(VALID_USERNAME);
-		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result = new ValidationResults<HubCredentialsFieldEnum, HubCredentials>();
 		builder.validateUsername(result);
 		assertTrue(result.isSuccess());
 	}
@@ -119,7 +119,7 @@ public class HubCredentialsBuilderTest {
 		// expectedMessages.add(ERROR_MSG_NO_PASSWORD_FOUND);
 
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
-		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result = new ValidationResults<HubCredentialsFieldEnum, HubCredentials>();
 		builder.validatePassword(result);
 		assertFalse(result.isSuccess());
 	}
@@ -128,7 +128,7 @@ public class HubCredentialsBuilderTest {
 	public void testValidateHubPassword() throws Exception {
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 		builder.setPassword(VALID_PASSWORD);
-		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result = new ValidationResults<HubCredentialsFieldEnum, HubCredentials>();
 		builder.validatePassword(result);
 		assertTrue(result.isSuccess());
 	}

@@ -91,10 +91,10 @@ public class HubServerConfigBuilderTest {
 		// expectedMessages.add("The Timeout must be greater than 0.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
-		ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 
 		assertFalse(builder.validateHubUrl(result));
-		result = new ValidationResults<String, HubServerConfig>();
+		result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 		assertFalse(builder.validateTimeout(result));
 	}
 
@@ -103,7 +103,7 @@ public class HubServerConfigBuilderTest {
 		// expectedMessages.add("No Hub Url was found.");
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl(null);
-		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 		builder.validateHubUrl(result);
 		assertFalse(result.isSuccess());
 	}
@@ -113,7 +113,7 @@ public class HubServerConfigBuilderTest {
 		// expectedMessages.add("No Hub Url was found.");
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl("");
-		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 		builder.validateHubUrl(result);
 		assertFalse(result.isSuccess());
 	}
@@ -123,7 +123,7 @@ public class HubServerConfigBuilderTest {
 		// expectedMessages.add("The Hub Url is not a valid URL.");
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl("ThisIsNotAUrl");
-		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 		builder.validateHubUrl(result);
 
 		assertFalse(result.isSuccess());
@@ -133,7 +133,7 @@ public class HubServerConfigBuilderTest {
 	public void testValidateHubUrlValid() throws Exception {
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl("https://google.com");
-		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 		builder.validateHubUrl(result);
 
 		assertTrue(result.isSuccess());
@@ -152,7 +152,7 @@ public class HubServerConfigBuilderTest {
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl("https://google.com");
 		builder.setProxyInfo(proxyInfo);
-		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 		builder.validateHubUrl(result);
 
 		assertFalse(result.isSuccess());
@@ -168,7 +168,7 @@ public class HubServerConfigBuilderTest {
 		setBuilderDefaults(builder);
 		builder.setHubUrl("https://google.com");
 		builder.setProxyInfo(proxyInfo);
-		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 		builder.validateHubUrl(result);
 
 		assertTrue(result.isSuccess());
@@ -179,7 +179,7 @@ public class HubServerConfigBuilderTest {
 		// expectedMessages.add("The Timeout must be greater than 0.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
-		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 		builder.validateTimeout(result);
 
 		assertFalse(result.isSuccess());
@@ -191,7 +191,7 @@ public class HubServerConfigBuilderTest {
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setTimeout("  ");
-		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 		builder.validateTimeout(result);
 
 		assertFalse(result.isSuccess());
@@ -212,7 +212,7 @@ public class HubServerConfigBuilderTest {
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setTimeout(-1200);
-		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 		builder.validateTimeout(result);
 
 		assertFalse(result.isSuccess());
@@ -222,7 +222,7 @@ public class HubServerConfigBuilderTest {
 	public void testValidateHubTimeout() throws Exception {
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setTimeout(1200);
-		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 		builder.validateTimeout(result);
 
 		assertTrue(result.isSuccess());
@@ -233,7 +233,7 @@ public class HubServerConfigBuilderTest {
 		// expectedMessages.add("The Timeout must be greater than 0.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
-		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
 		builder.validateTimeout(result);
 
 		assertFalse(result.isSuccess());
