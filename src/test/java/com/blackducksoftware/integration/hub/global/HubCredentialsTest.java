@@ -51,17 +51,17 @@ public class HubCredentialsTest {
 		HubCredentialsBuilder builder = new HubCredentialsBuilder();
 		builder.setUsername(hubUser1);
 		builder.setPassword(hubPass1);
-		final HubCredentials item1 = builder.build(logger);
+		final HubCredentials item1 = builder.build().getConstructedObject();
 
 		builder = new HubCredentialsBuilder();
 		builder.setUsername(hubUser2);
 		builder.setPassword(hubPass2Clear);
-		final HubCredentials item2 = builder.build(logger);
+		final HubCredentials item2 = builder.build().getConstructedObject();
 
 		builder = new HubCredentialsBuilder();
 		builder.setUsername(hubUser1);
 		builder.setPassword(hubPass1);
-		final HubCredentials item3 = builder.build(logger);
+		final HubCredentials item3 = builder.build().getConstructedObject();
 
 		assertEquals(hubUser1, item1.getUsername());
 		assertEquals(hubPass1, item1.getDecryptedPassword());

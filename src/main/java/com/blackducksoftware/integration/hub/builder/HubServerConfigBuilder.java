@@ -30,7 +30,7 @@ import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 
-public class HubServerConfigBuilder extends AbstractBuilder {
+public class HubServerConfigBuilder extends AbstractBuilder<String, HubServerConfig> {
 
 	public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
 	public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
@@ -45,38 +45,33 @@ public class HubServerConfigBuilder extends AbstractBuilder {
 	private HubProxyInfo proxyInfo;
 
 	@Override
-	public ValidationResult<HubServerConfig> build() {
-		final ValidationResult<HubServerConfig> result = assertValid();
+	public ValidationResults<String, HubServerConfig> build() {
+		final ValidationResults<String, HubServerConfig> result = assertValid();
 		URL hubURL = null;
 		try {
 			hubURL = new URL(hubUrl);
 		} catch (final MalformedURLException e) {
 			e.printStackTrace();
 		}
-		new HubServerConfig(hubURL, timeout, credentials, proxyInfo);
+		result.setConstructedObject(new HubServerConfig(hubURL, timeout, credentials, proxyInfo));
 		return result;
 	}
 
 	@Override
-	public ValidationResult<HubServerConfig> assertValid() {
-		final ValidationResult<HubServerConfig> result = null;
+	public ValidationResults<String, HubServerConfig> assertValid() {
+		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 
 		validateHubUrl(result);
 
 		validateTimeout(result, DEFAULT_TIMEOUT);
 
-		// if (!valid) {
-		// // throw new HubIntegrationException(
-		// // "The server configuration is not valid - please check the log for
-		// // the specific issues.");
-		// }
 		return result;
 	}
 
-	public boolean validateHubUrl(final ValidationResult<HubServerConfig> result) {
+	public boolean validateHubUrl(final ValidationResults<String, HubServerConfig> result) {
 		boolean valid = true;
 		if (hubUrl == null) {
-			logger.error(ERROR_MSG_URL_NOT_FOUND);
+			result.addResult("hubUrl", new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_FOUND));
 			return false;
 		}
 
@@ -85,10 +80,10 @@ public class HubServerConfigBuilder extends AbstractBuilder {
 			hubURL = new URL(hubUrl);
 			hubURL.toURI();
 		} catch (final MalformedURLException e) {
-			logger.error(ERROR_MSG_URL_NOT_VALID);
+			result.addResult("hubUrl", new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
 			valid = false;
 		} catch (final URISyntaxException e) {
-			logger.error(ERROR_MSG_URL_NOT_VALID);
+			result.addResult("hubUrl", new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
 			valid = false;
 		}
 
@@ -105,27 +100,37 @@ public class HubServerConfigBuilder extends AbstractBuilder {
 			}
 			connection.getContent();
 		} catch (final IOException ioe) {
-			logger.error(ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, ioe);
+			result.addResult("hubUrl", new ValidationResult(ValidationResultEnum.ERROR,
+					ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ioe.getMessage()));
 			valid = false;
 		} catch (final RuntimeException e) {
-			logger.error(ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl, e);
+			result.addResult("hubUrl", new ValidationResult(ValidationResultEnum.ERROR,
+					ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl + e.getMessage()));
 			valid = false;
+		}
+
+		if (valid) {
+			result.addResult("hubUrl", new ValidationResult(ValidationResultEnum.OK, ""));
 		}
 
 		return valid;
 	}
 
-	public boolean validateTimeout(final ValidationResult<HubServerConfig> result) {
+	public boolean validateTimeout(final ValidationResults<String, HubServerConfig> result) {
 		return validateTimeout(result, null);
 	}
 
-	private boolean validateTimeout(final ValidationResult<HubServerConfig> result, final Integer defaultTimeout) {
+	private boolean validateTimeout(final ValidationResults<String, HubServerConfig> result,
+			final Integer defaultTimeout) {
 		boolean valid = true;
 		if (defaultTimeout != null && timeout <= 0) {
 			timeout = defaultTimeout;
 		} else if (timeout <= 0) {
-			logger.error("The Timeout must be greater than 0.");
+			result.addResult("timeout",
+					new ValidationResult(ValidationResultEnum.ERROR, "The Timeout must be greater than 0."));
 			valid = false;
+		} else {
+			result.addResult("timeout", new ValidationResult(ValidationResultEnum.OK, ""));
 		}
 		return valid;
 	}
@@ -134,8 +139,8 @@ public class HubServerConfigBuilder extends AbstractBuilder {
 		this.hubUrl = StringUtils.trimToNull(hubUrl);
 	}
 
-	public void setTimeout(final String timeout, final Integer defaultPort) {
-		setTimeout(stringToInteger(timeout, defaultPort));
+	public void setTimeout(final String timeout, final Integer defaultTimeout) {
+		setTimeout(stringToInteger(timeout, defaultTimeout));
 	}
 
 	public int getTimeout() {

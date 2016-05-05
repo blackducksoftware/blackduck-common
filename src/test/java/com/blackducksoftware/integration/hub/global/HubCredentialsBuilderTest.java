@@ -30,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
+import com.blackducksoftware.integration.hub.builder.ValidationResults;
 import com.blackducksoftware.integration.hub.util.TestLogger;
 
 public class HubCredentialsBuilderTest {
@@ -62,24 +63,26 @@ public class HubCredentialsBuilderTest {
 
 	@Test
 	public void testvalidateCredentialsNull() throws Exception {
-		expectedMessages.add(ERROR_MSG_NO_USER_FOUND);
-		expectedMessages.add(ERROR_MSG_NO_PASSWORD_FOUND);
+		// expectedMessages.add(ERROR_MSG_NO_USER_FOUND);
+		// expectedMessages.add(ERROR_MSG_NO_PASSWORD_FOUND);
 
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
-
-		assertFalse(builder.validateCredentials(logger));
+		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		builder.validateCredentials(result);
+		assertFalse(result.isSuccess());
 	}
 
 	@Test
 	public void testvalidateCredentialsEmpty() throws Exception {
-		expectedMessages.add(ERROR_MSG_NO_USER_FOUND);
-		expectedMessages.add(ERROR_MSG_NO_PASSWORD_FOUND);
+		// expectedMessages.add(ERROR_MSG_NO_USER_FOUND);
+		// expectedMessages.add(ERROR_MSG_NO_PASSWORD_FOUND);
 
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 		builder.setUsername("");
 		builder.setPassword("   ");
-
-		assertFalse(builder.validateCredentials(logger));
+		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		builder.validateCredentials(result);
+		assertFalse(result.isSuccess());
 	}
 
 	@Test
@@ -87,40 +90,46 @@ public class HubCredentialsBuilderTest {
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 		builder.setUsername(VALID_USERNAME);
 		builder.setPassword(VALID_PASSWORD);
-
-		assertTrue(builder.validateCredentials(logger));
+		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		builder.validateCredentials(result);
+		assertTrue(result.isSuccess());
 	}
 
 	@Test
 	public void testValidateHubUserNull() throws Exception {
-		expectedMessages.add(ERROR_MSG_NO_USER_FOUND);
+		// expectedMessages.add(ERROR_MSG_NO_USER_FOUND);
 
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
-
-		assertFalse(builder.validateUsername(logger));
+		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		builder.validateUsername(result);
+		assertFalse(result.isSuccess());
 	}
 
 	@Test
 	public void testValidateHubUser() throws Exception {
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 		builder.setUsername(VALID_USERNAME);
-		assertTrue(builder.validateUsername(logger));
+		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		builder.validateUsername(result);
+		assertTrue(result.isSuccess());
 	}
 
 	@Test
 	public void testValidateHubPasswordNull() throws Exception {
-		expectedMessages.add(ERROR_MSG_NO_PASSWORD_FOUND);
+		// expectedMessages.add(ERROR_MSG_NO_PASSWORD_FOUND);
 
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
-
-		assertFalse(builder.validatePassword(logger));
+		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		builder.validatePassword(result);
+		assertFalse(result.isSuccess());
 	}
 
 	@Test
 	public void testValidateHubPassword() throws Exception {
 		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
 		builder.setPassword(VALID_PASSWORD);
-		assertTrue(builder.validatePassword(logger));
+		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
+		builder.validatePassword(result);
+		assertTrue(result.isSuccess());
 	}
-
 }

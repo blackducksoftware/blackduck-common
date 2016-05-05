@@ -19,14 +19,17 @@
 package com.blackducksoftware.integration.hub.builder;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 public class ValidationResults<Key, Type> {
 
 	private Type constructedObject;
 	private final Map<Key, List<ValidationResult>> resultMap;
+	private final Set<ValidationResultEnum> status = new LinkedHashSet<ValidationResultEnum>();
 
 	public ValidationResults() {
 		resultMap = new HashMap<Key, List<ValidationResult>>();
@@ -42,6 +45,8 @@ public class ValidationResults<Key, Type> {
 			resultMap.put(fieldKey, resultList);
 		}
 
+		status.add(result.getResultType());
+
 		resultList.add(result);
 	}
 
@@ -52,6 +57,21 @@ public class ValidationResults<Key, Type> {
 	public void setConstructedObject(final Type constructedObject) {
 		this.constructedObject = constructedObject;
 	}
-	// add methods to check for errors, warnings, construct messages.
 
+	public Set<ValidationResultEnum> getValidationStatus() {
+
+		return status;
+	}
+
+	public boolean hasErrors() {
+		return status.contains(ValidationResultEnum.ERROR);
+	}
+
+	public boolean hasWarnings() {
+		return status.contains(ValidationResultEnum.WARN);
+	}
+
+	public boolean isSuccess() {
+		return (status.size() == 1 && status.contains(ValidationResultEnum.OK));
+	}
 }

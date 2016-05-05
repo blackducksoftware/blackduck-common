@@ -24,60 +24,60 @@ import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 
-public class HubCredentialsBuilder extends AbstractBuilder {
+public class HubCredentialsBuilder extends AbstractBuilder<String, HubCredentials> {
 
 	private String username;
 	private String password;
 
-
 	@Override
-	public ValidationResult<HubCredentials> build() {
-		final ValidationResult<HubCredentials> result = assertValid();
+	public ValidationResults<String, HubCredentials> build() {
+		final ValidationResults<String, HubCredentials> result = assertValid();
 		String encryptedPassword = null;
 		try {
 			encryptedPassword = PasswordEncrypter.encrypt(password);
 		} catch (final EncryptionException e) {
 			e.printStackTrace();
 		}
-		new HubCredentials(username, encryptedPassword, password.length());
+		result.setConstructedObject(new HubCredentials(username, encryptedPassword, password.length()));
 		return result;
 	}
 
 	@Override
-	public ValidationResult<HubCredentials> assertValid() {
-		final ValidationResult<HubCredentials> result = null;
+	public ValidationResults<String, HubCredentials> assertValid() {
+		final ValidationResults<String, HubCredentials> result = new ValidationResults<String, HubCredentials>();
 
 		validateCredentials(result);
 
-		// if (!valid) {
-		// // throw new HubIntegrationException(
-		// // "The credentials are not valid - please check the log for the
-		// // specific issues.");
-		// }
-		return null;
+		return result;
 	}
 
-	public void validateCredentials(final ValidationResult<HubCredentials> result) {
+	public void validateCredentials(final ValidationResults<String, HubCredentials> result) {
 
 		validateUsername(result);
 		validatePassword(result);
 
 	}
 
-	public boolean validateUsername(final ValidationResult<HubCredentials> result) {
+	public boolean validateUsername(final ValidationResults<String, HubCredentials> result) {
 		boolean valid = true;
 		if (StringUtils.isBlank(username)) {
 			valid = false;
-			logger.error("No Hub Username was found.");
+			result.addResult("hubUserName",
+					new ValidationResult(ValidationResultEnum.ERROR, "No Hub Username was found."));
+		} else {
+			result.addResult("hubUserName", new ValidationResult(ValidationResultEnum.OK, ""));
 		}
 		return valid;
 	}
 
-	public boolean validatePassword(final ValidationResult<HubCredentials> result) {
+	public boolean validatePassword(final ValidationResults<String, HubCredentials> result) {
 		boolean valid = true;
 		if (StringUtils.isBlank(password)) {
 			valid = false;
-			logger.error("No Hub Password was found.");
+			result.addResult("hubPassword",
+					new ValidationResult(ValidationResultEnum.ERROR, "No Hub Password was found."));
+		} else {
+			result.addResult("hubPassword", new ValidationResult(ValidationResultEnum.OK, ""));
 		}
 		return valid;
 	}

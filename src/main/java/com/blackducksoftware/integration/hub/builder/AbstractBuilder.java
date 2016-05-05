@@ -20,11 +20,11 @@ package com.blackducksoftware.integration.hub.builder;
 
 import org.apache.commons.lang3.StringUtils;
 
-public abstract class AbstractBuilder {
+public abstract class AbstractBuilder<Key, Type> {
 
-	public abstract ValidationResult build();
+	public abstract ValidationResults<Key, Type> build();
 
-	public abstract ValidationResult assertValid();
+	public abstract ValidationResults<Key, Type> assertValid();
 
 	protected int stringToInteger(final String integer, final Integer defaultInt) {
 		final String integerString = StringUtils.trimToNull(integer);
