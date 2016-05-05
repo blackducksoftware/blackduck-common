@@ -28,8 +28,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -41,16 +43,15 @@ import org.junit.rules.ExpectedException;
 import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
 import com.blackducksoftware.integration.hub.builder.HubProxyInfoBuilder;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
+import com.blackducksoftware.integration.hub.builder.ValidationResult;
 import com.blackducksoftware.integration.hub.builder.ValidationResults;
-import com.blackducksoftware.integration.hub.util.TestLogger;
 
 public class HubServerConfigBuilderTest {
 
 	private static Properties testProperties;
 
 	private List<String> expectedMessages;
-
-	private TestLogger logger;
+	private List<String> actualMessages;
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -70,63 +71,89 @@ public class HubServerConfigBuilderTest {
 	@Before
 	public void setUp() {
 		expectedMessages = new ArrayList<String>();
-		logger = new TestLogger();
+		actualMessages = new ArrayList<String>();
 	}
 
 	@After
 	public void tearDown() {
-		final List<String> outputList = logger.getOutputList();
-		final String outputString = logger.getOutputString();
-		assertEquals("Too many/not enough messages expected: \n" + outputString, expectedMessages.size(),
-				outputList.size());
+		assertEquals("Too many/not enough messages expected: \n" + actualMessages.size(), expectedMessages.size(),
+				actualMessages.size());
 
 		for (final String expectedMessage : expectedMessages) {
-			assertTrue("Did not find the expected message : " + expectedMessage, outputList.contains(expectedMessage));
+			assertTrue("Did not find the expected message : " + expectedMessage,
+					actualMessages.contains(expectedMessage));
 		}
+	}
+
+	private List<String> getMessages(final ValidationResults<String, HubServerConfig> result) {
+
+		final List<String> messageList = new ArrayList<String>();
+		final Map<String, List<ValidationResult>> resultMap = result.getResultMap();
+		for (final String key : resultMap.keySet()) {
+			final List<ValidationResult> resultList = resultMap.get(key);
+
+			for (final ValidationResult item : resultList) {
+				final String message = item.getMessage();
+
+				if (StringUtils.isNotBlank(message)) {
+					messageList.add(item.getMessage());
+				}
+			}
+		}
+		return messageList;
 	}
 
 	@Test
 	public void testEmptyConfigValidations() throws Exception {
-		// expectedMessages.add("No Hub Url was found.");
-		// expectedMessages.add("The Timeout must be greater than 0.");
+		expectedMessages.add("No Hub Url was found.");
+		expectedMessages.add("The Timeout must be greater than 0.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
-		ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
+		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 
-		assertFalse(builder.validateHubUrl(result));
-		result = new ValidationResults<String, HubServerConfig>();
-		assertFalse(builder.validateTimeout(result));
+		builder.validateHubUrl(result);
+		assertFalse(result.isSuccess());
+		builder.validateTimeout(result);
+		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
 	}
 
 	@Test
 	public void testValidateHubUrlNull() throws Exception {
-		// expectedMessages.add("No Hub Url was found.");
+		expectedMessages.add("No Hub Url was found.");
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl(null);
 		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 		builder.validateHubUrl(result);
 		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
 	}
 
 	@Test
 	public void testValidateHubUrlEmpty() throws Exception {
-		// expectedMessages.add("No Hub Url was found.");
+		expectedMessages.add("No Hub Url was found.");
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl("");
 		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 		builder.validateHubUrl(result);
 		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
 	}
 
 	@Test
 	public void testValidateHubUrlInvalid() throws Exception {
-		// expectedMessages.add("The Hub Url is not a valid URL.");
+		expectedMessages.add("The Hub Url is not a valid URL.");
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl("ThisIsNotAUrl");
 		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 		builder.validateHubUrl(result);
 
 		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
 	}
 
 	@Test
@@ -141,8 +168,7 @@ public class HubServerConfigBuilderTest {
 
 	@Test
 	public void testValidateHubUrlValidThroughInvalidProxy() throws Exception {
-		// expectedMessages.add("Can not reach this server :
-		// https://google.com");
+		expectedMessages.add("Can not reach this server : https://google.com caused by : FakeHost");
 
 		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
 		proxyBuilder.setHost("FakeHost");
@@ -156,6 +182,8 @@ public class HubServerConfigBuilderTest {
 		builder.validateHubUrl(result);
 
 		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
 	}
 
 	@Test
@@ -176,18 +204,20 @@ public class HubServerConfigBuilderTest {
 
 	@Test
 	public void testValidateHubTimeoutNull() throws Exception {
-		// expectedMessages.add("The Timeout must be greater than 0.");
+		expectedMessages.add("The Timeout must be greater than 0.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 		builder.validateTimeout(result);
 
 		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
 	}
 
 	@Test
 	public void testValidateHubTimeoutEmpty() throws Exception {
-		// expectedMessages.add("The Timeout must be greater than 0.");
+		expectedMessages.add("The Timeout must be greater than 0.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setTimeout("  ");
@@ -195,6 +225,8 @@ public class HubServerConfigBuilderTest {
 		builder.validateTimeout(result);
 
 		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
 	}
 
 	@Test
@@ -208,7 +240,7 @@ public class HubServerConfigBuilderTest {
 
 	@Test
 	public void testValidateHubTimeoutNegative() throws Exception {
-		// expectedMessages.add("The Timeout must be greater than 0.");
+		expectedMessages.add("The Timeout must be greater than 0.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setTimeout(-1200);
@@ -216,6 +248,8 @@ public class HubServerConfigBuilderTest {
 		builder.validateTimeout(result);
 
 		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
 	}
 
 	@Test
@@ -230,24 +264,26 @@ public class HubServerConfigBuilderTest {
 
 	@Test
 	public void testValidateHubTimeoutString() throws Exception {
-		// expectedMessages.add("The Timeout must be greater than 0.");
+		expectedMessages.add("The Timeout must be greater than 0.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		final ValidationResults<String, HubServerConfig> result = new ValidationResults<String, HubServerConfig>();
 		builder.validateTimeout(result);
 
 		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
 	}
 
 	@Test
 	public void testEmptyConfigIsInvalid() throws Exception {
-		// thrown.expect(HubIntegrationException.class);
-		// thrown.expectMessage("The server configuration is not valid - please
-		// check the log for the specific issues.");
-		// expectedMessages.add("No Hub Url was found.");
+		expectedMessages.add("No Hub Url was found.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-		assertFalse(builder.build().isSuccess());
+		final ValidationResults<String, HubServerConfig> result = builder.build();
+		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
 	}
 
 	@Test

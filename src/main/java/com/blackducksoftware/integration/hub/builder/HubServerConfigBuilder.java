@@ -110,11 +110,11 @@ public class HubServerConfigBuilder extends AbstractBuilder<String, HubServerCon
 			connection.getContent();
 		} catch (final IOException ioe) {
 			result.addResult("hubUrl", new ValidationResult(ValidationResultEnum.ERROR,
-					ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ioe.getMessage()));
+					ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + " caused by : " + ioe.getMessage()));
 			valid = false;
 		} catch (final RuntimeException e) {
 			result.addResult("hubUrl", new ValidationResult(ValidationResultEnum.ERROR,
-					ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl + e.getMessage()));
+					ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl + " caused by : " + e.getMessage()));
 			valid = false;
 		}
 
