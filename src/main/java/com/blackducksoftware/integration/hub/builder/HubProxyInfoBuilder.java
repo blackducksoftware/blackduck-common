@@ -56,8 +56,9 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 	public ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> build() {
 		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = assertValid();
 		HubProxyInfo proxyInfo;
-		if (StringUtils.isNotBlank(password) && passwordLength != 0) {
 
+		if (StringUtils.isNotBlank(password) && passwordLength == 0) {
+			// Password needs to be encrypted
 			String encryptedProxyPass = null;
 			try {
 				encryptedProxyPass = PasswordEncrypter.encrypt(password);
@@ -68,6 +69,8 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 			proxyInfo = new HubProxyInfo(host, port, username, encryptedProxyPass, password.length(),
 					ignoredProxyHosts);
 		} else {
+			// password is blank or already encrypted so we just pass in the
+			// values given to us
 			proxyInfo = new HubProxyInfo(host, port, username, password, passwordLength, ignoredProxyHosts);
 		}
 
