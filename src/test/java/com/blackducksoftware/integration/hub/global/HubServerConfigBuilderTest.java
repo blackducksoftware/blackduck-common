@@ -168,7 +168,7 @@ public class HubServerConfigBuilderTest {
 
 	@Test
 	public void testValidateHubUrlValidThroughInvalidProxy() throws Exception {
-		expectedMessages.add("Can not reach this server : https://google.com caused by : FakeHost");
+		expectedMessages.add("Can not reach this server : https://google.com");
 
 		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
 		proxyBuilder.setHost("FakeHost");

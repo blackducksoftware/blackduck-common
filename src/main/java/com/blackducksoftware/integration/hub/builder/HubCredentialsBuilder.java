@@ -74,13 +74,8 @@ public class HubCredentialsBuilder extends AbstractBuilder<HubCredentialsFieldEn
 
 	public void validateCredentials(final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result) {
 
-		if (StringUtils.isBlank(username) && StringUtils.isBlank(password)) {
-			result.addResult(HubCredentialsFieldEnum.USERNAME, new ValidationResult(ValidationResultEnum.OK, ""));
-			result.addResult(HubCredentialsFieldEnum.PASSWORD, new ValidationResult(ValidationResultEnum.OK, ""));
-		} else {
-			validateUsername(result);
-			validatePassword(result);
-		}
+		validateUsername(result);
+		validatePassword(result);
 	}
 
 	public boolean validateUsername(final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result) {

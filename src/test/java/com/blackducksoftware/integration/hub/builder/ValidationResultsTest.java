@@ -21,9 +21,9 @@ public class ValidationResultsTest {
 
 	private static final String KEY_PREFIX = "key-";
 	private static final String TEST_MESSAGE_PREFIX = "Test Message ";
-	private static final String KEY_3 = "key-3";
-	private static final String KEY_2 = "key-2";
-	private static final String KEY_1 = "key-1";
+	private static final String KEY_3 = "key-2";
+	private static final String KEY_2 = "key-1";
+	private static final String KEY_1 = "key-0";
 
 	private ValidationResults<String, String> createTestData(final List<ValidationResultEnum> resultTypeList) {
 		final ValidationResults<String, String> results = new ValidationResults<String, String>();
@@ -136,9 +136,10 @@ public class ValidationResultsTest {
 
 		assertNotNull(results);
 		final Map<String, List<ValidationResult>> map = results.getResultMap();
-		assertTrue(map.get(KEY_1).contains(TEST_MESSAGE_PREFIX + "1"));
-		assertTrue(map.get(KEY_2).contains(TEST_MESSAGE_PREFIX + "2"));
-		assertTrue(map.get(KEY_3).contains(TEST_MESSAGE_PREFIX + "3"));
+		assertTrue(map.get(KEY_1).contains(new ValidationResult(ValidationResultEnum.OK, TEST_MESSAGE_PREFIX + "0")));
+		assertTrue(map.get(KEY_2).contains(new ValidationResult(ValidationResultEnum.WARN, TEST_MESSAGE_PREFIX + "1")));
+		assertTrue(
+				map.get(KEY_3).contains(new ValidationResult(ValidationResultEnum.ERROR, TEST_MESSAGE_PREFIX + "2")));
 	}
 
 	@Test
@@ -157,7 +158,7 @@ public class ValidationResultsTest {
 
 		assertEquals(resultList.size(), 3);
 		assertEquals(resultList.get(0).getResultType(), ValidationResultEnum.ERROR);
-		assertEquals(resultList.get(0).getMessage(), TEST_MESSAGE_PREFIX + "1");
+		assertEquals(resultList.get(0).getMessage(), TEST_MESSAGE_PREFIX + "0");
 		assertEquals(resultList.get(1).getResultType(), ValidationResultEnum.WARN);
 		assertEquals(resultList.get(1).getMessage(), anotherMsg);
 		assertEquals(resultList.get(2).getResultType(), ValidationResultEnum.WARN);
@@ -186,7 +187,7 @@ public class ValidationResultsTest {
 		final List<String> resultList = results.getResultList(KEY_2, ValidationResultEnum.OK);
 
 		assertEquals(resultList.size(), 2);
-		assertEquals(resultList.get(0), TEST_MESSAGE_PREFIX + "2");
+		assertEquals(resultList.get(0), TEST_MESSAGE_PREFIX + "1");
 		assertEquals(resultList.get(1), okMessage);
 	}
 
@@ -246,7 +247,7 @@ public class ValidationResultsTest {
 		final String message = results.getResultString(KEY_2, ValidationResultEnum.OK);
 
 		assertTrue(StringUtils.isNotBlank(message));
-		assertTrue(StringUtils.contains(message, TEST_MESSAGE_PREFIX + "2"));
+		assertTrue(StringUtils.contains(message, TEST_MESSAGE_PREFIX + "1"));
 		assertTrue(StringUtils.contains(message, okMessage));
 	}
 
