@@ -136,9 +136,9 @@ public class ValidationResultsTest {
 
 		assertNotNull(results);
 		final Map<String, List<ValidationResult>> map = results.getResultMap();
-		assertTrue(map.get(KEY_1).contains(TEST_MESSAGE_PREFIX + "1"));
-		assertTrue(map.get(KEY_2).contains(TEST_MESSAGE_PREFIX + "2"));
-		assertTrue(map.get(KEY_3).contains(TEST_MESSAGE_PREFIX + "3"));
+		assertTrue(map.get(KEY_1).get(0).getMessage().contains(TEST_MESSAGE_PREFIX + "1"));
+		assertTrue(map.get(KEY_2).get(0).getMessage().contains(TEST_MESSAGE_PREFIX + "2"));
+		assertTrue(map.get(KEY_3).get(0).getMessage().contains(TEST_MESSAGE_PREFIX + "3"));
 	}
 
 	@Test
@@ -151,17 +151,17 @@ public class ValidationResultsTest {
 		assertNotNull(results);
 		final String anotherMsg = "Test Warning Message";
 		results.addResult(KEY_1, new ValidationResult(ValidationResultEnum.WARN, anotherMsg));
-		results.addResult(KEY_1, new ValidationResult(ValidationResultEnum.WARN, anotherMsg));
 
-		final List<ValidationResult> resultList = results.getResultList(KEY_1);
+		final List<ValidationResult> resultList0 = results.getResultList(KEY_PREFIX + "0");
+		assertEquals(resultList0.size(), 1);
+		assertEquals(resultList0.get(0).getResultType(), ValidationResultEnum.ERROR);
+		assertEquals(resultList0.get(0).getMessage(), TEST_MESSAGE_PREFIX + "0");
 
-		assertEquals(resultList.size(), 3);
-		assertEquals(resultList.get(0).getResultType(), ValidationResultEnum.ERROR);
-		assertEquals(resultList.get(0).getMessage(), TEST_MESSAGE_PREFIX + "1");
-		assertEquals(resultList.get(1).getResultType(), ValidationResultEnum.WARN);
-		assertEquals(resultList.get(1).getMessage(), anotherMsg);
-		assertEquals(resultList.get(2).getResultType(), ValidationResultEnum.WARN);
-		assertEquals(resultList.get(2).getMessage(), anotherMsg);
+		final List<ValidationResult> resultList1 = results.getResultList(KEY_1);
+
+		assertEquals(resultList1.size(), 1);
+		assertEquals(resultList1.get(0).getResultType(), ValidationResultEnum.WARN);
+		assertEquals(resultList1.get(0).getMessage(), anotherMsg);
 	}
 
 	@Test

@@ -67,9 +67,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 	@Override
 	public ValidationResults<GlobalFieldKey, HubServerConfig> build() {
 		final ValidationResults<GlobalFieldKey, HubProxyInfo> proxyResult = assertProxyValid();
-		proxyInfo = proxyResult.getConstructedObject();
 		final ValidationResults<GlobalFieldKey, HubCredentials> credentialResult = assertCredentialsValid();
-		credentials = credentialResult.getConstructedObject();
 		final ValidationResults<GlobalFieldKey, HubServerConfig> result = assertValid();
 		result.addAllResults(proxyResult.getResultMap());
 		result.addAllResults(credentialResult.getResultMap());
@@ -93,6 +91,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 	}
 
 	public ValidationResults<GlobalFieldKey, HubProxyInfo> assertProxyValid() {
+		ValidationResults<GlobalFieldKey, HubProxyInfo> result = null;
 		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder(shouldEatExceptionsOnSetters());
 		proxyBuilder.setHost(proxyHost);
 		proxyBuilder.setPort(proxyPort);
@@ -100,18 +99,24 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		proxyBuilder.setUsername(proxyUsername);
 		proxyBuilder.setPassword(proxyPassword);
 		proxyBuilder.setPasswordLength(proxyPasswordLength);
-		return proxyBuilder.build();
+		result = proxyBuilder.build();
+		proxyInfo = result.getConstructedObject();
+		return result;
 	}
 
 	public ValidationResults<GlobalFieldKey, HubCredentials> assertCredentialsValid() {
+		ValidationResults<GlobalFieldKey, HubCredentials> result = null;
 		final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder(shouldEatExceptionsOnSetters());
-		credentialsBuilder.setUsername(proxyUsername);
-		credentialsBuilder.setPassword(proxyPassword);
-		credentialsBuilder.setPasswordLength(proxyPasswordLength);
-		return credentialsBuilder.build();
+		credentialsBuilder.setUsername(username);
+		credentialsBuilder.setPassword(password);
+		credentialsBuilder.setPasswordLength(passwordLength);
+		result = credentialsBuilder.build();
+		credentials = result.getConstructedObject();
+		return result;
 	}
 
 	public void validateHubUrl(final ValidationResults<GlobalFieldKey, HubServerConfig> result) {
+		assertProxyValid();
 		if (hubUrl == null) {
 			result.addResult(HubServerConfigFieldEnum.HUBURL,
 					new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_FOUND));

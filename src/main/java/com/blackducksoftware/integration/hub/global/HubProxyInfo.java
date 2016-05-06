@@ -66,7 +66,11 @@ public class HubProxyInfo implements Serializable {
 
 	public boolean shouldUseProxyForUrl(final URL url) {
 		final List<Pattern> ignoredProxyHostPatterns = getIgnoredProxyHostPatterns();
-		return !shouldIgnoreHost(url.getHost(), ignoredProxyHostPatterns);
+		boolean shouldUseProxy = !shouldIgnoreHost(url.getHost(), ignoredProxyHostPatterns);
+		if (StringUtils.isBlank(host) || port <= 0) {
+			shouldUseProxy = false;
+		}
+		return shouldUseProxy;
 	}
 
 	public void setDefaultAuthenticator() {
