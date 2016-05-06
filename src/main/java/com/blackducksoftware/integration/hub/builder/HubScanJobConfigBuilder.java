@@ -84,8 +84,6 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 	public void validateProjectAndVersion(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result) {
 
 		if (null == projectName && null == version) {
-			result.addResult(HubScanJobFieldEnum.PROJECT, new ValidationResult(ValidationResultEnum.WARN,
-					"No Project name or Version were found. Any scans run will not be mapped to a Version."));
 			result.addResult(HubScanJobFieldEnum.VERSION, new ValidationResult(ValidationResultEnum.WARN,
 					"No Project name or Version were found. Any scans run will not be mapped to a Version."));
 		} else {

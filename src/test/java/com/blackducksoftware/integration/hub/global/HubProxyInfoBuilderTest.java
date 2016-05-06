@@ -67,11 +67,11 @@ public class HubProxyInfoBuilderTest {
 		}
 	}
 
-	private List<String> getMessages(final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result) {
+	private List<String> getMessages(final ValidationResults<GlobalFieldKey, HubProxyInfo> result) {
 
 		final List<String> messageList = new ArrayList<String>();
-		final Map<HubProxyInfoFieldEnum, List<ValidationResult>> resultMap = result.getResultMap();
-		for (final HubProxyInfoFieldEnum key : resultMap.keySet()) {
+		final Map<GlobalFieldKey, List<ValidationResult>> resultMap = result.getResultMap();
+		for (final GlobalFieldKey key : resultMap.keySet()) {
 			final List<ValidationResult> resultList = resultMap.get(key);
 
 			for (final ValidationResult item : resultList) {
@@ -114,7 +114,7 @@ public class HubProxyInfoBuilderTest {
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost(VALID_HOST);
 		builder.setPort(VALID_PORT);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validatePort(result);
 		assertTrue(result.isSuccess());
 	}
@@ -126,7 +126,7 @@ public class HubProxyInfoBuilderTest {
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost("");
 		builder.setPort(VALID_PORT);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validatePort(result);
 		assertFalse(result.isSuccess());
 
@@ -138,7 +138,7 @@ public class HubProxyInfoBuilderTest {
 		expectedMessages.add(HubProxyInfoBuilder.WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost("");
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validateCredentials(result);
 		assertTrue(result.hasWarnings());
 
@@ -151,7 +151,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setHost(VALID_HOST);
 		builder.setUsername("");
 		builder.setPassword("");
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validateCredentials(result);
 		assertTrue(result.isSuccess());
 	}
@@ -162,7 +162,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setHost(VALID_HOST);
 		builder.setUsername(VALID_USERNAME);
 		builder.setPassword(VALID_PASSWORD);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validateCredentials(result);
 		assertTrue(result.isSuccess());
 	}
@@ -175,7 +175,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setHost(VALID_HOST);
 		builder.setUsername(VALID_USERNAME);
 		builder.setPassword("");
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validateCredentials(result);
 		assertFalse(result.isSuccess());
 
@@ -190,7 +190,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setHost(VALID_HOST);
 		builder.setUsername("");
 		builder.setPassword(VALID_PASSWORD);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validateCredentials(result);
 		assertFalse(result.isSuccess());
 
@@ -203,7 +203,7 @@ public class HubProxyInfoBuilderTest {
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost("");
 		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validateIgnoreHosts(result);
 		assertTrue(result.hasWarnings());
 
@@ -215,7 +215,7 @@ public class HubProxyInfoBuilderTest {
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost(VALID_HOST);
 		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validateIgnoreHosts(result);
 		assertTrue(result.isSuccess());
 	}
@@ -225,7 +225,7 @@ public class HubProxyInfoBuilderTest {
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost(VALID_HOST);
 		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validateIgnoreHosts(result);
 		assertTrue(result.isSuccess());
 	}
@@ -236,7 +236,7 @@ public class HubProxyInfoBuilderTest {
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost(VALID_HOST);
 		builder.setIgnoredProxyHosts(INVALID_IGNORE_HOST);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validateIgnoreHosts(result);
 		assertFalse(result.isSuccess());
 
@@ -249,7 +249,7 @@ public class HubProxyInfoBuilderTest {
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost(VALID_HOST);
 		builder.setIgnoredProxyHosts(INVALID_IGNORE_HOST_LIST);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validateIgnoreHosts(result);
 		assertFalse(result.isSuccess());
 
@@ -266,7 +266,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setHost("");
 		builder.setPort(VALID_PORT);
 		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = builder.assertValid();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
 		assertFalse(result.isSuccess());
 
 		actualMessages = getMessages(result);
@@ -279,7 +279,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setHost(VALID_HOST);
 		builder.setPort(-1);
 		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = builder.assertValid();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
 		assertFalse(result.isSuccess());
 
 		actualMessages = getMessages(result);
@@ -295,7 +295,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setUsername("");
 		builder.setPassword(VALID_PASSWORD);
 		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = builder.assertValid();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
 		assertFalse(result.isSuccess());
 
 		actualMessages = getMessages(result);
@@ -311,7 +311,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setUsername(VALID_USERNAME);
 		builder.setPassword("");
 		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = builder.assertValid();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
 		assertFalse(result.isSuccess());
 
 		actualMessages = getMessages(result);
@@ -326,7 +326,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setUsername(VALID_USERNAME);
 		builder.setPassword(VALID_PASSWORD);
 		builder.setIgnoredProxyHosts(INVALID_IGNORE_HOST);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = builder.assertValid();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
 		assertFalse(result.isSuccess());
 
 		actualMessages = getMessages(result);
@@ -341,7 +341,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setUsername(VALID_USERNAME);
 		builder.setPassword(VALID_PASSWORD);
 		builder.setIgnoredProxyHosts(INVALID_IGNORE_HOST_LIST);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = builder.assertValid();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
 		assertFalse(result.isSuccess());
 
 		actualMessages = getMessages(result);
@@ -356,7 +356,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setUsername(VALID_USERNAME);
 		builder.setPassword(VALID_PASSWORD);
 		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = builder.assertValid();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
 		assertTrue(result.isSuccess());
 	}
 
@@ -380,7 +380,7 @@ public class HubProxyInfoBuilderTest {
 		expectedMessages.add(HubProxyInfoBuilder.WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = builder.build();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.build();
 		final HubProxyInfo proxyInfo = result.getConstructedObject();
 		assertNotNull(proxyInfo);
 

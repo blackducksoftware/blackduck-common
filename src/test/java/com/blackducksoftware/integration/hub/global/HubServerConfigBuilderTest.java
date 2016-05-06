@@ -40,7 +40,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
 import com.blackducksoftware.integration.hub.builder.HubProxyInfoBuilder;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.builder.ValidationResult;
@@ -85,11 +84,11 @@ public class HubServerConfigBuilderTest {
 		}
 	}
 
-	private List<String> getMessages(final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result) {
+	private List<String> getMessages(final ValidationResults<GlobalFieldKey, HubServerConfig> result) {
 
 		final List<String> messageList = new ArrayList<String>();
-		final Map<HubServerConfigFieldEnum, List<ValidationResult>> resultMap = result.getResultMap();
-		for (final HubServerConfigFieldEnum key : resultMap.keySet()) {
+		final Map<GlobalFieldKey, List<ValidationResult>> resultMap = result.getResultMap();
+		for (final GlobalFieldKey key : resultMap.keySet()) {
 			final List<ValidationResult> resultList = resultMap.get(key);
 
 			for (final ValidationResult item : resultList) {
@@ -109,7 +108,7 @@ public class HubServerConfigBuilderTest {
 		expectedMessages.add("The Timeout must be greater than 0.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 
 		builder.validateHubUrl(result);
 		assertFalse(result.isSuccess());
@@ -124,7 +123,7 @@ public class HubServerConfigBuilderTest {
 		expectedMessages.add("No Hub Url was found.");
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl(null);
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateHubUrl(result);
 		assertFalse(result.isSuccess());
 
@@ -136,7 +135,7 @@ public class HubServerConfigBuilderTest {
 		expectedMessages.add("No Hub Url was found.");
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl("");
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateHubUrl(result);
 		assertFalse(result.isSuccess());
 
@@ -148,7 +147,7 @@ public class HubServerConfigBuilderTest {
 		expectedMessages.add("The Hub Url is not a valid URL.");
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl("ThisIsNotAUrl");
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateHubUrl(result);
 
 		assertFalse(result.isSuccess());
@@ -160,7 +159,7 @@ public class HubServerConfigBuilderTest {
 	public void testValidateHubUrlValid() throws Exception {
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl("https://google.com");
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateHubUrl(result);
 
 		assertTrue(result.isSuccess());
@@ -173,12 +172,12 @@ public class HubServerConfigBuilderTest {
 		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
 		proxyBuilder.setHost("FakeHost");
 		proxyBuilder.setPort(3128);
-		final HubProxyInfo proxyInfo = proxyBuilder.build().getConstructedObject();
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setHubUrl("https://google.com");
-		builder.setProxyInfo(proxyInfo);
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
+		builder.setProxyHost("FakeHost");
+		builder.setProxyPort(3128);
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateHubUrl(result);
 
 		assertFalse(result.isSuccess());
@@ -188,15 +187,11 @@ public class HubServerConfigBuilderTest {
 
 	@Test
 	public void testValidateHubUrlValidThroughPassThroughProxy() throws Exception {
-		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
-		setProxyBuilderDefaults(proxyBuilder);
-		final HubProxyInfo proxyInfo = proxyBuilder.build().getConstructedObject();
-
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		setBuilderDefaults(builder);
 		builder.setHubUrl("https://google.com");
-		builder.setProxyInfo(proxyInfo);
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
+		setBuilderProxyDefaults(builder);
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateHubUrl(result);
 
 		assertTrue(result.isSuccess());
@@ -207,7 +202,7 @@ public class HubServerConfigBuilderTest {
 		expectedMessages.add("The Timeout must be greater than 0.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateTimeout(result);
 
 		assertFalse(result.isSuccess());
@@ -221,7 +216,7 @@ public class HubServerConfigBuilderTest {
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setTimeout("  ");
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateTimeout(result);
 
 		assertFalse(result.isSuccess());
@@ -244,7 +239,7 @@ public class HubServerConfigBuilderTest {
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setTimeout(-1200);
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateTimeout(result);
 
 		assertFalse(result.isSuccess());
@@ -256,7 +251,7 @@ public class HubServerConfigBuilderTest {
 	public void testValidateHubTimeout() throws Exception {
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setTimeout(1200);
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateTimeout(result);
 
 		assertTrue(result.isSuccess());
@@ -267,7 +262,7 @@ public class HubServerConfigBuilderTest {
 		expectedMessages.add("The Timeout must be greater than 0.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateTimeout(result);
 
 		assertFalse(result.isSuccess());
@@ -280,7 +275,7 @@ public class HubServerConfigBuilderTest {
 		expectedMessages.add("No Hub Url was found.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = builder.build();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = builder.build();
 		assertFalse(result.isSuccess());
 
 		actualMessages = getMessages(result);
@@ -299,13 +294,10 @@ public class HubServerConfigBuilderTest {
 
 	@Test
 	public void testValidConfigWithProxies() throws Exception {
-		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
-		setProxyBuilderDefaults(proxyBuilder);
-		final HubProxyInfo proxyInfo = proxyBuilder.build().getConstructedObject();
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		setBuilderDefaults(builder);
-		builder.setProxyInfo(proxyInfo);
+		setBuilderProxyDefaults(builder);
 		final HubServerConfig config = builder.build().getConstructedObject();
 
 		assertEquals(new URL("https://google.com"), config.getHubUrl());
@@ -318,14 +310,10 @@ public class HubServerConfigBuilderTest {
 
 	@Test
 	public void testValidConfigWithProxiesNoProxy() throws Exception {
-		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
-		setProxyBuilderDefaults(proxyBuilder);
-		proxyBuilder.setIgnoredProxyHosts("google");
-		final HubProxyInfo proxyInfo = proxyBuilder.build().getConstructedObject();
-
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		setBuilderDefaults(builder);
-		builder.setProxyInfo(proxyInfo);
+		setBuilderProxyDefaults(builder);
+		builder.setIgnoredProxyHosts("google");
 		final HubServerConfig config = builder.build().getConstructedObject();
 
 		assertEquals(new URL("https://google.com"), config.getHubUrl());
@@ -339,19 +327,15 @@ public class HubServerConfigBuilderTest {
 	}
 
 	private void setBuilderDefaults(final HubServerConfigBuilder builder) throws Exception {
-		final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder();
-		credentialsBuilder.setUsername("User");
-		credentialsBuilder.setPassword("Pass");
-		final HubCredentials credentials = credentialsBuilder.build().getConstructedObject();
-
 		builder.setHubUrl("https://google.com");
 		builder.setTimeout("100");
-		builder.setCredentials(credentials);
+		builder.setUsername("User");
+		builder.setPassword("Pass");
 	}
 
-	private void setProxyBuilderDefaults(final HubProxyInfoBuilder builder) throws Exception {
-		builder.setHost(testProperties.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
-		builder.setPort(NumberUtils.toInt(testProperties.getProperty("TEST_PROXY_PORT_PASSTHROUGH")));
+	private void setBuilderProxyDefaults(final HubServerConfigBuilder builder) throws Exception {
+		builder.setProxyHost(testProperties.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
+		builder.setProxyPort(NumberUtils.toInt(testProperties.getProperty("TEST_PROXY_PORT_PASSTHROUGH")));
 	}
 
 }

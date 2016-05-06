@@ -163,6 +163,7 @@ public class ValidationResultsTest {
 		assertEquals(resultList.get(1).getMessage(), anotherMsg);
 		assertEquals(resultList.get(2).getResultType(), ValidationResultEnum.WARN);
 		assertEquals(resultList.get(2).getMessage(), anotherMsg);
+
 	}
 
 	@Test

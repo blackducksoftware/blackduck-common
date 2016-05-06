@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
@@ -38,6 +39,15 @@ public class ValidationResults<Key, Type> {
 		resultMap = new HashMap<Key, List<ValidationResult>>();
 	}
 
+	public void addAllResults(final Map<Key, List<ValidationResult>> results) {
+		for (final Entry<Key, List<ValidationResult>> entry : resultMap.entrySet()) {
+			for (final ValidationResult result : entry.getValue()) {
+				// This will prevent duplication
+				addResult(entry.getKey(), result);
+			}
+		}
+	}
+
 	public void addResult(final Key fieldKey, final ValidationResult result) {
 		final List<ValidationResult> resultList;
 
@@ -47,10 +57,11 @@ public class ValidationResults<Key, Type> {
 			resultList = new Vector<ValidationResult>();
 			resultMap.put(fieldKey, resultList);
 		}
-
 		status.add(result.getResultType());
-
-		resultList.add(result);
+		if (!resultList.contains(result)) {
+			// This will prevent duplication
+			resultList.add(result);
+		}
 	}
 
 	public Map<Key, List<ValidationResult>> getResultMap() {

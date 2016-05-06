@@ -1,6 +1,6 @@
 package com.blackducksoftware.integration.hub.global;
 
-public enum HubServerConfigFieldEnum {
+public enum HubServerConfigFieldEnum implements GlobalFieldKey {
 
 	HUBURL("hubUrl"), CREDENTIALS("hubCredentials"), PROXYINFO("hubProxyInfo"), HUBTIMEOUT("hubTimeout");
 
