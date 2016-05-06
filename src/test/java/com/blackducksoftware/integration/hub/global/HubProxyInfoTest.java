@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
 import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -44,9 +45,19 @@ public class HubProxyInfoTest {
 		final String proxyUsername2 = "proxyUsername2";
 		final String proxyPassword2 = "proxyPassword2";
 
-		final HubProxyInfo item1 = new HubProxyInfo(host1, port1, proxyUsername1, proxyPassword1, noProxyHosts1);
-		final HubProxyInfo item2 = new HubProxyInfo(host2, port2, proxyUsername2, proxyPassword2, noProxyHosts2);
-		final HubProxyInfo item3 = new HubProxyInfo(host1, port1, proxyUsername1, proxyPassword1, noProxyHosts1);
+		final HubCredentialsBuilder credBuilder = new HubCredentialsBuilder();
+		credBuilder.setUsername(proxyUsername1);
+		credBuilder.setPassword(proxyPassword1);
+		final HubProxyInfo item1 = new HubProxyInfo(host1, port1, credBuilder.build().getConstructedObject(),
+				noProxyHosts1);
+		credBuilder.setUsername(proxyUsername2);
+		credBuilder.setPassword(proxyPassword2);
+		final HubProxyInfo item2 = new HubProxyInfo(host2, port2, credBuilder.build().getConstructedObject(),
+				noProxyHosts2);
+		credBuilder.setUsername(proxyUsername1);
+		credBuilder.setPassword(proxyPassword1);
+		final HubProxyInfo item3 = new HubProxyInfo(host1, port1, credBuilder.build().getConstructedObject(),
+				noProxyHosts1);
 
 		assertEquals(host1, item1.getHost());
 		assertEquals(port1, item1.getPort());

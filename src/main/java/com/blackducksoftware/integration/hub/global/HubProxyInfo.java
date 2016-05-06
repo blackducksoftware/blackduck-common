@@ -35,7 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.encryption.PasswordDecrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 
 public class HubProxyInfo implements Serializable {
 
@@ -46,30 +45,11 @@ public class HubProxyInfo implements Serializable {
 	private final HubCredentials proxyCredentials;
 	private final String ignoredProxyHosts;
 
-	public HubProxyInfo(final String host, final int port, final String username, final String password,
-			final String ignoredProxyHosts)
-					throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+	public HubProxyInfo(final String host, final int port, final HubCredentials proxyCredentials,
+			final String ignoredProxyHosts) {
 		this.host = host;
 		this.port = port;
-
-		if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
-			proxyCredentials = new HubCredentials(username, password);
-		} else {
-			proxyCredentials = null;
-		}
-		this.ignoredProxyHosts = ignoredProxyHosts;
-	}
-
-	public HubProxyInfo(final String host, final int port, final String username, final String encryptedPassword,
-			final int actualPasswordLength, final String ignoredProxyHosts) {
-		this.host = host;
-		this.port = port;
-
-		if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(encryptedPassword)) {
-			proxyCredentials = new HubCredentials(username, encryptedPassword, actualPasswordLength);
-		} else {
-			proxyCredentials = null;
-		}
+		this.proxyCredentials = proxyCredentials;
 		this.ignoredProxyHosts = ignoredProxyHosts;
 	}
 

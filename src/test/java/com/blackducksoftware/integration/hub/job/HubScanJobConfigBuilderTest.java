@@ -87,7 +87,6 @@ public class HubScanJobConfigBuilderTest {
 	@Test
 	public void testEmptyConfigValidations() throws HubIntegrationException, IOException {
 		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
-		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
 		expectedMessages.add("The minimum amount of memory for the scan is 256 MB.");
 		expectedMessages.add("The maximum wait time for the BOM Update must be greater than 0.");
 
@@ -273,8 +272,6 @@ public class HubScanJobConfigBuilderTest {
 	public void testConfigInvalidWithProjectNameNoVersion() throws HubIntegrationException, IOException {
 		expectedMessages.add("No Version was found.");
 
-		thrown.expect(HubIntegrationException.class);
-
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
 
 		setBuilderDefaults(builder);
@@ -289,8 +286,6 @@ public class HubScanJobConfigBuilderTest {
 	@Test
 	public void testConfigInvalidWithVersionNoProjectName() throws HubIntegrationException, IOException {
 		expectedMessages.add("No Project name was found.");
-
-		thrown.expect(HubIntegrationException.class);
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
 
@@ -364,8 +359,6 @@ public class HubScanJobConfigBuilderTest {
 	@Test
 	public void testInvalidWithTargetsOutsideWorkingDirectory() throws HubIntegrationException, IOException {
 		expectedMessages.add("Can not scan targets outside the working directory.");
-
-		thrown.expect(HubIntegrationException.class);
 
 		final String relativeClasspathResourcePath = "com/blackducksoftware/integration/hub/existingFileForTestingScanPaths.txt";
 		final URL url = HubScanJobConfigBuilder.class.getClassLoader().getResource(relativeClasspathResourcePath);

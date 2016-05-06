@@ -85,8 +85,6 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 	public void validateProjectAndVersion(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result) {
 
 		if (null == projectName && null == version) {
-			result.addResult(HubScanJobFieldEnum.PROJECT, new ValidationResult(ValidationResultEnum.WARN,
-					"No Project name or Version were found. Any scans run will not be mapped to a Version."));
 			result.addResult(HubScanJobFieldEnum.VERSION, new ValidationResult(ValidationResultEnum.WARN,
 					"No Project name or Version were found. Any scans run will not be mapped to a Version."));
 		} else {
@@ -128,6 +126,8 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 		if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES) {
 			result.addResult(HubScanJobFieldEnum.SCANMEMORY, new ValidationResult(ValidationResultEnum.ERROR,
 					"The minimum amount of memory for the scan is " + MINIMUM_MEMORY_IN_MEGABYTES + " MB."));
+		} else {
+			result.addResult(HubScanJobFieldEnum.SCANMEMORY, new ValidationResult(ValidationResultEnum.OK, ""));
 		}
 	}
 
@@ -136,6 +136,9 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 		if ((null == projectName || null == version) && shouldGenerateRiskReport) {
 			result.addResult(HubScanJobFieldEnum.GENERATE_RISK_REPORT, new ValidationResult(ValidationResultEnum.ERROR,
 					"To generate the Risk Report, you need to provide a Project name or version."));
+		} else {
+			result.addResult(HubScanJobFieldEnum.GENERATE_RISK_REPORT,
+					new ValidationResult(ValidationResultEnum.OK, ""));
 		}
 	}
 
@@ -158,6 +161,9 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 		} else if (maxWaitTimeForBomUpdate < 2) {
 			result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
 					new ValidationResult(ValidationResultEnum.WARN, "This wait time may be too short."));
+		} else {
+			result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
+					new ValidationResult(ValidationResultEnum.OK, ""));
 		}
 	}
 
@@ -177,7 +183,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 		if (scanTargetPaths.isEmpty() && defaultTargetPath != null) {
 			scanTargetPaths.add(defaultTargetPath);
 		}
-
+		boolean targetsHaveErrors = false;
 		final Set<String> targetPaths = new HashSet<String>();
 		for (final String currentTargetPath : scanTargetPaths) {
 			String targetPath;
@@ -196,6 +202,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 					// only validate non blank entries
 					final File target = new File(targetPath);
 					if (null == target || !target.exists()) {
+						targetsHaveErrors = true;
 						result.addResult(HubScanJobFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
 								"The scan target '" + target.getAbsolutePath() + "' does not exist."));
 					}
@@ -204,11 +211,13 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 					try {
 						targetCanonicalPath = target.getCanonicalPath();
 						if (!targetCanonicalPath.startsWith(workingDirectory)) {
+							targetsHaveErrors = true;
 							result.addResult(HubScanJobFieldEnum.TARGETS,
 									new ValidationResult(ValidationResultEnum.ERROR,
-									"Can not scan targets outside the working directory."));
+											"Can not scan targets outside the working directory."));
 						}
 					} catch (final IOException e) {
+						targetsHaveErrors = true;
 						result.addResult(HubScanJobFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
 								"Could not get the canonical path for Target : " + targetPath));
 					}
@@ -217,7 +226,9 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 		}
 		scanTargetPaths.clear();
 		scanTargetPaths.addAll(targetPaths);
-
+		if (!targetsHaveErrors) {
+			result.addResult(HubScanJobFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.OK, ""));
+		}
 	}
 
 	public void setProjectName(final String projectName) {
