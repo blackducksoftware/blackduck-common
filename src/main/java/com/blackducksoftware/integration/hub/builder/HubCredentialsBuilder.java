@@ -49,7 +49,8 @@ public class HubCredentialsBuilder extends AbstractBuilder<HubCredentialsFieldEn
 			try {
 				encryptedPassword = PasswordEncrypter.encrypt(password);
 			} catch (final EncryptionException e) {
-				e.printStackTrace();
+				result.addResult(HubCredentialsFieldEnum.PASSWORD,
+						new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
 			}
 			creds = new HubCredentials(username, encryptedPassword, password.length());
 		} else {
