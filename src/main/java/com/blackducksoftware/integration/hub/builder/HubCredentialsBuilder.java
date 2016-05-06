@@ -43,16 +43,20 @@ public class HubCredentialsBuilder extends AbstractBuilder<HubCredentialsFieldEn
 	public ValidationResults<HubCredentialsFieldEnum, HubCredentials> build() {
 		final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result = assertValid();
 		HubCredentials creds = null;
-		if (StringUtils.isNotBlank(password) && passwordLength != 0) {
-			creds = new HubCredentials(username, password, passwordLength);
-		} else {
+		if (StringUtils.isNotBlank(password) && passwordLength == 0) {
+			// Password needs to be encrypted
 			String encryptedPassword = null;
 			try {
 				encryptedPassword = PasswordEncrypter.encrypt(password);
 			} catch (final EncryptionException e) {
-				e.printStackTrace();
+				result.addResult(HubCredentialsFieldEnum.PASSWORD,
+						new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
 			}
 			creds = new HubCredentials(username, encryptedPassword, password.length());
+		} else {
+			// password is blank or already encrypted so we just pass in the
+			// values given to us
+			creds = new HubCredentials(username, password, passwordLength);
 		}
 
 		result.setConstructedObject(creds);

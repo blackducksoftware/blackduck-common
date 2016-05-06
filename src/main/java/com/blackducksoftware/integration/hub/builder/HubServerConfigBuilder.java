@@ -60,7 +60,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfigField
 		try {
 			hubURL = new URL(hubUrl);
 		} catch (final MalformedURLException e) {
-			e.printStackTrace();
 		}
 		final HubServerConfig config = new HubServerConfig(hubURL, timeout, credentials, proxyInfo);
 		result.setConstructedObject(config);
