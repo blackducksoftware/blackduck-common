@@ -23,8 +23,8 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
-import com.blackducksoftware.integration.hub.exception.EncryptionException;
+import com.blackducksoftware.integration.hub.global.HubCredentials;
+import com.blackducksoftware.integration.hub.global.HubCredentialsFieldEnum;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubProxyInfoFieldEnum;
 
@@ -57,21 +57,20 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = assertValid();
 		HubProxyInfo proxyInfo;
 
-		if (StringUtils.isNotBlank(password) && passwordLength == 0) {
-			// Password needs to be encrypted
-			String encryptedProxyPass = null;
-			try {
-				encryptedProxyPass = PasswordEncrypter.encrypt(password);
-			} catch (final EncryptionException e) {
-				result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD,
-						new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
-			}
-			proxyInfo = new HubProxyInfo(host, port, username, encryptedProxyPass, password.length(),
-					ignoredProxyHosts);
+		if (StringUtils.isNotBlank(password) && StringUtils.isNotBlank(username)) {
+
+			final HubCredentialsBuilder credBuilder = new HubCredentialsBuilder();
+			credBuilder.setUsername(username);
+			credBuilder.setPassword(password);
+			credBuilder.setPasswordLength(passwordLength);
+			final ValidationResults<HubCredentialsFieldEnum, HubCredentials> credResult = credBuilder.build();
+
+			proxyInfo = new HubProxyInfo(host, port, credResult.getConstructedObject(), ignoredProxyHosts);
+
 		} else {
 			// password is blank or already encrypted so we just pass in the
 			// values given to us
-			proxyInfo = new HubProxyInfo(host, port, username, password, passwordLength, ignoredProxyHosts);
+			proxyInfo = new HubProxyInfo(host, port, null, ignoredProxyHosts);
 		}
 
 		result.setConstructedObject(proxyInfo);
