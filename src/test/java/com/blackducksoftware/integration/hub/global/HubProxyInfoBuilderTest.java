@@ -259,8 +259,6 @@ public class HubProxyInfoBuilderTest {
 	@Test
 	public void testAssertWithNoHost() throws Exception {
 		expectedMessages.add(HubProxyInfoBuilder.WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
-		expectedMessages.add(HubProxyInfoBuilder.WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
-		expectedMessages.add(HubProxyInfoBuilder.WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
 		expectedMessages.add(HubProxyInfoBuilder.ERROR_MSG_PROXY_HOST_REQUIRED);
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 		builder.setHost("");
@@ -375,8 +373,6 @@ public class HubProxyInfoBuilderTest {
 
 	@Test
 	public void testBuildWithEmptyInput() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
-		expectedMessages.add(HubProxyInfoBuilder.WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
 		expectedMessages.add(HubProxyInfoBuilder.WARN_MSG_PROXY_HOST_NOT_SPECIFIED);
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 

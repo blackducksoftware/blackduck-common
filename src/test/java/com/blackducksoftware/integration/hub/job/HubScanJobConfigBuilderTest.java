@@ -82,7 +82,6 @@ public class HubScanJobConfigBuilderTest {
 	@Test
 	public void testEmptyConfigValidations() throws HubIntegrationException, IOException {
 		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
-		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
 		expectedMessages.add("The minimum amount of memory for the scan is 256 MB.");
 		expectedMessages.add("The maximum wait time for the BOM Update must be greater than 0.");
 
@@ -248,7 +247,6 @@ public class HubScanJobConfigBuilderTest {
 	@Test
 	public void testEmptyConfigIsInvalid() throws HubIntegrationException, IOException {
 		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
-		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
 		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
@@ -325,7 +323,6 @@ public class HubScanJobConfigBuilderTest {
 	public void testConfigInvalidGeneratingReportNeedProjectNameOrVersion()
 			throws HubIntegrationException, IOException {
 		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
-		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
 		expectedMessages.add("To generate the Risk Report, you need to provide a Project name or version.");
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
@@ -395,7 +392,6 @@ public class HubScanJobConfigBuilderTest {
 
 	@Test
 	public void testConfigValidWithEmptyProjectNameAndVersion() throws HubIntegrationException, IOException {
-		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
 		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);

@@ -21,9 +21,9 @@ public class ValidationResultsTest {
 
 	private static final String KEY_PREFIX = "key-";
 	private static final String TEST_MESSAGE_PREFIX = "Test Message ";
-	private static final String KEY_3 = "key-2";
-	private static final String KEY_2 = "key-1";
-	private static final String KEY_1 = "key-0";
+	private static final String KEY_2 = "key-2";
+	private static final String KEY_1 = "key-1";
+	private static final String KEY_0 = "key-0";
 
 	private ValidationResults<String, String> createTestData(final List<ValidationResultEnum> resultTypeList) {
 		final ValidationResults<String, String> results = new ValidationResults<String, String>();
@@ -136,10 +136,10 @@ public class ValidationResultsTest {
 
 		assertNotNull(results);
 		final Map<String, List<ValidationResult>> map = results.getResultMap();
-		assertTrue(map.get(KEY_1).contains(new ValidationResult(ValidationResultEnum.OK, TEST_MESSAGE_PREFIX + "0")));
-		assertTrue(map.get(KEY_2).contains(new ValidationResult(ValidationResultEnum.WARN, TEST_MESSAGE_PREFIX + "1")));
+		assertTrue(map.get(KEY_0).contains(new ValidationResult(ValidationResultEnum.OK, TEST_MESSAGE_PREFIX + "0")));
+		assertTrue(map.get(KEY_1).contains(new ValidationResult(ValidationResultEnum.WARN, TEST_MESSAGE_PREFIX + "1")));
 		assertTrue(
-				map.get(KEY_3).contains(new ValidationResult(ValidationResultEnum.ERROR, TEST_MESSAGE_PREFIX + "2")));
+				map.get(KEY_2).contains(new ValidationResult(ValidationResultEnum.ERROR, TEST_MESSAGE_PREFIX + "2")));
 	}
 
 	@Test
@@ -151,19 +151,16 @@ public class ValidationResultsTest {
 
 		assertNotNull(results);
 		final String anotherMsg = "Test Warning Message";
-		results.addResult(KEY_1, new ValidationResult(ValidationResultEnum.WARN, anotherMsg));
-		results.addResult(KEY_1, new ValidationResult(ValidationResultEnum.WARN, anotherMsg));
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.WARN, anotherMsg));
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.WARN, anotherMsg));
 
-		final List<ValidationResult> resultList = results.getResultList(KEY_1);
+		final List<ValidationResult> resultList = results.getResultList(KEY_0);
 
-		assertEquals(resultList.size(), 3);
+		assertEquals(resultList.size(), 2);
 		assertEquals(resultList.get(0).getResultType(), ValidationResultEnum.ERROR);
 		assertEquals(resultList.get(0).getMessage(), TEST_MESSAGE_PREFIX + "0");
 		assertEquals(resultList.get(1).getResultType(), ValidationResultEnum.WARN);
 		assertEquals(resultList.get(1).getMessage(), anotherMsg);
-		assertEquals(resultList.get(2).getResultType(), ValidationResultEnum.WARN);
-		assertEquals(resultList.get(2).getMessage(), anotherMsg);
-
 	}
 
 	@Test
@@ -179,13 +176,13 @@ public class ValidationResultsTest {
 
 		assertNotNull(results);
 		final String anotherMsg = "Test ERROR Message";
-		results.addResult(KEY_1, new ValidationResult(ValidationResultEnum.ERROR, anotherMsg));
-		results.addResult(KEY_1, new ValidationResult(ValidationResultEnum.ERROR, anotherMsg));
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.ERROR, anotherMsg));
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.ERROR, anotherMsg));
 		final String warningMessage = TEST_MESSAGE_PREFIX + "WARNING";
 		final String okMessage = TEST_MESSAGE_PREFIX + "OK";
-		results.addResult(KEY_2, new ValidationResult(ValidationResultEnum.WARN, warningMessage));
-		results.addResult(KEY_2, new ValidationResult(ValidationResultEnum.OK, okMessage));
-		final List<String> resultList = results.getResultList(KEY_2, ValidationResultEnum.OK);
+		results.addResult(KEY_1, new ValidationResult(ValidationResultEnum.WARN, warningMessage));
+		results.addResult(KEY_1, new ValidationResult(ValidationResultEnum.OK, okMessage));
+		final List<String> resultList = results.getResultList(KEY_1, ValidationResultEnum.OK);
 
 		assertEquals(resultList.size(), 2);
 		assertEquals(resultList.get(0), TEST_MESSAGE_PREFIX + "1");
@@ -239,13 +236,13 @@ public class ValidationResultsTest {
 
 		assertNotNull(results);
 		final String anotherMsg = "Test ERROR Message";
-		results.addResult(KEY_1, new ValidationResult(ValidationResultEnum.ERROR, anotherMsg));
-		results.addResult(KEY_1, new ValidationResult(ValidationResultEnum.ERROR, anotherMsg));
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.ERROR, anotherMsg));
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.ERROR, anotherMsg));
 		final String warningMessage = TEST_MESSAGE_PREFIX + "WARNING";
 		final String okMessage = TEST_MESSAGE_PREFIX + "OK";
-		results.addResult(KEY_2, new ValidationResult(ValidationResultEnum.WARN, warningMessage));
-		results.addResult(KEY_2, new ValidationResult(ValidationResultEnum.OK, okMessage));
-		final String message = results.getResultString(KEY_2, ValidationResultEnum.OK);
+		results.addResult(KEY_1, new ValidationResult(ValidationResultEnum.WARN, warningMessage));
+		results.addResult(KEY_1, new ValidationResult(ValidationResultEnum.OK, okMessage));
+		final String message = results.getResultString(KEY_1, ValidationResultEnum.OK);
 
 		assertTrue(StringUtils.isNotBlank(message));
 		assertTrue(StringUtils.contains(message, TEST_MESSAGE_PREFIX + "1"));
