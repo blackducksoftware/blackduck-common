@@ -25,10 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
+import com.blackducksoftware.integration.hub.global.GlobalFieldKey;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubProxyInfoFieldEnum;
 
-public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, HubProxyInfo> {
+public class HubProxyInfoBuilder extends AbstractBuilder<GlobalFieldKey, HubProxyInfo> {
 
 	public static final String MSG_PROXY_INVALID_CONFIG = "The proxy information not valid - please check the log for the specific issues.";
 	public static final String ERROR_MSG_IGNORE_HOSTS_INVALID = "Proxy ignore hosts does not compile to a valid regular expression.";
@@ -53,8 +54,8 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 	}
 
 	@Override
-	public ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> build() {
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = assertValid();
+	public ValidationResults<GlobalFieldKey, HubProxyInfo> build() {
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = assertValid();
 		HubProxyInfo proxyInfo;
 
 		if (StringUtils.isNotBlank(password) && passwordLength == 0) {
@@ -79,8 +80,8 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 	}
 
 	@Override
-	public ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> assertValid() {
-		final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result = new ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo>();
+	public ValidationResults<GlobalFieldKey, HubProxyInfo> assertValid() {
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 
 		validatePort(result);
 
@@ -91,7 +92,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 		return result;
 	}
 
-	public boolean validatePort(final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result) {
+	public boolean validatePort(final ValidationResults<GlobalFieldKey, HubProxyInfo> result) {
 		boolean valid = true;
 		if (StringUtils.isBlank(host)) {
 			result.addResult(HubProxyInfoFieldEnum.PROXYHOST,
@@ -112,7 +113,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 		return valid;
 	}
 
-	public boolean validateCredentials(final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result) {
+	public boolean validateCredentials(final ValidationResults<GlobalFieldKey, HubProxyInfo> result) {
 		boolean valid = true;
 
 		if (StringUtils.isBlank(host)) {
@@ -139,7 +140,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfoFieldEnum, 
 		return valid;
 	}
 
-	public boolean validateIgnoreHosts(final ValidationResults<HubProxyInfoFieldEnum, HubProxyInfo> result) {
+	public boolean validateIgnoreHosts(final ValidationResults<GlobalFieldKey, HubProxyInfo> result) {
 		boolean valid = true;
 
 		if (StringUtils.isBlank(host)) {

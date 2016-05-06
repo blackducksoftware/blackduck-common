@@ -1,6 +1,6 @@
 package com.blackducksoftware.integration.hub.global;
 
-public enum HubCredentialsFieldEnum {
+public enum HubCredentialsFieldEnum implements GlobalFieldKey {
 
 	USERNAME("hubUsername"), PASSWORD("hubPassword");
 

@@ -38,6 +38,10 @@ public class ValidationResults<Key, Type> {
 		resultMap = new HashMap<Key, List<ValidationResult>>();
 	}
 
+	public void addAllResults(final Map<Key, List<ValidationResult>> results) {
+		resultMap.putAll(results);
+	}
+
 	public void addResult(final Key fieldKey, final ValidationResult result) {
 		final List<ValidationResult> resultList;
 

@@ -22,10 +22,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
+import com.blackducksoftware.integration.hub.global.GlobalFieldKey;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubCredentialsFieldEnum;
 
-public class HubCredentialsBuilder extends AbstractBuilder<HubCredentialsFieldEnum, HubCredentials> {
+public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCredentials> {
 
 	private String username;
 	private String password;
@@ -40,8 +41,8 @@ public class HubCredentialsBuilder extends AbstractBuilder<HubCredentialsFieldEn
 	}
 
 	@Override
-	public ValidationResults<HubCredentialsFieldEnum, HubCredentials> build() {
-		final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result = assertValid();
+	public ValidationResults<GlobalFieldKey, HubCredentials> build() {
+		final ValidationResults<GlobalFieldKey, HubCredentials> result = assertValid();
 		HubCredentials creds = null;
 		if (StringUtils.isNotBlank(password) && passwordLength == 0) {
 			// Password needs to be encrypted
@@ -64,15 +65,15 @@ public class HubCredentialsBuilder extends AbstractBuilder<HubCredentialsFieldEn
 	}
 
 	@Override
-	public ValidationResults<HubCredentialsFieldEnum, HubCredentials> assertValid() {
-		final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result = new ValidationResults<HubCredentialsFieldEnum, HubCredentials>();
+	public ValidationResults<GlobalFieldKey, HubCredentials> assertValid() {
+		final ValidationResults<GlobalFieldKey, HubCredentials> result = new ValidationResults<GlobalFieldKey, HubCredentials>();
 
 		validateCredentials(result);
 
 		return result;
 	}
 
-	public void validateCredentials(final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result) {
+	public void validateCredentials(final ValidationResults<GlobalFieldKey, HubCredentials> result) {
 
 		if (StringUtils.isBlank(username) && StringUtils.isBlank(password)) {
 			result.addResult(HubCredentialsFieldEnum.USERNAME, new ValidationResult(ValidationResultEnum.OK, ""));
@@ -83,7 +84,7 @@ public class HubCredentialsBuilder extends AbstractBuilder<HubCredentialsFieldEn
 		}
 	}
 
-	public boolean validateUsername(final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result) {
+	public boolean validateUsername(final ValidationResults<GlobalFieldKey, HubCredentials> result) {
 		boolean valid = true;
 		if (StringUtils.isBlank(username)) {
 			valid = false;
@@ -95,7 +96,7 @@ public class HubCredentialsBuilder extends AbstractBuilder<HubCredentialsFieldEn
 		return valid;
 	}
 
-	public boolean validatePassword(final ValidationResults<HubCredentialsFieldEnum, HubCredentials> result) {
+	public boolean validatePassword(final ValidationResults<GlobalFieldKey, HubCredentials> result) {
 		boolean valid = true;
 		if (StringUtils.isBlank(password)) {
 			valid = false;
