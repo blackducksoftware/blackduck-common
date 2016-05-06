@@ -236,6 +236,10 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		this.proxyPort = proxyPort;
 	}
 
+	public void setProxyPort(final String proxyPort) {
+		setProxyPort(stringToInteger(proxyPort));
+	}
+
 	public String getProxyUsername() {
 		return proxyUsername;
 	}
