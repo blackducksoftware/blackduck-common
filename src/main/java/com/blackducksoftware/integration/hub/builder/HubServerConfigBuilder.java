@@ -70,9 +70,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfigField
 	@Override
 	public ValidationResults<HubServerConfigFieldEnum, HubServerConfig> assertValid() {
 		final ValidationResults<HubServerConfigFieldEnum, HubServerConfig> result = new ValidationResults<HubServerConfigFieldEnum, HubServerConfig>();
-
 		validateHubUrl(result);
-
 		validateTimeout(result, DEFAULT_TIMEOUT);
 
 		return result;

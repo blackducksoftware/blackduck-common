@@ -18,12 +18,15 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.builder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class ValidationResults<Key, Type> {
 
@@ -60,6 +63,27 @@ public class ValidationResults<Key, Type> {
 		} else {
 			return new Vector<ValidationResult>();
 		}
+	}
+
+	public List<String> getResultList(final Key fieldKey, final ValidationResultEnum resultEnum) {
+		final List<String> resultList = new ArrayList<String>();
+		if (resultMap.containsKey(fieldKey)) {
+			for (final ValidationResult result : resultMap.get(fieldKey)) {
+				if (result.getResultType() == resultEnum) {
+					resultList.add(result.getMessage());
+				}
+			}
+		}
+		return resultList;
+	}
+
+	public String getResultString(final Key fieldKey, final ValidationResultEnum resultEnum) {
+		String resultString = "";
+		final List<String> resultList = getResultList(fieldKey, resultEnum);
+		if (!resultList.isEmpty()) {
+			resultString = StringUtils.join(resultList, "\n");
+		}
+		return resultString;
 	}
 
 	public Type getConstructedObject() {
