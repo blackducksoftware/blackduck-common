@@ -264,6 +264,51 @@ public class HubScanJobConfigBuilderTest {
 	}
 
 	@Test
+	public void testInValidConfigWithDefaults() throws HubIntegrationException, IOException {
+		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
+
+		builder.setProjectName("projectName");
+		builder.setVersion("version");
+		builder.setPhase("phase");
+		builder.setDistribution("distribution");
+		builder.setWorkingDirectory("workingDirectory");
+		builder.setScanMemory("-23525");
+		builder.setShouldGenerateRiskReport(true);
+		builder.setMaxWaitTimeForBomUpdate("cats");
+		builder.addScanTargetPath("testPath");
+		builder.disableScanTargetPathExistenceCheck();
+
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		assertTrue(result.isSuccess());
+
+		actualMessages = getMessages(result);
+	}
+
+	@Test
+	public void testInValidConfig() throws HubIntegrationException, IOException {
+		expectedMessages.add("The String : cats , is not an Integer.");
+		expectedMessages.add("The minimum amount of memory for the scan is 256 MB.");
+
+		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(false);
+
+		builder.setProjectName("projectName");
+		builder.setVersion("version");
+		builder.setPhase("phase");
+		builder.setDistribution("distribution");
+		builder.setWorkingDirectory("workingDirectory");
+		builder.setScanMemory("-23525");
+		builder.setShouldGenerateRiskReport(true);
+		builder.setMaxWaitTimeForBomUpdate("cats");
+		builder.addScanTargetPath("testPath");
+		builder.disableScanTargetPathExistenceCheck();
+
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
+	}
+
+	@Test
 	public void testConfigInvalidWithProjectNameNoVersion() throws HubIntegrationException, IOException {
 		expectedMessages.add("No Version was found.");
 
