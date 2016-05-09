@@ -141,7 +141,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setPassword(VALID_PASSWORD);
 		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validateCredentials(result);
-		assertTrue(result.hasWarnings());
+		assertTrue(result.hasErrors());
 
 		actualMessages = getMessages(result);
 	}
@@ -206,7 +206,7 @@ public class HubProxyInfoBuilderTest {
 		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST);
 		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
 		builder.validateIgnoreHosts(result);
-		assertTrue(result.hasWarnings());
+		assertTrue(result.hasErrors());
 
 		actualMessages = getMessages(result);
 	}

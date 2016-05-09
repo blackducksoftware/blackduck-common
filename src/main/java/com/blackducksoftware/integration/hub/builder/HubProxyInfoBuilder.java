@@ -100,10 +100,10 @@ public class HubProxyInfoBuilder extends AbstractBuilder<GlobalFieldKey, HubProx
 			return;
 		} else if (StringUtils.isBlank(host) && StringUtils.isNotBlank(port)) {
 			result.addResult(HubProxyInfoFieldEnum.PROXYHOST,
-					new ValidationResult(ValidationResultEnum.WARN, MSG_PROXY_HOST_REQUIRED));
+					new ValidationResult(ValidationResultEnum.ERROR, MSG_PROXY_HOST_REQUIRED));
 		} else if (StringUtils.isNotBlank(host) && StringUtils.isBlank(port)) {
 			result.addResult(HubProxyInfoFieldEnum.PROXYPORT,
-					new ValidationResult(ValidationResultEnum.WARN, MSG_PROXY_PORT_REQUIRED));
+					new ValidationResult(ValidationResultEnum.ERROR, MSG_PROXY_PORT_REQUIRED));
 			return;
 		}
 		int portToValidate = 0;
@@ -130,7 +130,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder<GlobalFieldKey, HubProx
 		} else {
 			if (StringUtils.isBlank(host)) {
 				result.addResult(HubProxyInfoFieldEnum.PROXYHOST,
-						new ValidationResult(ValidationResultEnum.WARN, MSG_PROXY_HOST_NOT_SPECIFIED));
+						new ValidationResult(ValidationResultEnum.ERROR, MSG_PROXY_HOST_NOT_SPECIFIED));
 			}
 			if (StringUtils.isNotBlank(getUsername()) && StringUtils.isNotBlank(getPassword())) {
 				result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.OK, ""));
@@ -149,7 +149,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder<GlobalFieldKey, HubProx
 		if (StringUtils.isNotBlank(ignoredProxyHosts)) {
 			if (StringUtils.isBlank(host)) {
 				result.addResult(HubProxyInfoFieldEnum.PROXYHOST,
-						new ValidationResult(ValidationResultEnum.WARN, MSG_PROXY_HOST_NOT_SPECIFIED));
+						new ValidationResult(ValidationResultEnum.ERROR, MSG_PROXY_HOST_NOT_SPECIFIED));
 			}
 			try {
 				if (ignoredProxyHosts.contains(",")) {
