@@ -273,6 +273,11 @@ public class HubServerConfigBuilderTest {
 	@Test
 	public void testEmptyConfigIsInvalid() throws Exception {
 		expectedMessages.add("No Hub Url was found.");
+		expectedMessages.add("No Hub Username was found.");
+		expectedMessages.add("No Hub Password was found.");
+		expectedMessages.add("The proxy host not specified."); // TODO: Check if
+																// this is
+																// needed.
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		final ValidationResults<GlobalFieldKey, HubServerConfig> result = builder.build();

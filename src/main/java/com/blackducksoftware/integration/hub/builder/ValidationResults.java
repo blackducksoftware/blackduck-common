@@ -20,6 +20,7 @@ package com.blackducksoftware.integration.hub.builder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,15 +33,15 @@ import org.apache.commons.lang3.StringUtils;
 public class ValidationResults<Key, Type> {
 
 	private Type constructedObject;
-	private final Map<Key, List<ValidationResult>> resultMap;
+	private final Map<Key, Map<ValidationResultEnum, List<ValidationResult>>> resultMap;
 	private final Set<ValidationResultEnum> status = new LinkedHashSet<ValidationResultEnum>();
 
 	public ValidationResults() {
-		resultMap = new HashMap<Key, List<ValidationResult>>();
+		resultMap = new HashMap<Key, Map<ValidationResultEnum, List<ValidationResult>>>();
 	}
 
 	public void addAllResults(final Map<Key, List<ValidationResult>> results) {
-		for (final Entry<Key, List<ValidationResult>> entry : resultMap.entrySet()) {
+		for (final Entry<Key, List<ValidationResult>> entry : results.entrySet()) {
 			for (final ValidationResult result : entry.getValue()) {
 				// This will prevent duplication
 				addResult(entry.getKey(), result);
@@ -50,14 +51,24 @@ public class ValidationResults<Key, Type> {
 
 	public void addResult(final Key fieldKey, final ValidationResult result) {
 		final List<ValidationResult> resultList;
-
+		final Map<ValidationResultEnum, List<ValidationResult>> resultListMap;
+		final ValidationResultEnum resultType = result.getResultType();
 		if (resultMap.containsKey(fieldKey)) {
-			resultList = resultMap.get(fieldKey);
+			resultListMap = resultMap.get(fieldKey);
+
+		} else {
+			resultListMap = new LinkedHashMap<ValidationResultEnum, List<ValidationResult>>();
+			resultMap.put(fieldKey, resultListMap);
+		}
+
+		if (resultListMap.containsKey(resultType)) {
+			resultList = resultListMap.get(result.getResultType());
 		} else {
 			resultList = new Vector<ValidationResult>();
-			resultMap.put(fieldKey, resultList);
+			resultListMap.put(resultType, resultList);
 		}
-		status.add(result.getResultType());
+		status.add(resultType);
+
 		if (!resultList.contains(result)) {
 			// This will prevent duplication
 			resultList.add(result);
@@ -65,12 +76,22 @@ public class ValidationResults<Key, Type> {
 	}
 
 	public Map<Key, List<ValidationResult>> getResultMap() {
-		return resultMap;
+		final Map<Key, List<ValidationResult>> map = new HashMap<Key, List<ValidationResult>>();
+		for (final Key fieldKey : resultMap.keySet()) {
+			map.put(fieldKey, getResultList(fieldKey));
+		}
+		return map;
 	}
 
 	public List<ValidationResult> getResultList(final Key fieldKey) {
 		if (resultMap.containsKey(fieldKey)) {
-			return resultMap.get(fieldKey);
+			final List<ValidationResult> resultList = new Vector<ValidationResult>();
+			final Map<ValidationResultEnum, List<ValidationResult>> itemList = resultMap.get(fieldKey);
+			for (final ValidationResultEnum key : itemList.keySet()) {
+				resultList.addAll(itemList.get(key));
+			}
+
+			return resultList;
 		} else {
 			return new Vector<ValidationResult>();
 		}
@@ -79,8 +100,10 @@ public class ValidationResults<Key, Type> {
 	public List<String> getResultList(final Key fieldKey, final ValidationResultEnum resultEnum) {
 		final List<String> resultList = new ArrayList<String>();
 		if (resultMap.containsKey(fieldKey)) {
-			for (final ValidationResult result : resultMap.get(fieldKey)) {
-				if (result.getResultType() == resultEnum) {
+			final Map<ValidationResultEnum, List<ValidationResult>> listMap = resultMap.get(fieldKey);
+			if (listMap.containsKey(resultEnum)) {
+				final List<ValidationResult> itemList = listMap.get(resultEnum);
+				for (final ValidationResult result : itemList) {
 					resultList.add(result.getMessage());
 				}
 			}
@@ -106,8 +129,23 @@ public class ValidationResults<Key, Type> {
 	}
 
 	public Set<ValidationResultEnum> getValidationStatus() {
-
 		return status;
+	}
+
+	public boolean hasErrors(final Key fieldKey) {
+		if (resultMap.containsKey(fieldKey)) {
+			return resultMap.get(fieldKey).containsKey(ValidationResultEnum.ERROR);
+		} else {
+			return false;
+		}
+	}
+
+	public boolean hasWarnings(final Key fieldKey) {
+		if (resultMap.containsKey(fieldKey)) {
+			return resultMap.get(fieldKey).containsKey(ValidationResultEnum.WARN);
+		} else {
+			return false;
+		}
 	}
 
 	public boolean hasErrors() {
