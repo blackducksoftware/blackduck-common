@@ -25,6 +25,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.hub.global.GlobalFieldKey;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
@@ -42,12 +43,12 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 	public static int DEFAULT_TIMEOUT = 120;
 
 	private String hubUrl;
-	private int timeout;
+	private String timeout;
 	private String username;
 	private String password;
 	private int passwordLength;
 	private String proxyHost;
-	private int proxyPort;
+	private String proxyPort;
 	private String proxyUsername;
 	private String proxyPassword;
 	private int proxyPasswordLength;
@@ -60,8 +61,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		super(false);
 	}
 
-	public HubServerConfigBuilder(final boolean eatExceptionsOnSetters) {
-		super(eatExceptionsOnSetters);
+	public HubServerConfigBuilder(final boolean shouldUseDefaultValues) {
+		super(shouldUseDefaultValues);
 	}
 
 	@Override
@@ -77,7 +78,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 			hubURL = new URL(hubUrl);
 		} catch (final MalformedURLException e) {
 		}
-		final HubServerConfig config = new HubServerConfig(hubURL, timeout, credentials, proxyInfo);
+		final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeout), credentials, proxyInfo);
 		result.setConstructedObject(config);
 		return result;
 	}
@@ -86,13 +87,17 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 	public ValidationResults<GlobalFieldKey, HubServerConfig> assertValid() {
 		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		validateHubUrl(result);
-		validateTimeout(result, DEFAULT_TIMEOUT);
+		if (shouldUseDefaultValues()) {
+			validateTimeout(result, DEFAULT_TIMEOUT);
+		} else {
+			validateTimeout(result, null);
+		}
 		return result;
 	}
 
 	public ValidationResults<GlobalFieldKey, HubProxyInfo> assertProxyValid() {
 		ValidationResults<GlobalFieldKey, HubProxyInfo> result = null;
-		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder(shouldEatExceptionsOnSetters());
+		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder(shouldUseDefaultValues());
 		proxyBuilder.setHost(proxyHost);
 		proxyBuilder.setPort(proxyPort);
 		proxyBuilder.setIgnoredProxyHosts(ignoredProxyHosts);
@@ -106,7 +111,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 
 	public ValidationResults<GlobalFieldKey, HubCredentials> assertCredentialsValid() {
 		ValidationResults<GlobalFieldKey, HubCredentials> result = null;
-		final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder(shouldEatExceptionsOnSetters());
+		final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder(shouldUseDefaultValues());
 		credentialsBuilder.setUsername(username);
 		credentialsBuilder.setPassword(password);
 		credentialsBuilder.setPasswordLength(passwordLength);
@@ -166,9 +171,32 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 
 	private void validateTimeout(final ValidationResults<GlobalFieldKey, HubServerConfig> result,
 			final Integer defaultTimeout) {
-		if (defaultTimeout != null && timeout <= 0) {
-			timeout = defaultTimeout;
-		} else if (timeout <= 0) {
+		if (shouldUseDefaultValues() && defaultTimeout != null) {
+			int timeoutToValidate = 0;
+			try {
+				timeoutToValidate = stringToInteger(timeout);
+			} catch (final IllegalArgumentException e) {
+				timeout = String.valueOf(defaultTimeout);
+			}
+			if (timeoutToValidate <= 0) {
+				timeout = String.valueOf(defaultTimeout);
+			}
+			return;
+		}
+		if (StringUtils.isBlank(timeout)) {
+			result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
+					new ValidationResult(ValidationResultEnum.ERROR, "No Hub Timeout was found."));
+			return;
+		}
+		int timeoutToValidate = 0;
+		try {
+			timeoutToValidate = stringToInteger(timeout);
+		} catch (final IllegalArgumentException e) {
+			result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
+					new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
+			return;
+		}
+		if (timeoutToValidate <= 0) {
 			result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
 					new ValidationResult(ValidationResultEnum.ERROR, "The Timeout must be greater than 0."));
 		} else {
@@ -181,15 +209,15 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 	}
 
 	public void setTimeout(final String timeout) {
-		setTimeout(stringToInteger(timeout));
+		this.timeout = timeout;
 	}
 
-	public int getTimeout() {
+	public String getTimeout() {
 		return timeout;
 	}
 
 	public void setTimeout(final int timeout) {
-		this.timeout = timeout;
+		setTimeout(String.valueOf(timeout));
 	}
 
 	public String getHubUrl() {
@@ -228,16 +256,16 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		this.proxyHost = proxyHost;
 	}
 
-	public int getProxyPort() {
+	public String getProxyPort() {
 		return proxyPort;
 	}
 
 	public void setProxyPort(final int proxyPort) {
-		this.proxyPort = proxyPort;
+		setProxyPort(String.valueOf(proxyPort));
 	}
 
 	public void setProxyPort(final String proxyPort) {
-		setProxyPort(stringToInteger(proxyPort));
+		this.proxyPort = proxyPort;
 	}
 
 	public String getProxyUsername() {

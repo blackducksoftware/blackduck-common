@@ -36,8 +36,8 @@ public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCr
 		super(false);
 	}
 
-	public HubCredentialsBuilder(final boolean eatExceptionsOnSetters) {
-		super(eatExceptionsOnSetters);
+	public HubCredentialsBuilder(final boolean shouldUseDefaultValues) {
+		super(shouldUseDefaultValues);
 	}
 
 	@Override
@@ -79,28 +79,22 @@ public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCr
 		validatePassword(result);
 	}
 
-	public boolean validateUsername(final ValidationResults<GlobalFieldKey, HubCredentials> result) {
-		boolean valid = true;
+	public void validateUsername(final ValidationResults<GlobalFieldKey, HubCredentials> result) {
 		if (StringUtils.isBlank(username)) {
-			valid = false;
 			result.addResult(HubCredentialsFieldEnum.USERNAME,
 					new ValidationResult(ValidationResultEnum.ERROR, "No Hub Username was found."));
 		} else {
 			result.addResult(HubCredentialsFieldEnum.USERNAME, new ValidationResult(ValidationResultEnum.OK, ""));
 		}
-		return valid;
 	}
 
-	public boolean validatePassword(final ValidationResults<GlobalFieldKey, HubCredentials> result) {
-		boolean valid = true;
+	public void validatePassword(final ValidationResults<GlobalFieldKey, HubCredentials> result) {
 		if (StringUtils.isBlank(password)) {
-			valid = false;
 			result.addResult(HubCredentialsFieldEnum.PASSWORD,
 					new ValidationResult(ValidationResultEnum.ERROR, "No Hub Password was found."));
 		} else {
 			result.addResult(HubCredentialsFieldEnum.PASSWORD, new ValidationResult(ValidationResultEnum.OK, ""));
 		}
-		return valid;
 	}
 
 	public String getUsername() {

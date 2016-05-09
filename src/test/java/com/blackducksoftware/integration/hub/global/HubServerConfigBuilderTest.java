@@ -103,11 +103,27 @@ public class HubServerConfigBuilderTest {
 	}
 
 	@Test
-	public void testEmptyConfigValidations() throws Exception {
+	public void testEmptyConfigValidationsWithDefaults() throws Exception {
 		expectedMessages.add("No Hub Url was found.");
-		expectedMessages.add("The Timeout must be greater than 0.");
+		expectedMessages.add("No Hub Timeout was found.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
+
+		builder.validateHubUrl(result);
+		assertFalse(result.isSuccess());
+		builder.validateTimeout(result);
+		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
+	}
+
+	@Test
+	public void testEmptyConfigValidationsWithoutDefaults() throws Exception {
+		expectedMessages.add("No Hub Url was found.");
+		expectedMessages.add("No Hub Timeout was found.");
+
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 
 		builder.validateHubUrl(result);
@@ -198,8 +214,8 @@ public class HubServerConfigBuilderTest {
 	}
 
 	@Test
-	public void testValidateHubTimeoutNull() throws Exception {
-		expectedMessages.add("The Timeout must be greater than 0.");
+	public void testValidateHubTimeoutNullWithDefaults() throws Exception {
+		expectedMessages.add("No Hub Timeout was found.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
@@ -211,8 +227,21 @@ public class HubServerConfigBuilderTest {
 	}
 
 	@Test
-	public void testValidateHubTimeoutEmpty() throws Exception {
-		expectedMessages.add("The Timeout must be greater than 0.");
+	public void testValidateHubTimeoutNull() throws Exception {
+		expectedMessages.add("No Hub Timeout was found.");
+
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
+		builder.validateTimeout(result);
+
+		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
+	}
+
+	@Test
+	public void testValidateHubTimeoutEmptyWithDeafults() throws Exception {
+		expectedMessages.add("No Hub Timeout was found.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setTimeout("  ");
@@ -225,19 +254,67 @@ public class HubServerConfigBuilderTest {
 	}
 
 	@Test
+	public void testValidateHubTimeoutEmpty() throws Exception {
+		expectedMessages.add("No Hub Timeout was found.");
+
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+		builder.setTimeout("  ");
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
+		builder.validateTimeout(result);
+
+		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
+	}
+
+	@Test
+	public void testValidateHubTimeoutNotIntegerWithDeafults() throws Exception {
+		expectedMessages.add("The String : Not Integer , is not an Integer.");
+
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
+		builder.setTimeout("Not Integer");
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
+		builder.validateTimeout(result);
+
+		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
+	}
+
+	@Test
 	public void testValidateHubTimeoutNotInteger() throws Exception {
-		thrown.expect(IllegalArgumentException.class);
-		thrown.expectMessage("The String : Not Integer , is not an Integer.");
+		expectedMessages.add("The String : Not Integer , is not an Integer.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setTimeout("Not Integer");
+
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
+		builder.validateTimeout(result);
+
+		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
+	}
+
+	@Test
+	public void testValidateHubTimeoutNegativeWithDefaults() throws Exception {
+		expectedMessages.add("The Timeout must be greater than 0.");
+
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
+		builder.setTimeout(-1200);
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
+		builder.validateTimeout(result);
+
+		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
 	}
 
 	@Test
 	public void testValidateHubTimeoutNegative() throws Exception {
 		expectedMessages.add("The Timeout must be greater than 0.");
 
-		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		builder.setTimeout(-1200);
 		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateTimeout(result);
@@ -258,13 +335,37 @@ public class HubServerConfigBuilderTest {
 	}
 
 	@Test
-	public void testValidateHubTimeoutString() throws Exception {
-		expectedMessages.add("The Timeout must be greater than 0.");
-
+	public void testValidateHubTimeoutStringWithDefaults() throws Exception {
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
+		builder.setTimeout("120");
 		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
 		builder.validateTimeout(result);
 
+		assertTrue(result.isSuccess());
+
+		actualMessages = getMessages(result);
+	}
+
+	@Test
+	public void testValidateHubTimeoutString() throws Exception {
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+		builder.setTimeout("120");
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
+		builder.validateTimeout(result);
+
+		assertTrue(result.isSuccess());
+
+		actualMessages = getMessages(result);
+	}
+
+	@Test
+	public void testEmptyConfigIsInvalidWithDefaults() throws Exception {
+		expectedMessages.add("No Hub Url was found.");
+		expectedMessages.add("No Hub Username was found.");
+		expectedMessages.add("No Hub Password was found.");
+
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = builder.build();
 		assertFalse(result.isSuccess());
 
 		actualMessages = getMessages(result);
@@ -275,13 +376,51 @@ public class HubServerConfigBuilderTest {
 		expectedMessages.add("No Hub Url was found.");
 		expectedMessages.add("No Hub Username was found.");
 		expectedMessages.add("No Hub Password was found.");
-		expectedMessages.add("The proxy host not specified."); // TODO: Check if
-																// this is
-																// needed.
+		expectedMessages.add("No Hub Timeout was found.");
 
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		final ValidationResults<GlobalFieldKey, HubServerConfig> result = builder.build();
 		assertFalse(result.isSuccess());
+
+		actualMessages = getMessages(result);
+	}
+
+	@Test
+	public void testBuildConfigInvalidWithDefaults() throws Exception {
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
+		builder.setHubUrl("https://google.com");
+		builder.setTimeout("-122134");
+		builder.setUsername("User");
+		builder.setPassword("Pass");
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = builder.build();
+		assertFalse(result.hasErrors());
+
+		final HubServerConfig config = result.getConstructedObject();
+
+		assertEquals(new URL("https://google.com"), config.getHubUrl());
+		assertEquals(HubServerConfigBuilder.DEFAULT_TIMEOUT, config.getTimeout());
+		assertEquals("User", config.getGlobalCredentials().getUsername());
+		assertEquals("Pass", config.getGlobalCredentials().getDecryptedPassword());
+	}
+
+	@Test
+	public void testBuildConfigInvalid() throws Exception {
+		expectedMessages.add("The Timeout must be greater than 0.");
+
+		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+		builder.setHubUrl("https://google.com");
+		builder.setTimeout("-122134");
+		builder.setUsername("User");
+		builder.setPassword("Pass");
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = builder.build();
+		assertTrue(result.hasErrors());
+
+		final HubServerConfig config = result.getConstructedObject();
+
+		assertEquals(new URL("https://google.com"), config.getHubUrl());
+		assertEquals(-122134, config.getTimeout());
+		assertEquals("User", config.getGlobalCredentials().getUsername());
+		assertEquals("Pass", config.getGlobalCredentials().getDecryptedPassword());
 
 		actualMessages = getMessages(result);
 	}

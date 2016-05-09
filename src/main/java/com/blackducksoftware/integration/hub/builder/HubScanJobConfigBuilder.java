@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.hub.job.HubScanJobConfig;
 import com.blackducksoftware.integration.hub.job.HubScanJobFieldEnum;
@@ -43,13 +44,13 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 	private String distribution;
 	private String workingDirectory;
 	private boolean shouldGenerateRiskReport;
-	private int maxWaitTimeForBomUpdate;
-	private int scanMemory;
+	private String maxWaitTimeForBomUpdate;
+	private String scanMemory;
 	private final Set<String> scanTargetPaths = new HashSet<String>();
 	private boolean disableScanTargetPathExistenceCheck;
 
-	public HubScanJobConfigBuilder(final boolean eatExceptionsOnSetters) {
-		super(eatExceptionsOnSetters);
+	public HubScanJobConfigBuilder(final boolean shouldUseDefaultValues) {
+		super(shouldUseDefaultValues);
 	}
 
 	@Override
@@ -59,7 +60,8 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 				.addAll(scanTargetPaths).build();
 
 		result.setConstructedObject(new HubScanJobConfig(projectName, version, phase, distribution, workingDirectory,
-				scanMemory, shouldGenerateRiskReport, maxWaitTimeForBomUpdate, immutableScanTargetPaths));
+				NumberUtils.toInt(scanMemory), shouldGenerateRiskReport, NumberUtils.toInt(maxWaitTimeForBomUpdate),
+				immutableScanTargetPaths));
 
 		return result;
 	}
@@ -116,10 +118,27 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 
 	private void validateScanMemory(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result,
 			final Integer defaultScanMemory) {
-		if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES && defaultScanMemory != null) {
-			scanMemory = defaultScanMemory;
+		if (shouldUseDefaultValues() && defaultScanMemory != null) {
+			final int scanMemoryInt = NumberUtils.toInt(scanMemory);
+			if (scanMemoryInt < MINIMUM_MEMORY_IN_MEGABYTES && defaultScanMemory != null) {
+				scanMemory = String.valueOf(defaultScanMemory);
+			}
+			return;
 		}
-		if (scanMemory < MINIMUM_MEMORY_IN_MEGABYTES) {
+		if (StringUtils.isBlank(scanMemory)) {
+			result.addResult(HubScanJobFieldEnum.SCANMEMORY,
+					new ValidationResult(ValidationResultEnum.ERROR, "No scan memory was specified."));
+			return;
+		}
+		int scanMemoryInt = 0;
+		try {
+			scanMemoryInt = stringToInteger(scanMemory);
+		} catch (final IllegalArgumentException e) {
+			result.addResult(HubScanJobFieldEnum.SCANMEMORY,
+					new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
+			return;
+		}
+		if (scanMemoryInt < MINIMUM_MEMORY_IN_MEGABYTES) {
 			result.addResult(HubScanJobFieldEnum.SCANMEMORY, new ValidationResult(ValidationResultEnum.ERROR,
 					"The minimum amount of memory for the scan is " + MINIMUM_MEMORY_IN_MEGABYTES + " MB."));
 		} else {
@@ -144,15 +163,31 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 
 	private void validateMaxWaitTimeForBomUpdate(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result,
 			final Integer defaultMaxWaitTime) {
-		if (maxWaitTimeForBomUpdate <= 0) {
-			if (defaultMaxWaitTime != null) {
-				maxWaitTimeForBomUpdate = defaultMaxWaitTime;
-			} else {
-				result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
-						new ValidationResult(ValidationResultEnum.ERROR,
-								"The maximum wait time for the BOM Update must be greater than 0."));
+		if (shouldUseDefaultValues() && defaultMaxWaitTime != null) {
+			final int maxWaitTime = NumberUtils.toInt(maxWaitTimeForBomUpdate);
+			if (maxWaitTime <= 0) {
+				maxWaitTimeForBomUpdate = String.valueOf(defaultMaxWaitTime);
 			}
-		} else if (maxWaitTimeForBomUpdate < 2) {
+			return;
+		}
+		if (StringUtils.isBlank(maxWaitTimeForBomUpdate)) {
+			result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
+					new ValidationResult(ValidationResultEnum.ERROR, "No maximum wait time for the Bom Update found."));
+			return;
+		}
+		int maxWaitTime = -1;
+		try {
+			maxWaitTime = stringToInteger(maxWaitTimeForBomUpdate);
+		} catch (final IllegalArgumentException e) {
+			result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
+					new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
+			return;
+		}
+		if (maxWaitTime <= 0) {
+			result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
+					new ValidationResult(ValidationResultEnum.ERROR,
+							"The maximum wait time for the BOM Update must be greater than 0."));
+		} else if (maxWaitTime < 2) {
 			result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
 					new ValidationResult(ValidationResultEnum.WARN, "This wait time may be too short."));
 		} else {
@@ -250,20 +285,20 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 		setShouldGenerateRiskReport(shouldGenerateRiskReportValue);
 	}
 
-	public void setMaxWaitTimeForBomUpdate(final int maxWaitTimeForRiskReport) {
-		this.maxWaitTimeForBomUpdate = maxWaitTimeForRiskReport;
+	public void setMaxWaitTimeForBomUpdate(final int maxWaitTimeForBomUpdate) {
+		setMaxWaitTimeForBomUpdate(String.valueOf(maxWaitTimeForBomUpdate));
 	}
 
 	public void setMaxWaitTimeForBomUpdate(final String maxWaitTimeForBomUpdate) {
-		setMaxWaitTimeForBomUpdate(stringToInteger(maxWaitTimeForBomUpdate));
+		this.maxWaitTimeForBomUpdate = maxWaitTimeForBomUpdate;
 	}
 
 	public void setScanMemory(final int scanMemory) {
-		this.scanMemory = scanMemory;
+		setScanMemory(String.valueOf(scanMemory));
 	}
 
 	public void setScanMemory(final String scanMemory) {
-		setScanMemory(stringToInteger(scanMemory));
+		this.scanMemory = scanMemory;
 	}
 
 	public void addScanTargetPath(final String scanTargetPath) {

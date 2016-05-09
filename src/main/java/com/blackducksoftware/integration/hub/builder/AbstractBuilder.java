@@ -22,10 +22,10 @@ import org.apache.commons.lang3.StringUtils;
 
 public abstract class AbstractBuilder<Key, Type> {
 
-	private final boolean eatExceptionsOnSetters;
+	private final boolean shouldUseDefaultValues;
 
-	public AbstractBuilder(final boolean eatExceptionsOnSetters) {
-		this.eatExceptionsOnSetters = eatExceptionsOnSetters;
+	public AbstractBuilder(final boolean shouldUseDefaultValues) {
+		this.shouldUseDefaultValues = shouldUseDefaultValues;
 	}
 
 	public abstract ValidationResults<Key, Type> build();
@@ -38,21 +38,15 @@ public abstract class AbstractBuilder<Key, Type> {
 			try {
 				return Integer.valueOf(integerString);
 			} catch (final NumberFormatException e) {
-				if (!eatExceptionsOnSetters) {
-					throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.", e);
-				}
+				throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.", e);
 			}
 		} else {
-			if (!eatExceptionsOnSetters) {
-				throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.");
-			} else {
-				return -1;
-			}
+			throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.");
 		}
-		return -1;
 	}
 
-	public boolean shouldEatExceptionsOnSetters() {
-		return eatExceptionsOnSetters;
+
+	public boolean shouldUseDefaultValues() {
+		return shouldUseDefaultValues;
 	}
 }

@@ -82,8 +82,8 @@ public class HubScanJobConfigBuilderTest {
 	@Test
 	public void testEmptyConfigValidations() throws HubIntegrationException, IOException {
 		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
-		expectedMessages.add("The minimum amount of memory for the scan is 256 MB.");
-		expectedMessages.add("The maximum wait time for the BOM Update must be greater than 0.");
+		expectedMessages.add("No scan memory was specified.");
+		expectedMessages.add("No maximum wait time for the Bom Update found.");
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
 		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
@@ -167,7 +167,7 @@ public class HubScanJobConfigBuilderTest {
 
 	@Test
 	public void testValidateMaxWaitTimeForRiskReport() throws HubIntegrationException, IOException {
-		expectedMessages.add("The maximum wait time for the BOM Update must be greater than 0.");
+		expectedMessages.add("No maximum wait time for the Bom Update found.");
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
 		builder.setShouldGenerateRiskReport(true);
