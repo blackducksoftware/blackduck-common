@@ -40,7 +40,7 @@ public class ValidationResults<Key, Type> {
 	}
 
 	public void addAllResults(final Map<Key, List<ValidationResult>> results) {
-		for (final Entry<Key, List<ValidationResult>> entry : resultMap.entrySet()) {
+		for (final Entry<Key, List<ValidationResult>> entry : results.entrySet()) {
 			for (final ValidationResult result : entry.getValue()) {
 				// This will prevent duplication
 				addResult(entry.getKey(), result);
