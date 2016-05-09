@@ -34,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.restlet.Context;
 import org.restlet.Response;
 import org.restlet.data.ChallengeRequest;
-import org.restlet.data.ChallengeResponse;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.Cookie;
 import org.restlet.data.CookieSetting;
@@ -50,10 +49,13 @@ import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.hub.api.VersionComparison;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.MissingPolicyStatusException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.VersionDoesNotExistException;
+import com.blackducksoftware.integration.hub.global.HubCredentials;
+import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.policy.api.PolicyStatus;
 import com.blackducksoftware.integration.hub.project.api.ProjectItem;
@@ -81,10 +83,6 @@ public class HubIntRestService {
 
 	private IntLogger logger;
 
-	private String proxyUsername;
-
-	private String proxyPassword;
-
 	public HubIntRestService(final String baseUrl) {
 		this.baseUrl = baseUrl;
 	}
@@ -105,30 +103,53 @@ public class HubIntRestService {
 		return baseUrl;
 	}
 
-	private void attemptResetProxyCache() {
-		try {
-			Class<?> sunAuthCacheValue;
-			Class<?> sunAuthCache;
-			Class<?> sunAuthCacheImpl;
-			try {
-				sunAuthCacheValue = Class.forName("sun.net.www.protocol.http.AuthCacheValue");
-				sunAuthCache = Class.forName("sun.net.www.protocol.http.AuthCache");
-				sunAuthCacheImpl = Class.forName("sun.net.www.protocol.http.AuthCacheImpl");
-			} catch (final Exception e) {
-				// Must not be using a JDK with sun classes so we abandon this
-				// reset since it is sun specific
-				return;
+	/**
+	 * The proxy settings get set as System properties. I.E. https.proxyHost,
+	 * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
+	 *
+	 */
+	public void setProxyProperties(final HubProxyInfo proxyInfo) {
+		cleanUpOldProxySettings();
+
+		if (!StringUtils.isBlank(proxyInfo.getHost()) && proxyInfo.getPort() > 0) {
+			if (logger != null) {
+				logger.debug("Using Proxy : " + proxyInfo.getHost() + ", at Port : " + proxyInfo.getPort());
 			}
 
-			final java.lang.reflect.Method m = sunAuthCacheValue.getDeclaredMethod("setAuthCache", sunAuthCache);
+			System.setProperty("https.proxyHost", proxyInfo.getHost());
+			System.setProperty("https.proxyPort", Integer.toString(proxyInfo.getPort()));
+			System.setProperty("http.proxyHost", proxyInfo.getHost());
+			System.setProperty("http.proxyPort", Integer.toString(proxyInfo.getPort()));
 
-			final Constructor<?> authCacheImplConstr = sunAuthCacheImpl.getConstructor();
-			final Object authCachImp = authCacheImplConstr.newInstance();
+			try {
+				if (!StringUtils.isBlank(proxyInfo.getUsername())
+						&& !StringUtils.isBlank(proxyInfo.getDecryptedPassword())) {
 
-			m.invoke(null, authCachImp);
-
-		} catch (final Exception e) {
-			logger.error(e.getMessage());
+					// Java ignores http.proxyUser. Here's the workaround.
+					Authenticator.setDefault(new Authenticator() {
+						// Need this to support digest authentication
+						@Override
+						protected PasswordAuthentication getPasswordAuthentication() {
+							if (getRequestorType() == RequestorType.PROXY) {
+								try {
+									return new PasswordAuthentication(proxyInfo.getUsername(),
+											proxyInfo.getDecryptedPassword().toCharArray());
+								} catch (final Exception e) {
+									e.printStackTrace();
+								}
+							}
+							return null;
+						}
+					});
+				}
+			} catch (final Exception e) {
+				if (logger != null) {
+					logger.error(e);
+				}
+			}
+		}
+		if (!StringUtils.isBlank(proxyInfo.getIgnoredProxyHosts())) {
+			System.setProperty("http.nonProxyHosts", proxyInfo.getIgnoredProxyHosts());
 		}
 	}
 
@@ -140,37 +161,16 @@ public class HubIntRestService {
 	public void setProxyProperties(final String proxyHost, final int proxyPort, final List<Pattern> noProxyHosts,
 			final String proxyUsername, final String proxyPassword) {
 
-		cleanUpOldProxySettings();
-
-		if (!StringUtils.isBlank(proxyHost) && proxyPort > 0) {
+		HubCredentials proxyCredentials = null;
+		try {
+			proxyCredentials = new HubCredentials(proxyUsername, proxyPassword);
+		} catch (final EncryptionException e) {
 			if (logger != null) {
-				logger.debug("Using Proxy : " + proxyHost + ", at Port : " + proxyPort);
-			}
-
-			System.setProperty("https.proxyHost", proxyHost);
-			System.setProperty("https.proxyPort", Integer.toString(proxyPort));
-			System.setProperty("http.proxyHost", proxyHost);
-			System.setProperty("http.proxyPort", Integer.toString(proxyPort));
-
-			if (!StringUtils.isBlank(proxyUsername) && !StringUtils.isBlank(proxyPassword)) {
-				this.proxyUsername = proxyUsername;
-				this.proxyPassword = proxyPassword;
-
-				// Java ignores http.proxyUser. Here's the workaround.
-				Authenticator.setDefault(new Authenticator() {
-					// Need this to support digest authentication
-					@Override
-					protected PasswordAuthentication getPasswordAuthentication() {
-						if (getRequestorType() == RequestorType.PROXY) {
-							return new PasswordAuthentication(proxyUsername, proxyPassword.toCharArray());
-						}
-						return null;
-					}
-				});
+				logger.error(e);
 			}
 		}
+		String noProxyHostsString = null;
 		if (noProxyHosts != null && !noProxyHosts.isEmpty()) {
-			String noProxyHostsString = null;
 			for (final Pattern pattern : noProxyHosts) {
 				if (noProxyHostsString == null) {
 					noProxyHostsString = pattern.toString();
@@ -182,6 +182,10 @@ public class HubIntRestService {
 				System.setProperty("http.nonProxyHosts", noProxyHostsString);
 			}
 		}
+
+		final HubProxyInfo proxyInfo = new HubProxyInfo(proxyHost, proxyPort, proxyCredentials, noProxyHostsString);
+		setProxyProperties(proxyInfo);
+
 	}
 
 	public ClientResource createClientResource() throws URISyntaxException {
@@ -226,32 +230,30 @@ public class HubIntRestService {
 		Authenticator.setDefault(null);
 	}
 
-	public void parseChallengeRequestRawValue(final ChallengeRequest proxyChallengeRequest) {
-		if (proxyChallengeRequest == null || StringUtils.isBlank(proxyChallengeRequest.getRawValue())) {
-			return;
-		}
-		final String rawValue = proxyChallengeRequest.getRawValue();
-
-		final String[] splitRawValue = rawValue.split(",");
-		for (final String currentValue : splitRawValue) {
-			final String trimmedCurrentValue = currentValue.trim();
-			if (StringUtils.isBlank(proxyChallengeRequest.getRealm()) && trimmedCurrentValue.startsWith("realm=")) {
-				final String realm = trimmedCurrentValue.substring("realm=".length());
-				proxyChallengeRequest.setRealm(realm);
-			} else if (StringUtils.isBlank(proxyChallengeRequest.getServerNonce())
-					&& trimmedCurrentValue.startsWith("nonce=")) {
-				final String nonce = trimmedCurrentValue.substring("nonce=".length());
-				proxyChallengeRequest.setServerNonce(nonce);
-			} else if ((proxyChallengeRequest.getQualityOptions() == null
-					|| proxyChallengeRequest.getQualityOptions().isEmpty()) && trimmedCurrentValue.startsWith("qop=")) {
-				final String qop = trimmedCurrentValue.substring("qop=".length());
-				final List<String> qualityOptions = new ArrayList<String>();
-				qualityOptions.add(qop);
-				proxyChallengeRequest.setQualityOptions(qualityOptions);
-			} else if (trimmedCurrentValue.startsWith("stale=")) {
-				final String stale = trimmedCurrentValue.substring("stale=".length());
-				proxyChallengeRequest.setStale(Boolean.valueOf(stale));
+	private void attemptResetProxyCache() {
+		try {
+			Class<?> sunAuthCacheValue;
+			Class<?> sunAuthCache;
+			Class<?> sunAuthCacheImpl;
+			try {
+				sunAuthCacheValue = Class.forName("sun.net.www.protocol.http.AuthCacheValue");
+				sunAuthCache = Class.forName("sun.net.www.protocol.http.AuthCache");
+				sunAuthCacheImpl = Class.forName("sun.net.www.protocol.http.AuthCacheImpl");
+			} catch (final Exception e) {
+				// Must not be using a JDK with sun classes so we abandon this
+				// reset since it is sun specific
+				return;
 			}
+
+			final java.lang.reflect.Method m = sunAuthCacheValue.getDeclaredMethod("setAuthCache", sunAuthCache);
+
+			final Constructor<?> authCacheImplConstr = sunAuthCacheImpl.getConstructor();
+			final Object authCachImp = authCacheImplConstr.newInstance();
+
+			m.invoke(null, authCachImp);
+
+		} catch (final Exception e) {
+			logger.error(e.getMessage());
 		}
 	}
 
@@ -272,7 +274,7 @@ public class HubIntRestService {
 
 		final EmptyRepresentation rep = new EmptyRepresentation();
 		resource.getRequest().setEntity(rep);
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		final int statusCode = resource.getResponse().getStatus().getCode();
 		if (statusCode == 204) {
 			if (cookies == null) {
@@ -324,7 +326,7 @@ public class HubIntRestService {
 		resource.addQueryParameter("q", "name:" + projectName);
 		resource.addQueryParameter("limit", "15");
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -354,7 +356,7 @@ public class HubIntRestService {
 		resource.addQueryParameter("q", "name:" + projectName);
 		resource.addQueryParameter("limit", "15");
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -384,7 +386,7 @@ public class HubIntRestService {
 	public ProjectItem getProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = createClientResource(projectUrl);
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -402,7 +404,7 @@ public class HubIntRestService {
 			throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = createClientResource(versionUrl);
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -441,7 +443,7 @@ public class HubIntRestService {
 		final ClientResource resource = createClientResource(project.getLink(ProjectItem.VERSION_LINK));
 		resource.addQueryParameter("limit", "10000000");
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -478,7 +480,7 @@ public class HubIntRestService {
 		stringRep.setMediaType(MediaType.APPLICATION_JSON);
 		stringRep.setCharacterSet(CharacterSet.UTF_8);
 		resource.getRequest().setEntity(stringRep);
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 201) {
@@ -524,7 +526,7 @@ public class HubIntRestService {
 		stringRep.setMediaType(MediaType.APPLICATION_JSON);
 		stringRep.setCharacterSet(CharacterSet.UTF_8);
 		resource.getRequest().setEntity(stringRep);
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 201) {
@@ -562,7 +564,7 @@ public class HubIntRestService {
 		int responseCode = 0;
 
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -590,7 +592,7 @@ public class HubIntRestService {
 		int responseCode = 0;
 
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -639,7 +641,7 @@ public class HubIntRestService {
 
 			resource.setMethod(Method.GET);
 
-			handleRequest(resource, null, 0);
+			handleRequest(resource, null);
 
 			final int responseCode = resource.getResponse().getStatus().getCode();
 
@@ -713,7 +715,7 @@ public class HubIntRestService {
 		stringRep.setMediaType(MediaType.APPLICATION_JSON);
 		stringRep.setCharacterSet(CharacterSet.UTF_8);
 		resource.getRequest().setEntity(stringRep);
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
@@ -743,7 +745,7 @@ public class HubIntRestService {
 
 		final ClientResource resource = createClientResource(reportUrl);
 		resource.setMethod(Method.DELETE);
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 
 		final int responseCode = resource.getResponse().getStatus().getCode();
 		if (responseCode != 204) {
@@ -772,7 +774,7 @@ public class HubIntRestService {
 
 		resource.setMethod(Method.GET);
 
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200) {
@@ -798,7 +800,7 @@ public class HubIntRestService {
 
 		resource.setMethod(Method.GET);
 
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200) {
@@ -833,7 +835,7 @@ public class HubIntRestService {
 
 		resource.setMethod(Method.GET);
 
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
@@ -863,7 +865,7 @@ public class HubIntRestService {
 
 		resource.setMethod(Method.GET);
 
-		handleRequest(resource, null, 0);
+		handleRequest(resource, null);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200) {
@@ -896,31 +898,11 @@ public class HubIntRestService {
 		return sb.toString();
 	}
 
-	private void handleRequest(final ClientResource resource, final ChallengeRequest proxyChallengeRequest,
-			final int attempt) throws BDRestException {
-		if (proxyChallengeRequest != null) {
-			// This should replace the authenticator for the proxy
-			// authentication
-			// BUT it doesn't work for Digest authentication
-			parseChallengeRequestRawValue(proxyChallengeRequest);
-			resource.setProxyChallengeResponse(new ChallengeResponse(proxyChallengeRequest.getScheme(), null,
-					proxyUsername, proxyPassword.toCharArray(), null, proxyChallengeRequest.getRealm(), null, null,
-					proxyChallengeRequest.getDigestAlgorithm(), null, null, proxyChallengeRequest.getServerNonce(), 0,
-					0L));
-		}
+	private void handleRequest(final ClientResource resource, final ChallengeRequest proxyChallengeRequest)
+			throws BDRestException {
 		try {
 			resource.handle();
 		} catch (final ResourceException e) {
-			if (resource.getProxyChallengeRequests() != null && !resource.getProxyChallengeRequests().isEmpty()
-					&& StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-
-				final ChallengeRequest newChallengeRequest = resource.getProxyChallengeRequests().get(0);
-				if (attempt < 2) {
-					handleRequest(resource, newChallengeRequest, attempt + 1);
-				} else {
-					throw new BDRestException("Too many proxy authentication attempts.", e, resource);
-				}
-			}
 			throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
 		}
 	}
