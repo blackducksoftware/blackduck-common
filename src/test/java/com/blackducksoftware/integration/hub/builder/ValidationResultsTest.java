@@ -318,4 +318,49 @@ public class ValidationResultsTest {
 		assertTrue(status.contains(ValidationResultEnum.WARN));
 		assertFalse(status.contains(ValidationResultEnum.OK));
 	}
+
+	@Test
+	public void testHasErrorsWithField() {
+
+		final List<ValidationResultEnum> items = new ArrayList<ValidationResultEnum>();
+		items.add(ValidationResultEnum.OK);
+		items.add(ValidationResultEnum.OK);
+		items.add(ValidationResultEnum.WARN);
+		items.add(ValidationResultEnum.WARN);
+
+		final ValidationResults<String, String> results = createTestData(items);
+		assertNotNull(results);
+		final String anotherMsg = "Test Message";
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.OK, anotherMsg));
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.WARN, anotherMsg));
+
+		assertFalse(results.hasErrors(KEY_0));
+		final String errMsg = "Test ERROR Message";
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.ERROR, errMsg));
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.ERROR, errMsg));
+
+		assertTrue(results.hasErrors(KEY_0));
+	}
+
+	@Test
+	public void testHasWarningsWithField() {
+		final List<ValidationResultEnum> items = new ArrayList<ValidationResultEnum>();
+		items.add(ValidationResultEnum.OK);
+		items.add(ValidationResultEnum.OK);
+		items.add(ValidationResultEnum.ERROR);
+		items.add(ValidationResultEnum.ERROR);
+
+		final ValidationResults<String, String> results = createTestData(items);
+		assertNotNull(results);
+		final String anotherMsg = "Test Message";
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.OK, anotherMsg));
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.ERROR, anotherMsg));
+
+		assertFalse(results.hasWarnings(KEY_0));
+		final String errMsg = "Test WARN Message";
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.WARN, errMsg));
+		results.addResult(KEY_0, new ValidationResult(ValidationResultEnum.WARN, errMsg));
+
+		assertTrue(results.hasWarnings(KEY_0));
+	}
 }
