@@ -117,6 +117,10 @@ public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCr
 		return passwordLength;
 	}
 
+	/**
+	 * IMPORTANT : The password length should only be set if the password is
+	 * already encrypted
+	 */
 	public void setPasswordLength(final int passwordLength) {
 		this.passwordLength = passwordLength;
 	}

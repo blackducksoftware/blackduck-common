@@ -103,6 +103,9 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		proxyBuilder.setIgnoredProxyHosts(ignoredProxyHosts);
 		proxyBuilder.setUsername(proxyUsername);
 		proxyBuilder.setPassword(proxyPassword);
+		if (proxyPasswordLength > 0) {
+			proxyBuilder.setPasswordLength(proxyPasswordLength);
+		}
 		result = proxyBuilder.build();
 		proxyInfo = result.getConstructedObject();
 		return result;
@@ -113,6 +116,9 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder(shouldUseDefaultValues());
 		credentialsBuilder.setUsername(username);
 		credentialsBuilder.setPassword(password);
+		if (passwordLength > 0) {
+			credentialsBuilder.setPasswordLength(passwordLength);
+		}
 		result = credentialsBuilder.build();
 		credentials = result.getConstructedObject();
 		return result;
@@ -243,6 +249,10 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		return passwordLength;
 	}
 
+	/**
+	 * IMPORTANT : The password length should only be set if the password is
+	 * already encrypted
+	 */
 	public void setPasswordLength(final int passwordLength) {
 		this.passwordLength = passwordLength;
 	}
@@ -287,6 +297,10 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		return proxyPasswordLength;
 	}
 
+	/**
+	 * IMPORTANT : The proxy password length should only be set if the proxy password is
+	 * already encrypted
+	 */
 	public void setProxyPasswordLength(final int proxyPasswordLength) {
 		this.proxyPasswordLength = proxyPasswordLength;
 	}
