@@ -103,7 +103,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		proxyBuilder.setIgnoredProxyHosts(ignoredProxyHosts);
 		proxyBuilder.setUsername(proxyUsername);
 		proxyBuilder.setPassword(proxyPassword);
-		proxyBuilder.setPasswordLength(proxyPasswordLength);
 		result = proxyBuilder.build();
 		proxyInfo = result.getConstructedObject();
 		return result;
@@ -114,7 +113,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder(shouldUseDefaultValues());
 		credentialsBuilder.setUsername(username);
 		credentialsBuilder.setPassword(password);
-		credentialsBuilder.setPasswordLength(passwordLength);
 		result = credentialsBuilder.build();
 		credentials = result.getConstructedObject();
 		return result;
