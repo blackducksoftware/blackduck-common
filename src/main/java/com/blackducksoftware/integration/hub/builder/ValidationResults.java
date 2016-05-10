@@ -120,6 +120,21 @@ public class ValidationResults<Key, Type> {
 		return resultString;
 	}
 
+	public List<Throwable> getResultThrowables(final Key fieldKey, final ValidationResultEnum resultEnum) {
+		final List<Throwable> throwables = new ArrayList<Throwable>();
+
+		if (resultMap.containsKey(fieldKey)) {
+			final Map<ValidationResultEnum, List<ValidationResult>> listMap = resultMap.get(fieldKey);
+			if (listMap.containsKey(resultEnum)) {
+				final List<ValidationResult> itemList = listMap.get(resultEnum);
+				for (final ValidationResult result : itemList) {
+					throwables.add(result.getThrowable());
+				}
+			}
+		}
+		return throwables;
+	}
+
 	public Type getConstructedObject() {
 		return constructedObject;
 	}

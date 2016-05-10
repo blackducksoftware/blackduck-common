@@ -147,6 +147,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		try {
 			URLConnection connection = null;
 			if (null != proxyInfo) {
+
 				connection = proxyInfo.openConnection(hubURL);
 			} else {
 				connection = hubURL.openConnection();

@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.encryption.PasswordDecrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
 
 public class HubProxyInfo implements Serializable {
@@ -75,17 +74,17 @@ public class HubProxyInfo implements Serializable {
 
 	public void setDefaultAuthenticator() {
 		if (getUsername() != null && getEncryptedPassword() != null) {
-			Authenticator.setDefault(new Authenticator() {
-				@Override
-				public PasswordAuthentication getPasswordAuthentication() {
-					try {
-						return new PasswordAuthentication(getProxyCredentials().getUsername(),
-								PasswordDecrypter.decrypt(getProxyCredentials().getEncryptedPassword()).toCharArray());
-					} catch (final Exception e) {
+				Authenticator.setDefault(new Authenticator() {
+					@Override
+					public PasswordAuthentication getPasswordAuthentication() {
+						try {
+							return new PasswordAuthentication(getProxyCredentials().getUsername(),
+									getProxyCredentials().getDecryptedPassword().toCharArray());
+						} catch (final Exception e) {
+						}
+						return null;
 					}
-					return null;
-				}
-			});
+				});
 		} else {
 			Authenticator.setDefault(null);
 		}
