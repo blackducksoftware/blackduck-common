@@ -128,7 +128,9 @@ public class ValidationResults<Key, Type> {
 			if (listMap.containsKey(resultEnum)) {
 				final List<ValidationResult> itemList = listMap.get(resultEnum);
 				for (final ValidationResult result : itemList) {
-					throwables.add(result.getThrowable());
+					if (result.getThrowable() != null) {
+						throwables.add(result.getThrowable());
+					}
 				}
 			}
 		}
