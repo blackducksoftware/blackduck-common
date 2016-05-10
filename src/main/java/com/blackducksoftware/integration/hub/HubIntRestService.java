@@ -149,7 +149,7 @@ public class HubIntRestService {
 			}
 		}
 		if (!StringUtils.isBlank(proxyInfo.getIgnoredProxyHosts())) {
-			System.setProperty("http.nonProxyHosts", proxyInfo.getIgnoredProxyHosts());
+			System.setProperty("http.nonProxyHosts", proxyInfo.getIgnoredProxyHosts().replaceAll(",", "|"));
 		}
 	}
 
