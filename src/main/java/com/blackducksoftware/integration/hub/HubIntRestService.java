@@ -164,6 +164,10 @@ public class HubIntRestService {
 		HubCredentials proxyCredentials = null;
 		try {
 			proxyCredentials = new HubCredentials(proxyUsername, proxyPassword);
+		} catch (final IllegalArgumentException e) {
+			if (logger != null) {
+				logger.error(e);
+			}
 		} catch (final EncryptionException e) {
 			if (logger != null) {
 				logger.error(e);
@@ -490,7 +494,7 @@ public class HubIntRestService {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-			.get(HeaderConstants.ATTRIBUTE_HEADERS);
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header projectUrl = responseHeaders.getFirst("location", true);
 
 			if (projectUrl == null || StringUtils.isBlank(projectUrl.getValue())) {
@@ -536,7 +540,7 @@ public class HubIntRestService {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-			.get(HeaderConstants.ATTRIBUTE_HEADERS);
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header versionUrl = responseHeaders.getFirst("location", true);
 
 			if (versionUrl == null || StringUtils.isBlank(versionUrl.getValue())) {
@@ -547,7 +551,7 @@ public class HubIntRestService {
 			throw new BDRestException(
 					"There was a problem creating this Version for the specified Hub Project. Error Code: "
 							+ responseCode,
-							resource);
+					resource);
 		}
 
 	}
@@ -605,7 +609,7 @@ public class HubIntRestService {
 			throw new BDRestException(
 					"There was a problem comparing the specified version to the version of the Hub server. Error Code: "
 							+ responseCode,
-							resource);
+					resource);
 		}
 	}
 
@@ -660,7 +664,7 @@ public class HubIntRestService {
 				throw new BDRestException(
 						"There was a problem getting the code locations for the host and paths provided. Error Code: "
 								+ responseCode,
-								resource);
+						resource);
 			}
 
 		}
@@ -726,7 +730,7 @@ public class HubIntRestService {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-			.get(HeaderConstants.ATTRIBUTE_HEADERS);
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header reportUrl = responseHeaders.getFirst("location", true);
 
 			if (reportUrl == null || StringUtils.isBlank(reportUrl.getValue())) {
@@ -762,7 +766,7 @@ public class HubIntRestService {
 
 		@SuppressWarnings("unchecked")
 		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
-		.get(HeaderConstants.ATTRIBUTE_HEADERS);
+				.get(HeaderConstants.ATTRIBUTE_HEADERS);
 		if (requestHeaders == null) {
 			requestHeaders = new Series<Header>(Header.class);
 			resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);

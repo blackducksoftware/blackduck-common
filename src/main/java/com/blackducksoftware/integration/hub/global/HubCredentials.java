@@ -32,10 +32,9 @@ public class HubCredentials implements Serializable {
 	private final String encryptedPassword;
 	private final int actualPasswordLength;
 
-	public HubCredentials(final String username, final String password)
-			throws EncryptionException {
+	public HubCredentials(final String username, final String password) throws EncryptionException {
 		this.username = username;
-		this.actualPasswordLength = password.length();
+		this.actualPasswordLength = (password == null ? 0 : password.length());
 		this.encryptedPassword = PasswordEncrypter.encrypt(password);
 	}
 
