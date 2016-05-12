@@ -820,6 +820,12 @@ public class HubIntRestService {
 			final VersionReport report = gson.fromJson(reportFile.get("fileContent"), VersionReport.class);
 
 			return report;
+		} else if (responseCode == 412) {
+			final String response = readResponseAsString(resource.getResponse());
+			final JsonParser parser = new JsonParser();
+			final JsonObject json = parser.parse(response).getAsJsonObject();
+			final String errorMessage = json.get("errorMessage").getAsString();
+			throw new BDRestException(errorMessage + " Error Code: " + responseCode, resource);
 		} else {
 			throw new BDRestException(
 					"There was a problem getting the content of this Report. Error Code: " + responseCode, resource);
