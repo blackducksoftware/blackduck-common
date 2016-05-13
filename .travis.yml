@@ -14,7 +14,6 @@ notifications:
 
 install: true
 script:
-  #skip tests for now since some of them require a hub server
-  - mvn clean package -DskipTests=true
+  - mvn clean package
 after_success:
-  #- mvn test jacoco:report coveralls:report
+  - mvn test jacoco:report coveralls:report
