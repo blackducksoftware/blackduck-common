@@ -18,6 +18,8 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.logging;
 
+import org.apache.commons.lang3.StringUtils;
+
 public enum LogLevel {
 	OFF(0), ERROR(1), WARN(2), INFO(3), DEBUG(4), TRACE(5);
 
@@ -52,5 +54,15 @@ public enum LogLevel {
 		}
 		return false;
 
+	}
+
+	public static LogLevel fromString(final String level) {
+		if (StringUtils.isNotBlank(level)) {
+			try {
+				return LogLevel.valueOf(level.toUpperCase());
+			} catch (final IllegalArgumentException e) {
+			}
+		}
+		return LogLevel.INFO;
 	}
 }
