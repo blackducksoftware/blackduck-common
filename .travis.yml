@@ -1,4 +1,9 @@
 language: java
+
+cache:
+  directories:
+    - $HOME/.m2
+
 notifications:
   email:
     recipients:
@@ -8,8 +13,8 @@ notifications:
       - ekerwin@blackducksoftware.com
 
 install: true
-# Run maven, but skip tests for now as they require Hub instance.
 script:
-  - mvn package -DskipTests=true
+  #skip tests for now since some of them require a hub server
+  - mvn clean package -DskipTests=true
 after_success:
-#  - mvn test jacoco:report coveralls:report
+  #- mvn test jacoco:report coveralls:report
