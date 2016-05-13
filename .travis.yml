@@ -6,9 +6,10 @@ notifications:
       - jrichard@blackducksoftware.com
       - psantos@blackducksoftware.com
       - ekerwin@blackducksoftware.com
-      
-# Skip the internal gradle commands
+
 install: true
 # Run maven, but skip tests for now as they require Hub instance.
 script:
-  - mvn package -Dmaven.test.skip=true
+  - mvn package -DskipTests=true
+after_success:
+#  - mvn test jacoco:report coveralls:report
