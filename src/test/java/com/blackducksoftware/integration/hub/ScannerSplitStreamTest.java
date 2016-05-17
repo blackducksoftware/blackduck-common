@@ -21,6 +21,10 @@ package com.blackducksoftware.integration.hub;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
@@ -28,16 +32,59 @@ import com.blackducksoftware.integration.hub.util.TestLogger;
 import com.blackducksoftware.integration.hub.util.TestOutputStream;
 
 public class ScannerSplitStreamTest {
-	private static final String newLine = System.getProperty("line.separator");
+	private static final String NEW_LINE = System.getProperty("line.separator");
+
+	@Test
+	public void testWritingTextWithWindowsLineSeparator() throws IOException {
+		final TestLogger logger = new TestLogger();
+		final TestOutputStream stream = new TestOutputStream();
+		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
+
+		final String originalLineSeparator = System.getProperty("line.separator");
+		try {
+			System.setProperty("line.separator", "\r\n");
+			final String text = "Exception: one fish\r\nException: two fish";
+			final List<Integer> codePoints = getCodePoints(text);
+
+			writeCodePointsToScannerSplitStream(codePoints, splitStream);
+
+			final String output = splitStream.getOutput().trim();
+			assertEquals(text, output);
+		} finally {
+			System.setProperty("line.separator", originalLineSeparator);
+			splitStream.close();
+		}
+	}
+
+	@Test
+	public void testWritingTextWithNonWindowsLineSeparator() throws IOException {
+		final TestLogger logger = new TestLogger();
+		final TestOutputStream stream = new TestOutputStream();
+		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
+
+		final String originalLineSeparator = System.getProperty("line.separator");
+		try {
+			System.setProperty("line.separator", "\n");
+			final String text = "Exception: one fish\nException: two fish";
+			final List<Integer> codePoints = getCodePoints(text);
+
+			writeCodePointsToScannerSplitStream(codePoints, splitStream);
+
+			final String output = splitStream.getOutput().trim();
+			assertEquals(text, output);
+		} finally {
+			System.setProperty("line.separator", originalLineSeparator);
+			splitStream.close();
+		}
+	}
 
 	@Test
 	public void testWriteBytes() throws Exception {
 		final TestLogger logger = new TestLogger();
 		final TestOutputStream stream = new TestOutputStream();
-
 		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String notLoggable = "Test 1 2 3, test 1 2 3, can you hear me? " + newLine + " What about now?";
+		final String notLoggable = "Test 1 2 3, test 1 2 3, can you hear me? " + NEW_LINE + " What about now?";
 
 		for (int i = 0; i < notLoggable.length(); i++) {
 			splitStream.write(notLoggable.codePointAt(i));
@@ -54,19 +101,16 @@ public class ScannerSplitStreamTest {
 	public void testWriteBytesLoggable() throws Exception {
 		final TestLogger logger = new TestLogger();
 		final TestOutputStream stream = new TestOutputStream();
-
 		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String loggable = "Exception: Test 1 2 3, test 1 2 3, can you hear me?  " + newLine
-				+ " WARN: about to explode " + newLine + " INFO: breaking news " + newLine
-				+ " Finished in What about now? " + newLine + " ERROR: something happened";
+		final String loggable = "Exception: Test 1 2 3, test 1 2 3, can you hear me?  " + NEW_LINE
+				+ " WARN: about to explode " + NEW_LINE + " INFO: breaking news " + NEW_LINE
+				+ " Finished in What about now? " + NEW_LINE + " ERROR: something happened";
 
-		final String notLoggable = "DEBUG: found something " + newLine + " TRACE: reading pg 876";
+		final String notLoggable = "DEBUG: found something " + NEW_LINE + " TRACE: reading pg 876";
 
-		for (int i = 0; i < loggable.length(); i++) {
-			splitStream.write(loggable.codePointAt(i));
-		}
-		splitStream.flush();
+		List<Integer> codePoints = getCodePoints(loggable);
+		writeCodePointsToScannerSplitStream(codePoints, splitStream);
 
 		// Should write all the bytes to the TestOutputStream
 		assertEquals(loggable, stream.buffer.toString());
@@ -77,10 +121,9 @@ public class ScannerSplitStreamTest {
 		stream.resetBuffer();
 		logger.resetAllOutput();
 
-		for (int i = 0; i < notLoggable.length(); i++) {
-			splitStream.write(notLoggable.codePointAt(i));
-		}
-		splitStream.flush();
+		codePoints = getCodePoints(notLoggable);
+		writeCodePointsToScannerSplitStream(codePoints, splitStream);
+
 		// Should write all the bytes to the TestOutputStream
 		assertEquals(notLoggable, stream.buffer.toString());
 
@@ -92,10 +135,9 @@ public class ScannerSplitStreamTest {
 	public void testWriteByteArray() throws Exception {
 		final TestLogger logger = new TestLogger();
 		final TestOutputStream stream = new TestOutputStream();
-
 		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String notLoggable = "Test 1 2 3, test 1 2 3, can you hear me? " + newLine + " What about now?";
+		final String notLoggable = "Test 1 2 3, test 1 2 3, can you hear me? " + NEW_LINE + " What about now?";
 
 		splitStream.write(notLoggable.getBytes());
 		splitStream.flush();
@@ -110,14 +152,13 @@ public class ScannerSplitStreamTest {
 	public void testWriteByteArrayLoggable() throws Exception {
 		final TestLogger logger = new TestLogger();
 		final TestOutputStream stream = new TestOutputStream();
-
 		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String loggable = "Exception: Test 1 2 3, test 1 2 3, can you hear me?  " + newLine
-				+ " WARN: about to explode " + newLine + " INFO: breaking news " + newLine
-				+ " Finished in What about now? " + newLine + " ERROR: something happened";
+		final String loggable = "Exception: Test 1 2 3, test 1 2 3, can you hear me?  " + NEW_LINE
+				+ " WARN: about to explode " + NEW_LINE + " INFO: breaking news " + NEW_LINE
+				+ " Finished in What about now? " + NEW_LINE + " ERROR: something happened";
 
-		final String notLoggable = "DEBUG: found something " + newLine + " TRACE: reading pg 876";
+		final String notLoggable = "DEBUG: found something " + NEW_LINE + " TRACE: reading pg 876";
 
 		splitStream.write(loggable.getBytes());
 		splitStream.flush();
@@ -144,10 +185,9 @@ public class ScannerSplitStreamTest {
 	public void testWriteByteArrayWithOffset() throws Exception {
 		final TestLogger logger = new TestLogger();
 		final TestOutputStream stream = new TestOutputStream();
-
 		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String notLoggable = "Test 1 2 3, test 1 2 3, can you hear me? " + newLine + " What about now?";
+		final String notLoggable = "Test 1 2 3, test 1 2 3, can you hear me? " + NEW_LINE + " What about now?";
 
 		splitStream.write(notLoggable.getBytes(), 0, notLoggable.length());
 		splitStream.flush();
@@ -162,14 +202,13 @@ public class ScannerSplitStreamTest {
 	public void testWriteByteArrayWithOffsetLoggable() throws Exception {
 		final TestLogger logger = new TestLogger();
 		final TestOutputStream stream = new TestOutputStream();
-
 		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String loggable = "Exception: Test 1 2 3, test 1 2 3, can you hear me?  " + newLine
-				+ " WARN: about to explode " + newLine + " INFO: breaking news " + newLine
-				+ " Finished in What about now? " + newLine + " ERROR: something happened";
+		final String loggable = "Exception: Test 1 2 3, test 1 2 3, can you hear me?  " + NEW_LINE
+				+ " WARN: about to explode " + NEW_LINE + " INFO: breaking news " + NEW_LINE
+				+ " Finished in What about now? " + NEW_LINE + " ERROR: something happened";
 
-		final String notLoggable = "DEBUG: found something " + newLine + " TRACE: reading pg 876";
+		final String notLoggable = "DEBUG: found something " + NEW_LINE + " TRACE: reading pg 876";
 
 		splitStream.write(loggable.getBytes(), 0, loggable.length());
 		splitStream.flush();
@@ -190,6 +229,23 @@ public class ScannerSplitStreamTest {
 
 		assertTrue(StringUtils.isBlank(logger.getOutputString()));
 		splitStream.close();
+	}
+
+	private List<Integer> getCodePoints(final String s) {
+		final List<Integer> codePoints = new ArrayList<Integer>();
+		for (int i = 0; i < s.length(); i++) {
+			codePoints.add(s.codePointAt(i));
+		}
+
+		return codePoints;
+	}
+
+	private void writeCodePointsToScannerSplitStream(final List<Integer> codePoints, final ScannerSplitStream stream)
+			throws IOException {
+		for (final Integer codePoint : codePoints) {
+			stream.write(codePoint);
+		}
+		stream.flush();
 	}
 
 }

@@ -54,7 +54,7 @@ public class TestLogger implements IntLogger {
     }
 
     public String getOutputString() {
-        return StringUtils.join(outputList, '\n');
+        return StringUtils.join(outputList, System.getProperty("line.separator"));
     }
 
     public String getErrorOutputString() {
@@ -62,7 +62,7 @@ public class TestLogger implements IntLogger {
         if (errorList != null && !errorList.isEmpty()) {
             for (Throwable e : errorList) {
                 if (sb.length() > 0) {
-                    sb.append('\n');
+                    sb.append(System.getProperty("line.separator"));
                 }
                 StringWriter sw = new StringWriter();
                 e.printStackTrace(new PrintWriter(sw));
