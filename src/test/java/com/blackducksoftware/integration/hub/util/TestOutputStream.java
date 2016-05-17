@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class TestOutputStream extends OutputStream {
-
     public StringBuilder buffer = new StringBuilder();
 
     public void resetBuffer() {

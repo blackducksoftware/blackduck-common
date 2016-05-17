@@ -64,6 +64,8 @@ public class ScannerSplitStream extends OutputStream {
 
 	private String currentLine = "";
 
+	private int previousCodePoint = -1;
+
 	public ScannerSplitStream(final IntLogger logger, final OutputStream outputFileStream) {
 		this.outputFileStream = outputFileStream;
 		this.logger = logger;
@@ -78,35 +80,34 @@ public class ScannerSplitStream extends OutputStream {
 	}
 
 	@Override
-	public void write(final int b) throws IOException {
-		outputFileStream.write(b);
+	public void write(final int codePoint) throws IOException {
+		outputFileStream.write(codePoint);
 
-		final String stringAcii = new String(Character.toChars(b));
-		final StringBuilder outputBuilder = new StringBuilder();
-		outputBuilder.append(currentLine);
-		switch (b) {
-		case ETX:
-			processLine(currentLine);
-			currentLine = "";
-			return;
-		case EOT:
-			processLine(currentLine);
-			currentLine = "";
-			return;
-		case LF:
-			processLine(currentLine);
-			currentLine = "";
-			return;
-		case CR:
-			processLine(currentLine);
-			currentLine = "";
-			return;
-		case EOF:
+		if (EOF == codePoint) {
 			throw new EOFException();
-		default:
-			outputBuilder.append(stringAcii);
-			currentLine = outputBuilder.toString();
-			return;
+		}
+
+		boolean atLineEnd = false;
+		if (ETX == codePoint || EOT == codePoint) {
+			atLineEnd = true;
+		} else if (LF == codePoint && CR != previousCodePoint) {
+			atLineEnd = true;
+		} else if (LF == codePoint && CR == previousCodePoint) {
+			atLineEnd = true;
+			// also need to remove the previously consumed CR
+			currentLine = currentLine.substring(0, currentLine.length() - 1);
+		} else if (LF != codePoint && CR == previousCodePoint) {
+			processLine(currentLine);
+			currentLine = "";
+		}
+		previousCodePoint = codePoint;
+
+		if (atLineEnd) {
+			processLine(currentLine);
+			currentLine = "";
+		} else {
+			final String stringAscii = new String(Character.toChars(codePoint));
+			currentLine += stringAscii;
 		}
 	}
 
@@ -147,7 +148,8 @@ public class ScannerSplitStream extends OutputStream {
 			// replace with the current line
 			lineBuffer = line;
 		} else {
-			// We assume that each new log starts with the log level, if this line does not contain a log level it
+			// We assume that each new log starts with the log level, if this
+			// line does not contain a log level it
 			// must only be a piece of a log
 			// needs to be added into the buffer
 			final StringBuilder builder = new StringBuilder();
@@ -209,7 +211,8 @@ public class ScannerSplitStream extends OutputStream {
 	public void close() throws IOException {
 		outputFileStream.close();
 
-		// Do not close the listener, will not be able to log to the UI anymore if you do
+		// Do not close the listener, will not be able to log to the UI anymore
+		// if you do
 	}
 
 	private void writeToConsole(final String line) {
