@@ -31,6 +31,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -258,6 +259,13 @@ public class HubIntRestService {
 		}
 	}
 
+	private void logMessage(final String txt) {
+		System.out.println(txt);
+		if (logger != null) {
+			logger.info(txt);
+		}
+	}
+
 	/**
 	 * Gets the cookie for the Authorized connection to the Hub server. Returns
 	 * the response code from the connection.
@@ -275,11 +283,65 @@ public class HubIntRestService {
 
 		final EmptyRepresentation rep = new EmptyRepresentation();
 		resource.getRequest().setEntity(rep);
+
+		logMessage("Cookies before auth : ");
+		if (cookies != null) {
+			for (final Cookie ck : cookies) {
+				logMessage("Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
+						+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+			}
+		} else {
+			logMessage("Current 'Cookies' is null (none have ever been set yet).");
+		}
+
+		logMessage("Resource : " + resource.toString());
+		logMessage("Request : " + resource.getRequest().toString());
+
+		logMessage("Request attributes : ");
+		for (final Entry<String, Object> requestAtt : resource.getRequest().getAttributes().entrySet()) {
+			logMessage("Attribute key : " + requestAtt.getKey());
+			logMessage("Attribute value : " + requestAtt.getValue());
+			logMessage("");
+		}
+		logMessage("Request headers : ");
+		final Series<Header> requestheaders = (Series<Header>) resource.getRequest().getAttributes()
+				.get(HeaderConstants.ATTRIBUTE_HEADERS);
+		for (final Header header : requestheaders) {
+			logMessage("Header name : " + header.getName());
+			logMessage("Header value : " + header.getValue());
+			logMessage("");
+		}
+
 		handleRequest(resource, null, 0);
+
+		logMessage("Response : " + resource.getResponse().toString());
+
+		logMessage("Response attributes : ");
+		for (final Entry<String, Object> requestAtt : resource.getResponse().getAttributes().entrySet()) {
+			logMessage("Attribute key : " + requestAtt.getKey());
+			logMessage("Attribute value : " + requestAtt.getValue());
+			logMessage("");
+		}
+		logMessage("Response headers : ");
+		final Series<Header> responseheaders = (Series<Header>) resource.getResponse().getAttributes()
+				.get(HeaderConstants.ATTRIBUTE_HEADERS);
+		for (final Header header : responseheaders) {
+			logMessage("Header name : " + header.getName());
+			logMessage("Header value : " + header.getValue());
+			logMessage("");
+		}
+
+		logMessage("Status Code : " + resource.getResponse().getStatus().getCode());
+
 		final int statusCode = resource.getResponse().getStatus().getCode();
 		if (statusCode == 204) {
 			if (cookies == null) {
 				final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
+				if (cookieSettings != null) {
+					logMessage("Set-Cookies returned : " + cookieSettings.size());
+				} else {
+					logMessage("Set-Cookies returned : " + null);
+				}
 
 				final Series<Cookie> requestCookies = resource.getRequest().getCookies();
 				if (cookieSettings != null && !cookieSettings.isEmpty()) {
@@ -287,6 +349,9 @@ public class HubIntRestService {
 						if (ck == null) {
 							continue;
 						}
+						logMessage("Set-Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
+								+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+
 						final Cookie cookie = new Cookie();
 						cookie.setName(ck.getName());
 						cookie.setDomain(ck.getDomain());
@@ -303,6 +368,11 @@ public class HubIntRestService {
 
 				cookies = requestCookies;
 
+				logMessage("Cookies after auth : ");
+				for (final Cookie ck : cookies) {
+					logMessage("Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
+							+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+				}
 			}
 		} else {
 			throw new HubIntegrationException(resource.getResponse().getStatus().toString());
@@ -491,7 +561,7 @@ public class HubIntRestService {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-			.get(HeaderConstants.ATTRIBUTE_HEADERS);
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header projectUrl = responseHeaders.getFirst("location", true);
 
 			if (projectUrl == null || StringUtils.isBlank(projectUrl.getValue())) {
@@ -537,7 +607,7 @@ public class HubIntRestService {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-			.get(HeaderConstants.ATTRIBUTE_HEADERS);
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header versionUrl = responseHeaders.getFirst("location", true);
 
 			if (versionUrl == null || StringUtils.isBlank(versionUrl.getValue())) {
@@ -548,7 +618,7 @@ public class HubIntRestService {
 			throw new BDRestException(
 					"There was a problem creating this Version for the specified Hub Project. Error Code: "
 							+ responseCode,
-							resource);
+					resource);
 		}
 
 	}
@@ -606,7 +676,7 @@ public class HubIntRestService {
 			throw new BDRestException(
 					"There was a problem comparing the specified version to the version of the Hub server. Error Code: "
 							+ responseCode,
-							resource);
+					resource);
 		}
 	}
 
@@ -661,7 +731,7 @@ public class HubIntRestService {
 				throw new BDRestException(
 						"There was a problem getting the code locations for the host and paths provided. Error Code: "
 								+ responseCode,
-								resource);
+						resource);
 			}
 
 		}
@@ -727,7 +797,7 @@ public class HubIntRestService {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-			.get(HeaderConstants.ATTRIBUTE_HEADERS);
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header reportUrl = responseHeaders.getFirst("location", true);
 
 			if (reportUrl == null || StringUtils.isBlank(reportUrl.getValue())) {
@@ -763,7 +833,7 @@ public class HubIntRestService {
 
 		@SuppressWarnings("unchecked")
 		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
-		.get(HeaderConstants.ATTRIBUTE_HEADERS);
+				.get(HeaderConstants.ATTRIBUTE_HEADERS);
 		if (requestHeaders == null) {
 			requestHeaders = new Series<Header>(Header.class);
 			resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
@@ -927,4 +997,5 @@ public class HubIntRestService {
 			throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
 		}
 	}
+
 }
