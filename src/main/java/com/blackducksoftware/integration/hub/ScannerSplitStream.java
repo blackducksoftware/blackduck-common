@@ -87,7 +87,6 @@ public class ScannerSplitStream extends OutputStream {
 			throw new EOFException();
 		}
 
-		// CR LF
 		boolean atLineEnd = false;
 		if (ETX == codePoint || EOT == codePoint) {
 			atLineEnd = true;

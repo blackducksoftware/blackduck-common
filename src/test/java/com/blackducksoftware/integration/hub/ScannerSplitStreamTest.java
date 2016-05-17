@@ -65,7 +65,7 @@ public class ScannerSplitStreamTest {
 		final String originalLineSeparator = System.getProperty("line.separator");
 		try {
 			System.setProperty("line.separator", "\n");
-			final String text = "Exception: one fish\nException: two fish";
+			final String text = "Exception: red fish\nException: blue fish";
 			final List<Integer> codePoints = getCodePoints(text);
 
 			writeCodePointsToScannerSplitStream(codePoints, splitStream);
