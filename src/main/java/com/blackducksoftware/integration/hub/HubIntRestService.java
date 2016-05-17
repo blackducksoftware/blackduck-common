@@ -28,6 +28,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -255,6 +256,13 @@ public class HubIntRestService {
 		}
 	}
 
+	private void logMessage(final String txt) {
+		System.out.println(txt);
+		if (logger != null) {
+			logger.info(txt);
+		}
+	}
+
 	/**
 	 * Gets the cookie for the Authorized connection to the Hub server. Returns
 	 * the response code from the connection.
@@ -272,11 +280,61 @@ public class HubIntRestService {
 
 		final EmptyRepresentation rep = new EmptyRepresentation();
 		resource.getRequest().setEntity(rep);
+
+		logMessage("Cookies before auth : ");
+		for (final Cookie ck : cookies) {
+			logMessage("Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = " + ck.getPath()
+			+ " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+		}
+
+		logMessage("Resource : " + resource.toString());
+		logMessage("Request : " + resource.getRequest().toString());
+
+		logMessage("Request attributes : ");
+		for (final Entry<String, Object> requestAtt : resource.getRequest().getAttributes().entrySet()) {
+			logMessage("Attribute key : " + requestAtt.getKey());
+			logMessage("Attribute value : " + requestAtt.getValue());
+			logMessage("");
+		}
+		logMessage("Request headers : ");
+		final Series<Header> requestheaders = (Series<Header>) resource.getRequest().getAttributes()
+				.get(HeaderConstants.ATTRIBUTE_HEADERS);
+		for (final Header header : requestheaders) {
+			logMessage("Header name : " + header.getName());
+			logMessage("Header value : " + header.getValue());
+			logMessage("");
+		}
+
 		handleRequest(resource, null, 0);
+
+		logMessage("Response : " + resource.getResponse().toString());
+
+		logMessage("Response attributes : ");
+		for (final Entry<String, Object> requestAtt : resource.getResponse().getAttributes().entrySet()) {
+			logMessage("Attribute key : " + requestAtt.getKey());
+			logMessage("Attribute value : " + requestAtt.getValue());
+			logMessage("");
+		}
+		logMessage("Response headers : ");
+		final Series<Header> responseheaders = (Series<Header>) resource.getResponse().getAttributes()
+				.get(HeaderConstants.ATTRIBUTE_HEADERS);
+		for (final Header header : responseheaders) {
+			logMessage("Header name : " + header.getName());
+			logMessage("Header value : " + header.getValue());
+			logMessage("");
+		}
+
+		logMessage("Status Code : " + resource.getResponse().getStatus().getCode());
+
 		final int statusCode = resource.getResponse().getStatus().getCode();
 		if (statusCode == 204) {
 			if (cookies == null) {
 				final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
+				if (cookieSettings != null) {
+					logMessage("Set-Cookies returned : " + cookieSettings.size());
+				} else {
+					logMessage("Set-Cookies returned : " + null);
+				}
 
 				final Series<Cookie> requestCookies = resource.getRequest().getCookies();
 				if (cookieSettings != null && !cookieSettings.isEmpty()) {
@@ -284,6 +342,10 @@ public class HubIntRestService {
 						if (ck == null) {
 							continue;
 						}
+						logMessage("Set-Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain()
+						+ " , path = " + ck.getPath() + " , value = " + ck.getValue() + " , version = "
+						+ ck.getVersion());
+
 						final Cookie cookie = new Cookie();
 						cookie.setName(ck.getName());
 						cookie.setDomain(ck.getDomain());
@@ -300,6 +362,11 @@ public class HubIntRestService {
 
 				cookies = requestCookies;
 
+				logMessage("Cookies after auth : ");
+				for (final Cookie ck : cookies) {
+					logMessage("Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
+							+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+				}
 			}
 		} else {
 			throw new HubIntegrationException(resource.getResponse().getStatus().toString());
