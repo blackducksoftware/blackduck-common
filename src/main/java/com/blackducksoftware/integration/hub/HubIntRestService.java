@@ -282,9 +282,13 @@ public class HubIntRestService {
 		resource.getRequest().setEntity(rep);
 
 		logMessage("Cookies before auth : ");
-		for (final Cookie ck : cookies) {
-			logMessage("Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = " + ck.getPath()
-			+ " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+		if(cookies != null) {
+			for (final Cookie ck : cookies) {
+				logMessage("Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = " + ck.getPath()
+				+ " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+			}
+		} else {
+			logMessage("Current 'Cookies' is null (none have ever been set yet).");
 		}
 
 		logMessage("Resource : " + resource.toString());
