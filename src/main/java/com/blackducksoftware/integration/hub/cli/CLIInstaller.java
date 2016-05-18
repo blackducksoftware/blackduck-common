@@ -29,6 +29,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
@@ -198,6 +199,8 @@ public class CLIInstaller {
 				writer.write(hubVersion);
 				writer.close();
 			}
+			final long cliTimestamp = hubVersionFile.lastModified();
+
 			URLConnection connection = null;
 			try {
 				Proxy proxy = null;
@@ -227,24 +230,32 @@ public class CLIInstaller {
 				} else {
 					connection = archive.openConnection();
 				}
+				connection.setIfModifiedSince(cliTimestamp);
 				connection.connect();
 			} catch (final IOException ioe) {
 				logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo.getCanonicalPath() + ": " + ioe.toString());
 				return false;
 			}
 
+			if (connection instanceof HttpURLConnection
+					&& ((HttpURLConnection) connection).getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
+				return false; // CLI has not been modified
+			}
+
+			final long sourceTimestamp = connection.getLastModified();
+
 			final File cliInstallDirectory = getCLIInstallDir();
 			if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
-				if (!cliMismatch)
+				if (!cliMismatch && sourceTimestamp == cliTimestamp)
 				{
 					return false; // already up to date
 				}
-
 				// delete directory contents
 				deleteFilesRecursive(cliInstallDirectory.listFiles());
 			} else {
 				cliInstallDirectory.mkdir();
 			}
+			hubVersionFile.setLastModified(sourceTimestamp);
 
 			logger.info("Unpacking " + archive.toString() + " to " + cliInstallDirectory.getCanonicalPath() + " on " + localHostName);
 
