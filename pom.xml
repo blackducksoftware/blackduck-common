@@ -1,11 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>com.blackducksoftware.integration</groupId>
   <artifactId>hub-common</artifactId>
-  <version>1.3.4-SNAPSHOT</version>
-
+  <version>1.3.4</version>
   <name>General Code for Hub Integration with CI systems</name>
   <inceptionYear>2015</inceptionYear>
   <organization>
@@ -18,7 +15,6 @@
       <url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1-standalone.html</url>
     </license>
   </licenses>
-
   <developers>
     <developer>
       <id>jrichard</id>
@@ -31,7 +27,6 @@
       <timezone>-5</timezone>
     </developer>
   </developers>
-
   <distributionManagement>
     <repository>
       <id>bds-int-public</id>
@@ -42,7 +37,6 @@
       <url>https://updates.suite.blackducksoftware.com/integrations/</url>
     </snapshotRepository>
   </distributionManagement>
-
   <properties>
     <build.info.version>2.0.2</build.info.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -50,7 +44,6 @@
     <project.resources.sourceEncoding>UTF-8</project.resources.sourceEncoding>
     <slf4j.version>1.7.5</slf4j.version>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
@@ -153,7 +146,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <repositories>
     <repository>
       <id>maven-restlet</id>
@@ -165,7 +157,6 @@
       <url>https://updates.suite.blackducksoftware.com/integrations/</url>
     </repository>
   </repositories>
-
   <build>
     <pluginManagement>
       <plugins>
