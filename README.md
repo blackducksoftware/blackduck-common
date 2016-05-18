@@ -17,4 +17,4 @@ Lastly, release tab on GitHub will contain the latest artifacts.
 All documentation for hub-common can be found on the base project:  https://github.com/blackducksoftware/hub-common/wiki
 
 ## License ##
-GNU Lesser General Public License v2.1 only
+Apache License 2.0
