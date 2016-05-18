@@ -304,12 +304,20 @@ public class HubIntRestService {
 			logMessage("");
 		}
 		logMessage("Request headers : ");
-		final Series<Header> requestheaders = (Series<Header>) resource.getRequest().getAttributes()
+		final Series<Header> requestHeaders = (Series<Header>) resource.getRequest().getAttributes()
 				.get(HeaderConstants.ATTRIBUTE_HEADERS);
-		for (final Header header : requestheaders) {
-			logMessage("Header name : " + header.getName());
-			logMessage("Header value : " + header.getValue());
-			logMessage("");
+		if (null == requestHeaders) {
+			logMessage("There are no request headers to log...");
+		} else {
+			for (final Header header : requestHeaders) {
+				if (null == header) {
+					logMessage("received a null header");
+				} else {
+					logMessage("Header name : " + header.getName());
+					logMessage("Header value : " + header.getValue());
+					logMessage("");
+				}
+			}
 		}
 
 		handleRequest(resource, null, 0);
