@@ -294,38 +294,55 @@ public class HubIntRestService {
 		logMessage("Resource : " + resource.toString());
 		logMessage("Request : " + resource.getRequest().toString());
 
-		logMessage("Request attributes : ");
-		for (final Entry<String, Object> requestAtt : resource.getRequest().getAttributes().entrySet()) {
-			logMessage("Attribute key : " + requestAtt.getKey());
-			logMessage("Attribute value : " + requestAtt.getValue());
-			logMessage("");
-		}
-		logMessage("Request headers : ");
-		final Series<Header> requestheaders = (Series<Header>) resource.getRequest().getAttributes()
-				.get(HeaderConstants.ATTRIBUTE_HEADERS);
-		for (final Header header : requestheaders) {
-			logMessage("Header name : " + header.getName());
-			logMessage("Header value : " + header.getValue());
-			logMessage("");
+		if (!resource.getRequest().getAttributes().isEmpty()) {
+			logMessage("Request attributes : ");
+			for (final Entry<String, Object> requestAtt : resource.getRequest().getAttributes().entrySet()) {
+				logMessage("Attribute key : " + requestAtt.getKey());
+				logMessage("Attribute value : " + requestAtt.getValue());
+				logMessage("");
+			}
+			logMessage("Request headers : ");
+			final Series<Header> requestheaders = (Series<Header>) resource.getRequest().getAttributes()
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			if (requestheaders != null) {
+				logMessage("Request headers : ");
+				for (final Header header : requestheaders) {
+					logMessage("Header name : " + header.getName());
+					logMessage("Header value : " + header.getValue());
+					logMessage("");
+				}
+			} else {
+				logMessage("Request headers : NONE");
+			}
+		} else {
+			logMessage("Request does not have any attributes/headers.");
 		}
 
 		handleRequest(resource, null, 0);
 
 		logMessage("Response : " + resource.getResponse().toString());
 
-		logMessage("Response attributes : ");
-		for (final Entry<String, Object> requestAtt : resource.getResponse().getAttributes().entrySet()) {
-			logMessage("Attribute key : " + requestAtt.getKey());
-			logMessage("Attribute value : " + requestAtt.getValue());
-			logMessage("");
-		}
-		logMessage("Response headers : ");
-		final Series<Header> responseheaders = (Series<Header>) resource.getResponse().getAttributes()
-				.get(HeaderConstants.ATTRIBUTE_HEADERS);
-		for (final Header header : responseheaders) {
-			logMessage("Header name : " + header.getName());
-			logMessage("Header value : " + header.getValue());
-			logMessage("");
+		if (!resource.getResponse().getAttributes().isEmpty()) {
+			logMessage("Response attributes : ");
+			for (final Entry<String, Object> requestAtt : resource.getResponse().getAttributes().entrySet()) {
+				logMessage("Attribute key : " + requestAtt.getKey());
+				logMessage("Attribute value : " + requestAtt.getValue());
+				logMessage("");
+			}
+			final Series<Header> responseheaders = (Series<Header>) resource.getResponse().getAttributes()
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			if (responseheaders != null) {
+				logMessage("Response headers : ");
+				for (final Header header : responseheaders) {
+					logMessage("Header name : " + header.getName());
+					logMessage("Header value : " + header.getValue());
+					logMessage("");
+				}
+			} else {
+				logMessage("Response headers : NONE");
+			}
+		} else {
+			logMessage("Response does not have any attributes/headers.");
 		}
 
 		logMessage("Status Code : " + resource.getResponse().getStatus().getCode());
@@ -367,9 +384,13 @@ public class HubIntRestService {
 				cookies = requestCookies;
 
 				logMessage("Cookies after auth : ");
-				for (final Cookie ck : cookies) {
-					logMessage("Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
-							+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+				if (cookies != null) {
+					for (final Cookie ck : cookies) {
+						logMessage("Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
+								+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+					}
+				} else {
+					logMessage("New 'Cookies' are null.");
 				}
 			}
 		} else {
