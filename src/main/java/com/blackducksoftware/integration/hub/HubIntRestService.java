@@ -1,20 +1,23 @@
 /*******************************************************************************
- * Black Duck Software Suite SDK
  * Copyright (C) 2016 Black Duck Software, Inc.
+ * http://www.blackducksoftware.com/
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  *******************************************************************************/
 package com.blackducksoftware.integration.hub;
 
@@ -282,10 +285,10 @@ public class HubIntRestService {
 		resource.getRequest().setEntity(rep);
 
 		logMessage("Cookies before auth : ");
-		if(cookies != null) {
+		if (cookies != null) {
 			for (final Cookie ck : cookies) {
-				logMessage("Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = " + ck.getPath()
-				+ " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+				logMessage("Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
+						+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
 			}
 		} else {
 			logMessage("Current 'Cookies' is null (none have ever been set yet).");
@@ -307,9 +310,13 @@ public class HubIntRestService {
 			if (requestheaders != null) {
 				logMessage("Request headers : ");
 				for (final Header header : requestheaders) {
-					logMessage("Header name : " + header.getName());
-					logMessage("Header value : " + header.getValue());
-					logMessage("");
+					if (null == header) {
+						logMessage("received a null header");
+					} else {
+						logMessage("Header name : " + header.getName());
+						logMessage("Header value : " + header.getValue());
+						logMessage("");
+					}
 				}
 			} else {
 				logMessage("Request headers : NONE");
@@ -334,9 +341,13 @@ public class HubIntRestService {
 			if (responseheaders != null) {
 				logMessage("Response headers : ");
 				for (final Header header : responseheaders) {
-					logMessage("Header name : " + header.getName());
-					logMessage("Header value : " + header.getValue());
-					logMessage("");
+					if (null == header) {
+						logMessage("received a null header");
+					} else {
+						logMessage("Header name : " + header.getName());
+						logMessage("Header value : " + header.getValue());
+						logMessage("");
+					}
 				}
 			} else {
 				logMessage("Response headers : NONE");
@@ -349,49 +360,46 @@ public class HubIntRestService {
 
 		final int statusCode = resource.getResponse().getStatus().getCode();
 		if (statusCode == 204) {
-			if (cookies == null) {
-				final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
-				if (cookieSettings != null) {
-					logMessage("Set-Cookies returned : " + cookieSettings.size());
-				} else {
-					logMessage("Set-Cookies returned : " + null);
-				}
+			final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
+			if (cookieSettings != null) {
+				logMessage("Set-Cookies returned : " + cookieSettings.size());
+			} else {
+				logMessage("Set-Cookies returned : NULL");
+			}
 
-				final Series<Cookie> requestCookies = resource.getRequest().getCookies();
-				if (cookieSettings != null && !cookieSettings.isEmpty()) {
-					for (final CookieSetting ck : cookieSettings) {
-						if (ck == null) {
-							continue;
-						}
-						logMessage("Set-Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain()
-						+ " , path = " + ck.getPath() + " , value = " + ck.getValue() + " , version = "
-						+ ck.getVersion());
-
-						final Cookie cookie = new Cookie();
-						cookie.setName(ck.getName());
-						cookie.setDomain(ck.getDomain());
-						cookie.setPath(ck.getPath());
-						cookie.setValue(ck.getValue());
-						cookie.setVersion(ck.getVersion());
-						requestCookies.add(cookie);
+			final Series<Cookie> requestCookies = resource.getRequest().getCookies();
+			if (cookieSettings != null && !cookieSettings.isEmpty()) {
+				for (final CookieSetting ck : cookieSettings) {
+					if (ck == null) {
+						continue;
 					}
-				}
-				if (requestCookies == null || requestCookies.size() == 0) {
-					throw new HubIntegrationException(
-							"Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
-				}
+					logMessage("Set-Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
+							+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
 
-				cookies = requestCookies;
-
-				logMessage("Cookies after auth : ");
-				if (cookies != null) {
-					for (final Cookie ck : cookies) {
-						logMessage("Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
-								+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
-					}
-				} else {
-					logMessage("New 'Cookies' are null.");
+					final Cookie cookie = new Cookie();
+					cookie.setName(ck.getName());
+					cookie.setDomain(ck.getDomain());
+					cookie.setPath(ck.getPath());
+					cookie.setValue(ck.getValue());
+					cookie.setVersion(ck.getVersion());
+					requestCookies.add(cookie);
 				}
+			}
+			if (requestCookies == null || requestCookies.size() == 0) {
+				throw new HubIntegrationException(
+						"Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
+			}
+
+			cookies = requestCookies;
+
+			logMessage("Cookies after auth : ");
+			if (cookies != null) {
+				for (final Cookie ck : cookies) {
+					logMessage("Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
+							+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+				}
+			} else {
+				logMessage("New 'Cookies' are null.");
 			}
 		} else {
 			throw new HubIntegrationException(resource.getResponse().getStatus().toString());
@@ -1016,4 +1024,5 @@ public class HubIntRestService {
 			throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
 		}
 	}
+
 }
