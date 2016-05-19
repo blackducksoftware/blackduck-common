@@ -81,6 +81,8 @@ import com.google.gson.reflect.TypeToken;
 
 public class HubIntRestService {
 
+    private static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
     private Series<Cookie> cookies;
 
     private final String baseUrl;
@@ -497,7 +499,7 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
-	if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+	if (success(responseCode)) {
 	    final String response = readResponseAsString(resource.getResponse());
 	    final Gson gson = new GsonBuilder().create();
 	    final JsonParser parser = new JsonParser();
@@ -530,7 +532,7 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
-	if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+	if (success(responseCode)) {
 	    final String response = readResponseAsString(resource.getResponse());
 	    final Gson gson = new GsonBuilder().create();
 	    final JsonParser parser = new JsonParser();
@@ -567,7 +569,7 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
-	if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+	if (success(responseCode)) {
 	    final String response = readResponseAsString(resource.getResponse());
 	    final Gson gson = new GsonBuilder().create();
 	    return gson.fromJson(response, ProjectItem.class);
@@ -587,7 +589,7 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
-	if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+	if (success(responseCode)) {
 	    final String response = readResponseAsString(resource.getResponse());
 	    final Gson gson = new GsonBuilder().create();
 	    return gson.fromJson(response, ReleaseItem.class);
@@ -631,7 +633,7 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
-	if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+	if (success(responseCode)) {
 	    final String response = readResponseAsString(resource.getResponse());
 
 	    final Gson gson = new GsonBuilder().create();
@@ -777,7 +779,7 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	responseCode = resource.getResponse().getStatus().getCode();
 
-	if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+	if (success(responseCode)) {
 	    final Response resp = resource.getResponse();
 	    return resp.getEntityAsText();
 	} else {
@@ -806,7 +808,7 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	responseCode = resource.getResponse().getStatus().getCode();
 
-	if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+	if (success(responseCode)) {
 
 	    final String response = readResponseAsString(resource.getResponse());
 	    final Gson gson = new GsonBuilder().create();
@@ -1130,38 +1132,22 @@ public class HubIntRestService {
      *            The type of the returned object.
      * @param url
      *            The absolute URL for the resource.
-     * @param dateFormat
-     *            If modelClass contains Date objects, specify the date format
-     *            via which dates in the data returned from the Hub should be
-     *            interpreted. If null, the default Gson date format is used.
      * @return The resource gotten from the Hub.
      * @throws ResourceDoesNotExistException
      * @throws URISyntaxException
      * @throws IOException
      */
-    public <T> T getFromAbsoluteUrl(Class<T> modelClass, String url,
-	    String dateFormat) throws ResourceDoesNotExistException,
-	    URISyntaxException, IOException {
+    public <T> T getFromAbsoluteUrl(Class<T> modelClass, String url)
+	    throws ResourceDoesNotExistException, URISyntaxException,
+	    IOException {
 
-	initReusableClientResourceForGet();
-	Reference queryRef = new Reference(url);
-	reUsableResource.setReference(queryRef);
-	reUsableResource.handle();
+	Reference queryRef = createReference(url);
+	initReusableClientResourceForGet(queryRef);
 
 	logMessage(LogLevel.DEBUG, "Resource: " + reUsableResource);
-	int responseCode = reUsableResource.getResponse().getStatus().getCode();
-	if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-	    logMessage(LogLevel.DEBUG, "SUCCESS getting resource from Hub");
-	    final String response = readResponseAsString(reUsableResource
-		    .getResponse());
-
-	    Gson gson = getGson(dateFormat);
-
-	    JsonParser parser = new JsonParser();
-	    JsonObject json = parser.parse(response).getAsJsonObject();
-
-	    T modelObject = gson.fromJson(json, modelClass);
-	    return modelObject;
+	int responseCode = getResponseStatusCode(reUsableResource);
+	if (success(responseCode)) {
+	    return parseResponse(modelClass, reUsableResource);
 	} else {
 	    throw new ResourceDoesNotExistException(
 		    "Error getting resource from " + url + ": " + responseCode,
@@ -1181,10 +1167,6 @@ public class HubIntRestService {
      *            URL segments to add to the base Hub URL.
      * @param queryParameters
      *            Query parameters to add to the URL.
-     * @param dateFormat
-     *            If modelClass contains Date objects, specify the date format
-     *            via which dates in the data returned from the Hub should be
-     *            interpreted. If null, the default Gson date format is used.
      * @return The resource gotten from the Hub.
      * @throws IOException
      * @throws ResourceDoesNotExistException
@@ -1192,35 +1174,18 @@ public class HubIntRestService {
      */
     public <T> T getFromRelativeUrl(Class<T> modelClass,
 	    List<String> urlSegments,
-	    Set<AbstractMap.SimpleEntry<String, String>> queryParameters,
-	    String dateFormat) throws IOException,
-	    ResourceDoesNotExistException, URISyntaxException {
+	    Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
+	    throws IOException, ResourceDoesNotExistException,
+	    URISyntaxException {
 
-	initReusableClientResourceForGet();
-	Reference queryRef = new Reference(getBaseUrl());
-	for (String urlSegment : urlSegments) {
-	    queryRef.addSegment(urlSegment);
-	}
-	for (AbstractMap.SimpleEntry<String, String> queryParameter : queryParameters) {
-	    queryRef.addQueryParameter(queryParameter.getKey(),
-		    queryParameter.getValue());
-	}
-	reUsableResource.setReference(queryRef);
-	reUsableResource.handle();
+	Reference queryRef = createReference(urlSegments, queryParameters);
+	initReusableClientResourceForGet(queryRef);
 
 	logMessage(LogLevel.DEBUG, "Resource: " + reUsableResource);
-	int responseCode = reUsableResource.getResponse().getStatus().getCode();
+	int responseCode = getResponseStatusCode(reUsableResource);
 
-	if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
-	    final String response = readResponseAsString(reUsableResource
-		    .getResponse());
-
-	    Gson gson = getGson(dateFormat);
-	    JsonParser parser = new JsonParser();
-	    JsonObject json = parser.parse(response).getAsJsonObject();
-	    T modelObject = gson.fromJson(json, modelClass);
-
-	    return modelObject;
+	if (success(responseCode)) {
+	    return parseResponse(modelClass, reUsableResource);
 	} else {
 	    throw new ResourceDoesNotExistException(
 		    "Error getting resource from relative url segments "
@@ -1230,25 +1195,55 @@ public class HubIntRestService {
 	}
     }
 
-    private void initReusableClientResourceForGet() throws URISyntaxException {
+    private int getResponseStatusCode(ClientResource resource) {
+	return resource.getResponse().getStatus().getCode();
+    }
+
+    private Reference createReference(String url) {
+	Reference queryRef = new Reference(url);
+	return queryRef;
+    }
+
+    private boolean success(int responseCode) {
+	return responseCode == 200 || responseCode == 204
+		|| responseCode == 202;
+    }
+
+    private Reference createReference(List<String> urlSegments,
+	    Set<AbstractMap.SimpleEntry<String, String>> queryParameters) {
+	Reference queryRef = new Reference(getBaseUrl());
+	for (String urlSegment : urlSegments) {
+	    queryRef.addSegment(urlSegment);
+	}
+	for (AbstractMap.SimpleEntry<String, String> queryParameter : queryParameters) {
+	    queryRef.addQueryParameter(queryParameter.getKey(),
+		    queryParameter.getValue());
+	}
+	return queryRef;
+    }
+
+    private <T> T parseResponse(Class<T> modelClass, ClientResource resource)
+	    throws IOException {
+	final String response = readResponseAsString(resource.getResponse());
+	Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
+	JsonParser parser = new JsonParser();
+	JsonObject json = parser.parse(response).getAsJsonObject();
+	T modelObject = gson.fromJson(json, modelClass);
+	return modelObject;
+    }
+
+    private void initReusableClientResourceForGet(Reference queryRef)
+	    throws URISyntaxException {
 	initReusableClientResource();
 	reUsableResource.setMethod(Method.GET);
-
+	reUsableResource.setReference(queryRef);
+	reUsableResource.handle();
     }
 
     private void initReusableClientResource() throws URISyntaxException {
 	if (reUsableResource == null) {
 	    reUsableResource = createClientResource();
 	}
-    }
-
-    private Gson getGson(String dateFormat) {
-	GsonBuilder gsonBuilder = new GsonBuilder();
-	if (dateFormat != null) {
-	    gsonBuilder.setDateFormat(dateFormat);
-	}
-	Gson gson = gsonBuilder.create();
-	return gson;
     }
 
     private String readResponseAsString(final Response response)
