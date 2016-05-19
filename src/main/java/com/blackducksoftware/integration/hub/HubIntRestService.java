@@ -46,7 +46,6 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.engine.header.Header;
 import org.restlet.engine.header.HeaderConstants;
-import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
@@ -286,20 +285,21 @@ public class HubIntRestService {
 
 		final ClientResource resource = createClientResource();
 		resource.addSegment("j_spring_security_check");
-		resource.addQueryParameter("j_username", hubUserName);
-		resource.addQueryParameter("j_password", hubPassword);
-
 		resource.setMethod(Method.POST);
 
-		final EmptyRepresentation rep = new EmptyRepresentation();
-		resource.getRequest().setEntity(rep);
+
+		final StringRepresentation stringRep = new StringRepresentation(
+				"j_username=" + hubUserName + "&j_password=" + hubPassword);
+		stringRep.setCharacterSet(CharacterSet.UTF_8);
+		stringRep.setMediaType(MediaType.APPLICATION_WWW_FORM);
+		resource.getRequest().setEntity(stringRep);
 
 		logMessage(LogLevel.TRACE, "Cookies before auth : ");
 		if (cookies != null) {
 			for (final Cookie ck : cookies) {
 				logMessage(LogLevel.TRACE,
 						"Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
-						+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+								+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
 			}
 		} else {
 			logMessage(LogLevel.TRACE, "Current 'Cookies' is null (none have ever been set yet).");
@@ -386,7 +386,7 @@ public class HubIntRestService {
 					}
 					logMessage(LogLevel.TRACE,
 							"Set-Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
-							+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+									+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
 
 					final Cookie cookie = new Cookie();
 					cookie.setName(ck.getName());
@@ -409,7 +409,7 @@ public class HubIntRestService {
 				for (final Cookie ck : cookies) {
 					logMessage(LogLevel.TRACE,
 							"Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
-							+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+									+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
 				}
 			} else {
 				logMessage(LogLevel.TRACE, "New 'Cookies' are null.");
