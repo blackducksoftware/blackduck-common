@@ -1199,14 +1199,15 @@ public class HubIntRestService {
 	return resource.getResponse().getStatus().getCode();
     }
 
+    /**
+     * This method exists for code symmetry with the other createReference()
+     * method.
+     * 
+     * @param url
+     * @return
+     */
     private Reference createReference(String url) {
-	Reference queryRef = new Reference(url);
-	return queryRef;
-    }
-
-    private boolean success(int responseCode) {
-	return responseCode == 200 || responseCode == 204
-		|| responseCode == 202;
+	return new Reference(url);
     }
 
     private Reference createReference(List<String> urlSegments,
@@ -1220,6 +1221,11 @@ public class HubIntRestService {
 		    queryParameter.getValue());
 	}
 	return queryRef;
+    }
+
+    private boolean success(int responseCode) {
+	return responseCode == 200 || responseCode == 204
+		|| responseCode == 202;
     }
 
     private <T> T parseResponse(Class<T> modelClass, ClientResource resource)
