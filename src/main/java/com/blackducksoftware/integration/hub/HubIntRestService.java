@@ -1142,16 +1142,16 @@ public class HubIntRestService {
 	    IOException {
 
 	Reference queryRef = createReference(url);
-	initReusableClientResourceForGet(queryRef);
+	ClientResource resource = getResource(queryRef);
 
-	logMessage(LogLevel.DEBUG, "Resource: " + reUsableResource);
-	int responseCode = getResponseStatusCode(reUsableResource);
+	logMessage(LogLevel.DEBUG, "Resource: " + resource);
+	int responseCode = getResponseStatusCode(resource);
 	if (success(responseCode)) {
-	    return parseResponse(modelClass, reUsableResource);
+	    return parseResponse(modelClass, resource);
 	} else {
 	    throw new ResourceDoesNotExistException(
 		    "Error getting resource from " + url + ": " + responseCode,
-		    reUsableResource);
+		    resource);
 	}
     }
 
@@ -1179,19 +1179,19 @@ public class HubIntRestService {
 	    URISyntaxException {
 
 	Reference queryRef = createReference(urlSegments, queryParameters);
-	initReusableClientResourceForGet(queryRef);
+	ClientResource resource = getResource(queryRef);
 
-	logMessage(LogLevel.DEBUG, "Resource: " + reUsableResource);
-	int responseCode = getResponseStatusCode(reUsableResource);
+	logMessage(LogLevel.DEBUG, "Resource: " + resource);
+	int responseCode = getResponseStatusCode(resource);
 
 	if (success(responseCode)) {
-	    return parseResponse(modelClass, reUsableResource);
+	    return parseResponse(modelClass, resource);
 	} else {
 	    throw new ResourceDoesNotExistException(
 		    "Error getting resource from relative url segments "
 			    + urlSegments + " and query parameters "
 			    + queryParameters + "; errorCode: " + responseCode,
-		    reUsableResource);
+			    resource);
 	}
     }
 
@@ -1238,12 +1238,13 @@ public class HubIntRestService {
 	return modelObject;
     }
 
-    private void initReusableClientResourceForGet(Reference queryRef)
+    private ClientResource getResource(Reference queryRef)
 	    throws URISyntaxException {
 	initReusableClientResource();
 	reUsableResource.setMethod(Method.GET);
 	reUsableResource.setReference(queryRef);
 	reUsableResource.handle();
+	return reUsableResource;
     }
 
     private void initReusableClientResource() throws URISyntaxException {
