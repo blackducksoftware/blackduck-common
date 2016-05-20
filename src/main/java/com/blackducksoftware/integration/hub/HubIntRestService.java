@@ -21,9 +21,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
@@ -71,6 +69,7 @@ import com.blackducksoftware.integration.hub.report.api.VersionReport;
 import com.blackducksoftware.integration.hub.scan.api.ScanLocationItem;
 import com.blackducksoftware.integration.hub.scan.api.ScanLocationResults;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
+import com.blackducksoftware.integration.hub.util.RestletUtil;
 import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -80,8 +79,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class HubIntRestService {
-
-    private static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     private Series<Cookie> cookies;
 
@@ -97,8 +94,9 @@ public class HubIntRestService {
 
     private ClientResource reUsableResource;
 
-    public HubIntRestService(final String baseUrl) {
+    public HubIntRestService(final String baseUrl) throws URISyntaxException {
 	this.baseUrl = baseUrl;
+	reUsableResource = createClientResource();
     }
 
     public void setTimeout(final int timeout) {
@@ -499,8 +497,9 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
-	if (success(responseCode)) {
-	    final String response = readResponseAsString(resource.getResponse());
+	if (RestletUtil.isSuccess(responseCode)) {
+	    final String response = RestletUtil.readResponseAsString(resource
+		    .getResponse());
 	    final Gson gson = new GsonBuilder().create();
 	    final JsonParser parser = new JsonParser();
 	    final JsonObject json = parser.parse(response).getAsJsonObject();
@@ -532,8 +531,9 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
-	if (success(responseCode)) {
-	    final String response = readResponseAsString(resource.getResponse());
+	if (RestletUtil.isSuccess(responseCode)) {
+	    final String response = RestletUtil.readResponseAsString(resource
+		    .getResponse());
 	    final Gson gson = new GsonBuilder().create();
 	    final JsonParser parser = new JsonParser();
 	    final JsonObject json = parser.parse(response).getAsJsonObject();
@@ -569,8 +569,9 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
-	if (success(responseCode)) {
-	    final String response = readResponseAsString(resource.getResponse());
+	if (RestletUtil.isSuccess(responseCode)) {
+	    final String response = RestletUtil.readResponseAsString(resource
+		    .getResponse());
 	    final Gson gson = new GsonBuilder().create();
 	    return gson.fromJson(response, ProjectItem.class);
 
@@ -589,8 +590,9 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
-	if (success(responseCode)) {
-	    final String response = readResponseAsString(resource.getResponse());
+	if (RestletUtil.isSuccess(responseCode)) {
+	    final String response = RestletUtil.readResponseAsString(resource
+		    .getResponse());
 	    final Gson gson = new GsonBuilder().create();
 	    return gson.fromJson(response, ReleaseItem.class);
 
@@ -633,8 +635,9 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
-	if (success(responseCode)) {
-	    final String response = readResponseAsString(resource.getResponse());
+	if (RestletUtil.isSuccess(responseCode)) {
+	    final String response = RestletUtil.readResponseAsString(resource
+		    .getResponse());
 
 	    final Gson gson = new GsonBuilder().create();
 	    final JsonParser parser = new JsonParser();
@@ -779,7 +782,7 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	responseCode = resource.getResponse().getStatus().getCode();
 
-	if (success(responseCode)) {
+	if (RestletUtil.isSuccess(responseCode)) {
 	    final Response resp = resource.getResponse();
 	    return resp.getEntityAsText();
 	} else {
@@ -808,9 +811,10 @@ public class HubIntRestService {
 	handleRequest(resource, null, 0);
 	responseCode = resource.getResponse().getStatus().getCode();
 
-	if (success(responseCode)) {
+	if (RestletUtil.isSuccess(responseCode)) {
 
-	    final String response = readResponseAsString(resource.getResponse());
+	    final String response = RestletUtil.readResponseAsString(resource
+		    .getResponse());
 	    final Gson gson = new GsonBuilder().create();
 	    final VersionComparison comparison = gson.fromJson(response,
 		    VersionComparison.class);
@@ -862,8 +866,8 @@ public class HubIntRestService {
 		    .getCode();
 
 	    if (responseCode == 200) {
-		final String response = readResponseAsString(resource
-			.getResponse());
+		final String response = RestletUtil
+			.readResponseAsString(resource.getResponse());
 		final ScanLocationResults results = new Gson().fromJson(
 			response, ScanLocationResults.class);
 		final ScanLocationItem currentCodeLocation = getScanLocationMatch(
@@ -1012,7 +1016,8 @@ public class HubIntRestService {
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
 	if (responseCode == 200) {
-	    final String response = readResponseAsString(resource.getResponse());
+	    final String response = RestletUtil.readResponseAsString(resource
+		    .getResponse());
 
 	    return new Gson().fromJson(response, ReportInformationItem.class);
 	} else {
@@ -1038,7 +1043,8 @@ public class HubIntRestService {
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
 	if (responseCode == 200) {
-	    final String response = readResponseAsString(resource.getResponse());
+	    final String response = RestletUtil.readResponseAsString(resource
+		    .getResponse());
 
 	    final Gson gson = new GsonBuilder().create();
 
@@ -1079,7 +1085,8 @@ public class HubIntRestService {
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
 	if (responseCode == 200) {
-	    final String response = readResponseAsString(resource.getResponse());
+	    final String response = RestletUtil.readResponseAsString(resource
+		    .getResponse());
 
 	    final Gson gson = new GsonBuilder().create();
 	    final PolicyStatus status = gson.fromJson(response,
@@ -1110,7 +1117,8 @@ public class HubIntRestService {
 	final int responseCode = resource.getResponse().getStatus().getCode();
 
 	if (responseCode == 200) {
-	    final String response = readResponseAsString(resource.getResponse());
+	    final String response = RestletUtil.readResponseAsString(resource
+		    .getResponse());
 
 	    final Gson gson = new GsonBuilder().create();
 
@@ -1126,7 +1134,7 @@ public class HubIntRestService {
     }
 
     /**
-     * Get a resource from Hub via an absolute URL.
+     * Get a resource from via an absolute URL.
      * 
      * @param modelClass
      *            The type of the returned object.
@@ -1141,13 +1149,14 @@ public class HubIntRestService {
 	    throws ResourceDoesNotExistException, URISyntaxException,
 	    IOException {
 
-	Reference queryRef = createReference(url);
-	ClientResource resource = getResource(queryRef);
+	Reference queryRef = RestletUtil.createReference(url);
+	ClientResource resource = RestletUtil.getResource(reUsableResource,
+		queryRef);
 
 	logMessage(LogLevel.DEBUG, "Resource: " + resource);
-	int responseCode = getResponseStatusCode(resource);
-	if (success(responseCode)) {
-	    return parseResponse(modelClass, resource);
+	int responseCode = RestletUtil.getResponseStatusCode(resource);
+	if (RestletUtil.isSuccess(responseCode)) {
+	    return RestletUtil.parseResponse(modelClass, resource);
 	} else {
 	    throw new ResourceDoesNotExistException(
 		    "Error getting resource from " + url + ": " + responseCode,
@@ -1156,7 +1165,7 @@ public class HubIntRestService {
     }
 
     /**
-     * Get a resource from Hub via a relative URL.
+     * Get a resource via a relative URL.
      * 
      * This method uses (and, if necessary, initializes) the re-usable
      * ClientResource object.
@@ -1178,96 +1187,23 @@ public class HubIntRestService {
 	    throws IOException, ResourceDoesNotExistException,
 	    URISyntaxException {
 
-	Reference queryRef = createReference(urlSegments, queryParameters);
-	ClientResource resource = getResource(queryRef);
+	Reference queryRef = RestletUtil.createReference(getBaseUrl(),
+		urlSegments, queryParameters);
+	ClientResource resource = RestletUtil.getResource(reUsableResource,
+		queryRef);
 
 	logMessage(LogLevel.DEBUG, "Resource: " + resource);
-	int responseCode = getResponseStatusCode(resource);
+	int responseCode = RestletUtil.getResponseStatusCode(resource);
 
-	if (success(responseCode)) {
-	    return parseResponse(modelClass, resource);
+	if (RestletUtil.isSuccess(responseCode)) {
+	    return RestletUtil.parseResponse(modelClass, resource);
 	} else {
 	    throw new ResourceDoesNotExistException(
 		    "Error getting resource from relative url segments "
 			    + urlSegments + " and query parameters "
 			    + queryParameters + "; errorCode: " + responseCode,
-			    resource);
+		    resource);
 	}
-    }
-
-    private int getResponseStatusCode(ClientResource resource) {
-	return resource.getResponse().getStatus().getCode();
-    }
-
-    /**
-     * This method exists for code symmetry with the other createReference()
-     * method.
-     * 
-     * @param url
-     * @return
-     */
-    private Reference createReference(String url) {
-	return new Reference(url);
-    }
-
-    private Reference createReference(List<String> urlSegments,
-	    Set<AbstractMap.SimpleEntry<String, String>> queryParameters) {
-	Reference queryRef = new Reference(getBaseUrl());
-	for (String urlSegment : urlSegments) {
-	    queryRef.addSegment(urlSegment);
-	}
-	for (AbstractMap.SimpleEntry<String, String> queryParameter : queryParameters) {
-	    queryRef.addQueryParameter(queryParameter.getKey(),
-		    queryParameter.getValue());
-	}
-	return queryRef;
-    }
-
-    private boolean success(int responseCode) {
-	return responseCode == 200 || responseCode == 204
-		|| responseCode == 202;
-    }
-
-    private <T> T parseResponse(Class<T> modelClass, ClientResource resource)
-	    throws IOException {
-	final String response = readResponseAsString(resource.getResponse());
-	Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
-	JsonParser parser = new JsonParser();
-	JsonObject json = parser.parse(response).getAsJsonObject();
-	T modelObject = gson.fromJson(json, modelClass);
-	return modelObject;
-    }
-
-    private ClientResource getResource(Reference queryRef)
-	    throws URISyntaxException {
-	initReusableClientResource();
-	reUsableResource.setMethod(Method.GET);
-	reUsableResource.setReference(queryRef);
-	reUsableResource.handle();
-	return reUsableResource;
-    }
-
-    private void initReusableClientResource() throws URISyntaxException {
-	if (reUsableResource == null) {
-	    reUsableResource = createClientResource();
-	}
-    }
-
-    private String readResponseAsString(final Response response)
-	    throws IOException {
-	final StringBuilder sb = new StringBuilder();
-	final Reader reader = response.getEntity().getReader();
-	final BufferedReader bufReader = new BufferedReader(reader);
-	try {
-	    String line;
-	    while ((line = bufReader.readLine()) != null) {
-		sb.append(line);
-		sb.append("\n");
-	    }
-	} finally {
-	    bufReader.close();
-	}
-	return sb.toString();
     }
 
     private void handleRequest(final ClientResource resource,
