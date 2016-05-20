@@ -83,8 +83,8 @@ public class ItemService {
 	    throw new ResourceDoesNotExistException(
 		    "Error getting resource from relative url segments "
 			    + urlSegments + " and query parameters "
-			    + queryParameters + "; errorCode: " + responseCode,
-		    resource);
+			    + queryParameters + "; errorCode: " + responseCode
+			    + "; " + resource, resource);
 	}
     }
 
