@@ -27,8 +27,6 @@ import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.net.Authenticator;
 import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -286,8 +284,14 @@ public class HubIntRestService {
 	public int setCookies(final String hubUserName, final String hubPassword)
 			throws HubIntegrationException, URISyntaxException, BDRestException {
 		final CookieHandler originalCookieHandler = CookieHandler.getDefault();
-		try{
-			CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+		if (originalCookieHandler != null) {
+			logMessage(LogLevel.TRACE, "Original Cookie Handler : " + originalCookieHandler.toString());
+		} else {
+			logMessage(LogLevel.TRACE, "Original Cookie Handler : NULL");
+		}
+		try {
+			logMessage(LogLevel.TRACE, "Setting Cookie Handler to NULL");
+			CookieHandler.setDefault(null);
 
 			final ClientResource resource = createClientResource();
 			resource.addSegment("j_spring_security_check");
@@ -403,6 +407,7 @@ public class HubIntRestService {
 						requestCookies.add(cookie);
 					}
 				}
+
 				if (requestCookies == null || requestCookies.size() == 0) {
 					throw new HubIntegrationException(
 							"Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
@@ -425,7 +430,12 @@ public class HubIntRestService {
 			}
 
 			return resource.getResponse().getStatus().getCode();
-		}finally{
+		} finally {
+			if (originalCookieHandler != null) {
+				logMessage(LogLevel.TRACE, "Setting Original Cookie Handler : " + originalCookieHandler.toString());
+			} else {
+				logMessage(LogLevel.TRACE, "Setting Original Cookie Handler : NULL");
+			}
 			CookieHandler.setDefault(originalCookieHandler);
 		}
 	}
