@@ -167,13 +167,16 @@ public class CLIInstaller {
 				return HubSupportHelper.getLinuxCLIWrapperLink(restService.getBaseUrl());
 			}
 		} catch (final URISyntaxException e) {
-			logger.error(e.getMessage(), e);
+			if (logger != null) {
+				logger.error(e.getMessage(), e);
+			}
 		}
 		return null;
 
 	}
 
-	private boolean customInstall(final URL archive, String hubVersion, final String localHostName, final IntLogger logger) throws IOException, InterruptedException,
+	public void customInstall(final URL archive, String hubVersion, final String localHostName,
+			final IntLogger logger) throws IOException, InterruptedException,
 	HubIntegrationException {
 
 		try {
@@ -198,6 +201,7 @@ public class CLIInstaller {
 				final FileWriter writer = new FileWriter(hubVersionFile);
 				writer.write(hubVersion);
 				writer.close();
+				hubVersionFile.setLastModified(0L);
 			}
 			final long cliTimestamp = hubVersionFile.lastModified();
 
@@ -234,12 +238,12 @@ public class CLIInstaller {
 				connection.connect();
 			} catch (final IOException ioe) {
 				logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo.getCanonicalPath() + ": " + ioe.toString());
-				return false;
+				return;
 			}
 
 			if (connection instanceof HttpURLConnection
 					&& ((HttpURLConnection) connection).getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
-				return false; // CLI has not been modified
+				return; // CLI has not been modified
 			}
 
 			final long sourceTimestamp = connection.getLastModified();
@@ -248,7 +252,7 @@ public class CLIInstaller {
 			if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
 				if (!cliMismatch && sourceTimestamp == cliTimestamp)
 				{
-					return false; // already up to date
+					return; // already up to date
 				}
 				// delete directory contents
 				deleteFilesRecursive(cliInstallDirectory.listFiles());
@@ -268,7 +272,7 @@ public class CLIInstaller {
 				throw new IOException(String.format("Failed to unpack %s (%d bytes read of total %d)",
 						archive, cis.getByteCount(), connection.getContentLength()), e);
 			}
-			return true;
+			return;
 		} catch (final IOException e) {
 			throw new IOException("Failed to install " + archive + " to " + directoryToInstallTo.getCanonicalPath(), e);
 		}
