@@ -96,7 +96,7 @@ public class HubIntRestService {
 
     public HubIntRestService(final String baseUrl) throws URISyntaxException {
 	this.baseUrl = baseUrl;
-	reUsableResource = createClientResource();
+
     }
 
     public void setTimeout(final int timeout) {
@@ -474,7 +474,8 @@ public class HubIntRestService {
 	    throw new HubIntegrationException(resource.getResponse()
 		    .getStatus().toString());
 	}
-
+	reUsableResource = createClientResource(); // Now that cookies are set,
+						   // we can create this
 	return resource.getResponse().getStatus().getCode();
     }
 
