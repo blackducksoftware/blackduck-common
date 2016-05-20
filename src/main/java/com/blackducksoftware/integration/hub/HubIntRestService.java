@@ -1159,8 +1159,8 @@ public class HubIntRestService {
 	    return RestletUtil.parseResponse(modelClass, resource);
 	} else {
 	    throw new ResourceDoesNotExistException(
-		    "Error getting resource from " + url + ": " + responseCode,
-		    resource);
+		    "Error getting resource from " + url + ": " + responseCode
+			    + "; " + resource.toString(), resource);
 	}
     }
 
@@ -1201,8 +1201,8 @@ public class HubIntRestService {
 	    throw new ResourceDoesNotExistException(
 		    "Error getting resource from relative url segments "
 			    + urlSegments + " and query parameters "
-			    + queryParameters + "; errorCode: " + responseCode,
-		    resource);
+			    + queryParameters + "; errorCode: " + responseCode
+			    + "; " + resource.toString(), resource);
 	}
     }
 
