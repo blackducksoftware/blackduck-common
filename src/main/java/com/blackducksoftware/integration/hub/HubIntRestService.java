@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.net.Authenticator;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -282,129 +285,22 @@ public class HubIntRestService {
 	 */
 	public int setCookies(final String hubUserName, final String hubPassword)
 			throws HubIntegrationException, URISyntaxException, BDRestException {
+		final CookieHandler originalCookieHandler = CookieHandler.getDefault();
+		try{
+			CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
 
-		final ClientResource resource = createClientResource();
-		resource.addSegment("j_spring_security_check");
-		resource.setMethod(Method.POST);
+			final ClientResource resource = createClientResource();
+			resource.addSegment("j_spring_security_check");
+			resource.setMethod(Method.POST);
 
 
-		final StringRepresentation stringRep = new StringRepresentation(
-				"j_username=" + hubUserName + "&j_password=" + hubPassword);
-		stringRep.setCharacterSet(CharacterSet.UTF_8);
-		stringRep.setMediaType(MediaType.APPLICATION_WWW_FORM);
-		resource.getRequest().setEntity(stringRep);
+			final StringRepresentation stringRep = new StringRepresentation(
+					"j_username=" + hubUserName + "&j_password=" + hubPassword);
+			stringRep.setCharacterSet(CharacterSet.UTF_8);
+			stringRep.setMediaType(MediaType.APPLICATION_WWW_FORM);
+			resource.getRequest().setEntity(stringRep);
 
-		logMessage(LogLevel.TRACE, "Cookies before auth : ");
-		if (cookies != null) {
-			for (final Cookie ck : cookies) {
-				logMessage(LogLevel.TRACE,
-						"Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
-								+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
-			}
-		} else {
-			logMessage(LogLevel.TRACE, "Current 'Cookies' is null (none have ever been set yet).");
-		}
-
-		logMessage(LogLevel.TRACE, "Resource : " + resource.toString());
-		logMessage(LogLevel.TRACE, "Request : " + resource.getRequest().toString());
-
-		if (!resource.getRequest().getAttributes().isEmpty()) {
-			logMessage(LogLevel.TRACE, "Request attributes : ");
-			for (final Entry<String, Object> requestAtt : resource.getRequest().getAttributes().entrySet()) {
-				logMessage(LogLevel.TRACE, "Attribute key : " + requestAtt.getKey());
-				logMessage(LogLevel.TRACE, "Attribute value : " + requestAtt.getValue());
-				logMessage(LogLevel.TRACE, "");
-			}
-			logMessage(LogLevel.TRACE, "Request headers : ");
-			final Series<Header> requestheaders = (Series<Header>) resource.getRequest().getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
-			if (requestheaders != null) {
-				logMessage(LogLevel.TRACE, "Request headers : ");
-				for (final Header header : requestheaders) {
-					if (null == header) {
-						logMessage(LogLevel.TRACE, "received a null header");
-					} else {
-						logMessage(LogLevel.TRACE, "Header name : " + header.getName());
-						logMessage(LogLevel.TRACE, "Header value : " + header.getValue());
-						logMessage(LogLevel.TRACE, "");
-					}
-				}
-			} else {
-				logMessage(LogLevel.TRACE, "Request headers : NONE");
-			}
-		} else {
-			logMessage(LogLevel.TRACE, "Request does not have any attributes/headers.");
-		}
-
-		handleRequest(resource, null, 0);
-
-		logMessage(LogLevel.TRACE, "Response : " + resource.getResponse().toString());
-
-		if (!resource.getResponse().getAttributes().isEmpty()) {
-			logMessage(LogLevel.TRACE, "Response attributes : ");
-			for (final Entry<String, Object> requestAtt : resource.getResponse().getAttributes().entrySet()) {
-				logMessage(LogLevel.TRACE, "Attribute key : " + requestAtt.getKey());
-				logMessage(LogLevel.TRACE, "Attribute value : " + requestAtt.getValue());
-				logMessage(LogLevel.TRACE, "");
-			}
-			final Series<Header> responseheaders = (Series<Header>) resource.getResponse().getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
-			if (responseheaders != null) {
-				logMessage(LogLevel.TRACE, "Response headers : ");
-				for (final Header header : responseheaders) {
-					if (null == header) {
-						logMessage(LogLevel.TRACE, "received a null header");
-					} else {
-						logMessage(LogLevel.TRACE, "Header name : " + header.getName());
-						logMessage(LogLevel.TRACE, "Header value : " + header.getValue());
-						logMessage(LogLevel.TRACE, "");
-					}
-				}
-			} else {
-				logMessage(LogLevel.TRACE, "Response headers : NONE");
-			}
-		} else {
-			logMessage(LogLevel.TRACE, "Response does not have any attributes/headers.");
-		}
-
-		logMessage(LogLevel.TRACE, "Status Code : " + resource.getResponse().getStatus().getCode());
-
-		final int statusCode = resource.getResponse().getStatus().getCode();
-		if (statusCode == 204) {
-			final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
-			if (cookieSettings != null) {
-				logMessage(LogLevel.TRACE, "Set-Cookies returned : " + cookieSettings.size());
-			} else {
-				logMessage(LogLevel.TRACE, "Set-Cookies returned : NULL");
-			}
-
-			final Series<Cookie> requestCookies = resource.getRequest().getCookies();
-			if (cookieSettings != null && !cookieSettings.isEmpty()) {
-				for (final CookieSetting ck : cookieSettings) {
-					if (ck == null) {
-						continue;
-					}
-					logMessage(LogLevel.TRACE,
-							"Set-Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
-									+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
-
-					final Cookie cookie = new Cookie();
-					cookie.setName(ck.getName());
-					cookie.setDomain(ck.getDomain());
-					cookie.setPath(ck.getPath());
-					cookie.setValue(ck.getValue());
-					cookie.setVersion(ck.getVersion());
-					requestCookies.add(cookie);
-				}
-			}
-			if (requestCookies == null || requestCookies.size() == 0) {
-				throw new HubIntegrationException(
-						"Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
-			}
-
-			cookies = requestCookies;
-
-			logMessage(LogLevel.TRACE, "Cookies after auth : ");
+			logMessage(LogLevel.TRACE, "Cookies before auth : ");
 			if (cookies != null) {
 				for (final Cookie ck : cookies) {
 					logMessage(LogLevel.TRACE,
@@ -412,13 +308,126 @@ public class HubIntRestService {
 									+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
 				}
 			} else {
-				logMessage(LogLevel.TRACE, "New 'Cookies' are null.");
+				logMessage(LogLevel.TRACE, "Current 'Cookies' is null (none have ever been set yet).");
 			}
-		} else {
-			throw new HubIntegrationException(resource.getResponse().getStatus().toString());
-		}
 
-		return resource.getResponse().getStatus().getCode();
+			logMessage(LogLevel.TRACE, "Resource : " + resource.toString());
+			logMessage(LogLevel.TRACE, "Request : " + resource.getRequest().toString());
+
+			if (!resource.getRequest().getAttributes().isEmpty()) {
+				logMessage(LogLevel.TRACE, "Request attributes : ");
+				for (final Entry<String, Object> requestAtt : resource.getRequest().getAttributes().entrySet()) {
+					logMessage(LogLevel.TRACE, "Attribute key : " + requestAtt.getKey());
+					logMessage(LogLevel.TRACE, "Attribute value : " + requestAtt.getValue());
+					logMessage(LogLevel.TRACE, "");
+				}
+				logMessage(LogLevel.TRACE, "Request headers : ");
+				final Series<Header> requestheaders = (Series<Header>) resource.getRequest().getAttributes()
+						.get(HeaderConstants.ATTRIBUTE_HEADERS);
+				if (requestheaders != null) {
+					logMessage(LogLevel.TRACE, "Request headers : ");
+					for (final Header header : requestheaders) {
+						if (null == header) {
+							logMessage(LogLevel.TRACE, "received a null header");
+						} else {
+							logMessage(LogLevel.TRACE, "Header name : " + header.getName());
+							logMessage(LogLevel.TRACE, "Header value : " + header.getValue());
+							logMessage(LogLevel.TRACE, "");
+						}
+					}
+				} else {
+					logMessage(LogLevel.TRACE, "Request headers : NONE");
+				}
+			} else {
+				logMessage(LogLevel.TRACE, "Request does not have any attributes/headers.");
+			}
+
+			handleRequest(resource, null, 0);
+
+			logMessage(LogLevel.TRACE, "Response : " + resource.getResponse().toString());
+
+			if (!resource.getResponse().getAttributes().isEmpty()) {
+				logMessage(LogLevel.TRACE, "Response attributes : ");
+				for (final Entry<String, Object> requestAtt : resource.getResponse().getAttributes().entrySet()) {
+					logMessage(LogLevel.TRACE, "Attribute key : " + requestAtt.getKey());
+					logMessage(LogLevel.TRACE, "Attribute value : " + requestAtt.getValue());
+					logMessage(LogLevel.TRACE, "");
+				}
+				final Series<Header> responseheaders = (Series<Header>) resource.getResponse().getAttributes()
+						.get(HeaderConstants.ATTRIBUTE_HEADERS);
+				if (responseheaders != null) {
+					logMessage(LogLevel.TRACE, "Response headers : ");
+					for (final Header header : responseheaders) {
+						if (null == header) {
+							logMessage(LogLevel.TRACE, "received a null header");
+						} else {
+							logMessage(LogLevel.TRACE, "Header name : " + header.getName());
+							logMessage(LogLevel.TRACE, "Header value : " + header.getValue());
+							logMessage(LogLevel.TRACE, "");
+						}
+					}
+				} else {
+					logMessage(LogLevel.TRACE, "Response headers : NONE");
+				}
+			} else {
+				logMessage(LogLevel.TRACE, "Response does not have any attributes/headers.");
+			}
+
+			logMessage(LogLevel.TRACE, "Status Code : " + resource.getResponse().getStatus().getCode());
+
+			final int statusCode = resource.getResponse().getStatus().getCode();
+			if (statusCode == 204) {
+				final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
+				if (cookieSettings != null) {
+					logMessage(LogLevel.TRACE, "Set-Cookies returned : " + cookieSettings.size());
+				} else {
+					logMessage(LogLevel.TRACE, "Set-Cookies returned : NULL");
+				}
+
+				final Series<Cookie> requestCookies = resource.getRequest().getCookies();
+				if (cookieSettings != null && !cookieSettings.isEmpty()) {
+					for (final CookieSetting ck : cookieSettings) {
+						if (ck == null) {
+							continue;
+						}
+						logMessage(LogLevel.TRACE,
+								"Set-Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
+										+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+
+						final Cookie cookie = new Cookie();
+						cookie.setName(ck.getName());
+						cookie.setDomain(ck.getDomain());
+						cookie.setPath(ck.getPath());
+						cookie.setValue(ck.getValue());
+						cookie.setVersion(ck.getVersion());
+						requestCookies.add(cookie);
+					}
+				}
+				if (requestCookies == null || requestCookies.size() == 0) {
+					throw new HubIntegrationException(
+							"Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
+				}
+
+				cookies = requestCookies;
+
+				logMessage(LogLevel.TRACE, "Cookies after auth : ");
+				if (cookies != null) {
+					for (final Cookie ck : cookies) {
+						logMessage(LogLevel.TRACE,
+								"Cookie, name = " + ck.getName() + " , domain = " + ck.getDomain() + " , path = "
+										+ ck.getPath() + " , value = " + ck.getValue() + " , version = " + ck.getVersion());
+					}
+				} else {
+					logMessage(LogLevel.TRACE, "New 'Cookies' are null.");
+				}
+			} else {
+				throw new HubIntegrationException(resource.getResponse().getStatus().toString());
+			}
+
+			return resource.getResponse().getStatus().getCode();
+		}finally{
+			CookieHandler.setDefault(originalCookieHandler);
+		}
 	}
 
 	public Series<Cookie> getCookies() {
