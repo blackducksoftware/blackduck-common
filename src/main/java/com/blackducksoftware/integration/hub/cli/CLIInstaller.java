@@ -28,10 +28,8 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -50,6 +48,7 @@ import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.hub.util.AuthenticatorUtil;
 
 public class CLIInstaller {
 	public static final String VERSION_FILE_NAME = "hubVersion.txt";
@@ -215,18 +214,9 @@ public class CLIInstaller {
 				if (proxy != null) {
 
 					if (StringUtils.isNotBlank(proxyUserName) && StringUtils.isNotBlank(proxyPassword)) {
-						Authenticator.setDefault(
-								new Authenticator() {
-									@Override
-									public PasswordAuthentication getPasswordAuthentication() {
-										return new PasswordAuthentication(
-												proxyUserName,
-												proxyPassword.toCharArray());
-									}
-								}
-								);
+						AuthenticatorUtil.setAuthenticator(proxyUserName, proxyPassword);
 					} else {
-						Authenticator.setDefault(null);
+						AuthenticatorUtil.resetAuthenticator();
 					}
 				}
 				if (proxy != null) {

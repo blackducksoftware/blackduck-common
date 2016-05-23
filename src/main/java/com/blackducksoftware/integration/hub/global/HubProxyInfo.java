@@ -23,9 +23,7 @@ package com.blackducksoftware.integration.hub.global;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.Authenticator;
 import java.net.InetSocketAddress;
-import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
@@ -39,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.hub.encryption.PasswordDecrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.util.AuthenticatorUtil;
 
 public class HubProxyInfo implements Serializable {
 
@@ -95,19 +94,13 @@ public class HubProxyInfo implements Serializable {
 
 	public void setDefaultAuthenticator() {
 		if (getUsername() != null && getEncryptedPassword() != null) {
-			Authenticator.setDefault(new Authenticator() {
-				@Override
-				public PasswordAuthentication getPasswordAuthentication() {
-					try {
-						return new PasswordAuthentication(getProxyCredentials().getUsername(),
-								PasswordDecrypter.decrypt(getProxyCredentials().getEncryptedPassword()).toCharArray());
-					} catch (final Exception e) {
-					}
-					return null;
-				}
-			});
+			try {
+				AuthenticatorUtil.setAuthenticator(getProxyCredentials().getUsername(),
+						PasswordDecrypter.decrypt(getProxyCredentials().getEncryptedPassword()));
+			} catch (final Exception e) {
+			}
 		} else {
-			Authenticator.setDefault(null);
+			AuthenticatorUtil.resetAuthenticator();
 		}
 	}
 
