@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.blackducksoftware.integration</groupId>
     <artifactId>common-maven-parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <relativePath>../common-maven-parent</relativePath>
   </parent>
 
@@ -14,6 +14,17 @@
 
   <name>General Code for Hub Integration with CI systems</name>
   <inceptionYear>2015</inceptionYear>
+
+  <repositories>
+    <!-- ekerwin(2016-05-24): this is included only to acquire the parent pom, where this information is sadly duplicated. -->
+    <repository>
+      <snapshots>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+      <id>bds-int-public</id>
+      <url>https://updates.suite.blackducksoftware.com/integrations/</url>
+    </repository>
+</repositories>
 
   <properties>
     <build.info.version>2.0.2</build.info.version>
