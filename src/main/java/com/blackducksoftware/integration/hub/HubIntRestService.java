@@ -189,8 +189,9 @@ public class HubIntRestService {
 			} else if (level == LogLevel.TRACE) {
 				logger.trace(txt);
 			}
+		} else {
+			System.out.println(level.name() + " " + txt);
 		}
-		System.out.println(level.name() + " " + txt);
 	}
 
 	/**
