@@ -529,6 +529,7 @@ public class RestConnection {
 	}
     }
 
+    // TODO not sure we want any static methods in this class
     public static int getResponseStatusCode(ClientResource resource) {
 	return resource.getResponse().getStatus().getCode();
     }
@@ -557,11 +558,13 @@ public class RestConnection {
 	return queryRef;
     }
 
+    // TODO not sure we want any static methods in this class
     public static boolean isSuccess(int responseCode) {
 	return responseCode == 200 || responseCode == 204
 		|| responseCode == 202;
     }
 
+    // TODO not sure we want any static methods in this class
     static <T> T parseResponse(Class<T> modelClass, ClientResource resource)
 	    throws IOException {
 	final String response = readResponseAsString(resource.getResponse());
@@ -572,6 +575,7 @@ public class RestConnection {
 	return modelObject;
     }
 
+    // TODO not sure we want any static methods in this class
     public static String readResponseAsString(final Response response)
 	    throws IOException {
 	final StringBuilder sb = new StringBuilder();
@@ -606,6 +610,7 @@ public class RestConnection {
     }
 
     // TODO make this private (or eliminate it)
+    // TODO not sure we want any static methods in this class
     public static ClientResource getResource(ClientResource resource,
 	    Reference reference) throws URISyntaxException {
 	resource.setMethod(Method.GET);
