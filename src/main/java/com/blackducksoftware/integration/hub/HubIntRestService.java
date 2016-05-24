@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.Context;
+import org.restlet.Message;
 import org.restlet.Response;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.Cookie;
@@ -117,8 +118,6 @@ public class HubIntRestService {
 				logger.debug("Using Proxy : " + proxyHost + ", at Port : " + proxyPort);
 			}
 
-			System.setProperty("https.proxyHost", proxyHost);
-			System.setProperty("https.proxyPort", Integer.toString(proxyPort));
 			System.setProperty("http.proxyHost", proxyHost);
 			System.setProperty("http.proxyPort", Integer.toString(proxyPort));
 
@@ -158,7 +157,6 @@ public class HubIntRestService {
 		context.getParameters().add("readTimeout", stringTimeout);
 		// Should throw timeout exception after the specified timeout, default
 		// is 2 minutes
-
 		final ClientResource resource = new ClientResource(context, new URI(providedUrl));
 		resource.getRequest().setCookies(getCookies());
 		return resource;
@@ -170,8 +168,7 @@ public class HubIntRestService {
 	 *
 	 */
 	private void cleanUpOldProxySettings() {
-		System.clearProperty("https.proxyHost");
-		System.clearProperty("https.proxyPort");
+
 		System.clearProperty("http.proxyHost");
 		System.clearProperty("http.proxyPort");
 		System.clearProperty("http.nonProxyHosts");
@@ -206,7 +203,6 @@ public class HubIntRestService {
 		final ClientResource resource = createClientResource();
 		resource.addSegment("j_spring_security_check");
 		resource.setMethod(Method.POST);
-
 
 		final StringRepresentation stringRep = new StringRepresentation(
 				"j_username=" + hubUserName + "&j_password=" + hubPassword);
@@ -838,35 +834,8 @@ public class HubIntRestService {
 
 	private void handleRequest(final ClientResource resource) throws BDRestException {
 		logMessage(LogLevel.TRACE, "Resource : " + resource.toString());
-		logMessage(LogLevel.TRACE, "Request : " + resource.getRequest().toString());
 
-		if (!resource.getRequest().getAttributes().isEmpty()) {
-			logMessage(LogLevel.TRACE, "Request attributes : ");
-			for (final Entry<String, Object> requestAtt : resource.getRequest().getAttributes().entrySet()) {
-				logMessage(LogLevel.TRACE, "Attribute key : " + requestAtt.getKey());
-				logMessage(LogLevel.TRACE, "Attribute value : " + requestAtt.getValue());
-				logMessage(LogLevel.TRACE, "");
-			}
-			logMessage(LogLevel.TRACE, "Request headers : ");
-			final Series<Header> requestheaders = (Series<Header>) resource.getRequest().getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
-			if (requestheaders != null) {
-				logMessage(LogLevel.TRACE, "Request headers : ");
-				for (final Header header : requestheaders) {
-					if (null == header) {
-						logMessage(LogLevel.TRACE, "received a null header");
-					} else {
-						logMessage(LogLevel.TRACE, "Header name : " + header.getName());
-						logMessage(LogLevel.TRACE, "Header value : " + header.getValue());
-						logMessage(LogLevel.TRACE, "");
-					}
-				}
-			} else {
-				logMessage(LogLevel.TRACE, "Request headers : NONE");
-			}
-		} else {
-			logMessage(LogLevel.TRACE, "Request does not have any attributes/headers.");
-		}
+		logRestletRequestOrResponse(resource.getRequest());
 
 		final CookieHandler originalCookieHandler = CookieHandler.getDefault();
 		try {
@@ -884,19 +853,26 @@ public class HubIntRestService {
 			}
 		}
 
-		logMessage(LogLevel.TRACE, "Response : " + resource.getResponse().toString());
+		logRestletRequestOrResponse(resource.getResponse());
 
-		if (!resource.getResponse().getAttributes().isEmpty()) {
-			logMessage(LogLevel.TRACE, "Response attributes : ");
-			for (final Entry<String, Object> requestAtt : resource.getResponse().getAttributes().entrySet()) {
+		logMessage(LogLevel.TRACE, "Status Code : " + resource.getResponse().getStatus().getCode());
+	}
+
+	private void logRestletRequestOrResponse(final Message requestOrResponse) {
+		final String requestOrResponseName = requestOrResponse.getClass().getSimpleName();
+		logMessage(LogLevel.TRACE, requestOrResponseName + " : " + requestOrResponse.toString());
+
+		if (!requestOrResponse.getAttributes().isEmpty()) {
+			logMessage(LogLevel.TRACE, requestOrResponseName + " attributes : ");
+			for (final Entry<String, Object> requestAtt : requestOrResponse.getAttributes().entrySet()) {
 				logMessage(LogLevel.TRACE, "Attribute key : " + requestAtt.getKey());
 				logMessage(LogLevel.TRACE, "Attribute value : " + requestAtt.getValue());
 				logMessage(LogLevel.TRACE, "");
 			}
-			final Series<Header> responseheaders = (Series<Header>) resource.getResponse().getAttributes()
+			final Series<Header> responseheaders = (Series<Header>) requestOrResponse.getAttributes()
 					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			if (responseheaders != null) {
-				logMessage(LogLevel.TRACE, "Response headers : ");
+				logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
 				for (final Header header : responseheaders) {
 					if (null == header) {
 						logMessage(LogLevel.TRACE, "received a null header");
@@ -907,13 +883,12 @@ public class HubIntRestService {
 					}
 				}
 			} else {
-				logMessage(LogLevel.TRACE, "Response headers : NONE");
+				logMessage(LogLevel.TRACE, requestOrResponseName + " headers : NONE");
 			}
 		} else {
-			logMessage(LogLevel.TRACE, "Response does not have any attributes/headers.");
+			logMessage(LogLevel.TRACE, requestOrResponseName + " does not have any attributes/headers.");
 		}
 
-		logMessage(LogLevel.TRACE, "Status Code : " + resource.getResponse().getStatus().getCode());
 	}
 
 }
