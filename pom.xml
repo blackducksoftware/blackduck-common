@@ -15,6 +15,13 @@
   <name>General Code for Hub Integration with CI systems</name>
   <inceptionYear>2015</inceptionYear>
 
+  <properties>
+    <build.info.version>2.0.2</build.info.version>
+    <slf4j.version>1.7.5</slf4j.version>
+    <source.java.version>1.6</source.java.version>
+    <target.java.version>1.6</target.java.version>
+  </properties>
+
   <repositories>
     <!-- ekerwin(2016-05-24): this is included only to acquire the parent pom, where this information is sadly duplicated. -->
     <repository>
@@ -24,14 +31,7 @@
       <id>bds-int-public</id>
       <url>https://updates.suite.blackducksoftware.com/integrations/</url>
     </repository>
-</repositories>
-
-  <properties>
-    <build.info.version>2.0.2</build.info.version>
-    <slf4j.version>1.7.5</slf4j.version>
-    <source.java.version>1.6</source.java.version>
-    <target.java.version>1.6</target.java.version>
-  </properties>
+  </repositories>
 
   <dependencies>
     <dependency>
