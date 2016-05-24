@@ -294,9 +294,7 @@ public class RestConnection {
 	    throws ResourceDoesNotExistException, URISyntaxException,
 	    IOException {
 
-	// TODO simplify
-	Reference queryRef = createReference(url);
-	ClientResource resource = getResource(createClientResource(), queryRef);
+	ClientResource resource = getResource(url);
 
 	logMessage(LogLevel.DEBUG, "Resource: " + resource);
 	int responseCode = getResponseStatusCode(resource);
@@ -332,10 +330,8 @@ public class RestConnection {
 	    throws IOException, ResourceDoesNotExistException,
 	    URISyntaxException {
 
-	// TODO simplify
-	Reference queryRef = createReference(getBaseUrl(), urlSegments,
+	ClientResource resource = getResource(getBaseUrl(), urlSegments,
 		queryParameters);
-	ClientResource resource = getResource(createClientResource(), queryRef);
 
 	logMessage(LogLevel.DEBUG, "Resource: " + resource);
 	int responseCode = getResponseStatusCode(resource);
@@ -542,10 +538,12 @@ public class RestConnection {
      * This method exists for code symmetry with the other createReference()
      * method.
      */
+    // TODO get rid of this
     static Reference createReference(String url) {
 	return new Reference(url);
     }
 
+    // TODO get rid of this
     public static Reference createReference(String baseUrl,
 	    List<String> urlSegments,
 	    Set<AbstractMap.SimpleEntry<String, String>> queryParameters) {
@@ -592,10 +590,26 @@ public class RestConnection {
 	return sb.toString();
     }
 
+    public ClientResource getResource(String url) throws URISyntaxException {
+	// TODO does this overlap with a legacy method??
+	ClientResource resource = createClientResource();
+	Reference reference = new Reference(url);
+	return getResource(resource, reference);
+    }
+
+    public ClientResource getResource(String baseUrl, List<String> urlSegments,
+	    Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
+	    throws URISyntaxException {
+	ClientResource resource = createClientResource();
+	Reference reference = createReference(baseUrl, urlSegments,
+		queryParameters);
+	return getResource(resource, reference);
+    }
+
     public static ClientResource getResource(ClientResource resource,
-	    Reference queryRef) throws URISyntaxException {
+	    Reference reference) throws URISyntaxException {
 	resource.setMethod(Method.GET);
-	resource.setReference(queryRef);
+	resource.setReference(reference);
 	resource.handle();
 	return resource;
     }
