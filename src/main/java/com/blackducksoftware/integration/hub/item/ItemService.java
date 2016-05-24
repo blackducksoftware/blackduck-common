@@ -17,7 +17,7 @@ import com.blackducksoftware.integration.hub.exception.ItemIsNotInCacheException
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.logging.LogLevel;
-import com.blackducksoftware.integration.hub.util.RestletUtil;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -40,7 +40,7 @@ public class ItemService {
 	this.hub = hub;
 	reUsableResource = hub.createClientResource();
 	reUsableResource.setMethod(Method.GET);
-	gson = new GsonBuilder().setDateFormat(RestletUtil.JSON_DATE_FORMAT)
+	gson = new GsonBuilder().setDateFormat(RestConnection.JSON_DATE_FORMAT)
 		.create();
     }
 
@@ -54,16 +54,16 @@ public class ItemService {
 	    throws ResourceDoesNotExistException, URISyntaxException,
 	    IOException {
 
-	Reference queryRef = RestletUtil.createReference(hub.getBaseUrl(),
+	Reference queryRef = RestConnection.createReference(hub.getBaseUrl(),
 		urlSegments, queryParameters);
-	ClientResource resource = RestletUtil.getResource(reUsableResource,
+	ClientResource resource = RestConnection.getResource(reUsableResource,
 		queryRef);
 	logMessage(LogLevel.DEBUG, "Resource: " + resource);
-	int responseCode = RestletUtil.getResponseStatusCode(resource);
+	int responseCode = RestConnection.getResponseStatusCode(resource);
 
-	if (RestletUtil.isSuccess(responseCode)) {
-	    final String response = RestletUtil.readResponseAsString(resource
-		    .getResponse());
+	if (RestConnection.isSuccess(responseCode)) {
+	    final String response = RestConnection
+		    .readResponseAsString(resource.getResponse());
 
 	    JsonParser parser = new JsonParser();
 	    JsonObject json = parser.parse(response).getAsJsonObject();

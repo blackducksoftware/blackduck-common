@@ -1,17 +1,23 @@
-package com.blackducksoftware.integration.hub.connection;
+package com.blackducksoftware.integration.hub.rest;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.Context;
+import org.restlet.Response;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.CharacterSet;
@@ -19,6 +25,7 @@ import org.restlet.data.Cookie;
 import org.restlet.data.CookieSetting;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.data.Reference;
 import org.restlet.engine.header.Header;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.representation.StringRepresentation;
@@ -27,8 +34,13 @@ import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.logging.LogLevel;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class RestConnection {
     private final String baseUrl;
@@ -37,6 +49,7 @@ public class RestConnection {
     private IntLogger logger;
     private String proxyUsername;
     private String proxyPassword;
+    public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     public RestConnection(String baseUrl) {
 	this.baseUrl = baseUrl;
@@ -265,6 +278,79 @@ public class RestConnection {
 	return cookies;
     }
 
+    /**
+     * Get a resource from via an absolute URL.
+     * 
+     * @param modelClass
+     *            The type of the returned object.
+     * @param url
+     *            The absolute URL for the resource.
+     * @return The resource gotten from the Hub.
+     * @throws ResourceDoesNotExistException
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public <T> T getFromAbsoluteUrl(Class<T> modelClass, String url)
+	    throws ResourceDoesNotExistException, URISyntaxException,
+	    IOException {
+
+	// TODO simplify
+	Reference queryRef = createReference(url);
+	ClientResource resource = getResource(createClientResource(), queryRef);
+
+	logMessage(LogLevel.DEBUG, "Resource: " + resource);
+	int responseCode = getResponseStatusCode(resource);
+	if (isSuccess(responseCode)) {
+	    return parseResponse(modelClass, resource);
+	} else {
+	    throw new ResourceDoesNotExistException(
+		    "Error getting resource from " + url + ": " + responseCode
+			    + "; " + resource.toString(), resource);
+	}
+    }
+
+    /**
+     * Get a resource via a relative URL.
+     * 
+     * This method uses (and, if necessary, initializes) the re-usable
+     * ClientResource object.
+     * 
+     * @param modelClass
+     *            The type of the returned object.
+     * @param urlSegments
+     *            URL segments to add to the base Hub URL.
+     * @param queryParameters
+     *            Query parameters to add to the URL.
+     * @return The resource gotten from the Hub.
+     * @throws IOException
+     * @throws ResourceDoesNotExistException
+     * @throws URISyntaxException
+     */
+    public <T> T getFromRelativeUrl(Class<T> modelClass,
+	    List<String> urlSegments,
+	    Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
+	    throws IOException, ResourceDoesNotExistException,
+	    URISyntaxException {
+
+	// TODO simplify
+	Reference queryRef = createReference(getBaseUrl(), urlSegments,
+		queryParameters);
+	ClientResource resource = getResource(createClientResource(), queryRef);
+
+	logMessage(LogLevel.DEBUG, "Resource: " + resource);
+	int responseCode = getResponseStatusCode(resource);
+
+	if (isSuccess(responseCode)) {
+	    return parseResponse(modelClass, resource);
+	} else {
+	    throw new ResourceDoesNotExistException(
+		    "Error getting resource from relative url segments "
+			    + urlSegments + " and query parameters "
+			    + queryParameters + "; errorCode: " + responseCode
+			    + "; " + resource.toString(), resource);
+	}
+    }
+
     public void parseChallengeRequestRawValue(
 	    final ChallengeRequest proxyChallengeRequest) {
 	if (proxyChallengeRequest == null
@@ -448,7 +534,72 @@ public class RestConnection {
 	}
     }
 
-    // TODO duplicated from HubIntRestService
+    public static int getResponseStatusCode(ClientResource resource) {
+	return resource.getResponse().getStatus().getCode();
+    }
+
+    /**
+     * This method exists for code symmetry with the other createReference()
+     * method.
+     */
+    static Reference createReference(String url) {
+	return new Reference(url);
+    }
+
+    public static Reference createReference(String baseUrl,
+	    List<String> urlSegments,
+	    Set<AbstractMap.SimpleEntry<String, String>> queryParameters) {
+	Reference queryRef = new Reference(baseUrl);
+	for (String urlSegment : urlSegments) {
+	    queryRef.addSegment(urlSegment);
+	}
+	for (AbstractMap.SimpleEntry<String, String> queryParameter : queryParameters) {
+	    queryRef.addQueryParameter(queryParameter.getKey(),
+		    queryParameter.getValue());
+	}
+	return queryRef;
+    }
+
+    public static boolean isSuccess(int responseCode) {
+	return responseCode == 200 || responseCode == 204
+		|| responseCode == 202;
+    }
+
+    static <T> T parseResponse(Class<T> modelClass, ClientResource resource)
+	    throws IOException {
+	final String response = readResponseAsString(resource.getResponse());
+	Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
+	JsonParser parser = new JsonParser();
+	JsonObject json = parser.parse(response).getAsJsonObject();
+	T modelObject = gson.fromJson(json, modelClass);
+	return modelObject;
+    }
+
+    public static String readResponseAsString(final Response response)
+	    throws IOException {
+	final StringBuilder sb = new StringBuilder();
+	final Reader reader = response.getEntity().getReader();
+	final BufferedReader bufReader = new BufferedReader(reader);
+	try {
+	    String line;
+	    while ((line = bufReader.readLine()) != null) {
+		sb.append(line);
+		sb.append("\n");
+	    }
+	} finally {
+	    bufReader.close();
+	}
+	return sb.toString();
+    }
+
+    public static ClientResource getResource(ClientResource resource,
+	    Reference queryRef) throws URISyntaxException {
+	resource.setMethod(Method.GET);
+	resource.setReference(queryRef);
+	resource.handle();
+	return resource;
+    }
+
     private void logMessage(final LogLevel level, final String txt) {
 	if (logger != null) {
 	    if (level == LogLevel.ERROR) {
