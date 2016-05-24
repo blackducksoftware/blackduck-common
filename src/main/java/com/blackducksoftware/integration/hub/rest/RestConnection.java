@@ -330,8 +330,7 @@ public class RestConnection {
 	    throws IOException, ResourceDoesNotExistException,
 	    URISyntaxException {
 
-	ClientResource resource = getResource(getBaseUrl(), urlSegments,
-		queryParameters);
+	ClientResource resource = getResource(urlSegments, queryParameters);
 
 	logMessage(LogLevel.DEBUG, "Resource: " + resource);
 	int responseCode = getResponseStatusCode(resource);
@@ -597,15 +596,16 @@ public class RestConnection {
 	return getResource(resource, reference);
     }
 
-    public ClientResource getResource(String baseUrl, List<String> urlSegments,
+    public ClientResource getResource(List<String> urlSegments,
 	    Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
 	    throws URISyntaxException {
 	ClientResource resource = createClientResource();
-	Reference reference = createReference(baseUrl, urlSegments,
+	Reference reference = createReference(getBaseUrl(), urlSegments,
 		queryParameters);
 	return getResource(resource, reference);
     }
 
+    // TODO make this private (or eliminate it)
     public static ClientResource getResource(ClientResource resource,
 	    Reference reference) throws URISyntaxException {
 	resource.setMethod(Method.GET);

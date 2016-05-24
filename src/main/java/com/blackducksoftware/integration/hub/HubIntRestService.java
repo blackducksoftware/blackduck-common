@@ -96,6 +96,10 @@ public class HubIntRestService {
 	return restConnection.getBaseUrl();
     }
 
+    public RestConnection getRestConnection() {
+	return restConnection;
+    }
+
     /**
      * The proxy settings get set as System properties. I.E. https.proxyHost,
      * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
@@ -438,7 +442,9 @@ public class HubIntRestService {
 	    return versionUrl.getValue();
 	} else {
 	    throw new BDRestException(
-		    "There was a problem creating this Version for the specified Hub Project. Error Code: "
+		    "There was a problem creating this Version (" + versionName
+			    + ") for the specified Hub Project ("
+			    + project.getName() + ". Error Code: "
 			    + responseCode, resource);
 	}
 
