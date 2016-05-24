@@ -35,6 +35,10 @@ import com.blackducksoftware.integration.hub.logging.IntLogger;
 public class HubSupportHelper implements Serializable {
 	private static final long serialVersionUID = 6440466357358359056L;
 
+	public static final String DEFAULT_CLI_DOWNLOAD = "scan.cli.zip";
+	public static final String WINDOWS_CLI_DOWNLOAD = "scan.cli-windows.zip";
+	public static final String MAC_CLI_DOWNLOAD = "scan.cli-macosx.zip";
+
 	private boolean hasBeenChecked = false;
 	private boolean hub3_0Support = false;
 
@@ -216,7 +220,7 @@ public class HubSupportHelper implements Serializable {
 		final String baseUrl = getCLIWrapperLink(hubUrl);
 		final StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append(baseUrl);
-		urlBuilder.append("scan.cli.zip");
+		urlBuilder.append(DEFAULT_CLI_DOWNLOAD);
 		return urlBuilder.toString();
 	}
 
@@ -224,7 +228,7 @@ public class HubSupportHelper implements Serializable {
 		final String baseUrl = getCLIWrapperLink(hubUrl);
 		final StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append(baseUrl);
-		urlBuilder.append("scan.cli-windows.zip");
+		urlBuilder.append(WINDOWS_CLI_DOWNLOAD);
 		return urlBuilder.toString();
 	}
 
@@ -232,7 +236,7 @@ public class HubSupportHelper implements Serializable {
 		final String baseUrl = getCLIWrapperLink(hubUrl);
 		final StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append(baseUrl);
-		urlBuilder.append("scan.cli-macosx.zip");
+		urlBuilder.append(MAC_CLI_DOWNLOAD);
 		return urlBuilder.toString();
 	}
 
