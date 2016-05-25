@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.restlet.data.Method;
 import org.restlet.resource.ClientResource;
 
+import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.json.RuntimeTypeAdapterFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -48,13 +50,15 @@ public class HubItemListParser<T> {
 	public List<T> parseItemList(final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
 					throws IOException, URISyntaxException,
-					ResourceDoesNotExistException {
+					ResourceDoesNotExistException, BDRestException {
 
 		final List<T> items = new ArrayList<T>();
 
 		// TODO: Change to use non reusable resource approach
-		final ClientResource resource = restConnection.getResource(urlSegments,
+		final ClientResource resource = restConnection.createClientResource(urlSegments,
 				queryParameters);
+		resource.setMethod(Method.GET);
+		restConnection.handleRequest(resource);
 
 		System.out.println("Resource: " + resource);
 		final int responseCode = restConnection.getResponseStatusCode(resource);

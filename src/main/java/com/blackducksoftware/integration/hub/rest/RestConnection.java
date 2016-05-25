@@ -21,7 +21,6 @@ import org.restlet.data.Cookie;
 import org.restlet.data.CookieSetting;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Reference;
 import org.restlet.engine.header.Header;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.representation.StringRepresentation;
@@ -79,12 +78,15 @@ public class RestConnection {
 	 * @throws ResourceDoesNotExistException
 	 * @throws URISyntaxException
 	 * @throws IOException
+	 * @throws BDRestException
 	 */
 	public <T> T getFromAbsoluteUrl(final Class<T> modelClass, final String url)
 			throws ResourceDoesNotExistException, URISyntaxException,
-			IOException {
+			IOException, BDRestException {
 
-		final ClientResource resource = getResource(url);
+		final ClientResource resource = createClientResource(url);
+		resource.setMethod(Method.GET);
+		handleRequest(resource);
 
 		logMessage(LogLevel.DEBUG, "Resource: " + resource);
 		final int responseCode = getResponseStatusCode(resource);
@@ -113,14 +115,17 @@ public class RestConnection {
 	 * @throws IOException
 	 * @throws ResourceDoesNotExistException
 	 * @throws URISyntaxException
+	 * @throws BDRestException
 	 */
 	public <T> T getFromRelativeUrl(final Class<T> modelClass,
 			final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
 					throws IOException, ResourceDoesNotExistException,
-					URISyntaxException {
+					URISyntaxException, BDRestException {
 
-		final ClientResource resource = getResource(urlSegments, queryParameters);
+		final ClientResource resource = createClientResource(urlSegments, queryParameters);
+		resource.setMethod(Method.GET);
+		handleRequest(resource);
 
 		logMessage(LogLevel.DEBUG, "Resource: " + resource);
 		final int responseCode = getResponseStatusCode(resource);
@@ -192,6 +197,20 @@ public class RestConnection {
 		// is 2 minutes
 		final ClientResource resource = new ClientResource(context, new URI(providedUrl));
 		resource.getRequest().setCookies(getCookies());
+		return resource;
+	}
+
+	public ClientResource createClientResource(final List<String> urlSegments,
+			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters) throws URISyntaxException {
+
+		final ClientResource resource = createClientResource();
+
+		for (final String urlSegment : urlSegments) {
+			resource.addSegment(urlSegment);
+		}
+		for (final AbstractMap.SimpleEntry<String, String> queryParameter : queryParameters) {
+			resource.addQueryParameter(queryParameter.getKey(), queryParameter.getValue());
+		}
 		return resource;
 	}
 
@@ -327,36 +346,12 @@ public class RestConnection {
 		return resource.getResponse().getStatus().getCode();
 	}
 
-	/**
-	 * This method exists for code symmetry with the other createReference()
-	 * method.
-	 */
-	// TODO get rid of this
-	Reference createReference(final String url) {
-		return new Reference(url);
-	}
-
-	// TODO get rid of this
-	public Reference createReference(final String baseUrl,
-			final List<String> urlSegments,
-			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters) {
-		final Reference queryRef = new Reference(baseUrl);
-		for (final String urlSegment : urlSegments) {
-			queryRef.addSegment(urlSegment);
-		}
-		for (final AbstractMap.SimpleEntry<String, String> queryParameter : queryParameters) {
-			queryRef.addQueryParameter(queryParameter.getKey(),
-					queryParameter.getValue());
-		}
-		return queryRef;
-	}
-
 	public boolean isSuccess(final int responseCode) {
 		return responseCode == 200 || responseCode == 204
 				|| responseCode == 202;
 	}
 
-	<T> T parseResponse(final Class<T> modelClass, final ClientResource resource)
+	public <T> T parseResponse(final Class<T> modelClass, final ClientResource resource)
 			throws IOException {
 		final String response = readResponseAsString(resource.getResponse());
 		final Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
@@ -382,30 +377,7 @@ public class RestConnection {
 		return sb.toString();
 	}
 
-	public ClientResource getResource(final String url) throws URISyntaxException {
-		// TODO does this overlap with a legacy method??
-		final ClientResource resource = createClientResource();
-		final Reference reference = new Reference(url);
-		return getResource(resource, reference);
-	}
 
-	public ClientResource getResource(final List<String> urlSegments,
-			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
-					throws URISyntaxException {
-		final ClientResource resource = createClientResource();
-		final Reference reference = createReference(getBaseUrl(), urlSegments,
-				queryParameters);
-		return getResource(resource, reference);
-	}
-
-	// TODO make this private (or eliminate it)
-	public ClientResource getResource(final ClientResource resource,
-			final Reference reference) throws URISyntaxException {
-		resource.setMethod(Method.GET);
-		resource.setReference(reference);
-		resource.handle();
-		return resource;
-	}
 
 	private void logMessage(final LogLevel level, final String txt) {
 		if (logger != null) {
