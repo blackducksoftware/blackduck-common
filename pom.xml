@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>hub-common</artifactId>
-  <version>1.3.5-SNAPSHOT</version>
+  <version>1.3.5</version>
 
   <name>General Code for Hub Integration with CI systems</name>
   <inceptionYear>2015</inceptionYear>
@@ -23,7 +23,6 @@
   </properties>
 
   <repositories>
-    <!-- ekerwin(2016-05-24): this is included only to acquire the parent pom, where this information is sadly duplicated. -->
     <repository>
       <snapshots>
         <updatePolicy>always</updatePolicy>
