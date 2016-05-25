@@ -23,12 +23,33 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class HubItemListParser<T> {
+/**
+ * Use this class to get a polymorphic list of items (projects, notifications,
+ * etc.) from the hub, and get a list of objects back. The type of each object
+ * is driven by the "type" field in each returned item.
+ *
+ * @author sbillings
+ *
+ * @param <T>
+ *            The common parent class of all items
+ */
+public class PolymorphicHubItemListService<T> {
 	private final Gson gson;
 	private final RestConnection restConnection;
 	private final TypeToken<T> requestListTypeToken;
 
-	public HubItemListParser(final RestConnection restConnection, final Class<T> baseType,
+	/**
+	 * Construct a service for a given type of list.
+	 *
+	 * @param restConnection
+	 * @param baseType
+	 *            The common parent class of all items.
+	 * @param requestListTypeToken
+	 *            A Gson type token used to convert each item to an object
+	 * @param typeNameToSubclassMap
+	 *            A mapping of type field values to item subclass types
+	 */
+	public PolymorphicHubItemListService(final RestConnection restConnection, final Class<T> baseType,
 			final TypeToken<T> requestListTypeToken,
 			final Map<String, Class<? extends T>> typeNameToSubclassMap) {
 
@@ -47,14 +68,25 @@ public class HubItemListParser<T> {
 				.create();
 	}
 
-	public List<T> parseItemList(final List<String> urlSegments,
+	/**
+	 * Get (from the Hub, via a relative URL) a polymorphic item list.
+	 *
+	 * @param urlSegments
+	 *            Used to construct the relative URL.
+	 * @param queryParameters
+	 *            Used to construct the relative URL.
+	 * @return The list of objects corresponding to the items.
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 * @throws ResourceDoesNotExistException
+	 * @throws BDRestException
+	 */
+	public List<T> httpGetItemList(final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
 					throws IOException, URISyntaxException,
 					ResourceDoesNotExistException, BDRestException {
 
 		final List<T> items = new ArrayList<T>();
-
-		// TODO: Change to use non reusable resource approach
 		final ClientResource resource = restConnection.createClientResource(urlSegments,
 				queryParameters);
 		resource.setMethod(Method.GET);

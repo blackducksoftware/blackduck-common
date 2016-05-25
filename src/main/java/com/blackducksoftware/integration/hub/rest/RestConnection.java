@@ -43,8 +43,6 @@ public class RestConnection {
 	private Series<Cookie> cookies;
 	private int timeout = 120000;
 	private IntLogger logger;
-	private String proxyUsername;
-	private String proxyPassword;
 	public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
 	public RestConnection(final String baseUrl) {

@@ -2,7 +2,7 @@ package com.blackducksoftware.integration.hub;
 
 
 public class ProjectVersionItem extends
-	com.blackducksoftware.integration.hub.item.Item {
+	com.blackducksoftware.integration.hub.item.HubItem {
     private String versionName;
     private String phase;
     private String distribution;

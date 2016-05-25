@@ -72,11 +72,17 @@ public class HubIntRestService {
 		this.restConnection = restConnection;
 	}
 
+	/**
+	 * @deprecated moved to RestConnection.
+	 */
 	@Deprecated
 	public HubIntRestService(final String baseUrl) throws URISyntaxException {
 		restConnection = new RestConnection(baseUrl);
 	}
 
+	/**
+	 * @deprecated moved to RestConnection.
+	 */
 	@Deprecated
 	public void setTimeout(final int timeout) {
 		restConnection.setTimeout(timeout);
@@ -87,6 +93,9 @@ public class HubIntRestService {
 		restConnection.setLogger(logger);
 	}
 
+	/**
+	 * @deprecated moved to RestConnection.
+	 */
 	@Deprecated
 	public String getBaseUrl() {
 		return restConnection.getBaseUrl();
@@ -100,7 +109,9 @@ public class HubIntRestService {
 	 * The proxy settings get set as System properties. I.E. https.proxyHost,
 	 * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
 	 *
+	 * @deprecated moved to RestConnection.
 	 */
+	@Deprecated
 	public void setProxyProperties(final String proxyHost, final int proxyPort, final List<Pattern> noProxyHosts,
 			final String proxyUsername, final String proxyPassword) {
 		restConnection.setProxyProperties(proxyHost, proxyPort, noProxyHosts, proxyUsername, proxyPassword);
@@ -128,20 +139,34 @@ public class HubIntRestService {
 	 * Gets the cookie for the Authorized connection to the Hub server. Returns
 	 * the response code from the connection.
 	 *
+	 * @deprecated moved to RestConnection.
 	 */
+	@Deprecated
 	public int setCookies(final String hubUserName, final String hubPassword)
 			throws HubIntegrationException, URISyntaxException, BDRestException {
 		return restConnection.setCookies(hubUserName, hubPassword);
 	}
 
+	/**
+	 * @deprecated moved to RestConnection.
+	 */
+	@Deprecated
 	public Series<Cookie> getCookies() {
 		return restConnection.getCookies();
 	}
 
+	/**
+	 * @deprecated moved to RestConnection.
+	 */
+	@Deprecated
 	public ClientResource createClientResource() throws URISyntaxException {
 		return restConnection.createClientResource();
 	}
 
+	/**
+	 * @deprecated moved to RestConnection.
+	 */
+	@Deprecated
 	public ClientResource createClientResource(final String providedUrl) throws URISyntaxException {
 		return restConnection.createClientResource(providedUrl);
 	}

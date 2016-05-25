@@ -4,7 +4,7 @@ import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 import com.google.gson.annotations.SerializedName;
 
-public class Item {
+public class HubItem {
 
     @SerializedName("_meta")
     private MetaInformation meta;

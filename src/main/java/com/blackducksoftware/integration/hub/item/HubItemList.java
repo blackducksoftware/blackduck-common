@@ -4,13 +4,13 @@ import java.util.List;
 
 public class HubItemList {
     private int totalCount;
-    private List<Item> items;
+    private List<HubItem> items;
 
     public int getTotalCount() {
 	return totalCount;
     }
 
-    public List<Item> getItems() {
+    public List<HubItem> getItems() {
 	return items;
     }
 
@@ -18,7 +18,7 @@ public class HubItemList {
 	this.totalCount = totalCount;
     }
 
-    public void setItems(List<Item> items) {
+    public void setItems(List<HubItem> items) {
 	this.items = items;
     }
 
