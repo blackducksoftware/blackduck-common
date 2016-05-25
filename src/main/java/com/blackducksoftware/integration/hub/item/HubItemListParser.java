@@ -45,7 +45,7 @@ public class HubItemListParser<T> {
 		.create();
     }
 
-    public List<T> parseNotificationItemList(List<String> urlSegments,
+    public List<T> parseItemList(List<String> urlSegments,
 	    Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
 	    throws IOException, URISyntaxException,
 	    ResourceDoesNotExistException {
