@@ -22,68 +22,68 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class HubItemListParser<T> {
-    private Gson gson;
-    private RestConnection restConnection;
-    private final TypeToken<T> requestListTypeToken;
+	private final Gson gson;
+	private final RestConnection restConnection;
+	private final TypeToken<T> requestListTypeToken;
 
-    public HubItemListParser(RestConnection restConnection, Class<T> baseType,
-	    TypeToken<T> requestListTypeToken,
-	    Map<String, Class<? extends T>> typeNameToSubclassMap) {
+	public HubItemListParser(final RestConnection restConnection, final Class<T> baseType,
+			final TypeToken<T> requestListTypeToken,
+			final Map<String, Class<? extends T>> typeNameToSubclassMap) {
 
-	this.restConnection = restConnection;
-	this.requestListTypeToken = requestListTypeToken;
+		this.restConnection = restConnection;
+		this.requestListTypeToken = requestListTypeToken;
 
-	RuntimeTypeAdapterFactory<T> modelClassTypeAdapter = (RuntimeTypeAdapterFactory<T>) RuntimeTypeAdapterFactory
-		.of(baseType, "type");
-	for (String typeName : typeNameToSubclassMap.keySet()) {
-	    modelClassTypeAdapter.registerSubtype(
-		    typeNameToSubclassMap.get(typeName), typeName);
+		final RuntimeTypeAdapterFactory<T> modelClassTypeAdapter = RuntimeTypeAdapterFactory
+				.of(baseType, "type");
+		for (final String typeName : typeNameToSubclassMap.keySet()) {
+			modelClassTypeAdapter.registerSubtype(
+					typeNameToSubclassMap.get(typeName), typeName);
+		}
+		final GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.registerTypeAdapterFactory(modelClassTypeAdapter);
+		gson = gsonBuilder.setDateFormat(RestConnection.JSON_DATE_FORMAT)
+				.create();
 	}
-	GsonBuilder gsonBuilder = new GsonBuilder();
-	gsonBuilder.registerTypeAdapterFactory(modelClassTypeAdapter);
-	gson = gsonBuilder.setDateFormat(RestConnection.JSON_DATE_FORMAT)
-		.create();
-    }
 
-    public List<T> parseItemList(List<String> urlSegments,
-	    Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
-	    throws IOException, URISyntaxException,
-	    ResourceDoesNotExistException {
+	public List<T> parseItemList(final List<String> urlSegments,
+			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
+					throws IOException, URISyntaxException,
+					ResourceDoesNotExistException {
 
-	List<T> items = new ArrayList<T>();
+		final List<T> items = new ArrayList<T>();
 
-	// TODO: Change to use non reusable resource approach
-	ClientResource resource = restConnection.getResource(urlSegments,
-		queryParameters);
+		// TODO: Change to use non reusable resource approach
+		final ClientResource resource = restConnection.getResource(urlSegments,
+				queryParameters);
 
-	System.out.println("Resource: " + resource);
-	int responseCode = RestConnection.getResponseStatusCode(resource);
+		System.out.println("Resource: " + resource);
+		final int responseCode = restConnection.getResponseStatusCode(resource);
 
-	if (RestConnection.isSuccess(responseCode)) {
-	    final String response = RestConnection
-		    .readResponseAsString(resource.getResponse());
+		if (restConnection.isSuccess(responseCode)) {
+			final String response = restConnection
+					.readResponseAsString(resource.getResponse());
 
-	    JsonParser parser = new JsonParser();
-	    JsonObject json = parser.parse(response).getAsJsonObject();
-	    HubItemList notificationResponse = gson.fromJson(json,
-		    HubItemList.class);
-	    System.out.println(notificationResponse);
-	    JsonArray array = json.get("items").getAsJsonArray();
-	    for (JsonElement elem : array) {
-		T genericItem = gson.fromJson(elem,
-			requestListTypeToken.getType());
+			final JsonParser parser = new JsonParser();
+			final JsonObject json = parser.parse(response).getAsJsonObject();
+			final HubItemList notificationResponse = gson.fromJson(json,
+					HubItemList.class);
+			System.out.println(notificationResponse);
+			final JsonArray array = json.get("items").getAsJsonArray();
+			for (final JsonElement elem : array) {
+				final T genericItem = gson.fromJson(elem,
+						requestListTypeToken.getType());
 
-		items.add(genericItem);
+				items.add(genericItem);
 
-	    }
-	} else {
-	    throw new ResourceDoesNotExistException(
-		    "Error getting resource from relative url segments "
-			    + urlSegments + " and query parameters "
-			    + queryParameters + "; errorCode: " + responseCode
-			    + "; " + resource, resource);
+			}
+		} else {
+			throw new ResourceDoesNotExistException(
+					"Error getting resource from relative url segments "
+							+ urlSegments + " and query parameters "
+							+ queryParameters + "; errorCode: " + responseCode
+							+ "; " + resource, resource);
+		}
+		return items;
 	}
-	return items;
-    }
 
 }
