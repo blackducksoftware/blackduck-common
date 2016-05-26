@@ -1,20 +1,23 @@
 @rem ***************************************************************************
-@rem Black Duck Software Suite SDK
 @rem Copyright (C) 2016 Black Duck Software, Inc.
+@rem http://www.blackducksoftware.com/
 @rem
-@rem This library is free software; you can redistribute it and/or
-@rem modify it under the terms of the GNU Lesser General Public
-@rem License as published by the Free Software Foundation; either
-@rem version 2.1 of the License, or (at your option) any later version.
+@rem Licensed to the Apache Software Foundation (ASF) under one
+@rem or more contributor license agreements. See the NOTICE file
+@rem distributed with this work for additional information
+@rem regarding copyright ownership. The ASF licenses this file
+@rem to you under the Apache License, Version 2.0 (the
+@rem "License"); you may not use this file except in compliance
+@rem with the License. You may obtain a copy of the License at
 @rem
-@rem This library is distributed in the hope that it will be useful,
-@rem but WITHOUT ANY WARRANTY; without even the implied warranty of
-@rem MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-@rem Lesser General Public License for more details.
+@rem http://www.apache.org/licenses/LICENSE-2.0
 @rem
-@rem You should have received a copy of the GNU Lesser General Public
-@rem License along with this library; if not, write to the Free Software
-@rem Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+@rem Unless required by applicable law or agreed to in writing,
+@rem software distributed under the License is distributed on an
+@rem "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+@rem KIND, either express or implied. See the License for the
+@rem specific language governing permissions and limitations
+@rem under the License.
 @rem ***************************************************************************
 @if "%DEBUG%" == "" @echo off
 @rem ##########################################################################

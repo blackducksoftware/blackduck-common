@@ -1,39 +1,38 @@
 /*******************************************************************************
- * Black Duck Software Suite SDK
  * Copyright (C) 2016 Black Duck Software, Inc.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * http://www.blackducksoftware.com/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  *******************************************************************************/
 package com.blackducksoftware.integration.hub;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.reflect.Constructor;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
+import java.net.CookieHandler;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.Context;
+import org.restlet.Message;
 import org.restlet.Response;
-import org.restlet.data.ChallengeRequest;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.Cookie;
 import org.restlet.data.CookieSetting;
@@ -41,7 +40,6 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.engine.header.Header;
 import org.restlet.engine.header.HeaderConstants;
-import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
@@ -57,6 +55,7 @@ import com.blackducksoftware.integration.hub.exception.VersionDoesNotExistExcept
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.hub.logging.LogLevel;
 import com.blackducksoftware.integration.hub.policy.api.PolicyStatus;
 import com.blackducksoftware.integration.hub.project.api.ProjectItem;
 import com.blackducksoftware.integration.hub.report.api.ReportFormatEnum;
@@ -65,6 +64,7 @@ import com.blackducksoftware.integration.hub.report.api.VersionReport;
 import com.blackducksoftware.integration.hub.scan.api.ScanLocationItem;
 import com.blackducksoftware.integration.hub.scan.api.ScanLocationResults;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
+import com.blackducksoftware.integration.hub.util.AuthenticatorUtil;
 import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -104,6 +104,7 @@ public class HubIntRestService {
 		return baseUrl;
 	}
 
+
 	/**
 	 * The proxy settings get set as System properties. I.E. https.proxyHost,
 	 * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
@@ -117,8 +118,6 @@ public class HubIntRestService {
 				logger.debug("Using Proxy : " + proxyInfo.getHost() + ", at Port : " + proxyInfo.getPort());
 			}
 
-			System.setProperty("https.proxyHost", proxyInfo.getHost());
-			System.setProperty("https.proxyPort", Integer.toString(proxyInfo.getPort()));
 			System.setProperty("http.proxyHost", proxyInfo.getHost());
 			System.setProperty("http.proxyPort", Integer.toString(proxyInfo.getPort()));
 
@@ -126,22 +125,7 @@ public class HubIntRestService {
 				if (!StringUtils.isBlank(proxyInfo.getUsername())
 						&& !StringUtils.isBlank(proxyInfo.getDecryptedPassword())) {
 
-					// Java ignores http.proxyUser. Here's the workaround.
-					Authenticator.setDefault(new Authenticator() {
-						// Need this to support digest authentication
-						@Override
-						protected PasswordAuthentication getPasswordAuthentication() {
-							if (getRequestorType() == RequestorType.PROXY) {
-								try {
-									return new PasswordAuthentication(proxyInfo.getUsername(),
-											proxyInfo.getDecryptedPassword().toCharArray());
-								} catch (final Exception e) {
-									e.printStackTrace();
-								}
-							}
-							return null;
-						}
-					});
+					AuthenticatorUtil.setAuthenticator(proxyInfo.getUsername(), proxyInfo.getDecryptedPassword());
 				}
 			} catch (final Exception e) {
 				if (logger != null) {
@@ -183,9 +167,6 @@ public class HubIntRestService {
 					noProxyHostsString = noProxyHostsString + "|" + pattern.toString();
 				}
 			}
-			if (!StringUtils.isBlank(noProxyHostsString)) {
-				System.setProperty("http.nonProxyHosts", noProxyHostsString);
-			}
 		}
 
 		final HubProxyInfo proxyInfo = new HubProxyInfo(proxyHost, proxyPort, proxyCredentials, noProxyHostsString);
@@ -212,7 +193,6 @@ public class HubIntRestService {
 		context.getParameters().add("readTimeout", stringTimeout);
 		// Should throw timeout exception after the specified timeout, default
 		// is 2 minutes
-
 		final ClientResource resource = new ClientResource(context, new URI(providedUrl));
 		resource.getRequest().setCookies(getCookies());
 		return resource;
@@ -224,43 +204,32 @@ public class HubIntRestService {
 	 *
 	 */
 	private void cleanUpOldProxySettings() {
-		System.clearProperty("https.proxyHost");
-		System.clearProperty("https.proxyPort");
+
 		System.clearProperty("http.proxyHost");
 		System.clearProperty("http.proxyPort");
 		System.clearProperty("http.nonProxyHosts");
 
-		attemptResetProxyCache();
-
-		Authenticator.setDefault(null);
+		AuthenticatorUtil.resetAuthenticator();
 	}
 
-	private void attemptResetProxyCache() {
-		try {
-			Class<?> sunAuthCacheValue;
-			Class<?> sunAuthCache;
-			Class<?> sunAuthCacheImpl;
-			try {
-				sunAuthCacheValue = Class.forName("sun.net.www.protocol.http.AuthCacheValue");
-				sunAuthCache = Class.forName("sun.net.www.protocol.http.AuthCache");
-				sunAuthCacheImpl = Class.forName("sun.net.www.protocol.http.AuthCacheImpl");
-			} catch (final Exception e) {
-				// Must not be using a JDK with sun classes so we abandon this
-				// reset since it is sun specific
-				return;
+	private void logMessage(final LogLevel level, final String txt) {
+		if (logger != null) {
+			if (level == LogLevel.ERROR) {
+				logger.error(txt);
+			} else if (level == LogLevel.WARN) {
+				logger.warn(txt);
+			} else if (level == LogLevel.INFO) {
+				logger.info(txt);
+			} else if (level == LogLevel.DEBUG) {
+				logger.debug(txt);
+			} else if (level == LogLevel.TRACE) {
+				logger.trace(txt);
 			}
-
-			final java.lang.reflect.Method m = sunAuthCacheValue.getDeclaredMethod("setAuthCache", sunAuthCache);
-
-			final Constructor<?> authCacheImplConstr = sunAuthCacheImpl.getConstructor();
-			final Object authCachImp = authCacheImplConstr.newInstance();
-
-			m.invoke(null, authCachImp);
-
-		} catch (final Exception e) {
-			logger.error(e.getMessage());
+		} else {
+			System.out.println(level.name() + " " + txt);
 		}
 	}
+
 
 	/**
 	 * Gets the cookie for the Authorized connection to the Hub server. Returns
@@ -269,45 +238,43 @@ public class HubIntRestService {
 	 */
 	public int setCookies(final String hubUserName, final String hubPassword)
 			throws HubIntegrationException, URISyntaxException, BDRestException {
-
 		final ClientResource resource = createClientResource();
 		resource.addSegment("j_spring_security_check");
-		resource.addQueryParameter("j_username", hubUserName);
-		resource.addQueryParameter("j_password", hubPassword);
-
 		resource.setMethod(Method.POST);
 
-		final EmptyRepresentation rep = new EmptyRepresentation();
-		resource.getRequest().setEntity(rep);
-		handleRequest(resource, null);
+		final StringRepresentation stringRep = new StringRepresentation(
+				"j_username=" + hubUserName + "&j_password=" + hubPassword);
+		stringRep.setCharacterSet(CharacterSet.UTF_8);
+		stringRep.setMediaType(MediaType.APPLICATION_WWW_FORM);
+		resource.getRequest().setEntity(stringRep);
+
+		handleRequest(resource);
+
 		final int statusCode = resource.getResponse().getStatus().getCode();
 		if (statusCode == 204) {
-			if (cookies == null) {
-				final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
-
-				final Series<Cookie> requestCookies = resource.getRequest().getCookies();
-				if (cookieSettings != null && !cookieSettings.isEmpty()) {
-					for (final CookieSetting ck : cookieSettings) {
-						if (ck == null) {
-							continue;
-						}
-						final Cookie cookie = new Cookie();
-						cookie.setName(ck.getName());
-						cookie.setDomain(ck.getDomain());
-						cookie.setPath(ck.getPath());
-						cookie.setValue(ck.getValue());
-						cookie.setVersion(ck.getVersion());
-						requestCookies.add(cookie);
+			final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
+			final Series<Cookie> requestCookies = resource.getRequest().getCookies();
+			if (cookieSettings != null && !cookieSettings.isEmpty()) {
+				for (final CookieSetting ck : cookieSettings) {
+					if (ck == null) {
+						continue;
 					}
+					final Cookie cookie = new Cookie();
+					cookie.setName(ck.getName());
+					cookie.setDomain(ck.getDomain());
+					cookie.setPath(ck.getPath());
+					cookie.setValue(ck.getValue());
+					cookie.setVersion(ck.getVersion());
+					requestCookies.add(cookie);
 				}
-				if (requestCookies == null || requestCookies.size() == 0) {
-					throw new HubIntegrationException(
-							"Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
-				}
-
-				cookies = requestCookies;
-
 			}
+
+			if (requestCookies == null || requestCookies.size() == 0) {
+				throw new HubIntegrationException(
+						"Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
+			}
+
+			cookies = requestCookies;
 		} else {
 			throw new HubIntegrationException(resource.getResponse().getStatus().toString());
 		}
@@ -331,7 +298,7 @@ public class HubIntRestService {
 		resource.addQueryParameter("q", "name:" + projectName);
 		resource.addQueryParameter("limit", "15");
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null);
+		handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -361,7 +328,7 @@ public class HubIntRestService {
 		resource.addQueryParameter("q", "name:" + projectName);
 		resource.addQueryParameter("limit", "15");
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null);
+		handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -391,7 +358,7 @@ public class HubIntRestService {
 	public ProjectItem getProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = createClientResource(projectUrl);
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null);
+		handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -409,7 +376,7 @@ public class HubIntRestService {
 			throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = createClientResource(versionUrl);
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null);
+		handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -448,7 +415,7 @@ public class HubIntRestService {
 		final ClientResource resource = createClientResource(project.getLink(ProjectItem.VERSION_LINK));
 		resource.addQueryParameter("limit", "10000000");
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null);
+		handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -485,7 +452,7 @@ public class HubIntRestService {
 		stringRep.setMediaType(MediaType.APPLICATION_JSON);
 		stringRep.setCharacterSet(CharacterSet.UTF_8);
 		resource.getRequest().setEntity(stringRep);
-		handleRequest(resource, null);
+		handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 201) {
@@ -495,7 +462,7 @@ public class HubIntRestService {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header projectUrl = responseHeaders.getFirst("location", true);
 
 			if (projectUrl == null || StringUtils.isBlank(projectUrl.getValue())) {
@@ -521,7 +488,7 @@ public class HubIntRestService {
 			final String dist) throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = createClientResource(project.getLink(ProjectItem.VERSION_LINK));
 
-		int responseCode;
+		final int responseCode;
 		final ReleaseItem newRelease = new ReleaseItem(versionName, phase, dist, null, null);
 
 		resource.setMethod(Method.POST);
@@ -531,7 +498,7 @@ public class HubIntRestService {
 		stringRep.setMediaType(MediaType.APPLICATION_JSON);
 		stringRep.setCharacterSet(CharacterSet.UTF_8);
 		resource.getRequest().setEntity(stringRep);
-		handleRequest(resource, null);
+		handleRequest(resource);
 		responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 201) {
@@ -541,7 +508,7 @@ public class HubIntRestService {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header versionUrl = responseHeaders.getFirst("location", true);
 
 			if (versionUrl == null || StringUtils.isBlank(versionUrl.getValue())) {
@@ -552,7 +519,7 @@ public class HubIntRestService {
 			throw new BDRestException(
 					"There was a problem creating this Version for the specified Hub Project. Error Code: "
 							+ responseCode,
-					resource);
+							resource);
 		}
 
 	}
@@ -569,7 +536,7 @@ public class HubIntRestService {
 		int responseCode = 0;
 
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null);
+		handleRequest(resource);
 		responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -597,7 +564,7 @@ public class HubIntRestService {
 		int responseCode = 0;
 
 		resource.setMethod(Method.GET);
-		handleRequest(resource, null);
+		handleRequest(resource);
 		responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
@@ -610,7 +577,7 @@ public class HubIntRestService {
 			throw new BDRestException(
 					"There was a problem comparing the specified version to the version of the Hub server. Error Code: "
 							+ responseCode,
-					resource);
+							resource);
 		}
 	}
 
@@ -646,7 +613,7 @@ public class HubIntRestService {
 
 			resource.setMethod(Method.GET);
 
-			handleRequest(resource, null);
+			handleRequest(resource);
 
 			final int responseCode = resource.getResponse().getStatus().getCode();
 
@@ -665,7 +632,7 @@ public class HubIntRestService {
 				throw new BDRestException(
 						"There was a problem getting the code locations for the host and paths provided. Error Code: "
 								+ responseCode,
-						resource);
+								resource);
 			}
 
 		}
@@ -720,7 +687,7 @@ public class HubIntRestService {
 		stringRep.setMediaType(MediaType.APPLICATION_JSON);
 		stringRep.setCharacterSet(CharacterSet.UTF_8);
 		resource.getRequest().setEntity(stringRep);
-		handleRequest(resource, null);
+		handleRequest(resource);
 
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
@@ -731,7 +698,7 @@ public class HubIntRestService {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header reportUrl = responseHeaders.getFirst("location", true);
 
 			if (reportUrl == null || StringUtils.isBlank(reportUrl.getValue())) {
@@ -750,7 +717,7 @@ public class HubIntRestService {
 
 		final ClientResource resource = createClientResource(reportUrl);
 		resource.setMethod(Method.DELETE);
-		handleRequest(resource, null);
+		handleRequest(resource);
 
 		final int responseCode = resource.getResponse().getStatus().getCode();
 		if (responseCode != 204) {
@@ -767,7 +734,7 @@ public class HubIntRestService {
 
 		@SuppressWarnings("unchecked")
 		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
-				.get(HeaderConstants.ATTRIBUTE_HEADERS);
+		.get(HeaderConstants.ATTRIBUTE_HEADERS);
 		if (requestHeaders == null) {
 			requestHeaders = new Series<Header>(Header.class);
 			resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
@@ -779,7 +746,7 @@ public class HubIntRestService {
 
 		resource.setMethod(Method.GET);
 
-		handleRequest(resource, null);
+		handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200) {
@@ -805,7 +772,7 @@ public class HubIntRestService {
 
 		resource.setMethod(Method.GET);
 
-		handleRequest(resource, null);
+		handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200) {
@@ -848,7 +815,7 @@ public class HubIntRestService {
 
 		resource.setMethod(Method.GET);
 
-		handleRequest(resource, null);
+		handleRequest(resource);
 
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
@@ -878,7 +845,7 @@ public class HubIntRestService {
 
 		resource.setMethod(Method.GET);
 
-		handleRequest(resource, null);
+		handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
 		if (responseCode == 200) {
@@ -911,12 +878,64 @@ public class HubIntRestService {
 		return sb.toString();
 	}
 
-	private void handleRequest(final ClientResource resource, final ChallengeRequest proxyChallengeRequest)
-			throws BDRestException {
+	private void handleRequest(final ClientResource resource) throws BDRestException {
+		logMessage(LogLevel.TRACE, "Resource : " + resource.toString());
+
+		logRestletRequestOrResponse(resource.getRequest());
+
+		final CookieHandler originalCookieHandler = CookieHandler.getDefault();
 		try {
+			if (originalCookieHandler != null) {
+				logMessage(LogLevel.TRACE, "Setting Cookie Handler to NULL");
+				CookieHandler.setDefault(null);
+			}
 			resource.handle();
 		} catch (final ResourceException e) {
 			throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+		} finally {
+			if (originalCookieHandler != null) {
+				logMessage(LogLevel.TRACE, "Setting Original Cookie Handler : " + originalCookieHandler.toString());
+				CookieHandler.setDefault(originalCookieHandler);
+			}
 		}
+
+		logRestletRequestOrResponse(resource.getResponse());
+
+		logMessage(LogLevel.TRACE, "Status Code : " + resource.getResponse().getStatus().getCode());
 	}
+
+	private void logRestletRequestOrResponse(final Message requestOrResponse) {
+		final String requestOrResponseName = requestOrResponse.getClass().getSimpleName();
+		logMessage(LogLevel.TRACE, requestOrResponseName + " : " + requestOrResponse.toString());
+
+		if (!requestOrResponse.getAttributes().isEmpty()) {
+			logMessage(LogLevel.TRACE, requestOrResponseName + " attributes : ");
+			for (final Entry<String, Object> requestAtt : requestOrResponse.getAttributes().entrySet()) {
+				logMessage(LogLevel.TRACE, "Attribute key : " + requestAtt.getKey());
+				logMessage(LogLevel.TRACE, "Attribute value : " + requestAtt.getValue());
+				logMessage(LogLevel.TRACE, "");
+			}
+			@SuppressWarnings("unchecked")
+			final Series<Header> responseheaders = (Series<Header>) requestOrResponse.getAttributes()
+			.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			if (responseheaders != null) {
+				logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
+				for (final Header header : responseheaders) {
+					if (null == header) {
+						logMessage(LogLevel.TRACE, "received a null header");
+					} else {
+						logMessage(LogLevel.TRACE, "Header name : " + header.getName());
+						logMessage(LogLevel.TRACE, "Header value : " + header.getValue());
+						logMessage(LogLevel.TRACE, "");
+					}
+				}
+			} else {
+				logMessage(LogLevel.TRACE, requestOrResponseName + " headers : NONE");
+			}
+		} else {
+			logMessage(LogLevel.TRACE, requestOrResponseName + " does not have any attributes/headers.");
+		}
+
+	}
+
 }

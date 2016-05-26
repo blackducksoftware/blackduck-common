@@ -1,20 +1,20 @@
 /*******************************************************************************
- * Black Duck Software Suite SDK
  * Copyright (C) 2016 Black Duck Software, Inc.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * http://www.blackducksoftware.com/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  *******************************************************************************/
 package com.blackducksoftware.integration.hub;
 
@@ -31,6 +31,10 @@ import com.blackducksoftware.integration.hub.logging.IntLogger;
 
 public class HubSupportHelper implements Serializable {
 	private static final long serialVersionUID = 6440466357358359056L;
+
+	public static final String DEFAULT_CLI_DOWNLOAD = "scan.cli.zip";
+	public static final String WINDOWS_CLI_DOWNLOAD = "scan.cli-windows.zip";
+	public static final String MAC_CLI_DOWNLOAD = "scan.cli-macosx.zip";
 
 	private boolean hasBeenChecked = false;
 	private boolean hub3_0Support = false;
@@ -213,7 +217,7 @@ public class HubSupportHelper implements Serializable {
 		final String baseUrl = getCLIWrapperLink(hubUrl);
 		final StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append(baseUrl);
-		urlBuilder.append("scan.cli.zip");
+		urlBuilder.append(DEFAULT_CLI_DOWNLOAD);
 		return urlBuilder.toString();
 	}
 
@@ -221,7 +225,7 @@ public class HubSupportHelper implements Serializable {
 		final String baseUrl = getCLIWrapperLink(hubUrl);
 		final StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append(baseUrl);
-		urlBuilder.append("scan.cli-windows.zip");
+		urlBuilder.append(WINDOWS_CLI_DOWNLOAD);
 		return urlBuilder.toString();
 	}
 
@@ -229,7 +233,7 @@ public class HubSupportHelper implements Serializable {
 		final String baseUrl = getCLIWrapperLink(hubUrl);
 		final StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append(baseUrl);
-		urlBuilder.append("scan.cli-macosx.zip");
+		urlBuilder.append(MAC_CLI_DOWNLOAD);
 		return urlBuilder.toString();
 	}
 

@@ -1,20 +1,20 @@
 /*******************************************************************************
- * Black Duck Software Suite SDK
  * Copyright (C) 2016 Black Duck Software, Inc.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * http://www.blackducksoftware.com/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  *******************************************************************************/
 package com.blackducksoftware.integration.hub;
 
@@ -64,6 +64,8 @@ public class ScannerSplitStream extends OutputStream {
 
 	private String currentLine = "";
 
+	private int previousCodePoint = -1;
+
 	public ScannerSplitStream(final IntLogger logger, final OutputStream outputFileStream) {
 		this.outputFileStream = outputFileStream;
 		this.logger = logger;
@@ -78,35 +80,34 @@ public class ScannerSplitStream extends OutputStream {
 	}
 
 	@Override
-	public void write(final int b) throws IOException {
-		outputFileStream.write(b);
+	public void write(final int codePoint) throws IOException {
+		outputFileStream.write(codePoint);
 
-		final String stringAcii = new String(Character.toChars(b));
-		final StringBuilder outputBuilder = new StringBuilder();
-		outputBuilder.append(currentLine);
-		switch (b) {
-		case ETX:
-			processLine(currentLine);
-			currentLine = "";
-			return;
-		case EOT:
-			processLine(currentLine);
-			currentLine = "";
-			return;
-		case LF:
-			processLine(currentLine);
-			currentLine = "";
-			return;
-		case CR:
-			processLine(currentLine);
-			currentLine = "";
-			return;
-		case EOF:
+		if (EOF == codePoint) {
 			throw new EOFException();
-		default:
-			outputBuilder.append(stringAcii);
-			currentLine = outputBuilder.toString();
-			return;
+		}
+
+		boolean atLineEnd = false;
+		if (ETX == codePoint || EOT == codePoint) {
+			atLineEnd = true;
+		} else if (LF == codePoint && CR != previousCodePoint) {
+			atLineEnd = true;
+		} else if (LF == codePoint && CR == previousCodePoint) {
+			atLineEnd = true;
+			// also need to remove the previously consumed CR
+			currentLine = currentLine.substring(0, currentLine.length() - 1);
+		} else if (LF != codePoint && CR == previousCodePoint) {
+			processLine(currentLine);
+			currentLine = "";
+		}
+		previousCodePoint = codePoint;
+
+		if (atLineEnd) {
+			processLine(currentLine);
+			currentLine = "";
+		} else {
+			final String stringAscii = new String(Character.toChars(codePoint));
+			currentLine += stringAscii;
 		}
 	}
 
@@ -147,7 +148,8 @@ public class ScannerSplitStream extends OutputStream {
 			// replace with the current line
 			lineBuffer = line;
 		} else {
-			// We assume that each new log starts with the log level, if this line does not contain a log level it
+			// We assume that each new log starts with the log level, if this
+			// line does not contain a log level it
 			// must only be a piece of a log
 			// needs to be added into the buffer
 			final StringBuilder builder = new StringBuilder();
@@ -209,7 +211,8 @@ public class ScannerSplitStream extends OutputStream {
 	public void close() throws IOException {
 		outputFileStream.close();
 
-		// Do not close the listener, will not be able to log to the UI anymore if you do
+		// Do not close the listener, will not be able to log to the UI anymore
+		// if you do
 	}
 
 	private void writeToConsole(final String line) {
