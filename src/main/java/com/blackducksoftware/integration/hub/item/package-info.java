@@ -1,6 +1,6 @@
 /**
- * Classes for accesing Hub Items
- * 
+ * Access to Hub Items and lists of Items
+ *
  * @author sbillings
  *
  */

@@ -24,9 +24,9 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 /**
- * Use this class to get a polymorphic list of items (projects, notifications,
- * etc.) from the hub, and get a list of objects back. The type of each object
- * is driven by the "type" field in each returned item.
+ * Gets a polymorphic list of items (such as a list of) from the hub, and get a
+ * list of objects back. The type of each object is driven by the "type" field
+ * in each returned item.
  *
  * @author sbillings
  *
@@ -91,26 +91,14 @@ public class PolymorphicHubItemListService<T> {
 				queryParameters);
 		resource.setMethod(Method.GET);
 		restConnection.handleRequest(resource);
-
-		System.out.println("Resource: " + resource);
 		final int responseCode = restConnection.getResponseStatusCode(resource);
 
 		if (restConnection.isSuccess(responseCode)) {
-			final String response = restConnection
-					.readResponseAsString(resource.getResponse());
-
-			final JsonParser parser = new JsonParser();
-			final JsonObject json = parser.parse(response).getAsJsonObject();
-			final HubItemList notificationResponse = gson.fromJson(json,
-					HubItemList.class);
-			System.out.println(notificationResponse);
-			final JsonArray array = json.get("items").getAsJsonArray();
+			final JsonArray array = parseJsonArray(resource);
 			for (final JsonElement elem : array) {
 				final T genericItem = gson.fromJson(elem,
 						requestListTypeToken.getType());
-
 				items.add(genericItem);
-
 			}
 		} else {
 			throw new ResourceDoesNotExistException(
@@ -120,6 +108,18 @@ public class PolymorphicHubItemListService<T> {
 							+ "; " + resource, resource);
 		}
 		return items;
+	}
+
+	private JsonArray parseJsonArray(final ClientResource resource) throws IOException {
+		final String response = restConnection
+				.readResponseAsString(resource.getResponse());
+
+		final JsonParser parser = new JsonParser();
+		final JsonObject json = parser.parse(response).getAsJsonObject();
+		final HubItemList notificationResponse = gson.fromJson(json,
+				HubItemList.class);
+		final JsonArray array = json.get("items").getAsJsonArray();
+		return array;
 	}
 
 }

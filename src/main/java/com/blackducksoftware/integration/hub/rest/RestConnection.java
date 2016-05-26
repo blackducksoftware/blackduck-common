@@ -38,6 +38,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+/**
+ * Manages the low-level details of communicating with the server via REST.
+ *
+ * @author sbillings
+ *
+ */
 public class RestConnection {
 	private final String baseUrl;
 	private Series<Cookie> cookies;
@@ -78,7 +84,7 @@ public class RestConnection {
 	 * @throws IOException
 	 * @throws BDRestException
 	 */
-	public <T> T getFromAbsoluteUrl(final Class<T> modelClass, final String url)
+	public <T> T httpGetFromAbsoluteUrl(final Class<T> modelClass, final String url)
 			throws ResourceDoesNotExistException, URISyntaxException,
 			IOException, BDRestException {
 
@@ -115,7 +121,7 @@ public class RestConnection {
 	 * @throws URISyntaxException
 	 * @throws BDRestException
 	 */
-	public <T> T getFromRelativeUrl(final Class<T> modelClass,
+	public <T> T httpGetFromRelativeUrl(final Class<T> modelClass,
 			final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
 					throws IOException, ResourceDoesNotExistException,
@@ -349,7 +355,7 @@ public class RestConnection {
 				|| responseCode == 202;
 	}
 
-	public <T> T parseResponse(final Class<T> modelClass, final ClientResource resource)
+	private <T> T parseResponse(final Class<T> modelClass, final ClientResource resource)
 			throws IOException {
 		final String response = readResponseAsString(resource.getResponse());
 		final Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
