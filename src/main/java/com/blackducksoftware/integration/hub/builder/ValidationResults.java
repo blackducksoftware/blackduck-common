@@ -22,9 +22,9 @@
 package com.blackducksoftware.integration.hub.builder;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,7 +37,7 @@ public class ValidationResults<Key, Type> {
 
 	private Type constructedObject;
 	private final Map<Key, Map<ValidationResultEnum, List<ValidationResult>>> resultMap;
-	private final Set<ValidationResultEnum> status = new LinkedHashSet<ValidationResultEnum>();
+	private final Set<ValidationResultEnum> status = EnumSet.noneOf(ValidationResultEnum.class);
 
 	public ValidationResults() {
 		resultMap = new HashMap<Key, Map<ValidationResultEnum, List<ValidationResult>>>();
