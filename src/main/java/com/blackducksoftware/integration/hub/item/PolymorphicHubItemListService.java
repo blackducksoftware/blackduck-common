@@ -116,8 +116,6 @@ public class PolymorphicHubItemListService<T> {
 
 		final JsonParser parser = new JsonParser();
 		final JsonObject json = parser.parse(response).getAsJsonObject();
-		final HubItemList notificationResponse = gson.fromJson(json,
-				HubItemList.class);
 		final JsonArray array = json.get("items").getAsJsonArray();
 		return array;
 	}
