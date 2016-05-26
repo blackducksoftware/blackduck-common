@@ -375,8 +375,6 @@ public class RestConnection {
 		return sb.toString();
 	}
 
-
-
 	private void logMessage(final LogLevel level, final String txt) {
 		if (logger != null) {
 			if (level == LogLevel.ERROR) {
@@ -391,5 +389,10 @@ public class RestConnection {
 				logger.trace(txt);
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "RestConnection [baseUrl=" + baseUrl + "]";
 	}
 }
