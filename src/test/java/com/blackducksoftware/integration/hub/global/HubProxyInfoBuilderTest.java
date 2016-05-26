@@ -24,6 +24,7 @@ package com.blackducksoftware.integration.hub.global;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
@@ -371,8 +372,36 @@ public class HubProxyInfoBuilderTest {
 		builder.setPassword(VALID_PASSWORD);
 		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
 
-		final HubProxyInfo proxyInfo = builder.build().getConstructedObject();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.build();
+		assertNotNull(result);
+		assertTrue(result.isSuccess());
+
+		final HubProxyInfo proxyInfo = result.getConstructedObject();
 		assertNotNull(proxyInfo);
+		assertEquals(VALID_HOST, proxyInfo.getHost());
+		assertEquals(VALID_PORT, proxyInfo.getPort());
+		assertEquals(VALID_USERNAME, proxyInfo.getUsername());
+		assertEquals(VALID_PASSWORD, proxyInfo.getDecryptedPassword());
+		assertEquals(VALID_IGNORE_HOST_LIST, proxyInfo.getIgnoredProxyHosts());
+	}
+
+	@Test
+	public void testBuildWithInValidInput() throws Exception {
+		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+		builder.setPort(-512431);
+		builder.setUsername(VALID_USERNAME);
+
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.build();
+		assertNotNull(result);
+		assertFalse(result.isSuccess());
+
+		final HubProxyInfo proxyInfo = result.getConstructedObject();
+		assertNotNull(proxyInfo);
+		assertNull(proxyInfo.getHost());
+		assertEquals(-512431, proxyInfo.getPort());
+		assertNull(proxyInfo.getUsername());
+		assertNull(proxyInfo.getDecryptedPassword());
+		assertNull(proxyInfo.getIgnoredProxyHosts());
 	}
 
 	@Test
@@ -380,9 +409,16 @@ public class HubProxyInfoBuilderTest {
 		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
 
 		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.build();
+
+		assertNotNull(result);
+		assertTrue(result.isSuccess());
+
 		final HubProxyInfo proxyInfo = result.getConstructedObject();
 		assertNotNull(proxyInfo);
-
-		actualMessages = getMessages(result);
+		assertNull(proxyInfo.getHost());
+		assertEquals(0, proxyInfo.getPort());
+		assertNull(proxyInfo.getUsername());
+		assertNull(proxyInfo.getEncryptedPassword());
+		assertNull(proxyInfo.getIgnoredProxyHosts());
 	}
 }

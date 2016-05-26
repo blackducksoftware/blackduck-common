@@ -23,6 +23,8 @@ package com.blackducksoftware.integration.hub.global;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -161,5 +163,36 @@ public class HubCredentialsBuilderTest {
 		final ValidationResults<GlobalFieldKey, HubCredentials> result = new ValidationResults<GlobalFieldKey, HubCredentials>();
 		builder.validatePassword(result);
 		assertTrue(result.isSuccess());
+	}
+
+	@Test
+	public void testBuildWithValidInput() throws Exception {
+		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
+		builder.setUsername(VALID_USERNAME);
+		builder.setPassword(VALID_PASSWORD);
+
+		final ValidationResults<GlobalFieldKey, HubCredentials> result = builder.build();
+		assertNotNull(result);
+		assertTrue(result.isSuccess());
+
+		final HubCredentials credentials = result.getConstructedObject();
+		assertNotNull(credentials);
+		assertEquals(VALID_USERNAME, credentials.getUsername());
+		assertEquals(VALID_PASSWORD, credentials.getDecryptedPassword());
+	}
+
+	@Test
+	public void testBuildWithEmptyInput() throws Exception {
+		final HubCredentialsBuilder builder = new HubCredentialsBuilder();
+
+		final ValidationResults<GlobalFieldKey, HubCredentials> result = builder.build();
+
+		assertNotNull(result);
+		assertFalse(result.isSuccess());
+
+		final HubCredentials credentials = result.getConstructedObject();
+		assertNotNull(credentials);
+		assertNull(credentials.getUsername());
+		assertNull(credentials.getEncryptedPassword());
 	}
 }
