@@ -19,7 +19,7 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.validate;
+package com.blackducksoftware.integration.hub.builder;
 
 public enum ValidationResultEnum {
 	ERROR, OK, WARN;

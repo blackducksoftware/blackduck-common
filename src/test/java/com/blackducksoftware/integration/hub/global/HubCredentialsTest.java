@@ -29,10 +29,10 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
 import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.util.TestLogger;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -41,7 +41,6 @@ public class HubCredentialsTest {
 	@Test
 	public void testHubCredentials() throws IllegalArgumentException, EncryptionException, NoSuchMethodException,
 			IllegalAccessException, InvocationTargetException, HubIntegrationException {
-		final TestLogger logger = new TestLogger();
 
 		final String hubUser1 = "hubUser1";
 		final String hubPass1 = "hubPass1";
@@ -53,17 +52,17 @@ public class HubCredentialsTest {
 		HubCredentialsBuilder builder = new HubCredentialsBuilder();
 		builder.setUsername(hubUser1);
 		builder.setPassword(hubPass1);
-		final HubCredentials item1 = builder.build(logger);
+		final HubCredentials item1 = builder.build().getConstructedObject();
 
 		builder = new HubCredentialsBuilder();
 		builder.setUsername(hubUser2);
 		builder.setPassword(hubPass2Clear);
-		final HubCredentials item2 = builder.build(logger);
+		final HubCredentials item2 = builder.build().getConstructedObject();
 
 		builder = new HubCredentialsBuilder();
 		builder.setUsername(hubUser1);
 		builder.setPassword(hubPass1);
-		final HubCredentials item3 = builder.build(logger);
+		final HubCredentials item3 = builder.build().getConstructedObject();
 
 		assertEquals(hubUser1, item1.getUsername());
 		assertEquals(hubPass1, item1.getDecryptedPassword());

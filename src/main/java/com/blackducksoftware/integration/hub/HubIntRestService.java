@@ -50,10 +50,13 @@ import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.hub.api.VersionComparison;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.MissingPolicyStatusException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.VersionDoesNotExistException;
+import com.blackducksoftware.integration.hub.global.HubCredentials;
+import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.logging.LogLevel;
 import com.blackducksoftware.integration.hub.policy.api.PolicyStatus;
@@ -69,6 +72,7 @@ import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
@@ -103,6 +107,40 @@ public class HubIntRestService {
 		return baseUrl;
 	}
 
+
+	/**
+	 * The proxy settings get set as System properties. I.E. https.proxyHost,
+	 * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
+	 *
+	 */
+	public void setProxyProperties(final HubProxyInfo proxyInfo) {
+		cleanUpOldProxySettings();
+
+		if (!StringUtils.isBlank(proxyInfo.getHost()) && proxyInfo.getPort() > 0) {
+			if (logger != null) {
+				logger.debug("Using Proxy : " + proxyInfo.getHost() + ", at Port : " + proxyInfo.getPort());
+			}
+
+			System.setProperty("http.proxyHost", proxyInfo.getHost());
+			System.setProperty("http.proxyPort", Integer.toString(proxyInfo.getPort()));
+
+			try {
+				if (!StringUtils.isBlank(proxyInfo.getUsername())
+						&& !StringUtils.isBlank(proxyInfo.getDecryptedPassword())) {
+
+					AuthenticatorUtil.setAuthenticator(proxyInfo.getUsername(), proxyInfo.getDecryptedPassword());
+				}
+			} catch (final Exception e) {
+				if (logger != null) {
+					logger.error(e);
+				}
+			}
+		}
+		if (!StringUtils.isBlank(proxyInfo.getIgnoredProxyHosts())) {
+			System.setProperty("http.nonProxyHosts", proxyInfo.getIgnoredProxyHosts().replaceAll(",", "|"));
+		}
+	}
+
 	/**
 	 * The proxy settings get set as System properties. I.E. https.proxyHost,
 	 * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
@@ -111,20 +149,20 @@ public class HubIntRestService {
 	public void setProxyProperties(final String proxyHost, final int proxyPort, final List<Pattern> noProxyHosts,
 			final String proxyUsername, final String proxyPassword) {
 
-		cleanUpOldProxySettings();
-
-		if (!StringUtils.isBlank(proxyHost) && proxyPort > 0) {
+		HubCredentials proxyCredentials = null;
+		try {
+			proxyCredentials = new HubCredentials(proxyUsername, proxyPassword);
+		} catch (final IllegalArgumentException e) {
 			if (logger != null) {
-				logger.debug("Using Proxy : " + proxyHost + ", at Port : " + proxyPort);
+				logger.error(e);
 			}
-
-			System.setProperty("http.proxyHost", proxyHost);
-			System.setProperty("http.proxyPort", Integer.toString(proxyPort));
-
-			AuthenticatorUtil.setAuthenticator(proxyUsername, proxyPassword);
+		} catch (final EncryptionException e) {
+			if (logger != null) {
+				logger.error(e);
+			}
 		}
+		String noProxyHostsString = null;
 		if (noProxyHosts != null && !noProxyHosts.isEmpty()) {
-			String noProxyHostsString = null;
 			for (final Pattern pattern : noProxyHosts) {
 				if (noProxyHostsString == null) {
 					noProxyHostsString = pattern.toString();
@@ -132,10 +170,11 @@ public class HubIntRestService {
 					noProxyHostsString = noProxyHostsString + "|" + pattern.toString();
 				}
 			}
-			if (!StringUtils.isBlank(noProxyHostsString)) {
-				System.setProperty("http.nonProxyHosts", noProxyHostsString);
-			}
 		}
+
+		final HubProxyInfo proxyInfo = new HubProxyInfo(proxyHost, proxyPort, proxyCredentials, noProxyHostsString);
+		setProxyProperties(proxyInfo);
+
 	}
 
 	public ClientResource createClientResource() throws URISyntaxException {
@@ -193,6 +232,7 @@ public class HubIntRestService {
 			System.out.println(level.name() + " " + txt);
 		}
 	}
+
 
 	/**
 	 * Gets the cookie for the Authorized connection to the Hub server. Returns
@@ -451,7 +491,7 @@ public class HubIntRestService {
 			final String dist) throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = createClientResource(project.getLink(ProjectItem.VERSION_LINK));
 
-		int responseCode;
+		final int responseCode;
 		final ReleaseItem newRelease = new ReleaseItem(versionName, phase, dist, null, null);
 
 		resource.setMethod(Method.POST);
@@ -743,13 +783,21 @@ public class HubIntRestService {
 
 			final Gson gson = new GsonBuilder().create();
 
-			final JsonObject reportResponse = gson.fromJson(response, JsonObject.class);
-			final JsonArray reportConentArray = gson.fromJson(reportResponse.get("reportContent"), JsonArray.class);
-			final JsonObject reportFile = (JsonObject) reportConentArray.get(0);
+			final JsonParser parser = new JsonParser();
+			final JsonObject json = parser.parse(response).getAsJsonObject();
+			final JsonElement content = json.get("reportContent");
+			final JsonArray reportConentArray = content.getAsJsonArray();
+			final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
 
 			final VersionReport report = gson.fromJson(reportFile.get("fileContent"), VersionReport.class);
 
 			return report;
+		} else if (responseCode == 412) {
+			final String response = readResponseAsString(resource.getResponse());
+			final JsonParser parser = new JsonParser();
+			final JsonObject json = parser.parse(response).getAsJsonObject();
+			final String errorMessage = json.get("errorMessage").getAsString();
+			throw new BDRestException(errorMessage + " Error Code: " + responseCode, resource);
 		} else {
 			throw new BDRestException(
 					"There was a problem getting the content of this Report. Error Code: " + responseCode, resource);
@@ -870,8 +918,9 @@ public class HubIntRestService {
 				logMessage(LogLevel.TRACE, "Attribute value : " + requestAtt.getValue());
 				logMessage(LogLevel.TRACE, "");
 			}
+			@SuppressWarnings("unchecked")
 			final Series<Header> responseheaders = (Series<Header>) requestOrResponse.getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			if (responseheaders != null) {
 				logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
 				for (final Header header : responseheaders) {

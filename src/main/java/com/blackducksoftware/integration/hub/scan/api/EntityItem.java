@@ -22,7 +22,6 @@
 package com.blackducksoftware.integration.hub.scan.api;
 
 public class EntityItem {
-
 	private String entityType;
 
 	private String entityId;

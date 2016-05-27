@@ -27,7 +27,6 @@ import org.joda.time.DateTime;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 
 public class ScanHistoryItem {
-
 	private String scannerVersion;
 
 	private String lastModifiedOn;

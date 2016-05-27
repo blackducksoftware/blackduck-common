@@ -29,6 +29,8 @@ import java.net.URL;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
@@ -39,6 +41,8 @@ public class HubServerConfigTest {
 		final URL hubUrl1 = new URL("https://www.blackducksoftware.com/");
 		final Integer timeout1 = 1;
 
+		final HubCredentialsBuilder credBuilder = new HubCredentialsBuilder();
+
 		final HubCredentials credentials1 = new HubCredentials("hubUser1", "hubPass1");
 
 		final String host1 = "host1";
@@ -47,7 +51,10 @@ public class HubServerConfigTest {
 		final String proxyUsername1 = "proxyUsername1";
 		final String proxyPassword1 = "proxyPassword1";
 
-		final HubProxyInfo proxy1 = new HubProxyInfo(host1, port1, noProxyHosts1, proxyUsername1, proxyPassword1);
+		credBuilder.setUsername(proxyUsername1);
+		credBuilder.setPassword(proxyPassword1);
+		final HubProxyInfo proxy1 = new HubProxyInfo(host1, port1, credBuilder.build().getConstructedObject(),
+				noProxyHosts1);
 
 		final URL hubUrl2 = new URL("http://google.com");
 		final Integer timeout2 = 2;
@@ -58,8 +65,12 @@ public class HubServerConfigTest {
 		final String proxyUsername2 = "proxyUsername2";
 		final String proxyPassword2 = "proxyPassword2";
 
+		credBuilder.setUsername(proxyUsername2);
+		credBuilder.setPassword(proxyPassword2);
+
 		final HubCredentials credentials2 = new HubCredentials("hubUser2", "hubPass2");
-		final HubProxyInfo proxy2 = new HubProxyInfo(host2, port2, noProxyHosts2, proxyUsername2, proxyPassword2);
+		final HubProxyInfo proxy2 = new HubProxyInfo(host2, port2, credBuilder.build().getConstructedObject(),
+				noProxyHosts2);
 
 		final HubServerConfig item1 = new HubServerConfig(hubUrl1, timeout1, credentials1, proxy1);
 		final HubServerConfig item2 = new HubServerConfig(hubUrl2, timeout2, credentials2, proxy2);

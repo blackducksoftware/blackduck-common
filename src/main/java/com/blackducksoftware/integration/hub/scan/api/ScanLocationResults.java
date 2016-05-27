@@ -24,7 +24,6 @@ package com.blackducksoftware.integration.hub.scan.api;
 import java.util.List;
 
 public class ScanLocationResults {
-
 	private Integer totalCount; // Number of results
 
 	private List<ScanLocationItem> items;
