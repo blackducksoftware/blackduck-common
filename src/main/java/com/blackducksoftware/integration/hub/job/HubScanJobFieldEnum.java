@@ -19,20 +19,28 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.util;
+package com.blackducksoftware.integration.hub.job;
 
-import com.blackducksoftware.integration.hub.validate.HubScanJobConfigValidator;
-import com.blackducksoftware.integration.hub.validate.ValidationResult;
-import com.blackducksoftware.integration.hub.validate.ValidationResultEnum;
+public enum HubScanJobFieldEnum {
 
-public class TestJobConfigValidator extends HubScanJobConfigValidator<Boolean> {
+	PROJECT("hubProject"),
+	VERSION("hubVersion"),
+	PHASE("hubPhase"),
+	DISTRIBUTION("hubDistribution"),
+	GENERATE_RISK_REPORT("shouldGenerateRiskReport"),
+	MAX_WAIT_TIME_FOR_BOM_UPDATE("maxWaitTimeForBomUpdate"),
+	SCANMEMORY("hubScanMemory"),
+	TARGETS("hubTargets"),
+	FAIL_ON_POLICY_VIOLATION("failOnPolicyViolation");
 
-	@Override
-	public Boolean processResult(final ValidationResult result) {
-		if (result.getResultType() != ValidationResultEnum.OK) {
-			return Boolean.FALSE;
-		} else {
-			return Boolean.TRUE;
-		}
+	private String key;
+
+	private HubScanJobFieldEnum(final String key) {
+		this.key = key;
 	}
+
+	public String getKey() {
+		return key;
+	}
+
 }

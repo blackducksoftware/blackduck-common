@@ -19,22 +19,37 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.validate;
+package com.blackducksoftware.integration.hub.builder;
 
-public class ValidationResult {
-	private final ValidationResultEnum resultType;
-	private final String message;
+import org.apache.commons.lang3.StringUtils;
 
-	public ValidationResult(final ValidationResultEnum resultType, final String message) {
-		this.resultType = resultType;
-		this.message = message;
+public abstract class AbstractBuilder<Key, Type> {
+
+	private final boolean shouldUseDefaultValues;
+
+	public AbstractBuilder(final boolean shouldUseDefaultValues) {
+		this.shouldUseDefaultValues = shouldUseDefaultValues;
 	}
 
-	public ValidationResultEnum getResultType() {
-		return resultType;
+	public abstract ValidationResults<Key, Type> build();
+
+	public abstract ValidationResults<Key, Type> assertValid();
+
+	protected int stringToInteger(final String integer) throws IllegalArgumentException {
+		final String integerString = StringUtils.trimToNull(integer);
+		if (integerString != null) {
+			try {
+				return Integer.valueOf(integerString);
+			} catch (final NumberFormatException e) {
+				throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.", e);
+			}
+		} else {
+			throw new IllegalArgumentException("The String : " + integer + " , is not an Integer.");
+		}
 	}
 
-	public String getMessage() {
-		return message;
+
+	public boolean shouldUseDefaultValues() {
+		return shouldUseDefaultValues;
 	}
 }

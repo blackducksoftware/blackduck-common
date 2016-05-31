@@ -19,20 +19,20 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.util;
+package com.blackducksoftware.integration.hub.global;
 
-import com.blackducksoftware.integration.hub.validate.HubCredentialsValidator;
-import com.blackducksoftware.integration.hub.validate.ValidationResult;
-import com.blackducksoftware.integration.hub.validate.ValidationResultEnum;
+public enum HubCredentialsFieldEnum implements GlobalFieldKey {
 
-public class TestCredentialsValidator extends HubCredentialsValidator<Boolean> {
+	USERNAME("hubUsername"), PASSWORD("hubPassword");
 
-	@Override
-	public Boolean processResult(final ValidationResult result) {
-		if (result.getResultType() != ValidationResultEnum.OK) {
-			return Boolean.FALSE;
-		} else {
-			return Boolean.TRUE;
-		}
+	private String key;
+
+	private HubCredentialsFieldEnum(final String key) {
+		this.key = key;
 	}
+
+	public String getKey() {
+		return key;
+	}
+
 }

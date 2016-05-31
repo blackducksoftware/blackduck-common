@@ -45,6 +45,7 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.MissingPolicyStatusException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.VersionDoesNotExistException;
+import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.policy.api.PolicyStatus;
 import com.blackducksoftware.integration.hub.project.api.ProjectItem;
@@ -59,6 +60,7 @@ import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
@@ -113,29 +115,20 @@ public class HubIntRestService {
 	 * @deprecated moved to RestConnection.
 	 */
 	@Deprecated
-	public void setProxyProperties(final String proxyHost, final int proxyPort, final List<Pattern> noProxyHosts,
-			final String proxyUsername, final String proxyPassword) {
-		getRestConnection().setProxyProperties(proxyHost, proxyPort, noProxyHosts, proxyUsername, proxyPassword);
+	public void setProxyProperties(final HubProxyInfo proxyInfo) {
+		getRestConnection().setProxyProperties(proxyInfo);
 	}
 
 	/**
-	 * Gets the cookie for the Authorized connection to the Hub server. Returns
-	 * the response code from the connection.
+	 * The proxy settings get set as System properties. I.E. https.proxyHost,
+	 * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
 	 *
 	 * @deprecated moved to RestConnection.
 	 */
 	@Deprecated
-	public int setCookies(final String hubUserName, final String hubPassword)
-			throws HubIntegrationException, URISyntaxException, BDRestException {
-		return getRestConnection().setCookies(hubUserName, hubPassword);
-	}
-
-	/**
-	 * @deprecated moved to RestConnection.
-	 */
-	@Deprecated
-	public Series<Cookie> getCookies() {
-		return getRestConnection().getCookies();
+	public void setProxyProperties(final String proxyHost, final int proxyPort, final List<Pattern> noProxyHosts,
+			final String proxyUsername, final String proxyPassword) {
+		getRestConnection().setProxyProperties(proxyHost, proxyPort, noProxyHosts, proxyUsername, proxyPassword);
 	}
 
 	/**
@@ -155,12 +148,32 @@ public class HubIntRestService {
 	}
 
 	/**
+	 * Gets the cookie for the Authorized connection to the Hub server. Returns
+	 * the response code from the connection.
+	 *
+	 * @deprecated moved to RestConnection.
+	 */
+	@Deprecated
+	public int setCookies(final String hubUserName, final String hubPassword) throws HubIntegrationException,
+	URISyntaxException, BDRestException {
+		return getRestConnection().setCookies(hubUserName, hubPassword);
+	}
+
+	/**
+	 * @deprecated moved to RestConnection.
+	 */
+	@Deprecated
+	public Series<Cookie> getCookies() {
+		return getRestConnection().getCookies();
+	}
+
+	/**
 	 * Retrieves a list of Hub Projects that may match the hubProjectName
 	 *
 	 */
-	public List<ProjectItem> getProjectMatches(final String projectName)
-			throws IOException, BDRestException, URISyntaxException {
-		final ClientResource resource = getRestConnection().createClientResource();
+	public List<ProjectItem> getProjectMatches(final String projectName) throws IOException, BDRestException,
+	URISyntaxException {
+		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
 		resource.addSegment("projects");
 		resource.addQueryParameter("q", "name:" + projectName);
@@ -188,9 +201,9 @@ public class HubIntRestService {
 	 * Gets the Project that is specified by the projectName
 	 *
 	 */
-	public ProjectItem getProjectByName(final String projectName)
-			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
-		final ClientResource resource = getRestConnection().createClientResource();
+	public ProjectItem getProjectByName(final String projectName) throws IOException, BDRestException,
+	URISyntaxException, ProjectDoesNotExistException {
+		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
 		resource.addSegment("projects");
 		resource.addQueryParameter("q", "name:" + projectName);
@@ -224,7 +237,7 @@ public class HubIntRestService {
 	}
 
 	public ProjectItem getProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
-		final ClientResource resource = getRestConnection().createClientResource(projectUrl);
+		final ClientResource resource = createClientResource(projectUrl);
 		resource.setMethod(Method.GET);
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
@@ -240,9 +253,9 @@ public class HubIntRestService {
 
 	}
 
-	public ReleaseItem getProjectVersion(final String versionUrl)
-			throws IOException, BDRestException, URISyntaxException {
-		final ClientResource resource = getRestConnection().createClientResource(versionUrl);
+	public ReleaseItem getProjectVersion(final String versionUrl) throws IOException, BDRestException,
+	URISyntaxException {
+		final ClientResource resource = createClientResource(versionUrl);
 		resource.setMethod(Method.GET);
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
@@ -262,26 +275,25 @@ public class HubIntRestService {
 	 * Gets the list of Versions for the specified Project
 	 *
 	 */
-	public ReleaseItem getVersion(final ProjectItem project, final String versionName)
-			throws IOException, BDRestException, URISyntaxException, VersionDoesNotExistException {
+	public ReleaseItem getVersion(final ProjectItem project, final String versionName) throws IOException,
+	BDRestException, URISyntaxException, VersionDoesNotExistException {
 		final List<ReleaseItem> versions = getVersionsForProject(project);
 		for (final ReleaseItem version : versions) {
 			if (version.getVersionName().equals(versionName)) {
 				return version;
 			}
 		}
-		throw new VersionDoesNotExistException(
-				"This Version does not exist. Project : " + project.getName() + " Version : " + versionName);
+		throw new VersionDoesNotExistException("This Version does not exist. Project : " + project.getName()
+				+ " Version : " + versionName);
 	}
 
 	/**
 	 * Gets the list of Versions for the specified Project
 	 *
 	 */
-	public List<ReleaseItem> getVersionsForProject(final ProjectItem project)
-			throws IOException, BDRestException, URISyntaxException {
-		final ClientResource resource = getRestConnection().createClientResource(
-				project.getLink(ProjectItem.VERSION_LINK));
+	public List<ReleaseItem> getVersionsForProject(final ProjectItem project) throws IOException, BDRestException,
+	URISyntaxException {
+		final ClientResource resource = createClientResource(project.getLink(ProjectItem.VERSION_LINK));
 		resource.addQueryParameter("limit", "10000000");
 		resource.setMethod(Method.GET);
 		getRestConnection().handleRequest(resource);
@@ -299,8 +311,8 @@ public class HubIntRestService {
 			return versions;
 
 		} else {
-			throw new BDRestException(
-					"There was a problem getting the versions for this Project. Error Code: " + responseCode, resource);
+			throw new BDRestException("There was a problem getting the versions for this Project. Error Code: "
+					+ responseCode, resource);
 		}
 	}
 
@@ -310,7 +322,7 @@ public class HubIntRestService {
 	 * @return the project URL.
 	 */
 	public String createHubProject(final String projectName) throws IOException, BDRestException, URISyntaxException {
-		final ClientResource resource = getRestConnection().createClientResource();
+		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
 		resource.addSegment("projects");
 		resource.setMethod(Method.POST);
@@ -355,10 +367,9 @@ public class HubIntRestService {
 	 */
 	public String createHubVersion(final ProjectItem project, final String versionName, final String phase,
 			final String dist) throws IOException, BDRestException, URISyntaxException {
-		final ClientResource resource = getRestConnection().createClientResource(
-				project.getLink(ProjectItem.VERSION_LINK));
+		final ClientResource resource = createClientResource(project.getLink(ProjectItem.VERSION_LINK));
 
-		int responseCode;
+		final int responseCode;
 		final ReleaseItem newRelease = new ReleaseItem(versionName, phase, dist, null, null);
 
 		resource.setMethod(Method.POST);
@@ -388,8 +399,7 @@ public class HubIntRestService {
 		} else {
 			throw new BDRestException(
 					"There was a problem creating this Version for the specified Hub Project. Error Code: "
-							+ responseCode,
-							resource);
+							+ responseCode, resource);
 		}
 
 	}
@@ -398,7 +408,7 @@ public class HubIntRestService {
 	 * Retrieves the version of the Hub server
 	 */
 	public String getHubVersion() throws IOException, BDRestException, URISyntaxException {
-		final ClientResource resource = getRestConnection().createClientResource();
+		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
 		resource.addSegment("v1");
 		resource.addSegment("current-version");
@@ -413,8 +423,8 @@ public class HubIntRestService {
 			final Response resp = resource.getResponse();
 			return resp.getEntityAsText();
 		} else {
-			throw new BDRestException(
-					"There was a problem getting the version of the Hub server. Error Code: " + responseCode, resource);
+			throw new BDRestException("There was a problem getting the version of the Hub server. Error Code: "
+					+ responseCode, resource);
 		}
 	}
 
@@ -422,10 +432,10 @@ public class HubIntRestService {
 	 * Compares the specified version with the actual version of the Hub server.
 	 *
 	 */
-	public VersionComparison compareWithHubVersion(final String version)
-			throws IOException, BDRestException, URISyntaxException {
+	public VersionComparison compareWithHubVersion(final String version) throws IOException, BDRestException,
+	URISyntaxException {
 
-		final ClientResource resource = getRestConnection().createClientResource();
+		final ClientResource resource = createClientResource();
 		resource.addSegment("api");
 		resource.addSegment("v1");
 		resource.addSegment("current-version-comparison");
@@ -446,8 +456,7 @@ public class HubIntRestService {
 		} else {
 			throw new BDRestException(
 					"There was a problem comparing the specified version to the version of the Hub server. Error Code: "
-							+ responseCode,
-							resource);
+							+ responseCode, resource);
 		}
 	}
 
@@ -474,7 +483,7 @@ public class HubIntRestService {
 				correctedTargetPath = "/" + correctedTargetPath;
 			}
 
-			resource = getRestConnection().createClientResource();
+			resource = createClientResource();
 			resource.addSegment("api");
 			resource.addSegment("v1");
 			resource.addSegment("scanlocations");
@@ -483,8 +492,7 @@ public class HubIntRestService {
 
 			resource.setMethod(Method.GET);
 
-			final RestConnection restConnection = getRestConnection();
-			restConnection.handleRequest(resource);
+			getRestConnection().handleRequest(resource);
 
 			final int responseCode = resource.getResponse().getStatus().getCode();
 
@@ -494,16 +502,15 @@ public class HubIntRestService {
 				final ScanLocationItem currentCodeLocation = getScanLocationMatch(hostname, correctedTargetPath,
 						results);
 				if (currentCodeLocation == null) {
-					throw new HubIntegrationException("Could not determine the code location for the Host : " + hostname
-							+ " and Path : " + correctedTargetPath);
+					throw new HubIntegrationException("Could not determine the code location for the Host : "
+							+ hostname + " and Path : " + correctedTargetPath);
 				}
 
 				codeLocations.add(currentCodeLocation);
 			} else {
 				throw new BDRestException(
 						"There was a problem getting the code locations for the host and paths provided. Error Code: "
-								+ responseCode,
-								resource);
+								+ responseCode, resource);
 			}
 
 		}
@@ -540,15 +547,13 @@ public class HubIntRestService {
 	 * @return the Report URL
 	 *
 	 */
-	public String generateHubReport(final ReleaseItem version, final ReportFormatEnum reportFormat)
-			throws IOException, BDRestException, URISyntaxException {
+	public String generateHubReport(final ReleaseItem version, final ReportFormatEnum reportFormat) throws IOException,
+	BDRestException, URISyntaxException {
 		if (ReportFormatEnum.UNKNOWN == reportFormat) {
 			throw new IllegalArgumentException("Can not generate a report of format : " + reportFormat);
 		}
 
-		final ClientResource resource = getRestConnection().createClientResource(
-				version
-				.getLink(ReleaseItem.VERSION_REPORT_LINK));
+		final ClientResource resource = createClientResource(version.getLink(ReleaseItem.VERSION_REPORT_LINK));
 
 		resource.setMethod(Method.POST);
 
@@ -581,33 +586,32 @@ public class HubIntRestService {
 			return reportUrl.getValue();
 
 		} else {
-			throw new BDRestException(
-					"There was a problem generating a report for this Version. Error Code: " + responseCode, resource);
+			throw new BDRestException("There was a problem generating a report for this Version. Error Code: "
+					+ responseCode, resource);
 		}
 	}
 
 	public int deleteHubReport(final String reportUrl) throws IOException, BDRestException, URISyntaxException {
 
-		final ClientResource resource = getRestConnection().createClientResource(reportUrl);
+		final ClientResource resource = createClientResource(reportUrl);
 		resource.setMethod(Method.DELETE);
 		getRestConnection().handleRequest(resource);
 
 		final int responseCode = resource.getResponse().getStatus().getCode();
 		if (responseCode != 204) {
-			throw new BDRestException("There was a problem deleting this report. Error Code: " + responseCode,
-					resource);
+			throw new BDRestException("There was a problem deleting this report. Error Code: " + responseCode, resource);
 		}
 		return responseCode;
 	}
 
-	public ReportInformationItem getReportInformation(final String reportUrl)
-			throws IOException, BDRestException, URISyntaxException {
+	public ReportInformationItem getReportInformation(final String reportUrl) throws IOException, BDRestException,
+	URISyntaxException {
 
-		final ClientResource resource = getRestConnection().createClientResource(reportUrl);
+		final ClientResource resource = createClientResource(reportUrl);
 
 		@SuppressWarnings("unchecked")
-		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
-		.get(HeaderConstants.ATTRIBUTE_HEADERS);
+		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes().get(
+				HeaderConstants.ATTRIBUTE_HEADERS);
 		if (requestHeaders == null) {
 			requestHeaders = new Series<Header>(Header.class);
 			resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
@@ -627,9 +631,8 @@ public class HubIntRestService {
 
 			return new Gson().fromJson(response, ReportInformationItem.class);
 		} else {
-			throw new BDRestException(
-					"There was a problem getting the links for the specified report. Error Code: " + responseCode,
-					resource);
+			throw new BDRestException("There was a problem getting the links for the specified report. Error Code: "
+					+ responseCode, resource);
 		}
 
 	}
@@ -638,10 +641,10 @@ public class HubIntRestService {
 	 * Gets the content of the report
 	 *
 	 */
-	public VersionReport getReportContent(final String reportContentUrl)
-			throws IOException, BDRestException, URISyntaxException {
+	public VersionReport getReportContent(final String reportContentUrl) throws IOException, BDRestException,
+	URISyntaxException {
 
-		final ClientResource resource = getRestConnection().createClientResource(reportContentUrl);
+		final ClientResource resource = createClientResource(reportContentUrl);
 
 		resource.setMethod(Method.GET);
 
@@ -653,16 +656,24 @@ public class HubIntRestService {
 
 			final Gson gson = new GsonBuilder().create();
 
-			final JsonObject reportResponse = gson.fromJson(response, JsonObject.class);
-			final JsonArray reportConentArray = gson.fromJson(reportResponse.get("reportContent"), JsonArray.class);
-			final JsonObject reportFile = (JsonObject) reportConentArray.get(0);
+			final JsonParser parser = new JsonParser();
+			final JsonObject json = parser.parse(response).getAsJsonObject();
+			final JsonElement content = json.get("reportContent");
+			final JsonArray reportConentArray = content.getAsJsonArray();
+			final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
 
 			final VersionReport report = gson.fromJson(reportFile.get("fileContent"), VersionReport.class);
 
 			return report;
+		} else if (responseCode == 412) {
+			final String response = getRestConnection().readResponseAsString(resource.getResponse());
+			final JsonParser parser = new JsonParser();
+			final JsonObject json = parser.parse(response).getAsJsonObject();
+			final String errorMessage = json.get("errorMessage").getAsString();
+			throw new BDRestException(errorMessage + " Error Code: " + responseCode, resource);
 		} else {
-			throw new BDRestException(
-					"There was a problem getting the content of this Report. Error Code: " + responseCode, resource);
+			throw new BDRestException("There was a problem getting the content of this Report. Error Code: "
+					+ responseCode, resource);
 		}
 
 	}
@@ -671,12 +682,12 @@ public class HubIntRestService {
 	 * Generates a new Hub report for the specified version.
 	 *
 	 */
-	public PolicyStatus getPolicyStatus(final String policyStatusUrl)
-			throws IOException, BDRestException, URISyntaxException, MissingPolicyStatusException {
+	public PolicyStatus getPolicyStatus(final String policyStatusUrl) throws IOException, BDRestException,
+	URISyntaxException, MissingPolicyStatusException {
 		if (StringUtils.isBlank(policyStatusUrl)) {
 			throw new IllegalArgumentException("Missing the policy status URL.");
 		}
-		final ClientResource resource = getRestConnection().createClientResource(policyStatusUrl);
+		final ClientResource resource = createClientResource(policyStatusUrl);
 
 		resource.setMethod(Method.GET);
 
@@ -703,10 +714,10 @@ public class HubIntRestService {
 	/**
 	 * Gets the content of the scanStatus at the provided url
 	 */
-	public ScanStatusToPoll checkScanStatus(final String scanStatusUrl)
-			throws IOException, BDRestException, URISyntaxException {
+	public ScanStatusToPoll checkScanStatus(final String scanStatusUrl) throws IOException, BDRestException,
+	URISyntaxException {
 
-		final ClientResource resource = getRestConnection().createClientResource(scanStatusUrl);
+		final ClientResource resource = createClientResource(scanStatusUrl);
 
 		resource.setMethod(Method.GET);
 

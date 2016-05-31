@@ -24,7 +24,6 @@ package com.blackducksoftware.integration.hub.scan.api;
 import java.util.List;
 
 public class ScanLocationItem {
-
 	private String id;
 
 	private String scanId;
