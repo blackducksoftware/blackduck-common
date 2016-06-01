@@ -41,6 +41,7 @@ public class HubSupportHelper implements Serializable {
 
 	private boolean hasBeenChecked = false;
 	private boolean hub3_0Support = false;
+	private boolean hub3_1Support = false;
 
 	/**
 	 * CLI wrappers were packaged with OS specific Jre's since Hub 3.0.0
@@ -64,8 +65,20 @@ public class HubSupportHelper implements Serializable {
 		return hub3_0Support;
 	}
 
+	/**
+	 * The CLI requires the password be provided as an environment variable
+	 * since Hub 3.1.0
+	 */
+	public boolean isCliPasswordEnvironmentVar() {
+		return hub3_1Support;
+	}
+
 	private void setHub3_0Support(final boolean hub3_0Support) {
 		this.hub3_0Support = hub3_0Support;
+	}
+
+	private void setHub3_1Support(final boolean hub3_1Support) {
+		this.hub3_1Support = hub3_1Support;
 	}
 
 	public boolean isHasBeenChecked() {
@@ -86,10 +99,16 @@ public class HubSupportHelper implements Serializable {
 		try {
 			final String hubServerVersion = service.getHubVersion();
 
-			if (compareVersion(hubServerVersion, "3.0.0", service)) {
+			if (compareVersion(hubServerVersion, "3.1.0", service)) {
+				setHub3_1Support(true);
 				setHub3_0Support(true);
 			} else {
-				setHub3_0Support(false);
+				setHub3_1Support(false);
+				if (compareVersion(hubServerVersion, "3.0.0", service)) {
+					setHub3_0Support(true);
+				} else {
+					setHub3_0Support(false);
+				}
 			}
 			setHasBeenChecked(true);
 		} catch (final BDRestException e) {
