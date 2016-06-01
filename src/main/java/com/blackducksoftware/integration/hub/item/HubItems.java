@@ -8,7 +8,7 @@ import java.util.List;
  * @author sbillings
  *
  */
-public class HubItemList {
+public class HubItems {
 	private int totalCount;
 	private List<HubItem> items;
 

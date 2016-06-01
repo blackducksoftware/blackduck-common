@@ -24,16 +24,17 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 /**
- * Gets a polymorphic list of items (such as a list of) from the hub, and get a
- * list of objects back. The type of each object is driven by the "type" field
- * in each returned item.
+ * Gets a list of items (such as a list of) from the hub, and get a list of
+ * objects back. The type of each object is driven by the "type" field in each
+ * returned item.
  *
  * @author sbillings
  *
  * @param <T>
- *            The common parent class of all items
+ *            The common parent class of all items (typically HubItem.class, or,
+ *            where possible, a subclass of it)
  */
-public class PolymorphicHubItemListService<T> {
+public class HubItemsService<T> {
 	private final Gson gson;
 	private final RestConnection restConnection;
 	private final TypeToken<T> requestListTypeToken;
@@ -49,7 +50,7 @@ public class PolymorphicHubItemListService<T> {
 	 * @param typeNameToSubclassMap
 	 *            A mapping of type field values to item subclass types
 	 */
-	public PolymorphicHubItemListService(final RestConnection restConnection, final Class<T> baseType,
+	public HubItemsService(final RestConnection restConnection, final Class<T> baseType,
 			final TypeToken<T> requestListTypeToken,
 			final Map<String, Class<? extends T>> typeNameToSubclassMap) {
 
