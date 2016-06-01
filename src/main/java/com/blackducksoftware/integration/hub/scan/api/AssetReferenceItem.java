@@ -22,7 +22,6 @@
 package com.blackducksoftware.integration.hub.scan.api;
 
 public class AssetReferenceItem {
-
 	private EntityItem ownerEntityKey;
 
 	private EntityItem assetEntityKey;
