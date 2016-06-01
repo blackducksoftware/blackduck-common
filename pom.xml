@@ -23,6 +23,7 @@
   </properties>
 
   <repositories>
+    <!-- ekerwin(2016-05-26): this is included only to acquire the parent pom, where this information is sadly duplicated. -->
     <repository>
       <snapshots>
         <updatePolicy>always</updatePolicy>
