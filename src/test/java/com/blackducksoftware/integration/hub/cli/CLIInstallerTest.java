@@ -26,7 +26,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 import org.junit.Rule;
@@ -39,22 +38,9 @@ public class CLIInstallerTest {
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
 
-	private File createCliFolderStructure() throws IOException {
-		final File directoryToInstallTo = folder.newFolder();
-		final File bin = new File(directoryToInstallTo, "bin");
-		final File jre = new File(directoryToInstallTo, "jre");
-		final File lib = new File(directoryToInstallTo, "lib");
-
-		bin.mkdir();
-		jre.mkdir();
-		lib.mkdir();
-
-		return directoryToInstallTo;
-	}
-
 	@Test
 	public void testCustomInstall_2_4_2() throws Exception {
-		final File directoryToInstallTo = createCliFolderStructure();
+		final File directoryToInstallTo = folder.newFolder();
 		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
 		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -76,7 +62,7 @@ public class CLIInstallerTest {
 
 	@Test
 	public void testCustomInstall_2_4_2_To_3_1_0() throws Exception {
-		final File directoryToInstallTo = createCliFolderStructure();
+		final File directoryToInstallTo = folder.newFolder();
 		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
 		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -112,7 +98,7 @@ public class CLIInstallerTest {
 
 	@Test
 	public void testCustomInstall_3_1_0() throws Exception {
-		final File directoryToInstallTo = createCliFolderStructure();
+		final File directoryToInstallTo = folder.newFolder();
 		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
 		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -133,7 +119,7 @@ public class CLIInstallerTest {
 
 	@Test
 	public void testCustomInstall_3_1_0_Modified() throws Exception {
-		final File directoryToInstallTo = createCliFolderStructure();
+		final File directoryToInstallTo = folder.newFolder();
 		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
 		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -170,7 +156,7 @@ public class CLIInstallerTest {
 
 	@Test
 	public void testCustomInstall_3_1_0_NotModified() throws Exception {
-		final File directoryToInstallTo = createCliFolderStructure();
+		final File directoryToInstallTo = folder.newFolder();
 		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
 		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
