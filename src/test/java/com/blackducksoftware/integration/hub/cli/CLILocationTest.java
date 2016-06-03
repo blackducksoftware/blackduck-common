@@ -39,7 +39,7 @@ public class CLILocationTest {
 		assertNull(cliLocation.getCLIHome());
 		assertNull(cliLocation.getProvidedJavaExec());
 		assertFalse(cliLocation.getCLIExists(null));
-		assertNull(cliLocation.getCLI());
+		assertNull(cliLocation.getCLI(null));
 		assertNull(cliLocation.getOneJarFile());
 	}
 

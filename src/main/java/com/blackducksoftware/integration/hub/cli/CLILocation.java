@@ -1,7 +1,6 @@
 package com.blackducksoftware.integration.hub.cli;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -23,6 +22,31 @@ public class CLILocation {
 			throw new IllegalArgumentException("You must provided a directory to install the CLI to.");
 		}
 		this.directoryToInstallTo = directoryToInstallTo;
+	}
+
+	public File getCLIHome() {
+		final CLIHomeFinder cliHomeFinder = new CLIHomeFinder();
+		return cliHomeFinder.findCliHome(directoryToInstallTo);
+	}
+
+	public File getJreSecurityDirectory() {
+		final CLIHomeFinder cliHomeFinder = new CLIHomeFinder();
+		final File cliHomeFile = cliHomeFinder.findCliHome(directoryToInstallTo);
+		if (cliHomeFile == null) {
+			return null;
+		}
+
+		final File[] files = cliHomeFile.listFiles();
+		final File jreFolder = findFileByName(files, "jre");
+		if (null == jreFolder) {
+			return null;
+		}
+
+		File jreContents = getJreContentsDirectory(jreFolder);
+		jreContents = new File(jreContents, "lib");
+		jreContents = new File(jreContents, "security");
+
+		return jreContents;
 	}
 
 	public String getCLIDownloadUrl(final IntLogger logger, final HubIntRestService restService)
@@ -48,7 +72,8 @@ public class CLILocation {
 	}
 
 	public File getOneJarFile() {
-		final File cliHomeFile = getCLIHome();
+		final CLIHomeFinder cliHomeFinder = new CLIHomeFinder();
+		final File cliHomeFile = cliHomeFinder.findCliHome(directoryToInstallTo);
 		if (cliHomeFile == null) {
 			return null;
 		}
@@ -59,29 +84,6 @@ public class CLILocation {
 		oneJarFile.setExecutable(true);
 
 		return oneJarFile;
-	}
-
-	public File getCLIHome() {
-		final File cliHome = getCLIInstallDir();
-		if (cliHome == null) {
-			return null;
-		}
-		final File[] installDirFiles = cliHome.listFiles();
-		if (installDirFiles == null) {
-			return null;
-		}
-		if (installDirFiles.length > 1) {
-			for (final File currentFile : installDirFiles) {
-				if (!currentFile.getName().contains("windows")) {
-					return currentFile;
-				}
-			}
-			return null;
-		} else if (installDirFiles.length == 1) {
-			return installDirFiles[0];
-		} else {
-			return null;
-		}
 	}
 
 	public File createHubVersionFile() throws HubIntegrationException, IOException {
@@ -101,137 +103,93 @@ public class CLILocation {
 		return directoryToInstallTo.getCanonicalPath();
 	}
 
-	/**
-	 * Returns the executable file of the installation
-	 */
 	public File getProvidedJavaExec() throws IOException, InterruptedException {
-		final File cliHomeFile = getCLIHome();
+		final CLIHomeFinder cliHomeFinder = new CLIHomeFinder();
+		final File cliHomeFile = cliHomeFinder.findCliHome(directoryToInstallTo);
 		if (cliHomeFile == null) {
 			return null;
 		}
-		final File[] files = cliHomeFile.listFiles();
-		if (files != null && files.length > 0) {
-			File jreFolder = null;
-			for (final File directory : files) {
-				if ("jre".equalsIgnoreCase(directory.getName())) {
-					jreFolder = directory;
-					break;
-				}
-			}
-			if (jreFolder != null) {
-				File javaExec = null;
-				if (SystemUtils.IS_OS_MAC_OSX) {
-					javaExec = new File(jreFolder, "Contents");
-					javaExec = new File(javaExec, "Home");
-					javaExec = new File(javaExec, "bin");
-				} else {
-					javaExec = new File(jreFolder, "bin");
-				}
 
-				if (SystemUtils.IS_OS_WINDOWS) {
-					javaExec = new File(javaExec, "java.exe");
-				} else {
-					javaExec = new File(javaExec, "java");
-				}
-				if (javaExec.exists()) {
-					javaExec.setExecutable(true);
-					return javaExec;
+		final File[] files = cliHomeFile.listFiles();
+		final File jreFolder = findFileByName(files, "jre");
+		if (null == jreFolder) {
+			return null;
+		}
+
+		final File jreContents = getJreContentsDirectory(jreFolder);
+		File javaExec = new File(jreContents, "bin");
+		if (SystemUtils.IS_OS_WINDOWS) {
+			javaExec = new File(javaExec, "java.exe");
+		} else {
+			javaExec = new File(javaExec, "java");
+		}
+		if (!javaExec.exists()) {
+			return null;
+		}
+
+		javaExec.setExecutable(true);
+		return javaExec;
+	}
+
+	public boolean getCLIExists(final IntLogger logger) throws IOException, InterruptedException {
+		final File cli = getCLI(logger);
+		return null != cli && cli.exists();
+	}
+
+	public File getCLI(final IntLogger logger) throws IOException, InterruptedException {
+		final CLIHomeFinder cliHomeFinder = new CLIHomeFinder();
+		final File cliHomeFile = cliHomeFinder.findCliHome(directoryToInstallTo);
+		if (cliHomeFile == null) {
+			return null;
+		}
+
+		// find the lib folder in the iScan directory
+		logger.debug("BlackDuck scan directory: " + cliHomeFile.getCanonicalPath());
+		final File[] files = cliHomeFile.listFiles();
+		if (null == files || files.length <= 0) {
+			logger.error("No files found in the BlackDuck scan directory.");
+			return null;
+		}
+
+		logger.debug("directories in the BlackDuck scan directory: " + files.length);
+		final File libFolder = findFileByName(files, "lib");
+		if (libFolder == null) {
+			logger.error("Could not find the lib directory of the CLI.");
+			return null;
+		}
+
+		logger.debug("BlackDuck scan lib directory: " + libFolder.getCanonicalPath());
+		File hubScanJar = null;
+		for (final File file : libFolder.listFiles()) {
+			if (file.getName().startsWith("scan.cli.") && file.getName().endsWith(".jar")) {
+				hubScanJar = file;
+				hubScanJar.setExecutable(true);
+				break;
+			}
+		}
+
+		return hubScanJar;
+	}
+
+	private File getJreContentsDirectory(final File jreFolder) {
+		File jreContents = jreFolder;
+		if (SystemUtils.IS_OS_MAC_OSX) {
+			jreContents = new File(jreContents, "Contents");
+			jreContents = new File(jreContents, "Home");
+		}
+
+		return jreContents;
+	}
+
+	private File findFileByName(final File[] files, final String name) {
+		if (files != null && files.length > 0) {
+			for (final File file : files) {
+				if (name.equalsIgnoreCase(file.getName())) {
+					return file;
 				}
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Checks if the executable exists
-	 */
-	public boolean getCLIExists(final IntLogger logger) throws IOException, InterruptedException {
-		final File cliHomeFile = getCLIHome();
-		if (cliHomeFile == null) {
-			return false;
-		}
-		// find the lib folder in the iScan directory
-		logger.debug("BlackDuck scan directory: " + cliHomeFile.getCanonicalPath());
-		final File[] files = cliHomeFile.listFiles();
-		if (files != null) {
-			logger.debug("directories in the BlackDuck scan directory: " + files.length);
-			if (files.length > 0) {
-				File libFolder = null;
-				for (final File directory : files) {
-					if ("lib".equalsIgnoreCase(directory.getName())) {
-						libFolder = directory;
-						break;
-					}
-				}
-				if (libFolder == null) {
-					logger.error("Could not find the lib directory of the CLI.");
-					return false;
-				}
-				logger.debug("BlackDuck scan lib directory: " + libFolder.getCanonicalPath());
-				final FilenameFilter nameFilter = new FilenameFilter() {
-					@Override
-					public boolean accept(final File dir, final String name) {
-						return name.matches("scan.cli.*.jar");
-					}
-				};
-				final File[] cliFiles = libFolder.listFiles(nameFilter);
-
-				File hubScanJar = null;
-				if (cliFiles.length == 0) {
-					return false;
-				} else {
-					hubScanJar = cliFiles[0];
-				}
-
-				return hubScanJar.exists();
-			} else {
-				logger.error("No files found in the BlackDuck scan directory.");
-				return false;
-			}
-		} else {
-			logger.error("No files found in the BlackDuck scan directory.");
-			return false;
-		}
-	}
-
-	/**
-	 * Returns the executable file of the installation
-	 */
-	public File getCLI() throws IOException, InterruptedException {
-		final File cliHomeFile = getCLIHome();
-		if (cliHomeFile == null) {
-			return null;
-		}
-		final File[] files = cliHomeFile.listFiles();
-		if (files != null && files.length > 0) {
-			File libFolder = null;
-			for (final File directory : files) {
-				if ("lib".equalsIgnoreCase(directory.getName())) {
-					libFolder = directory;
-					break;
-				}
-			}
-			if (libFolder == null) {
-				return null;
-			}
-			final FilenameFilter nameFilter = new FilenameFilter() {
-				@Override
-				public boolean accept(final File dir, final String name) {
-					return name.matches("scan.cli.*.jar");
-				}
-			};
-			final File[] cliFiles = libFolder.listFiles(nameFilter);
-			if (cliFiles.length == 0) {
-				return null;
-			} else {
-				final File file = cliFiles[0];
-				file.setExecutable(true);
-
-				return file;
-			}
-		} else {
-			return null;
-		}
 	}
 
 }

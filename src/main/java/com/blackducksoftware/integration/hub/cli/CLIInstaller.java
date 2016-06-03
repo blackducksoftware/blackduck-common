@@ -42,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
+import com.blackducksoftware.integration.hub.CIEnvironmentVariables;
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -155,13 +156,34 @@ public class CLIInstaller {
 			final CountingInputStream cis = new CountingInputStream(connection.getInputStream());
 			try {
 				unzip(cliInstallDirectory, cis, logger);
+				updateJreSecurity(logger);
 			} catch (final IOException e) {
 				throw new IOException(String.format("Failed to unpack %s (%d bytes read of total %d)", archive,
 						cis.getByteCount(), connection.getContentLength()), e);
 			}
-			return;
 		} catch (final IOException e) {
 			throw new IOException("Failed to install " + archive + " to " + cliLocation.getCanonicalPath(), e);
+		}
+	}
+
+	private void updateJreSecurity(final IntLogger logger) throws IOException {
+		final String cacertsFilename = "cacerts";
+		if (CIEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
+			final String customCacertsPath = CIEnvironmentVariables
+					.getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
+			final File customCacerts = new File(customCacertsPath);
+
+			final File securityDirectory = cliLocation.getJreSecurityDirectory();
+			final File cacerts = new File(securityDirectory, cacertsFilename);
+			final File cacertsBackup = new File(securityDirectory, cacertsFilename + System.currentTimeMillis());
+
+			try {
+				FileUtils.moveFile(cacerts, cacertsBackup);
+				FileUtils.copyFile(customCacerts, cacerts);
+			} catch (final IOException e) {
+				logger.error("Could not copy the custom cacerts file: " + e.getMessage());
+				throw e;
+			}
 		}
 	}
 
