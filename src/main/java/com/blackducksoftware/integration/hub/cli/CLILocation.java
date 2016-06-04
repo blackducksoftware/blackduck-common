@@ -24,14 +24,8 @@ public class CLILocation {
 		this.directoryToInstallTo = directoryToInstallTo;
 	}
 
-	public File getCLIHome() {
-		final CLIHomeFinder cliHomeFinder = new CLIHomeFinder();
-		return cliHomeFinder.findCliHome(directoryToInstallTo);
-	}
-
 	public File getJreSecurityDirectory() {
-		final CLIHomeFinder cliHomeFinder = new CLIHomeFinder();
-		final File cliHomeFile = cliHomeFinder.findCliHome(directoryToInstallTo);
+		final File cliHomeFile = getCLIHome();
 		if (cliHomeFile == null) {
 			return null;
 		}
@@ -72,8 +66,7 @@ public class CLILocation {
 	}
 
 	public File getOneJarFile() {
-		final CLIHomeFinder cliHomeFinder = new CLIHomeFinder();
-		final File cliHomeFile = cliHomeFinder.findCliHome(directoryToInstallTo);
+		final File cliHomeFile = getCLIHome();
 		if (cliHomeFile == null) {
 			return null;
 		}
@@ -103,9 +96,31 @@ public class CLILocation {
 		return directoryToInstallTo.getCanonicalPath();
 	}
 
+	public File getCLIHome() {
+		final File cliHome = getCLIInstallDir();
+		if (cliHome == null) {
+			return null;
+		}
+		final File[] installDirFiles = cliHome.listFiles();
+		if (installDirFiles == null) {
+			return null;
+		}
+		if (installDirFiles.length > 1) {
+			for (final File currentFile : installDirFiles) {
+				if (!currentFile.getName().contains("windows")) {
+					return currentFile;
+				}
+			}
+			return null;
+		} else if (installDirFiles.length == 1) {
+			return installDirFiles[0];
+		} else {
+			return null;
+		}
+	}
+
 	public File getProvidedJavaExec() throws IOException, InterruptedException {
-		final CLIHomeFinder cliHomeFinder = new CLIHomeFinder();
-		final File cliHomeFile = cliHomeFinder.findCliHome(directoryToInstallTo);
+		final File cliHomeFile = getCLIHome();
 		if (cliHomeFile == null) {
 			return null;
 		}
@@ -137,8 +152,7 @@ public class CLILocation {
 	}
 
 	public File getCLI(final IntLogger logger) throws IOException, InterruptedException {
-		final CLIHomeFinder cliHomeFinder = new CLIHomeFinder();
-		final File cliHomeFile = cliHomeFinder.findCliHome(directoryToInstallTo);
+		final File cliHomeFile = getCLIHome();
 		if (cliHomeFile == null) {
 			return null;
 		}
@@ -161,7 +175,7 @@ public class CLILocation {
 		logger.debug("BlackDuck scan lib directory: " + libFolder.getCanonicalPath());
 		File hubScanJar = null;
 		for (final File file : libFolder.listFiles()) {
-			if (file.getName().startsWith("scan.cli.") && file.getName().endsWith(".jar")) {
+			if (file.getName().startsWith("scan.cli") && file.getName().endsWith(".jar")) {
 				hubScanJar = file;
 				hubScanJar.setExecutable(true);
 				break;

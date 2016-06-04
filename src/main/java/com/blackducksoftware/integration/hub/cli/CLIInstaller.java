@@ -169,11 +169,15 @@ public class CLIInstaller {
 	private void updateJreSecurity(final IntLogger logger) throws IOException {
 		final String cacertsFilename = "cacerts";
 		if (CIEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
+			final File securityDirectory = cliLocation.getJreSecurityDirectory();
+			if (null == securityDirectory) {
+				// the cli might not have the jre included
+				return;
+			}
 			final String customCacertsPath = CIEnvironmentVariables
 					.getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
 			final File customCacerts = new File(customCacertsPath);
 
-			final File securityDirectory = cliLocation.getJreSecurityDirectory();
 			final File cacerts = new File(securityDirectory, cacertsFilename);
 			final File cacertsBackup = new File(securityDirectory, cacertsFilename + System.currentTimeMillis());
 
@@ -181,7 +185,8 @@ public class CLIInstaller {
 				FileUtils.moveFile(cacerts, cacertsBackup);
 				FileUtils.copyFile(customCacerts, cacerts);
 			} catch (final IOException e) {
-				logger.error("Could not copy the custom cacerts file: " + e.getMessage());
+				logger.error("Could not copy the custom cacerts file from: " + customCacertsPath + " to: "
+						+ cacerts.getAbsolutePath() + " msg: " + e.getMessage());
 				throw e;
 			}
 		}
