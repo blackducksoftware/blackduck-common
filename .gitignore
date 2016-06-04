@@ -1,8 +1,9 @@
-/.settings/
-/.classpath
-/.project
-/build/
-/target/
-/.gradle/
-/bin/
+.settings/
+.classpath
+.project
+build/
+target/
+.gradle/
+bin/
 pom.xml.bak
+.DS_Store
