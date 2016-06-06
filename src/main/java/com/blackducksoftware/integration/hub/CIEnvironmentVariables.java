@@ -6,17 +6,21 @@ import java.util.Map;
 public class CIEnvironmentVariables {
 	public static final String BDS_CACERTS_OVERRIDE = "BDS_CACERTS_OVERRIDE";
 
-	private static final Map<String, String> environmentVariables = new HashMap<String, String>();
+	private final Map<String, String> environmentVariables = new HashMap<String, String>();
 
 	public void putAll(final Map<String, String> map) {
-		CIEnvironmentVariables.environmentVariables.putAll(map);
+		environmentVariables.putAll(map);
 	}
 
-	public static boolean containsKey(final String key) {
+	public void put(final String key, final String value) {
+		environmentVariables.put(key, value);
+	}
+
+	public boolean containsKey(final String key) {
 		return environmentVariables.containsKey(key);
 	}
 
-	public static String getValue(final String key) {
+	public String getValue(final String key) {
 		return environmentVariables.get(key);
 	}
 

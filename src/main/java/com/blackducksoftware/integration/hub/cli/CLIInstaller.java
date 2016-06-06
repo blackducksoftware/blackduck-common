@@ -55,9 +55,11 @@ public class CLIInstaller {
 	private String proxyUserName;
 	private String proxyPassword;
 	private final CLILocation cliLocation;
+	private final CIEnvironmentVariables ciEnvironmentVariables;
 
-	public CLIInstaller(final CLILocation cliLocation) {
+	public CLIInstaller(final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables) {
 		this.cliLocation = cliLocation;
+		this.ciEnvironmentVariables = ciEnvironmentVariables;
 	}
 
 	public void performInstallation(final IntLogger logger, final HubIntRestService restService,
@@ -168,13 +170,13 @@ public class CLIInstaller {
 
 	private void updateJreSecurity(final IntLogger logger) throws IOException {
 		final String cacertsFilename = "cacerts";
-		if (CIEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
+		if (ciEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
 			final File securityDirectory = cliLocation.getJreSecurityDirectory();
 			if (null == securityDirectory) {
 				// the cli might not have the jre included
 				return;
 			}
-			final String customCacertsPath = CIEnvironmentVariables
+			final String customCacertsPath = ciEnvironmentVariables
 					.getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
 			final File customCacerts = new File(customCacertsPath);
 

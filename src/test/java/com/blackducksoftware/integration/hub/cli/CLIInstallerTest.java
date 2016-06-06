@@ -32,11 +32,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import com.blackducksoftware.integration.hub.CIEnvironmentVariables;
 import com.blackducksoftware.integration.hub.util.TestLogger;
 
 public class CLIInstallerTest {
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
+
+	public CIEnvironmentVariables ciEnvironmentVariables = new CIEnvironmentVariables();
 
 	@Test
 	public void testCustomInstall_2_4_2() throws Exception {
@@ -47,7 +50,7 @@ public class CLIInstallerTest {
 		final URL cliZip = classLoader.getResource("scan.cli-2.4.2.zip");
 		final TestLogger logger = new TestLogger();
 
-		final CLIInstaller installer = new CLIInstaller(cliLocation);
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
 		installer.customInstall(cliZip, "2.4.2", "localHost", logger);
 
 		assertNotNull(cliLocation.getCLIHome());
@@ -69,7 +72,7 @@ public class CLIInstallerTest {
 		URL cliZip = classLoader.getResource("scan.cli-2.4.2.zip");
 		TestLogger logger = new TestLogger();
 
-		final CLIInstaller installer = new CLIInstaller(cliLocation);
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
 		installer.customInstall(cliZip, "2.4.2", "localHost", logger);
 
 		assertNotNull(cliLocation.getCLIHome());
@@ -105,7 +108,7 @@ public class CLIInstallerTest {
 		final URL cliZip = classLoader.getResource("scan.cli-3.1.0.zip");
 		final TestLogger logger = new TestLogger();
 
-		final CLIInstaller installer = new CLIInstaller(cliLocation);
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
 		installer.customInstall(cliZip, "3.1.0", "localHost", logger);
 
 		assertNotNull(cliLocation.getCLIHome());
@@ -126,7 +129,7 @@ public class CLIInstallerTest {
 		final URL cliZip = classLoader.getResource("scan.cli-3.1.0.zip");
 		TestLogger logger = new TestLogger();
 
-		final CLIInstaller installer = new CLIInstaller(cliLocation);
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
 		installer.customInstall(cliZip, "3.1.0", "localHost", logger);
 
 		assertNotNull(cliLocation.getCLIHome());
@@ -163,7 +166,7 @@ public class CLIInstallerTest {
 		final URL cliZip = classLoader.getResource("scan.cli-3.1.0.zip");
 		TestLogger logger = new TestLogger();
 
-		final CLIInstaller installer = new CLIInstaller(cliLocation);
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
 		installer.customInstall(cliZip, "3.1.0", "localHost", logger);
 
 		assertNotNull(cliLocation.getCLIHome());
