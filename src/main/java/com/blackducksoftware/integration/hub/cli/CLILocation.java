@@ -3,6 +3,8 @@ package com.blackducksoftware.integration.hub.cli;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.SystemUtils;
 
@@ -187,7 +189,9 @@ public class CLILocation {
 
 	private File getJreContentsDirectory(final File jreFolder) {
 		File jreContents = jreFolder;
-		if (SystemUtils.IS_OS_MAC_OSX) {
+
+		final List<String> filenames = Arrays.asList(jreContents.list());
+		if (filenames.contains("Contents")) {
 			jreContents = new File(jreContents, "Contents");
 			jreContents = new File(jreContents, "Home");
 		}

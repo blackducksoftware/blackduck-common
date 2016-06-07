@@ -21,18 +21,23 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.cli;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.blackducksoftware.integration.hub.CIEnvironmentVariables;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.util.TestLogger;
 
 public class CLIInstallerTest {
@@ -189,6 +194,53 @@ public class CLIInstallerTest {
 
 		assertTrue(logger.getErrorList().isEmpty());
 		assertTrue(logger.getOutputString(), !logger.getOutputString().contains("Unpacking file:"));
+	}
+
+	@Test
+	public void testCustomInstallWithCacertsOverride()
+			throws IOException, InterruptedException, HubIntegrationException {
+		final File directoryToInstallTo = folder.newFolder();
+		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
+
+		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		final URL cliZip = classLoader.getResource("scan.cli-3.0.3.zip");
+		final TestLogger logger = new TestLogger();
+
+		final File cacertsFolder = folder.newFolder();
+		final File customCacerts = new File(cacertsFolder, "custom_cacerts");
+		customCacerts.createNewFile();
+		FileUtils.write(customCacerts, "a test cacerts file for testing");
+
+		final String customCacertsPath = customCacerts.getAbsolutePath();
+		ciEnvironmentVariables.put(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE, customCacertsPath);
+
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
+		installer.customInstall(cliZip, "3.0.3", "localHost", logger);
+
+		final File securityDirectory = cliLocation.getJreSecurityDirectory();
+		final File cacerts = new File(securityDirectory, "cacerts");
+		final String cacertsContents = FileUtils.readFileToString(cacerts);
+		assertEquals("a test cacerts file for testing", cacertsContents);
+	}
+
+	@Test
+	public void testCustomInstallWithoutCacertsOverride()
+			throws IOException, InterruptedException, HubIntegrationException {
+		final File directoryToInstallTo = folder.newFolder();
+		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
+
+		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		final URL cliZip = classLoader.getResource("scan.cli-3.0.3.zip");
+		final String expectedCacertsContents = IOUtils.toString(classLoader.getResourceAsStream("cacerts"));
+		final TestLogger logger = new TestLogger();
+
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
+		installer.customInstall(cliZip, "3.0.3", "localHost", logger);
+
+		final File securityDirectory = cliLocation.getJreSecurityDirectory();
+		final File cacerts = new File(securityDirectory, "cacerts");
+		final String cacertsContents = FileUtils.readFileToString(cacerts);
+		assertEquals(expectedCacertsContents, cacertsContents);
 	}
 
 }
