@@ -22,116 +22,47 @@
 package com.blackducksoftware.integration.hub.cli;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
-import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mockito;
 
-import com.blackducksoftware.integration.hub.HubIntRestService;
-import com.blackducksoftware.integration.hub.HubSupportHelper;
+import com.blackducksoftware.integration.hub.CIEnvironmentVariables;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.util.TestLogger;
 
 public class CLIInstallerTest {
-
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
 
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
-
-	@Test
-	public void testConstructorNull() throws Exception {
-		exception.expect(IllegalArgumentException.class);
-		exception.expectMessage("You must provided a directory to install the CLI to.");
-		new CLIInstaller(null);
-	}
-
-	@Test
-	public void testConstructor() throws Exception {
-		final File directoryToInstallTo = folder.newFolder();
-		final CLIInstaller installer = new CLIInstaller(directoryToInstallTo);
-
-		assertEquals(directoryToInstallTo, installer.getDirectoryToInstallTo());
-		assertEquals(new File(directoryToInstallTo, CLIInstaller.CLI_UNZIP_DIR), installer.getCLIInstallDir());
-		assertNull(installer.getCLIHome());
-		assertNull(installer.getProvidedJavaExec());
-		assertFalse(installer.getCLIExists(null));
-		assertNull(installer.getCLI());
-		assertNull(installer.getOneJarFile());
-
-	}
-
-	@Test
-	public void testGetCLIDownloadUrlJreSupported() throws Exception {
-		final String baseUrl = "http://test-hub-server";
-
-		final File directoryToInstallTo = folder.newFolder();
-		final CLIInstaller installer = new CLIInstaller(directoryToInstallTo);
-		HubIntRestService restService = new HubIntRestService(baseUrl);
-		restService = Mockito.spy(restService);
-		Mockito.doReturn("3.0.1").when(restService).getHubVersion();
-
-		final String downloadUrl = installer.getCLIDownloadUrl(null, restService);
-
-		final StringBuilder urlBuilder = new StringBuilder();
-		urlBuilder.append(baseUrl + "/download/");
-
-		if (SystemUtils.IS_OS_MAC_OSX) {
-			urlBuilder.append(HubSupportHelper.MAC_CLI_DOWNLOAD);
-			assertEquals(urlBuilder.toString(), downloadUrl);
-		} else if (SystemUtils.IS_OS_WINDOWS) {
-			urlBuilder.append(HubSupportHelper.WINDOWS_CLI_DOWNLOAD);
-			assertEquals(urlBuilder.toString(), downloadUrl);
-		} else {
-			urlBuilder.append(HubSupportHelper.DEFAULT_CLI_DOWNLOAD);
-			assertEquals(urlBuilder.toString(), downloadUrl);
-		}
-	}
-
-	@Test
-	public void testGetCLIDownloadUrlJreNotSupported() throws Exception {
-		final String baseUrl = "http://test-hub-server";
-
-		final File directoryToInstallTo = folder.newFolder();
-		final CLIInstaller installer = new CLIInstaller(directoryToInstallTo);
-		HubIntRestService restService = new HubIntRestService(baseUrl);
-		restService = Mockito.spy(restService);
-		Mockito.doReturn("2.4.0").when(restService).getHubVersion();
-
-		final String downloadUrl = installer.getCLIDownloadUrl(null, restService);
-
-		final StringBuilder urlBuilder = new StringBuilder();
-		urlBuilder.append(baseUrl + "/download/");
-		urlBuilder.append(HubSupportHelper.DEFAULT_CLI_DOWNLOAD);
-		assertEquals(urlBuilder.toString(), downloadUrl);
-	}
+	public CIEnvironmentVariables ciEnvironmentVariables = new CIEnvironmentVariables();
 
 	@Test
 	public void testCustomInstall_2_4_2() throws Exception {
 		final File directoryToInstallTo = folder.newFolder();
-		final CLIInstaller installer = new CLIInstaller(directoryToInstallTo);
+		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
 		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		final URL cliZip = classLoader.getResource("scan.cli-2.4.2.zip");
 		final TestLogger logger = new TestLogger();
 
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
 		installer.customInstall(cliZip, "2.4.2", "localHost", logger);
 
-		assertNotNull(installer.getCLIHome());
-		assertNull(installer.getProvidedJavaExec());
-		assertTrue(installer.getCLIExists(logger));
-		assertNotNull(installer.getCLI());
-		assertNotNull(installer.getOneJarFile());
+		assertNotNull(cliLocation.getCLIHome());
+		assertNull(cliLocation.getProvidedJavaExec());
+		assertTrue(cliLocation.getCLIExists(logger));
+		assertNotNull(cliLocation.getCLI(logger));
+		assertNotNull(cliLocation.getOneJarFile());
 
 		assertTrue(logger.getErrorList().isEmpty());
 		assertTrue(logger.getOutputString(), logger.getOutputString().contains("Unpacking file:"));
@@ -140,19 +71,20 @@ public class CLIInstallerTest {
 	@Test
 	public void testCustomInstall_2_4_2_To_3_1_0() throws Exception {
 		final File directoryToInstallTo = folder.newFolder();
-		final CLIInstaller installer = new CLIInstaller(directoryToInstallTo);
+		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
 		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		URL cliZip = classLoader.getResource("scan.cli-2.4.2.zip");
 		TestLogger logger = new TestLogger();
 
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
 		installer.customInstall(cliZip, "2.4.2", "localHost", logger);
 
-		assertNotNull(installer.getCLIHome());
-		assertNull(installer.getProvidedJavaExec());
-		assertTrue(installer.getCLIExists(logger));
-		assertNotNull(installer.getCLI());
-		assertNotNull(installer.getOneJarFile());
+		assertNotNull(cliLocation.getCLIHome());
+		assertNull(cliLocation.getProvidedJavaExec());
+		assertTrue(cliLocation.getCLIExists(logger));
+		assertNotNull(cliLocation.getCLI(logger));
+		assertNotNull(cliLocation.getOneJarFile());
 
 		assertTrue(logger.getErrorList().isEmpty());
 		assertTrue(logger.getOutputString(), logger.getOutputString().contains("Unpacking file:"));
@@ -162,11 +94,11 @@ public class CLIInstallerTest {
 
 		installer.customInstall(cliZip, "3.1.0", "localHost", logger);
 
-		assertNotNull(installer.getCLIHome());
-		assertNull(installer.getProvidedJavaExec());
-		assertTrue(installer.getCLIExists(logger));
-		assertNotNull(installer.getCLI());
-		assertNotNull(installer.getOneJarFile());
+		assertNotNull(cliLocation.getCLIHome());
+		assertNull(cliLocation.getProvidedJavaExec());
+		assertTrue(cliLocation.getCLIExists(logger));
+		assertNotNull(cliLocation.getCLI(logger));
+		assertNotNull(cliLocation.getOneJarFile());
 
 		assertTrue(logger.getErrorList().isEmpty());
 		assertTrue(logger.getOutputString(), logger.getOutputString().contains("Unpacking file:"));
@@ -175,18 +107,19 @@ public class CLIInstallerTest {
 	@Test
 	public void testCustomInstall_3_1_0() throws Exception {
 		final File directoryToInstallTo = folder.newFolder();
-		final CLIInstaller installer = new CLIInstaller(directoryToInstallTo);
+		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
 		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		final URL cliZip = classLoader.getResource("scan.cli-3.1.0.zip");
 		final TestLogger logger = new TestLogger();
 
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
 		installer.customInstall(cliZip, "3.1.0", "localHost", logger);
 
-		assertNotNull(installer.getCLIHome());
-		assertTrue(installer.getCLIExists(logger));
-		assertNotNull(installer.getCLI());
-		assertNotNull(installer.getOneJarFile());
+		assertNotNull(cliLocation.getCLIHome());
+		assertTrue(cliLocation.getCLIExists(logger));
+		assertNotNull(cliLocation.getCLI(logger));
+		assertNotNull(cliLocation.getOneJarFile());
 
 		assertTrue(logger.getErrorList().isEmpty());
 		assertTrue(logger.getOutputString(), logger.getOutputString().contains("Unpacking file:"));
@@ -195,34 +128,35 @@ public class CLIInstallerTest {
 	@Test
 	public void testCustomInstall_3_1_0_Modified() throws Exception {
 		final File directoryToInstallTo = folder.newFolder();
-		final CLIInstaller installer = new CLIInstaller(directoryToInstallTo);
+		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
 		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		final URL cliZip = classLoader.getResource("scan.cli-3.1.0.zip");
 		TestLogger logger = new TestLogger();
 
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
 		installer.customInstall(cliZip, "3.1.0", "localHost", logger);
 
-		assertNotNull(installer.getCLIHome());
-		assertTrue(installer.getCLIExists(logger));
-		assertNotNull(installer.getCLI());
-		assertNotNull(installer.getOneJarFile());
+		assertNotNull(cliLocation.getCLIHome());
+		assertTrue(cliLocation.getCLIExists(logger));
+		assertNotNull(cliLocation.getCLI(logger));
+		assertNotNull(cliLocation.getOneJarFile());
 
 		assertTrue(logger.getErrorList().isEmpty());
 		assertTrue(logger.getOutputString(), logger.getOutputString().contains("Unpacking file:"));
 
-		final File hubVersionFile = new File(directoryToInstallTo, CLIInstaller.VERSION_FILE_NAME);
+		final File hubVersionFile = new File(directoryToInstallTo, CLILocation.VERSION_FILE_NAME);
 		hubVersionFile.setLastModified(0L);
 
 		logger = new TestLogger();
 
 		installer.customInstall(cliZip, "3.1.0", "localHost", logger);
 
-		assertNotNull(installer.getCLIHome());
-		assertNull(installer.getProvidedJavaExec());
-		assertTrue(installer.getCLIExists(logger));
-		assertNotNull(installer.getCLI());
-		assertNotNull(installer.getOneJarFile());
+		assertNotNull(cliLocation.getCLIHome());
+		assertNull(cliLocation.getProvidedJavaExec());
+		assertTrue(cliLocation.getCLIExists(logger));
+		assertNotNull(cliLocation.getCLI(logger));
+		assertNotNull(cliLocation.getOneJarFile());
 
 		assertTrue(logger.getErrorList().isEmpty());
 		assertTrue(logger.getOutputString(), logger.getOutputString().contains("Unpacking file:"));
@@ -231,18 +165,19 @@ public class CLIInstallerTest {
 	@Test
 	public void testCustomInstall_3_1_0_NotModified() throws Exception {
 		final File directoryToInstallTo = folder.newFolder();
-		final CLIInstaller installer = new CLIInstaller(directoryToInstallTo);
+		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
 		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		final URL cliZip = classLoader.getResource("scan.cli-3.1.0.zip");
 		TestLogger logger = new TestLogger();
 
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
 		installer.customInstall(cliZip, "3.1.0", "localHost", logger);
 
-		assertNotNull(installer.getCLIHome());
-		assertTrue(installer.getCLIExists(logger));
-		assertNotNull(installer.getCLI());
-		assertNotNull(installer.getOneJarFile());
+		assertNotNull(cliLocation.getCLIHome());
+		assertTrue(cliLocation.getCLIExists(logger));
+		assertNotNull(cliLocation.getCLI(logger));
+		assertNotNull(cliLocation.getOneJarFile());
 
 		assertTrue(logger.getErrorList().isEmpty());
 		assertTrue(logger.getOutputString(), logger.getOutputString().contains("Unpacking file:"));
@@ -251,14 +186,61 @@ public class CLIInstallerTest {
 
 		installer.customInstall(cliZip, "3.1.0", "localHost", logger);
 
-		assertNotNull(installer.getCLIHome());
-		assertNull(installer.getProvidedJavaExec());
-		assertTrue(installer.getCLIExists(logger));
-		assertNotNull(installer.getCLI());
-		assertNotNull(installer.getOneJarFile());
+		assertNotNull(cliLocation.getCLIHome());
+		assertNull(cliLocation.getProvidedJavaExec());
+		assertTrue(cliLocation.getCLIExists(logger));
+		assertNotNull(cliLocation.getCLI(logger));
+		assertNotNull(cliLocation.getOneJarFile());
 
 		assertTrue(logger.getErrorList().isEmpty());
 		assertTrue(logger.getOutputString(), !logger.getOutputString().contains("Unpacking file:"));
+	}
+
+	@Test
+	public void testCustomInstallWithCacertsOverride()
+			throws IOException, InterruptedException, HubIntegrationException {
+		final File directoryToInstallTo = folder.newFolder();
+		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
+
+		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		final URL cliZip = classLoader.getResource("scan.cli-3.0.3.zip");
+		final TestLogger logger = new TestLogger();
+
+		final File cacertsFolder = folder.newFolder();
+		final File customCacerts = new File(cacertsFolder, "custom_cacerts");
+		customCacerts.createNewFile();
+		FileUtils.write(customCacerts, "a test cacerts file for testing");
+
+		final String customCacertsPath = customCacerts.getAbsolutePath();
+		ciEnvironmentVariables.put(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE, customCacertsPath);
+
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
+		installer.customInstall(cliZip, "3.0.3", "localHost", logger);
+
+		final File securityDirectory = cliLocation.getJreSecurityDirectory();
+		final File cacerts = new File(securityDirectory, "cacerts");
+		final String cacertsContents = FileUtils.readFileToString(cacerts);
+		assertEquals("a test cacerts file for testing", cacertsContents);
+	}
+
+	@Test
+	public void testCustomInstallWithoutCacertsOverride()
+			throws IOException, InterruptedException, HubIntegrationException {
+		final File directoryToInstallTo = folder.newFolder();
+		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
+
+		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		final URL cliZip = classLoader.getResource("scan.cli-3.0.3.zip");
+		final String expectedCacertsContents = IOUtils.toString(classLoader.getResourceAsStream("cacerts"));
+		final TestLogger logger = new TestLogger();
+
+		final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
+		installer.customInstall(cliZip, "3.0.3", "localHost", logger);
+
+		final File securityDirectory = cliLocation.getJreSecurityDirectory();
+		final File cacerts = new File(securityDirectory, "cacerts");
+		final String cacertsContents = FileUtils.readFileToString(cacerts);
+		assertEquals(expectedCacertsContents, cacertsContents);
 	}
 
 }
