@@ -173,7 +173,7 @@ public class HubIntRestService {
 	 */
 	public List<ProjectItem> getProjectMatches(final String projectName)
 			throws IOException, BDRestException, URISyntaxException {
-		return getProjectMatches(projectName, 15);
+		return getProjectMatches(projectName, Integer.MAX_VALUE);
 	}
 
 	/**
@@ -216,7 +216,7 @@ public class HubIntRestService {
 	 */
 	public ProjectItem getProjectByName(final String projectName)
 			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
-		return getProjectByName(projectName, 15);
+		return getProjectByName(projectName, Integer.MAX_VALUE);
 	}
 
 	/**
