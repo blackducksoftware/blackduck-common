@@ -173,11 +173,26 @@ public class HubIntRestService {
 	 */
 	public List<ProjectItem> getProjectMatches(final String projectName)
 			throws IOException, BDRestException, URISyntaxException {
+		return getProjectMatches(projectName, Integer.MAX_VALUE);
+	}
+
+	/**
+	 * Retrieves a list of Hub Projects that may match the hubProjectName,
+	 * default limit is 10
+	 *
+	 */
+	public List<ProjectItem> getProjectMatches(final String projectName, final int limit)
+			throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = getRestConnection().createClientResource();
 		resource.addSegment("api");
 		resource.addSegment("projects");
-		resource.addQueryParameter("q", "name:" + projectName);
-		resource.addQueryParameter("limit", "15");
+		if (StringUtils.isNotBlank(projectName)) {
+			resource.addQueryParameter("q", "name:" + projectName);
+		}
+		if (limit > 0) {
+			// if limit is not provided, the default is 10
+			resource.addQueryParameter("limit", String.valueOf(limit));
+		}
 		resource.setMethod(Method.GET);
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
@@ -201,11 +216,24 @@ public class HubIntRestService {
 	 */
 	public ProjectItem getProjectByName(final String projectName)
 			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
+		return getProjectByName(projectName, Integer.MAX_VALUE);
+	}
+
+	/**
+	 * Gets the Project that is specified by the projectName, default limit is
+	 * 10
+	 *
+	 */
+	public ProjectItem getProjectByName(final String projectName, final int limit)
+			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
 		final ClientResource resource = getRestConnection().createClientResource();
 		resource.addSegment("api");
 		resource.addSegment("projects");
 		resource.addQueryParameter("q", "name:" + projectName);
-		resource.addQueryParameter("limit", "15");
+		if (limit > 0) {
+			// if limit is not provided, the default is 10
+			resource.addQueryParameter("limit", String.valueOf(limit));
+		}
 		resource.setMethod(Method.GET);
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
@@ -335,7 +363,7 @@ public class HubIntRestService {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header projectUrl = responseHeaders.getFirst("location", true);
 
 			if (projectUrl == null || StringUtils.isBlank(projectUrl.getValue())) {
@@ -380,7 +408,7 @@ public class HubIntRestService {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header versionUrl = responseHeaders.getFirst("location", true);
 
 			if (versionUrl == null || StringUtils.isBlank(versionUrl.getValue())) {
@@ -391,7 +419,7 @@ public class HubIntRestService {
 			throw new BDRestException(
 					"There was a problem creating this Version for the specified Hub Project. Error Code: "
 							+ responseCode,
-					resource);
+							resource);
 		}
 	}
 
@@ -446,7 +474,7 @@ public class HubIntRestService {
 			throw new BDRestException(
 					"There was a problem comparing the specified version to the version of the Hub server. Error Code: "
 							+ responseCode,
-					resource);
+							resource);
 		}
 	}
 
@@ -501,7 +529,7 @@ public class HubIntRestService {
 				throw new BDRestException(
 						"There was a problem getting the code locations for the host and paths provided. Error Code: "
 								+ responseCode,
-						resource);
+								resource);
 			}
 		}
 		return codeLocations;
@@ -566,7 +594,7 @@ public class HubIntRestService {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			final Header reportUrl = responseHeaders.getFirst("location", true);
 
 			if (reportUrl == null || StringUtils.isBlank(reportUrl.getValue())) {
@@ -600,7 +628,7 @@ public class HubIntRestService {
 
 		@SuppressWarnings("unchecked")
 		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
-				.get(HeaderConstants.ATTRIBUTE_HEADERS);
+		.get(HeaderConstants.ATTRIBUTE_HEADERS);
 		if (requestHeaders == null) {
 			requestHeaders = new Series<Header>(Header.class);
 			resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
