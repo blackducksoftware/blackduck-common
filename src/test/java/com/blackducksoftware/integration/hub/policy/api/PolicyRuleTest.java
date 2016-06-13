@@ -24,7 +24,6 @@ public class PolicyRuleTest {
 		final String description1 = "description1";
 		final Boolean enabled1 = true;
 		final Boolean overridable1 = true;
-		final String expression1 = "expression1";
 		final String createdAt1 = "createdAt1";
 		final String createdBy1 = "createdBy1";
 		final String updatedAt1 = "updatedAt1";
@@ -43,7 +42,6 @@ public class PolicyRuleTest {
 		final String description2 = "description2";
 		final Boolean enabled2 = false;
 		final Boolean overridable2 = false;
-		final String expression2 = "expression2";
 		final DateTime createdAt2 = new DateTime();
 		final String createdBy2 = "createdBy2";
 		final DateTime updatedAt2 = new DateTime();
@@ -58,13 +56,13 @@ public class PolicyRuleTest {
 		links2.add(link2);
 		final MetaInformation _meta2 = new MetaInformation(allows2, href2, links2);
 
-		final PolicyRule item1 = new PolicyRule(_meta1, name1, description1, enabled1, overridable1, expression1,
+		final PolicyRule item1 = new PolicyRule(_meta1, name1, description1, enabled1, overridable1,
 				createdAt1, createdBy1, updatedAt1, updatedBy1);
-		final PolicyRule item2 = new PolicyRule(_meta2, name2, description2, enabled2, overridable2, expression2,
+		final PolicyRule item2 = new PolicyRule(_meta2, name2, description2, enabled2, overridable2,
 				createdAt2.toString(), createdBy2, updatedAt2.toString(), updatedBy2);
-		final PolicyRule item3 = new PolicyRule(_meta1, name1, description1, enabled1, overridable1, expression1,
+		final PolicyRule item3 = new PolicyRule(_meta1, name1, description1, enabled1, overridable1,
 				createdAt1, createdBy1, updatedAt1, updatedBy1);
-		final PolicyRule item4 = new PolicyRule(null, null, null, null, null, null, null, null, null, null);
+		final PolicyRule item4 = new PolicyRule(null, null, null, null, null, null, null, null, null);
 
 		assertNull(item4.getCreatedAtTime());
 		assertNull(item4.getUpdatedAtTime());
@@ -74,7 +72,6 @@ public class PolicyRuleTest {
 		assertEquals(description1, item1.getDescription());
 		assertEquals(enabled1, item1.getEnabled());
 		assertEquals(overridable1, item1.getOverridable());
-		assertEquals(expression1, item1.getExpression());
 		assertEquals(createdAt1, item1.getCreatedAt());
 		assertEquals(createdBy1, item1.getCreatedBy());
 		assertEquals(updatedAt1, item1.getUpdatedAt());
@@ -87,7 +84,6 @@ public class PolicyRuleTest {
 		assertEquals(description2, item2.getDescription());
 		assertEquals(enabled2, item2.getEnabled());
 		assertEquals(overridable2, item2.getOverridable());
-		assertEquals(expression2, item2.getExpression());
 		assertEquals(createdAt2.toString(), item2.getCreatedAt());
 		assertEquals(createdBy2, item2.getCreatedBy());
 		assertEquals(updatedAt2.toString(), item2.getUpdatedAt());
@@ -112,8 +108,6 @@ public class PolicyRuleTest {
 		builder.append(item1.getEnabled());
 		builder.append(", overridable=");
 		builder.append(item1.getOverridable());
-		builder.append(", expression=");
-		builder.append(item1.getExpression());
 		builder.append(", createdAt=");
 		builder.append(item1.getCreatedAt());
 		builder.append(", createdBy=");

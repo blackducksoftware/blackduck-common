@@ -129,6 +129,7 @@ public class HubItemsService<T> {
 
 		if (restConnection.isSuccess(responseCode)) {
 			final JsonArray array = parseJsonArray(resource);
+
 			for (final JsonElement elem : array) {
 				final T genericItem = gson.fromJson(elem,
 						requestListTypeToken.getType());
