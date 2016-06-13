@@ -47,6 +47,33 @@ public class HubItemsService<T> {
 	 *            The common parent class of all items.
 	 * @param requestListTypeToken
 	 *            A Gson type token used to convert each item to an object
+	 */
+	public HubItemsService(final RestConnection restConnection, final TypeToken<T> requestListTypeToken) {
+		this(restConnection, null, requestListTypeToken, null);
+	}
+
+	/**
+	 * Construct a service for a given type of list.
+	 *
+	 * @param restConnection
+	 * @param baseType
+	 *            The common parent class of all items.
+	 * @param requestListTypeToken
+	 *            A Gson type token used to convert each item to an object
+	 */
+	public HubItemsService(final RestConnection restConnection, final Class<T> baseType,
+			final TypeToken<T> requestListTypeToken) {
+		this(restConnection, baseType, requestListTypeToken, null);
+	}
+
+	/**
+	 * Construct a service for a given type of list.
+	 *
+	 * @param restConnection
+	 * @param baseType
+	 *            The common parent class of all items.
+	 * @param requestListTypeToken
+	 *            A Gson type token used to convert each item to an object
 	 * @param typeNameToSubclassMap
 	 *            A mapping of type field values to item subclass types
 	 */
@@ -57,17 +84,23 @@ public class HubItemsService<T> {
 		this.restConnection = restConnection;
 		this.requestListTypeToken = requestListTypeToken;
 
-		final RuntimeTypeAdapterFactory<T> modelClassTypeAdapter = RuntimeTypeAdapterFactory
-				.of(baseType, "type");
-		for (final String typeName : typeNameToSubclassMap.keySet()) {
-			modelClassTypeAdapter.registerSubtype(
-					typeNameToSubclassMap.get(typeName), typeName);
-		}
 		final GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapterFactory(modelClassTypeAdapter);
+
+		if (baseType != null) {
+			final RuntimeTypeAdapterFactory<T> modelClassTypeAdapter = RuntimeTypeAdapterFactory
+					.of(baseType, "type");
+			if (typeNameToSubclassMap != null) {
+				for (final String typeName : typeNameToSubclassMap.keySet()) {
+					modelClassTypeAdapter.registerSubtype(
+							typeNameToSubclassMap.get(typeName), typeName);
+				}
+			}
+			gsonBuilder.registerTypeAdapterFactory(modelClassTypeAdapter);
+		}
 		gson = gsonBuilder.setDateFormat(RestConnection.JSON_DATE_FORMAT)
 				.create();
 	}
+
 
 	/**
 	 * Get (from the Hub, via a relative URL) a polymorphic item list.
