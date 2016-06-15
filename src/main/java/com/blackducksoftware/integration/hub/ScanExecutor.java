@@ -305,8 +305,10 @@ public abstract class ScanExecutor {
 				getLogger().debug("Using this Hub hostname : '" + url.getHost() + "'");
 				cmd.add("--username");
 				cmd.add(getHubUsername());
-				cmd.add("--password");
-				cmd.add(getHubPassword());
+				if (!supportHelper.isCliPasswordEnvironmentVar()) {
+					cmd.add("--password");
+					cmd.add(getHubPassword());
+				}
 
 				if (url.getPort() != -1) {
 					cmd.add("--port");
