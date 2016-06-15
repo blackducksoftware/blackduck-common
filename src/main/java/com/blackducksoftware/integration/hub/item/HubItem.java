@@ -1,5 +1,8 @@
 package com.blackducksoftware.integration.hub.item;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 import com.google.gson.annotations.SerializedName;
@@ -24,15 +27,38 @@ public class HubItem {
 	}
 
 	public String getLink(final String linkRel) {
-		if (getMeta() != null && getMeta().getLinks() != null
-				&& !getMeta().getLinks().isEmpty()) {
-			for (final MetaLink link : getMeta().getLinks()) {
-				if (link.getRel().equalsIgnoreCase(linkRel)) {
+		if (linksExist()) {
+			for (final MetaLink link : getLinks()) {
+				if (isRequestedLink(linkRel, link)) {
 					return link.getHref();
 				}
 			}
 		}
 		return null;
+	}
+
+	private List<MetaLink> getLinks() {
+		return getMeta().getLinks();
+	}
+
+	public List<String> getLinks(final String linkRel) {
+		final List<String> links = new ArrayList<String>();
+		if (linksExist()) {
+			for (final MetaLink link : getLinks()) {
+				if (isRequestedLink(linkRel, link)) {
+					links.add(link.getHref());
+				}
+			}
+		}
+		return links;
+	}
+
+	private boolean isRequestedLink(final String linkRel, final MetaLink link) {
+		return link.getRel().equalsIgnoreCase(linkRel);
+	}
+
+	private boolean linksExist() {
+		return getMeta() != null && getLinks() != null && !getLinks().isEmpty();
 	}
 
 	@Override
