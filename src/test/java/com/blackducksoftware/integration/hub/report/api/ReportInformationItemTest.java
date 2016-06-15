@@ -28,14 +28,14 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+
 import org.joda.time.DateTime;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 public class ReportInformationItemTest {
 
@@ -94,7 +94,7 @@ public class ReportInformationItemTest {
 		assertEquals(updatedAt1, item1.getUpdatedAt());
 		assertEquals(finishedAt1, item1.getFinishedAt());
 		assertEquals(createdBy1, item1.getCreatedBy());
-		assertEquals(_meta1, item1.get_meta());
+		assertEquals(_meta1, item1.getMeta());
 
 		assertEquals(reportFormat2, item2.getReportFormat());
 		assertEquals(locale2, item2.getLocale());
@@ -104,7 +104,7 @@ public class ReportInformationItemTest {
 		assertEquals(updatedAt2, item2.getUpdatedAt());
 		assertEquals(finishedAt2, item2.getFinishedAt());
 		assertEquals(createdBy2, item2.getCreatedBy());
-		assertEquals(_meta2, item2.get_meta());
+		assertEquals(_meta2, item2.getMeta());
 
 		assertTrue(!item1.equals(item2));
 		assertTrue(item1.equals(item3));
@@ -166,7 +166,7 @@ public class ReportInformationItemTest {
 		builder.append(", createdBy=");
 		builder.append(item1.getCreatedBy());
 		builder.append(", _meta=");
-		builder.append(item1.get_meta());
+		builder.append(item1.getMeta());
 		builder.append("]");
 
 		assertEquals(builder.toString(), item1.toString());

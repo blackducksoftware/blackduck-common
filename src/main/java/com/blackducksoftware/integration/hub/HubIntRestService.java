@@ -44,6 +44,7 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.MissingPolicyStatusException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
+import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.exception.VersionDoesNotExistException;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
@@ -296,7 +297,8 @@ public class HubIntRestService {
 	 *
 	 */
 	public ReleaseItem getVersion(final ProjectItem project, final String versionName)
-			throws IOException, BDRestException, URISyntaxException, VersionDoesNotExistException {
+ throws IOException,
+			BDRestException, URISyntaxException, VersionDoesNotExistException, UnexpectedHubResponseException {
 		final List<ReleaseItem> versions = getVersionsForProject(project);
 		for (final ReleaseItem version : versions) {
 			if (version.getVersionName().equals(versionName)) {
@@ -312,9 +314,11 @@ public class HubIntRestService {
 	 *
 	 */
 	public List<ReleaseItem> getVersionsForProject(final ProjectItem project)
-			throws IOException, BDRestException, URISyntaxException {
+ throws IOException, BDRestException,
+			URISyntaxException, UnexpectedHubResponseException {
+		final String versionLink = getVersionLink(project);
 		final ClientResource resource = getRestConnection()
-				.createClientResource(project.getLink(ProjectItem.VERSION_LINK));
+				.createClientResource(versionLink);
 		resource.addQueryParameter("limit", "10000000");
 		resource.setMethod(Method.GET);
 		getRestConnection().handleRequest(resource);
@@ -334,6 +338,26 @@ public class HubIntRestService {
 			throw new BDRestException(
 					"There was a problem getting the versions for this Project. Error Code: " + responseCode, resource);
 		}
+	}
+
+	private String getVersionLink(final ProjectItem project) throws UnexpectedHubResponseException {
+		final List<String> versionLinks = project.getLinks(ProjectItem.VERSION_LINK);
+		if (versionLinks.size() != 1) {
+			throw new UnexpectedHubResponseException("The project " + project.getName() + " has " + versionLinks.size()
+					+ " " + ProjectItem.VERSION_LINK + " links; expected one");
+		}
+		final String versionLink = versionLinks.get(0);
+		return versionLink;
+	}
+
+	private String getVersionReportLink(final ReleaseItem version) throws UnexpectedHubResponseException {
+		final List<String> versionLinks = version.getLinks(ReleaseItem.VERSION_REPORT_LINK);
+		if (versionLinks.size() != 1) {
+			throw new UnexpectedHubResponseException("The release " + version.getVersionName() + " has "
+					+ versionLinks.size() + " " + ProjectItem.VERSION_LINK + " links; expected one");
+		}
+		final String versionLink = versionLinks.get(0);
+		return versionLink;
 	}
 
 	/**
@@ -384,9 +408,9 @@ public class HubIntRestService {
 	 *
 	 */
 	public String createHubVersion(final ProjectItem project, final String versionName, final String phase,
-			final String dist) throws IOException, BDRestException, URISyntaxException {
+			final String dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
 		final ClientResource resource = getRestConnection()
-				.createClientResource(project.getLink(ProjectItem.VERSION_LINK));
+.createClientResource(getVersionLink(project));
 
 		final int responseCode;
 		final ReleaseItem newRelease = new ReleaseItem(versionName, phase, dist, null, null);
@@ -565,13 +589,14 @@ public class HubIntRestService {
 	 *
 	 */
 	public String generateHubReport(final ReleaseItem version, final ReportFormatEnum reportFormat)
-			throws IOException, BDRestException, URISyntaxException {
+ throws IOException,
+			BDRestException, URISyntaxException, UnexpectedHubResponseException {
 		if (ReportFormatEnum.UNKNOWN == reportFormat) {
 			throw new IllegalArgumentException("Can not generate a report of format : " + reportFormat);
 		}
 
 		final ClientResource resource = getRestConnection()
-				.createClientResource(version.getLink(ReleaseItem.VERSION_REPORT_LINK));
+.createClientResource(getVersionReportLink(version));
 
 		resource.setMethod(Method.POST);
 

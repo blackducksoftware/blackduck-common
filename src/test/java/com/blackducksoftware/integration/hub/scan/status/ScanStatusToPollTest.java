@@ -48,11 +48,11 @@ public class ScanStatusToPollTest {
 
 		assertEquals(status1, item1.getStatus());
 		assertEquals(ScanStatus.UNKNOWN, item1.getStatusEnum());
-		assertEquals(meta1, item1.get_meta());
+		assertEquals(meta1, item1.getMeta());
 
 		assertEquals(status2, item2.getStatus());
 		assertEquals(ScanStatus.COMPLETE, item2.getStatusEnum());
-		assertEquals(meta2, item2.get_meta());
+		assertEquals(meta2, item2.getMeta());
 
 		assertTrue(!item1.equals(item2));
 		assertTrue(item1.equals(item3));

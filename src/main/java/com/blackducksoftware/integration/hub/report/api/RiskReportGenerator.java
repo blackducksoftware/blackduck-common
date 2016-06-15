@@ -29,6 +29,7 @@ import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 import com.blackducksoftware.integration.hub.polling.HubEventPolling;
@@ -48,7 +49,7 @@ public class RiskReportGenerator {
 	}
 
 	public HubRiskReportData generateHubReport(final IntLogger logger) throws IOException, BDRestException, URISyntaxException, InterruptedException,
-	HubIntegrationException {
+ HubIntegrationException, UnexpectedHubResponseException {
 		logger.debug("Waiting for the bom to be updated with the scan results.");
 		final HubEventPolling hubEventPolling = getHubEventPolling(hubReportGenerationInfo.getService());
 
@@ -64,7 +65,7 @@ public class RiskReportGenerator {
 
 		final ReportInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl, hubReportGenerationInfo.getMaximumWaitTime());
 
-		final List<MetaLink> links = reportInfo.get_meta().getLinks();
+		final List<MetaLink> links = reportInfo.getMeta().getLinks();
 
 		MetaLink contentLink = null;
 		for (final MetaLink link : links) {

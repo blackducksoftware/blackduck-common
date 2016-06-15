@@ -30,7 +30,7 @@ public class HubItemTest {
 
 	@Test
 	public void test() {
-		final HubItem hubItem = new HubItem();
+
 		final List<MetaLink> links = new ArrayList<MetaLink>();
 
 		links.add(new MetaLink(POLICY_RULE_LINK_NAME, TEST_POLICY_RULE_URL_1));
@@ -38,13 +38,14 @@ public class HubItemTest {
 		links.add(new MetaLink(OTHER_LINK_NAME, OTHER_URL));
 
 		final MetaInformation meta = new MetaInformation(null, null, links);
-		hubItem.setMeta(meta);
-
-		assertEquals(TEST_POLICY_RULE_URL_1, hubItem.getLink(POLICY_RULE_LINK_NAME));
-		assertEquals(OTHER_URL, hubItem.getLink(OTHER_LINK_NAME));
+		final HubItem hubItem = new HubItem(meta);
 
 		assertEquals(2, hubItem.getLinks(POLICY_RULE_LINK_NAME).size());
+		assertEquals(TEST_POLICY_RULE_URL_1, hubItem.getLinks(POLICY_RULE_LINK_NAME).get(0));
 		assertEquals(TEST_POLICY_RULE_URL_2, hubItem.getLinks(POLICY_RULE_LINK_NAME).get(1));
+
+		assertEquals(1, hubItem.getLinks(OTHER_LINK_NAME).size());
+		assertEquals(OTHER_URL, hubItem.getLinks(OTHER_LINK_NAME).get(0));
 	}
 
 }

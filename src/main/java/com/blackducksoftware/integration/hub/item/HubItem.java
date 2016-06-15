@@ -16,29 +16,13 @@ import com.google.gson.annotations.SerializedName;
 public class HubItem {
 
 	@SerializedName("_meta")
-	private MetaInformation meta;
+	private final MetaInformation meta;
 
-	public MetaInformation getMeta() {
-		return meta;
-	}
-
-	public void setMeta(final MetaInformation meta) {
+	public HubItem(final MetaInformation meta) {
 		this.meta = meta;
 	}
-
-	public String getLink(final String linkRel) {
-		if (linksExist()) {
-			for (final MetaLink link : getLinks()) {
-				if (isRequestedLink(linkRel, link)) {
-					return link.getHref();
-				}
-			}
-		}
-		return null;
-	}
-
-	private List<MetaLink> getLinks() {
-		return getMeta().getLinks();
+	public MetaInformation getMeta() {
+		return meta;
 	}
 
 	public List<String> getLinks(final String linkRel) {
@@ -51,6 +35,10 @@ public class HubItem {
 			}
 		}
 		return links;
+	}
+
+	private List<MetaLink> getLinks() {
+		return getMeta().getLinks();
 	}
 
 	private boolean isRequestedLink(final String linkRel, final MetaLink link) {
