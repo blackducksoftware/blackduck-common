@@ -23,13 +23,12 @@ package com.blackducksoftware.integration.hub.version.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 public class ReleaseItemTest {
 
@@ -57,8 +56,8 @@ public class ReleaseItemTest {
 		assertEquals(phase1, item1.getPhase());
 		assertEquals(distribution1, item1.getDistribution());
 		assertEquals(source1, item1.getSource());
-		assertEquals(href1, item1.get_meta().getHref());
-		assertEquals(metaInfo1, item1.get_meta());
+		assertEquals(href1, item1.getMeta().getHref());
+		assertEquals(metaInfo1, item1.getMeta());
 
 		assertEquals(versionName2, item2.getVersionName());
 		assertEquals(phase2, item2.getPhase());
@@ -66,8 +65,8 @@ public class ReleaseItemTest {
 		assertEquals(PhaseEnum.ARCHIVED, item2.getPhaseEnum());
 		assertEquals(DistributionEnum.EXTERNAL, item2.getDistributionEnum());
 		assertEquals(source2, item2.getSource());
-		assertEquals(href2, item2.get_meta().getHref());
-		assertEquals(metaInfo2, item2.get_meta());
+		assertEquals(href2, item2.getMeta().getHref());
+		assertEquals(metaInfo2, item2.getMeta());
 
 		assertTrue(!item1.equals(item2));
 		assertTrue(item1.equals(item3));
@@ -87,7 +86,7 @@ public class ReleaseItemTest {
 		builder.append(", source=");
 		builder.append(item1.getSource());
 		builder.append(", _meta=");
-		builder.append(item1.get_meta());
+		builder.append(item1.getMeta());
 		builder.append("]");
 
 		assertEquals(builder.toString(), item1.toString());

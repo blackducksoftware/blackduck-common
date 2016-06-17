@@ -1,5 +1,8 @@
 package com.blackducksoftware.integration.hub.item;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
@@ -21,21 +24,32 @@ public class HubItem {
 	public HubItem(final MetaInformation meta) {
 		this.meta = meta;
 	}
-
 	public MetaInformation getMeta() {
 		return meta;
 	}
 
-	public String getLink(final String linkRel) {
-		if (getMeta() != null && getMeta().getLinks() != null
-				&& !getMeta().getLinks().isEmpty()) {
-			for (final MetaLink link : getMeta().getLinks()) {
-				if (link.getRel().equalsIgnoreCase(linkRel)) {
-					return link.getHref();
+	public List<String> getLinks(final String linkRel) {
+		final List<String> links = new ArrayList<String>();
+		if (linksExist()) {
+			for (final MetaLink link : getLinks()) {
+				if (isRequestedLink(linkRel, link)) {
+					links.add(link.getHref());
 				}
 			}
 		}
-		return null;
+		return links;
+	}
+
+	private List<MetaLink> getLinks() {
+		return getMeta().getLinks();
+	}
+
+	private boolean isRequestedLink(final String linkRel, final MetaLink link) {
+		return link.getRel().equalsIgnoreCase(linkRel);
+	}
+
+	private boolean linksExist() {
+		return getMeta() != null && getLinks() != null && !getLinks().isEmpty();
 	}
 
 	public DateTime getDateTime(final String time) {

@@ -21,11 +21,11 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.scan.status;
 
-import com.blackducksoftware.integration.hub.meta.AbstractLinkedResource;
+import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 
-public class ScanStatusToPoll extends AbstractLinkedResource {
+public class ScanStatusToPoll extends HubItem {
 	private final String status;
 
 
@@ -46,7 +46,7 @@ public class ScanStatusToPoll extends AbstractLinkedResource {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((get_meta() == null) ? 0 : get_meta().hashCode());
+		result = prime * result + ((getMeta() == null) ? 0 : getMeta().hashCode());
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		return result;
 	}
@@ -63,11 +63,11 @@ public class ScanStatusToPoll extends AbstractLinkedResource {
 			return false;
 		}
 		final ScanStatusToPoll other = (ScanStatusToPoll) obj;
-		if (get_meta() == null) {
-			if (other.get_meta() != null) {
+		if (getMeta() == null) {
+			if (other.getMeta() != null) {
 				return false;
 			}
-		} else if (!get_meta().equals(other.get_meta())) {
+		} else if (!getMeta().equals(other.getMeta())) {
 			return false;
 		}
 		if (status == null) {
@@ -86,7 +86,7 @@ public class ScanStatusToPoll extends AbstractLinkedResource {
 		builder.append("ScanStatusToPoll [status=");
 		builder.append(status);
 		builder.append(", _meta=");
-		builder.append(get_meta());
+		builder.append(getMeta());
 		builder.append("]");
 		return builder.toString();
 	}

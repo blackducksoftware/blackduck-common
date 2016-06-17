@@ -21,10 +21,10 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.version.api;
 
-import com.blackducksoftware.integration.hub.meta.AbstractLinkedResource;
+import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
-public class ReleaseItem extends AbstractLinkedResource {
+public class ReleaseItem extends HubItem {
 
 	public static final String VERSION_REPORT_LINK = "versionReport";
 
@@ -82,7 +82,7 @@ public class ReleaseItem extends AbstractLinkedResource {
 		result = prime * result + ((phase == null) ? 0 : phase.hashCode());
 		result = prime * result + ((source == null) ? 0 : source.hashCode());
 		result = prime * result + ((versionName == null) ? 0 : versionName.hashCode());
-		result = prime * result + ((get_meta() == null) ? 0 : get_meta().hashCode());
+		result = prime * result + ((getMeta() == null) ? 0 : getMeta().hashCode());
 		return result;
 	}
 
@@ -95,11 +95,11 @@ public class ReleaseItem extends AbstractLinkedResource {
 			return false;
 		}
 		final ReleaseItem other = (ReleaseItem) obj;
-		if (get_meta() == null) {
-			if (other.get_meta() != null) {
+		if (getMeta() == null) {
+			if (other.getMeta() != null) {
 				return false;
 			}
-		} else if (!get_meta().equals(other.get_meta())) {
+		} else if (!getMeta().equals(other.getMeta())) {
 			return false;
 		}
 		if (distribution == null) {
@@ -145,7 +145,7 @@ public class ReleaseItem extends AbstractLinkedResource {
 		builder.append(", source=");
 		builder.append(source);
 		builder.append(", _meta=");
-		builder.append(get_meta());
+		builder.append(getMeta());
 		builder.append("]");
 		return builder.toString();
 	}

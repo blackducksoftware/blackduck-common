@@ -24,10 +24,10 @@ package com.blackducksoftware.integration.hub.report.api;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
-import com.blackducksoftware.integration.hub.meta.AbstractLinkedResource;
+import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
-public class ReportInformationItem extends AbstractLinkedResource {
+public class ReportInformationItem extends HubItem {
 
 	public static final String REPORT_CONTENT_LINK = "content";
 
@@ -130,7 +130,7 @@ public class ReportInformationItem extends AbstractLinkedResource {
 		result = prime * result + ((locale == null) ? 0 : locale.hashCode());
 		result = prime * result + ((reportFormat == null) ? 0 : reportFormat.hashCode());
 		result = prime * result + ((updatedAt == null) ? 0 : updatedAt.hashCode());
-		result = prime * result + ((get_meta() == null) ? 0 : get_meta().hashCode());
+		result = prime * result + ((getMeta() == null) ? 0 : getMeta().hashCode());
 		return result;
 	}
 
@@ -146,11 +146,11 @@ public class ReportInformationItem extends AbstractLinkedResource {
 			return false;
 		}
 		final ReportInformationItem other = (ReportInformationItem) obj;
-		if (get_meta() == null) {
-			if (other.get_meta() != null) {
+		if (getMeta() == null) {
+			if (other.getMeta() != null) {
 				return false;
 			}
-		} else if (!get_meta().equals(other.get_meta())) {
+		} else if (!getMeta().equals(other.getMeta())) {
 			return false;
 		}
 		if (createdAt == null) {
@@ -228,7 +228,7 @@ public class ReportInformationItem extends AbstractLinkedResource {
 		builder.append(", createdBy=");
 		builder.append(createdBy);
 		builder.append(", _meta=");
-		builder.append(get_meta());
+		builder.append(getMeta());
 		builder.append("]");
 		return builder.toString();
 	}

@@ -88,7 +88,7 @@ public class ScanStatusChecker implements Runnable {
 					break;
 				} else {
 					// The code location is still updating or matching, etc.
-					currentStatus = service.checkScanStatus(currentStatus.get_meta().getHref());
+					currentStatus = service.checkScanStatus(currentStatus.getMeta().getHref());
 
 					if (isScanFinished(currentStatus) == true) {
 						break;

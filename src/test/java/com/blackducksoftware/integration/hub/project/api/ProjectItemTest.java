@@ -23,13 +23,12 @@ package com.blackducksoftware.integration.hub.project.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 public class ProjectItemTest {
 
@@ -51,13 +50,13 @@ public class ProjectItemTest {
 
 		assertEquals(name1, item1.getName());
 		assertEquals(source1, item1.getSource());
-		assertEquals(href1, item1.get_meta().getHref());
-		assertEquals(metaInfo1, item1.get_meta());
+		assertEquals(href1, item1.getMeta().getHref());
+		assertEquals(metaInfo1, item1.getMeta());
 
 		assertEquals(name2, item2.getName());
 		assertEquals(source2, item2.getSource());
-		assertEquals(href2, item2.get_meta().getHref());
-		assertEquals(metaInfo2, item2.get_meta());
+		assertEquals(href2, item2.getMeta().getHref());
+		assertEquals(metaInfo2, item2.getMeta());
 
 		assertTrue(!item1.equals(item2));
 		assertTrue(item1.equals(item3));
@@ -74,7 +73,7 @@ public class ProjectItemTest {
 		builder.append(", source=");
 		builder.append(item1.getSource());
 		builder.append(", _meta=");
-		builder.append(item1.get_meta());
+		builder.append(item1.getMeta());
 		builder.append("]");
 
 		assertEquals(builder.toString(), item1.toString());
