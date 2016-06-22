@@ -23,6 +23,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.engine.header.Header;
 import org.restlet.engine.header.HeaderConstants;
+import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
@@ -148,14 +149,14 @@ public class RestConnection {
 	 * the response code from the connection.
 	 *
 	 */
-	public int setCookies(final String hubUserName, final String hubPassword) throws URISyntaxException,
-			BDRestException {
+	public int setCookies(final String hubUserName, final String hubPassword)
+			throws URISyntaxException, BDRestException {
 		final ClientResource resource = createClientResource();
 		resource.addSegment("j_spring_security_check");
 		resource.setMethod(Method.POST);
 
-		final StringRepresentation stringRep = new StringRepresentation("j_username=" + hubUserName + "&j_password="
-				+ hubPassword);
+		final StringRepresentation stringRep = new StringRepresentation(
+				"j_username=" + hubUserName + "&j_password=" + hubPassword);
 		stringRep.setCharacterSet(CharacterSet.UTF_8);
 		stringRep.setMediaType(MediaType.APPLICATION_WWW_FORM);
 		resource.getRequest().setEntity(stringRep);
@@ -182,8 +183,9 @@ public class RestConnection {
 			}
 
 			if (requestCookies == null || requestCookies.size() == 0) {
-				throw new BDRestException("Could not establish connection to '" + getBaseUrl()
-						+ "' . Failed to retrieve cookies", resource);
+				throw new BDRestException(
+						"Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies",
+						resource);
 			}
 
 			cookies = requestCookies;
@@ -212,8 +214,7 @@ public class RestConnection {
 	 * @throws BDRestException
 	 */
 	public <T> T httpGetFromAbsoluteUrl(final Class<T> modelClass, final String url)
-			throws ResourceDoesNotExistException, URISyntaxException,
-			IOException, BDRestException {
+			throws ResourceDoesNotExistException, URISyntaxException, IOException, BDRestException {
 
 		final ClientResource resource = createClientResource(url);
 		resource.setMethod(Method.GET);
@@ -225,8 +226,7 @@ public class RestConnection {
 			return parseResponse(modelClass, resource);
 		} else {
 			throw new ResourceDoesNotExistException(
-					"Error getting resource from " + url + ": " + responseCode
-					+ "; " + resource.toString(), resource);
+					"Error getting resource from " + url + ": " + responseCode + "; " + resource.toString(), resource);
 		}
 	}
 
@@ -248,11 +248,9 @@ public class RestConnection {
 	 * @throws URISyntaxException
 	 * @throws BDRestException
 	 */
-	public <T> T httpGetFromRelativeUrl(final Class<T> modelClass,
-			final List<String> urlSegments,
+	public <T> T httpGetFromRelativeUrl(final Class<T> modelClass, final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
-					throws IOException, ResourceDoesNotExistException,
-					URISyntaxException, BDRestException {
+			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
 
 		final ClientResource resource = createClientResource(urlSegments, queryParameters);
 		resource.setMethod(Method.GET);
@@ -265,10 +263,9 @@ public class RestConnection {
 			return parseResponse(modelClass, resource);
 		} else {
 			throw new ResourceDoesNotExistException(
-					"Error getting resource from relative url segments "
-							+ urlSegments + " and query parameters "
-							+ queryParameters + "; errorCode: " + responseCode
-							+ "; " + resource.toString(), resource);
+					"Error getting resource from relative url segments " + urlSegments + " and query parameters "
+							+ queryParameters + "; errorCode: " + responseCode + "; " + resource.toString(),
+					resource);
 		}
 	}
 
@@ -372,8 +369,8 @@ public class RestConnection {
 				logMessage(LogLevel.TRACE, "");
 			}
 			@SuppressWarnings("unchecked")
-			final Series<Header> responseheaders = (Series<Header>) requestOrResponse.getAttributes().get(
-					HeaderConstants.ATTRIBUTE_HEADERS);
+			final Series<Header> responseheaders = (Series<Header>) requestOrResponse.getAttributes()
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			if (responseheaders != null) {
 				logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
 				for (final Header header : responseheaders) {
@@ -408,8 +405,7 @@ public class RestConnection {
 		AuthenticatorUtil.resetAuthenticator();
 	}
 
-	private <T> T parseResponse(final Class<T> modelClass, final ClientResource resource)
-			throws IOException {
+	private <T> T parseResponse(final Class<T> modelClass, final ClientResource resource) throws IOException {
 		final String response = readResponseAsString(resource.getResponse());
 		final Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
 		final JsonParser parser = new JsonParser();
@@ -437,5 +433,75 @@ public class RestConnection {
 	@Override
 	public String toString() {
 		return "RestConnection [baseUrl=" + baseUrl + "]";
+	}
+
+	public boolean isPostSuccess(final int responseCode) {
+		return responseCode == 201;
+	}
+
+	public String httpPostFromAbsoluteUrl(final String url, final Representation content)
+			throws ResourceDoesNotExistException, URISyntaxException, IOException, BDRestException {
+
+		final ClientResource resource = createClientResource(url);
+		resource.setMethod(Method.POST);
+		resource.getRequest().setEntity(content);
+		handleRequest(resource);
+
+		logMessage(LogLevel.DEBUG, "Resource: " + resource);
+		final int responseCode = getResponseStatusCode(resource);
+		if (isPostSuccess(responseCode)) {
+			if (resource.getResponse().getAttributes() == null
+					|| resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
+				throw new ResourceDoesNotExistException(
+						"Could not get the response headers after creating the resource.", resource);
+			}
+			@SuppressWarnings("unchecked")
+			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			final Header resourceUrl = responseHeaders.getFirst("location", true);
+
+			if (resourceUrl == null || StringUtils.isBlank(resourceUrl.getValue())) {
+				throw new ResourceDoesNotExistException("Could not get the project URL from the response headers.",
+						resource);
+			}
+			return resourceUrl.getValue();
+		} else {
+			throw new ResourceDoesNotExistException(
+					"There was a problem creating the resource. Error Code: " + responseCode, resource);
+		}
+	}
+
+	public String httpPostFromRelativeUrl(final List<String> urlSegments,
+			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters, final Representation content)
+			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+
+		final ClientResource resource = createClientResource(urlSegments, queryParameters);
+		resource.setMethod(Method.POST);
+		resource.getRequest().setEntity(content);
+		handleRequest(resource);
+
+		logMessage(LogLevel.DEBUG, "Resource: " + resource);
+		final int responseCode = getResponseStatusCode(resource);
+
+		if (isPostSuccess(responseCode)) {
+			if (resource.getResponse().getAttributes() == null
+					|| resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
+				throw new ResourceDoesNotExistException(
+						"Could not get the response headers after creating the resource.", resource);
+			}
+			@SuppressWarnings("unchecked")
+			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			final Header resourceUrl = responseHeaders.getFirst("location", true);
+
+			if (resourceUrl == null || StringUtils.isBlank(resourceUrl.getValue())) {
+				throw new ResourceDoesNotExistException("Could not get the project URL from the response headers.",
+						resource);
+			}
+			return resourceUrl.getValue();
+		} else {
+			throw new ResourceDoesNotExistException(
+					"There was a problem creating the resource. Error Code: " + responseCode, resource);
+		}
 	}
 }
