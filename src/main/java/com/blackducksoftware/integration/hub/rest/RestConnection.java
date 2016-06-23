@@ -28,6 +28,8 @@ import java.net.CookieHandler;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -467,6 +469,12 @@ public class RestConnection {
 		resource.setMethod(Method.POST);
 		resource.getRequest().setEntity(content);
 		return handleHttpPost(resource);
+	}
+
+	public String httpPostFromRelativeUrl(final List<String> urlSegments, final Representation content)
+			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+		final Set<SimpleEntry<String, String>> queryParameters = new HashSet<SimpleEntry<String, String>>();
+		return httpPostFromRelativeUrl(urlSegments, queryParameters, content);
 	}
 
 	public String httpPostFromRelativeUrl(final List<String> urlSegments,
