@@ -25,24 +25,17 @@ import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ReleaseItem extends HubItem {
-
 	public static final String VERSION_REPORT_LINK = "versionReport";
-
 	public static final String RISK_PROFILE_LINK = "riskProfile";
-
 	public static final String POLICY_STATUS_LINK = "policy-status";
 
 	private final String versionName;
-
 	private final String phase;
-
 	private final String distribution;
-
 	private final String source;
 
-
-	public ReleaseItem(final String versionName, final String phase, final String distribution,
-			final String source, final MetaInformation _meta) {
+	public ReleaseItem(final String versionName, final String phase, final String distribution, final String source,
+			final MetaInformation _meta) {
 		super(_meta);
 		this.versionName = versionName;
 		this.phase = phase;

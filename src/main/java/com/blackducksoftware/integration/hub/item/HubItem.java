@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 import com.google.gson.annotations.SerializedName;
@@ -17,15 +18,25 @@ import com.google.gson.annotations.SerializedName;
  *
  */
 public class HubItem {
-
 	@SerializedName("_meta")
 	private final MetaInformation meta;
 
 	public HubItem(final MetaInformation meta) {
 		this.meta = meta;
 	}
+
 	public MetaInformation getMeta() {
 		return meta;
+	}
+
+	public String getLink(final String linkRel) throws HubIntegrationException {
+		final List<String> links = getLinks(linkRel);
+		if (links.size() != 1) {
+			final String combinedLinks = StringUtils.join(links, ", ");
+			throw new HubIntegrationException("Only 1 link was expected: " + combinedLinks);
+		}
+
+		return links.get(0);
 	}
 
 	public List<String> getLinks(final String linkRel) {
