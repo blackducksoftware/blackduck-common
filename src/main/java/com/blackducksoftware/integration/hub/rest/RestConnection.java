@@ -445,30 +445,7 @@ public class RestConnection {
 		final ClientResource resource = createClientResource(url);
 		resource.setMethod(Method.POST);
 		resource.getRequest().setEntity(content);
-		handleRequest(resource);
-
-		logMessage(LogLevel.DEBUG, "Resource: " + resource);
-		final int responseCode = getResponseStatusCode(resource);
-		if (isPostSuccess(responseCode)) {
-			if (resource.getResponse().getAttributes() == null
-					|| resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
-				throw new ResourceDoesNotExistException(
-						"Could not get the response headers after creating the resource.", resource);
-			}
-			@SuppressWarnings("unchecked")
-			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
-			final Header resourceUrl = responseHeaders.getFirst("location", true);
-
-			if (resourceUrl == null || StringUtils.isBlank(resourceUrl.getValue())) {
-				throw new ResourceDoesNotExistException("Could not get the project URL from the response headers.",
-						resource);
-			}
-			return resourceUrl.getValue();
-		} else {
-			throw new ResourceDoesNotExistException(
-					"There was a problem creating the resource. Error Code: " + responseCode, resource);
-		}
+		return handleHttpPost(resource);
 	}
 
 	public String httpPostFromRelativeUrl(final List<String> urlSegments,
@@ -478,6 +455,12 @@ public class RestConnection {
 		final ClientResource resource = createClientResource(urlSegments, queryParameters);
 		resource.setMethod(Method.POST);
 		resource.getRequest().setEntity(content);
+		return handleHttpPost(resource);
+	}
+
+	private String handleHttpPost(final ClientResource resource)
+			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+
 		handleRequest(resource);
 
 		logMessage(LogLevel.DEBUG, "Resource: " + resource);
@@ -495,7 +478,7 @@ public class RestConnection {
 			final Header resourceUrl = responseHeaders.getFirst("location", true);
 
 			if (resourceUrl == null || StringUtils.isBlank(resourceUrl.getValue())) {
-				throw new ResourceDoesNotExistException("Could not get the project URL from the response headers.",
+				throw new ResourceDoesNotExistException("Could not get the resource URL from the response headers.",
 						resource);
 			}
 			return resourceUrl.getValue();

@@ -42,6 +42,7 @@ public class HubSupportHelper implements Serializable {
 	private boolean hasBeenChecked = false;
 	private boolean hub3_0Support = false;
 	private boolean hub3_1Support = false;
+	private boolean hub3_4Support = false;
 
 	/**
 	 * CLI wrappers were packaged with OS specific Jre's since Hub 3.0.0
@@ -99,7 +100,11 @@ public class HubSupportHelper implements Serializable {
 		try {
 			final String hubServerVersion = service.getHubVersion();
 
-			if (compareVersion(hubServerVersion, "3.1.0", service)) {
+			if (compareVersion(hubServerVersion, "3.4.0", service)) {
+				setHub3_4Support(true);
+				setHub3_1Support(true);
+				setHub3_0Support(true);
+			} else if (compareVersion(hubServerVersion, "3.1.0", service)) {
 				setHub3_1Support(true);
 				setHub3_0Support(true);
 			} else {
@@ -259,4 +264,15 @@ public class HubSupportHelper implements Serializable {
 		return urlBuilder.toString();
 	}
 
+	public boolean isHub3_4Support() {
+		return hub3_4Support;
+	}
+
+	private void setHub3_4Support(final boolean hub3_4Support) {
+		this.hub3_4Support = hub3_4Support;
+	}
+
+	public boolean isBomFileUploadSupported() {
+		return hub3_4Support;
+	}
 }
