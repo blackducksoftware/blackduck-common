@@ -19,30 +19,9 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub;
+package com.blackducksoftware.integration.hub.capabilities;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class CIEnvironmentVariables {
-	public static final String BDS_CACERTS_OVERRIDE = "BDS_CACERTS_OVERRIDE";
-
-	private final Map<String, String> environmentVariables = new HashMap<String, String>();
-
-	public void putAll(final Map<String, String> map) {
-		environmentVariables.putAll(map);
-	}
-
-	public void put(final String key, final String value) {
-		environmentVariables.put(key, value);
-	}
-
-	public boolean containsKey(final String key) {
-		return environmentVariables.containsKey(key);
-	}
-
-	public String getValue(final String key) {
-		return environmentVariables.get(key);
-	}
+public enum HubCapabilitiesEnum {
+	JRE_PROVIDED, POLICY_API, CLI_STATUS_DIRECTORY_OPTION, CLI_PASSWORD_ENVIRONMENT_VARIABLE, BOM_FILE_UPLOAD;
 
 }
