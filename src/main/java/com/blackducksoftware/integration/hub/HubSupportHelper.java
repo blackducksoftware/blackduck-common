@@ -24,11 +24,14 @@ package com.blackducksoftware.integration.hub;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
+import java.util.EnumSet;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.resource.ResourceException;
 
 import com.blackducksoftware.integration.hub.api.VersionComparison;
+import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 
@@ -40,45 +43,41 @@ public class HubSupportHelper implements Serializable {
 	public static final String MAC_CLI_DOWNLOAD = "scan.cli-macosx.zip";
 
 	private boolean hasBeenChecked = false;
-	private boolean hub3_0Support = false;
-	private boolean hub3_1Support = false;
+
+	private final Set<HubCapabilitiesEnum> capabilities = EnumSet.noneOf(HubCapabilitiesEnum.class);
 
 	/**
 	 * CLI wrappers were packaged with OS specific Jre's since Hub 3.0.0
 	 */
+	@Deprecated
 	public boolean isJreProvidedSupport() {
-		return hub3_0Support;
+		return hasCapability(HubCapabilitiesEnum.JRE_PROVIDED);
 	}
 
 	/**
 	 * Policy Api's were added since Hub 3.0.0
 	 */
+	@Deprecated
 	public boolean isPolicyApiSupport() {
-		return hub3_0Support;
+		return hasCapability(HubCapabilitiesEnum.POLICY_API);
 	}
 
 	/**
 	 * The CLI started supporting an option to print status files to a directory
 	 * since Hub 3.0.0
 	 */
+	@Deprecated
 	public boolean isCliStatusDirOptionSupport() {
-		return hub3_0Support;
+		return hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION);
 	}
 
 	/**
 	 * The CLI requires the password be provided as an environment variable
 	 * since Hub 3.1.0
 	 */
+	@Deprecated
 	public boolean isCliPasswordEnvironmentVar() {
-		return hub3_1Support;
-	}
-
-	private void setHub3_0Support(final boolean hub3_0Support) {
-		this.hub3_0Support = hub3_0Support;
-	}
-
-	private void setHub3_1Support(final boolean hub3_1Support) {
-		this.hub3_1Support = hub3_1Support;
+		return hasCapability(HubCapabilitiesEnum.CLI_PASSWORD_ENVIRONMENT_VARIABLE);
 	}
 
 	public boolean isHasBeenChecked() {
@@ -99,15 +98,16 @@ public class HubSupportHelper implements Serializable {
 		try {
 			final String hubServerVersion = service.getHubVersion();
 
-			if (compareVersion(hubServerVersion, "3.1.0", service)) {
-				setHub3_1Support(true);
-				setHub3_0Support(true);
+			if (compareVersion(hubServerVersion, "3.4.0", service)) {
+				setHub3_4Support();
+				setHub3_1Support();
+				setHub3_0Support();
+			} else if (compareVersion(hubServerVersion, "3.1.0", service)) {
+				setHub3_1Support();
+				setHub3_0Support();
 			} else {
-				setHub3_1Support(false);
 				if (compareVersion(hubServerVersion, "3.0.0", service)) {
-					setHub3_0Support(true);
-				} else {
-					setHub3_0Support(false);
+					setHub3_0Support();
 				}
 			}
 			setHasBeenChecked(true);
@@ -259,4 +259,21 @@ public class HubSupportHelper implements Serializable {
 		return urlBuilder.toString();
 	}
 
+	public boolean hasCapability(final HubCapabilitiesEnum capability) {
+		return capabilities.contains(capability);
+	}
+
+	private void setHub3_0Support() {
+		capabilities.add(HubCapabilitiesEnum.JRE_PROVIDED);
+		capabilities.add(HubCapabilitiesEnum.POLICY_API);
+		capabilities.add(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION);
+	}
+
+	private void setHub3_1Support() {
+		capabilities.add(HubCapabilitiesEnum.CLI_PASSWORD_ENVIRONMENT_VARIABLE);
+	}
+
+	private void setHub3_4Support() {
+		capabilities.add(HubCapabilitiesEnum.BOM_FILE_UPLOAD);
+	}
 }
