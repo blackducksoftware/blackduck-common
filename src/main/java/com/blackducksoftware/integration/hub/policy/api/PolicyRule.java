@@ -21,12 +21,17 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.policy.api;
 
+import java.util.UUID;
+
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class PolicyRule extends HubItem {
+	public static final String POLICY_RULES_URL_IDENTIFIER = "policy-rules";
 
 	private final String name;
 	private final String description;
@@ -89,6 +94,13 @@ public class PolicyRule extends HubItem {
 
 	public DateTime getCreatedAtTime() {
 		return getDateTime(createdAt);
+	}
+
+	public UUID getPolicyRuleId() throws MissingUUIDException {
+		if (getMeta() == null || getMeta().getHref() == null) {
+			return null;
+		}
+		return HubUrlParser.getUUIDFromURLString(POLICY_RULES_URL_IDENTIFIER, getMeta().getHref());
 	}
 
 

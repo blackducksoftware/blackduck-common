@@ -21,10 +21,15 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.project.api;
 
+import java.util.UUID;
+
+import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class ProjectItem extends HubItem {
+	public static final String PROJECT_URL_IDENTIFIER = "projects";
 	public static final String VERSION_LINK = "versions";
 	public static final String CANONICAL_VERSION_LINK = "canonicalVersion";
 
@@ -43,6 +48,13 @@ public class ProjectItem extends HubItem {
 
 	public String getSource() {
 		return source;
+	}
+
+	public UUID getProjectId() throws MissingUUIDException {
+		if (getMeta() == null || getMeta().getHref() == null) {
+			return null;
+		}
+		return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getMeta().getHref());
 	}
 
 	@Override

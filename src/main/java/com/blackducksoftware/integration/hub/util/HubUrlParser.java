@@ -1,9 +1,9 @@
 package com.blackducksoftware.integration.hub.util;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 
@@ -16,32 +16,43 @@ public class HubUrlParser {
 	// Rule URL :
 	// http://eng-hub-valid03.dc1.lan/api/policy-rules/138d0d0f-45b5-4e51-8a32-42ed8946434c
 
-	public static List<UUID> getUUIDsFromURL(final URL url) throws MissingUUIDException {
+	public static UUID getUUIDFromURL(final String identifier, final URL url) throws MissingUUIDException {
+		if (StringUtils.isBlank(identifier)) {
+			throw new IllegalArgumentException("No identifier was provided.");
+		}
 		if (url == null) {
 			throw new IllegalArgumentException("No URL was provided to parse.");
 		}
-		return getUUIDsFromURLString(url.toString());
+		return getUUIDFromURLString(identifier, url.toString());
 	}
 
-	public static List<UUID> getUUIDsFromURLString(final String url) throws MissingUUIDException {
+	public static UUID getUUIDFromURLString(final String identifier, final String url)
+			throws MissingUUIDException {
+		if (StringUtils.isBlank(identifier)) {
+			throw new IllegalArgumentException("No identifier was provided.");
+		}
 		if (url == null) {
 			throw new IllegalArgumentException("No url String was provided to parse.");
 		}
-		final List<UUID> uuids = new ArrayList<UUID>();
+		UUID uuid = null;
 
 		final String[] urlParts = url.split("/");
-		for (final String urlPart : urlParts) {
-			try {
-				uuids.add(UUID.fromString(urlPart));
-			} catch (final IllegalArgumentException e) {
-				// ignore errors for the parts of the URL that are not UUID's
+
+		for (int i = 0; i < urlParts.length; i++) {
+			if (urlParts[i].equalsIgnoreCase(identifier)) {
+				try {
+					uuid = UUID.fromString(urlParts[i + 1]);
+				} catch (final IllegalArgumentException e) {
+				}
+				break;
 			}
 		}
 
-		if(uuids.isEmpty()){
-			throw new MissingUUIDException("The String provided does not contain any UUID's.");
+		if (uuid == null) {
+			throw new MissingUUIDException("The String provided : " + url
+					+ ", does not contain any UUID's for the specified identifer : " + identifier);
 		}
 
-		return uuids;
+		return uuid;
 	}
 }
