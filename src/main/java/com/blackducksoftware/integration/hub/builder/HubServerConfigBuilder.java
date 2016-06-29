@@ -33,6 +33,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.blackducksoftware.integration.hub.global.GlobalFieldKey;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
+import com.blackducksoftware.integration.hub.global.HubProxyInfoFieldEnum;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
 
@@ -42,6 +43,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 	public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
 	public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
 	public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
+
+	public static final String ERROR_MSG_AUTHENTICATED_PROXY_WITH_HTTPS = "Using an authenticated proxy to connect to an http Hub server is not supported.";
 
 	public static int DEFAULT_TIMEOUT = 120;
 
@@ -70,11 +73,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 
 	@Override
 	public ValidationResults<GlobalFieldKey, HubServerConfig> build() {
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> proxyResult = assertProxyValid();
-		final ValidationResults<GlobalFieldKey, HubCredentials> credentialResult = assertCredentialsValid();
 		final ValidationResults<GlobalFieldKey, HubServerConfig> result = assertValid();
-		result.addAllResults(proxyResult.getResultMap());
-		result.addAllResults(credentialResult.getResultMap());
 
 		URL hubURL = null;
 		try {
@@ -88,7 +87,11 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 
 	@Override
 	public ValidationResults<GlobalFieldKey, HubServerConfig> assertValid() {
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> proxyResult = assertProxyValid();
+		final ValidationResults<GlobalFieldKey, HubCredentials> credentialResult = assertCredentialsValid();
 		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
+		result.addAllResults(proxyResult.getResultMap());
+		result.addAllResults(credentialResult.getResultMap());
 		validateHubUrl(result);
 		if (shouldUseDefaultValues()) {
 			validateTimeout(result, DEFAULT_TIMEOUT);
@@ -154,7 +157,12 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		try {
 			URLConnection connection = null;
 			if (null != proxyInfo) {
-
+				if (!hubURL.getProtocol().equals("https") && proxyInfo.getUsername() != null
+						&& proxyInfo.getEncryptedPassword() != null) {
+					result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
+							new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_AUTHENTICATED_PROXY_WITH_HTTPS));
+					return;
+				}
 				connection = proxyInfo.openConnection(hubURL);
 			} else {
 				connection = hubURL.openConnection();
