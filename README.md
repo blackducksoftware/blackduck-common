@@ -9,9 +9,7 @@ The hub-common library supplies convenient communication with a Hub server throu
 ## Where can I get the latest release? ##
 You can download the latest source from GitHub: https://github.com/blackducksoftware/hub-common. 
 
-You can download the latest artifact through your preferred dependency management system from BinTray: https://bintray.com/bds/integration/hub-common/view
-
-Lastly, release tab on GitHub will contain the latest artifacts.
+You can download the latest release from our public Artifactory (please see pom)
 
 ## Documentation ##
 All documentation for hub-common can be found on the base project:  https://github.com/blackducksoftware/hub-common/wiki
