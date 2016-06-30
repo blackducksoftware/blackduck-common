@@ -29,74 +29,74 @@ public class PolicyRuleConditionEnumTest {
 
 	@Test
 	public void testGetPolicyRuleConditionFieldEnum() {
-		assertEquals(PolicyRuleConditionFieldEnum.UNKNOWN_RULE_CONDTION,
-				PolicyRuleConditionFieldEnum.getPolicyRuleConditionFieldEnum("Fake"));
-		assertEquals(PolicyRuleConditionFieldEnum.COMPONENT_USAGE, PolicyRuleConditionFieldEnum
+		assertEquals(PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION,
+				PolicyRuleConditionEnum.getPolicyRuleConditionFieldEnum("Fake"));
+		assertEquals(PolicyRuleConditionEnum.COMPONENT_USAGE, PolicyRuleConditionEnum
 				.getPolicyRuleConditionFieldEnum(
-						PolicyRuleConditionFieldEnum.COMPONENT_USAGE.toString().toLowerCase()));
-		assertEquals(PolicyRuleConditionFieldEnum.HIGH_SEVERITY_VULN_COUNT, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionFieldEnum.HIGH_SEVERITY_VULN_COUNT.toString()));
-		assertEquals(PolicyRuleConditionFieldEnum.LICENSE_FAMILY, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionFieldEnum.LICENSE_FAMILY.toString().toLowerCase()));
-		assertEquals(PolicyRuleConditionFieldEnum.LOW_SEVERITY_VULN_COUNT, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionFieldEnum.LOW_SEVERITY_VULN_COUNT.toString()));
-		assertEquals(PolicyRuleConditionFieldEnum.MEDIUM_SEVERITY_VULN_COUNT, PolicyRuleConditionFieldEnum
+						PolicyRuleConditionEnum.COMPONENT_USAGE.toString().toLowerCase()));
+		assertEquals(PolicyRuleConditionEnum.HIGH_SEVERITY_VULN_COUNT, PolicyRuleConditionEnum
+				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionEnum.HIGH_SEVERITY_VULN_COUNT.toString()));
+		assertEquals(PolicyRuleConditionEnum.LICENSE_FAMILY, PolicyRuleConditionEnum
+				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionEnum.LICENSE_FAMILY.toString().toLowerCase()));
+		assertEquals(PolicyRuleConditionEnum.LOW_SEVERITY_VULN_COUNT, PolicyRuleConditionEnum
+				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionEnum.LOW_SEVERITY_VULN_COUNT.toString()));
+		assertEquals(PolicyRuleConditionEnum.MEDIUM_SEVERITY_VULN_COUNT, PolicyRuleConditionEnum
 				.getPolicyRuleConditionFieldEnum(
-						PolicyRuleConditionFieldEnum.MEDIUM_SEVERITY_VULN_COUNT.toString().toLowerCase()));
-		assertEquals(PolicyRuleConditionFieldEnum.NEWER_VERSIONS_COUNT, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionFieldEnum.NEWER_VERSIONS_COUNT.toString()));
-		assertEquals(PolicyRuleConditionFieldEnum.PROJECT_TIER, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionFieldEnum.PROJECT_TIER.toString().toLowerCase()));
-		assertEquals(PolicyRuleConditionFieldEnum.SINGLE_LICENSE, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionFieldEnum.SINGLE_LICENSE.toString()));
-		assertEquals(PolicyRuleConditionFieldEnum.SINGLE_VERSION, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionFieldEnum.SINGLE_VERSION.toString()));
-		assertEquals(PolicyRuleConditionFieldEnum.VERSION_DISTRIBUTION, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionFieldEnum.VERSION_DISTRIBUTION.toString()));
-		assertEquals(PolicyRuleConditionFieldEnum.VERSION_PHASE, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionFieldEnum.VERSION_PHASE.toString()));
-		assertEquals(PolicyRuleConditionFieldEnum.UNKNOWN_RULE_CONDTION,
-				PolicyRuleConditionFieldEnum.getPolicyRuleConditionFieldEnum(
-						PolicyRuleConditionFieldEnum.UNKNOWN_RULE_CONDTION.toString().toLowerCase()));
-		assertEquals(PolicyRuleConditionFieldEnum.UNKNOWN_RULE_CONDTION, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionFieldEnum.UNKNOWN_RULE_CONDTION.toString()));
-		assertEquals(PolicyRuleConditionFieldEnum.UNKNOWN_RULE_CONDTION,
-				PolicyRuleConditionFieldEnum.getPolicyRuleConditionFieldEnum(null));
+						PolicyRuleConditionEnum.MEDIUM_SEVERITY_VULN_COUNT.toString().toLowerCase()));
+		assertEquals(PolicyRuleConditionEnum.NEWER_VERSIONS_COUNT, PolicyRuleConditionEnum
+				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionEnum.NEWER_VERSIONS_COUNT.toString()));
+		assertEquals(PolicyRuleConditionEnum.PROJECT_TIER, PolicyRuleConditionEnum
+				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionEnum.PROJECT_TIER.toString().toLowerCase()));
+		assertEquals(PolicyRuleConditionEnum.SINGLE_LICENSE, PolicyRuleConditionEnum
+				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionEnum.SINGLE_LICENSE.toString()));
+		assertEquals(PolicyRuleConditionEnum.SINGLE_VERSION, PolicyRuleConditionEnum
+				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionEnum.SINGLE_VERSION.toString()));
+		assertEquals(PolicyRuleConditionEnum.VERSION_DISTRIBUTION, PolicyRuleConditionEnum
+				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionEnum.VERSION_DISTRIBUTION.toString()));
+		assertEquals(PolicyRuleConditionEnum.VERSION_PHASE, PolicyRuleConditionEnum
+				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionEnum.VERSION_PHASE.toString()));
+		assertEquals(PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION,
+				PolicyRuleConditionEnum.getPolicyRuleConditionFieldEnum(
+						PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION.toString().toLowerCase()));
+		assertEquals(PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION, PolicyRuleConditionEnum
+				.getPolicyRuleConditionFieldEnum(PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION.toString()));
+		assertEquals(PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION,
+				PolicyRuleConditionEnum.getPolicyRuleConditionFieldEnum(null));
 	}
 
 	@Test
 	public void testGetPolicyRuleConditionByDisplayValue() {
-		assertEquals(PolicyRuleConditionFieldEnum.UNKNOWN_RULE_CONDTION,
-				PolicyRuleConditionFieldEnum.getPolicyRuleConditionByDisplayValue("Fake"));
-		assertEquals(PolicyRuleConditionFieldEnum.COMPONENT_USAGE, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionByDisplayValue(PolicyRuleConditionFieldEnum.COMPONENT_USAGE.getDisplayValue()));
-		assertEquals(PolicyRuleConditionFieldEnum.HIGH_SEVERITY_VULN_COUNT,
-				PolicyRuleConditionFieldEnum.getPolicyRuleConditionByDisplayValue(
-						PolicyRuleConditionFieldEnum.HIGH_SEVERITY_VULN_COUNT.getDisplayValue()));
-		assertEquals(PolicyRuleConditionFieldEnum.LICENSE_FAMILY, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionByDisplayValue(PolicyRuleConditionFieldEnum.LICENSE_FAMILY.getDisplayValue()));
-		assertEquals(PolicyRuleConditionFieldEnum.LOW_SEVERITY_VULN_COUNT,
-				PolicyRuleConditionFieldEnum.getPolicyRuleConditionByDisplayValue(
-						PolicyRuleConditionFieldEnum.LOW_SEVERITY_VULN_COUNT.getDisplayValue()));
-		assertEquals(PolicyRuleConditionFieldEnum.MEDIUM_SEVERITY_VULN_COUNT,
-				PolicyRuleConditionFieldEnum.getPolicyRuleConditionByDisplayValue(
-						PolicyRuleConditionFieldEnum.MEDIUM_SEVERITY_VULN_COUNT.getDisplayValue()));
-		assertEquals(PolicyRuleConditionFieldEnum.NEWER_VERSIONS_COUNT,
-				PolicyRuleConditionFieldEnum.getPolicyRuleConditionByDisplayValue(
-						PolicyRuleConditionFieldEnum.NEWER_VERSIONS_COUNT.getDisplayValue()));
-		assertEquals(PolicyRuleConditionFieldEnum.PROJECT_TIER, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionByDisplayValue(PolicyRuleConditionFieldEnum.PROJECT_TIER.getDisplayValue()));
-		assertEquals(PolicyRuleConditionFieldEnum.SINGLE_LICENSE, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionByDisplayValue(PolicyRuleConditionFieldEnum.SINGLE_LICENSE.getDisplayValue()));
-		assertEquals(PolicyRuleConditionFieldEnum.SINGLE_VERSION, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionByDisplayValue(PolicyRuleConditionFieldEnum.SINGLE_VERSION.getDisplayValue()));
-		assertEquals(PolicyRuleConditionFieldEnum.VERSION_DISTRIBUTION,
-				PolicyRuleConditionFieldEnum.getPolicyRuleConditionByDisplayValue(
-						PolicyRuleConditionFieldEnum.VERSION_DISTRIBUTION.getDisplayValue()));
-		assertEquals(PolicyRuleConditionFieldEnum.VERSION_PHASE, PolicyRuleConditionFieldEnum
-				.getPolicyRuleConditionByDisplayValue(PolicyRuleConditionFieldEnum.VERSION_PHASE.getDisplayValue()));
-		assertEquals(PolicyRuleConditionFieldEnum.UNKNOWN_RULE_CONDTION,
-				PolicyRuleConditionFieldEnum.getPolicyRuleConditionByDisplayValue(
-						PolicyRuleConditionFieldEnum.UNKNOWN_RULE_CONDTION.getDisplayValue()));
+		assertEquals(PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION,
+				PolicyRuleConditionEnum.getPolicyRuleConditionByDisplayValue("Fake"));
+		assertEquals(PolicyRuleConditionEnum.COMPONENT_USAGE, PolicyRuleConditionEnum
+				.getPolicyRuleConditionByDisplayValue(PolicyRuleConditionEnum.COMPONENT_USAGE.getDisplayValue()));
+		assertEquals(PolicyRuleConditionEnum.HIGH_SEVERITY_VULN_COUNT,
+				PolicyRuleConditionEnum.getPolicyRuleConditionByDisplayValue(
+						PolicyRuleConditionEnum.HIGH_SEVERITY_VULN_COUNT.getDisplayValue()));
+		assertEquals(PolicyRuleConditionEnum.LICENSE_FAMILY, PolicyRuleConditionEnum
+				.getPolicyRuleConditionByDisplayValue(PolicyRuleConditionEnum.LICENSE_FAMILY.getDisplayValue()));
+		assertEquals(PolicyRuleConditionEnum.LOW_SEVERITY_VULN_COUNT,
+				PolicyRuleConditionEnum.getPolicyRuleConditionByDisplayValue(
+						PolicyRuleConditionEnum.LOW_SEVERITY_VULN_COUNT.getDisplayValue()));
+		assertEquals(PolicyRuleConditionEnum.MEDIUM_SEVERITY_VULN_COUNT,
+				PolicyRuleConditionEnum.getPolicyRuleConditionByDisplayValue(
+						PolicyRuleConditionEnum.MEDIUM_SEVERITY_VULN_COUNT.getDisplayValue()));
+		assertEquals(PolicyRuleConditionEnum.NEWER_VERSIONS_COUNT,
+				PolicyRuleConditionEnum.getPolicyRuleConditionByDisplayValue(
+						PolicyRuleConditionEnum.NEWER_VERSIONS_COUNT.getDisplayValue()));
+		assertEquals(PolicyRuleConditionEnum.PROJECT_TIER, PolicyRuleConditionEnum
+				.getPolicyRuleConditionByDisplayValue(PolicyRuleConditionEnum.PROJECT_TIER.getDisplayValue()));
+		assertEquals(PolicyRuleConditionEnum.SINGLE_LICENSE, PolicyRuleConditionEnum
+				.getPolicyRuleConditionByDisplayValue(PolicyRuleConditionEnum.SINGLE_LICENSE.getDisplayValue()));
+		assertEquals(PolicyRuleConditionEnum.SINGLE_VERSION, PolicyRuleConditionEnum
+				.getPolicyRuleConditionByDisplayValue(PolicyRuleConditionEnum.SINGLE_VERSION.getDisplayValue()));
+		assertEquals(PolicyRuleConditionEnum.VERSION_DISTRIBUTION,
+				PolicyRuleConditionEnum.getPolicyRuleConditionByDisplayValue(
+						PolicyRuleConditionEnum.VERSION_DISTRIBUTION.getDisplayValue()));
+		assertEquals(PolicyRuleConditionEnum.VERSION_PHASE, PolicyRuleConditionEnum
+				.getPolicyRuleConditionByDisplayValue(PolicyRuleConditionEnum.VERSION_PHASE.getDisplayValue()));
+		assertEquals(PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION,
+				PolicyRuleConditionEnum.getPolicyRuleConditionByDisplayValue(
+						PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION.getDisplayValue()));
 	}
 }
