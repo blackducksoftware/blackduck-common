@@ -5,8 +5,7 @@
   <parent>
     <groupId>com.blackducksoftware.integration</groupId>
     <artifactId>common-maven-parent</artifactId>
-    <version>1.0.1</version>
-    <relativePath>../common-maven-parent</relativePath>
+    <version>1.0.3</version>
   </parent>
 
   <artifactId>hub-common</artifactId>
@@ -20,17 +19,6 @@
     <source.java.version>1.6</source.java.version>
     <target.java.version>1.6</target.java.version>
   </properties>
-
-  <repositories>
-    <!-- ekerwin(2016-05-26): this is included only to acquire the parent pom, where this information is sadly duplicated. -->
-    <repository>
-      <snapshots>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-      <id>bds-int-public</id>
-      <url>https://updates.suite.blackducksoftware.com/integrations/</url>
-    </repository>
-  </repositories>
 
   <dependencies>
     <dependency>
