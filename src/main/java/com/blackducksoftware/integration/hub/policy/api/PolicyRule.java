@@ -21,30 +21,38 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.policy.api;
 
+import java.util.UUID;
+
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class PolicyRule extends HubItem {
+	public static final String POLICY_RULES_URL_IDENTIFIER = "policy-rules";
 
 	private final String name;
 	private final String description;
 	private final Boolean enabled;
 	private final Boolean overridable;
+	private final PolicyExpressions expression;
 	private final String createdAt;
 	private final String createdBy;
 	private final String updatedAt;
 	private final String updatedBy;
 
 	public PolicyRule(final MetaInformation meta, final String name, final String description, final Boolean enabled,
-			final Boolean overridable, final String createdAt, final String createdBy,
+			final Boolean overridable, final PolicyExpressions expression, final String createdAt,
+			final String createdBy,
 			final String updatedAt, final String updatedBy) {
 		super(meta);
 		this.name = name;
 		this.description = description;
 		this.enabled = enabled;
 		this.overridable = overridable;
+		this.expression = expression;
 		this.createdAt = createdAt;
 		this.createdBy = createdBy;
 		this.updatedAt = updatedAt;
@@ -65,6 +73,10 @@ public class PolicyRule extends HubItem {
 
 	public Boolean getOverridable() {
 		return overridable;
+	}
+
+	public PolicyExpressions getExpression() {
+		return expression;
 	}
 
 	public String getCreatedAt() {
@@ -91,6 +103,12 @@ public class PolicyRule extends HubItem {
 		return getDateTime(createdAt);
 	}
 
+	public UUID getPolicyRuleId() throws MissingUUIDException {
+		if (getMeta() == null || getMeta().getHref() == null) {
+			return null;
+		}
+		return HubUrlParser.getUUIDFromURLString(POLICY_RULES_URL_IDENTIFIER, getMeta().getHref());
+	}
 
 	@Override
 	public int hashCode() {
@@ -100,6 +118,7 @@ public class PolicyRule extends HubItem {
 		result = prime * result + ((createdBy == null) ? 0 : createdBy.hashCode());
 		result = prime * result + ((description == null) ? 0 : description.hashCode());
 		result = prime * result + ((enabled == null) ? 0 : enabled.hashCode());
+		result = prime * result + ((expression == null) ? 0 : expression.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((overridable == null) ? 0 : overridable.hashCode());
 		result = prime * result + ((updatedAt == null) ? 0 : updatedAt.hashCode());
@@ -155,6 +174,13 @@ public class PolicyRule extends HubItem {
 		} else if (!enabled.equals(other.enabled)) {
 			return false;
 		}
+		if (expression == null) {
+			if (other.expression != null) {
+				return false;
+			}
+		} else if (!expression.equals(other.expression)) {
+			return false;
+		}
 		if (name == null) {
 			if (other.name != null) {
 				return false;
@@ -197,6 +223,8 @@ public class PolicyRule extends HubItem {
 		builder.append(enabled);
 		builder.append(", overridable=");
 		builder.append(overridable);
+		builder.append(", expression=");
+		builder.append(expression);
 		builder.append(", createdAt=");
 		builder.append(createdAt);
 		builder.append(", createdBy=");
@@ -208,5 +236,6 @@ public class PolicyRule extends HubItem {
 		builder.append("]");
 		return builder.toString();
 	}
+
 
 }

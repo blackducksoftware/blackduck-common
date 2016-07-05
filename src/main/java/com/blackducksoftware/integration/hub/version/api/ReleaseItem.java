@@ -21,10 +21,17 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.version.api;
 
+import java.util.UUID;
+
+import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class ReleaseItem extends HubItem {
+	public static final String PROJECT_URL_IDENTIFIER = "projects";
+	public static final String VERSION_URL_IDENTIFIER = "versions";
+
 	public static final String VERSION_REPORT_LINK = "versionReport";
 	public static final String RISK_PROFILE_LINK = "riskProfile";
 	public static final String POLICY_STATUS_LINK = "policy-status";
@@ -65,6 +72,20 @@ public class ReleaseItem extends HubItem {
 
 	public String getSource() {
 		return source;
+	}
+
+	public UUID getProjectId() throws MissingUUIDException {
+		if (getMeta() == null || getMeta().getHref() == null) {
+			return null;
+		}
+		return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getMeta().getHref());
+	}
+
+	public UUID getVersionId() throws MissingUUIDException {
+		if (getMeta() == null || getMeta().getHref() == null) {
+			return null;
+		}
+		return HubUrlParser.getUUIDFromURLString(VERSION_URL_IDENTIFIER, getMeta().getHref());
 	}
 
 	@Override

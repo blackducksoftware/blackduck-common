@@ -21,7 +21,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.policy.api;
 
-public enum PolicyRuleConditionFieldEnum {
+public enum PolicyRuleConditionEnum {
 	PROJECT_TIER("Project Tier"),
 	VERSION_PHASE("Version Phase"),
 	VERSION_DISTRIBUTION("Version Distribution"),
@@ -37,7 +37,7 @@ public enum PolicyRuleConditionFieldEnum {
 
 	private final String displayValue;
 
-	private PolicyRuleConditionFieldEnum(final String displayValue) {
+	private PolicyRuleConditionEnum(final String displayValue) {
 		this.displayValue = displayValue;
 	}
 
@@ -45,22 +45,22 @@ public enum PolicyRuleConditionFieldEnum {
 		return displayValue;
 	}
 
-	public static PolicyRuleConditionFieldEnum getPolicyRuleConditionByDisplayValue(final String displayValue) {
-		for (final PolicyRuleConditionFieldEnum currentEnum : PolicyRuleConditionFieldEnum.values()) {
+	public static PolicyRuleConditionEnum getPolicyRuleConditionByDisplayValue(final String displayValue) {
+		for (final PolicyRuleConditionEnum currentEnum : PolicyRuleConditionEnum.values()) {
 			if (currentEnum.getDisplayValue().equalsIgnoreCase(displayValue)) {
 				return currentEnum;
 			}
 		}
-		return PolicyRuleConditionFieldEnum.UNKNOWN_RULE_CONDTION;
+		return PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION;
 	}
 
-	public static PolicyRuleConditionFieldEnum getPolicyRuleConditionFieldEnum(final String distribution) {
+	public static PolicyRuleConditionEnum getPolicyRuleConditionFieldEnum(final String distribution) {
 		if (distribution == null) {
-			return PolicyRuleConditionFieldEnum.UNKNOWN_RULE_CONDTION;
+			return PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION;
 		}
-		PolicyRuleConditionFieldEnum distributionEnum;
+		PolicyRuleConditionEnum distributionEnum;
 		try {
-			distributionEnum = PolicyRuleConditionFieldEnum.valueOf(distribution.toUpperCase());
+			distributionEnum = PolicyRuleConditionEnum.valueOf(distribution.toUpperCase());
 		} catch (final IllegalArgumentException e) {
 			// ignore expection
 			distributionEnum = UNKNOWN_RULE_CONDTION;

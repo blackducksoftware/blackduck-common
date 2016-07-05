@@ -26,22 +26,22 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
-public class PolicyStatus {
+public class PolicyStatus extends HubItem {
 	private final String overallStatus;
 
 	private final String updatedAt;
 
 	private final List<ComponentVersionStatusCount> componentVersionStatusCounts;
 
-	private final MetaInformation _meta;
 
-	public PolicyStatus(final String overallStatus, final String updatedAt, final List<ComponentVersionStatusCount> componentVersionStatusCounts, final MetaInformation _meta) {
+	public PolicyStatus(final String overallStatus, final String updatedAt, final List<ComponentVersionStatusCount> componentVersionStatusCounts, final MetaInformation meta) {
+		super(meta);
 		this.overallStatus = overallStatus;
 		this.updatedAt = updatedAt;
 		this.componentVersionStatusCounts = componentVersionStatusCounts;
-		this._meta = _meta;
 	}
 
 	public String getOverallStatus() {
@@ -103,9 +103,6 @@ public class PolicyStatus {
 		}
 	}
 
-	public MetaInformation get_meta() {
-		return _meta;
-	}
 
 	public List<ComponentVersionStatusCount> getComponentVersionStatusCounts() {
 		return componentVersionStatusCounts;
@@ -115,7 +112,7 @@ public class PolicyStatus {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((_meta == null) ? 0 : _meta.hashCode());
+		result = prime * result + ((getMeta() == null) ? 0 : getMeta().hashCode());
 		result = prime * result + ((componentVersionStatusCounts == null) ? 0 : componentVersionStatusCounts.hashCode());
 		result = prime * result + ((overallStatus == null) ? 0 : overallStatus.hashCode());
 		result = prime * result + ((updatedAt == null) ? 0 : updatedAt.hashCode());
@@ -134,11 +131,11 @@ public class PolicyStatus {
 			return false;
 		}
 		final PolicyStatus other = (PolicyStatus) obj;
-		if (_meta == null) {
-			if (other._meta != null) {
+		if (getMeta() == null) {
+			if (other.getMeta() != null) {
 				return false;
 			}
-		} else if (!_meta.equals(other._meta)) {
+		} else if (!getMeta().equals(other.getMeta())) {
 			return false;
 		}
 		if (componentVersionStatusCounts == null) {
@@ -174,8 +171,8 @@ public class PolicyStatus {
 		builder.append(updatedAt);
 		builder.append(", componentVersionStatusCounts=");
 		builder.append(componentVersionStatusCounts);
-		builder.append(", _meta=");
-		builder.append(_meta);
+		builder.append(", meta=");
+		builder.append(getMeta());
 		builder.append("]");
 		return builder.toString();
 	}
