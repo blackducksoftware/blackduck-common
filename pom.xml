@@ -11,8 +11,16 @@
   <artifactId>hub-common</artifactId>
   <version>1.4.2-SNAPSHOT</version>
 
-  <name>General Code for Hub Integration with CI systems</name>
+  <name>HUB Common</name>
+  <description>General Code for Hub Integration with CI systems</description>
+  <url>https://www.github.com/blackducksoftware/hub-common</url>
   <inceptionYear>2015</inceptionYear>
+
+  <scm>
+    <connection>scm:git:git://github.com/blackducksoftware/hub-common.git/</connection>
+    <developerConnection>scm:git:git@github.com:blackducksoftware/hub-common.git</developerConnection>
+    <url>https://www.github.com/blackducksoftware/hub-common</url>
+  </scm>
 
   <properties>
     <slf4j.version>1.7.5</slf4j.version>
