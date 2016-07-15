@@ -96,7 +96,7 @@ public class HubSupportHelper implements Serializable {
 	public void checkHubSupport(final HubIntRestService service, final IntLogger logger)
 			throws IOException, URISyntaxException {
 		try {
-			final String hubServerVersion = service.getHubVersion();
+			final String hubServerVersion = getHubVersion(service);
 
 			if (compareVersion(hubServerVersion, "3.4.0", service)) {
 				setHub3_4Support();
@@ -202,6 +202,10 @@ public class HubSupportHelper implements Serializable {
 		}
 
 		return true;
+	}
+	
+	public String getHubVersion(HubIntRestService service) throws IOException, BDRestException, URISyntaxException{
+		return service.getHubVersion();
 	}
 
 	/**
