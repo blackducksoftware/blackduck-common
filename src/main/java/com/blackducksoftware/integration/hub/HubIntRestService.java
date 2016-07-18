@@ -715,5 +715,29 @@ public class HubIntRestService {
 					resource);
 		}
 	}
+	
+	/**
+	 * 
+	 * @return registration id
+	 * @throws URISyntaxException 
+	 * @throws BDRestException 
+	 * @throws IOException 
+	 */
+	public String getRegistrationId() throws URISyntaxException, BDRestException, IOException{
+		final ClientResource resource = getRestConnection().createClientResource();
+		resource.addSegment("api");
+		resource.addSegment("v1");
+		resource.addSegment("registrations");
+		resource.setMethod(Method.GET);
+		
+		getRestConnection().handleRequest(resource);
+		final int responseCode = resource.getResponse().getStatus().getCode();
+		if(responseCode == 200){
+			final String response = getRestConnection().readResponseAsString(resource.getResponse());
+			return response;
+		} else {
+			throw new BDRestException("There was a problem getting the registration ID. Error Code: " + responseCode, resource);
+		}
+	}
 
 }
