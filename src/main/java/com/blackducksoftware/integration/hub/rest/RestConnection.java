@@ -392,11 +392,11 @@ public class RestConnection {
 				logMessage(LogLevel.TRACE, "");
 			}
 			@SuppressWarnings("unchecked")
-			final Series<Header> responseheaders = (Series<Header>) requestOrResponse.getAttributes()
+			final Series<org.restlet.engine.header.Header> responseheaders = (Series<org.restlet.engine.header.Header>) requestOrResponse.getAttributes()
 					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			if (responseheaders != null) {
 				logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
-				for (final Header header : responseheaders) {
+				for (final org.restlet.engine.header.Header header : responseheaders) {
 					if (null == header) {
 						logMessage(LogLevel.TRACE, "received a null header");
 					} else {

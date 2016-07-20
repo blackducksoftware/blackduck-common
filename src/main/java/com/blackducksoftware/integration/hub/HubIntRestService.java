@@ -738,8 +738,10 @@ public class HubIntRestService {
 			String regId = "";
 			try{
 				JsonParser parser = new JsonParser();
-				JsonObject jo = parser.parse(response).getAsJsonObject();
-				regId = jo.get("responseId").getAsString();
+				JsonElement je = parser.parse(response);
+				JsonObject jo = je.getAsJsonObject();
+				JsonElement je2 = jo.get("registrationId");
+				regId = je2.getAsString();
 			} catch (Exception e){
 				//TODO Exception handling
 				e.printStackTrace();
