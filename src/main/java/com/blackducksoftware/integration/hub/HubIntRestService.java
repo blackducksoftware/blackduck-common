@@ -734,11 +734,17 @@ public class HubIntRestService {
 		final int responseCode = resource.getResponse().getStatus().getCode();
 		if(responseCode == 200){
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-			return response;
-//			JsonParser parser = new JsonParser();
-//			JsonObject jo = parser.parse(response).getAsJsonObject();
-//			String regId = jo.get("responseId").getAsString();
-//			return regId;
+//			return response;
+			String regId = "";
+			try{
+				JsonParser parser = new JsonParser();
+				JsonObject jo = parser.parse(response).getAsJsonObject();
+				regId = jo.get("responseId").getAsString();
+			} catch (Exception e){
+				//TODO Exception handling
+				e.printStackTrace();
+			}
+			return regId;
 		} else {
 			throw new BDRestException("There was a problem getting the registration ID. Error Code: " + responseCode, resource);
 		}
