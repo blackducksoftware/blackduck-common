@@ -30,7 +30,6 @@ import org.joda.time.DateTime;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
-import com.google.gson.annotations.SerializedName;
 
 /**
  * An Item (project, notification, etc.) as returned from the Hub.
@@ -39,15 +38,14 @@ import com.google.gson.annotations.SerializedName;
  *
  */
 public class HubItem {
-	@SerializedName("_meta")
-	private final MetaInformation meta;
+	private final MetaInformation _meta;
 
 	public HubItem(final MetaInformation meta) {
-		this.meta = meta;
+		this._meta = meta;
 	}
 
 	public MetaInformation getMeta() {
-		return meta;
+		return _meta;
 	}
 
 	public String getLink(final String linkRel) throws UnexpectedHubResponseException {

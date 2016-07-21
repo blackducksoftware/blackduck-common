@@ -335,7 +335,7 @@ public class RestConnection {
 	}
 
 	public boolean isSuccess(final int responseCode) {
-		return responseCode == 200 || responseCode == 204 || responseCode == 202;
+		return responseCode >= 200 && responseCode < 300;
 	}
 
 	public void handleRequest(final ClientResource resource) throws BDRestException {
@@ -458,10 +458,6 @@ public class RestConnection {
 		return "RestConnection [baseUrl=" + baseUrl + "]";
 	}
 
-	public boolean isPostSuccess(final int responseCode) {
-		return responseCode == 201;
-	}
-
 	public String httpPostFromAbsoluteUrl(final String url, final Representation content)
 			throws ResourceDoesNotExistException, URISyntaxException, IOException, BDRestException {
 
@@ -495,7 +491,7 @@ public class RestConnection {
 		logMessage(LogLevel.DEBUG, "Resource: " + resource);
 		final int responseCode = getResponseStatusCode(resource);
 
-		if (isPostSuccess(responseCode)) {
+		if (isSuccess(responseCode)) {
 			if (resource.getResponse().getAttributes() == null
 					|| resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
 				throw new ResourceDoesNotExistException(
