@@ -95,7 +95,7 @@ public class HubItem {
 
 	@Override
 	public String toString() {
-		return "Item [meta=" + meta + "]";
+		return "Item [meta=" + _meta + "]";
 	}
 
 }
