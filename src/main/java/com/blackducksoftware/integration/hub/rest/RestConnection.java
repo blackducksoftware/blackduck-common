@@ -411,7 +411,6 @@ public class RestConnection {
 		} else {
 			logMessage(LogLevel.TRACE, requestOrResponseName + " does not have any attributes/headers.");
 		}
-
 	}
 
 	/**
@@ -497,17 +496,24 @@ public class RestConnection {
 				throw new ResourceDoesNotExistException(
 						"Could not get the response headers after creating the resource.", resource);
 			}
-			@SuppressWarnings("unchecked")
-			final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
-			final Header resourceUrl = responseHeaders.getFirst("location", true);
 
-			if (resourceUrl == null || StringUtils.isBlank(resourceUrl.getValue())) {
-				throw new ResourceDoesNotExistException("Could not get the resource URL from the response headers.",
-						resource);
+			if (responseCode != 201) {
+				return "";
+			} else {
+				@SuppressWarnings("unchecked")
+				final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
+						.get(HeaderConstants.ATTRIBUTE_HEADERS);
+				final Header resourceUrl = responseHeaders.getFirst("location", true);
+
+				if (resourceUrl == null || StringUtils.isBlank(resourceUrl.getValue())) {
+					throw new ResourceDoesNotExistException("Could not get the resource URL from the response headers.",
+							resource);
+				}
+				return resourceUrl.getValue();
 			}
-			return resourceUrl.getValue();
-		} else {
+		} else
+
+		{
 			throw new ResourceDoesNotExistException(
 					"There was a problem creating the resource. Error Code: " + responseCode, resource);
 		}
