@@ -6,7 +6,7 @@
     <version>1.0.5</version>
   </parent>
   <artifactId>hub-common</artifactId>
-  <version>1.4.5-SNAPSHOT</version>
+  <version>1.4.4</version>
   <name>HUB Common</name>
   <description>General Code for Hub Integration with CI systems</description>
   <url>https://www.github.com/blackducksoftware/hub-common</url>
