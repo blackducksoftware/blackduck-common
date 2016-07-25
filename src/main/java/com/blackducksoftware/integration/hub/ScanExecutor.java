@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 
@@ -76,7 +77,10 @@ public abstract class ScanExecutor {
 
 	private boolean verboseRun;
 
-	protected ScanExecutor(final String hubUrl, final String hubUsername, final String hubPassword, final List<String> scanTargets, final Integer buildNumber, final HubSupportHelper supportHelper) {
+	private boolean dryRun;
+
+	protected ScanExecutor(final String hubUrl, final String hubUsername, final String hubPassword,
+			final List<String> scanTargets, final Integer buildNumber, final HubSupportHelper supportHelper) {
 		if (StringUtils.isBlank(hubUrl)) {
 			throw new IllegalArgumentException("No Hub URL provided.");
 		}
@@ -171,6 +175,14 @@ public abstract class ScanExecutor {
 
 	public void setVerboseRun(final boolean verboseRun) {
 		this.verboseRun = verboseRun;
+	}
+
+	public boolean isDryRun() {
+		return dryRun;
+	}
+
+	public void setDryRun(final boolean dryRun) {
+		this.dryRun = dryRun;
 	}
 
 	public String getProxyHost() {
@@ -305,7 +317,7 @@ public abstract class ScanExecutor {
 				getLogger().debug("Using this Hub hostname : '" + url.getHost() + "'");
 				cmd.add("--username");
 				cmd.add(getHubUsername());
-				if (!supportHelper.isCliPasswordEnvironmentVar()) {
+				if (!supportHelper.hasCapability(HubCapabilitiesEnum.CLI_PASSWORD_ENVIRONMENT_VARIABLE)) {
 					cmd.add("--password");
 					cmd.add(getHubPassword());
 				}
@@ -332,7 +344,14 @@ public abstract class ScanExecutor {
 
 				cmd.add(logDirectoryPath);
 
-				if (supportHelper.isCliStatusDirOptionSupport()) {
+				if (isDryRun()) {
+					// The dryRunWriteDir is the same as the log directory path
+					// The CLI will create a subdirectory for the json files
+					cmd.add("--dryRunWriteDir");
+					cmd.add(getLogDirectoryPath());
+				}
+
+				if (supportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
 					// Only add the statusWriteDir option if the Hub supports the statusWriteDir option
 
 					// The scanStatusDirectoryPath is the same as the log directory path
@@ -378,13 +397,25 @@ public abstract class ScanExecutor {
 	 *
 	 */
 	protected String getLogDirectoryPath() throws IOException {
-		final File logDirectory = new File(new File(getWorkingDirectory(), "HubScanLogs"), String.valueOf(getBuildNumber()));
-		// This log directory should never exist as a new one is created for each Build
+		final File logDirectory = getLogDirectory();
+		return logDirectory.getCanonicalPath();
+	}
+
+	/**
+	 * Should determine the log directory to pass into the CLI. If the directory
+	 * does not exist it should be created here.
+	 *
+	 */
+	protected File getLogDirectory() throws IOException {
+		final File logDirectory = new File(new File(getWorkingDirectory(), "HubScanLogs"),
+				String.valueOf(getBuildNumber()));
+		// This log directory should never exist as a new one is created for
+		// each Build
 		if (!logDirectory.exists() && !logDirectory.mkdirs()) {
 			throw new IOException("Could not create the HubScanLogs directory!");
 		}
 
-		return logDirectory.getCanonicalPath();
+		return logDirectory;
 	}
 
 	/**
@@ -393,8 +424,7 @@ public abstract class ScanExecutor {
 	 *
 	 */
 	public String getScanStatusDirectoryPath() throws IOException {
-		final String logDirectory = getLogDirectoryPath();
-		File scanStatusDirectory = new File(logDirectory);
+		File scanStatusDirectory = getLogDirectory();
 		scanStatusDirectory = new File(scanStatusDirectory, "status");
 		return scanStatusDirectory.getCanonicalPath();
 	}
