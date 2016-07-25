@@ -157,7 +157,7 @@ public class HubIntRestService {
 	 */
 	@Deprecated
 	public int setCookies(final String hubUserName, final String hubPassword)
-			throws HubIntegrationException, URISyntaxException, BDRestException {
+			throws URISyntaxException, BDRestException {
 		return getRestConnection().setCookies(hubUserName, hubPassword);
 	}
 
@@ -199,7 +199,7 @@ public class HubIntRestService {
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
-		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+		if (getRestConnection().isSuccess(responseCode)) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
 			final Gson gson = new GsonBuilder().create();
 			final JsonParser parser = new JsonParser();
@@ -240,7 +240,7 @@ public class HubIntRestService {
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
-		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+		if (getRestConnection().isSuccess(responseCode)) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
 			final Gson gson = new GsonBuilder().create();
 			final JsonParser parser = new JsonParser();
@@ -268,7 +268,7 @@ public class HubIntRestService {
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
-		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+		if (getRestConnection().isSuccess(responseCode)) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
 			final Gson gson = new GsonBuilder().create();
 			return gson.fromJson(response, ProjectItem.class);
@@ -284,7 +284,7 @@ public class HubIntRestService {
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
-		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+		if (getRestConnection().isSuccess(responseCode)) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
 			final Gson gson = new GsonBuilder().create();
 			return gson.fromJson(response, ReleaseItem.class);
@@ -298,7 +298,7 @@ public class HubIntRestService {
 	 *
 	 */
 	public ReleaseItem getVersion(final ProjectItem project, final String versionName) throws IOException,
-			BDRestException, URISyntaxException, VersionDoesNotExistException, UnexpectedHubResponseException {
+	BDRestException, URISyntaxException, VersionDoesNotExistException, UnexpectedHubResponseException {
 		final List<ReleaseItem> versions = getVersionsForProject(project);
 		for (final ReleaseItem version : versions) {
 			if (version.getVersionName().equals(versionName)) {
@@ -322,7 +322,7 @@ public class HubIntRestService {
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
-		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+		if (getRestConnection().isSuccess(responseCode)) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
 
 			final Gson gson = new GsonBuilder().create();
@@ -342,7 +342,7 @@ public class HubIntRestService {
 		final List<String> versionLinks = project.getLinks(ProjectItem.VERSION_LINK);
 		if (versionLinks.size() != 1) {
 			throw new UnexpectedHubResponseException("The project " + project.getName() + " has " + versionLinks.size()
-					+ " " + ProjectItem.VERSION_LINK + " links; expected one");
+			+ " " + ProjectItem.VERSION_LINK + " links; expected one");
 		}
 		final String versionLink = versionLinks.get(0);
 		return versionLink;
@@ -424,7 +424,7 @@ public class HubIntRestService {
 		getRestConnection().handleRequest(resource);
 		responseCode = resource.getResponse().getStatus().getCode();
 
-		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+		if (getRestConnection().isSuccess(responseCode)) {
 			final Response resp = resource.getResponse();
 			return resp.getEntityAsText();
 		} else {
@@ -451,7 +451,7 @@ public class HubIntRestService {
 		getRestConnection().handleRequest(resource);
 		responseCode = resource.getResponse().getStatus().getCode();
 
-		if (responseCode == 200 || responseCode == 204 || responseCode == 202) {
+		if (getRestConnection().isSuccess(responseCode)) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
 			final Gson gson = new GsonBuilder().create();
 			final VersionComparison comparison = gson.fromJson(response, VersionComparison.class);
@@ -460,7 +460,7 @@ public class HubIntRestService {
 			throw new BDRestException(
 					"There was a problem comparing the specified version to the version of the Hub server. Error Code: "
 							+ responseCode,
-					resource);
+							resource);
 		}
 	}
 
@@ -500,7 +500,7 @@ public class HubIntRestService {
 
 			final int responseCode = resource.getResponse().getStatus().getCode();
 
-			if (responseCode == 200) {
+			if (getRestConnection().isSuccess(responseCode)) {
 				final String response = getRestConnection().readResponseAsString(resource.getResponse());
 				final ScanLocationResults results = new Gson().fromJson(response, ScanLocationResults.class);
 				final ScanLocationItem currentCodeLocation = getScanLocationMatch(hostname, correctedTargetPath,
@@ -515,7 +515,7 @@ public class HubIntRestService {
 				throw new BDRestException(
 						"There was a problem getting the code locations for the host and paths provided. Error Code: "
 								+ responseCode,
-						resource);
+								resource);
 			}
 		}
 		return codeLocations;
@@ -581,7 +581,7 @@ public class HubIntRestService {
 		getRestConnection().handleRequest(resource);
 
 		final int responseCode = resource.getResponse().getStatus().getCode();
-		if (responseCode != 204) {
+		if (!getRestConnection().isSuccess(responseCode)) {
 			throw new BDRestException("There was a problem deleting this report. Error Code: " + responseCode,
 					resource);
 		}
@@ -594,7 +594,7 @@ public class HubIntRestService {
 
 		@SuppressWarnings("unchecked")
 		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
-				.get(HeaderConstants.ATTRIBUTE_HEADERS);
+		.get(HeaderConstants.ATTRIBUTE_HEADERS);
 		if (requestHeaders == null) {
 			requestHeaders = new Series<Header>(Header.class);
 			resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
@@ -609,7 +609,7 @@ public class HubIntRestService {
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
-		if (responseCode == 200) {
+		if (getRestConnection().isSuccess(responseCode)) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
 			return new Gson().fromJson(response, ReportInformationItem.class);
 		} else {
@@ -632,7 +632,7 @@ public class HubIntRestService {
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
-		if (responseCode == 200) {
+		if (getRestConnection().isSuccess(responseCode)) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
 
 			final Gson gson = new GsonBuilder().create();
@@ -675,7 +675,7 @@ public class HubIntRestService {
 
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
-		if (responseCode == 200) {
+		if (getRestConnection().isSuccess(responseCode)) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
 
 			final Gson gson = new GsonBuilder().create();
@@ -703,7 +703,7 @@ public class HubIntRestService {
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
 
-		if (responseCode == 200) {
+		if (getRestConnection().isSuccess(responseCode)) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
 
 			final Gson gson = new GsonBuilder().create();
