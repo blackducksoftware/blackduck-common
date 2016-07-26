@@ -46,6 +46,7 @@ public class HubScanJobConfigTest {
 		final boolean shouldGenReport1 = false;
 		final int waitTime1 = 0;
 		final String target1 = "target1";
+		final boolean dryRun1 = false;
 		final ImmutableList<String> targets1 = new ImmutableList.Builder<String>().add(target1).build();
 
 		final String projectName2 = "projectName2";
@@ -57,15 +58,16 @@ public class HubScanJobConfigTest {
 		final boolean shouldGenReport2 = false;
 		final int waitTime2 = 1234;
 		final String target2 = "target2";
+		final boolean dryRun2 = false;
 		final ImmutableList<String> targets2 = new ImmutableList.Builder<String>().add(target2).build();
 
 
 		final HubScanJobConfig item1 = new HubScanJobConfig(projectName1, version1, phase1, dist1, workingDir1,
-				scanMemory1, shouldGenReport1, waitTime1, targets1);
+				scanMemory1, shouldGenReport1, waitTime1, targets1, dryRun1);
 		final HubScanJobConfig item2 = new HubScanJobConfig(projectName2, version2, phase2, dist2, workingDir2,
-				scanMemory2, shouldGenReport2, waitTime2, targets2);
+				scanMemory2, shouldGenReport2, waitTime2, targets2, dryRun2);
 		final HubScanJobConfig item3 = new HubScanJobConfig(projectName1, version1, phase1, dist1, workingDir1,
-				scanMemory1, shouldGenReport1, waitTime1, targets1);
+				scanMemory1, shouldGenReport1, waitTime1, targets1, dryRun1);
 
 		assertEquals(projectName1, item1.getProjectName());
 		assertEquals(version1, item1.getVersion());
@@ -117,6 +119,8 @@ public class HubScanJobConfigTest {
 		builder.append(item1.getScanMemory());
 		builder.append(", scanTargetPaths=");
 		builder.append(item1.getScanTargetPaths());
+		builder.append(", dryRun=");
+		builder.append(item1.isDryRun());
 		builder.append("]");
 
 		assertEquals(builder.toString(), item1.toString());

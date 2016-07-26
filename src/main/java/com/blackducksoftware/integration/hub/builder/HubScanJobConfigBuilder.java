@@ -50,6 +50,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 	private String maxWaitTimeForBomUpdate;
 	private String scanMemory;
 	private final Set<String> scanTargetPaths = new HashSet<String>();
+	private boolean dryRun;
 	private boolean disableScanTargetPathExistenceCheck;
 
 	public HubScanJobConfigBuilder(final boolean shouldUseDefaultValues) {
@@ -64,7 +65,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 
 		result.setConstructedObject(new HubScanJobConfig(projectName, version, phase, distribution, workingDirectory,
 				NumberUtils.toInt(scanMemory), shouldGenerateRiskReport, NumberUtils.toInt(maxWaitTimeForBomUpdate),
-				immutableScanTargetPaths));
+				immutableScanTargetPaths, dryRun));
 
 		return result;
 	}
@@ -87,8 +88,10 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 	}
 
 	public void validateProjectAndVersion(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result) {
-
-		if (null == projectName && null == version) {
+		if (dryRun) {
+			result.addResult(HubScanJobFieldEnum.PROJECT, new ValidationResult(ValidationResultEnum.OK, ""));
+			result.addResult(HubScanJobFieldEnum.VERSION, new ValidationResult(ValidationResultEnum.OK, ""));
+		} else if (null == projectName && null == version) {
 			result.addResult(HubScanJobFieldEnum.VERSION, new ValidationResult(ValidationResultEnum.WARN,
 					"No Project name or Version were found. Any scans run will not be mapped to a Version."));
 		} else {
@@ -151,7 +154,10 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 
 	public void validateShouldGenerateRiskReport(
 			final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result) {
-		if ((null == projectName || null == version) && shouldGenerateRiskReport) {
+		if (dryRun) {
+			result.addResult(HubScanJobFieldEnum.GENERATE_RISK_REPORT,
+					new ValidationResult(ValidationResultEnum.OK, ""));
+		} else if ((null == projectName || null == version) && shouldGenerateRiskReport) {
 			result.addResult(HubScanJobFieldEnum.GENERATE_RISK_REPORT, new ValidationResult(ValidationResultEnum.ERROR,
 					"To generate the Risk Report, you need to provide a Project name or version."));
 		} else {
@@ -166,36 +172,41 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 
 	private void validateMaxWaitTimeForBomUpdate(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result,
 			final Integer defaultMaxWaitTime) {
-		if (shouldUseDefaultValues() && defaultMaxWaitTime != null) {
-			final int maxWaitTime = NumberUtils.toInt(maxWaitTimeForBomUpdate);
-			if (maxWaitTime <= 0) {
-				maxWaitTimeForBomUpdate = String.valueOf(defaultMaxWaitTime);
-			}
-			return;
-		}
-		if (StringUtils.isBlank(maxWaitTimeForBomUpdate)) {
-			result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
-					new ValidationResult(ValidationResultEnum.ERROR, "No maximum wait time for the Bom Update found."));
-			return;
-		}
-		int maxWaitTime = -1;
-		try {
-			maxWaitTime = stringToInteger(maxWaitTimeForBomUpdate);
-		} catch (final IllegalArgumentException e) {
-			result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
-					new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
-			return;
-		}
-		if (maxWaitTime <= 0) {
-			result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
-					new ValidationResult(ValidationResultEnum.ERROR,
-							"The maximum wait time for the BOM Update must be greater than 0."));
-		} else if (maxWaitTime < 2) {
-			result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
-					new ValidationResult(ValidationResultEnum.WARN, "This wait time may be too short."));
-		} else {
+		if (dryRun) {
 			result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
 					new ValidationResult(ValidationResultEnum.OK, ""));
+		} else {
+			if (shouldUseDefaultValues() && defaultMaxWaitTime != null) {
+				final int maxWaitTime = NumberUtils.toInt(maxWaitTimeForBomUpdate);
+				if (maxWaitTime <= 0) {
+					maxWaitTimeForBomUpdate = String.valueOf(defaultMaxWaitTime);
+				}
+				return;
+			}
+			if (StringUtils.isBlank(maxWaitTimeForBomUpdate)) {
+				result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
+						new ValidationResult(ValidationResultEnum.ERROR, "No maximum wait time for the Bom Update found."));
+				return;
+			}
+			int maxWaitTime = -1;
+			try {
+				maxWaitTime = stringToInteger(maxWaitTimeForBomUpdate);
+			} catch (final IllegalArgumentException e) {
+				result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
+						new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
+				return;
+			}
+			if (maxWaitTime <= 0) {
+				result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
+						new ValidationResult(ValidationResultEnum.ERROR,
+								"The maximum wait time for the BOM Update must be greater than 0."));
+			} else if (maxWaitTime < 2) {
+				result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
+						new ValidationResult(ValidationResultEnum.WARN, "This wait time may be too short."));
+			} else {
+				result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
+						new ValidationResult(ValidationResultEnum.OK, ""));
+			}
 		}
 	}
 
@@ -310,6 +321,10 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 
 	public void addAllScanTargetPaths(final List<String> scanTargetPaths) {
 		this.scanTargetPaths.addAll(scanTargetPaths);
+	}
+
+	public void setDryRun(final boolean dryRun) {
+		this.dryRun = dryRun;
 	}
 
 	public void setWorkingDirectory(final String workingDirectory) {

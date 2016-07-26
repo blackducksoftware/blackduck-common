@@ -44,9 +44,11 @@ public class HubScanJobConfig {
 
 	private final ImmutableList<String> scanTargetPaths;
 
+	private final boolean dryRun;
+
 	public HubScanJobConfig(final String projectName, final String version, final String phase, final String distribution, final String workingDirectory, final int scanMemory,
 			final boolean shouldGenerateRiskReport, final int maxWaitTimeForBomUpdate,
-			final ImmutableList<String> scanTargetPaths) {
+			final ImmutableList<String> scanTargetPaths, final boolean dryRun) {
 		this.projectName = projectName;
 		this.version = version;
 		this.phase = phase;
@@ -56,6 +58,7 @@ public class HubScanJobConfig {
 		this.maxWaitTimeForBomUpdate = maxWaitTimeForBomUpdate;
 		this.scanMemory = scanMemory;
 		this.scanTargetPaths = scanTargetPaths;
+		this.dryRun = dryRun;
 	}
 
 	public String getProjectName() {
@@ -98,6 +101,9 @@ public class HubScanJobConfig {
 		return scanTargetPaths;
 	}
 
+	public boolean isDryRun() {
+		return dryRun;
+	}
 
 	@Override
 	public String toString() {
@@ -120,6 +126,8 @@ public class HubScanJobConfig {
 		builder.append(scanMemory);
 		builder.append(", scanTargetPaths=");
 		builder.append(scanTargetPaths);
+		builder.append(", dryRun=");
+		builder.append(dryRun);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -129,6 +137,7 @@ public class HubScanJobConfig {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((distribution == null) ? 0 : distribution.hashCode());
+		result = prime * result + (dryRun ? 1231 : 1237);
 		result = prime * result + maxWaitTimeForBomUpdate;
 		result = prime * result + ((phase == null) ? 0 : phase.hashCode());
 		result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
@@ -157,6 +166,9 @@ public class HubScanJobConfig {
 				return false;
 			}
 		} else if (!distribution.equals(other.distribution)) {
+			return false;
+		}
+		if (dryRun != other.dryRun) {
 			return false;
 		}
 		if (maxWaitTimeForBomUpdate != other.maxWaitTimeForBomUpdate) {
@@ -205,5 +217,6 @@ public class HubScanJobConfig {
 		}
 		return true;
 	}
+
 
 }
