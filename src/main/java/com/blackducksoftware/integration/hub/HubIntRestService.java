@@ -65,6 +65,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 public class HubIntRestService {
@@ -718,12 +719,14 @@ public class HubIntRestService {
 	
 	/**
 	 * 
-	 * @return registration id
+	 * @return registration id		Registration ID of the hub instance
 	 * @throws URISyntaxException 
 	 * @throws BDRestException 
 	 * @throws IOException 
+	 * 
+	 * Returns the registration ID of the hub instance
 	 */
-	public String getRegistrationId() throws URISyntaxException, BDRestException, IOException{
+	public String getRegistrationId() throws URISyntaxException, BDRestException, IOException, JsonSyntaxException{
 		final ClientResource resource = getRestConnection().createClientResource();
 		resource.addSegment("api");
 		resource.addSegment("v1");
@@ -734,18 +737,11 @@ public class HubIntRestService {
 		final int responseCode = resource.getResponse().getStatus().getCode();
 		if(responseCode == 200){
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-//			return response;
-			String regId = "";
-			try{
-				JsonParser parser = new JsonParser();
-				JsonElement je = parser.parse(response);
-				JsonObject jo = je.getAsJsonObject();
-				JsonElement je2 = jo.get("registrationId");
-				regId = je2.getAsString();
-			} catch (Exception e){
-				//TODO Exception handling
-				e.printStackTrace();
-			}
+			JsonParser parser = new JsonParser();
+			JsonElement je = parser.parse(response);
+			JsonObject jo = je.getAsJsonObject();
+			JsonElement je2 = jo.get("registrationId");
+			String regId = je2.getAsString();
 			return regId;
 		} else {
 			throw new BDRestException("There was a problem getting the registration ID. Error Code: " + responseCode, resource);
