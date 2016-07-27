@@ -30,7 +30,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class IntBufferedLogger implements IntLogger {
+public class IntBufferedLogger extends IntLogger {
 	private final Map<LogLevel, List<String>> outputMap = new HashMap<LogLevel, List<String>>();
 
 

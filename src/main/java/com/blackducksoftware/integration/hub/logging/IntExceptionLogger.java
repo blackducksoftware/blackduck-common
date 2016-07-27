@@ -29,7 +29,7 @@ import com.blackducksoftware.integration.hub.exception.ValidationException;
  * invocations, which should all simply throw a ValidationException with the
  * appropriate ValidationMessageEnum.
  */
-public class IntExceptionLogger implements IntLogger {
+public class IntExceptionLogger extends IntLogger {
 	public static final IntLogger LOGGER = new IntExceptionLogger();
 
 	@Override
