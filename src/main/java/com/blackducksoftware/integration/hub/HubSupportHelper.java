@@ -203,6 +203,12 @@ public class HubSupportHelper implements Serializable {
 
 		return true;
 	}
+	
+	public String getHubVersion(HubIntRestService service) throws IOException, BDRestException, URISyntaxException{
+		String hubVersion = service.getHubVersion();
+		hubVersion = hubVersion.replaceAll("\"", "");
+		return hubVersion;
+	}
 
 	/**
 	 * We are parsing the versions incorrectly so we let the Hub server compare

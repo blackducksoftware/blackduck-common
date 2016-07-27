@@ -396,7 +396,7 @@ public class RestConnection {
 			.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			if (responseheaders != null) {
 				logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
-				for (final Header header : responseheaders) {
+				for (final org.restlet.engine.header.Header header : responseheaders) {
 					if (null == header) {
 						logMessage(LogLevel.TRACE, "received a null header");
 					} else {
