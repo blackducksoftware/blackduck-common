@@ -22,11 +22,16 @@
 package com.blackducksoftware.integration.hub.component.api;
 
 import java.util.Date;
+import java.util.UUID;
 
+import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class ComponentVersion extends HubItem {
+	public static final String COMPONENT_URL_IDENTIFIER = "components";
+	public static final String VERSION_URL_IDENTIFIER = "versions";
 	private String versionName;
 	private Date releasedOn;
 
@@ -52,9 +57,24 @@ public class ComponentVersion extends HubItem {
 		this.releasedOn = releasedOn;
 	}
 
+	public UUID getComponentId() throws MissingUUIDException {
+		if (getMeta() == null || getMeta().getHref() == null) {
+			return null;
+		}
+		return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER, getMeta().getHref());
+	}
+
+	public UUID getVersionId() throws MissingUUIDException {
+		if (getMeta() == null || getMeta().getHref() == null) {
+			return null;
+		}
+		return HubUrlParser.getUUIDFromURLString(VERSION_URL_IDENTIFIER, getMeta().getHref());
+	}
+
 	@Override
 	public String toString() {
 		return "ComponentVersion [versionName=" + versionName + ", releasedOn=" + releasedOn + "]";
 	}
+
 
 }

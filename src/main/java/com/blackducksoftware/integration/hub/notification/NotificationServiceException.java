@@ -19,29 +19,31 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.notification.api;
+package com.blackducksoftware.integration.hub.notification;
 
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
+public class NotificationServiceException extends Exception {
 
-public class VulnerabilityNotificationItem extends NotificationItem {
-	public VulnerabilityNotificationContent content;
+	private static final long serialVersionUID = -5409459979943538039L;
 
-	public VulnerabilityNotificationItem(final MetaInformation meta) {
-		super(meta);
+	public NotificationServiceException() {
+		super();
 	}
 
-	public VulnerabilityNotificationContent getContent() {
-		return content;
+	public NotificationServiceException(final String message) {
+		super(message);
 	}
 
-	public void setContent(final VulnerabilityNotificationContent content) {
-		this.content = content;
+	public NotificationServiceException(final Throwable cause) {
+		super(cause);
 	}
 
-	@Override
-	public String toString() {
-		return "VulnerabilityNotificationItem [content=" + content + ", contentType=" + contentType + ", type=" + type
-				+ ", createdAt=" + createdAt + ", Meta=" + getMeta() + "]";
+	public NotificationServiceException(final String message, final Throwable cause) {
+		super(message, cause);
 	}
 
+	public NotificationServiceException(final String message, final Throwable cause, final boolean enableSuppression,
+			final boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
 }
+
