@@ -55,7 +55,6 @@ public class HubProxyInfo implements Serializable {
 		this.ignoredProxyHosts = ignoredProxyHosts;
 	}
 
-
 	public URLConnection openConnection(final URL url) throws IOException {
 		if (shouldUseProxyForUrl(url)) {
 			final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));

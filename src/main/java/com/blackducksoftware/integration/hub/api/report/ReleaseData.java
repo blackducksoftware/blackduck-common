@@ -27,8 +27,7 @@ public class ReleaseData {
 
 	private final String version;
 
-	public ReleaseData(final String id,
-			final String version) {
+	public ReleaseData(final String id, final String version) {
 		this.id = id;
 		this.version = version;
 	}

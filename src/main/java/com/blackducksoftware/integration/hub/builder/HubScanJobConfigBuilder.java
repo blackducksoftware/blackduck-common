@@ -184,8 +184,8 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 				return;
 			}
 			if (StringUtils.isBlank(maxWaitTimeForBomUpdate)) {
-				result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
-						new ValidationResult(ValidationResultEnum.ERROR, "No maximum wait time for the Bom Update found."));
+				result.addResult(HubScanJobFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE, new ValidationResult(
+						ValidationResultEnum.ERROR, "No maximum wait time for the Bom Update found."));
 				return;
 			}
 			int maxWaitTime = -1;

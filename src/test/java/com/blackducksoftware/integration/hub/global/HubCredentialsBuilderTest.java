@@ -66,8 +66,7 @@ public class HubCredentialsBuilderTest {
 		}
 	}
 
-	private List<String> getMessages(
-			final ValidationResults<GlobalFieldKey, HubCredentials> result) {
+	private List<String> getMessages(final ValidationResults<GlobalFieldKey, HubCredentials> result) {
 
 		final List<String> messageList = new ArrayList<String>();
 		final Map<GlobalFieldKey, List<ValidationResult>> resultMap = result.getResultMap();

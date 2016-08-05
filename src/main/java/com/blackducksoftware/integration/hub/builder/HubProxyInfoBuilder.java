@@ -136,8 +136,10 @@ public class HubProxyInfoBuilder extends AbstractBuilder<GlobalFieldKey, HubProx
 						new ValidationResult(ValidationResultEnum.ERROR, MSG_PROXY_HOST_NOT_SPECIFIED));
 			}
 			if (StringUtils.isNotBlank(getUsername()) && StringUtils.isNotBlank(getPassword())) {
-				result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.OK, ""));
-				result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD, new ValidationResult(ValidationResultEnum.OK, ""));
+				result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
+						new ValidationResult(ValidationResultEnum.OK, ""));
+				result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD,
+						new ValidationResult(ValidationResultEnum.OK, ""));
 			} else {
 				result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
 						new ValidationResult(ValidationResultEnum.ERROR, MSG_CREDENTIALS_INVALID));

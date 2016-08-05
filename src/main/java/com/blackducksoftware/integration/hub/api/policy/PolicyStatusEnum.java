@@ -22,10 +22,7 @@
 package com.blackducksoftware.integration.hub.api.policy;
 
 public enum PolicyStatusEnum {
-	IN_VIOLATION,
-	IN_VIOLATION_OVERRIDDEN,
-	NOT_IN_VIOLATION,
-	UNKNOWN;
+	IN_VIOLATION, IN_VIOLATION_OVERRIDDEN, NOT_IN_VIOLATION, UNKNOWN;
 
 	public static PolicyStatusEnum getPolicyStatusEnum(final String policyStatus) {
 		if (policyStatus == null) {

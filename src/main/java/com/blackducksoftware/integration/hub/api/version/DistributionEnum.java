@@ -21,17 +21,12 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.version;
 
-
 public enum DistributionEnum {
 
-	EXTERNAL("External")
-	,
-	SAAS("SaaS")
-	,
-	INTERNAL("Internal")
-	,
-	OPENSOURCE("Open Source")
-	,
+	EXTERNAL("External"),
+	SAAS("SaaS"),
+	INTERNAL("Internal"),
+	OPENSOURCE("Open Source"),
 	UNKNOWNDISTRIBUTION("Unknown Distribution");
 
 	private final String displayValue;

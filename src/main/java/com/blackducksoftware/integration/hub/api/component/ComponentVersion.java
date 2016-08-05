@@ -76,5 +76,4 @@ public class ComponentVersion extends HubItem {
 		return "ComponentVersion [versionName=" + versionName + ", releasedOn=" + releasedOn + "]";
 	}
 
-
 }

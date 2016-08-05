@@ -24,10 +24,8 @@ package com.blackducksoftware.integration.hub.scan.status;
 import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
-
 public class ScanStatusToPoll extends HubItem {
 	private final String status;
-
 
 	public ScanStatusToPoll(final String status, final MetaInformation _meta) {
 		super(_meta);

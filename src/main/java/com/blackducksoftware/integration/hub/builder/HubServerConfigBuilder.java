@@ -169,12 +169,12 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 			}
 			connection.getContent();
 		} catch (final IOException ioe) {
-			result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR,
-					ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, ioe));
+			result.addResult(HubServerConfigFieldEnum.HUBURL,
+					new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, ioe));
 			return;
 		} catch (final RuntimeException e) {
-			result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR,
-					ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl, e));
+			result.addResult(HubServerConfigFieldEnum.HUBURL,
+					new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl, e));
 			return;
 		}
 
@@ -309,8 +309,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 	}
 
 	/**
-	 * IMPORTANT : The proxy password length should only be set if the proxy password is
-	 * already encrypted
+	 * IMPORTANT : The proxy password length should only be set if the proxy
+	 * password is already encrypted
 	 */
 	public void setProxyPasswordLength(final int proxyPasswordLength) {
 		this.proxyPasswordLength = proxyPasswordLength;
@@ -323,6 +323,5 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 	public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
 		this.ignoredProxyHosts = ignoredProxyHosts;
 	}
-
 
 }

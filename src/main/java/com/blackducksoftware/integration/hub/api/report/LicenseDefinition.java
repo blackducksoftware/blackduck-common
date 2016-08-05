@@ -41,10 +41,8 @@ public class LicenseDefinition {
 
 	private final String licenseDisplay;
 
-	public LicenseDefinition(final String licenseId,
-			final String discoveredAs, final String name, final String spdxId,
-			final String ownership, final String codeSharing,
-			final String licenseDisplay) {
+	public LicenseDefinition(final String licenseId, final String discoveredAs, final String name, final String spdxId,
+			final String ownership, final String codeSharing, final String licenseDisplay) {
 		this.licenseId = licenseId;
 		this.discoveredAs = discoveredAs;
 		this.name = name;
@@ -93,7 +91,7 @@ public class LicenseDefinition {
 	/**
 	 * This method is supposed to be called by JSON serializer only
 	 */
-	 public String getLicenseDisplay() {
+	public String getLicenseDisplay() {
 		return licenseDisplay;
 	}
 

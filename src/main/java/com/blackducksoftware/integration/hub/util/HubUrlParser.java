@@ -26,8 +26,7 @@ public class HubUrlParser {
 		return getUUIDFromURLString(identifier, url.toString());
 	}
 
-	public static UUID getUUIDFromURLString(final String identifier, final String url)
-			throws MissingUUIDException {
+	public static UUID getUUIDFromURLString(final String identifier, final String url) throws MissingUUIDException {
 		if (StringUtils.isBlank(identifier)) {
 			throw new IllegalArgumentException("No identifier was provided.");
 		}

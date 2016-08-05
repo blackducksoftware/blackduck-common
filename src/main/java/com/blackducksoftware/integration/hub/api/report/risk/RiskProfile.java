@@ -31,9 +31,7 @@ public class RiskProfile {
 
 	private final RiskCategories categories;
 
-	public RiskProfile(
-			final int numberOfItems,
-			final RiskCategories categories) {
+	public RiskProfile(final int numberOfItems, final RiskCategories categories) {
 		this.numberOfItems = numberOfItems;
 		this.categories = categories;
 	}

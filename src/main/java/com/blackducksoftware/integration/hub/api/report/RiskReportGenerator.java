@@ -40,16 +40,18 @@ public class RiskReportGenerator {
 	private final HubSupportHelper supportHelper;
 
 	/**
-	 * Make sure supportHelper.checkHubSupport() has already been run before passing in the supportHelper.
+	 * Make sure supportHelper.checkHubSupport() has already been run before
+	 * passing in the supportHelper.
 	 *
 	 */
-	public RiskReportGenerator(final HubReportGenerationInfo hubReportGenerationInfo, final HubSupportHelper supportHelper) {
+	public RiskReportGenerator(final HubReportGenerationInfo hubReportGenerationInfo,
+			final HubSupportHelper supportHelper) {
 		this.hubReportGenerationInfo = hubReportGenerationInfo;
 		this.supportHelper = supportHelper;
 	}
 
-	public HubRiskReportData generateHubReport(final IntLogger logger) throws IOException, BDRestException, URISyntaxException, InterruptedException,
- HubIntegrationException, UnexpectedHubResponseException {
+	public HubRiskReportData generateHubReport(final IntLogger logger) throws IOException, BDRestException,
+			URISyntaxException, InterruptedException, HubIntegrationException, UnexpectedHubResponseException {
 		logger.debug("Waiting for the bom to be updated with the scan results.");
 		final HubEventPolling hubEventPolling = getHubEventPolling(hubReportGenerationInfo.getService());
 
@@ -63,7 +65,8 @@ public class RiskReportGenerator {
 		final String reportUrl = hubReportGenerationInfo.getService()
 				.generateHubReport(hubReportGenerationInfo.getVersion(), ReportFormatEnum.JSON);
 
-		final ReportInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl, hubReportGenerationInfo.getMaximumWaitTime());
+		final ReportInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl,
+				hubReportGenerationInfo.getMaximumWaitTime());
 
 		final List<MetaLink> links = reportInfo.getMeta().getLinks();
 
@@ -88,7 +91,7 @@ public class RiskReportGenerator {
 		return hubRiskReportData;
 	}
 
-	public HubEventPolling getHubEventPolling(final HubIntRestService service){
+	public HubEventPolling getHubEventPolling(final HubIntRestService service) {
 		return new HubEventPolling(service);
 	}
 

@@ -29,19 +29,26 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
 
 public class PolicyStatusEnumTest {
 
-    @Test
-    public void testGetPolicyStatusEnum() {
-        assertEquals(PolicyStatusEnum.UNKNOWN, PolicyStatusEnum.getPolicyStatusEnum("Fake"));
-        assertEquals(PolicyStatusEnum.IN_VIOLATION, PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.IN_VIOLATION.toString().toLowerCase()));
-        assertEquals(PolicyStatusEnum.IN_VIOLATION, PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.IN_VIOLATION.toString()));
-        assertEquals(PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN,
-                PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN.toString().toLowerCase()));
-        assertEquals(PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN, PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN.toString()));
-        assertEquals(PolicyStatusEnum.NOT_IN_VIOLATION, PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.NOT_IN_VIOLATION.toString().toLowerCase()));
-        assertEquals(PolicyStatusEnum.NOT_IN_VIOLATION, PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.NOT_IN_VIOLATION.toString()));
-        assertEquals(PolicyStatusEnum.UNKNOWN, PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.UNKNOWN.toString().toLowerCase()));
-        assertEquals(PolicyStatusEnum.UNKNOWN, PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.UNKNOWN.toString()));
-        assertEquals(PolicyStatusEnum.UNKNOWN, PolicyStatusEnum.getPolicyStatusEnum(null));
-    }
+	@Test
+	public void testGetPolicyStatusEnum() {
+		assertEquals(PolicyStatusEnum.UNKNOWN, PolicyStatusEnum.getPolicyStatusEnum("Fake"));
+		assertEquals(PolicyStatusEnum.IN_VIOLATION,
+				PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.IN_VIOLATION.toString().toLowerCase()));
+		assertEquals(PolicyStatusEnum.IN_VIOLATION,
+				PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.IN_VIOLATION.toString()));
+		assertEquals(PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN, PolicyStatusEnum
+				.getPolicyStatusEnum(PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN.toString().toLowerCase()));
+		assertEquals(PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN,
+				PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN.toString()));
+		assertEquals(PolicyStatusEnum.NOT_IN_VIOLATION,
+				PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.NOT_IN_VIOLATION.toString().toLowerCase()));
+		assertEquals(PolicyStatusEnum.NOT_IN_VIOLATION,
+				PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.NOT_IN_VIOLATION.toString()));
+		assertEquals(PolicyStatusEnum.UNKNOWN,
+				PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.UNKNOWN.toString().toLowerCase()));
+		assertEquals(PolicyStatusEnum.UNKNOWN,
+				PolicyStatusEnum.getPolicyStatusEnum(PolicyStatusEnum.UNKNOWN.toString()));
+		assertEquals(PolicyStatusEnum.UNKNOWN, PolicyStatusEnum.getPolicyStatusEnum(null));
+	}
 
 }

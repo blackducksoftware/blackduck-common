@@ -54,15 +54,9 @@ public class DetailedReleaseSummary {
 
 	private final URLProvider uiUrlGenerator;
 
-	public DetailedReleaseSummary(final String projectId,
-			final String versionId,
-			final String projectName,
-			final String version,
-			final String versionComments,
-			final String nickname,
-			final String releasedOn,
-			final String phase,
-			final String distribution, final URLProvider uiUrlGenerator) {
+	public DetailedReleaseSummary(final String projectId, final String versionId, final String projectName,
+			final String version, final String versionComments, final String nickname, final String releasedOn,
+			final String phase, final String distribution, final URLProvider uiUrlGenerator) {
 		this.projectId = projectId;
 		this.versionId = versionId;
 		this.projectName = projectName;

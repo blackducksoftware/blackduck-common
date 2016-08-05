@@ -43,10 +43,12 @@ public class HostnameHelper {
 					final NetworkInterface nic = interfaces.nextElement();
 					// Get the addresses for this network interface
 					final Enumeration<InetAddress> addresses = nic.getInetAddresses();
-					// will loop through the addresses until it finds a non loop back address that has a host name
+					// will loop through the addresses until it finds a non loop
+					// back address that has a host name
 					while (hostName == null && addresses.hasMoreElements()) {
 						final InetAddress address = addresses.nextElement();
-						// if the address is not a loopback address then get the host name
+						// if the address is not a loopback address then get the
+						// host name
 						if (!address.isLoopbackAddress()) {
 							hostName = address.getHostName();
 							break;

@@ -33,7 +33,6 @@ import nl.jqno.equalsverifier.Warning;
 
 public class HubScanJobConfigTest {
 
-
 	@Test
 	public void testHubScanJobConfig() {
 
@@ -60,7 +59,6 @@ public class HubScanJobConfigTest {
 		final String target2 = "target2";
 		final boolean dryRun2 = false;
 		final ImmutableList<String> targets2 = new ImmutableList.Builder<String>().add(target2).build();
-
 
 		final HubScanJobConfig item1 = new HubScanJobConfig(projectName1, version1, phase1, dist1, workingDir1,
 				scanMemory1, shouldGenReport1, waitTime1, targets1, dryRun1);
@@ -90,7 +88,6 @@ public class HubScanJobConfigTest {
 		assertEquals(waitTime2 * 60 * 1000, item2.getMaxWaitTimeForBomUpdateInMilliseconds());
 		assertEquals(targets2, item2.getScanTargetPaths());
 
-
 		assertTrue(item1.equals(item3));
 		assertTrue(!item1.equals(item2));
 
@@ -98,7 +95,6 @@ public class HubScanJobConfigTest {
 
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());
-
 
 		final StringBuilder builder = new StringBuilder();
 		builder.append("HubScanJobConfig [projectName=");

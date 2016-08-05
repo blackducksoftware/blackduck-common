@@ -40,7 +40,8 @@ public class ScanStatusChecker implements Runnable {
 
 	private boolean running;
 
-	public ScanStatusChecker(final HubIntRestService service, final ScanStatusToPoll currentStatus, final CountDownLatch countDownLock) {
+	public ScanStatusChecker(final HubIntRestService service, final ScanStatusToPoll currentStatus,
+			final CountDownLatch countDownLock) {
 		this.service = service;
 		this.currentStatus = currentStatus;
 		this.countDownLock = countDownLock;

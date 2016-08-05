@@ -230,7 +230,8 @@ public class HubRiskReportDataTest {
 		assertEquals(11000, hubRiskReportData.getOperationalRiskLowCount());
 		assertEquals(12000, hubRiskReportData.getOperationalRiskNoneCount());
 
-		final InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(XStreamHelperTest.toReadClasspathEntry);
+		final InputStream inputStream = TestUtils
+				.getInputStreamFromClasspathFile(XStreamHelperTest.toReadClasspathEntry);
 		hubRiskReportData.readFromInputStream(inputStream);
 		IOUtils.closeQuietly(inputStream);
 

@@ -69,19 +69,11 @@ public class AggregateBomViewEntry {
 	private final String policyApprovalStatus;
 
 	public AggregateBomViewEntry(// NOPMD ExcessiveParameterList
-			final List<String> bomEntryIds,
-			final List<Long> bomViewEntryIds,
-			final List<String> matchTypes,
-			final List<String> producerMatchTypes,
-			final List<String> componentMatchTypes,
-			final List<String> usages,
-			final List<Boolean> inUses,
-			final List<UserData> createdByUsers,
-			final String since,
-			final ProjectData producerProject,
-			final List<ReleaseData> producerReleases,
-			final List<LicenseDefinition> licenses,
-			final RiskProfile riskProfile, final String policyApprovalStatus) {
+			final List<String> bomEntryIds, final List<Long> bomViewEntryIds, final List<String> matchTypes,
+			final List<String> producerMatchTypes, final List<String> componentMatchTypes, final List<String> usages,
+			final List<Boolean> inUses, final List<UserData> createdByUsers, final String since,
+			final ProjectData producerProject, final List<ReleaseData> producerReleases,
+			final List<LicenseDefinition> licenses, final RiskProfile riskProfile, final String policyApprovalStatus) {
 		this.bomEntryIds = bomEntryIds;
 		this.bomViewEntryIds = bomViewEntryIds;
 		this.matchTypes = matchTypes;
@@ -162,7 +154,8 @@ public class AggregateBomViewEntry {
 	}
 
 	public String getLicensesDisplay() {
-		// The first license should be the "parent license" and it should have the correct display of all the licenses
+		// The first license should be the "parent license" and it should have
+		// the correct display of all the licenses
 		// for this entry
 		if (licenses == null || licenses.isEmpty()) {
 			return "";
@@ -175,36 +168,40 @@ public class AggregateBomViewEntry {
 	}
 
 	public RiskCounts getVulnerabilityRisk() {
-		if (riskProfile == null || riskProfile.getCategories() == null || riskProfile.getCategories().getVULNERABILITY() == null) {
+		if (riskProfile == null || riskProfile.getCategories() == null
+				|| riskProfile.getCategories().getVULNERABILITY() == null) {
 			return null;
 		}
 		return riskProfile.getCategories().getVULNERABILITY();
 	}
 
 	public RiskCounts getActivityRisk() {
-		if (riskProfile == null || riskProfile.getCategories() == null || riskProfile.getCategories().getACTIVITY() == null) {
+		if (riskProfile == null || riskProfile.getCategories() == null
+				|| riskProfile.getCategories().getACTIVITY() == null) {
 			return null;
 		}
 		return riskProfile.getCategories().getACTIVITY();
 	}
 
 	public RiskCounts getVersionRisk() {
-		if (riskProfile == null || riskProfile.getCategories() == null || riskProfile.getCategories().getVERSION() == null) {
+		if (riskProfile == null || riskProfile.getCategories() == null
+				|| riskProfile.getCategories().getVERSION() == null) {
 			return null;
 		}
 		return riskProfile.getCategories().getVERSION();
 	}
 
 	public RiskCounts getLicenseRisk() {
-		if (riskProfile == null || riskProfile.getCategories() == null || riskProfile.getCategories().getLICENSE() == null) {
+		if (riskProfile == null || riskProfile.getCategories() == null
+				|| riskProfile.getCategories().getLICENSE() == null) {
 			return null;
 		}
 		return riskProfile.getCategories().getLICENSE();
 	}
 
 	/**
-	 * Returns the appropriate String for the License Risk type to be used in the UI. If the License
-	 * Risk is null it will return an empty String.
+	 * Returns the appropriate String for the License Risk type to be used in
+	 * the UI. If the License Risk is null it will return an empty String.
 	 *
 	 */
 	public String getLicenseRiskString() {
@@ -223,15 +220,17 @@ public class AggregateBomViewEntry {
 	}
 
 	public RiskCounts getOperationalRisk() {
-		if (riskProfile == null || riskProfile.getCategories() == null || riskProfile.getCategories().getOPERATIONAL() == null) {
+		if (riskProfile == null || riskProfile.getCategories() == null
+				|| riskProfile.getCategories().getOPERATIONAL() == null) {
 			return null;
 		}
 		return riskProfile.getCategories().getOPERATIONAL();
 	}
 
 	/**
-	 * Returns the appropriate String for the Operational Risk type to be used in the UI. If the Operational
-	 * Risk is null it will return an empty String.
+	 * Returns the appropriate String for the Operational Risk type to be used
+	 * in the UI. If the Operational Risk is null it will return an empty
+	 * String.
 	 *
 	 */
 	public String getOperationalRiskString() {

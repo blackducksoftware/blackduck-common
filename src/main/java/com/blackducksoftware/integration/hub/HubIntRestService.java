@@ -299,7 +299,7 @@ public class HubIntRestService {
 	 *
 	 */
 	public ReleaseItem getVersion(final ProjectItem project, final String versionName) throws IOException,
-	BDRestException, URISyntaxException, VersionDoesNotExistException, UnexpectedHubResponseException {
+			BDRestException, URISyntaxException, VersionDoesNotExistException, UnexpectedHubResponseException {
 		final List<ReleaseItem> versions = getVersionsForProject(project);
 		for (final ReleaseItem version : versions) {
 			if (version.getVersionName().equals(versionName)) {
@@ -343,7 +343,7 @@ public class HubIntRestService {
 		final List<String> versionLinks = project.getLinks(ProjectItem.VERSION_LINK);
 		if (versionLinks.size() != 1) {
 			throw new UnexpectedHubResponseException("The project " + project.getName() + " has " + versionLinks.size()
-			+ " " + ProjectItem.VERSION_LINK + " links; expected one");
+					+ " " + ProjectItem.VERSION_LINK + " links; expected one");
 		}
 		final String versionLink = versionLinks.get(0);
 		return versionLink;
@@ -461,7 +461,7 @@ public class HubIntRestService {
 			throw new BDRestException(
 					"There was a problem comparing the specified version to the version of the Hub server. Error Code: "
 							+ responseCode,
-							resource);
+					resource);
 		}
 	}
 
@@ -516,7 +516,7 @@ public class HubIntRestService {
 				throw new BDRestException(
 						"There was a problem getting the code locations for the host and paths provided. Error Code: "
 								+ responseCode,
-								resource);
+						resource);
 			}
 		}
 		return codeLocations;
@@ -595,7 +595,7 @@ public class HubIntRestService {
 
 		@SuppressWarnings("unchecked")
 		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
-		.get(HeaderConstants.ATTRIBUTE_HEADERS);
+				.get(HeaderConstants.ATTRIBUTE_HEADERS);
 		if (requestHeaders == null) {
 			requestHeaders = new Series<Header>(Header.class);
 			resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
@@ -716,26 +716,26 @@ public class HubIntRestService {
 					resource);
 		}
 	}
-	
+
 	/**
 	 * 
-	 * @return registration id		Registration ID of the hub instance
-	 * @throws URISyntaxException 
-	 * @throws BDRestException 
-	 * @throws IOException 
+	 * @return registration id Registration ID of the hub instance
+	 * @throws URISyntaxException
+	 * @throws BDRestException
+	 * @throws IOException
 	 * 
-	 * Returns the registration ID of the hub instance
+	 *             Returns the registration ID of the hub instance
 	 */
-	public String getRegistrationId() throws URISyntaxException, BDRestException, IOException, JsonSyntaxException{
+	public String getRegistrationId() throws URISyntaxException, BDRestException, IOException, JsonSyntaxException {
 		final ClientResource resource = getRestConnection().createClientResource();
 		resource.addSegment("api");
 		resource.addSegment("v1");
 		resource.addSegment("registrations");
 		resource.setMethod(Method.GET);
-		
+
 		getRestConnection().handleRequest(resource);
 		final int responseCode = resource.getResponse().getStatus().getCode();
-		if(responseCode == 200){
+		if (responseCode == 200) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
 			JsonParser parser = new JsonParser();
 			JsonElement je = parser.parse(response);
@@ -744,7 +744,8 @@ public class HubIntRestService {
 			String regId = je2.getAsString();
 			return regId;
 		} else {
-			throw new BDRestException("There was a problem getting the registration ID. Error Code: " + responseCode, resource);
+			throw new BDRestException("There was a problem getting the registration ID. Error Code: " + responseCode,
+					resource);
 		}
 	}
 

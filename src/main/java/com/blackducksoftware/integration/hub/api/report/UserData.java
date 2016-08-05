@@ -31,8 +31,7 @@ public class UserData {
 
 	private final String username;
 
-	public UserData(final String id,
-			final String username) {
+	public UserData(final String id, final String username) {
 		this.id = id;
 		this.username = username;
 	}

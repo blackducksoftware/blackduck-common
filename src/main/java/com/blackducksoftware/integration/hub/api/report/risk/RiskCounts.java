@@ -33,12 +33,7 @@ public class RiskCounts {
 
 	private final int UNKNOWN;
 
-	public RiskCounts(
-			final int HIGH,
-			final int MEDIUM,
-			final int LOW,
-			final int OK,
-			final int UNKNOWN) {
+	public RiskCounts(final int HIGH, final int MEDIUM, final int LOW, final int OK, final int UNKNOWN) {
 		this.HIGH = HIGH;
 		this.MEDIUM = MEDIUM;
 		this.LOW = LOW;

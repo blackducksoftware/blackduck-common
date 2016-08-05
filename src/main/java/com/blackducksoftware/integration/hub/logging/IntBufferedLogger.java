@@ -33,8 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 public class IntBufferedLogger extends IntLogger {
 	private final Map<LogLevel, List<String>> outputMap = new HashMap<LogLevel, List<String>>();
 
-
-	public IntBufferedLogger(){
+	public IntBufferedLogger() {
 		outputMap.put(LogLevel.ERROR, new ArrayList<String>());
 		outputMap.put(LogLevel.WARN, new ArrayList<String>());
 		outputMap.put(LogLevel.INFO, new ArrayList<String>());
@@ -42,11 +41,11 @@ public class IntBufferedLogger extends IntLogger {
 		outputMap.put(LogLevel.TRACE, new ArrayList<String>());
 	}
 
-	public void resetLogs(final LogLevel level){
+	public void resetLogs(final LogLevel level) {
 		outputMap.put(level, new ArrayList<String>());
 	}
 
-	public void resetAllLogs(){
+	public void resetAllLogs() {
 		outputMap.put(LogLevel.ERROR, new ArrayList<String>());
 		outputMap.put(LogLevel.WARN, new ArrayList<String>());
 		outputMap.put(LogLevel.INFO, new ArrayList<String>());

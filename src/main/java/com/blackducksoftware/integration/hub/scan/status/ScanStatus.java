@@ -54,8 +54,9 @@ public enum ScanStatus {
 	}
 
 	/**
-	 * Returns true if the status some sort of end status.
-	 * COMPLETE, CANCELLED, ERROR_SCANNING, ERROR_SAVING_SCAN_DATA, ERROR_MATCHING, ERROR_BUILDING_BOM, ERROR
+	 * Returns true if the status some sort of end status. COMPLETE, CANCELLED,
+	 * ERROR_SCANNING, ERROR_SAVING_SCAN_DATA, ERROR_MATCHING,
+	 * ERROR_BUILDING_BOM, ERROR
 	 *
 	 */
 	public static boolean isFinishedStatus(final ScanStatus scanStatus) {
@@ -69,8 +70,9 @@ public enum ScanStatus {
 	}
 
 	/**
-	 * Returns true if the status some sort of end status.
-	 * CANCELLED, ERROR_SCANNING, ERROR_SAVING_SCAN_DATA, ERROR_MATCHING, ERROR_BUILDING_BOM, ERROR
+	 * Returns true if the status some sort of end status. CANCELLED,
+	 * ERROR_SCANNING, ERROR_SAVING_SCAN_DATA, ERROR_MATCHING,
+	 * ERROR_BUILDING_BOM, ERROR
 	 *
 	 */
 	public static boolean isErrorStatus(final ScanStatus scanStatus) {

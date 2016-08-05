@@ -116,8 +116,8 @@ public class PolicyOverrideNotificationContent {
 	public String toString() {
 		return "PolicyOverrideNotificationContent [projectName=" + projectName + ", projectVersionName="
 				+ projectVersionName + ", componentName=" + componentName + ", componentVersionName="
-				+ componentVersionName + ", firstName=" + firstName + ", lastName=" + lastName
-				+ ", projectVersionLink=" + projectVersionLink + ", componentVersionLink=" + componentVersionLink
+				+ componentVersionName + ", firstName=" + firstName + ", lastName=" + lastName + ", projectVersionLink="
+				+ projectVersionLink + ", componentVersionLink=" + componentVersionLink
 				+ ", bomComponentVersionPolicyStatusLink=" + bomComponentVersionPolicyStatusLink + "]";
 	}
 

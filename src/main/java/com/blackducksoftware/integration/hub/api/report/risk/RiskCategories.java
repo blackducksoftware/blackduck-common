@@ -33,12 +33,8 @@ public class RiskCategories {
 
 	private final RiskCounts OPERATIONAL;
 
-	public RiskCategories(
-			final RiskCounts VULNERABILITY,
-			final RiskCounts ACTIVITY,
-			final RiskCounts VERSION,
-			final RiskCounts LICENSE,
-			final RiskCounts OPERATIONAL) {
+	public RiskCategories(final RiskCounts VULNERABILITY, final RiskCounts ACTIVITY, final RiskCounts VERSION,
+			final RiskCounts LICENSE, final RiskCounts OPERATIONAL) {
 		this.VULNERABILITY = VULNERABILITY;
 		this.ACTIVITY = ACTIVITY;
 		this.VERSION = VERSION;

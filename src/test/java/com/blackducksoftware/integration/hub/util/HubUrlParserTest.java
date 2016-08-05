@@ -144,8 +144,7 @@ public class HubUrlParserTest {
 		final UUID uuid3 = UUID.randomUUID();
 		final UUID uuid4 = UUID.randomUUID();
 		final String identifier = "google";
-		final String url = "http://" + uuid + "/google/" + uuid2 + "/version/" + uuid3 + "/component/" + uuid4
-				+ "/";
+		final String url = "http://" + uuid + "/google/" + uuid2 + "/version/" + uuid3 + "/component/" + uuid4 + "/";
 		final UUID uuidFound = HubUrlParser.getUUIDFromURLString(identifier, url);
 		assertNotNull(uuidFound);
 		assertEquals(uuid2, uuidFound);

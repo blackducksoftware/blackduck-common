@@ -23,9 +23,7 @@ package com.blackducksoftware.integration.hub.api.report;
 
 public enum ReportFormatEnum {
 
-	CSV,
-	JSON,
-	UNKNOWN;
+	CSV, JSON, UNKNOWN;
 
 	public static ReportFormatEnum getReportFormatEnum(final String reportFormatEnum) {
 		if (reportFormatEnum == null) {

@@ -22,16 +22,11 @@
 package com.blackducksoftware.integration.hub.api.version;
 
 public enum PhaseEnum {
-	PLANNING("In Planning")
-	,
-	DEVELOPMENT("In Developement")
-	,
-	RELEASED("Released")
-	,
-	DEPRECATED("Deprecated")
-	,
-	ARCHIVED("Archived")
-	,
+	PLANNING("In Planning"),
+	DEVELOPMENT("In Developement"),
+	RELEASED("Released"),
+	DEPRECATED("Deprecated"),
+	ARCHIVED("Archived"),
 	UNKNOWNPHASE("Unknown Phase");
 
 	private final String displayValue;

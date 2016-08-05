@@ -103,9 +103,11 @@ public class HubRiskReportData {
 
 		totalBomEntries = bomEntries.size();
 
-		vulnerabilityRiskNoneCount = totalBomEntries - vulnerabilityRiskHighCount - vulnerabilityRiskMediumCount - vulnerabilityRiskLowCount;
+		vulnerabilityRiskNoneCount = totalBomEntries - vulnerabilityRiskHighCount - vulnerabilityRiskMediumCount
+				- vulnerabilityRiskLowCount;
 		licenseRiskNoneCount = totalBomEntries - licenseRiskHighCount - licenseRiskMediumCount - licenseRiskLowCount;
-		operationalRiskNoneCount = totalBomEntries - operationalRiskHighCount - operationalRiskMediumCount - operationalRiskLowCount;
+		operationalRiskNoneCount = totalBomEntries - operationalRiskHighCount - operationalRiskMediumCount
+				- operationalRiskLowCount;
 	}
 
 	public void readFromInputStream(final InputStream inputStream) {

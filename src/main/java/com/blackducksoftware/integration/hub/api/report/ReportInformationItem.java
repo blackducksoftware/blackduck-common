@@ -49,8 +49,8 @@ public class ReportInformationItem extends HubItem {
 
 	private final String createdBy;
 
-
-	public ReportInformationItem(final String reportFormat, final String locale, final String fileName, final int fileSize, final String createdAt, final String updatedAt, final String finishedAt,
+	public ReportInformationItem(final String reportFormat, final String locale, final String fileName,
+			final int fileSize, final String createdAt, final String updatedAt, final String finishedAt,
 			final String createdBy, final MetaInformation _meta) {
 		super(_meta);
 		this.reportFormat = reportFormat;

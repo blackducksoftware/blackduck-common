@@ -29,8 +29,7 @@ public class ProjectData {
 
 	private final Boolean restructured;
 
-	public ProjectData(final String id,
-			final String name, final Boolean restructured) {
+	public ProjectData(final String id, final String name, final Boolean restructured) {
 		this.id = id;
 		this.name = name;
 		this.restructured = restructured;

@@ -36,8 +36,8 @@ public class PolicyStatus extends HubItem {
 
 	private final List<ComponentVersionStatusCount> componentVersionStatusCounts;
 
-
-	public PolicyStatus(final String overallStatus, final String updatedAt, final List<ComponentVersionStatusCount> componentVersionStatusCounts, final MetaInformation meta) {
+	public PolicyStatus(final String overallStatus, final String updatedAt,
+			final List<ComponentVersionStatusCount> componentVersionStatusCounts, final MetaInformation meta) {
 		super(meta);
 		this.overallStatus = overallStatus;
 		this.updatedAt = updatedAt;
@@ -103,7 +103,6 @@ public class PolicyStatus extends HubItem {
 		}
 	}
 
-
 	public List<ComponentVersionStatusCount> getComponentVersionStatusCounts() {
 		return componentVersionStatusCounts;
 	}
@@ -113,7 +112,8 @@ public class PolicyStatus extends HubItem {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((getMeta() == null) ? 0 : getMeta().hashCode());
-		result = prime * result + ((componentVersionStatusCounts == null) ? 0 : componentVersionStatusCounts.hashCode());
+		result = prime * result
+				+ ((componentVersionStatusCounts == null) ? 0 : componentVersionStatusCounts.hashCode());
 		result = prime * result + ((overallStatus == null) ? 0 : overallStatus.hashCode());
 		result = prime * result + ((updatedAt == null) ? 0 : updatedAt.hashCode());
 		return result;

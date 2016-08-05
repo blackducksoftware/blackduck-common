@@ -64,7 +64,6 @@ public class VersionReport {
 		urlBuilder.append("projects/id:");
 		urlBuilder.append(detailedReleaseSummary.getProjectId());
 
-
 		return urlBuilder.toString();
 	}
 
@@ -81,13 +80,12 @@ public class VersionReport {
 		urlBuilder.append(detailedReleaseSummary.getVersionId());
 		urlBuilder.append("/view:bom");
 
-
 		return urlBuilder.toString();
 	}
 
 	public String getComponentUrl(final AggregateBomViewEntry entry) {
-		if (StringUtils.isBlank(getBaseUrl()) || entry == null ||
-				entry.getProducerProject() == null || StringUtils.isBlank(entry.getProducerProject().getId())) {
+		if (StringUtils.isBlank(getBaseUrl()) || entry == null || entry.getProducerProject() == null
+				|| StringUtils.isBlank(entry.getProducerProject().getId())) {
 			return null;
 		}
 
@@ -101,8 +99,8 @@ public class VersionReport {
 	}
 
 	public String getVersionUrl(final AggregateBomViewEntry entry) {
-		if (StringUtils.isBlank(getBaseUrl()) || entry == null ||
-				entry.getProducerReleases() == null || StringUtils.isBlank(entry.getProducerReleasesId())) {
+		if (StringUtils.isBlank(getBaseUrl()) || entry == null || entry.getProducerReleases() == null
+				|| StringUtils.isBlank(entry.getProducerReleasesId())) {
 			return null;
 		}
 
@@ -111,7 +109,6 @@ public class VersionReport {
 		urlBuilder.append("#");
 		urlBuilder.append("versions/id:");
 		urlBuilder.append(entry.getProducerReleasesId());
-
 
 		return urlBuilder.toString();
 	}

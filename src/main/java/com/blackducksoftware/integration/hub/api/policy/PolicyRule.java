@@ -45,8 +45,7 @@ public class PolicyRule extends HubItem {
 
 	public PolicyRule(final MetaInformation meta, final String name, final String description, final Boolean enabled,
 			final Boolean overridable, final PolicyExpressions expression, final String createdAt,
-			final String createdBy,
-			final String updatedAt, final String updatedBy) {
+			final String createdBy, final String updatedAt, final String updatedBy) {
 		super(meta);
 		this.name = name;
 		this.description = description;
@@ -236,6 +235,5 @@ public class PolicyRule extends HubItem {
 		builder.append("]");
 		return builder.toString();
 	}
-
 
 }

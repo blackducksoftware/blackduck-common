@@ -21,7 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.meta;
 
-
 public class MetaLink {
 	private final String rel;
 

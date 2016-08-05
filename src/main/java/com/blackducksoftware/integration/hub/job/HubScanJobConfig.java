@@ -46,7 +46,8 @@ public class HubScanJobConfig {
 
 	private final boolean dryRun;
 
-	public HubScanJobConfig(final String projectName, final String version, final String phase, final String distribution, final String workingDirectory, final int scanMemory,
+	public HubScanJobConfig(final String projectName, final String version, final String phase,
+			final String distribution, final String workingDirectory, final int scanMemory,
 			final boolean shouldGenerateRiskReport, final int maxWaitTimeForBomUpdate,
 			final ImmutableList<String> scanTargetPaths, final boolean dryRun) {
 		this.projectName = projectName;
@@ -217,6 +218,5 @@ public class HubScanJobConfig {
 		}
 		return true;
 	}
-
 
 }

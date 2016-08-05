@@ -18,7 +18,6 @@ import nl.jqno.equalsverifier.Warning;
 
 public class PolicyExpressionTest {
 
-
 	@Test
 	public void testPolicyExpression() {
 		final String label1 = "label1";

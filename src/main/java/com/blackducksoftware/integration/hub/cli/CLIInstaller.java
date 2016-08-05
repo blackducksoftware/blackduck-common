@@ -63,8 +63,8 @@ public class CLIInstaller {
 	}
 
 	public void performInstallation(final IntLogger logger, final HubIntRestService restService,
-			final String localHostName) throws IOException, InterruptedException, BDRestException, URISyntaxException,
-					HubIntegrationException {
+			final String localHostName)
+			throws IOException, InterruptedException, BDRestException, URISyntaxException, HubIntegrationException {
 		if (StringUtils.isBlank(localHostName)) {
 			throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
 		}
