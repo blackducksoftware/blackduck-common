@@ -143,8 +143,6 @@ public class CLIInstaller {
 
 			final long sourceTimestamp = connection.getLastModified();
 
-			logger.error("CLI INSTALL DIR : " + cliInstallDirectory.getAbsolutePath());
-			logger.error("CLI INSTALL DIR exists : " + cliInstallDirectory.exists());
 			if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
 				if (!cliMismatch && sourceTimestamp == cliTimestamp) {
 					logger.debug("The current Hub CLI is up to date.");
