@@ -1,4 +1,4 @@
-<com.blackducksoftware.integration.hub.report.api.HubRiskReportData>
+<com.blackducksoftware.integration.hub.api.report.HubRiskReportData>
   <vulnerabilityRiskHighCount>13</vulnerabilityRiskHighCount>
   <vulnerabilityRiskMediumCount>14</vulnerabilityRiskMediumCount>
   <vulnerabilityRiskLowCount>15</vulnerabilityRiskLowCount>
@@ -11,4 +11,4 @@
   <operationalRiskMediumCount>22</operationalRiskMediumCount>
   <operationalRiskLowCount>23</operationalRiskLowCount>
   <operationalRiskNoneCount>24</operationalRiskNoneCount>
-</com.blackducksoftware.integration.hub.report.api.HubRiskReportData>
+</com.blackducksoftware.integration.hub.api.report.HubRiskReportData>
