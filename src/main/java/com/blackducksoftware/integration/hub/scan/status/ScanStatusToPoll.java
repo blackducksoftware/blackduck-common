@@ -21,7 +21,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.scan.status;
 
-import com.blackducksoftware.integration.hub.item.HubItem;
+import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ScanStatusToPoll extends HubItem {

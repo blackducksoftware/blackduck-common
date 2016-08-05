@@ -67,4 +67,5 @@ public enum PolicyRuleConditionEnum {
 		}
 		return distributionEnum;
 	}
+
 }

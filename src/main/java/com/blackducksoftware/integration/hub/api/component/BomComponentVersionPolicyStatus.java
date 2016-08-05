@@ -21,8 +21,8 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.component;
 
+import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
-import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class BomComponentVersionPolicyStatus extends HubItem {

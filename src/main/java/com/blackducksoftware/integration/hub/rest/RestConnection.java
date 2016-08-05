@@ -72,11 +72,13 @@ import com.google.gson.JsonParser;
  *
  */
 public class RestConnection {
+	public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
 	private final String baseUrl;
 	private Series<Cookie> cookies;
 	private int timeout = 120000;
 	private IntLogger logger;
-	public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+	private final Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
 
 	public RestConnection(final String baseUrl) {
 		this.baseUrl = baseUrl;
@@ -238,7 +240,6 @@ public class RestConnection {
 	 */
 	public <T> T httpGetFromAbsoluteUrl(final Class<T> modelClass, final String url)
 			throws ResourceDoesNotExistException, URISyntaxException, IOException, BDRestException {
-
 		final ClientResource resource = createClientResource(url);
 		resource.setMethod(Method.GET);
 		handleRequest(resource);
@@ -419,7 +420,6 @@ public class RestConnection {
 	 *
 	 */
 	private void cleanUpOldProxySettings() {
-
 		System.clearProperty("http.proxyHost");
 		System.clearProperty("http.proxyPort");
 		System.clearProperty("http.nonProxyHosts");
@@ -429,9 +429,9 @@ public class RestConnection {
 
 	private <T> T parseResponse(final Class<T> modelClass, final ClientResource resource) throws IOException {
 		final String response = readResponseAsString(resource.getResponse());
-		final Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
 		final JsonParser parser = new JsonParser();
 		final JsonObject json = parser.parse(response).getAsJsonObject();
+
 		final T modelObject = gson.fromJson(json, modelClass);
 		return modelObject;
 	}
@@ -484,7 +484,6 @@ public class RestConnection {
 
 	private String handleHttpPost(final ClientResource resource)
 			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
-
 		handleRequest(resource);
 
 		logMessage(LogLevel.DEBUG, "Resource: " + resource);
@@ -511,9 +510,7 @@ public class RestConnection {
 				}
 				return resourceUrl.getValue();
 			}
-		} else
-
-		{
+		} else {
 			throw new ResourceDoesNotExistException(
 					"There was a problem creating the resource. Error Code: " + responseCode, resource);
 		}

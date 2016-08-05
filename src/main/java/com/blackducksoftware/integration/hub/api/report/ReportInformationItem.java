@@ -24,7 +24,7 @@ package com.blackducksoftware.integration.hub.api.report;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
-import com.blackducksoftware.integration.hub.item.HubItem;
+import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ReportInformationItem extends HubItem {

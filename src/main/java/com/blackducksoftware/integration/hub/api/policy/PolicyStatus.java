@@ -26,7 +26,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
-import com.blackducksoftware.integration.hub.item.HubItem;
+import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class PolicyStatus extends HubItem {

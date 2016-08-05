@@ -24,8 +24,8 @@ package com.blackducksoftware.integration.hub.api.component;
 import java.util.Date;
 import java.util.UUID;
 
+import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
-import com.blackducksoftware.integration.hub.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.util.HubUrlParser;
 

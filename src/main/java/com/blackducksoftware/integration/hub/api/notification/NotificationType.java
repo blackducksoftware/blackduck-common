@@ -22,7 +22,6 @@
 package com.blackducksoftware.integration.hub.api.notification;
 
 public enum NotificationType {
-
 	POLICY_VIOLATION("Policy Violation"), POLICY_OVERRIDE("Policy Override"), VULNERABILITY("Vulnerability");
 
 	private final String displayName;
@@ -34,4 +33,5 @@ public enum NotificationType {
 	public String getDisplayName() {
 		return displayName;
 	}
+
 }

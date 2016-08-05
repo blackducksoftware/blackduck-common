@@ -5,7 +5,6 @@ public class PolicyValue {
 	private final String value;
 
 	public PolicyValue(final String label, final String value) {
-		super();
 		this.label = label;
 		this.value = value;
 	}
@@ -66,4 +65,5 @@ public class PolicyValue {
 		builder.append("]");
 		return builder.toString();
 	}
+
 }

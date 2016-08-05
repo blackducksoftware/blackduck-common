@@ -23,7 +23,7 @@ package com.blackducksoftware.integration.hub.api.notification;
 
 import java.util.Date;
 
-import com.blackducksoftware.integration.hub.item.HubItem;
+import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class NotificationItem extends HubItem {

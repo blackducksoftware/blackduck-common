@@ -24,8 +24,6 @@
 
   <properties>
     <slf4j.version>1.7.5</slf4j.version>
-    <source.java.version>1.6</source.java.version>
-    <target.java.version>1.6</target.java.version>
   </properties>
 
   <dependencies>
@@ -47,7 +45,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.3.2</version>
+      <version>3.4</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
