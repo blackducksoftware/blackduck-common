@@ -64,7 +64,7 @@ public class CLIInstaller {
 
 	public void performInstallation(final IntLogger logger, final HubIntRestService restService,
 			final String localHostName) throws IOException, InterruptedException, BDRestException, URISyntaxException,
-					HubIntegrationException {
+	HubIntegrationException {
 		if (StringUtils.isBlank(localHostName)) {
 			throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
 		}
@@ -94,6 +94,7 @@ public class CLIInstaller {
 				}
 			}
 			if (cliMismatch) {
+				logger.debug("Attempting to download the Hub CLI.");
 				hubVersionFile.createNewFile();
 				final FileWriter writer = new FileWriter(hubVersionFile);
 				writer.write(hubVersion);
@@ -140,16 +141,16 @@ public class CLIInstaller {
 			final File cliInstallDirectory = cliLocation.getCLIInstallDir();
 			if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
 				if (!cliMismatch && sourceTimestamp == cliTimestamp) {
-					// already up to date
+					logger.debug("The current Hub CLI is up to date.");
 					return;
 				}
-
 				for (final File file : cliInstallDirectory.listFiles()) {
 					FileUtils.deleteDirectory(file);
 				}
 			} else {
 				cliInstallDirectory.mkdir();
 			}
+			logger.debug("Updating the Hub CLI.");
 			hubVersionFile.setLastModified(sourceTimestamp);
 
 			logger.info("Unpacking " + archive.toString() + " to " + cliInstallDirectory.getCanonicalPath() + " on "
