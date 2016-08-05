@@ -273,7 +273,7 @@ public class RestConnection {
 	 */
 	public <T> T httpGetFromRelativeUrl(final Class<T> modelClass, final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
-					throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
 
 		final ClientResource resource = createClientResource(urlSegments, queryParameters);
 		resource.setMethod(Method.GET);
@@ -288,7 +288,7 @@ public class RestConnection {
 			throw new ResourceDoesNotExistException(
 					"Error getting resource from relative url segments " + urlSegments + " and query parameters "
 							+ queryParameters + "; errorCode: " + responseCode + "; " + resource.toString(),
-							resource);
+					resource);
 		}
 	}
 
@@ -393,7 +393,7 @@ public class RestConnection {
 			}
 			@SuppressWarnings("unchecked")
 			final Series<Header> responseheaders = (Series<Header>) requestOrResponse.getAttributes()
-			.get(HeaderConstants.ATTRIBUTE_HEADERS);
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
 			if (responseheaders != null) {
 				logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
 				for (final org.restlet.engine.header.Header header : responseheaders) {
@@ -474,7 +474,7 @@ public class RestConnection {
 
 	public String httpPostFromRelativeUrl(final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters, final Representation content)
-					throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
 
 		final ClientResource resource = createClientResource(urlSegments, queryParameters);
 		resource.setMethod(Method.POST);
@@ -502,7 +502,7 @@ public class RestConnection {
 			} else {
 				@SuppressWarnings("unchecked")
 				final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-				.get(HeaderConstants.ATTRIBUTE_HEADERS);
+						.get(HeaderConstants.ATTRIBUTE_HEADERS);
 				final Header resourceUrl = responseHeaders.getFirst("location", true);
 
 				if (resourceUrl == null || StringUtils.isBlank(resourceUrl.getValue())) {
@@ -518,4 +518,5 @@ public class RestConnection {
 					"There was a problem creating the resource. Error Code: " + responseCode, resource);
 		}
 	}
+
 }

@@ -51,8 +51,7 @@ public class HubItems {
 
 	@Override
 	public String toString() {
-		return "HubItemList [totalCount=" + totalCount + ", items=" + items
-				+ "]";
+		return "HubItemList [totalCount=" + totalCount + ", items=" + items + "]";
 	}
 
 }

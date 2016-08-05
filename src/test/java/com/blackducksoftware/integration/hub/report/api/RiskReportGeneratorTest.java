@@ -40,16 +40,22 @@ import org.mockito.stubbing.Answer;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
+import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
+import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
+import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
+import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
+import com.blackducksoftware.integration.hub.api.report.RiskReportGenerator;
+import com.blackducksoftware.integration.hub.api.report.VersionReport;
+import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
+import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
+import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
-import com.blackducksoftware.integration.hub.project.api.ProjectItem;
-import com.blackducksoftware.integration.hub.scan.api.ScanHistoryItem;
-import com.blackducksoftware.integration.hub.scan.api.ScanLocationItem;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
 import com.blackducksoftware.integration.hub.util.TestLogger;
-import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -95,8 +101,8 @@ public class RiskReportGeneratorTest {
 		final MetaLink linkItem = new MetaLink("content", "FakeContentLink");
 		links.add(linkItem);
 		final MetaInformation reportMeta = new MetaInformation(null, null, links);
-		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0, null, null, "Finished", null,
-				reportMeta);
+		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0,
+				null, null, "Finished", null, reportMeta);
 
 		Mockito.doReturn(reportInfo).when(service).getReportInformation(Mockito.anyString());
 
@@ -158,8 +164,8 @@ public class RiskReportGeneratorTest {
 
 		final List<MetaLink> links = new ArrayList<MetaLink>();
 		final MetaInformation reportMeta = new MetaInformation(null, null, links);
-		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0, null, null, "Finished", null,
-				reportMeta);
+		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0,
+				null, null, "Finished", null, reportMeta);
 
 		Mockito.doReturn(reportInfo).when(service).getReportInformation(Mockito.anyString());
 
@@ -209,8 +215,8 @@ public class RiskReportGeneratorTest {
 		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
 				Mockito.any(ReportFormatEnum.class));
 
-		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0, null, null, null, null,
-				null);
+		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0,
+				null, null, null, null, null);
 
 		Mockito.doReturn(reportInfo).when(service).getReportInformation(Mockito.anyString());
 
@@ -290,47 +296,48 @@ public class RiskReportGeneratorTest {
 		final String serverPath2 = "/Test/Fake/Path/Child/";
 		final String serverPath3 = "/Test/Fake/File";
 
-		Mockito.when(service.getScanLocations(Mockito.anyString(), Mockito.anyListOf(String.class))).then(new Answer<List<ScanLocationItem>>() {
-			@Override
-			public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
-				final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
-				historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
-				historyBeforeScanTime.setStatus(ScanStatus.ERROR);
+		Mockito.when(service.getScanLocations(Mockito.anyString(), Mockito.anyListOf(String.class)))
+				.then(new Answer<List<ScanLocationItem>>() {
+					@Override
+					public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
+						final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
+						historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
+						historyBeforeScanTime.setStatus(ScanStatus.ERROR);
 
-				final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
-				historyInScanTime.setCreatedOn(inScanTime.toString());
-				historyInScanTime.setStatus(ScanStatus.COMPLETE);
+						final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
+						historyInScanTime.setCreatedOn(inScanTime.toString());
+						historyInScanTime.setStatus(ScanStatus.COMPLETE);
 
-				final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
-				historyAfterScanTime.setCreatedOn(afterScanTime.toString());
-				historyAfterScanTime.setStatus(ScanStatus.MATCHING);
+						final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
+						historyAfterScanTime.setCreatedOn(afterScanTime.toString());
+						historyAfterScanTime.setStatus(ScanStatus.MATCHING);
 
-				final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
-				historyList.add(historyBeforeScanTime);
-				historyList.add(historyInScanTime);
-				historyList.add(historyAfterScanTime);
+						final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+						historyList.add(historyBeforeScanTime);
+						historyList.add(historyInScanTime);
+						historyList.add(historyAfterScanTime);
 
-				final ScanLocationItem sl1 = new ScanLocationItem();
-				sl1.setHost(hostName);
-				sl1.setPath(serverPath1);
-				sl1.setScanList(historyList);
-				final ScanLocationItem sl2 = new ScanLocationItem();
-				sl2.setHost(hostName);
-				sl2.setPath(serverPath2);
-				sl2.setScanList(historyList);
-				final ScanLocationItem sl3 = new ScanLocationItem();
-				sl3.setHost(hostName);
-				sl3.setPath(serverPath3);
-				sl3.setScanList(historyList);
+						final ScanLocationItem sl1 = new ScanLocationItem();
+						sl1.setHost(hostName);
+						sl1.setPath(serverPath1);
+						sl1.setScanList(historyList);
+						final ScanLocationItem sl2 = new ScanLocationItem();
+						sl2.setHost(hostName);
+						sl2.setPath(serverPath2);
+						sl2.setScanList(historyList);
+						final ScanLocationItem sl3 = new ScanLocationItem();
+						sl3.setHost(hostName);
+						sl3.setPath(serverPath3);
+						sl3.setScanList(historyList);
 
-				final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
-				items.add(sl1);
-				items.add(sl2);
-				items.add(sl3);
+						final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+						items.add(sl1);
+						items.add(sl2);
+						items.add(sl3);
 
-				return items;
-			}
-		});
+						return items;
+					}
+				});
 
 		final List<String> scanTargets = new ArrayList<String>();
 		scanTargets.add("Test/Fake/Path/Child");
@@ -352,8 +359,8 @@ public class RiskReportGeneratorTest {
 		final MetaLink linkItem = new MetaLink("content", "FakeContentLink");
 		links.add(linkItem);
 		final MetaInformation reportMeta = new MetaInformation(null, null, links);
-		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0, null, null, "Finished", null,
-				reportMeta);
+		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0,
+				null, null, "Finished", null, reportMeta);
 
 		Mockito.doReturn(reportInfo).when(service).getReportInformation(Mockito.anyString());
 
@@ -403,47 +410,48 @@ public class RiskReportGeneratorTest {
 		final String serverPath2 = "/Test/Fake/Path/Child/";
 		final String serverPath3 = "/Test/Fake/File";
 
-		Mockito.when(service.getScanLocations(Mockito.anyString(), Mockito.anyListOf(String.class))).then(new Answer<List<ScanLocationItem>>() {
-			@Override
-			public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
-				final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
-				historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
-				historyBeforeScanTime.setStatus(ScanStatus.ERROR);
+		Mockito.when(service.getScanLocations(Mockito.anyString(), Mockito.anyListOf(String.class)))
+				.then(new Answer<List<ScanLocationItem>>() {
+					@Override
+					public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
+						final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
+						historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
+						historyBeforeScanTime.setStatus(ScanStatus.ERROR);
 
-				final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
-				historyInScanTime.setCreatedOn(inScanTime.toString());
-				historyInScanTime.setStatus(ScanStatus.COMPLETE);
+						final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
+						historyInScanTime.setCreatedOn(inScanTime.toString());
+						historyInScanTime.setStatus(ScanStatus.COMPLETE);
 
-				final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
-				historyAfterScanTime.setCreatedOn(afterScanTime.toString());
-				historyAfterScanTime.setStatus(ScanStatus.MATCHING);
+						final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
+						historyAfterScanTime.setCreatedOn(afterScanTime.toString());
+						historyAfterScanTime.setStatus(ScanStatus.MATCHING);
 
-				final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
-				historyList.add(historyBeforeScanTime);
-				historyList.add(historyInScanTime);
-				historyList.add(historyAfterScanTime);
+						final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+						historyList.add(historyBeforeScanTime);
+						historyList.add(historyInScanTime);
+						historyList.add(historyAfterScanTime);
 
-				final ScanLocationItem sl1 = new ScanLocationItem();
-				sl1.setHost(hostName);
-				sl1.setPath(serverPath1);
-				sl1.setScanList(historyList);
-				final ScanLocationItem sl2 = new ScanLocationItem();
-				sl2.setHost(hostName);
-				sl2.setPath(serverPath2);
-				sl2.setScanList(historyList);
-				final ScanLocationItem sl3 = new ScanLocationItem();
-				sl3.setHost(hostName);
-				sl3.setPath(serverPath3);
-				sl3.setScanList(historyList);
+						final ScanLocationItem sl1 = new ScanLocationItem();
+						sl1.setHost(hostName);
+						sl1.setPath(serverPath1);
+						sl1.setScanList(historyList);
+						final ScanLocationItem sl2 = new ScanLocationItem();
+						sl2.setHost(hostName);
+						sl2.setPath(serverPath2);
+						sl2.setScanList(historyList);
+						final ScanLocationItem sl3 = new ScanLocationItem();
+						sl3.setHost(hostName);
+						sl3.setPath(serverPath3);
+						sl3.setScanList(historyList);
 
-				final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
-				items.add(sl1);
-				items.add(sl2);
-				items.add(sl3);
+						final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+						items.add(sl1);
+						items.add(sl2);
+						items.add(sl3);
 
-				return items;
-			}
-		});
+						return items;
+					}
+				});
 
 		final List<String> scanTargets = new ArrayList<String>();
 		scanTargets.add("Test/Fake/Path/Child");
@@ -463,8 +471,8 @@ public class RiskReportGeneratorTest {
 
 		final List<MetaLink> links = new ArrayList<MetaLink>();
 		final MetaInformation reportMeta = new MetaInformation(null, null, links);
-		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0, null, null, "Finished", null,
-				reportMeta);
+		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0,
+				null, null, "Finished", null, reportMeta);
 
 		Mockito.doReturn(reportInfo).when(service).getReportInformation(Mockito.anyString());
 
@@ -506,47 +514,48 @@ public class RiskReportGeneratorTest {
 		final String serverPath2 = "/Test/Fake/Path/Child/";
 		final String serverPath3 = "/Test/Fake/File";
 
-		Mockito.when(service.getScanLocations(Mockito.anyString(), Mockito.anyListOf(String.class))).then(new Answer<List<ScanLocationItem>>() {
-			@Override
-			public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
-				final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
-				historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
-				historyBeforeScanTime.setStatus(ScanStatus.ERROR);
+		Mockito.when(service.getScanLocations(Mockito.anyString(), Mockito.anyListOf(String.class)))
+				.then(new Answer<List<ScanLocationItem>>() {
+					@Override
+					public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
+						final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
+						historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
+						historyBeforeScanTime.setStatus(ScanStatus.ERROR);
 
-				final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
-				historyInScanTime.setCreatedOn(inScanTime.toString());
-				historyInScanTime.setStatus(ScanStatus.COMPLETE);
+						final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
+						historyInScanTime.setCreatedOn(inScanTime.toString());
+						historyInScanTime.setStatus(ScanStatus.COMPLETE);
 
-				final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
-				historyAfterScanTime.setCreatedOn(afterScanTime.toString());
-				historyAfterScanTime.setStatus(ScanStatus.MATCHING);
+						final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
+						historyAfterScanTime.setCreatedOn(afterScanTime.toString());
+						historyAfterScanTime.setStatus(ScanStatus.MATCHING);
 
-				final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
-				historyList.add(historyBeforeScanTime);
-				historyList.add(historyInScanTime);
-				historyList.add(historyAfterScanTime);
+						final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+						historyList.add(historyBeforeScanTime);
+						historyList.add(historyInScanTime);
+						historyList.add(historyAfterScanTime);
 
-				final ScanLocationItem sl1 = new ScanLocationItem();
-				sl1.setHost(hostName);
-				sl1.setPath(serverPath1);
-				sl1.setScanList(historyList);
-				final ScanLocationItem sl2 = new ScanLocationItem();
-				sl2.setHost(hostName);
-				sl2.setPath(serverPath2);
-				sl2.setScanList(historyList);
-				final ScanLocationItem sl3 = new ScanLocationItem();
-				sl3.setHost(hostName);
-				sl3.setPath(serverPath3);
-				sl3.setScanList(historyList);
+						final ScanLocationItem sl1 = new ScanLocationItem();
+						sl1.setHost(hostName);
+						sl1.setPath(serverPath1);
+						sl1.setScanList(historyList);
+						final ScanLocationItem sl2 = new ScanLocationItem();
+						sl2.setHost(hostName);
+						sl2.setPath(serverPath2);
+						sl2.setScanList(historyList);
+						final ScanLocationItem sl3 = new ScanLocationItem();
+						sl3.setHost(hostName);
+						sl3.setPath(serverPath3);
+						sl3.setScanList(historyList);
 
-				final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
-				items.add(sl1);
-				items.add(sl2);
-				items.add(sl3);
+						final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+						items.add(sl1);
+						items.add(sl2);
+						items.add(sl3);
 
-				return items;
-			}
-		});
+						return items;
+					}
+				});
 
 		final List<String> scanTargets = new ArrayList<String>();
 		scanTargets.add("Test/Fake/Path/Child");
@@ -564,8 +573,8 @@ public class RiskReportGeneratorTest {
 		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
 				Mockito.any(ReportFormatEnum.class));
 
-		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0, null, null, null, null,
-				null);
+		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0,
+				null, null, null, null, null);
 
 		Mockito.doReturn(reportInfo).when(service).getReportInformation(Mockito.anyString());
 
@@ -605,48 +614,49 @@ public class RiskReportGeneratorTest {
 		final String serverPath2 = "/Test/Fake/Path/Child/";
 		final String serverPath3 = "/Test/Fake/File";
 
-		Mockito.when(service.getScanLocations(Mockito.anyString(), Mockito.anyListOf(String.class))).then(new Answer<List<ScanLocationItem>>() {
-			@Override
-			public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
+		Mockito.when(service.getScanLocations(Mockito.anyString(), Mockito.anyListOf(String.class)))
+				.then(new Answer<List<ScanLocationItem>>() {
+					@Override
+					public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
 
-				final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
-				historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
-				historyBeforeScanTime.setStatus(ScanStatus.ERROR);
+						final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
+						historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
+						historyBeforeScanTime.setStatus(ScanStatus.ERROR);
 
-				final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
-				historyInScanTime.setCreatedOn(inScanTime.toString());
-				historyInScanTime.setStatus(ScanStatus.BUILDING_BOM);
+						final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
+						historyInScanTime.setCreatedOn(inScanTime.toString());
+						historyInScanTime.setStatus(ScanStatus.BUILDING_BOM);
 
-				final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
-				historyAfterScanTime.setCreatedOn(afterScanTime.toString());
-				historyAfterScanTime.setStatus(ScanStatus.MATCHING);
+						final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
+						historyAfterScanTime.setCreatedOn(afterScanTime.toString());
+						historyAfterScanTime.setStatus(ScanStatus.MATCHING);
 
-				final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
-				historyList.add(historyBeforeScanTime);
-				historyList.add(historyInScanTime);
-				historyList.add(historyAfterScanTime);
+						final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+						historyList.add(historyBeforeScanTime);
+						historyList.add(historyInScanTime);
+						historyList.add(historyAfterScanTime);
 
-				final ScanLocationItem sl1 = new ScanLocationItem();
-				sl1.setHost(hostName);
-				sl1.setPath(serverPath1);
-				sl1.setScanList(historyList);
-				final ScanLocationItem sl2 = new ScanLocationItem();
-				sl2.setHost(hostName);
-				sl2.setPath(serverPath2);
-				sl2.setScanList(historyList);
-				final ScanLocationItem sl3 = new ScanLocationItem();
-				sl3.setHost(hostName);
-				sl3.setPath(serverPath3);
-				sl3.setScanList(historyList);
+						final ScanLocationItem sl1 = new ScanLocationItem();
+						sl1.setHost(hostName);
+						sl1.setPath(serverPath1);
+						sl1.setScanList(historyList);
+						final ScanLocationItem sl2 = new ScanLocationItem();
+						sl2.setHost(hostName);
+						sl2.setPath(serverPath2);
+						sl2.setScanList(historyList);
+						final ScanLocationItem sl3 = new ScanLocationItem();
+						sl3.setHost(hostName);
+						sl3.setPath(serverPath3);
+						sl3.setScanList(historyList);
 
-				final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
-				items.add(sl1);
-				items.add(sl2);
-				items.add(sl3);
+						final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+						items.add(sl1);
+						items.add(sl2);
+						items.add(sl3);
 
-				return items;
-			}
-		});
+						return items;
+					}
+				});
 
 		final List<String> scanTargets = new ArrayList<String>();
 		scanTargets.add("Test/Fake/Path/Child");

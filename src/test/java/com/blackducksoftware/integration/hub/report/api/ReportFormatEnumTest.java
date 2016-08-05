@@ -25,19 +25,23 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.report.api.ReportFormatEnum;
+import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 
 public class ReportFormatEnumTest {
 
-    @Test
-    public void testGetReportFormatEnum() {
-        assertEquals(ReportFormatEnum.UNKNOWN, ReportFormatEnum.getReportFormatEnum("Fake"));
-        assertEquals(ReportFormatEnum.CSV, ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.CSV.toString().toLowerCase()));
-        assertEquals(ReportFormatEnum.CSV, ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.CSV.toString()));
-        assertEquals(ReportFormatEnum.JSON, ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.JSON.toString().toLowerCase()));
-        assertEquals(ReportFormatEnum.JSON, ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.JSON.toString()));
-        assertEquals(ReportFormatEnum.UNKNOWN, ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.UNKNOWN.toString()));
-        assertEquals(ReportFormatEnum.UNKNOWN, ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.UNKNOWN.toString().toLowerCase()));
-        assertEquals(ReportFormatEnum.UNKNOWN, ReportFormatEnum.getReportFormatEnum(null));
-    }
+	@Test
+	public void testGetReportFormatEnum() {
+		assertEquals(ReportFormatEnum.UNKNOWN, ReportFormatEnum.getReportFormatEnum("Fake"));
+		assertEquals(ReportFormatEnum.CSV,
+				ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.CSV.toString().toLowerCase()));
+		assertEquals(ReportFormatEnum.CSV, ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.CSV.toString()));
+		assertEquals(ReportFormatEnum.JSON,
+				ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.JSON.toString().toLowerCase()));
+		assertEquals(ReportFormatEnum.JSON, ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.JSON.toString()));
+		assertEquals(ReportFormatEnum.UNKNOWN,
+				ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.UNKNOWN.toString()));
+		assertEquals(ReportFormatEnum.UNKNOWN,
+				ReportFormatEnum.getReportFormatEnum(ReportFormatEnum.UNKNOWN.toString().toLowerCase()));
+		assertEquals(ReportFormatEnum.UNKNOWN, ReportFormatEnum.getReportFormatEnum(null));
+	}
 }

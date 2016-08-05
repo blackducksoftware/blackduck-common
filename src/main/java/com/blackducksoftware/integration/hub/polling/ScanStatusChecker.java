@@ -29,18 +29,14 @@ import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
 
 public class ScanStatusChecker implements Runnable {
-
 	private ScanStatusToPoll currentStatus;
-
 	private final CountDownLatch countDownLock;
-
 	private final HubIntRestService service;
-
 	private HubIntegrationException exception;
-
 	private boolean running;
 
-	public ScanStatusChecker(final HubIntRestService service, final ScanStatusToPoll currentStatus, final CountDownLatch countDownLock) {
+	public ScanStatusChecker(final HubIntRestService service, final ScanStatusToPoll currentStatus,
+			final CountDownLatch countDownLock) {
 		this.service = service;
 		this.currentStatus = currentStatus;
 		this.countDownLock = countDownLock;
@@ -67,12 +63,12 @@ public class ScanStatusChecker implements Runnable {
 		if (ScanStatus.isFinishedStatus(currentStatus.getStatusEnum()) == false) {
 			return false;
 		} else {
-
 			if (ScanStatus.isErrorStatus(currentStatus.getStatusEnum())) {
 				exception = new HubIntegrationException("There was a problem with one of the scans. Error Status : "
 						+ currentStatus.getStatusEnum().name());
 			}
-			countDownLock.countDown(); // finished so unlock the parent thread.
+			// finished so unlock the parent thread
+			countDownLock.countDown();
 			setRunning(false);
 			return true;
 		}
@@ -82,7 +78,6 @@ public class ScanStatusChecker implements Runnable {
 	@Override
 	public void run() {
 		while (isRunning() == true) {
-
 			try {
 				if (isScanFinished(currentStatus) == true) {
 					break;
@@ -101,4 +96,5 @@ public class ScanStatusChecker implements Runnable {
 			}
 		}
 	}
+
 }

@@ -34,9 +34,8 @@ import org.junit.Test;
 
 public class MetaInformationTest {
 
-
 	@Test
-	public void testMetaInformation(){
+	public void testMetaInformation() {
 		final String rel1 = "rel1";
 		final String href1 = "href1";
 
@@ -57,7 +56,6 @@ public class MetaInformationTest {
 		final List<String> allow2 = new ArrayList<String>();
 		allow2.add("PUT");
 
-
 		final MetaInformation item1 = new MetaInformation(allow1, href1, links1);
 		final MetaInformation item2 = new MetaInformation(allow2, href2, links2);
 		final MetaInformation item3 = new MetaInformation(allow1, href1, links1);
@@ -76,7 +74,6 @@ public class MetaInformationTest {
 
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());
-
 
 		final StringBuilder builder = new StringBuilder();
 		builder.append("MetaInformation [allow=");

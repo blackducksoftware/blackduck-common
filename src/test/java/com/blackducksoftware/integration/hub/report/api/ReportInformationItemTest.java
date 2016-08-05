@@ -34,6 +34,7 @@ import nl.jqno.equalsverifier.Warning;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 
@@ -79,12 +80,12 @@ public class ReportInformationItemTest {
 		final MetaInformation _meta3 = new MetaInformation(allow1, href1, links1);
 		final MetaLink metaLink3 = new MetaLink(rel1, href1);
 
-		final ReportInformationItem item1 = new ReportInformationItem(reportFormat1, locale1,
-				fileName1, fileSize1, createdAt1, updatedAt1, finishedAt1, createdBy1, _meta1);
-		final ReportInformationItem item2 = new ReportInformationItem(reportFormat2, locale2,
-				fileName2, fileSize2, createdAt2, updatedAt2, finishedAt2, createdBy2, _meta2);
-		final ReportInformationItem item3 = new ReportInformationItem(reportFormat1, locale1,
-				fileName1, fileSize1, createdAt1, updatedAt1, finishedAt1, createdBy1, _meta1);
+		final ReportInformationItem item1 = new ReportInformationItem(reportFormat1, locale1, fileName1, fileSize1,
+				createdAt1, updatedAt1, finishedAt1, createdBy1, _meta1);
+		final ReportInformationItem item2 = new ReportInformationItem(reportFormat2, locale2, fileName2, fileSize2,
+				createdAt2, updatedAt2, finishedAt2, createdBy2, _meta2);
+		final ReportInformationItem item3 = new ReportInformationItem(reportFormat1, locale1, fileName1, fileSize1,
+				createdAt1, updatedAt1, finishedAt1, createdBy1, _meta1);
 
 		assertEquals(reportFormat1, item1.getReportFormat());
 		assertEquals(locale1, item1.getLocale());

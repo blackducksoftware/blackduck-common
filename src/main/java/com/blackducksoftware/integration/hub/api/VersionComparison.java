@@ -31,7 +31,8 @@ public class VersionComparison {
 
 	private final String operatorResult;
 
-	public VersionComparison(final String consumerVersion, final String producerVersion, final Integer numericResult, final String operatorResult) {
+	public VersionComparison(final String consumerVersion, final String producerVersion, final Integer numericResult,
+			final String operatorResult) {
 		this.consumerVersion = consumerVersion;
 		this.producerVersion = producerVersion;
 		this.numericResult = numericResult;

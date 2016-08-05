@@ -47,7 +47,7 @@ public class CIEnvironmentVariables {
 
 	public String getValue(final String key, final String defaultValue) {
 		String value = environmentVariables.get(key);
-		if(value == null && defaultValue != null){
+		if (value == null && defaultValue != null) {
 			value = defaultValue;
 		}
 		return value;

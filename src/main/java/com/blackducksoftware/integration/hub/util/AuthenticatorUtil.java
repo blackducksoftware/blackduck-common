@@ -28,7 +28,6 @@ import java.net.PasswordAuthentication;
 import org.apache.commons.lang3.StringUtils;
 
 public class AuthenticatorUtil {
-
 	public static void resetAuthenticator() {
 		Authenticator.setDefault(null);
 
@@ -74,4 +73,5 @@ public class AuthenticatorUtil {
 			System.err.println(e.toString());
 		}
 	}
+
 }

@@ -31,17 +31,18 @@ import java.util.List;
 import java.util.Set;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
-import com.blackducksoftware.integration.hub.component.api.BomComponentVersionPolicyStatus;
-import com.blackducksoftware.integration.hub.component.api.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.BomComponentVersionPolicyStatus;
+import com.blackducksoftware.integration.hub.api.component.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
+import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.item.HubItemsService;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
-import com.blackducksoftware.integration.hub.notification.api.NotificationItem;
-import com.blackducksoftware.integration.hub.policy.api.PolicyRule;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
 
 /**
  * Hub Notification get methods. TODO: Move to hub-common.
@@ -91,7 +92,8 @@ public class NotificationService {
 	public List<NotificationItem> fetchNotifications(final NotificationDateRange dateRange)
 			throws NotificationServiceException {
 
-		final int limit = 1000; // TODO may need chunking and maybe retry logic to
+		final int limit = 1000; // TODO may need chunking and maybe retry logic
+								// to
 		// handle large sets
 
 		final String startDateString = dateFormatter.format(dateRange.getStartDate());
@@ -126,20 +128,20 @@ public class NotificationService {
 			throws NotificationServiceException {
 		BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus;
 		try {
-			bomComponentVersionPolicyStatus = restConnection.httpGetFromAbsoluteUrl(
-					BomComponentVersionPolicyStatus.class, policyStatusUrl);
+			bomComponentVersionPolicyStatus = restConnection
+					.httpGetFromAbsoluteUrl(BomComponentVersionPolicyStatus.class, policyStatusUrl);
 		} catch (final ResourceDoesNotExistException e) {
-			throw new NotificationServiceException(
-					"Error getting a BomComponentVersionPolicyStatus: " + e.getMessage(), e);
+			throw new NotificationServiceException("Error getting a BomComponentVersionPolicyStatus: " + e.getMessage(),
+					e);
 		} catch (final URISyntaxException e) {
-			throw new NotificationServiceException(
-					"Error getting a BomComponentVersionPolicyStatus: " + e.getMessage(), e);
+			throw new NotificationServiceException("Error getting a BomComponentVersionPolicyStatus: " + e.getMessage(),
+					e);
 		} catch (final IOException e) {
-			throw new NotificationServiceException(
-					"Error getting a BomComponentVersionPolicyStatus: " + e.getMessage(), e);
+			throw new NotificationServiceException("Error getting a BomComponentVersionPolicyStatus: " + e.getMessage(),
+					e);
 		} catch (final BDRestException e) {
-			throw new NotificationServiceException("Error getting a BomComponentVersionPolicyStatus: "
-					+ e.getMessage(), e);
+			throw new NotificationServiceException("Error getting a BomComponentVersionPolicyStatus: " + e.getMessage(),
+					e);
 		}
 		return bomComponentVersionPolicyStatus;
 	}
@@ -160,23 +162,22 @@ public class NotificationService {
 		return rule;
 	}
 
-	public ComponentVersion getComponentVersion(final String componentVersionUrl)
-			throws NotificationServiceException {
+	public ComponentVersion getComponentVersion(final String componentVersionUrl) throws NotificationServiceException {
 		ComponentVersion componentVersion;
 		try {
 			componentVersion = restConnection.httpGetFromAbsoluteUrl(ComponentVersion.class, componentVersionUrl);
 		} catch (final ResourceDoesNotExistException e) {
-			throw new NotificationServiceException("Error getting component version from: " + componentVersionUrl
-					+ ": " + e.getMessage(), e);
+			throw new NotificationServiceException(
+					"Error getting component version from: " + componentVersionUrl + ": " + e.getMessage(), e);
 		} catch (final URISyntaxException e) {
-			throw new NotificationServiceException("Error getting component version from: " + componentVersionUrl
-					+ ": " + e.getMessage(), e);
+			throw new NotificationServiceException(
+					"Error getting component version from: " + componentVersionUrl + ": " + e.getMessage(), e);
 		} catch (final IOException e) {
-			throw new NotificationServiceException("Error getting component version from: " + componentVersionUrl
-					+ ": " + e.getMessage(), e);
+			throw new NotificationServiceException(
+					"Error getting component version from: " + componentVersionUrl + ": " + e.getMessage(), e);
 		} catch (final BDRestException e) {
-			throw new NotificationServiceException("Error getting component version from: " + componentVersionUrl
-					+ ": " + e.getMessage(), e);
+			throw new NotificationServiceException(
+					"Error getting component version from: " + componentVersionUrl + ": " + e.getMessage(), e);
 		}
 		return componentVersion;
 	}
@@ -199,8 +200,7 @@ public class NotificationService {
 	}
 
 	public ReleaseItem getProjectReleaseItemFromProjectReleaseUrl(final String versionUrl)
-			throws NotificationServiceException,
-			UnexpectedHubResponseException {
+			throws NotificationServiceException, UnexpectedHubResponseException {
 		ReleaseItem projectVersion;
 		try {
 			projectVersion = hub.getProjectVersion(versionUrl);
@@ -209,10 +209,8 @@ public class NotificationService {
 		} catch (final BDRestException e) {
 			throw new NotificationServiceException("Error getting Project Link from ProjectVersion: " + versionUrl, e);
 		} catch (final URISyntaxException e) {
-			throw new NotificationServiceException("Error getting Project Link from ProjectVersion: " + versionUrl,
-					e);
+			throw new NotificationServiceException("Error getting Project Link from ProjectVersion: " + versionUrl, e);
 		}
 		return projectVersion;
 	}
 }
-

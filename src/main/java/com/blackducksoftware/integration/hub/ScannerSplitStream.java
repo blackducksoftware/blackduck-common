@@ -32,41 +32,24 @@ import com.blackducksoftware.integration.hub.logging.IntLogger;
 
 public class ScannerSplitStream extends OutputStream {
 	// https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
-
 	private static final int EOF = -1; // End of file
-
 	private static final int ETX = 3; // End of text, should have no more data
-
 	private static final int EOT = 4; // End of transmission, no more data
-
 	private static final int LF = 10; // Line feed, new line
-
 	private static final int CR = 13; // Carriage return
-
 	private static final String EXCEPTION = "Exception:";
-
 	private static final String FINISHED = "Finished in";
-
 	private static final String ERROR = "ERROR:";
-
 	private static final String WARN = "WARN:";
-
 	private static final String INFO = "INFO:";
-
 	private static final String DEBUG = "DEBUG:";
-
 	private static final String TRACE = "TRACE:";
 
 	private final OutputStream outputFileStream;
-
 	private final IntLogger logger;
-
 	private String output = "";
-
 	private String lineBuffer = "";
-
 	private String currentLine = "";
-
 	private int previousCodePoint = -1;
 
 	public ScannerSplitStream(final IntLogger logger, final OutputStream outputFileStream) {

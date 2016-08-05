@@ -40,7 +40,7 @@ public class ScanStatusToPollTest {
 
 		final String status2 = ScanStatus.COMPLETE.name();
 		final String href2 = "href2";
-		final MetaInformation meta2 = new MetaInformation(null,href2, null);
+		final MetaInformation meta2 = new MetaInformation(null, href2, null);
 
 		final ScanStatusToPoll item1 = new ScanStatusToPoll(status1, meta1);
 		final ScanStatusToPoll item2 = new ScanStatusToPoll(status2, meta2);

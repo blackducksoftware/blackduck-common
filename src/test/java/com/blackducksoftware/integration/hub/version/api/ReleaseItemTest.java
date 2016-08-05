@@ -28,6 +28,9 @@ import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
+import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
+import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ReleaseItemTest {
@@ -71,7 +74,8 @@ public class ReleaseItemTest {
 		assertTrue(!item1.equals(item2));
 		assertTrue(item1.equals(item3));
 
-		EqualsVerifier.forClass(ReleaseItem.class).suppress(Warning.NONFINAL_FIELDS).suppress(Warning.STRICT_INHERITANCE).verify();
+		EqualsVerifier.forClass(ReleaseItem.class).suppress(Warning.NONFINAL_FIELDS)
+				.suppress(Warning.STRICT_INHERITANCE).verify();
 
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());

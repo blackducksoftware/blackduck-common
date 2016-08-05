@@ -31,7 +31,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.report.api.DetailedReleaseSummary.URLProvider;
+import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
+import com.blackducksoftware.integration.hub.api.report.DetailedReleaseSummary;
+import com.blackducksoftware.integration.hub.api.report.ProjectData;
+import com.blackducksoftware.integration.hub.api.report.ReleaseData;
+import com.blackducksoftware.integration.hub.api.report.VersionReport;
+import com.blackducksoftware.integration.hub.api.report.DetailedReleaseSummary.URLProvider;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -51,8 +56,10 @@ public class VersionReportTest {
 		final List<AggregateBomViewEntry> aggregateBomViewEntries2 = new ArrayList<AggregateBomViewEntry>();
 		aggregateBomViewEntries2.add(bomEntry2);
 
-		final DetailedReleaseSummary releaseSumary1 = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, null);
-		final DetailedReleaseSummary releaseSumary2 = new DetailedReleaseSummary(null, null, null, null, null, "notEqual", null, null, null, null);
+		final DetailedReleaseSummary releaseSumary1 = new DetailedReleaseSummary(null, null, null, null, null, null,
+				null, null, null, null);
+		final DetailedReleaseSummary releaseSumary2 = new DetailedReleaseSummary(null, null, null, null, null,
+				"notEqual", null, null, null, null);
 
 		final VersionReport item1 = new VersionReport(releaseSumary1, aggregateBomViewEntries1);
 		final VersionReport item2 = new VersionReport(releaseSumary2, aggregateBomViewEntries2);
@@ -86,13 +93,15 @@ public class VersionReportTest {
 	public void testGetBaseUrl() {
 		final String baseUrl = "baseurl";
 		URLProvider uiUrlGenerator = new URLProvider(baseUrl);
-		DetailedReleaseSummary releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		DetailedReleaseSummary releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null,
+				null, null, uiUrlGenerator);
 		VersionReport item = new VersionReport(releaseSumary, null);
 
 		assertEquals(baseUrl, item.getBaseUrl());
 
 		uiUrlGenerator = new URLProvider(null);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 
 		assertNull(item.getBaseUrl());
@@ -112,19 +121,22 @@ public class VersionReportTest {
 		final String baseUrl = "http://test";
 		URLProvider uiUrlGenerator = new URLProvider(baseUrl);
 		final String projectId = "projectId";
-		DetailedReleaseSummary releaseSumary = new DetailedReleaseSummary(projectId, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		DetailedReleaseSummary releaseSumary = new DetailedReleaseSummary(projectId, null, null, null, null, null, null,
+				null, null, uiUrlGenerator);
 		VersionReport item = new VersionReport(releaseSumary, null);
 
 		assertTrue(StringUtils.isNotBlank(item.getReportProjectUrl()));
 		assertEquals("http://test#projects/id:projectId", item.getReportProjectUrl());
 
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 
 		assertNull(item.getReportProjectUrl());
 
 		uiUrlGenerator = new URLProvider(null);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 
 		assertNull(item.getReportProjectUrl());
@@ -144,19 +156,22 @@ public class VersionReportTest {
 		final String baseUrl = "http://test";
 		URLProvider uiUrlGenerator = new URLProvider(baseUrl);
 		final String versionId = "versionId";
-		DetailedReleaseSummary releaseSumary = new DetailedReleaseSummary(null, versionId, null, null, null, null, null, null, null, uiUrlGenerator);
+		DetailedReleaseSummary releaseSumary = new DetailedReleaseSummary(null, versionId, null, null, null, null, null,
+				null, null, uiUrlGenerator);
 		VersionReport item = new VersionReport(releaseSumary, null);
 
 		assertTrue(StringUtils.isNotBlank(item.getReportVersionUrl()));
 		assertEquals("http://test#versions/id:versionId/view:bom", item.getReportVersionUrl());
 
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 
 		assertNull(item.getReportVersionUrl());
 
 		uiUrlGenerator = new URLProvider(null);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 
 		assertNull(item.getReportVersionUrl());
@@ -179,7 +194,8 @@ public class VersionReportTest {
 				project, null, null, null, null);
 		final String baseUrl = "http://test";
 		URLProvider uiUrlGenerator = new URLProvider(baseUrl);
-		DetailedReleaseSummary releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		DetailedReleaseSummary releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null,
+				null, null, uiUrlGenerator);
 		VersionReport item = new VersionReport(releaseSumary, null);
 		// Test valid
 		assertTrue(StringUtils.isNotBlank(item.getComponentUrl(bomEntry)));
@@ -189,7 +205,8 @@ public class VersionReportTest {
 		bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null, null, project, null, null,
 				null, null);
 		uiUrlGenerator = new URLProvider(baseUrl);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// Empty project Id
 		assertNull(item.getComponentUrl(bomEntry));
@@ -198,7 +215,8 @@ public class VersionReportTest {
 		bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null, null, project, null, null,
 				null, null);
 		uiUrlGenerator = new URLProvider(baseUrl);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// Null project id
 		assertNull(item.getComponentUrl(bomEntry));
@@ -206,25 +224,29 @@ public class VersionReportTest {
 		bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null, null, null, null, null,
 				null, null);
 		uiUrlGenerator = new URLProvider(baseUrl);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// null project
 		assertNull(item.getComponentUrl(bomEntry));
 
 		uiUrlGenerator = new URLProvider(baseUrl);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// null entry
 		assertNull(item.getComponentUrl(null));
 
 		uiUrlGenerator = new URLProvider("");
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// empty base url
 		assertNull(item.getComponentUrl(null));
 
 		uiUrlGenerator = new URLProvider(null);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// null base url
 		assertNull(item.getComponentUrl(null));
@@ -250,7 +272,8 @@ public class VersionReportTest {
 				null, releases, null, null, null);
 		final String baseUrl = "http://test";
 		URLProvider uiUrlGenerator = new URLProvider(baseUrl);
-		DetailedReleaseSummary releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		DetailedReleaseSummary releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null,
+				null, null, uiUrlGenerator);
 		VersionReport item = new VersionReport(releaseSumary, null);
 		// Test valid
 		assertTrue(StringUtils.isNotBlank(item.getVersionUrl(bomEntry)));
@@ -262,7 +285,8 @@ public class VersionReportTest {
 		bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null, null, null, releases, null,
 				null, null);
 		uiUrlGenerator = new URLProvider(baseUrl);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// Empty version Id
 		assertNull(item.getVersionUrl(bomEntry));
@@ -273,7 +297,8 @@ public class VersionReportTest {
 		bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null, null, null, releases, null,
 				null, null);
 		uiUrlGenerator = new URLProvider(baseUrl);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// Null version id
 		assertNull(item.getVersionUrl(bomEntry));
@@ -282,7 +307,8 @@ public class VersionReportTest {
 		bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null, null, null, releases, null,
 				null, null);
 		uiUrlGenerator = new URLProvider(baseUrl);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// Empty releases
 		assertNull(item.getVersionUrl(bomEntry));
@@ -290,25 +316,29 @@ public class VersionReportTest {
 		bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null, null, null, null, null,
 				null, null);
 		uiUrlGenerator = new URLProvider(baseUrl);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// null versions
 		assertNull(item.getVersionUrl(bomEntry));
 
 		uiUrlGenerator = new URLProvider(baseUrl);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// null entry
 		assertNull(item.getVersionUrl(null));
 
 		uiUrlGenerator = new URLProvider("");
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// empty base url
 		assertNull(item.getVersionUrl(null));
 
 		uiUrlGenerator = new URLProvider(null);
-		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null, uiUrlGenerator);
+		releaseSumary = new DetailedReleaseSummary(null, null, null, null, null, null, null, null, null,
+				uiUrlGenerator);
 		item = new VersionReport(releaseSumary, null);
 		// null base url
 		assertNull(item.getVersionUrl(null));

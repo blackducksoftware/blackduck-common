@@ -99,8 +99,7 @@ public class HubItemsService<T> {
 	 *            A mapping of type field values to item subclass types
 	 */
 	public HubItemsService(final RestConnection restConnection, final Class<T> baseType,
-			final TypeToken<T> requestListTypeToken,
-			final Map<String, Class<? extends T>> typeNameToSubclassMap) {
+			final TypeToken<T> requestListTypeToken, final Map<String, Class<? extends T>> typeNameToSubclassMap) {
 
 		this.restConnection = restConnection;
 		this.requestListTypeToken = requestListTypeToken;
@@ -108,20 +107,16 @@ public class HubItemsService<T> {
 		final GsonBuilder gsonBuilder = new GsonBuilder();
 
 		if (baseType != null) {
-			final RuntimeTypeAdapterFactory<T> modelClassTypeAdapter = RuntimeTypeAdapterFactory
-					.of(baseType, "type");
+			final RuntimeTypeAdapterFactory<T> modelClassTypeAdapter = RuntimeTypeAdapterFactory.of(baseType, "type");
 			if (typeNameToSubclassMap != null) {
 				for (final String typeName : typeNameToSubclassMap.keySet()) {
-					modelClassTypeAdapter.registerSubtype(
-							typeNameToSubclassMap.get(typeName), typeName);
+					modelClassTypeAdapter.registerSubtype(typeNameToSubclassMap.get(typeName), typeName);
 				}
 			}
 			gsonBuilder.registerTypeAdapterFactory(modelClassTypeAdapter);
 		}
-		gson = gsonBuilder.setDateFormat(RestConnection.JSON_DATE_FORMAT)
-				.create();
+		gson = gsonBuilder.setDateFormat(RestConnection.JSON_DATE_FORMAT).create();
 	}
-
 
 	/**
 	 * Get (from the Hub, via a relative URL) a polymorphic item list.
@@ -138,12 +133,10 @@ public class HubItemsService<T> {
 	 */
 	public List<T> httpGetItemList(final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
-					throws IOException, URISyntaxException,
-					ResourceDoesNotExistException, BDRestException {
+			throws IOException, URISyntaxException, ResourceDoesNotExistException, BDRestException {
 
 		final List<T> items = new ArrayList<T>();
-		final ClientResource resource = restConnection.createClientResource(urlSegments,
-				queryParameters);
+		final ClientResource resource = restConnection.createClientResource(urlSegments, queryParameters);
 		resource.setMethod(Method.GET);
 		restConnection.handleRequest(resource);
 		final int responseCode = restConnection.getResponseStatusCode(resource);
@@ -152,23 +145,19 @@ public class HubItemsService<T> {
 			final JsonArray array = parseJsonArray(resource);
 
 			for (final JsonElement elem : array) {
-				final T genericItem = gson.fromJson(elem,
-						requestListTypeToken.getType());
+				final T genericItem = gson.fromJson(elem, requestListTypeToken.getType());
 				items.add(genericItem);
 			}
 		} else {
-			throw new ResourceDoesNotExistException(
-					"Error getting resource from relative url segments "
-							+ urlSegments + " and query parameters "
-							+ queryParameters + "; errorCode: " + responseCode
-							+ "; " + resource, resource);
+			throw new ResourceDoesNotExistException("Error getting resource from relative url segments " + urlSegments
+					+ " and query parameters " + queryParameters + "; errorCode: " + responseCode + "; " + resource,
+					resource);
 		}
 		return items;
 	}
 
 	private JsonArray parseJsonArray(final ClientResource resource) throws IOException {
-		final String response = restConnection
-				.readResponseAsString(resource.getResponse());
+		final String response = restConnection.readResponseAsString(resource.getResponse());
 
 		final JsonParser parser = new JsonParser();
 		final JsonObject json = parser.parse(response).getAsJsonObject();

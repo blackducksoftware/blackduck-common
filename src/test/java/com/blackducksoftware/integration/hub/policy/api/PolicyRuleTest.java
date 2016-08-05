@@ -31,6 +31,8 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.policy.PolicyExpressions;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 
@@ -77,14 +79,12 @@ public class PolicyRuleTest {
 		links2.add(link2);
 		final MetaInformation _meta2 = new MetaInformation(allows2, href2, links2);
 
-
 		final String operator1 = "operator1";
 
 		final String operator2 = "operator2";
 
 		final PolicyExpressions policyExpression1 = new PolicyExpressions(operator1, null);
 		final PolicyExpressions policyExpression2 = new PolicyExpressions(operator2, null);
-
 
 		final PolicyRule item1 = new PolicyRule(_meta1, name1, description1, enabled1, overridable1, policyExpression1,
 				createdAt1, createdBy1, updatedAt1, updatedBy1);

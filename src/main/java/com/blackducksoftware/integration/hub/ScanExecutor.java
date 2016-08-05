@@ -36,7 +36,6 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 
 public abstract class ScanExecutor {
-
 	public static final int DEFAULT_MEMORY = 4096;
 
 	public static enum Result {
@@ -44,39 +43,22 @@ public abstract class ScanExecutor {
 	}
 
 	private final String hubUrl;
-
 	private final String hubUsername;
-
 	private final String hubPassword;
-
 	private final List<String> scanTargets;
-
 	private final String buildIdentifier;
-
 	private final HubSupportHelper supportHelper;
-
 	private int scanMemory;
-
 	private IntLogger logger;
-
 	private String project;
-
 	private String version;
-
 	private String workingDirectory;
-
 	private String proxyHost;
-
 	private int proxyPort;
-
 	private List<Pattern> noProxyHosts;
-
 	private String proxyUsername;
-
 	private String proxyPassword;
-
 	private boolean verboseRun;
-
 	private boolean dryRun;
 
 	protected ScanExecutor(final String hubUrl, final String hubUsername, final String hubPassword,
@@ -234,8 +216,7 @@ public abstract class ScanExecutor {
 		if (scanExec == null) {
 			getLogger().error("Please provide the Hub scan CLI.");
 			return false;
-		}
-		else {
+		} else {
 			final File scanExecFile = new File(scanExec);
 			if (!scanExecFile.exists()) {
 
@@ -252,8 +233,7 @@ public abstract class ScanExecutor {
 		if (javaExec == null) {
 			getLogger().error("Please provide the java home directory.");
 			return false;
-		}
-		else {
+		} else {
 			final File javaExecFile = new File(javaExec);
 			if (!javaExecFile.exists()) {
 				getLogger().error("The Java executable provided does not exist at : " + javaExecFile.getAbsolutePath());
@@ -269,7 +249,8 @@ public abstract class ScanExecutor {
 		return true;
 	}
 
-	public Result setupAndRunScan(final String scanExec, final String oneJarPath, final String javaExec) throws HubIntegrationException {
+	public Result setupAndRunScan(final String scanExec, final String oneJarPath, final String javaExec)
+			throws HubIntegrationException {
 		if (isConfiguredCorrectly(scanExec, oneJarPath, javaExec)) {
 
 			try {
@@ -352,9 +333,11 @@ public abstract class ScanExecutor {
 				}
 
 				if (supportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
-					// Only add the statusWriteDir option if the Hub supports the statusWriteDir option
+					// Only add the statusWriteDir option if the Hub supports
+					// the statusWriteDir option
 
-					// The scanStatusDirectoryPath is the same as the log directory path
+					// The scanStatusDirectoryPath is the same as the log
+					// directory path
 					// The CLI will create a subdirectory for the status files
 					final String scanStatusDirectoryPath = getLogDirectoryPath();
 
@@ -392,8 +375,8 @@ public abstract class ScanExecutor {
 	}
 
 	/**
-	 * Should determine the path to the log directory to pass into the CLI. If the directory does not exist it should be
-	 * created here.
+	 * Should determine the path to the log directory to pass into the CLI. If
+	 * the directory does not exist it should be created here.
 	 *
 	 */
 	protected String getLogDirectoryPath() throws IOException {
@@ -419,8 +402,9 @@ public abstract class ScanExecutor {
 	}
 
 	/**
-	 * Should determine the path to the scan status directory within the log directory.
-	 * This should only be used outside of this class to get the path of the status directory
+	 * Should determine the path to the scan status directory within the log
+	 * directory. This should only be used outside of this class to get the path
+	 * of the status directory
 	 *
 	 */
 	public String getScanStatusDirectoryPath() throws IOException {
@@ -429,5 +413,7 @@ public abstract class ScanExecutor {
 		return scanStatusDirectory.getCanonicalPath();
 	}
 
-	protected abstract Result executeScan(List<String> cmd, String logDirectoryPath) throws HubIntegrationException, InterruptedException;
+	protected abstract Result executeScan(List<String> cmd, String logDirectoryPath)
+			throws HubIntegrationException, InterruptedException;
+
 }

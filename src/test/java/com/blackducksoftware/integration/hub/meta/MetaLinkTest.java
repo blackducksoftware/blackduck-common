@@ -31,9 +31,8 @@ import nl.jqno.equalsverifier.Warning;
 
 public class MetaLinkTest {
 
-
 	@Test
-	public void testMetaLink(){
+	public void testMetaLink() {
 		final String rel1 = "rel1";
 		final String href1 = "href1";
 

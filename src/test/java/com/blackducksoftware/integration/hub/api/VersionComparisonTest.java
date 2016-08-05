@@ -43,9 +43,12 @@ public class VersionComparisonTest {
 		final Integer numericResult2 = 2;
 		final String operatorResult2 = "operator2";
 
-		final VersionComparison item1 = new VersionComparison(consumerVersion1, producerVersion1, numericResult1, operatorResult1);
-		final VersionComparison item2 = new VersionComparison(consumerVersion2, producerVersion2, numericResult2, operatorResult2);
-		final VersionComparison item3 = new VersionComparison(consumerVersion1, producerVersion1, numericResult1, operatorResult1);
+		final VersionComparison item1 = new VersionComparison(consumerVersion1, producerVersion1, numericResult1,
+				operatorResult1);
+		final VersionComparison item2 = new VersionComparison(consumerVersion2, producerVersion2, numericResult2,
+				operatorResult2);
+		final VersionComparison item3 = new VersionComparison(consumerVersion1, producerVersion1, numericResult1,
+				operatorResult1);
 
 		assertEquals(consumerVersion1, item1.getConsumerVersion());
 		assertEquals(producerVersion1, item1.getProducerVersion());

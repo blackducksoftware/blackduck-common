@@ -48,7 +48,6 @@ public abstract class AbstractBuilder<Key, Type> {
 		}
 	}
 
-
 	public boolean shouldUseDefaultValues() {
 		return shouldUseDefaultValues;
 	}

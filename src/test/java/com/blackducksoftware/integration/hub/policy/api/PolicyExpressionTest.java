@@ -8,11 +8,15 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.policy.PolicyExpression;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRuleConditionEnum;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatus;
+import com.blackducksoftware.integration.hub.api.policy.PolicyValue;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
 public class PolicyExpressionTest {
-
 
 	@Test
 	public void testPolicyExpression() {
