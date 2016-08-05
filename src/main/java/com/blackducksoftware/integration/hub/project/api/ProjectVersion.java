@@ -42,6 +42,18 @@ public class ProjectVersion {
 		return projectVersionLink;
 	}
 
+	public void setProjectName(final String projectName) {
+		this.projectName = projectName;
+	}
+
+	public void setProjectVersionName(final String projectVersionName) {
+		this.projectVersionName = projectVersionName;
+	}
+
+	public void setProjectVersionLink(final String projectVersionLink) {
+		this.projectVersionLink = projectVersionLink;
+	}
+
 	@Override
 	public String toString() {
 		return "ProjectVersion [projectName=" + projectName + ", projectVersionName=" + projectVersionName
