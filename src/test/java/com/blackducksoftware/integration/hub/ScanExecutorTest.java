@@ -160,7 +160,7 @@ public class ScanExecutorTest {
 		scanTargets.add((new File("")).getAbsolutePath());
 
 		new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
-				testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123, null) {
+				testProperties.getProperty("TEST_PASSWORD"), scanTargets, "123", null) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -182,7 +182,7 @@ public class ScanExecutorTest {
 		final HubSupportHelper supportHelper = new HubSupportHelper();
 
 		new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
-				testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123, supportHelper) {
+				testProperties.getProperty("TEST_PASSWORD"), scanTargets, "123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -202,7 +202,7 @@ public class ScanExecutorTest {
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 
 		new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
-				testProperties.getProperty("TEST_PASSWORD"), scanTargets, 123, supportHelper) {
+				testProperties.getProperty("TEST_PASSWORD"), scanTargets, "123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -223,7 +223,7 @@ public class ScanExecutorTest {
 
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
 				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
-				123, supportHelper) {
+				"123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -246,7 +246,7 @@ public class ScanExecutorTest {
 
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
 				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
-				123, supportHelper) {
+				"123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -274,7 +274,7 @@ public class ScanExecutorTest {
 
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
 				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
-				123, supportHelper) {
+				"123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -302,7 +302,7 @@ public class ScanExecutorTest {
 
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
 				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
-				123, supportHelper) {
+				"123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -328,7 +328,7 @@ public class ScanExecutorTest {
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
 				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
-				123, supportHelper) {
+				"123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -354,7 +354,7 @@ public class ScanExecutorTest {
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
 				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
-				123, supportHelper) {
+				"123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -380,7 +380,7 @@ public class ScanExecutorTest {
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
 				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
-				123, supportHelper) {
+				"123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -408,7 +408,7 @@ public class ScanExecutorTest {
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
 				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
-				123, supportHelper) {
+				"123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -461,7 +461,7 @@ public class ScanExecutorTest {
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
 				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
-				123, supportHelper) {
+				"123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)

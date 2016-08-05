@@ -51,7 +51,7 @@ public abstract class ScanExecutor {
 
 	private final List<String> scanTargets;
 
-	private final int buildNumber;
+	private final String buildIdentifier;
 
 	private final HubSupportHelper supportHelper;
 
@@ -80,7 +80,7 @@ public abstract class ScanExecutor {
 	private boolean dryRun;
 
 	protected ScanExecutor(final String hubUrl, final String hubUsername, final String hubPassword,
-			final List<String> scanTargets, final Integer buildNumber, final HubSupportHelper supportHelper) {
+			final List<String> scanTargets, final String buildIdentifier, final HubSupportHelper supportHelper) {
 		if (StringUtils.isBlank(hubUrl)) {
 			throw new IllegalArgumentException("No Hub URL provided.");
 		}
@@ -93,8 +93,8 @@ public abstract class ScanExecutor {
 		if (scanTargets == null || scanTargets.isEmpty()) {
 			throw new IllegalArgumentException("No scan targets provided.");
 		}
-		if (buildNumber == null) {
-			throw new IllegalArgumentException("No build number provided.");
+		if (buildIdentifier == null) {
+			throw new IllegalArgumentException("No build identifier provided.");
 		}
 		if (supportHelper == null) {
 			throw new IllegalArgumentException("No HubSupportHelper provided.");
@@ -105,7 +105,7 @@ public abstract class ScanExecutor {
 		this.hubUsername = hubUsername;
 		this.hubPassword = hubPassword;
 		this.scanTargets = scanTargets;
-		this.buildNumber = buildNumber;
+		this.buildIdentifier = buildIdentifier;
 		this.supportHelper = supportHelper;
 	}
 
@@ -157,8 +157,8 @@ public abstract class ScanExecutor {
 		return hubUrl;
 	}
 
-	public Integer getBuildNumber() {
-		return buildNumber;
+	public String getBuildIdentifier() {
+		return buildIdentifier;
 	}
 
 	public String getHubUsername() {
@@ -408,7 +408,7 @@ public abstract class ScanExecutor {
 	 */
 	protected File getLogDirectory() throws IOException {
 		final File logDirectory = new File(new File(getWorkingDirectory(), "HubScanLogs"),
-				String.valueOf(getBuildNumber()));
+				String.valueOf(getBuildIdentifier()));
 		// This log directory should never exist as a new one is created for
 		// each Build
 		if (!logDirectory.exists() && !logDirectory.mkdirs()) {
