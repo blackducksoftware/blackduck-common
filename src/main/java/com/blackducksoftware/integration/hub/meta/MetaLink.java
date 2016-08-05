@@ -23,7 +23,6 @@ package com.blackducksoftware.integration.hub.meta;
 
 public class MetaLink {
 	private final String rel;
-
 	private final String href;
 
 	public MetaLink(final String rel, final String href) {

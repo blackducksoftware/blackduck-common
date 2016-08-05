@@ -22,7 +22,6 @@
 package com.blackducksoftware.integration.hub.job;
 
 public enum HubScanJobFieldEnum {
-
 	PROJECT("hubProject"),
 	VERSION("hubVersion"),
 	PHASE("hubPhase"),

@@ -28,7 +28,6 @@ import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 public class HostnameHelper {
-
 	public static String getMyHostname() {
 		String hostName = null;
 
@@ -65,4 +64,5 @@ public class HostnameHelper {
 		}
 		return hostName;
 	}
+
 }

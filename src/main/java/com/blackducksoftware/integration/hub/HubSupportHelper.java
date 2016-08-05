@@ -43,7 +43,6 @@ public class HubSupportHelper implements Serializable {
 	public static final String MAC_CLI_DOWNLOAD = "scan.cli-macosx.zip";
 
 	private boolean hasBeenChecked = false;
-
 	private final Set<HubCapabilitiesEnum> capabilities = EnumSet.noneOf(HubCapabilitiesEnum.class);
 
 	/**
@@ -204,7 +203,8 @@ public class HubSupportHelper implements Serializable {
 		return true;
 	}
 
-	public String getHubVersion(HubIntRestService service) throws IOException, BDRestException, URISyntaxException {
+	public String getHubVersion(final HubIntRestService service)
+			throws IOException, BDRestException, URISyntaxException {
 		String hubVersion = service.getHubVersion();
 		hubVersion = hubVersion.replaceAll("\"", "");
 		return hubVersion;
@@ -282,4 +282,5 @@ public class HubSupportHelper implements Serializable {
 	private void setHub3_4Support() {
 		capabilities.add(HubCapabilitiesEnum.BOM_FILE_UPLOAD);
 	}
+
 }

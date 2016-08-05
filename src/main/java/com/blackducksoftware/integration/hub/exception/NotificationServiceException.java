@@ -19,7 +19,7 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.notification;
+package com.blackducksoftware.integration.hub.exception;
 
 public class NotificationServiceException extends Exception {
 	private static final long serialVersionUID = -5409459979943538039L;

@@ -25,9 +25,7 @@ import java.util.List;
 
 public class MetaInformation {
 	private final List<String> allow;
-
 	private final String href;
-
 	private final List<MetaLink> links;
 
 	public MetaInformation(final List<String> allow, final String href, final List<MetaLink> links) {

@@ -22,7 +22,6 @@
 package com.blackducksoftware.integration.hub.global;
 
 public enum HubProxyInfoFieldEnum implements GlobalFieldKey {
-
 	PROXYHOST("hubProxyHost"),
 	PROXYPORT("hubProxyPort"),
 	PROXYUSERNAME("hubProxyUsername"),

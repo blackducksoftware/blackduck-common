@@ -27,23 +27,14 @@ import com.google.common.collect.ImmutableList;
 
 public class HubScanJobConfig {
 	private final String projectName;
-
 	private final String version;
-
 	private final String phase;
-
 	private final String distribution;
-
 	private final String workingDirectory;
-
 	private final boolean shouldGenerateRiskReport;
-
 	private final int maxWaitTimeForBomUpdate;
-
 	private final int scanMemory;
-
 	private final ImmutableList<String> scanTargetPaths;
-
 	private final boolean dryRun;
 
 	public HubScanJobConfig(final String projectName, final String version, final String phase,

@@ -39,7 +39,6 @@ import com.blackducksoftware.integration.hub.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.util.AuthenticatorUtil;
 
 public class HubProxyInfo implements Serializable {
-
 	private static final long serialVersionUID = -7476704373593358472L;
 
 	private final String host;

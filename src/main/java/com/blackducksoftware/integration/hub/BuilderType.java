@@ -25,14 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum BuilderType {
-
-	MAVEN,
-
-	GRADLE,
-
-	ANT,
-
-	UNKNOWN_BUILDER;
+	MAVEN, GRADLE, ANT, UNKNOWN_BUILDER;
 
 	public static BuilderType getBuilderType(final String builder) {
 		BuilderType entityTypeEnum;

@@ -36,7 +36,6 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 
 public abstract class ScanExecutor {
-
 	public static final int DEFAULT_MEMORY = 4096;
 
 	public static enum Result {
@@ -44,39 +43,22 @@ public abstract class ScanExecutor {
 	}
 
 	private final String hubUrl;
-
 	private final String hubUsername;
-
 	private final String hubPassword;
-
 	private final List<String> scanTargets;
-
 	private final String buildIdentifier;
-
 	private final HubSupportHelper supportHelper;
-
 	private int scanMemory;
-
 	private IntLogger logger;
-
 	private String project;
-
 	private String version;
-
 	private String workingDirectory;
-
 	private String proxyHost;
-
 	private int proxyPort;
-
 	private List<Pattern> noProxyHosts;
-
 	private String proxyUsername;
-
 	private String proxyPassword;
-
 	private boolean verboseRun;
-
 	private boolean dryRun;
 
 	protected ScanExecutor(final String hubUrl, final String hubUsername, final String hubPassword,
@@ -433,4 +415,5 @@ public abstract class ScanExecutor {
 
 	protected abstract Result executeScan(List<String> cmd, String logDirectoryPath)
 			throws HubIntegrationException, InterruptedException;
+
 }
