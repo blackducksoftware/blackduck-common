@@ -134,7 +134,7 @@ public class ScanExecutorTest {
 	@Test
 	public void testNoBuildNumber() throws Exception {
 		exception.expect(IllegalArgumentException.class);
-		exception.expectMessage("No build number provided.");
+		exception.expectMessage("No build identifier provided.");
 
 		final ArrayList<String> scanTargets = new ArrayList<String>();
 		scanTargets.add((new File("")).getAbsolutePath());
