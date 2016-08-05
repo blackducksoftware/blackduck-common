@@ -28,6 +28,8 @@ import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.report.risk.RiskCounts;
+
 public class RiskCountsTest {
 
     @Test

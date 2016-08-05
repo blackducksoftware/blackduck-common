@@ -31,6 +31,8 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.policy.PolicyExpressions;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 

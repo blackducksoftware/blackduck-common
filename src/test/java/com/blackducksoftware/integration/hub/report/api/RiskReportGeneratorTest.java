@@ -40,16 +40,22 @@ import org.mockito.stubbing.Answer;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
+import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
+import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
+import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
+import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
+import com.blackducksoftware.integration.hub.api.report.RiskReportGenerator;
+import com.blackducksoftware.integration.hub.api.report.VersionReport;
+import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
+import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
+import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
-import com.blackducksoftware.integration.hub.project.api.ProjectItem;
-import com.blackducksoftware.integration.hub.scan.api.ScanHistoryItem;
-import com.blackducksoftware.integration.hub.scan.api.ScanLocationItem;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
 import com.blackducksoftware.integration.hub.util.TestLogger;
-import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

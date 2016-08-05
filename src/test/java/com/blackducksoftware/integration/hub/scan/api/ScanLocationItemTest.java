@@ -32,11 +32,11 @@ import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.scan.api.AssetReferenceItem;
-import com.blackducksoftware.integration.hub.scan.api.EntityItem;
-import com.blackducksoftware.integration.hub.scan.api.EntityTypeEnum;
-import com.blackducksoftware.integration.hub.scan.api.ScanHistoryItem;
-import com.blackducksoftware.integration.hub.scan.api.ScanLocationItem;
+import com.blackducksoftware.integration.hub.api.scan.AssetReferenceItem;
+import com.blackducksoftware.integration.hub.api.scan.EntityItem;
+import com.blackducksoftware.integration.hub.api.scan.EntityTypeEnum;
+import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
+import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 
 public class ScanLocationItemTest {

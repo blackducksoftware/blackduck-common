@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.report.api.ReportFormatEnum;
+import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 
 public class ReportFormatEnumTest {
 

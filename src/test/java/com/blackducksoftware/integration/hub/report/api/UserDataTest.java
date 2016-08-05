@@ -32,6 +32,8 @@ import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.report.UserData;
+
 public class UserDataTest {
 
     @Test

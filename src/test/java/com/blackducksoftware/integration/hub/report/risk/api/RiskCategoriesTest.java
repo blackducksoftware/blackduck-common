@@ -28,6 +28,9 @@ import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.report.risk.RiskCategories;
+import com.blackducksoftware.integration.hub.api.report.risk.RiskCounts;
+
 public class RiskCategoriesTest {
 
     @Test

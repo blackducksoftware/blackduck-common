@@ -8,6 +8,11 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.policy.PolicyExpression;
+import com.blackducksoftware.integration.hub.api.policy.PolicyExpressions;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRuleConditionEnum;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatus;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 

@@ -28,6 +28,7 @@ import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ProjectItemTest {

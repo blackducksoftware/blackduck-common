@@ -25,6 +25,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
+
 public class PolicyStatusEnumTest {
 
     @Test

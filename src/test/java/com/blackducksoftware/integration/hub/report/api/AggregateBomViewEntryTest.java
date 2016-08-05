@@ -32,10 +32,15 @@ import java.util.UUID;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.policy.api.PolicyStatusEnum;
-import com.blackducksoftware.integration.hub.report.risk.api.RiskCategories;
-import com.blackducksoftware.integration.hub.report.risk.api.RiskCounts;
-import com.blackducksoftware.integration.hub.report.risk.api.RiskProfile;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
+import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
+import com.blackducksoftware.integration.hub.api.report.LicenseDefinition;
+import com.blackducksoftware.integration.hub.api.report.ProjectData;
+import com.blackducksoftware.integration.hub.api.report.ReleaseData;
+import com.blackducksoftware.integration.hub.api.report.UserData;
+import com.blackducksoftware.integration.hub.api.report.risk.RiskCategories;
+import com.blackducksoftware.integration.hub.api.report.risk.RiskCounts;
+import com.blackducksoftware.integration.hub.api.report.risk.RiskProfile;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;

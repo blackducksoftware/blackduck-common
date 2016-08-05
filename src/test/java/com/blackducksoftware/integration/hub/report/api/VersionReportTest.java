@@ -31,7 +31,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.report.api.DetailedReleaseSummary.URLProvider;
+import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
+import com.blackducksoftware.integration.hub.api.report.DetailedReleaseSummary;
+import com.blackducksoftware.integration.hub.api.report.ProjectData;
+import com.blackducksoftware.integration.hub.api.report.ReleaseData;
+import com.blackducksoftware.integration.hub.api.report.VersionReport;
+import com.blackducksoftware.integration.hub.api.report.DetailedReleaseSummary.URLProvider;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;

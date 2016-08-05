@@ -39,12 +39,12 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
+import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
+import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
+import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
+import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
-import com.blackducksoftware.integration.hub.report.api.HubReportGenerationInfo;
-import com.blackducksoftware.integration.hub.report.api.ReportInformationItem;
-import com.blackducksoftware.integration.hub.scan.api.ScanHistoryItem;
-import com.blackducksoftware.integration.hub.scan.api.ScanLocationItem;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
 import com.blackducksoftware.integration.hub.util.TestLogger;

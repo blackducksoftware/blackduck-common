@@ -33,9 +33,10 @@ import nl.jqno.equalsverifier.Warning;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.report.api.DetailedReleaseSummary.URLProvider;
-import com.blackducksoftware.integration.hub.version.api.DistributionEnum;
-import com.blackducksoftware.integration.hub.version.api.PhaseEnum;
+import com.blackducksoftware.integration.hub.api.report.DetailedReleaseSummary;
+import com.blackducksoftware.integration.hub.api.report.DetailedReleaseSummary.URLProvider;
+import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
+import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
 
 public class DetailedReleaseSummaryTest {
 

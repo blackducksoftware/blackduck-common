@@ -33,9 +33,12 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.report.risk.api.RiskCategories;
-import com.blackducksoftware.integration.hub.report.risk.api.RiskCounts;
-import com.blackducksoftware.integration.hub.report.risk.api.RiskProfile;
+import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
+import com.blackducksoftware.integration.hub.api.report.HubRiskReportData;
+import com.blackducksoftware.integration.hub.api.report.VersionReport;
+import com.blackducksoftware.integration.hub.api.report.risk.RiskCategories;
+import com.blackducksoftware.integration.hub.api.report.risk.RiskCounts;
+import com.blackducksoftware.integration.hub.api.report.risk.RiskProfile;
 import com.blackducksoftware.integration.hub.util.TestUtils;
 import com.blackducksoftware.integration.hub.util.XStreamHelperTest;
 
