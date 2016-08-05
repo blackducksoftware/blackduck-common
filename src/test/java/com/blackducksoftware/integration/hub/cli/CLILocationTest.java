@@ -36,6 +36,7 @@ import org.mockito.Mockito;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 
 public class CLILocationTest {
 	@Rule
@@ -70,7 +71,7 @@ public class CLILocationTest {
 
 		final File directoryToInstallTo = folder.newFolder();
 		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
-		HubIntRestService restService = new HubIntRestService(baseUrl);
+		HubIntRestService restService = new HubIntRestService(new RestConnection(baseUrl));
 		restService = Mockito.spy(restService);
 		Mockito.doReturn("3.0.1").when(restService).getHubVersion();
 
@@ -97,7 +98,7 @@ public class CLILocationTest {
 
 		final File directoryToInstallTo = folder.newFolder();
 		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
-		HubIntRestService restService = new HubIntRestService(baseUrl);
+		HubIntRestService restService = new HubIntRestService(new RestConnection(baseUrl));
 		restService = Mockito.spy(restService);
 		Mockito.doReturn("2.4.0").when(restService).getHubVersion();
 

@@ -55,9 +55,6 @@ import com.blackducksoftware.integration.hub.version.api.ReleaseItem;
 
 public class NotificationServiceTest {
 	private static final IntLogger logger = new TestLogger();
-	private static final String TEST_COMPONENT_VERSION_NAME = "testComponentVersionName";
-	private static final String TEST_COMPONENT_VERSION_LINK = "testComponentVersionLink";
-	private static final String TEST_COMPONENT_NAME = "testComponentName";
 	private static final String END_DATE_STRING = "2016-05-10T00:00:00.000Z";
 	private static final String START_DATE_STRING = "2016-05-01T00:00:00.000Z";
 
@@ -77,8 +74,8 @@ public class NotificationServiceTest {
 		links.add("http://test.project.url");
 		when(mockProjectVersion.getLinks("project")).thenReturn(links);
 		when(mockHubIntRestService.getProjectVersion("http://test.projectVersion.url")).thenReturn(mockProjectVersion);
-		hubNotificationService = new NotificationService(mockRestConnection, mockHubIntRestService,
-				mockHubItemsService, logger);
+		hubNotificationService = new NotificationService(mockRestConnection, mockHubIntRestService, mockHubItemsService,
+				logger);
 	}
 
 	@AfterClass
@@ -87,8 +84,7 @@ public class NotificationServiceTest {
 
 	@Test
 	public void testFetchNotifications() throws NotificationServiceException, URISyntaxException, BDRestException,
-	ParseException, IOException, ResourceDoesNotExistException {
-
+			ParseException, IOException, ResourceDoesNotExistException {
 		final SimpleDateFormat dateFormatter = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
 		dateFormatter.setTimeZone(java.util.TimeZone.getTimeZone("Zulu"));
 
@@ -99,7 +95,7 @@ public class NotificationServiceTest {
 		System.out.println("endDate: " + endDate.toString());
 
 		final NotificationDateRange dateRange = new NotificationDateRange(startDate, endDate);
-		final List<NotificationItem> notifs = hubNotificationService.fetchNotifications(dateRange);
+		hubNotificationService.fetchNotifications(dateRange);
 
 		// Verify
 		final List<String> expectedUrlSegments = new ArrayList<String>();
@@ -116,8 +112,8 @@ public class NotificationServiceTest {
 	}
 
 	@Test
-	public void testGetProjectUrlFromProjectReleaseUrl() throws NotificationServiceException,
-	UnexpectedHubResponseException {
+	public void testGetProjectUrlFromProjectReleaseUrl()
+			throws NotificationServiceException, UnexpectedHubResponseException {
 		final String versionUrl = "http://test.projectVersion.url";
 
 		final ReleaseItem releaseItem = hubNotificationService.getProjectReleaseItemFromProjectReleaseUrl(versionUrl);
