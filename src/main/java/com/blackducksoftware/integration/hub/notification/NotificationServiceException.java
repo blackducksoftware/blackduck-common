@@ -22,7 +22,6 @@
 package com.blackducksoftware.integration.hub.notification;
 
 public class NotificationServiceException extends Exception {
-
 	private static final long serialVersionUID = -5409459979943538039L;
 
 	public NotificationServiceException() {
@@ -41,9 +40,4 @@ public class NotificationServiceException extends Exception {
 		super(message, cause);
 	}
 
-	public NotificationServiceException(final String message, final Throwable cause, final boolean enableSuppression,
-			final boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
 }
-
