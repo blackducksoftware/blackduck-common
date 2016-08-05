@@ -91,10 +91,16 @@ public class CLIInstaller {
 					cliMismatch = false;
 				} else {
 					hubVersionFile.delete();
+					hubVersionFile.createNewFile();
 				}
 			}
+			final File cliInstallDirectory = cliLocation.getCLIInstallDir();
+			if (!cliInstallDirectory.exists()) {
+				cliMismatch = true;
+			}
+
 			if (cliMismatch) {
-				hubVersionFile.createNewFile();
+				logger.debug("Attempting to download the Hub CLI.");
 				final FileWriter writer = new FileWriter(hubVersionFile);
 				writer.write(hubVersion);
 				writer.close();
@@ -137,19 +143,18 @@ public class CLIInstaller {
 
 			final long sourceTimestamp = connection.getLastModified();
 
-			final File cliInstallDirectory = cliLocation.getCLIInstallDir();
 			if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
 				if (!cliMismatch && sourceTimestamp == cliTimestamp) {
-					// already up to date
+					logger.debug("The current Hub CLI is up to date.");
 					return;
 				}
-
 				for (final File file : cliInstallDirectory.listFiles()) {
 					FileUtils.deleteDirectory(file);
 				}
 			} else {
 				cliInstallDirectory.mkdir();
 			}
+			logger.debug("Updating the Hub CLI.");
 			hubVersionFile.setLastModified(sourceTimestamp);
 
 			logger.info("Unpacking " + archive.toString() + " to " + cliInstallDirectory.getCanonicalPath() + " on "
