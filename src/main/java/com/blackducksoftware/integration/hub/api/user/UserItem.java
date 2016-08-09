@@ -47,4 +47,10 @@ public class UserItem extends HubItem {
 		return active;
 	}
 
+	@Override
+	public String toString() {
+		return "UserItem [userName=" + userName + ", firstName=" + firstName + ", lastName=" + lastName + ", email="
+				+ email + ", type=" + type + ", active=" + active + "]";
+	}
+
 }

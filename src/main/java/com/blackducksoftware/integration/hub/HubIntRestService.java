@@ -365,7 +365,7 @@ public class HubIntRestService {
 	 * @return the project URL.
 	 */
 	public String createHubProject(final String projectName) throws IOException, BDRestException, URISyntaxException {
-		final List<String> urlSegments = new ArrayList<String>();
+		final List<String> urlSegments = new ArrayList<>();
 		urlSegments.add("api");
 		urlSegments.add("projects");
 
@@ -474,7 +474,7 @@ public class HubIntRestService {
 	@Deprecated
 	public List<ScanLocationItem> getScanLocations(final String hostname, final List<String> scanTargets)
 			throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
-		final List<ScanLocationItem> codeLocations = new ArrayList<ScanLocationItem>();
+		final List<ScanLocationItem> codeLocations = new ArrayList<>();
 		ClientResource resource = null;
 		for (final String targetPath : scanTargets) {
 			String correctedTargetPath = targetPath;
@@ -597,7 +597,7 @@ public class HubIntRestService {
 		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
 				.get(HeaderConstants.ATTRIBUTE_HEADERS);
 		if (requestHeaders == null) {
-			requestHeaders = new Series<Header>(Header.class);
+			requestHeaders = new Series<>(Header.class);
 			resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
 		}
 		requestHeaders.add(new Header("Accept", MediaType.APPLICATION_JSON.toString()));
@@ -718,12 +718,12 @@ public class HubIntRestService {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return registration id Registration ID of the hub instance
 	 * @throws URISyntaxException
 	 * @throws BDRestException
 	 * @throws IOException
-	 * 
+	 *
 	 *             Returns the registration ID of the hub instance
 	 */
 	public String getRegistrationId() throws URISyntaxException, BDRestException, IOException, JsonSyntaxException {
@@ -737,11 +737,11 @@ public class HubIntRestService {
 		final int responseCode = resource.getResponse().getStatus().getCode();
 		if (responseCode == 200) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-			JsonParser parser = new JsonParser();
-			JsonElement je = parser.parse(response);
-			JsonObject jo = je.getAsJsonObject();
-			JsonElement je2 = jo.get("registrationId");
-			String regId = je2.getAsString();
+			final JsonParser parser = new JsonParser();
+			final JsonElement je = parser.parse(response);
+			final JsonObject jo = je.getAsJsonObject();
+			final JsonElement je2 = jo.get("registrationId");
+			final String regId = je2.getAsString();
 			return regId;
 		} else {
 			throw new BDRestException("There was a problem getting the registration ID. Error Code: " + responseCode,

@@ -298,7 +298,6 @@ public class RestConnection {
 	}
 
 	public ClientResource createClientResource(final String providedUrl) throws URISyntaxException {
-
 		final Context context = new Context();
 
 		// the socketTimeout parameter is used in the httpClient extension that
@@ -319,7 +318,6 @@ public class RestConnection {
 
 	public ClientResource createClientResource(final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters) throws URISyntaxException {
-
 		final ClientResource resource = createClientResource();
 
 		for (final String urlSegment : urlSegments) {
@@ -341,7 +339,6 @@ public class RestConnection {
 
 	public void handleRequest(final ClientResource resource) throws BDRestException {
 		logMessage(LogLevel.TRACE, "Resource : " + resource.toString());
-
 		logRestletRequestOrResponse(resource.getRequest());
 
 		final CookieHandler originalCookieHandler = CookieHandler.getDefault();
@@ -468,7 +465,7 @@ public class RestConnection {
 
 	public String httpPostFromRelativeUrl(final List<String> urlSegments, final Representation content)
 			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
-		final Set<SimpleEntry<String, String>> queryParameters = new HashSet<SimpleEntry<String, String>>();
+		final Set<SimpleEntry<String, String>> queryParameters = new HashSet<>();
 		return httpPostFromRelativeUrl(urlSegments, queryParameters, content);
 	}
 
