@@ -39,6 +39,8 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.util.Series;
 
+import com.blackducksoftware.integration.hub.api.ProjectRestService;
+import com.blackducksoftware.integration.hub.api.UserRestService;
 import com.blackducksoftware.integration.hub.api.VersionComparison;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatus;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
@@ -71,8 +73,17 @@ import com.google.gson.reflect.TypeToken;
 public class HubIntRestService {
 	private final RestConnection restConnection;
 
+	private final Gson gson = new Gson();
+	private final JsonParser jsonParser = new JsonParser();
+
+	private final ProjectRestService projectRestService;
+	private final UserRestService userRestService;
+
 	public HubIntRestService(final RestConnection restConnection) throws URISyntaxException {
 		this.restConnection = restConnection;
+
+		this.projectRestService = new ProjectRestService(restConnection, gson, jsonParser);
+		this.userRestService = new UserRestService(restConnection, gson, jsonParser);
 	}
 
 	/**
@@ -80,7 +91,7 @@ public class HubIntRestService {
 	 */
 	@Deprecated
 	public HubIntRestService(final String baseUrl) throws URISyntaxException {
-		restConnection = new RestConnection(baseUrl);
+		this(new RestConnection(baseUrl));
 	}
 
 	/**
@@ -176,7 +187,7 @@ public class HubIntRestService {
 	 */
 	public List<ProjectItem> getProjectMatches(final String projectName)
 			throws IOException, BDRestException, URISyntaxException {
-		return getProjectMatches(projectName, Integer.MAX_VALUE);
+		return projectRestService.getAllProjectMatches(projectName);
 	}
 
 	/**
@@ -186,31 +197,7 @@ public class HubIntRestService {
 	 */
 	public List<ProjectItem> getProjectMatches(final String projectName, final int limit)
 			throws IOException, BDRestException, URISyntaxException {
-		final ClientResource resource = getRestConnection().createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("projects");
-		if (StringUtils.isNotBlank(projectName)) {
-			resource.addQueryParameter("q", "name:" + projectName);
-		}
-		if (limit > 0) {
-			// if limit is not provided, the default is 10
-			resource.addQueryParameter("limit", String.valueOf(limit));
-		}
-		resource.setMethod(Method.GET);
-		getRestConnection().handleRequest(resource);
-		final int responseCode = resource.getResponse().getStatus().getCode();
-
-		if (getRestConnection().isSuccess(responseCode)) {
-			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-			final Gson gson = new GsonBuilder().create();
-			final JsonParser parser = new JsonParser();
-			final JsonObject json = parser.parse(response).getAsJsonObject();
-			return gson.fromJson(json.get("items"), new TypeToken<List<ProjectItem>>() {
-			}.getType());
-		} else {
-			throw new BDRestException("There was a problem getting the project matches. Error Code: " + responseCode,
-					resource);
-		}
+		return projectRestService.getProjectMatches(projectName, limit);
 	}
 
 	/**
@@ -219,63 +206,11 @@ public class HubIntRestService {
 	 */
 	public ProjectItem getProjectByName(final String projectName)
 			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
-		return getProjectByName(projectName, Integer.MAX_VALUE);
-	}
-
-	/**
-	 * Gets the Project that is specified by the projectName, default limit is
-	 * 10
-	 *
-	 */
-	public ProjectItem getProjectByName(final String projectName, final int limit)
-			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
-		final ClientResource resource = getRestConnection().createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("projects");
-		resource.addQueryParameter("q", "name:" + projectName);
-		if (limit > 0) {
-			// if limit is not provided, the default is 10
-			resource.addQueryParameter("limit", String.valueOf(limit));
-		}
-		resource.setMethod(Method.GET);
-		getRestConnection().handleRequest(resource);
-		final int responseCode = resource.getResponse().getStatus().getCode();
-
-		if (getRestConnection().isSuccess(responseCode)) {
-			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-			final Gson gson = new GsonBuilder().create();
-			final JsonParser parser = new JsonParser();
-			final JsonObject json = parser.parse(response).getAsJsonObject();
-			final List<ProjectItem> projects = gson.fromJson(json.get("items"), new TypeToken<List<ProjectItem>>() {
-			}.getType());
-
-			for (final ProjectItem project : projects) {
-				if (project.getName().equals(projectName)) {
-					return project;
-				}
-			}
-			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName, resource);
-		} else if (responseCode == 404) {
-			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName, resource);
-		} else {
-			throw new BDRestException("There was a problem getting a Project by this name. Project : " + projectName,
-					resource);
-		}
+		return projectRestService.getProjectByName(projectName);
 	}
 
 	public ProjectItem getProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
-		final ClientResource resource = getRestConnection().createClientResource(projectUrl);
-		resource.setMethod(Method.GET);
-		getRestConnection().handleRequest(resource);
-		final int responseCode = resource.getResponse().getStatus().getCode();
-
-		if (getRestConnection().isSuccess(responseCode)) {
-			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-			final Gson gson = new GsonBuilder().create();
-			return gson.fromJson(response, ProjectItem.class);
-		} else {
-			throw new BDRestException("There was a problem getting the project. Error Code: " + responseCode, resource);
-		}
+		return projectRestService.getProject(projectUrl);
 	}
 
 	public ReleaseItem getProjectVersion(final String versionUrl)
@@ -365,7 +300,7 @@ public class HubIntRestService {
 	 * @return the project URL.
 	 */
 	public String createHubProject(final String projectName) throws IOException, BDRestException, URISyntaxException {
-		final List<String> urlSegments = new ArrayList<String>();
+		final List<String> urlSegments = new ArrayList<>();
 		urlSegments.add("api");
 		urlSegments.add("projects");
 
@@ -474,7 +409,7 @@ public class HubIntRestService {
 	@Deprecated
 	public List<ScanLocationItem> getScanLocations(final String hostname, final List<String> scanTargets)
 			throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
-		final List<ScanLocationItem> codeLocations = new ArrayList<ScanLocationItem>();
+		final List<ScanLocationItem> codeLocations = new ArrayList<>();
 		ClientResource resource = null;
 		for (final String targetPath : scanTargets) {
 			String correctedTargetPath = targetPath;
@@ -597,7 +532,7 @@ public class HubIntRestService {
 		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
 				.get(HeaderConstants.ATTRIBUTE_HEADERS);
 		if (requestHeaders == null) {
-			requestHeaders = new Series<Header>(Header.class);
+			requestHeaders = new Series<>(Header.class);
 			resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
 		}
 		requestHeaders.add(new Header("Accept", MediaType.APPLICATION_JSON.toString()));
@@ -718,12 +653,12 @@ public class HubIntRestService {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return registration id Registration ID of the hub instance
 	 * @throws URISyntaxException
 	 * @throws BDRestException
 	 * @throws IOException
-	 * 
+	 *
 	 *             Returns the registration ID of the hub instance
 	 */
 	public String getRegistrationId() throws URISyntaxException, BDRestException, IOException, JsonSyntaxException {
@@ -737,11 +672,11 @@ public class HubIntRestService {
 		final int responseCode = resource.getResponse().getStatus().getCode();
 		if (responseCode == 200) {
 			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-			JsonParser parser = new JsonParser();
-			JsonElement je = parser.parse(response);
-			JsonObject jo = je.getAsJsonObject();
-			JsonElement je2 = jo.get("registrationId");
-			String regId = je2.getAsString();
+			final JsonParser parser = new JsonParser();
+			final JsonElement je = parser.parse(response);
+			final JsonObject jo = je.getAsJsonObject();
+			final JsonElement je2 = jo.get("registrationId");
+			final String regId = je2.getAsString();
 			return regId;
 		} else {
 			throw new BDRestException("There was a problem getting the registration ID. Error Code: " + responseCode,

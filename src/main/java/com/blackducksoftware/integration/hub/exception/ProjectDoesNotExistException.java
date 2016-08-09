@@ -21,25 +21,15 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.exception;
 
-import org.restlet.resource.ClientResource;
-
 public class ProjectDoesNotExistException extends Exception {
 	private static final long serialVersionUID = 6616918212644568568L;
 
-	private final ClientResource resource;
-
-	public ProjectDoesNotExistException(final String message, final ClientResource resource) {
+	public ProjectDoesNotExistException(final String message) {
 		super(message);
-		this.resource = resource;
 	}
 
-	public ProjectDoesNotExistException(final String message, final Throwable cause, final ClientResource resource) {
+	public ProjectDoesNotExistException(final String message, final Throwable cause) {
 		super(message, cause);
-		this.resource = resource;
-	}
-
-	public ClientResource getResource() {
-		return resource;
 	}
 
 }

@@ -23,12 +23,6 @@ package com.blackducksoftware.integration.hub.api.item;
 
 import java.util.List;
 
-/**
- * A list of items as returned by the Hub.
- *
- * @author sbillings
- *
- */
 public class HubItems {
 	private int totalCount;
 	private List<HubItem> items;
