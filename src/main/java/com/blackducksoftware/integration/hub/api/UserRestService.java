@@ -32,7 +32,7 @@ public class UserRestService extends HubRestService<UserItem> {
 		userRequest.addQueryParameter("limit", "100");
 
 		final JsonObject jsonObject = userRequest.executeForResponseJson();
-		final List<UserItem> allUserItems = getAll(userItemListType, userRequest, jsonObject);
+		final List<UserItem> allUserItems = getAll(userItemListType, jsonObject, userRequest);
 		return allUserItems;
 	}
 

@@ -26,7 +26,7 @@ public class HubRestService<T extends HubItem> {
 		this.jsonParser = jsonParser;
 	}
 
-	public List<T> getAll(final Type type, final HubRequest hubRequest, final JsonObject jsonObject)
+	public List<T> getAll(final Type type, final JsonObject jsonObject, final HubRequest hubRequest)
 			throws BDRestException, IOException, URISyntaxException {
 		final List<T> allItems = new ArrayList<>();
 		final int totalCount = getTotalCount(jsonObject);
@@ -47,14 +47,14 @@ public class HubRestService<T extends HubItem> {
 		return allItems;
 	}
 
+	public List<T> getItems(final Type type, final JsonObject jsonObject) {
+		final List<T> items = gson.fromJson(jsonObject.get("items"), type);
+		return items;
+	}
+
 	private int getTotalCount(final JsonObject jsonObject) {
 		final int totalCount = jsonObject.get("totalCount").getAsInt();
 		return totalCount;
-	}
-
-	private List<T> getItems(final Type type, final JsonObject jsonObject) {
-		final List<T> items = gson.fromJson(jsonObject.get("items"), type);
-		return items;
 	}
 
 	public RestConnection getRestConnection() {
