@@ -254,9 +254,9 @@ public class HubIntRestService {
 					return project;
 				}
 			}
-			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName, resource);
+			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName);
 		} else if (responseCode == 404) {
-			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName, resource);
+			throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName);
 		} else {
 			throw new BDRestException("There was a problem getting a Project by this name. Project : " + projectName,
 					resource);
