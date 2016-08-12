@@ -2,28 +2,52 @@ package com.blackducksoftware.integration.hub.dataservices.transforms;
 
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
+import com.blackducksoftware.integration.hub.api.NotificationRestService;
+import com.blackducksoftware.integration.hub.api.PolicyRestService;
+import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.notification.NotificationService;
 
 public abstract class AbstractNotificationTransform {
-	public final String KEY_PROJECT_NAME = "projectName";
-	public final String KEY_PROJECT_VERSION = "projectVersionName";
-	public final String KEY_COMPONENT_NAME = "componentName";
-	public final String KEY_COMPONENT_VERSION = "componentVersionName";
+	private final NotificationRestService notificationService;
+	private final ProjectVersionRestService projectVersionService;
+	private final PolicyRestService policyService;
+	private final VersionBomPolicyRestService bomVersionPolicyService;
+	private final ComponentVersionRestService componentVersionService;
 
-	private final NotificationService notificationService;
-
-	public AbstractNotificationTransform(final NotificationService notificationService) {
+	public AbstractNotificationTransform(final NotificationRestService notificationService,
+			final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
+			final VersionBomPolicyRestService bomVersionPolicyService,
+			final ComponentVersionRestService componentVersionService) {
 		this.notificationService = notificationService;
+		this.projectVersionService = projectVersionService;
+		this.policyService = policyService;
+		this.bomVersionPolicyService = bomVersionPolicyService;
+		this.componentVersionService = componentVersionService;
 	}
 
-	public NotificationService getNotificationService() {
+	public NotificationRestService getNotificationService() {
 		return notificationService;
 	}
 
-	public abstract List<NotificationContentItem> transform(NotificationItem item) throws HubItemTransformException;
+	public ProjectVersionRestService getProjectVersionService() {
+		return projectVersionService;
+	}
 
-	public abstract String getNotificationType();
+	public PolicyRestService getPolicyService() {
+		return policyService;
+	}
+
+	public VersionBomPolicyRestService getBomVersionPolicyService() {
+		return bomVersionPolicyService;
+	}
+
+	public ComponentVersionRestService getComponentVersionService() {
+		return componentVersionService;
+	}
+
+	public abstract List<NotificationContentItem> transform(NotificationItem item) throws HubItemTransformException;
 }

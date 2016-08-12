@@ -1,21 +1,33 @@
 package com.blackducksoftware.integration.hub.dataservices.transforms;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
+import com.blackducksoftware.integration.hub.api.NotificationRestService;
+import com.blackducksoftware.integration.hub.api.PolicyRestService;
+import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.component.BomComponentVersionPolicyStatus;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
+import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
-import com.blackducksoftware.integration.hub.notification.NotificationService;
 
 public abstract class AbstractPolicyTransform extends AbstractNotificationTransform {
-	public AbstractPolicyTransform(final NotificationService notificationService) {
-		super(notificationService);
+
+	public AbstractPolicyTransform(final NotificationRestService notificationService,
+			final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
+			final VersionBomPolicyRestService bomVersionPolicyService,
+			final ComponentVersionRestService componentVersionService) {
+		super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
+				componentVersionService);
 	}
 
 	public void handleNotification(final String projectName, final List<ComponentVersionStatus> componentVersionList,
@@ -23,24 +35,24 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 			final List<NotificationContentItem> templateData) throws HubItemTransformException {
 		for (final ComponentVersionStatus componentVersion : componentVersionList) {
 			try {
-				final String componentVersionName = getNotificationService()
+				final String componentVersionName = getComponentVersionService()
 						.getComponentVersion(componentVersion.getComponentVersionLink()).getVersionName();
 				final String policyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
-				final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getNotificationService()
+				final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomVersionPolicyService()
 						.getPolicyStatus(policyStatusUrl);
 				final List<String> ruleList = getRules(
 						bomComponentVersionPolicyStatus.getLinks(BomComponentVersionPolicyStatus.POLICY_RULE_URL));
 				if (ruleList != null && !ruleList.isEmpty()) {
 					final List<String> ruleNameList = new ArrayList<String>();
 					for (final String ruleUrl : ruleList) {
-						final PolicyRule rule = getNotificationService().getPolicyRule(ruleUrl);
+						final PolicyRule rule = getPolicyService().getPolicyRule(ruleUrl);
 						ruleNameList.add(rule.getName());
 					}
 					createContents(projectName, releaseItem.getVersionName(), componentVersion.getComponentName(),
 							componentVersionName, ruleNameList, item, templateData);
 				}
 
-			} catch (final NotificationServiceException e) {
+			} catch (final NotificationServiceException | IOException | BDRestException | URISyntaxException e) {
 				throw new HubItemTransformException(e);
 			}
 		}

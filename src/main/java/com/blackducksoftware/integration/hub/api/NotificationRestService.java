@@ -50,12 +50,12 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 		dateFormatter.setTimeZone(java.util.TimeZone.getTimeZone("Zulu"));
 	}
 
-	public void getNotifications(final Date startDate, final Date endDate)
+	public List<NotificationItem> getNotifications(final Date startDate, final Date endDate)
 			throws IOException, URISyntaxException, BDRestException {
-		getNotifications(startDate, endDate, -1);
+		return getNotifications(startDate, endDate, -1);
 	}
 
-	public void getNotifications(final Date startDate, final Date endDate, final int limit)
+	public List<NotificationItem> getNotifications(final Date startDate, final Date endDate, final int limit)
 			throws IOException, URISyntaxException, BDRestException {
 		final String startDateString = dateFormatter.format(startDate);
 		final String endDateString = dateFormatter.format(endDate);
@@ -70,7 +70,6 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 		}
 		final JsonObject jsonObject = userRequest.executeForResponseJson();
 		final List<NotificationItem> allNotificationItems = getAll(notificationItemListType, jsonObject, userRequest);
-
+		return allNotificationItems;
 	}
-
 }

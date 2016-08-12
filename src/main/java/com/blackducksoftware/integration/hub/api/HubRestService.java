@@ -57,6 +57,14 @@ public class HubRestService<T extends HubItem> {
 		return totalCount;
 	}
 
+	public T getItem(final Type type, final String url) throws IOException, BDRestException, URISyntaxException {
+		final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+		projectItemRequest.setUrl(url);
+
+		final String response = projectItemRequest.executeForResponseString();
+		return getGson().fromJson(response, type);
+	}
+
 	public RestConnection getRestConnection() {
 		return restConnection;
 	}

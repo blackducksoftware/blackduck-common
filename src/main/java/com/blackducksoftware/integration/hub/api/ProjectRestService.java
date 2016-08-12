@@ -22,6 +22,8 @@ public class ProjectRestService extends HubRestService<ProjectItem> {
 	private final List<String> getProjectsSegments = Arrays.asList("api", "projects");
 	private final Type projectItemListType = new TypeToken<List<ProjectItem>>() {
 	}.getType();
+	private final Type projectItemType = new TypeToken<ProjectItem>() {
+	}.getType();
 
 	public ProjectRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
 		super(restConnection, gson, jsonParser);
@@ -71,11 +73,6 @@ public class ProjectRestService extends HubRestService<ProjectItem> {
 	}
 
 	public ProjectItem getProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
-		final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		projectItemRequest.setUrl(projectUrl);
-
-		final String response = projectItemRequest.executeForResponseString();
-		return getGson().fromJson(response, ProjectItem.class);
+		return getItem(projectItemType, projectUrl);
 	}
-
 }
