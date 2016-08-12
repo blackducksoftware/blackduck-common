@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ public class NotificationDataService extends AbstractDataService {
 	private final PolicyRestService policyService;
 	private final VersionBomPolicyRestService bomVersionPolicyService;
 	private final ComponentVersionRestService componentVersionService;
-	private Map<Class<?>, AbstractNotificationTransform> transformMap;
+	private final Map<Class<?>, AbstractNotificationTransform> transformMap;
 
 	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
 		super(restConnection, gson, jsonParser);
@@ -42,6 +43,7 @@ public class NotificationDataService extends AbstractDataService {
 		policyService = new PolicyRestService(restConnection, gson, jsonParser);
 		bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
+		transformMap = new HashMap<Class<?>, AbstractNotificationTransform>();
 		transformMap.put(RuleViolationNotificationItem.class, new PolicyViolationTransform(notificationService,
 				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
 		transformMap.put(PolicyOverrideNotificationItem.class, new PolicyViolationOverrideTransform(notificationService,
