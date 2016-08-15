@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.restlet.data.Method;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -58,10 +59,11 @@ public class HubRestService<T extends HubItem> {
 	}
 
 	public T getItem(final Type type, final String url) throws IOException, BDRestException, URISyntaxException {
-		final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		projectItemRequest.setUrl(url);
+		final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
+		itemRequest.setMethod(Method.GET);
+		itemRequest.setUrl(url);
 
-		final String response = projectItemRequest.executeForResponseString();
+		final String response = itemRequest.executeForResponseString();
 		return getGson().fromJson(response, type);
 	}
 
@@ -76,5 +78,4 @@ public class HubRestService<T extends HubItem> {
 	public JsonParser getJsonParser() {
 		return jsonParser;
 	}
-
 }
