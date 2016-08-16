@@ -38,12 +38,12 @@ public class NotificationDataService extends AbstractDataService {
 
 	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
 		super(restConnection, gson, jsonParser);
-		notificationService = new NotificationRestService(restConnection, gson, jsonParser);
+		notificationService = new NotificationRestService(restConnection, jsonParser);
 		projectVersionService = new ProjectVersionRestService(restConnection, gson, jsonParser);
 		policyService = new PolicyRestService(restConnection, gson, jsonParser);
 		bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
-		transformMap = new HashMap<Class<?>, AbstractNotificationTransform>();
+		transformMap = new HashMap<>();
 		transformMap.put(RuleViolationNotificationItem.class, new PolicyViolationTransform(notificationService,
 				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
 		transformMap.put(PolicyOverrideNotificationItem.class, new PolicyViolationOverrideTransform(notificationService,
@@ -54,7 +54,7 @@ public class NotificationDataService extends AbstractDataService {
 
 	public List<NotificationContentItem> getNotifications(final Date startDate, final Date endDate, final int limit)
 			throws IOException, URISyntaxException, BDRestException {
-		final List<NotificationContentItem> contentList = new ArrayList<NotificationContentItem>();
+		final List<NotificationContentItem> contentList = new ArrayList<>();
 		final List<NotificationItem> itemList = notificationService.getNotifications(startDate, endDate, limit);
 
 		for (final NotificationItem item : itemList) {

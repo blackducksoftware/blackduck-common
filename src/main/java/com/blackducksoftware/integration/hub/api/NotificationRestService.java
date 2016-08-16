@@ -44,7 +44,7 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 		return gsonBuilder.create();
 	}
 
-	public NotificationRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+	public NotificationRestService(final RestConnection restConnection, final JsonParser jsonParser) {
 		super(restConnection, createGsonInstance(), jsonParser);
 		dateFormatter = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
 		dateFormatter.setTimeZone(java.util.TimeZone.getTimeZone("Zulu"));

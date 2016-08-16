@@ -29,10 +29,22 @@ public class ProjectRestService extends HubRestService<ProjectItem> {
 		super(restConnection, gson, jsonParser);
 	}
 
+	public List<ProjectItem> getAllProjects() throws IOException, BDRestException, URISyntaxException {
+		final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+		projectItemRequest.setMethod(Method.GET);
+		projectItemRequest.setBatchSize(100);
+		projectItemRequest.addUrlSegments(getProjectsSegments);
+
+		final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
+		final List<ProjectItem> allProjectItems = getAll(projectItemListType, jsonObject, projectItemRequest);
+		return allProjectItems;
+	}
+
 	public List<ProjectItem> getAllProjectMatches(final String projectName)
 			throws IOException, BDRestException, URISyntaxException {
 		final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
 		projectItemRequest.setMethod(Method.GET);
+		projectItemRequest.setBatchSize(100);
 		projectItemRequest.addUrlSegments(getProjectsSegments);
 		if (StringUtils.isNotBlank(projectName)) {
 			projectItemRequest.addQueryParameter("q", "name:" + projectName);
@@ -47,12 +59,10 @@ public class ProjectRestService extends HubRestService<ProjectItem> {
 			throws IOException, BDRestException, URISyntaxException {
 		final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
 		projectItemRequest.setMethod(Method.GET);
+		projectItemRequest.setBatchSize(limit);
 		projectItemRequest.addUrlSegments(getProjectsSegments);
 		if (StringUtils.isNotBlank(projectName)) {
 			projectItemRequest.addQueryParameter("q", "name:" + projectName);
-		}
-		if (limit > 0) {
-			projectItemRequest.addQueryParameter("limit", Integer.toString(limit));
 		}
 
 		final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
@@ -75,4 +85,5 @@ public class ProjectRestService extends HubRestService<ProjectItem> {
 	public ProjectItem getProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
 		return getItem(projectItemType, projectUrl);
 	}
+
 }

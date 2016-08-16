@@ -22,10 +22,11 @@ public class HubRequest {
 	private final RestConnection restConnection;
 	private final JsonParser jsonParser;
 
-	public Method method;
-	public String url;
-	public List<String> urlSegments = new ArrayList<>();
-	public Map<String, String> queryParameters = new HashMap<>();
+	private Method method;
+	private String url;
+	private final List<String> urlSegments = new ArrayList<>();
+	private int batchSize = 10;
+	private final Map<String, String> queryParameters = new HashMap<>();
 
 	public HubRequest(final RestConnection restConnection, final JsonParser jsonParser) {
 		this.restConnection = restConnection;
@@ -76,8 +77,12 @@ public class HubRequest {
 		}
 
 		// if limit is not provided, the default is 10
+		int limit = batchSize;
+		if (limit <= 0) {
+			limit = 10;
+		}
 		if (!queryParameters.containsKey("limit") || NumberUtils.toInt(queryParameters.get("limit")) <= 0) {
-			queryParameters.put("limit", "10");
+			queryParameters.put("limit", Integer.toString(limit));
 		}
 
 		// if offset is not provided, the default is 0
@@ -118,6 +123,14 @@ public class HubRequest {
 
 	public void addUrlSegments(final List<String> urlSegment) {
 		urlSegments.addAll(urlSegment);
+	}
+
+	public int getBatchSize() {
+		return batchSize;
+	}
+
+	public void setBatchSize(final int batchSize) {
+		this.batchSize = batchSize;
 	}
 
 	public Map<String, String> getQueryParameters() {

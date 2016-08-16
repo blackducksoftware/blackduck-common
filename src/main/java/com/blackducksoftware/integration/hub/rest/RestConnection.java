@@ -72,7 +72,7 @@ import com.google.gson.JsonParser;
  *
  */
 public class RestConnection {
-	public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+	public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
 
 	private final String baseUrl;
 	private Series<Cookie> cookies;
