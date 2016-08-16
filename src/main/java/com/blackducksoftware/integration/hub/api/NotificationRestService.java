@@ -27,7 +27,6 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 	private final List<String> getNotificationSegments = Arrays.asList("api", "notifications");
 	private final Type notificationItemListType = new TypeToken<List<NotificationItem>>() {
 	}.getType();
-	private final SimpleDateFormat dateFormatter;
 
 	private final static Gson createGsonInstance() {
 		final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -46,30 +45,26 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 
 	public NotificationRestService(final RestConnection restConnection, final JsonParser jsonParser) {
 		super(restConnection, createGsonInstance(), jsonParser);
-		dateFormatter = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
-		dateFormatter.setTimeZone(java.util.TimeZone.getTimeZone("Zulu"));
 	}
 
-	public List<NotificationItem> getNotifications(final Date startDate, final Date endDate)
+	public List<NotificationItem> getAllNotifications(final Date startDate, final Date endDate)
 			throws IOException, URISyntaxException, BDRestException {
-		return getNotifications(startDate, endDate, -1);
-	}
+		final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
 
-	public List<NotificationItem> getNotifications(final Date startDate, final Date endDate, final int limit)
-			throws IOException, URISyntaxException, BDRestException {
-		final String startDateString = dateFormatter.format(startDate);
-		final String endDateString = dateFormatter.format(endDate);
+		final String startDateString = sdf.format(startDate);
+		final String endDateString = sdf.format(endDate);
 
-		final HubRequest userRequest = new HubRequest(getRestConnection(), getJsonParser());
-		userRequest.setMethod(Method.GET);
-		userRequest.addUrlSegments(getNotificationSegments);
-		userRequest.addQueryParameter("startDate", startDateString);
-		userRequest.addQueryParameter("endDate", endDateString);
-		if (limit > 0) {
-			userRequest.addQueryParameter("limit", String.valueOf(limit));
-		}
-		final JsonObject jsonObject = userRequest.executeForResponseJson();
-		final List<NotificationItem> allNotificationItems = getAll(notificationItemListType, jsonObject, userRequest);
+		final HubRequest notificationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+		notificationItemRequest.setMethod(Method.GET);
+		notificationItemRequest.setBatchSize(100);
+		notificationItemRequest.addUrlSegments(getNotificationSegments);
+		notificationItemRequest.addQueryParameter("startDate", startDateString);
+		notificationItemRequest.addQueryParameter("endDate", endDateString);
+
+		final JsonObject jsonObject = notificationItemRequest.executeForResponseJson();
+		final List<NotificationItem> allNotificationItems = getAll(notificationItemListType, jsonObject,
+				notificationItemRequest);
 		return allNotificationItems;
 	}
+
 }

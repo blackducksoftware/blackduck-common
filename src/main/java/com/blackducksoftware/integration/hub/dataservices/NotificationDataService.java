@@ -52,10 +52,10 @@ public class NotificationDataService extends AbstractDataService {
 				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
 	}
 
-	public List<NotificationContentItem> getNotifications(final Date startDate, final Date endDate, final int limit)
+	public List<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
 			throws IOException, URISyntaxException, BDRestException {
 		final List<NotificationContentItem> contentList = new ArrayList<>();
-		final List<NotificationItem> itemList = notificationService.getNotifications(startDate, endDate, limit);
+		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
 
 		for (final NotificationItem item : itemList) {
 			try {
