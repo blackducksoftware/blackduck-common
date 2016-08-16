@@ -27,12 +27,16 @@ import java.io.Reader;
 import java.net.CookieHandler;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -72,13 +76,25 @@ import com.google.gson.JsonParser;
  *
  */
 public class RestConnection {
-	public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+	public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
 
 	private final String baseUrl;
 	private Series<Cookie> cookies;
 	private int timeout = 120000;
 	private IntLogger logger;
 	private final Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
+
+	public static Date parseDateString(final String dateString) throws ParseException {
+		final SimpleDateFormat sdf = new SimpleDateFormat(JSON_DATE_FORMAT);
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return sdf.parse(dateString);
+	}
+
+	public static String formatDate(final Date date) {
+		final SimpleDateFormat sdf = new SimpleDateFormat(JSON_DATE_FORMAT);
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return sdf.format(date);
+	}
 
 	public RestConnection(final String baseUrl) {
 		this.baseUrl = baseUrl;
