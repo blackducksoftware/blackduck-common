@@ -5,6 +5,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.PolicyRestService;
@@ -35,23 +37,31 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 			final List<NotificationContentItem> templateData) throws HubItemTransformException {
 		for (final ComponentVersionStatus componentVersion : componentVersionList) {
 			try {
-				final String componentVersionName = getComponentVersionService()
-						.getComponentVersion(componentVersion.getComponentVersionLink()).getVersionName();
-				final String policyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
-				final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomVersionPolicyService()
-						.getPolicyStatus(policyStatusUrl);
-				final List<String> ruleList = getRules(
-						bomComponentVersionPolicyStatus.getLinks(BomComponentVersionPolicyStatus.POLICY_RULE_URL));
-				if (ruleList != null && !ruleList.isEmpty()) {
-					final List<String> ruleNameList = new ArrayList<String>();
-					for (final String ruleUrl : ruleList) {
-						final PolicyRule rule = getPolicyService().getPolicyRule(ruleUrl);
-						ruleNameList.add(rule.getName());
-					}
-					createContents(projectName, releaseItem.getVersionName(), componentVersion.getComponentName(),
-							componentVersionName, ruleNameList, item, templateData);
+				String componentVersionName;
+				if (StringUtils.isBlank(componentVersion.getComponentVersionLink())) {
+					componentVersionName = "";
+				} else {
+					componentVersionName = getComponentVersionService()
+							.getComponentVersion(componentVersion.getComponentVersionLink()).getVersionName();
 				}
 
+				final String policyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
+
+				if (StringUtils.isNotBlank(policyStatusUrl)) {
+					final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomVersionPolicyService()
+							.getPolicyStatus(policyStatusUrl);
+					final List<String> ruleList = getRules(
+							bomComponentVersionPolicyStatus.getLinks(BomComponentVersionPolicyStatus.POLICY_RULE_URL));
+					if (ruleList != null && !ruleList.isEmpty()) {
+						final List<String> ruleNameList = new ArrayList<String>();
+						for (final String ruleUrl : ruleList) {
+							final PolicyRule rule = getPolicyService().getPolicyRule(ruleUrl);
+							ruleNameList.add(rule.getName());
+						}
+						createContents(projectName, releaseItem.getVersionName(), componentVersion.getComponentName(),
+								componentVersionName, ruleNameList, item, templateData);
+					}
+				}
 			} catch (final NotificationServiceException | IOException | BDRestException | URISyntaxException e) {
 				throw new HubItemTransformException(e);
 			}

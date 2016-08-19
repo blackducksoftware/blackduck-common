@@ -395,35 +395,37 @@ public class RestConnection {
 	}
 
 	private void logRestletRequestOrResponse(final Message requestOrResponse) {
-		final String requestOrResponseName = requestOrResponse.getClass().getSimpleName();
-		logMessage(LogLevel.TRACE, requestOrResponseName + " : " + requestOrResponse.toString());
+		if (logger != null && logger.getLogLevel() == LogLevel.TRACE) {
+			final String requestOrResponseName = requestOrResponse.getClass().getSimpleName();
+			logMessage(LogLevel.TRACE, requestOrResponseName + " : " + requestOrResponse.toString());
 
-		if (!requestOrResponse.getAttributes().isEmpty()) {
-			logMessage(LogLevel.TRACE, requestOrResponseName + " attributes : ");
-			for (final Entry<String, Object> requestAtt : requestOrResponse.getAttributes().entrySet()) {
-				logMessage(LogLevel.TRACE, "Attribute key : " + requestAtt.getKey());
-				logMessage(LogLevel.TRACE, "Attribute value : " + requestAtt.getValue());
-				logMessage(LogLevel.TRACE, "");
-			}
-			@SuppressWarnings("unchecked")
-			final Series<Header> responseheaders = (Series<Header>) requestOrResponse.getAttributes()
-					.get(HeaderConstants.ATTRIBUTE_HEADERS);
-			if (responseheaders != null) {
-				logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
-				for (final Header header : responseheaders) {
-					if (null == header) {
-						logMessage(LogLevel.TRACE, "received a null header");
-					} else {
-						logMessage(LogLevel.TRACE, "Header name : " + header.getName());
-						logMessage(LogLevel.TRACE, "Header value : " + header.getValue());
-						logMessage(LogLevel.TRACE, "");
+			if (!requestOrResponse.getAttributes().isEmpty()) {
+				logMessage(LogLevel.TRACE, requestOrResponseName + " attributes : ");
+				for (final Entry<String, Object> requestAtt : requestOrResponse.getAttributes().entrySet()) {
+					logMessage(LogLevel.TRACE, "Attribute key : " + requestAtt.getKey());
+					logMessage(LogLevel.TRACE, "Attribute value : " + requestAtt.getValue());
+					logMessage(LogLevel.TRACE, "");
+				}
+				@SuppressWarnings("unchecked")
+				final Series<Header> responseheaders = (Series<Header>) requestOrResponse.getAttributes()
+						.get(HeaderConstants.ATTRIBUTE_HEADERS);
+				if (responseheaders != null) {
+					logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
+					for (final Header header : responseheaders) {
+						if (null == header) {
+							logMessage(LogLevel.TRACE, "received a null header");
+						} else {
+							logMessage(LogLevel.TRACE, "Header name : " + header.getName());
+							logMessage(LogLevel.TRACE, "Header value : " + header.getValue());
+							logMessage(LogLevel.TRACE, "");
+						}
 					}
+				} else {
+					logMessage(LogLevel.TRACE, requestOrResponseName + " headers : NONE");
 				}
 			} else {
-				logMessage(LogLevel.TRACE, requestOrResponseName + " headers : NONE");
+				logMessage(LogLevel.TRACE, requestOrResponseName + " does not have any attributes/headers.");
 			}
-		} else {
-			logMessage(LogLevel.TRACE, requestOrResponseName + " does not have any attributes/headers.");
 		}
 	}
 
