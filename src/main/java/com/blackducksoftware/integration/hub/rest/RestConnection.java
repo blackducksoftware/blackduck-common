@@ -395,7 +395,7 @@ public class RestConnection {
 	}
 
 	private void logRestletRequestOrResponse(final Message requestOrResponse) {
-		if (logger.getLogLevel() == LogLevel.TRACE) {
+		if (logger != null && logger.getLogLevel() == LogLevel.TRACE) {
 			final String requestOrResponseName = requestOrResponse.getClass().getSimpleName();
 			logMessage(LogLevel.TRACE, requestOrResponseName + " : " + requestOrResponse.toString());
 
