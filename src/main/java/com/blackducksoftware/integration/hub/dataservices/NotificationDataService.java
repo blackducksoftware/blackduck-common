@@ -1,5 +1,6 @@
 package com.blackducksoftware.integration.hub.dataservices;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -7,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
 
 import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.NotificationRestService;
@@ -23,7 +26,6 @@ import com.blackducksoftware.integration.hub.dataservices.transforms.PolicyViola
 import com.blackducksoftware.integration.hub.dataservices.transforms.PolicyViolationTransform;
 import com.blackducksoftware.integration.hub.dataservices.transforms.VulnerabilityTransform;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
@@ -57,16 +59,20 @@ public class NotificationDataService extends AbstractDataService {
 		final List<NotificationContentItem> contentList = new ArrayList<>();
 		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
 
+		final StringBuilder builder = new StringBuilder();
 		for (final NotificationItem item : itemList) {
 			try {
 				if (transformMap.containsKey(item.getClass())) {
 					final AbstractNotificationTransform converter = transformMap.get(item.getClass());
 					contentList.addAll(converter.transform(item));
 				}
-			} catch (final HubItemTransformException e) {
-				// transform what we can do not stop processing
+			} catch (final Exception e) {
+				builder.append("trouble transforming:" + e.getMessage() + "\n");
+				builder.append(item.toString() + "\n");
 			}
 		}
+		FileUtils.writeStringToFile(new File("/Users/ekerwin/Documents/results" + System.currentTimeMillis() + ".txt"),
+				builder.toString());
 
 		return contentList;
 	}
