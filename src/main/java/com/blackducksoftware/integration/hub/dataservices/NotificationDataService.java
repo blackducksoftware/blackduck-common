@@ -1,6 +1,5 @@
 package com.blackducksoftware.integration.hub.dataservices;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -8,8 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
 
 import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.NotificationRestService;
@@ -59,7 +56,6 @@ public class NotificationDataService extends AbstractDataService {
 		final List<NotificationContentItem> contentList = new ArrayList<>();
 		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
 
-		final StringBuilder builder = new StringBuilder();
 		for (final NotificationItem item : itemList) {
 			try {
 				if (transformMap.containsKey(item.getClass())) {
@@ -67,12 +63,8 @@ public class NotificationDataService extends AbstractDataService {
 					contentList.addAll(converter.transform(item));
 				}
 			} catch (final Exception e) {
-				builder.append("trouble transforming:" + e.getMessage() + "\n");
-				builder.append(item.toString() + "\n");
 			}
 		}
-		FileUtils.writeStringToFile(new File("/Users/ekerwin/Documents/results" + System.currentTimeMillis() + ".txt"),
-				builder.toString());
 
 		return contentList;
 	}
