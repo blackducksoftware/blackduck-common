@@ -23,7 +23,6 @@ import com.blackducksoftware.integration.hub.dataservices.transforms.PolicyViola
 import com.blackducksoftware.integration.hub.dataservices.transforms.PolicyViolationTransform;
 import com.blackducksoftware.integration.hub.dataservices.transforms.VulnerabilityTransform;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
@@ -63,8 +62,7 @@ public class NotificationDataService extends AbstractDataService {
 					final AbstractNotificationTransform converter = transformMap.get(item.getClass());
 					contentList.addAll(converter.transform(item));
 				}
-			} catch (final HubItemTransformException e) {
-				// transform what we can do not stop processing
+			} catch (final Exception e) {
 			}
 		}
 

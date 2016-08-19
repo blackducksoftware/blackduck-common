@@ -31,7 +31,7 @@ public class PolicyViolationTransform extends AbstractPolicyTransform {
 
 	@Override
 	public List<NotificationContentItem> transform(final NotificationItem item) throws HubItemTransformException {
-		final List<NotificationContentItem> templateData = new ArrayList<NotificationContentItem>();
+		final List<NotificationContentItem> templateData = new ArrayList<>();
 		try {
 			final RuleViolationNotificationItem policyViolation = (RuleViolationNotificationItem) item;
 			final String projectName = policyViolation.getContent().getProjectName();
@@ -43,6 +43,8 @@ public class PolicyViolationTransform extends AbstractPolicyTransform {
 			handleNotification(projectName, componentVersionList, releaseItem, item, templateData);
 		} catch (final IOException | BDRestException | URISyntaxException e) {
 			throw new HubItemTransformException(e);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
 		}
 
 		return templateData;
