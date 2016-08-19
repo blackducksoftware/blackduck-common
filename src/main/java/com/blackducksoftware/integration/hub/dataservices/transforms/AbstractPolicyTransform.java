@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,6 +15,7 @@ import com.blackducksoftware.integration.hub.api.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.component.BomComponentVersionPolicyStatus;
+import com.blackducksoftware.integration.hub.api.component.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
@@ -23,6 +26,10 @@ import com.blackducksoftware.integration.hub.exception.HubItemTransformException
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 
 public abstract class AbstractPolicyTransform extends AbstractNotificationTransform {
+
+	private final Map<String, PolicyRule> policyRuleMap = new ConcurrentHashMap<>();
+	private final Map<String, ComponentVersion> componentVersionMap = new ConcurrentHashMap<>();
+	private final Map<String, BomComponentVersionPolicyStatus> bomComponentPolicyStatusMap = new ConcurrentHashMap<>();
 
 	public AbstractPolicyTransform(final NotificationRestService notificationService,
 			final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
@@ -38,24 +45,41 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 		for (final ComponentVersionStatus componentVersion : componentVersionList) {
 			try {
 				String componentVersionName;
-				if (StringUtils.isBlank(componentVersion.getComponentVersionLink())) {
+				final String componentVersionLink = componentVersion.getComponentVersionLink();
+				if (StringUtils.isBlank(componentVersionLink)) {
 					componentVersionName = "";
 				} else {
-					componentVersionName = getComponentVersionService()
-							.getComponentVersion(componentVersion.getComponentVersionLink()).getVersionName();
+					ComponentVersion compVersion;
+					if (componentVersionMap.containsKey(componentVersionLink)) {
+						compVersion = componentVersionMap.get(componentVersionLink);
+					} else {
+						compVersion = getComponentVersionService().getComponentVersion(componentVersionLink);
+						componentVersionMap.put(componentVersionLink, compVersion);
+					}
+					componentVersionName = compVersion.getVersionName();
 				}
 
 				final String policyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
 
 				if (StringUtils.isNotBlank(policyStatusUrl)) {
-					final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomVersionPolicyService()
-							.getPolicyStatus(policyStatusUrl);
+					BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus;
+					if (bomComponentPolicyStatusMap.containsKey(policyStatusUrl)) {
+						bomComponentVersionPolicyStatus = bomComponentPolicyStatusMap.get(policyStatusUrl);
+					} else {
+						bomComponentVersionPolicyStatus = getBomVersionPolicyService().getPolicyStatus(policyStatusUrl);
+					}
 					final List<String> ruleList = getRules(
 							bomComponentVersionPolicyStatus.getLinks(BomComponentVersionPolicyStatus.POLICY_RULE_URL));
 					if (ruleList != null && !ruleList.isEmpty()) {
 						final List<String> ruleNameList = new ArrayList<String>();
 						for (final String ruleUrl : ruleList) {
-							final PolicyRule rule = getPolicyService().getPolicyRule(ruleUrl);
+							PolicyRule rule;
+							if (policyRuleMap.containsKey(ruleUrl)) {
+								rule = policyRuleMap.get(ruleUrl);
+							} else {
+								rule = getPolicyService().getPolicyRule(ruleUrl);
+								policyRuleMap.put(ruleUrl, rule);
+							}
 							ruleNameList.add(rule.getName());
 						}
 						createContents(projectName, releaseItem.getVersionName(), componentVersion.getComponentName(),
@@ -101,4 +125,11 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 	public abstract void createContents(String projectName, String projectVersion, String componentName,
 			String componentVersion, List<String> policyNameList, NotificationItem item,
 			List<NotificationContentItem> templateData);
+
+	@Override
+	public void reset() {
+		policyRuleMap.clear();
+		bomComponentPolicyStatusMap.clear();
+		componentVersionMap.clear();
+	}
 }

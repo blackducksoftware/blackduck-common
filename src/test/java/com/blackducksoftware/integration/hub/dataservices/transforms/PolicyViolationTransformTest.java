@@ -36,6 +36,7 @@ public class PolicyViolationTransformTest {
 	private final static String COMPONENT_NAME = "component 1";
 	private final static String COMPONENT_VERSION = "0.9.8";
 	private final static String POLICY_NAME = "Policy Name";
+	private final static String PROJECT_VERSION_LINK = "projectversionlink";
 
 	private NotificationRestService notificationService;
 	private ProjectVersionRestService projectVersionService;
@@ -107,6 +108,7 @@ public class PolicyViolationTransformTest {
 	private RuleViolationNotificationItem createNotificationItem() {
 		final RuleViolationNotificationItem item = Mockito.mock(RuleViolationNotificationItem.class);
 		final RuleViolationNotificationContent content = Mockito.mock(RuleViolationNotificationContent.class);
+		Mockito.when(content.getProjectVersionLink()).thenReturn(PROJECT_VERSION_LINK);
 		final List<ComponentVersionStatus> versionStatusList = new ArrayList<>();
 		final ComponentVersionStatus status = Mockito.mock(ComponentVersionStatus.class);
 		Mockito.when(status.getComponentName()).thenReturn(COMPONENT_NAME);

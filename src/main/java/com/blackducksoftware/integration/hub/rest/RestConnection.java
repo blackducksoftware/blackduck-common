@@ -46,9 +46,9 @@ import org.restlet.Response;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.Cookie;
 import org.restlet.data.CookieSetting;
+import org.restlet.data.Header;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.engine.header.Header;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -411,7 +411,7 @@ public class RestConnection {
 						.get(HeaderConstants.ATTRIBUTE_HEADERS);
 				if (responseheaders != null) {
 					logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
-					for (final org.restlet.engine.header.Header header : responseheaders) {
+					for (final Header header : responseheaders) {
 						if (null == header) {
 							logMessage(LogLevel.TRACE, "received a null header");
 						} else {

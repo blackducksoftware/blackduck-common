@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.NotificationRestService;
@@ -20,6 +22,8 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
 public class PolicyViolationTransform extends AbstractPolicyTransform {
+
+	private final Map<String, ReleaseItem> releaseItemMap = new ConcurrentHashMap<>();
 
 	public PolicyViolationTransform(final NotificationRestService notificationService,
 			final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
@@ -38,8 +42,13 @@ public class PolicyViolationTransform extends AbstractPolicyTransform {
 			final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent()
 					.getComponentVersionStatuses();
 			ReleaseItem releaseItem;
-			releaseItem = getProjectVersionService()
-					.getProjectVersionReleaseItem(policyViolation.getContent().getProjectVersionLink());
+			final String projectVersionLink = policyViolation.getContent().getProjectVersionLink();
+			if (releaseItemMap.containsKey(projectVersionLink)) {
+				releaseItem = releaseItemMap.get(projectVersionLink);
+			} else {
+				releaseItem = getProjectVersionService().getProjectVersionReleaseItem(projectVersionLink);
+				releaseItemMap.put(projectVersionLink, releaseItem);
+			}
 			handleNotification(projectName, componentVersionList, releaseItem, item, templateData);
 		} catch (final IOException | BDRestException | URISyntaxException e) {
 			throw new HubItemTransformException(e);
@@ -54,5 +63,11 @@ public class PolicyViolationTransform extends AbstractPolicyTransform {
 			final List<NotificationContentItem> templateData) {
 		templateData.add(new PolicyViolationContentItem(projectName, projectVersion, componentName, componentVersion,
 				policyNameList));
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		releaseItemMap.clear();
 	}
 }
