@@ -8,12 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 
 import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.NotificationRestService;
@@ -30,6 +24,7 @@ import com.blackducksoftware.integration.hub.dataservices.transforms.PolicyViola
 import com.blackducksoftware.integration.hub.dataservices.transforms.PolicyViolationTransform;
 import com.blackducksoftware.integration.hub.dataservices.transforms.VulnerabilityTransform;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
@@ -41,8 +36,9 @@ public class NotificationDataService extends AbstractDataService {
 	private final VersionBomPolicyRestService bomVersionPolicyService;
 	private final ComponentVersionRestService componentVersionService;
 	private final Map<Class<?>, AbstractNotificationTransform> transformMap;
-	private final ExecutorService executorService;
-	private final ExecutorCompletionService<List<NotificationContentItem>> completionService;
+	// private final ExecutorService executorService;
+	// private final ExecutorCompletionService<List<NotificationContentItem>>
+	// completionService;
 
 	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
 		super(restConnection, gson, jsonParser);
@@ -59,9 +55,11 @@ public class NotificationDataService extends AbstractDataService {
 		transformMap.put(VulnerabilityNotificationItem.class, new VulnerabilityTransform(notificationService,
 				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
 
-		final ThreadFactory threadFactory = Executors.defaultThreadFactory();
-		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
-		completionService = new ExecutorCompletionService<>(executorService);
+		// final ThreadFactory threadFactory = Executors.defaultThreadFactory();
+		// executorService =
+		// Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()
+		// / 2, threadFactory);
+		// completionService = new ExecutorCompletionService<>(executorService);
 	}
 
 	public List<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
@@ -69,27 +67,41 @@ public class NotificationDataService extends AbstractDataService {
 		final List<NotificationContentItem> contentList = new ArrayList<>();
 		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
 
-		final int count = itemList.size();
+		// final int count = itemList.size();
 		for (final Map.Entry<Class<?>, AbstractNotificationTransform> entry : transformMap.entrySet()) {
 			entry.getValue().reset();
 		}
 
 		for (final NotificationItem item : itemList) {
-			if (transformMap.containsKey(item.getClass())) {
-				final AbstractNotificationTransform converter = transformMap.get(item.getClass());
-				final TransformCallable callable = new TransformCallable(item, converter);
-				completionService.submit(callable);
-			}
-		}
-
-		for (int index = 0; index < count; index++) {
 			try {
-				final Future<List<NotificationContentItem>> future = completionService.take();
-				contentList.addAll(future.get());
-			} catch (final ExecutionException | InterruptedException e) {
-
+				if (transformMap.containsKey(item.getClass())) {
+					final AbstractNotificationTransform converter = transformMap.get(item.getClass());
+					contentList.addAll(converter.transform(item));
+				}
+			} catch (final HubItemTransformException e) {
+				// transform what we can do not stop processing
 			}
 		}
+
+		// for (final NotificationItem item : itemList) {
+		// if (transformMap.containsKey(item.getClass())) {
+		// final AbstractNotificationTransform converter =
+		// transformMap.get(item.getClass());
+		// final TransformCallable callable = new TransformCallable(item,
+		// converter);
+		// completionService.submit(callable);
+		// }
+		// }
+		//
+		// for (int index = 0; index < count; index++) {
+		// try {
+		// final Future<List<NotificationContentItem>> future =
+		// completionService.take();
+		// contentList.addAll(future.get());
+		// } catch (final ExecutionException | InterruptedException e) {
+		//
+		// }
+		// }
 
 		return contentList;
 	}

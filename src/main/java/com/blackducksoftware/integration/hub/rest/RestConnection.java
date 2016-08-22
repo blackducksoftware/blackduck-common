@@ -31,6 +31,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +41,7 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.Message;
 import org.restlet.Response;
@@ -49,6 +51,7 @@ import org.restlet.data.CookieSetting;
 import org.restlet.data.Header;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.data.Protocol;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -83,6 +86,7 @@ public class RestConnection {
 	private int timeout = 120000;
 	private IntLogger logger;
 	private final Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
+	private final Client client;
 
 	public static Date parseDateString(final String dateString) throws ParseException {
 		final SimpleDateFormat sdf = new SimpleDateFormat(JSON_DATE_FORMAT);
@@ -98,6 +102,11 @@ public class RestConnection {
 
 	public RestConnection(final String baseUrl) {
 		this.baseUrl = baseUrl;
+		final Context context = new Context();
+		final List<Protocol> protocolList = new ArrayList<>();
+		protocolList.add(Protocol.HTTP);
+		protocolList.add(Protocol.HTTPS);
+		client = new Client(context, protocolList);
 	}
 
 	public void setLogger(final IntLogger logger) {
@@ -193,48 +202,50 @@ public class RestConnection {
 	public int setCookies(final String hubUserName, final String hubPassword)
 			throws URISyntaxException, BDRestException {
 		final ClientResource resource = createClientResource();
-		resource.addSegment("j_spring_security_check");
-		resource.setMethod(Method.POST);
+		try {
+			resource.addSegment("j_spring_security_check");
+			resource.setMethod(Method.POST);
 
-		final StringRepresentation stringRep = new StringRepresentation(
-				"j_username=" + hubUserName + "&j_password=" + hubPassword);
-		stringRep.setCharacterSet(CharacterSet.UTF_8);
-		stringRep.setMediaType(MediaType.APPLICATION_WWW_FORM);
-		resource.getRequest().setEntity(stringRep);
+			final StringRepresentation stringRep = new StringRepresentation(
+					"j_username=" + hubUserName + "&j_password=" + hubPassword);
+			stringRep.setCharacterSet(CharacterSet.UTF_8);
+			stringRep.setMediaType(MediaType.APPLICATION_WWW_FORM);
+			resource.getRequest().setEntity(stringRep);
 
-		handleRequest(resource);
+			handleRequest(resource);
 
-		final int statusCode = resource.getResponse().getStatus().getCode();
-		if (isSuccess(statusCode)) {
-			final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
-			final Series<Cookie> requestCookies = resource.getRequest().getCookies();
-			if (cookieSettings != null && !cookieSettings.isEmpty()) {
-				for (final CookieSetting ck : cookieSettings) {
-					if (ck == null) {
-						continue;
+			final int statusCode = resource.getResponse().getStatus().getCode();
+			if (isSuccess(statusCode)) {
+				final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
+				final Series<Cookie> requestCookies = resource.getRequest().getCookies();
+				if (cookieSettings != null && !cookieSettings.isEmpty()) {
+					for (final CookieSetting ck : cookieSettings) {
+						if (ck == null) {
+							continue;
+						}
+						final Cookie cookie = new Cookie();
+						cookie.setName(ck.getName());
+						cookie.setDomain(ck.getDomain());
+						cookie.setPath(ck.getPath());
+						cookie.setValue(ck.getValue());
+						cookie.setVersion(ck.getVersion());
+						requestCookies.add(cookie);
 					}
-					final Cookie cookie = new Cookie();
-					cookie.setName(ck.getName());
-					cookie.setDomain(ck.getDomain());
-					cookie.setPath(ck.getPath());
-					cookie.setValue(ck.getValue());
-					cookie.setVersion(ck.getVersion());
-					requestCookies.add(cookie);
 				}
-			}
 
-			if (requestCookies == null || requestCookies.size() == 0) {
-				throw new BDRestException(
-						"Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies",
-						resource);
+				if (requestCookies == null || requestCookies.size() == 0) {
+					throw new BDRestException(
+							"Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies",
+							resource);
+				}
+				cookies = requestCookies;
+			} else {
+				throw new BDRestException(resource.getResponse().getStatus().toString(), resource);
 			}
-
-			cookies = requestCookies;
-		} else {
-			throw new BDRestException(resource.getResponse().getStatus().toString(), resource);
+			return statusCode;
+		} finally {
+			releaseResource(resource);
 		}
-
-		return resource.getResponse().getStatus().getCode();
 	}
 
 	public Series<Cookie> getCookies() {
@@ -257,16 +268,21 @@ public class RestConnection {
 	public <T> T httpGetFromAbsoluteUrl(final Class<T> modelClass, final String url)
 			throws ResourceDoesNotExistException, URISyntaxException, IOException, BDRestException {
 		final ClientResource resource = createClientResource(url);
-		resource.setMethod(Method.GET);
-		handleRequest(resource);
+		try {
+			resource.setMethod(Method.GET);
+			handleRequest(resource);
 
-		logMessage(LogLevel.DEBUG, "Resource: " + resource);
-		final int responseCode = getResponseStatusCode(resource);
-		if (isSuccess(responseCode)) {
-			return parseResponse(modelClass, resource);
-		} else {
-			throw new ResourceDoesNotExistException(
-					"Error getting resource from " + url + ": " + responseCode + "; " + resource.toString(), resource);
+			logMessage(LogLevel.DEBUG, "Resource: " + resource);
+			final int responseCode = getResponseStatusCode(resource);
+			if (isSuccess(responseCode)) {
+				return parseResponse(modelClass, resource);
+			} else {
+				throw new ResourceDoesNotExistException(
+						"Error getting resource from " + url + ": " + responseCode + "; " + resource.toString(),
+						resource);
+			}
+		} finally {
+			releaseResource(resource);
 		}
 	}
 
@@ -293,20 +309,31 @@ public class RestConnection {
 			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
 
 		final ClientResource resource = createClientResource(urlSegments, queryParameters);
-		resource.setMethod(Method.GET);
-		handleRequest(resource);
+		try {
+			resource.setMethod(Method.GET);
+			handleRequest(resource);
 
-		logMessage(LogLevel.DEBUG, "Resource: " + resource);
-		final int responseCode = getResponseStatusCode(resource);
+			logMessage(LogLevel.DEBUG, "Resource: " + resource);
+			final int responseCode = getResponseStatusCode(resource);
 
-		if (isSuccess(responseCode)) {
-			return parseResponse(modelClass, resource);
-		} else {
-			throw new ResourceDoesNotExistException(
-					"Error getting resource from relative url segments " + urlSegments + " and query parameters "
-							+ queryParameters + "; errorCode: " + responseCode + "; " + resource.toString(),
-					resource);
+			if (isSuccess(responseCode)) {
+				return parseResponse(modelClass, resource);
+			} else {
+				throw new ResourceDoesNotExistException(
+						"Error getting resource from relative url segments " + urlSegments + " and query parameters "
+								+ queryParameters + "; errorCode: " + responseCode + "; " + resource.toString(),
+						resource);
+			}
+		} finally {
+			releaseResource(resource);
 		}
+	}
+
+	private void releaseResource(final ClientResource resource) {
+		if (resource.getResponse() != null) {
+			resource.getResponse().release();
+		}
+		resource.release();
 	}
 
 	public ClientResource createClientResource() throws URISyntaxException {
@@ -314,20 +341,31 @@ public class RestConnection {
 	}
 
 	public ClientResource createClientResource(final String providedUrl) throws URISyntaxException {
-		final Context context = new Context();
 
-		// the socketTimeout parameter is used in the httpClient extension that
-		// we do not use
-		// We can probably remove this parameter
 		final String stringTimeout = String.valueOf(timeout);
+		// final String idleCheckInterval = String.valueOf(timeout / 2);
 
-		context.getParameters().add("socketTimeout", stringTimeout);
+		client.getContext().getParameters().add("socketTimeout", stringTimeout);
 
-		context.getParameters().add("socketConnectTimeoutMs", stringTimeout);
-		context.getParameters().add("readTimeout", stringTimeout);
+		client.getContext().getParameters().add("socketConnectTimeoutMs", stringTimeout);
+		client.getContext().getParameters().add("readTimeout", stringTimeout);
+		// client.getContext().getParameters().add("idleTimeout",
+		// stringTimeout);
+		// client.getContext().getParameters().add("idleCheckInterval",
+		// idleCheckInterval);
+
+		// set the connection pool parameters for the httpClient. Since we are
+		// connecting to one hub instance then the maxConnections per host can
+		// be equal to the maxTotalConnections. If this rest connection object
+		// connects to more than one hub instance then the maxConnectionsPerHost
+		// would need to be divided by the number of hub instances.
+		// client.getContext().getParameters().add("maxConnectionsPerHost",
+		// "50");
+		// client.getContext().getParameters().add("maxTotalConnections", "50");
 		// Should throw timeout exception after the specified timeout, default
 		// is 2 minutes
-		final ClientResource resource = new ClientResource(context, new URI(providedUrl));
+		final ClientResource resource = new ClientResource(client.getContext(), new URI(providedUrl));
+		resource.setNext(client);
 		resource.getRequest().setCookies(getCookies());
 		return resource;
 	}
@@ -381,15 +419,12 @@ public class RestConnection {
 	public String readResponseAsString(final Response response) throws IOException {
 		final StringBuilder sb = new StringBuilder();
 		final Reader reader = response.getEntity().getReader();
-		final BufferedReader bufReader = new BufferedReader(reader);
-		try {
+		try (final BufferedReader bufReader = new BufferedReader(reader)) {
 			String line;
 			while ((line = bufReader.readLine()) != null) {
 				sb.append(line);
 				sb.append("\n");
 			}
-		} finally {
-			bufReader.close();
 		}
 		return sb.toString();
 	}
@@ -476,9 +511,13 @@ public class RestConnection {
 			throws ResourceDoesNotExistException, URISyntaxException, IOException, BDRestException {
 
 		final ClientResource resource = createClientResource(url);
-		resource.setMethod(Method.POST);
-		resource.getRequest().setEntity(content);
-		return handleHttpPost(resource);
+		try {
+			resource.setMethod(Method.POST);
+			resource.getRequest().setEntity(content);
+			return handleHttpPost(resource);
+		} finally {
+			releaseResource(resource);
+		}
 	}
 
 	public String httpPostFromRelativeUrl(final List<String> urlSegments, final Representation content)
@@ -492,9 +531,13 @@ public class RestConnection {
 			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
 
 		final ClientResource resource = createClientResource(urlSegments, queryParameters);
-		resource.setMethod(Method.POST);
-		resource.getRequest().setEntity(content);
-		return handleHttpPost(resource);
+		try {
+			resource.setMethod(Method.POST);
+			resource.getRequest().setEntity(content);
+			return handleHttpPost(resource);
+		} finally {
+			releaseResource(resource);
+		}
 	}
 
 	private String handleHttpPost(final ClientResource resource)
