@@ -349,19 +349,14 @@ public class RestConnection {
 
 		client.getContext().getParameters().add("socketConnectTimeoutMs", stringTimeout);
 		client.getContext().getParameters().add("readTimeout", stringTimeout);
-		// client.getContext().getParameters().add("idleTimeout",
-		// stringTimeout);
-		// client.getContext().getParameters().add("idleCheckInterval",
-		// idleCheckInterval);
 
 		// set the connection pool parameters for the httpClient. Since we are
 		// connecting to one hub instance then the maxConnections per host can
 		// be equal to the maxTotalConnections. If this rest connection object
 		// connects to more than one hub instance then the maxConnectionsPerHost
 		// would need to be divided by the number of hub instances.
-		// client.getContext().getParameters().add("maxConnectionsPerHost",
-		// "50");
-		// client.getContext().getParameters().add("maxTotalConnections", "50");
+		client.getContext().getParameters().add("maxConnectionsPerHost", "100");
+		client.getContext().getParameters().add("maxTotalConnections", "100");
 		// Should throw timeout exception after the specified timeout, default
 		// is 2 minutes
 		final ClientResource resource = new ClientResource(client.getContext(), new URI(providedUrl));
