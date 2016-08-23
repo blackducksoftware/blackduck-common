@@ -14,6 +14,7 @@ import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
@@ -65,11 +66,12 @@ public class PolicyViolationOverrideTransform extends AbstractPolicyTransform {
 	@Override
 	public void createContents(final ProjectVersion projectVersion,
 			final String componentName,
-			final String componentVersion,final UUID componentId, final UUID componentVersionId, final List<String> policyNameList, final NotificationItem item,
+			final String componentVersion, final UUID componentId, final UUID componentVersionId,
+			final List<PolicyRule> policyRuleList, final NotificationItem item,
 			final List<NotificationContentItem> templateData) {
 		final PolicyOverrideNotificationItem policyOverride = (PolicyOverrideNotificationItem) item;
 		templateData.add(new PolicyOverrideContentItem(projectVersion, componentName, componentVersion, componentId,
 				componentVersionId,
-				policyNameList, policyOverride.getContent().getFirstName(), policyOverride.getContent().getLastName()));
+				policyRuleList, policyOverride.getContent().getFirstName(), policyOverride.getContent().getLastName()));
 	}
 }

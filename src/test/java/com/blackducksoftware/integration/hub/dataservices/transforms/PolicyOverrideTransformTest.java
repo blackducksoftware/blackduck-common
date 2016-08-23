@@ -1,7 +1,6 @@
 package com.blackducksoftware.integration.hub.dataservices.transforms;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -48,7 +47,6 @@ public class PolicyOverrideTransformTest {
 	private VersionBomPolicyRestService bomVersionPolicyService;
 	private ComponentVersionRestService componentVersionService;
 	private PolicyViolationOverrideTransform transformer;
-	private List<String> policyNameList;
 
 	private NotificationRestService createNotificationService() {
 		final NotificationRestService service = Mockito.mock(NotificationRestService.class);
@@ -101,9 +99,6 @@ public class PolicyOverrideTransformTest {
 		policyService = createPolicyService();
 		bomVersionPolicyService = createBomVersionService();
 		componentVersionService = createComponentVersionService();
-		policyNameList = new ArrayList<>();
-		policyNameList.add("Policy 1");
-		policyNameList.add("Policy 2");
 		transformer = new PolicyViolationOverrideTransform(notificationService, projectVersionService, policyService,
 				bomVersionPolicyService, componentVersionService);
 
@@ -114,6 +109,7 @@ public class PolicyOverrideTransformTest {
 		final PolicyOverrideNotificationContent content = Mockito.mock(PolicyOverrideNotificationContent.class);
 		final List<ComponentVersionStatus> versionStatusList = new ArrayList<>();
 		final ComponentVersionStatus status = Mockito.mock(ComponentVersionStatus.class);
+		Mockito.when(content.getBomComponentVersionPolicyStatusLink()).thenReturn("PolicyRule");
 		Mockito.when(content.getComponentName()).thenReturn(COMPONENT_NAME);
 		Mockito.when(content.getComponentVersionLink())
 		.thenReturn("/" + ComponentVersionStatus.COMPONENT_URL_IDENTIFIER + "/" + COMPONENT_ID + "/"
@@ -139,8 +135,8 @@ public class PolicyOverrideTransformTest {
 			assertEquals(COMPONENT_VERSION_ID, contentItem.getComponentVersionId());
 			assertEquals(FIRST_NAME, contentItem.getFirstName());
 			assertEquals(LAST_NAME, contentItem.getLastName());
-			assertEquals(1, contentItem.getPolicyNameList().size());
-			assertTrue(contentItem.getPolicyNameList().contains(POLICY_NAME));
+			assertEquals(1, contentItem.getPolicyRuleList().size());
+			assertEquals(POLICY_NAME, contentItem.getPolicyRuleList().get(0).getName());
 		}
 	}
 }

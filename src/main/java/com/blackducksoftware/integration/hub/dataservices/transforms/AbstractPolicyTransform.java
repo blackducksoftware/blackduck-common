@@ -55,14 +55,14 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 					final List<String> ruleList = getRules(
 							bomComponentVersionPolicyStatus.getLinks(BomComponentVersionPolicyStatus.POLICY_RULE_URL));
 					if (ruleList != null && !ruleList.isEmpty()) {
-						final List<String> ruleNameList = new ArrayList<String>();
+						final List<PolicyRule> policyRuleList = new ArrayList<PolicyRule>();
 						for (final String ruleUrl : ruleList) {
 							final PolicyRule rule = getPolicyService().getPolicyRule(ruleUrl);
-							ruleNameList.add(rule.getName());
+							policyRuleList.add(rule);
 						}
 						createContents(projectVersion, componentVersion.getComponentName(), componentVersionName,
 								componentVersion.getComponentId(), componentVersion.getComponentVersionId(),
-								ruleNameList, item, templateData);
+								policyRuleList, item, templateData);
 					}
 				}
 			} catch (final NotificationServiceException | IOException | BDRestException | URISyntaxException
@@ -103,6 +103,7 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 	}
 
 	public abstract void createContents(final ProjectVersion projectVersion, final String componentName,
-			final String componentVersion,final UUID componentId, final UUID componentVersionId, List<String> policyNameList, NotificationItem item,
+			final String componentVersion, final UUID componentId, final UUID componentVersionId,
+			List<PolicyRule> policyRuleList, NotificationItem item,
 			List<NotificationContentItem> templateData);
 }

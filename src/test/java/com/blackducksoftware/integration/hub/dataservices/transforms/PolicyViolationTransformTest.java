@@ -1,7 +1,6 @@
 package com.blackducksoftware.integration.hub.dataservices.transforms;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -28,6 +27,7 @@ import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.items.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 
 public class PolicyViolationTransformTest {
@@ -46,7 +46,6 @@ public class PolicyViolationTransformTest {
 	private VersionBomPolicyRestService bomVersionPolicyService;
 	private ComponentVersionRestService componentVersionService;
 	private PolicyViolationTransform transformer;
-	private List<String> policyNameList;
 
 	private NotificationRestService createNotificationService() {
 		final NotificationRestService service = Mockito.mock(NotificationRestService.class);
@@ -99,23 +98,23 @@ public class PolicyViolationTransformTest {
 		policyService = createPolicyService();
 		bomVersionPolicyService = createBomVersionService();
 		componentVersionService = createComponentVersionService();
-		policyNameList = new ArrayList<>();
-		policyNameList.add("Policy 1");
-		policyNameList.add("Policy 2");
 		transformer = new PolicyViolationTransform(notificationService, projectVersionService, policyService,
 				bomVersionPolicyService, componentVersionService);
 
 	}
 
-	private RuleViolationNotificationItem createNotificationItem() {
+	private RuleViolationNotificationItem createNotificationItem() throws MissingUUIDException {
 		final RuleViolationNotificationItem item = Mockito.mock(RuleViolationNotificationItem.class);
 		final RuleViolationNotificationContent content = Mockito.mock(RuleViolationNotificationContent.class);
 		final List<ComponentVersionStatus> versionStatusList = new ArrayList<>();
 		final ComponentVersionStatus status = Mockito.mock(ComponentVersionStatus.class);
 		Mockito.when(status.getComponentName()).thenReturn(COMPONENT_NAME);
+		Mockito.when(status.getBomComponentVersionPolicyStatusLink()).thenReturn("PolicyRule");
 		Mockito.when(status.getComponentVersionLink())
 		.thenReturn("/" + ComponentVersionStatus.COMPONENT_URL_IDENTIFIER + "/" + COMPONENT_ID + "/"
 				+ ComponentVersionStatus.COMPONENT_VERSION_URL_IDENTIFIER + "/" + COMPONENT_VERSION_ID);
+		Mockito.when(status.getComponentId()).thenReturn(COMPONENT_ID);
+		Mockito.when(status.getComponentVersionId()).thenReturn(COMPONENT_VERSION_ID);
 		versionStatusList.add(status);
 		Mockito.when(item.getContent()).thenReturn(content);
 		Mockito.when(content.getProjectName()).thenReturn(PROJECT_NAME);
@@ -134,8 +133,8 @@ public class PolicyViolationTransformTest {
 			assertEquals(COMPONENT_VERSION, contentItem.getComponentVersion());
 			assertEquals(COMPONENT_ID, contentItem.getComponentId());
 			assertEquals(COMPONENT_VERSION_ID, contentItem.getComponentVersionId());
-			assertEquals(1, contentItem.getPolicyNameList().size());
-			assertTrue(contentItem.getPolicyNameList().contains(POLICY_NAME));
+			assertEquals(1, contentItem.getPolicyRuleList().size());
+			assertEquals(POLICY_NAME, contentItem.getPolicyRuleList().get(0).getName());
 		}
 	}
 }
