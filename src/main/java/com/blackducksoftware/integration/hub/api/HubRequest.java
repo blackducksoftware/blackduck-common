@@ -35,11 +35,10 @@ public class HubRequest {
 
 	public JsonObject executeForResponseJson() throws IOException, URISyntaxException, BDRestException {
 		final ClientResource clientResource = buildClientResource(restConnection);
-		Response response = null;
 		try {
 			restConnection.handleRequest(clientResource);
 
-			response = clientResource.getResponse();
+			final Response response = clientResource.getResponse();
 			final int responseCode = response.getStatus().getCode();
 			if (restConnection.isSuccess(responseCode)) {
 				final String responseString = restConnection.readResponseAsString(response);
@@ -56,11 +55,10 @@ public class HubRequest {
 
 	public String executeForResponseString() throws IOException, URISyntaxException, BDRestException {
 		final ClientResource clientResource = buildClientResource(restConnection);
-		Response response = null;
 		try {
 			restConnection.handleRequest(clientResource);
 
-			response = clientResource.getResponse();
+			final Response response = clientResource.getResponse();
 			final int responseCode = response.getStatus().getCode();
 			if (restConnection.isSuccess(responseCode)) {
 				final String responseString = restConnection.readResponseAsString(response);
