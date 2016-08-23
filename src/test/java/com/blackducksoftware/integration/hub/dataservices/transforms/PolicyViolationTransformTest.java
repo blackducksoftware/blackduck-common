@@ -1,12 +1,12 @@
 package com.blackducksoftware.integration.hub.dataservices.transforms;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +27,7 @@ import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.items.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 
 public class PolicyViolationTransformTest {
@@ -35,6 +36,8 @@ public class PolicyViolationTransformTest {
 	private final static String PROJECT_VERSION = "0.1.0";
 	private final static String COMPONENT_NAME = "component 1";
 	private final static String COMPONENT_VERSION = "0.9.8";
+	private final static UUID COMPONENT_ID = UUID.randomUUID();
+	private final static UUID COMPONENT_VERSION_ID = UUID.randomUUID();
 	private final static String POLICY_NAME = "Policy Name";
 
 	private NotificationRestService notificationService;
@@ -43,7 +46,6 @@ public class PolicyViolationTransformTest {
 	private VersionBomPolicyRestService bomVersionPolicyService;
 	private ComponentVersionRestService componentVersionService;
 	private PolicyViolationTransform transformer;
-	private List<String> policyNameList;
 
 	private NotificationRestService createNotificationService() {
 		final NotificationRestService service = Mockito.mock(NotificationRestService.class);
@@ -96,20 +98,23 @@ public class PolicyViolationTransformTest {
 		policyService = createPolicyService();
 		bomVersionPolicyService = createBomVersionService();
 		componentVersionService = createComponentVersionService();
-		policyNameList = new ArrayList<>();
-		policyNameList.add("Policy 1");
-		policyNameList.add("Policy 2");
 		transformer = new PolicyViolationTransform(notificationService, projectVersionService, policyService,
 				bomVersionPolicyService, componentVersionService);
 
 	}
 
-	private RuleViolationNotificationItem createNotificationItem() {
+	private RuleViolationNotificationItem createNotificationItem() throws MissingUUIDException {
 		final RuleViolationNotificationItem item = Mockito.mock(RuleViolationNotificationItem.class);
 		final RuleViolationNotificationContent content = Mockito.mock(RuleViolationNotificationContent.class);
 		final List<ComponentVersionStatus> versionStatusList = new ArrayList<>();
 		final ComponentVersionStatus status = Mockito.mock(ComponentVersionStatus.class);
 		Mockito.when(status.getComponentName()).thenReturn(COMPONENT_NAME);
+		Mockito.when(status.getBomComponentVersionPolicyStatusLink()).thenReturn("PolicyRule");
+		Mockito.when(status.getComponentVersionLink())
+		.thenReturn("/" + ComponentVersionStatus.COMPONENT_URL_IDENTIFIER + "/" + COMPONENT_ID + "/"
+				+ ComponentVersionStatus.COMPONENT_VERSION_URL_IDENTIFIER + "/" + COMPONENT_VERSION_ID);
+		Mockito.when(status.getComponentId()).thenReturn(COMPONENT_ID);
+		Mockito.when(status.getComponentVersionId()).thenReturn(COMPONENT_VERSION_ID);
 		versionStatusList.add(status);
 		Mockito.when(item.getContent()).thenReturn(content);
 		Mockito.when(content.getProjectName()).thenReturn(PROJECT_NAME);
@@ -122,12 +127,14 @@ public class PolicyViolationTransformTest {
 		final List<NotificationContentItem> itemList = transformer.transform(createNotificationItem());
 		for (final NotificationContentItem item : itemList) {
 			final PolicyViolationContentItem contentItem = (PolicyViolationContentItem) item;
-			assertEquals(PROJECT_NAME, contentItem.getProjectName());
-			assertEquals(PROJECT_VERSION, contentItem.getProjectVersion());
+			assertEquals(PROJECT_NAME, contentItem.getProjectVersion().getProjectName());
+			assertEquals(PROJECT_VERSION, contentItem.getProjectVersion().getProjectVersionName());
 			assertEquals(COMPONENT_NAME, contentItem.getComponentName());
 			assertEquals(COMPONENT_VERSION, contentItem.getComponentVersion());
-			assertEquals(1, contentItem.getPolicyNameList().size());
-			assertTrue(contentItem.getPolicyNameList().contains(POLICY_NAME));
+			assertEquals(COMPONENT_ID, contentItem.getComponentId());
+			assertEquals(COMPONENT_VERSION_ID, contentItem.getComponentVersionId());
+			assertEquals(1, contentItem.getPolicyRuleList().size());
+			assertEquals(POLICY_NAME, contentItem.getPolicyRuleList().get(0).getName());
 		}
 	}
 }
