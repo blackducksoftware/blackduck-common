@@ -21,9 +21,15 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.project;
 
+import java.util.UUID;
+
+import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
+import com.blackducksoftware.integration.hub.util.HubUrlParser;
 import com.google.gson.annotations.SerializedName;
 
 public class ProjectVersion {
+	public static final String PROJECT_URL_IDENTIFIER = "projects";
+	public static final String VERSION_URL_IDENTIFIER = "versions";
 	private String projectName;
 	private String projectVersionName;
 
@@ -52,6 +58,20 @@ public class ProjectVersion {
 
 	public void setProjectVersionLink(final String projectVersionLink) {
 		this.projectVersionLink = projectVersionLink;
+	}
+
+	public UUID getProjectId() throws MissingUUIDException {
+		if (getProjectVersionLink() == null) {
+			return null;
+		}
+		return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getProjectVersionLink());
+	}
+
+	public UUID getVersionId() throws MissingUUIDException {
+		if (getProjectVersionLink() == null) {
+			return null;
+		}
+		return HubUrlParser.getUUIDFromURLString(VERSION_URL_IDENTIFIER, getProjectVersionLink());
 	}
 
 	@Override
