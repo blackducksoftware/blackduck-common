@@ -21,9 +21,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.rest;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.CookieHandler;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -102,11 +100,25 @@ public class RestConnection {
 
 	public RestConnection(final String baseUrl) {
 		this.baseUrl = baseUrl;
+		client = createClient();
+	}
+
+	private Client createClient() {
+
 		final Context context = new Context();
 		final List<Protocol> protocolList = new ArrayList<>();
 		protocolList.add(Protocol.HTTP);
 		protocolList.add(Protocol.HTTPS);
-		client = new Client(context, protocolList);
+		final Client client = new Client(context, protocolList);
+		// set the connection pool parameters for the httpClient. Since we are
+		// connecting to one hub instance then the maxConnections per host can
+		// be equal to the maxTotalConnections. If this rest connection object
+		// connects to more than one hub instance then the maxConnectionsPerHost
+		// would need to be divided by the number of hub instances.
+		client.getContext().getParameters().add("maxConnectionsPerHost", "100");
+		client.getContext().getParameters().add("maxTotalConnections", "100");
+
+		return client;
 	}
 
 	public void setLogger(final IntLogger logger) {
@@ -119,6 +131,15 @@ public class RestConnection {
 		}
 		// the User sets the timeout in seconds, so we translate to ms
 		this.timeout = timeout * 1000;
+		setClientTimeout(this.timeout);
+	}
+
+	private void setClientTimeout(final int timeout) {
+		final String stringTimeout = String.valueOf(timeout);
+
+		client.getContext().getParameters().add("socketTimeout", stringTimeout);
+		client.getContext().getParameters().add("socketConnectTimeoutMs", stringTimeout);
+		client.getContext().getParameters().add("readTimeout", stringTimeout);
 	}
 
 	public String getBaseUrl() {
@@ -341,22 +362,6 @@ public class RestConnection {
 	}
 
 	public ClientResource createClientResource(final String providedUrl) throws URISyntaxException {
-
-		final String stringTimeout = String.valueOf(timeout);
-		// final String idleCheckInterval = String.valueOf(timeout / 2);
-
-		client.getContext().getParameters().add("socketTimeout", stringTimeout);
-
-		client.getContext().getParameters().add("socketConnectTimeoutMs", stringTimeout);
-		client.getContext().getParameters().add("readTimeout", stringTimeout);
-
-		// set the connection pool parameters for the httpClient. Since we are
-		// connecting to one hub instance then the maxConnections per host can
-		// be equal to the maxTotalConnections. If this rest connection object
-		// connects to more than one hub instance then the maxConnectionsPerHost
-		// would need to be divided by the number of hub instances.
-		client.getContext().getParameters().add("maxConnectionsPerHost", "100");
-		client.getContext().getParameters().add("maxTotalConnections", "100");
 		// Should throw timeout exception after the specified timeout, default
 		// is 2 minutes
 		final ClientResource resource = new ClientResource(client.getContext(), new URI(providedUrl));
@@ -387,13 +392,18 @@ public class RestConnection {
 	}
 
 	public void handleRequest(final ClientResource resource) throws BDRestException {
-		logMessage(LogLevel.TRACE, "Resource : " + resource.toString());
-		logRestletRequestOrResponse(resource.getRequest());
+		final boolean debugLogging = logger != null && logger.getLogLevel() == LogLevel.TRACE;
+		if (debugLogging) {
+			logMessage(LogLevel.TRACE, "Resource : " + resource.toString());
+			logRestletRequestOrResponse(resource.getRequest());
+		}
 
 		final CookieHandler originalCookieHandler = CookieHandler.getDefault();
 		try {
 			if (originalCookieHandler != null) {
-				logMessage(LogLevel.TRACE, "Setting Cookie Handler to NULL");
+				if (debugLogging) {
+					logMessage(LogLevel.TRACE, "Setting Cookie Handler to NULL");
+				}
 				CookieHandler.setDefault(null);
 			}
 			resource.handle();
@@ -401,27 +411,21 @@ public class RestConnection {
 			throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
 		} finally {
 			if (originalCookieHandler != null) {
-				logMessage(LogLevel.TRACE, "Setting Original Cookie Handler : " + originalCookieHandler.toString());
+				if (debugLogging) {
+					logMessage(LogLevel.TRACE, "Setting Original Cookie Handler : " + originalCookieHandler.toString());
+				}
 				CookieHandler.setDefault(originalCookieHandler);
 			}
 		}
 
-		logRestletRequestOrResponse(resource.getResponse());
-
-		logMessage(LogLevel.TRACE, "Status Code : " + resource.getResponse().getStatus().getCode());
+		if (debugLogging) {
+			logRestletRequestOrResponse(resource.getResponse());
+			logMessage(LogLevel.TRACE, "Status Code : " + resource.getResponse().getStatus().getCode());
+		}
 	}
 
 	public String readResponseAsString(final Response response) throws IOException {
-		final StringBuilder sb = new StringBuilder();
-		final Reader reader = response.getEntity().getReader();
-		try (final BufferedReader bufReader = new BufferedReader(reader)) {
-			String line;
-			while ((line = bufReader.readLine()) != null) {
-				sb.append(line);
-				sb.append("\n");
-			}
-		}
-		return sb.toString();
+		return response.getEntityAsText();
 	}
 
 	private void logRestletRequestOrResponse(final Message requestOrResponse) {

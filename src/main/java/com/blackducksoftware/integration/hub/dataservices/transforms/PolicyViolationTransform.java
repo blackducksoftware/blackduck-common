@@ -41,20 +41,26 @@ public class PolicyViolationTransform extends AbstractPolicyTransform {
 			final String projectName = policyViolation.getContent().getProjectName();
 			final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent()
 					.getComponentVersionStatuses();
-			ReleaseItem releaseItem;
 			final String projectVersionLink = policyViolation.getContent().getProjectVersionLink();
-			if (releaseItemMap.containsKey(projectVersionLink)) {
-				releaseItem = releaseItemMap.get(projectVersionLink);
-			} else {
-				releaseItem = getProjectVersionService().getProjectVersionReleaseItem(projectVersionLink);
-				releaseItemMap.put(projectVersionLink, releaseItem);
-			}
+			final ReleaseItem releaseItem = getReleaseItem(projectVersionLink);
 			handleNotification(projectName, componentVersionList, releaseItem, item, templateData);
 		} catch (final IOException | BDRestException | URISyntaxException e) {
 			throw new HubItemTransformException(e);
 		}
 
 		return templateData;
+	}
+
+	private ReleaseItem getReleaseItem(final String projectVersionLink)
+			throws IOException, BDRestException, URISyntaxException {
+		ReleaseItem releaseItem;
+		if (releaseItemMap.containsKey(projectVersionLink)) {
+			releaseItem = releaseItemMap.get(projectVersionLink);
+		} else {
+			releaseItem = getProjectVersionService().getProjectVersionReleaseItem(projectVersionLink);
+			releaseItemMap.put(projectVersionLink, releaseItem);
+		}
+		return releaseItem;
 	}
 
 	@Override

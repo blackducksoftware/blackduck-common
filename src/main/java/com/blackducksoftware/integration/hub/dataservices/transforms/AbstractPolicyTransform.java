@@ -44,42 +44,19 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 			final List<NotificationContentItem> templateData) throws HubItemTransformException {
 		for (final ComponentVersionStatus componentVersion : componentVersionList) {
 			try {
-				String componentVersionName;
 				final String componentVersionLink = componentVersion.getComponentVersionLink();
-				if (StringUtils.isBlank(componentVersionLink)) {
-					componentVersionName = "";
-				} else {
-					ComponentVersion compVersion;
-					if (componentVersionMap.containsKey(componentVersionLink)) {
-						compVersion = componentVersionMap.get(componentVersionLink);
-					} else {
-						compVersion = getComponentVersionService().getComponentVersion(componentVersionLink);
-						componentVersionMap.put(componentVersionLink, compVersion);
-					}
-					componentVersionName = compVersion.getVersionName();
-				}
-
+				final String componentVersionName = getComponentVersionName(componentVersionLink);
 				final String policyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
 
 				if (StringUtils.isNotBlank(policyStatusUrl)) {
-					BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus;
-					if (bomComponentPolicyStatusMap.containsKey(policyStatusUrl)) {
-						bomComponentVersionPolicyStatus = bomComponentPolicyStatusMap.get(policyStatusUrl);
-					} else {
-						bomComponentVersionPolicyStatus = getBomVersionPolicyService().getPolicyStatus(policyStatusUrl);
-					}
+					final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
+							policyStatusUrl);
 					final List<String> ruleList = getRules(
 							bomComponentVersionPolicyStatus.getLinks(BomComponentVersionPolicyStatus.POLICY_RULE_URL));
 					if (ruleList != null && !ruleList.isEmpty()) {
 						final List<String> ruleNameList = new ArrayList<String>();
 						for (final String ruleUrl : ruleList) {
-							PolicyRule rule;
-							if (policyRuleMap.containsKey(ruleUrl)) {
-								rule = policyRuleMap.get(ruleUrl);
-							} else {
-								rule = getPolicyService().getPolicyRule(ruleUrl);
-								policyRuleMap.put(ruleUrl, rule);
-							}
+							final PolicyRule rule = getPolicyRule(ruleUrl);
 							ruleNameList.add(rule.getName());
 						}
 						createContents(projectName, releaseItem.getVersionName(), componentVersion.getComponentName(),
@@ -90,6 +67,47 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 				throw new HubItemTransformException(e);
 			}
 		}
+	}
+
+	private String getComponentVersionName(final String componentVersionLink)
+			throws NotificationServiceException, IOException, BDRestException, URISyntaxException {
+		String componentVersionName;
+		if (StringUtils.isBlank(componentVersionLink)) {
+			componentVersionName = "";
+		} else {
+			ComponentVersion compVersion;
+			if (componentVersionMap.containsKey(componentVersionLink)) {
+				compVersion = componentVersionMap.get(componentVersionLink);
+			} else {
+				compVersion = getComponentVersionService().getComponentVersion(componentVersionLink);
+				componentVersionMap.put(componentVersionLink, compVersion);
+			}
+			componentVersionName = compVersion.getVersionName();
+		}
+
+		return componentVersionName;
+	}
+
+	private BomComponentVersionPolicyStatus getBomComponentVersionPolicyStatus(final String policyStatusUrl)
+			throws IOException, BDRestException, URISyntaxException {
+		BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus;
+		if (bomComponentPolicyStatusMap.containsKey(policyStatusUrl)) {
+			bomComponentVersionPolicyStatus = bomComponentPolicyStatusMap.get(policyStatusUrl);
+		} else {
+			bomComponentVersionPolicyStatus = getBomVersionPolicyService().getPolicyStatus(policyStatusUrl);
+		}
+		return bomComponentVersionPolicyStatus;
+	}
+
+	private PolicyRule getPolicyRule(final String ruleUrl) throws IOException, BDRestException, URISyntaxException {
+		PolicyRule rule;
+		if (policyRuleMap.containsKey(ruleUrl)) {
+			rule = policyRuleMap.get(ruleUrl);
+		} else {
+			rule = getPolicyService().getPolicyRule(ruleUrl);
+			policyRuleMap.put(ruleUrl, rule);
+		}
+		return rule;
 	}
 
 	private List<String> getRules(final List<String> rulesViolated) throws NotificationServiceException {
