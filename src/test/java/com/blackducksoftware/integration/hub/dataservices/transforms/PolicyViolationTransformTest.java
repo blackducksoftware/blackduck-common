@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +36,8 @@ public class PolicyViolationTransformTest {
 	private final static String PROJECT_VERSION = "0.1.0";
 	private final static String COMPONENT_NAME = "component 1";
 	private final static String COMPONENT_VERSION = "0.9.8";
+	private final static UUID COMPONENT_ID = UUID.randomUUID();
+	private final static UUID COMPONENT_VERSION_ID = UUID.randomUUID();
 	private final static String POLICY_NAME = "Policy Name";
 
 	private NotificationRestService notificationService;
@@ -110,6 +113,9 @@ public class PolicyViolationTransformTest {
 		final List<ComponentVersionStatus> versionStatusList = new ArrayList<>();
 		final ComponentVersionStatus status = Mockito.mock(ComponentVersionStatus.class);
 		Mockito.when(status.getComponentName()).thenReturn(COMPONENT_NAME);
+		Mockito.when(status.getComponentVersionLink())
+		.thenReturn("/" + ComponentVersionStatus.COMPONENT_URL_IDENTIFIER + "/" + COMPONENT_ID + "/"
+				+ ComponentVersionStatus.COMPONENT_VERSION_URL_IDENTIFIER + "/" + COMPONENT_VERSION_ID);
 		versionStatusList.add(status);
 		Mockito.when(item.getContent()).thenReturn(content);
 		Mockito.when(content.getProjectName()).thenReturn(PROJECT_NAME);
@@ -122,10 +128,12 @@ public class PolicyViolationTransformTest {
 		final List<NotificationContentItem> itemList = transformer.transform(createNotificationItem());
 		for (final NotificationContentItem item : itemList) {
 			final PolicyViolationContentItem contentItem = (PolicyViolationContentItem) item;
-			assertEquals(PROJECT_NAME, contentItem.getProjectName());
-			assertEquals(PROJECT_VERSION, contentItem.getProjectVersion());
+			assertEquals(PROJECT_NAME, contentItem.getProjectVersion().getProjectName());
+			assertEquals(PROJECT_VERSION, contentItem.getProjectVersion().getProjectVersionName());
 			assertEquals(COMPONENT_NAME, contentItem.getComponentName());
 			assertEquals(COMPONENT_VERSION, contentItem.getComponentVersion());
+			assertEquals(COMPONENT_ID, contentItem.getComponentId());
+			assertEquals(COMPONENT_VERSION_ID, contentItem.getComponentVersionId());
 			assertEquals(1, contentItem.getPolicyNameList().size());
 			assertTrue(contentItem.getPolicyNameList().contains(POLICY_NAME));
 		}

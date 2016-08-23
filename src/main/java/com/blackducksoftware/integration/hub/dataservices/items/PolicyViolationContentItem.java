@@ -1,14 +1,19 @@
 package com.blackducksoftware.integration.hub.dataservices.items;
 
 import java.util.List;
+import java.util.UUID;
+
+import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 
 public class PolicyViolationContentItem extends NotificationContentItem {
 
 	private final List<String> policyNameList;
 
-	public PolicyViolationContentItem(final String projectName, final String projectVersion, final String componentName,
-			final String componentVersion, final List<String> policyNameList) {
-		super(projectName, projectVersion, componentName, componentVersion);
+	public PolicyViolationContentItem(final ProjectVersion projectVersion,
+			final String componentName,
+			final String componentVersion, final UUID componentId, final UUID componentVersionId,
+			final List<String> policyNameList) {
+		super(projectVersion, componentName, componentVersion, componentId, componentVersionId);
 		this.policyNameList = policyNameList;
 	}
 
@@ -18,8 +23,21 @@ public class PolicyViolationContentItem extends NotificationContentItem {
 
 	@Override
 	public String toString() {
-		return "PolicyViolationContentItem [projectName=" + getProjectName() + ", projectVersion=" + getProjectVersion()
-				+ ", componentName=" + getComponentName() + ", componentVersion=" + getComponentVersion()
-				+ ", policyNameList=" + policyNameList + "]";
+		final StringBuilder builder = new StringBuilder();
+		builder.append("PolicyViolationContentItem [projectVersion=");
+		builder.append(getProjectVersion());
+		builder.append(", componentName=");
+		builder.append(getComponentName());
+		builder.append(", componentVersion=");
+		builder.append(getComponentVersion());
+		builder.append(", componentId=");
+		builder.append(getComponentId());
+		builder.append(", componentVersionId=");
+		builder.append(getComponentVersionId());
+		builder.append(", policyNameList=");
+		builder.append(policyNameList);
+		builder.append("]");
+		return builder.toString();
 	}
+
 }
