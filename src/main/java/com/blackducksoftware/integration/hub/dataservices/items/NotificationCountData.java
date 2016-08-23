@@ -63,4 +63,12 @@ public class NotificationCountData {
 	public int getVulnDeletedCount() {
 		return vulnDeletedCount;
 	}
+
+	@Override
+	public String toString() {
+		return "NotificationCountData [startDate=" + startDate + ", endDate=" + endDate + ", total=" + total
+				+ ", policyViolationCount=" + policyViolationCount + ", policyOverrideCount=" + policyOverrideCount
+				+ ", vulnerabilityCount=" + vulnerabilityCount + ", vulnAddedCount=" + vulnAddedCount
+				+ ", vulnUpdatedCount=" + vulnUpdatedCount + ", vulnDeletedCount=" + vulnDeletedCount + "]";
+	}
 }
