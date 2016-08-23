@@ -19,6 +19,7 @@ import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
@@ -26,12 +27,15 @@ import com.blackducksoftware.integration.hub.exception.NotificationServiceExcept
 
 public abstract class AbstractPolicyTransform extends AbstractNotificationTransform {
 
+	private final PolicyNotificationFilter policyFilter;
+
 	public AbstractPolicyTransform(final NotificationRestService notificationService,
 			final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
 			final VersionBomPolicyRestService bomVersionPolicyService,
-			final ComponentVersionRestService componentVersionService) {
+			final ComponentVersionRestService componentVersionService, final PolicyNotificationFilter policyFilter) {
 		super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
 				componentVersionService);
+		this.policyFilter = policyFilter;
 	}
 
 	public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
@@ -52,8 +56,10 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 				if (StringUtils.isNotBlank(policyStatusUrl)) {
 					final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomVersionPolicyService()
 							.getPolicyStatus(policyStatusUrl);
-					final List<String> ruleList = getRules(
+					List<String> ruleList = getRules(
 							bomComponentVersionPolicyStatus.getLinks(BomComponentVersionPolicyStatus.POLICY_RULE_URL));
+
+					ruleList = getMatchingRules(ruleList);
 					if (ruleList != null && !ruleList.isEmpty()) {
 						final List<PolicyRule> policyRuleList = new ArrayList<PolicyRule>();
 						for (final String ruleUrl : ruleList) {
@@ -82,6 +88,21 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 			matchingRules.add(fixedRuleUrl);
 		}
 		return matchingRules;
+	}
+
+	private List<String> getMatchingRules(final List<String> rulesViolated) {
+		final List<String> filteredRules = new ArrayList<>();
+		if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null
+				&& !policyFilter.getRuleLinksToInclude().isEmpty()) {
+			for (final String ruleViolated : rulesViolated) {
+				if (policyFilter.getRuleLinksToInclude().contains(ruleViolated)) {
+					filteredRules.add(ruleViolated);
+				}
+			}
+		} else {
+			return rulesViolated;
+		}
+		return filteredRules;
 	}
 
 	/**

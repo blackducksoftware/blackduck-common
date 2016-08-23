@@ -18,6 +18,7 @@ import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNoti
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.transforms.AbstractNotificationTransform;
 import com.blackducksoftware.integration.hub.dataservices.transforms.PolicyViolationOverrideTransform;
 import com.blackducksoftware.integration.hub.dataservices.transforms.PolicyViolationTransform;
@@ -35,7 +36,8 @@ public class NotificationDataService extends AbstractDataService {
 	private final ComponentVersionRestService componentVersionService;
 	private final Map<Class<?>, AbstractNotificationTransform> transformMap;
 
-	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
+			final PolicyNotificationFilter policyFilter) {
 		super(restConnection, gson, jsonParser);
 		notificationService = new NotificationRestService(restConnection, jsonParser);
 		projectVersionService = new ProjectVersionRestService(restConnection, gson, jsonParser);
@@ -44,9 +46,9 @@ public class NotificationDataService extends AbstractDataService {
 		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
 		transformMap = new HashMap<>();
 		transformMap.put(RuleViolationNotificationItem.class, new PolicyViolationTransform(notificationService,
-				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
+				projectVersionService, policyService, bomVersionPolicyService, componentVersionService, policyFilter));
 		transformMap.put(PolicyOverrideNotificationItem.class, new PolicyViolationOverrideTransform(notificationService,
-				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
+				projectVersionService, policyService, bomVersionPolicyService, componentVersionService, policyFilter));
 		transformMap.put(VulnerabilityNotificationItem.class, new VulnerabilityTransform(notificationService,
 				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
 	}

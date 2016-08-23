@@ -25,6 +25,7 @@ import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNoti
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.items.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
@@ -100,7 +101,7 @@ public class PolicyOverrideTransformTest {
 		bomVersionPolicyService = createBomVersionService();
 		componentVersionService = createComponentVersionService();
 		transformer = new PolicyViolationOverrideTransform(notificationService, projectVersionService, policyService,
-				bomVersionPolicyService, componentVersionService);
+				bomVersionPolicyService, componentVersionService, new PolicyNotificationFilter(null));
 
 	}
 

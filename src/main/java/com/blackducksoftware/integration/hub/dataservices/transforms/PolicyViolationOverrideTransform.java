@@ -18,6 +18,7 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.items.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
@@ -27,9 +28,9 @@ public class PolicyViolationOverrideTransform extends AbstractPolicyTransform {
 	public PolicyViolationOverrideTransform(final NotificationRestService notificationService,
 			final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
 			final VersionBomPolicyRestService bomVersionPolicyService,
-			final ComponentVersionRestService componentVersionService) {
+			final ComponentVersionRestService componentVersionService, final PolicyNotificationFilter policyFilter) {
 		super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
-				componentVersionService);
+				componentVersionService, policyFilter);
 	}
 
 	@Override
