@@ -21,8 +21,10 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.component;
 
-import java.util.Date;
 import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
@@ -33,7 +35,7 @@ public class ComponentVersion extends HubItem {
 	public static final String COMPONENT_URL_IDENTIFIER = "components";
 	public static final String VERSION_URL_IDENTIFIER = "versions";
 	private String versionName;
-	private Date releasedOn;
+	private String releasedOn;
 
 	public ComponentVersion(final MetaInformation meta) {
 		super(meta);
@@ -49,11 +51,18 @@ public class ComponentVersion extends HubItem {
 		this.versionName = versionName;
 	}
 
-	public Date getReleasedOn() {
+	public String getReleasedOn() {
 		return releasedOn;
 	}
 
-	public void setReleasedOn(final Date releasedOn) {
+	public DateTime getReleasedOnDate() {
+		if (StringUtils.isNotBlank(releasedOn)) {
+			return DateTime.parse(releasedOn);
+		}
+		return null;
+	}
+
+	public void setReleasedOn(final String releasedOn) {
 		this.releasedOn = releasedOn;
 	}
 

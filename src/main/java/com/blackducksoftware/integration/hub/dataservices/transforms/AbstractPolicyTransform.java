@@ -1,7 +1,5 @@
 package com.blackducksoftware.integration.hub.dataservices.transforms;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,9 +18,7 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.items.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 
 public abstract class AbstractPolicyTransform extends AbstractNotificationTransform {
@@ -71,8 +67,7 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 								policyRuleList, item, templateData);
 					}
 				}
-			} catch (final NotificationServiceException | IOException | BDRestException | URISyntaxException
-					| MissingUUIDException e) {
+			} catch (final Exception e) {
 				throw new HubItemTransformException(e);
 			}
 		}
