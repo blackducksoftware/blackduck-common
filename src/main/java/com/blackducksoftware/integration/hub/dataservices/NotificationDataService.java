@@ -28,6 +28,7 @@ import com.blackducksoftware.integration.hub.dataservices.items.AbstractItemCoun
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationCountData;
 import com.blackducksoftware.integration.hub.dataservices.items.NotificationItemCount;
+import com.blackducksoftware.integration.hub.dataservices.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.items.VulnerabilityItemCount;
 import com.blackducksoftware.integration.hub.dataservices.transforms.AbstractNotificationTransform;
 import com.blackducksoftware.integration.hub.dataservices.transforms.PolicyViolationOverrideTransform;
@@ -48,14 +49,17 @@ public class NotificationDataService extends AbstractDataService {
 	private final Map<Class<?>, AbstractItemCount> counterMap;
 	private final ExecutorService executorService;
 	private final ExecutorCompletionService<List<NotificationContentItem>> completionService;
+	private final PolicyNotificationFilter policyFilter;
 
-	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
+			final PolicyNotificationFilter policyFilter) {
 		super(restConnection, gson, jsonParser);
 		notificationService = new NotificationRestService(restConnection, jsonParser);
 		projectVersionService = new ProjectVersionRestService(restConnection, gson, jsonParser);
 		policyService = new PolicyRestService(restConnection, gson, jsonParser);
 		bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
+		this.policyFilter = policyFilter;
 		transformMap = createTransformMap();
 		counterMap = createCounterMap();
 		final ThreadFactory threadFactory = Executors.defaultThreadFactory();
@@ -66,9 +70,9 @@ public class NotificationDataService extends AbstractDataService {
 	private Map<Class<?>, AbstractNotificationTransform> createTransformMap() {
 		final Map<Class<?>, AbstractNotificationTransform> transformMap = new HashMap<>();
 		transformMap.put(RuleViolationNotificationItem.class, new PolicyViolationTransform(notificationService,
-				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
+				projectVersionService, policyService, bomVersionPolicyService, componentVersionService, policyFilter));
 		transformMap.put(PolicyOverrideNotificationItem.class, new PolicyViolationOverrideTransform(notificationService,
-				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
+				projectVersionService, policyService, bomVersionPolicyService, componentVersionService, policyFilter));
 		transformMap.put(VulnerabilityNotificationItem.class, new VulnerabilityTransform(notificationService,
 				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
 
