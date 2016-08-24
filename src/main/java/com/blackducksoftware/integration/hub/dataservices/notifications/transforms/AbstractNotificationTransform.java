@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.transforms;
+package com.blackducksoftware.integration.hub.dataservices.notifications.transforms;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import com.blackducksoftware.integration.hub.api.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
-import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notifications.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
 public abstract class AbstractNotificationTransform {

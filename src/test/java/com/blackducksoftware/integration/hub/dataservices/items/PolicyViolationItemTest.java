@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
+import com.blackducksoftware.integration.hub.dataservices.notifications.items.PolicyViolationContentItem;
 
 public class PolicyViolationItemTest {
 

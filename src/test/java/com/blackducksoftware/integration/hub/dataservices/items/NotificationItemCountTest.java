@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
+import com.blackducksoftware.integration.hub.dataservices.notifications.items.NotificationItemCount;
 
 public class NotificationItemCountTest {
 

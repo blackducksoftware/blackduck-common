@@ -7,6 +7,8 @@ import java.util.Date;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.dataservices.notifications.items.NotificationCountData;
+
 public class NotificationCountDataTest {
 
 	@Test

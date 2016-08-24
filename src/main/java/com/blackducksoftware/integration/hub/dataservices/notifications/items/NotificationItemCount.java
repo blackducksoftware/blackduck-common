@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.items;
+package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 

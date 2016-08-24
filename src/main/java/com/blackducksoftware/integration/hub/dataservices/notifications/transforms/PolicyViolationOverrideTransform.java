@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.transforms;
+package com.blackducksoftware.integration.hub.dataservices.notifications.transforms;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -17,9 +17,9 @@ import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNoti
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
-import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservices.items.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.dataservices.items.PolicyOverrideContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notifications.items.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notifications.items.PolicyNotificationFilter;
+import com.blackducksoftware.integration.hub.dataservices.notifications.items.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
