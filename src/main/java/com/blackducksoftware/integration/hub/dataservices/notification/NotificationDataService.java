@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.notifications;
+package com.blackducksoftware.integration.hub.dataservices.notification;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -25,16 +25,16 @@ import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNoti
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
-import com.blackducksoftware.integration.hub.dataservices.notifications.items.AbstractItemCount;
-import com.blackducksoftware.integration.hub.dataservices.notifications.items.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservices.notifications.items.NotificationCountData;
-import com.blackducksoftware.integration.hub.dataservices.notifications.items.NotificationItemCount;
-import com.blackducksoftware.integration.hub.dataservices.notifications.items.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.dataservices.notifications.items.VulnerabilityItemCount;
-import com.blackducksoftware.integration.hub.dataservices.notifications.transforms.AbstractNotificationTransform;
-import com.blackducksoftware.integration.hub.dataservices.notifications.transforms.PolicyViolationOverrideTransform;
-import com.blackducksoftware.integration.hub.dataservices.notifications.transforms.PolicyViolationTransform;
-import com.blackducksoftware.integration.hub.dataservices.notifications.transforms.VulnerabilityTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.AbstractItemCount;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountData;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationItemCount;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.VulnerabilityItemCount;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationOverrideTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.VulnerabilityTransform;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;

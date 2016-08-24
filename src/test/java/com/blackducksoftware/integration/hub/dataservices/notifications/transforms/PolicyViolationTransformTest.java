@@ -25,10 +25,10 @@ import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotif
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
-import com.blackducksoftware.integration.hub.dataservices.notifications.items.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservices.notifications.items.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.dataservices.notifications.items.PolicyViolationContentItem;
-import com.blackducksoftware.integration.hub.dataservices.notifications.transforms.PolicyViolationTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationTransform;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;

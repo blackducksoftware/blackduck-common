@@ -24,10 +24,10 @@ import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNoti
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
-import com.blackducksoftware.integration.hub.dataservices.notifications.items.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservices.notifications.items.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.dataservices.notifications.items.PolicyOverrideContentItem;
-import com.blackducksoftware.integration.hub.dataservices.notifications.transforms.PolicyViolationOverrideTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyOverrideContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationOverrideTransform;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 
