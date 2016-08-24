@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.transforms;
+package com.blackducksoftware.integration.hub.dataservices.notifications.transforms;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
