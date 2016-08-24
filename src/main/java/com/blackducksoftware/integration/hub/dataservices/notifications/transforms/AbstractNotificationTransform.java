@@ -50,6 +50,4 @@ public abstract class AbstractNotificationTransform {
 	}
 
 	public abstract List<NotificationContentItem> transform(NotificationItem item) throws HubItemTransformException;
-
-	public abstract void reset();
 }

@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.NotificationRestService;
@@ -26,8 +24,6 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
 public class PolicyViolationTransform extends AbstractPolicyTransform {
-
-	private final Map<String, ReleaseItem> releaseItemMap = new ConcurrentHashMap<>();
 
 	public PolicyViolationTransform(final NotificationRestService notificationService,
 			final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
@@ -65,12 +61,7 @@ public class PolicyViolationTransform extends AbstractPolicyTransform {
 	private ReleaseItem getReleaseItem(final String projectVersionLink)
 			throws IOException, BDRestException, URISyntaxException {
 		ReleaseItem releaseItem;
-		if (releaseItemMap.containsKey(projectVersionLink)) {
-			releaseItem = releaseItemMap.get(projectVersionLink);
-		} else {
-			releaseItem = getProjectVersionService().getProjectVersionReleaseItem(projectVersionLink);
-			releaseItemMap.put(projectVersionLink, releaseItem);
-		}
+		releaseItem = getProjectVersionService().getProjectVersionReleaseItem(projectVersionLink);
 		return releaseItem;
 	}
 
@@ -81,11 +72,5 @@ public class PolicyViolationTransform extends AbstractPolicyTransform {
 			final List<NotificationContentItem> templateData) {
 		templateData.add(new PolicyViolationContentItem(projectVersion, componentName, componentVersion, componentId,
 				componentVersionId, policyRuleList));
-	}
-
-	@Override
-	public void reset() {
-		super.reset();
-		releaseItemMap.clear();
 	}
 }

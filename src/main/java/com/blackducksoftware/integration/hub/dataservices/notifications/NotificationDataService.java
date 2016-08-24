@@ -113,10 +113,6 @@ public class NotificationDataService extends AbstractDataService {
 
 			}
 		}
-		// clean up cached data
-		for (final Map.Entry<Class<?>, AbstractNotificationTransform> entry : transformMap.entrySet()) {
-			entry.getValue().reset();
-		}
 
 		return contentList;
 	}

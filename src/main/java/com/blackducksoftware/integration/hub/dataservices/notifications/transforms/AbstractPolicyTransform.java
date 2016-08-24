@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,11 +27,6 @@ import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 
 public abstract class AbstractPolicyTransform extends AbstractNotificationTransform {
-
-	private final Map<String, PolicyRule> policyRuleMap = new ConcurrentHashMap<>();
-	private final Map<String, ComponentVersion> componentVersionMap = new ConcurrentHashMap<>();
-	private final Map<String, BomComponentVersionPolicyStatus> bomComponentPolicyStatusMap = new ConcurrentHashMap<>();
-
 	private final PolicyNotificationFilter policyFilter;
 
 	public AbstractPolicyTransform(final NotificationRestService notificationService,
@@ -86,12 +79,7 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 			componentVersionName = "";
 		} else {
 			ComponentVersion compVersion;
-			if (componentVersionMap.containsKey(componentVersionLink)) {
-				compVersion = componentVersionMap.get(componentVersionLink);
-			} else {
-				compVersion = getComponentVersionService().getComponentVersion(componentVersionLink);
-				componentVersionMap.put(componentVersionLink, compVersion);
-			}
+			compVersion = getComponentVersionService().getComponentVersion(componentVersionLink);
 			componentVersionName = compVersion.getVersionName();
 		}
 
@@ -101,22 +89,14 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 	private BomComponentVersionPolicyStatus getBomComponentVersionPolicyStatus(final String policyStatusUrl)
 			throws IOException, BDRestException, URISyntaxException {
 		BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus;
-		if (bomComponentPolicyStatusMap.containsKey(policyStatusUrl)) {
-			bomComponentVersionPolicyStatus = bomComponentPolicyStatusMap.get(policyStatusUrl);
-		} else {
-			bomComponentVersionPolicyStatus = getBomVersionPolicyService().getPolicyStatus(policyStatusUrl);
-		}
+		bomComponentVersionPolicyStatus = getBomVersionPolicyService().getPolicyStatus(policyStatusUrl);
+
 		return bomComponentVersionPolicyStatus;
 	}
 
 	private PolicyRule getPolicyRule(final String ruleUrl) throws IOException, BDRestException, URISyntaxException {
 		PolicyRule rule;
-		if (policyRuleMap.containsKey(ruleUrl)) {
-			rule = policyRuleMap.get(ruleUrl);
-		} else {
-			rule = getPolicyService().getPolicyRule(ruleUrl);
-			policyRuleMap.put(ruleUrl, rule);
-		}
+		rule = getPolicyService().getPolicyRule(ruleUrl);
 		return rule;
 	}
 
@@ -168,11 +148,4 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 	public abstract void createContents(final ProjectVersion projectVersion, final String componentName,
 			final String componentVersion, final UUID componentId, final UUID componentVersionId,
 			List<PolicyRule> policyRuleList, NotificationItem item, List<NotificationContentItem> templateData);
-
-	@Override
-	public void reset() {
-		policyRuleMap.clear();
-		bomComponentPolicyStatusMap.clear();
-		componentVersionMap.clear();
-	}
 }
