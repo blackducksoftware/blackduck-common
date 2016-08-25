@@ -76,28 +76,34 @@ public class HubRiskReportData {
 
 		final List<AggregateBomViewEntry> bomEntries = report.getAggregateBomViewEntries();
 		for (final AggregateBomViewEntry bomEntry : bomEntries) {
-			if (bomEntry.getVulnerabilityRisk().getHIGH() > 0) {
-				vulnerabilityRiskHighCount++;
-			} else if (bomEntry.getVulnerabilityRisk().getMEDIUM() > 0) {
-				vulnerabilityRiskMediumCount++;
-			} else if (bomEntry.getVulnerabilityRisk().getLOW() > 0) {
-				vulnerabilityRiskLowCount++;
-			}
-
-			if (bomEntry.getLicenseRisk().getHIGH() > 0) {
-				licenseRiskHighCount++;
-			} else if (bomEntry.getLicenseRisk().getMEDIUM() > 0) {
-				licenseRiskMediumCount++;
-			} else if (bomEntry.getLicenseRisk().getLOW() > 0) {
-				licenseRiskLowCount += 1;
-			}
-
-			if (bomEntry.getOperationalRisk().getHIGH() > 0) {
-				operationalRiskHighCount++;
-			} else if (bomEntry.getOperationalRisk().getMEDIUM() > 0) {
-				operationalRiskMediumCount++;
-			} else if (bomEntry.getOperationalRisk().getLOW() > 0) {
-				operationalRiskLowCount++;
+			if (bomEntry != null) {
+				if (bomEntry.getVulnerabilityRisk() != null) {
+					if (bomEntry.getVulnerabilityRisk().getHIGH() > 0) {
+						vulnerabilityRiskHighCount++;
+					} else if (bomEntry.getVulnerabilityRisk().getMEDIUM() > 0) {
+						vulnerabilityRiskMediumCount++;
+					} else if (bomEntry.getVulnerabilityRisk().getLOW() > 0) {
+						vulnerabilityRiskLowCount++;
+					}
+				}
+				if (bomEntry.getLicenseRisk() != null) {
+					if (bomEntry.getLicenseRisk().getHIGH() > 0) {
+						licenseRiskHighCount++;
+					} else if (bomEntry.getLicenseRisk().getMEDIUM() > 0) {
+						licenseRiskMediumCount++;
+					} else if (bomEntry.getLicenseRisk().getLOW() > 0) {
+						licenseRiskLowCount += 1;
+					}
+				}
+				if (bomEntry.getOperationalRisk() != null) {
+					if (bomEntry.getOperationalRisk().getHIGH() > 0) {
+						operationalRiskHighCount++;
+					} else if (bomEntry.getOperationalRisk().getMEDIUM() > 0) {
+						operationalRiskMediumCount++;
+					} else if (bomEntry.getOperationalRisk().getLOW() > 0) {
+						operationalRiskLowCount++;
+					}
+				}
 			}
 		}
 
