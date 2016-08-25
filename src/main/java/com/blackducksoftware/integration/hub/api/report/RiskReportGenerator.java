@@ -27,6 +27,7 @@ import java.util.List;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
+import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
@@ -50,12 +51,13 @@ public class RiskReportGenerator {
 		this.supportHelper = supportHelper;
 	}
 
-	public HubRiskReportData generateHubReport(final IntLogger logger) throws IOException, BDRestException,
+	public HubRiskReportData generateHubReport(final IntLogger logger, final ReportCategoriesEnum[] categories)
+			throws IOException, BDRestException,
 			URISyntaxException, InterruptedException, HubIntegrationException, UnexpectedHubResponseException {
 		logger.debug("Waiting for the bom to be updated with the scan results.");
 		final HubEventPolling hubEventPolling = getHubEventPolling(hubReportGenerationInfo.getService());
 
-		if (supportHelper.isCliStatusDirOptionSupport()) {
+		if (supportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
 			hubEventPolling.assertBomUpToDate(hubReportGenerationInfo, logger);
 		} else {
 			hubEventPolling.assertBomUpToDate(hubReportGenerationInfo);
@@ -63,7 +65,7 @@ public class RiskReportGenerator {
 
 		logger.debug("The bom has been updated, generating the report.");
 		final String reportUrl = hubReportGenerationInfo.getService()
-				.generateHubReport(hubReportGenerationInfo.getVersion(), ReportFormatEnum.JSON);
+				.generateHubReport(hubReportGenerationInfo.getVersion(), ReportFormatEnum.JSON, categories);
 
 		final ReportInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl,
 				hubReportGenerationInfo.getMaximumWaitTime());

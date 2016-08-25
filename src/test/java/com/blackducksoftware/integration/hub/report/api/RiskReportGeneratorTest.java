@@ -43,6 +43,7 @@ import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
 import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
+import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
 import com.blackducksoftware.integration.hub.api.report.RiskReportGenerator;
@@ -95,7 +96,7 @@ public class RiskReportGeneratorTest {
 		final ScanStatusToPoll statusComplete = new ScanStatusToPoll(ScanStatus.COMPLETE.name(), _meta);
 		Mockito.doReturn(statusComplete).when(service).checkScanStatus(Mockito.anyString());
 		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
-				Mockito.any(ReportFormatEnum.class));
+				Mockito.any(ReportFormatEnum.class), Mockito.any(ReportCategoriesEnum[].class));
 
 		final List<MetaLink> links = new ArrayList<MetaLink>();
 		final MetaLink linkItem = new MetaLink("content", "FakeContentLink");
@@ -121,7 +122,7 @@ public class RiskReportGeneratorTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
-		assertEquals(report, generator.generateHubReport(logger).getReport());
+		assertEquals(report, generator.generateHubReport(logger, ReportCategoriesEnum.values()).getReport());
 		final String output = logger.getOutputString();
 		assertTrue(output, output.contains("Waiting for the bom to be updated with the scan results."));
 		assertTrue(output, output.contains("The bom has been updated, generating the report."));
@@ -160,7 +161,7 @@ public class RiskReportGeneratorTest {
 		final ScanStatusToPoll statusComplete = new ScanStatusToPoll(ScanStatus.COMPLETE.name(), _meta);
 		Mockito.doReturn(statusComplete).when(service).checkScanStatus(Mockito.anyString());
 		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
-				Mockito.any(ReportFormatEnum.class));
+				Mockito.any(ReportFormatEnum.class), Mockito.any(ReportCategoriesEnum[].class));
 
 		final List<MetaLink> links = new ArrayList<MetaLink>();
 		final MetaInformation reportMeta = new MetaInformation(null, null, links);
@@ -178,7 +179,7 @@ public class RiskReportGeneratorTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
-		generator.generateHubReport(logger).getReport();
+		generator.generateHubReport(logger, ReportCategoriesEnum.values()).getReport();
 	}
 
 	@Test
@@ -213,7 +214,7 @@ public class RiskReportGeneratorTest {
 		final ScanStatusToPoll statusComplete = new ScanStatusToPoll(ScanStatus.COMPLETE.name(), _meta);
 		Mockito.doReturn(statusComplete).when(service).checkScanStatus(Mockito.anyString());
 		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
-				Mockito.any(ReportFormatEnum.class));
+				Mockito.any(ReportFormatEnum.class), Mockito.any(ReportCategoriesEnum[].class));
 
 		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0,
 				null, null, null, null, null);
@@ -229,7 +230,7 @@ public class RiskReportGeneratorTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
-		generator.generateHubReport(logger).getReport();
+		generator.generateHubReport(logger, ReportCategoriesEnum.values()).getReport();
 	}
 
 	@Test
@@ -272,7 +273,7 @@ public class RiskReportGeneratorTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
-		generator.generateHubReport(logger).getReport();
+		generator.generateHubReport(logger, ReportCategoriesEnum.values()).getReport();
 	}
 
 	@Test
@@ -297,47 +298,47 @@ public class RiskReportGeneratorTest {
 		final String serverPath3 = "/Test/Fake/File";
 
 		Mockito.when(service.getScanLocations(Mockito.anyString(), Mockito.anyListOf(String.class)))
-				.then(new Answer<List<ScanLocationItem>>() {
-					@Override
-					public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
-						final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
-						historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
-						historyBeforeScanTime.setStatus(ScanStatus.ERROR);
+		.then(new Answer<List<ScanLocationItem>>() {
+			@Override
+			public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
+				final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
+				historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
+				historyBeforeScanTime.setStatus(ScanStatus.ERROR);
 
-						final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
-						historyInScanTime.setCreatedOn(inScanTime.toString());
-						historyInScanTime.setStatus(ScanStatus.COMPLETE);
+				final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
+				historyInScanTime.setCreatedOn(inScanTime.toString());
+				historyInScanTime.setStatus(ScanStatus.COMPLETE);
 
-						final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
-						historyAfterScanTime.setCreatedOn(afterScanTime.toString());
-						historyAfterScanTime.setStatus(ScanStatus.MATCHING);
+				final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
+				historyAfterScanTime.setCreatedOn(afterScanTime.toString());
+				historyAfterScanTime.setStatus(ScanStatus.MATCHING);
 
-						final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
-						historyList.add(historyBeforeScanTime);
-						historyList.add(historyInScanTime);
-						historyList.add(historyAfterScanTime);
+				final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+				historyList.add(historyBeforeScanTime);
+				historyList.add(historyInScanTime);
+				historyList.add(historyAfterScanTime);
 
-						final ScanLocationItem sl1 = new ScanLocationItem();
-						sl1.setHost(hostName);
-						sl1.setPath(serverPath1);
-						sl1.setScanList(historyList);
-						final ScanLocationItem sl2 = new ScanLocationItem();
-						sl2.setHost(hostName);
-						sl2.setPath(serverPath2);
-						sl2.setScanList(historyList);
-						final ScanLocationItem sl3 = new ScanLocationItem();
-						sl3.setHost(hostName);
-						sl3.setPath(serverPath3);
-						sl3.setScanList(historyList);
+				final ScanLocationItem sl1 = new ScanLocationItem();
+				sl1.setHost(hostName);
+				sl1.setPath(serverPath1);
+				sl1.setScanList(historyList);
+				final ScanLocationItem sl2 = new ScanLocationItem();
+				sl2.setHost(hostName);
+				sl2.setPath(serverPath2);
+				sl2.setScanList(historyList);
+				final ScanLocationItem sl3 = new ScanLocationItem();
+				sl3.setHost(hostName);
+				sl3.setPath(serverPath3);
+				sl3.setScanList(historyList);
 
-						final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
-						items.add(sl1);
-						items.add(sl2);
-						items.add(sl3);
+				final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+				items.add(sl1);
+				items.add(sl2);
+				items.add(sl3);
 
-						return items;
-					}
-				});
+				return items;
+			}
+		});
 
 		final List<String> scanTargets = new ArrayList<String>();
 		scanTargets.add("Test/Fake/Path/Child");
@@ -353,7 +354,7 @@ public class RiskReportGeneratorTest {
 		generatorInfo.setAfterScanTime(endScanTime);
 
 		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
-				Mockito.any(ReportFormatEnum.class));
+				Mockito.any(ReportFormatEnum.class), Mockito.any(ReportCategoriesEnum[].class));
 
 		final List<MetaLink> links = new ArrayList<MetaLink>();
 		final MetaLink linkItem = new MetaLink("content", "FakeContentLink");
@@ -379,7 +380,7 @@ public class RiskReportGeneratorTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
-		assertEquals(report, generator.generateHubReport(logger).getReport());
+		assertEquals(report, generator.generateHubReport(logger, null).getReport());
 		final String output = logger.getOutputString();
 		assertTrue(output, output.contains("Waiting for the bom to be updated with the scan results."));
 		assertTrue(output, output.contains("The bom has been updated, generating the report."));
@@ -411,47 +412,47 @@ public class RiskReportGeneratorTest {
 		final String serverPath3 = "/Test/Fake/File";
 
 		Mockito.when(service.getScanLocations(Mockito.anyString(), Mockito.anyListOf(String.class)))
-				.then(new Answer<List<ScanLocationItem>>() {
-					@Override
-					public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
-						final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
-						historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
-						historyBeforeScanTime.setStatus(ScanStatus.ERROR);
+		.then(new Answer<List<ScanLocationItem>>() {
+			@Override
+			public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
+				final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
+				historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
+				historyBeforeScanTime.setStatus(ScanStatus.ERROR);
 
-						final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
-						historyInScanTime.setCreatedOn(inScanTime.toString());
-						historyInScanTime.setStatus(ScanStatus.COMPLETE);
+				final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
+				historyInScanTime.setCreatedOn(inScanTime.toString());
+				historyInScanTime.setStatus(ScanStatus.COMPLETE);
 
-						final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
-						historyAfterScanTime.setCreatedOn(afterScanTime.toString());
-						historyAfterScanTime.setStatus(ScanStatus.MATCHING);
+				final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
+				historyAfterScanTime.setCreatedOn(afterScanTime.toString());
+				historyAfterScanTime.setStatus(ScanStatus.MATCHING);
 
-						final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
-						historyList.add(historyBeforeScanTime);
-						historyList.add(historyInScanTime);
-						historyList.add(historyAfterScanTime);
+				final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+				historyList.add(historyBeforeScanTime);
+				historyList.add(historyInScanTime);
+				historyList.add(historyAfterScanTime);
 
-						final ScanLocationItem sl1 = new ScanLocationItem();
-						sl1.setHost(hostName);
-						sl1.setPath(serverPath1);
-						sl1.setScanList(historyList);
-						final ScanLocationItem sl2 = new ScanLocationItem();
-						sl2.setHost(hostName);
-						sl2.setPath(serverPath2);
-						sl2.setScanList(historyList);
-						final ScanLocationItem sl3 = new ScanLocationItem();
-						sl3.setHost(hostName);
-						sl3.setPath(serverPath3);
-						sl3.setScanList(historyList);
+				final ScanLocationItem sl1 = new ScanLocationItem();
+				sl1.setHost(hostName);
+				sl1.setPath(serverPath1);
+				sl1.setScanList(historyList);
+				final ScanLocationItem sl2 = new ScanLocationItem();
+				sl2.setHost(hostName);
+				sl2.setPath(serverPath2);
+				sl2.setScanList(historyList);
+				final ScanLocationItem sl3 = new ScanLocationItem();
+				sl3.setHost(hostName);
+				sl3.setPath(serverPath3);
+				sl3.setScanList(historyList);
 
-						final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
-						items.add(sl1);
-						items.add(sl2);
-						items.add(sl3);
+				final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+				items.add(sl1);
+				items.add(sl2);
+				items.add(sl3);
 
-						return items;
-					}
-				});
+				return items;
+			}
+		});
 
 		final List<String> scanTargets = new ArrayList<String>();
 		scanTargets.add("Test/Fake/Path/Child");
@@ -467,7 +468,7 @@ public class RiskReportGeneratorTest {
 		generatorInfo.setAfterScanTime(endScanTime);
 
 		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
-				Mockito.any(ReportFormatEnum.class));
+				Mockito.any(ReportFormatEnum.class), Mockito.any(ReportCategoriesEnum[].class));
 
 		final List<MetaLink> links = new ArrayList<MetaLink>();
 		final MetaInformation reportMeta = new MetaInformation(null, null, links);
@@ -487,7 +488,7 @@ public class RiskReportGeneratorTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
-		generator.generateHubReport(logger).getReport();
+		generator.generateHubReport(logger, ReportCategoriesEnum.values()).getReport();
 	}
 
 	@Test
@@ -515,47 +516,47 @@ public class RiskReportGeneratorTest {
 		final String serverPath3 = "/Test/Fake/File";
 
 		Mockito.when(service.getScanLocations(Mockito.anyString(), Mockito.anyListOf(String.class)))
-				.then(new Answer<List<ScanLocationItem>>() {
-					@Override
-					public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
-						final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
-						historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
-						historyBeforeScanTime.setStatus(ScanStatus.ERROR);
+		.then(new Answer<List<ScanLocationItem>>() {
+			@Override
+			public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
+				final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
+				historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
+				historyBeforeScanTime.setStatus(ScanStatus.ERROR);
 
-						final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
-						historyInScanTime.setCreatedOn(inScanTime.toString());
-						historyInScanTime.setStatus(ScanStatus.COMPLETE);
+				final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
+				historyInScanTime.setCreatedOn(inScanTime.toString());
+				historyInScanTime.setStatus(ScanStatus.COMPLETE);
 
-						final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
-						historyAfterScanTime.setCreatedOn(afterScanTime.toString());
-						historyAfterScanTime.setStatus(ScanStatus.MATCHING);
+				final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
+				historyAfterScanTime.setCreatedOn(afterScanTime.toString());
+				historyAfterScanTime.setStatus(ScanStatus.MATCHING);
 
-						final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
-						historyList.add(historyBeforeScanTime);
-						historyList.add(historyInScanTime);
-						historyList.add(historyAfterScanTime);
+				final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+				historyList.add(historyBeforeScanTime);
+				historyList.add(historyInScanTime);
+				historyList.add(historyAfterScanTime);
 
-						final ScanLocationItem sl1 = new ScanLocationItem();
-						sl1.setHost(hostName);
-						sl1.setPath(serverPath1);
-						sl1.setScanList(historyList);
-						final ScanLocationItem sl2 = new ScanLocationItem();
-						sl2.setHost(hostName);
-						sl2.setPath(serverPath2);
-						sl2.setScanList(historyList);
-						final ScanLocationItem sl3 = new ScanLocationItem();
-						sl3.setHost(hostName);
-						sl3.setPath(serverPath3);
-						sl3.setScanList(historyList);
+				final ScanLocationItem sl1 = new ScanLocationItem();
+				sl1.setHost(hostName);
+				sl1.setPath(serverPath1);
+				sl1.setScanList(historyList);
+				final ScanLocationItem sl2 = new ScanLocationItem();
+				sl2.setHost(hostName);
+				sl2.setPath(serverPath2);
+				sl2.setScanList(historyList);
+				final ScanLocationItem sl3 = new ScanLocationItem();
+				sl3.setHost(hostName);
+				sl3.setPath(serverPath3);
+				sl3.setScanList(historyList);
 
-						final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
-						items.add(sl1);
-						items.add(sl2);
-						items.add(sl3);
+				final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+				items.add(sl1);
+				items.add(sl2);
+				items.add(sl3);
 
-						return items;
-					}
-				});
+				return items;
+			}
+		});
 
 		final List<String> scanTargets = new ArrayList<String>();
 		scanTargets.add("Test/Fake/Path/Child");
@@ -571,7 +572,7 @@ public class RiskReportGeneratorTest {
 		generatorInfo.setAfterScanTime(endScanTime);
 
 		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
-				Mockito.any(ReportFormatEnum.class));
+				Mockito.any(ReportFormatEnum.class), Mockito.any(ReportCategoriesEnum[].class));
 
 		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0,
 				null, null, null, null, null);
@@ -587,7 +588,7 @@ public class RiskReportGeneratorTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
-		generator.generateHubReport(logger).getReport();
+		generator.generateHubReport(logger, null).getReport();
 	}
 
 	@Test
@@ -615,48 +616,48 @@ public class RiskReportGeneratorTest {
 		final String serverPath3 = "/Test/Fake/File";
 
 		Mockito.when(service.getScanLocations(Mockito.anyString(), Mockito.anyListOf(String.class)))
-				.then(new Answer<List<ScanLocationItem>>() {
-					@Override
-					public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
+		.then(new Answer<List<ScanLocationItem>>() {
+			@Override
+			public List<ScanLocationItem> answer(final InvocationOnMock invocation) throws Throwable {
 
-						final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
-						historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
-						historyBeforeScanTime.setStatus(ScanStatus.ERROR);
+				final ScanHistoryItem historyBeforeScanTime = new ScanHistoryItem();
+				historyBeforeScanTime.setCreatedOn(beforeScanTime.toString());
+				historyBeforeScanTime.setStatus(ScanStatus.ERROR);
 
-						final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
-						historyInScanTime.setCreatedOn(inScanTime.toString());
-						historyInScanTime.setStatus(ScanStatus.BUILDING_BOM);
+				final ScanHistoryItem historyInScanTime = new ScanHistoryItem();
+				historyInScanTime.setCreatedOn(inScanTime.toString());
+				historyInScanTime.setStatus(ScanStatus.BUILDING_BOM);
 
-						final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
-						historyAfterScanTime.setCreatedOn(afterScanTime.toString());
-						historyAfterScanTime.setStatus(ScanStatus.MATCHING);
+				final ScanHistoryItem historyAfterScanTime = new ScanHistoryItem();
+				historyAfterScanTime.setCreatedOn(afterScanTime.toString());
+				historyAfterScanTime.setStatus(ScanStatus.MATCHING);
 
-						final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
-						historyList.add(historyBeforeScanTime);
-						historyList.add(historyInScanTime);
-						historyList.add(historyAfterScanTime);
+				final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+				historyList.add(historyBeforeScanTime);
+				historyList.add(historyInScanTime);
+				historyList.add(historyAfterScanTime);
 
-						final ScanLocationItem sl1 = new ScanLocationItem();
-						sl1.setHost(hostName);
-						sl1.setPath(serverPath1);
-						sl1.setScanList(historyList);
-						final ScanLocationItem sl2 = new ScanLocationItem();
-						sl2.setHost(hostName);
-						sl2.setPath(serverPath2);
-						sl2.setScanList(historyList);
-						final ScanLocationItem sl3 = new ScanLocationItem();
-						sl3.setHost(hostName);
-						sl3.setPath(serverPath3);
-						sl3.setScanList(historyList);
+				final ScanLocationItem sl1 = new ScanLocationItem();
+				sl1.setHost(hostName);
+				sl1.setPath(serverPath1);
+				sl1.setScanList(historyList);
+				final ScanLocationItem sl2 = new ScanLocationItem();
+				sl2.setHost(hostName);
+				sl2.setPath(serverPath2);
+				sl2.setScanList(historyList);
+				final ScanLocationItem sl3 = new ScanLocationItem();
+				sl3.setHost(hostName);
+				sl3.setPath(serverPath3);
+				sl3.setScanList(historyList);
 
-						final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
-						items.add(sl1);
-						items.add(sl2);
-						items.add(sl3);
+				final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+				items.add(sl1);
+				items.add(sl2);
+				items.add(sl3);
 
-						return items;
-					}
-				});
+				return items;
+			}
+		});
 
 		final List<String> scanTargets = new ArrayList<String>();
 		scanTargets.add("Test/Fake/Path/Child");
@@ -680,7 +681,7 @@ public class RiskReportGeneratorTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
-		generator.generateHubReport(logger).getReport();
+		generator.generateHubReport(logger, null).getReport();
 	}
 
 }

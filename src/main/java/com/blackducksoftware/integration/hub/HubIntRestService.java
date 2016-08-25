@@ -44,6 +44,7 @@ import com.blackducksoftware.integration.hub.api.UserRestService;
 import com.blackducksoftware.integration.hub.api.VersionComparison;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatus;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
@@ -234,7 +235,7 @@ public class HubIntRestService {
 	 *
 	 */
 	public ReleaseItem getVersion(final ProjectItem project, final String versionName) throws IOException,
-			BDRestException, URISyntaxException, VersionDoesNotExistException, UnexpectedHubResponseException {
+	BDRestException, URISyntaxException, VersionDoesNotExistException, UnexpectedHubResponseException {
 		final List<ReleaseItem> versions = getVersionsForProject(project);
 		for (final ReleaseItem version : versions) {
 			if (version.getVersionName().equals(versionName)) {
@@ -278,7 +279,7 @@ public class HubIntRestService {
 		final List<String> versionLinks = project.getLinks(ProjectItem.VERSION_LINK);
 		if (versionLinks.size() != 1) {
 			throw new UnexpectedHubResponseException("The project " + project.getName() + " has " + versionLinks.size()
-					+ " " + ProjectItem.VERSION_LINK + " links; expected one");
+			+ " " + ProjectItem.VERSION_LINK + " links; expected one");
 		}
 		final String versionLink = versionLinks.get(0);
 		return versionLink;
@@ -396,7 +397,7 @@ public class HubIntRestService {
 			throw new BDRestException(
 					"There was a problem comparing the specified version to the version of the Hub server. Error Code: "
 							+ responseCode,
-					resource);
+							resource);
 		}
 	}
 
@@ -451,7 +452,7 @@ public class HubIntRestService {
 				throw new BDRestException(
 						"There was a problem getting the code locations for the host and paths provided. Error Code: "
 								+ responseCode,
-						resource);
+								resource);
 			}
 		}
 		return codeLocations;
@@ -480,20 +481,30 @@ public class HubIntRestService {
 		return null;
 	}
 
+
 	/**
 	 * Generates a new Hub report for the specified version.
 	 *
 	 * @return the Report URL
 	 *
 	 */
-	public String generateHubReport(final ReleaseItem version, final ReportFormatEnum reportFormat)
-			throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
+	public String generateHubReport(final ReleaseItem version, final ReportFormatEnum reportFormat,
+			final ReportCategoriesEnum[] categories)
+					throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
 		if (ReportFormatEnum.UNKNOWN == reportFormat) {
 			throw new IllegalArgumentException("Can not generate a report of format : " + reportFormat);
 		}
 
 		final JsonObject json = new JsonObject();
 		json.addProperty("reportFormat", reportFormat.name());
+
+		if (categories != null) {
+			final JsonArray categoriesJson = new JsonArray();
+			for (final ReportCategoriesEnum category : categories) {
+				categoriesJson.add(category.name());
+			}
+			json.add("categories", categoriesJson);
+		}
 
 		final Gson gson = new GsonBuilder().create();
 		final StringRepresentation stringRep = new StringRepresentation(gson.toJson(json));
@@ -530,7 +541,7 @@ public class HubIntRestService {
 
 		@SuppressWarnings("unchecked")
 		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
-				.get(HeaderConstants.ATTRIBUTE_HEADERS);
+		.get(HeaderConstants.ATTRIBUTE_HEADERS);
 		if (requestHeaders == null) {
 			requestHeaders = new Series<>(Header.class);
 			resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
