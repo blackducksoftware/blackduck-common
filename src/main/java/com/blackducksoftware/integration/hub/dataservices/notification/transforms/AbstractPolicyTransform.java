@@ -23,7 +23,6 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Not
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 
 public abstract class AbstractPolicyTransform extends AbstractNotificationTransform {
@@ -65,8 +64,7 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 								policyRuleList, item, templateData);
 					}
 				}
-			} catch (final NotificationServiceException | IOException | BDRestException | URISyntaxException
-					| MissingUUIDException e) {
+			} catch (final Exception e) {
 				throw new HubItemTransformException(e);
 			}
 		}
