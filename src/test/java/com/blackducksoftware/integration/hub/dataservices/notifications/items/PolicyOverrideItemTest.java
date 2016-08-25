@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.items;
+package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,8 +10,9 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyOverrideContentItem;
 
-public class PolicyViolationItemTest {
+public class PolicyOverrideItemTest {
 
 	@Test
 	public void contentItemConstructorTest() {
@@ -22,21 +23,24 @@ public class PolicyViolationItemTest {
 		final String componentVersion = "0.9.8";
 		final UUID componentId = UUID.randomUUID();
 		final UUID componentVersionId = UUID.randomUUID();
-
+		final String firstName = "myName";
+		final String lastName = "noMyName";
 		final List<PolicyRule> policyRules = new ArrayList<>();
 		final PolicyRule policy1 = new PolicyRule(null, "Policy 1", null, null, null, null, null, null, null, null);
 		final PolicyRule policy2 = new PolicyRule(null, "Policy 2", null, null, null, null, null, null, null, null);
 		policyRules.add(policy1);
 		policyRules.add(policy2);
 
-		final PolicyViolationContentItem item = new PolicyViolationContentItem(projectVersion, componentName,
-				componentVersion, componentId, componentVersionId, policyRules);
+		final PolicyOverrideContentItem item = new PolicyOverrideContentItem(projectVersion, componentName,
+				componentVersion, componentId, componentVersionId, policyRules, firstName, lastName);
 
 		assertEquals(projectVersion, item.getProjectVersion());
 		assertEquals(componentName, item.getComponentName());
 		assertEquals(componentVersion, item.getComponentVersion());
 		assertEquals(componentId, item.getComponentId());
 		assertEquals(componentVersionId, item.getComponentVersionId());
+		assertEquals(firstName, item.getFirstName());
+		assertEquals(lastName, item.getLastName());
 		assertEquals(policyRules, item.getPolicyRuleList());
 	}
 }

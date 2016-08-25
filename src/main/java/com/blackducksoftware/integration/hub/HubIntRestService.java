@@ -216,16 +216,21 @@ public class HubIntRestService {
 	public ReleaseItem getProjectVersion(final String versionUrl)
 			throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = getRestConnection().createClientResource(versionUrl);
-		resource.setMethod(Method.GET);
-		getRestConnection().handleRequest(resource);
-		final int responseCode = resource.getResponse().getStatus().getCode();
+		try {
+			resource.setMethod(Method.GET);
+			getRestConnection().handleRequest(resource);
+			final int responseCode = resource.getResponse().getStatus().getCode();
 
-		if (getRestConnection().isSuccess(responseCode)) {
-			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-			final Gson gson = new GsonBuilder().create();
-			return gson.fromJson(response, ReleaseItem.class);
-		} else {
-			throw new BDRestException("There was a problem getting the version. Error Code: " + responseCode, resource);
+			if (getRestConnection().isSuccess(responseCode)) {
+				final String response = getRestConnection().readResponseAsString(resource.getResponse());
+				final Gson gson = new GsonBuilder().create();
+				return gson.fromJson(response, ReleaseItem.class);
+			} else {
+				throw new BDRestException("There was a problem getting the version. Error Code: " + responseCode,
+						resource);
+			}
+		} finally {
+			releaseResource(resource);
 		}
 	}
 
@@ -253,24 +258,29 @@ public class HubIntRestService {
 			throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
 		final String versionLink = getVersionLink(project);
 		final ClientResource resource = getRestConnection().createClientResource(versionLink);
-		resource.addQueryParameter("limit", "10000000");
-		resource.setMethod(Method.GET);
-		getRestConnection().handleRequest(resource);
-		final int responseCode = resource.getResponse().getStatus().getCode();
+		try {
+			resource.addQueryParameter("limit", "10000000");
+			resource.setMethod(Method.GET);
+			getRestConnection().handleRequest(resource);
+			final int responseCode = resource.getResponse().getStatus().getCode();
 
-		if (getRestConnection().isSuccess(responseCode)) {
-			final String response = getRestConnection().readResponseAsString(resource.getResponse());
+			if (getRestConnection().isSuccess(responseCode)) {
+				final String response = getRestConnection().readResponseAsString(resource.getResponse());
 
-			final Gson gson = new GsonBuilder().create();
-			final JsonParser parser = new JsonParser();
-			final JsonObject json = parser.parse(response).getAsJsonObject();
-			final List<ReleaseItem> versions = gson.fromJson(json.get("items"), new TypeToken<List<ReleaseItem>>() {
-			}.getType());
+				final Gson gson = new GsonBuilder().create();
+				final JsonParser parser = new JsonParser();
+				final JsonObject json = parser.parse(response).getAsJsonObject();
+				final List<ReleaseItem> versions = gson.fromJson(json.get("items"), new TypeToken<List<ReleaseItem>>() {
+				}.getType());
 
-			return versions;
-		} else {
-			throw new BDRestException(
-					"There was a problem getting the versions for this Project. Error Code: " + responseCode, resource);
+				return versions;
+			} else {
+				throw new BDRestException(
+						"There was a problem getting the versions for this Project. Error Code: " + responseCode,
+						resource);
+			}
+		} finally {
+			releaseResource(resource);
 		}
 	}
 
@@ -350,22 +360,27 @@ public class HubIntRestService {
 	 */
 	public String getHubVersion() throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = getRestConnection().createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("v1");
-		resource.addSegment("current-version");
+		try {
+			resource.addSegment("api");
+			resource.addSegment("v1");
+			resource.addSegment("current-version");
 
-		int responseCode = 0;
+			int responseCode = 0;
 
-		resource.setMethod(Method.GET);
-		getRestConnection().handleRequest(resource);
-		responseCode = resource.getResponse().getStatus().getCode();
+			resource.setMethod(Method.GET);
+			getRestConnection().handleRequest(resource);
+			responseCode = resource.getResponse().getStatus().getCode();
 
-		if (getRestConnection().isSuccess(responseCode)) {
-			final Response resp = resource.getResponse();
-			return resp.getEntityAsText();
-		} else {
-			throw new BDRestException(
-					"There was a problem getting the version of the Hub server. Error Code: " + responseCode, resource);
+			if (getRestConnection().isSuccess(responseCode)) {
+				final Response resp = resource.getResponse();
+				return resp.getEntityAsText();
+			} else {
+				throw new BDRestException(
+						"There was a problem getting the version of the Hub server. Error Code: " + responseCode,
+						resource);
+			}
+		} finally {
+			releaseResource(resource);
 		}
 	}
 
@@ -376,27 +391,31 @@ public class HubIntRestService {
 	public VersionComparison compareWithHubVersion(final String version)
 			throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = getRestConnection().createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("v1");
-		resource.addSegment("current-version-comparison");
-		resource.addQueryParameter("version", version);
+		try {
+			resource.addSegment("api");
+			resource.addSegment("v1");
+			resource.addSegment("current-version-comparison");
+			resource.addQueryParameter("version", version);
 
-		int responseCode = 0;
+			int responseCode = 0;
 
-		resource.setMethod(Method.GET);
-		getRestConnection().handleRequest(resource);
-		responseCode = resource.getResponse().getStatus().getCode();
+			resource.setMethod(Method.GET);
+			getRestConnection().handleRequest(resource);
+			responseCode = resource.getResponse().getStatus().getCode();
 
-		if (getRestConnection().isSuccess(responseCode)) {
-			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-			final Gson gson = new GsonBuilder().create();
-			final VersionComparison comparison = gson.fromJson(response, VersionComparison.class);
-			return comparison;
-		} else {
-			throw new BDRestException(
-					"There was a problem comparing the specified version to the version of the Hub server. Error Code: "
-							+ responseCode,
-					resource);
+			if (getRestConnection().isSuccess(responseCode)) {
+				final String response = getRestConnection().readResponseAsString(resource.getResponse());
+				final Gson gson = new GsonBuilder().create();
+				final VersionComparison comparison = gson.fromJson(response, VersionComparison.class);
+				return comparison;
+			} else {
+				throw new BDRestException(
+						"There was a problem comparing the specified version to the version of the Hub server. Error Code: "
+								+ responseCode,
+						resource);
+			}
+		} finally {
+			releaseResource(resource);
 		}
 	}
 
@@ -424,34 +443,38 @@ public class HubIntRestService {
 			}
 
 			resource = getRestConnection().createClientResource();
-			resource.addSegment("api");
-			resource.addSegment("v1");
-			resource.addSegment("scanlocations");
-			resource.addQueryParameter("host", hostname);
-			resource.addQueryParameter("path", correctedTargetPath);
+			try {
+				resource.addSegment("api");
+				resource.addSegment("v1");
+				resource.addSegment("scanlocations");
+				resource.addQueryParameter("host", hostname);
+				resource.addQueryParameter("path", correctedTargetPath);
 
-			resource.setMethod(Method.GET);
+				resource.setMethod(Method.GET);
 
-			getRestConnection().handleRequest(resource);
+				getRestConnection().handleRequest(resource);
 
-			final int responseCode = resource.getResponse().getStatus().getCode();
+				final int responseCode = resource.getResponse().getStatus().getCode();
 
-			if (getRestConnection().isSuccess(responseCode)) {
-				final String response = getRestConnection().readResponseAsString(resource.getResponse());
-				final ScanLocationResults results = new Gson().fromJson(response, ScanLocationResults.class);
-				final ScanLocationItem currentCodeLocation = getScanLocationMatch(hostname, correctedTargetPath,
-						results);
-				if (currentCodeLocation == null) {
-					throw new HubIntegrationException("Could not determine the code location for the Host : " + hostname
-							+ " and Path : " + correctedTargetPath);
+				if (getRestConnection().isSuccess(responseCode)) {
+					final String response = getRestConnection().readResponseAsString(resource.getResponse());
+					final ScanLocationResults results = new Gson().fromJson(response, ScanLocationResults.class);
+					final ScanLocationItem currentCodeLocation = getScanLocationMatch(hostname, correctedTargetPath,
+							results);
+					if (currentCodeLocation == null) {
+						throw new HubIntegrationException("Could not determine the code location for the Host : "
+								+ hostname + " and Path : " + correctedTargetPath);
+					}
+
+					codeLocations.add(currentCodeLocation);
+				} else {
+					throw new BDRestException(
+							"There was a problem getting the code locations for the host and paths provided. Error Code: "
+									+ responseCode,
+							resource);
 				}
-
-				codeLocations.add(currentCodeLocation);
-			} else {
-				throw new BDRestException(
-						"There was a problem getting the code locations for the host and paths provided. Error Code: "
-								+ responseCode,
-						resource);
+			} finally {
+				releaseResource(resource);
 			}
 		}
 		return codeLocations;
@@ -513,45 +536,52 @@ public class HubIntRestService {
 	public int deleteHubReport(final String reportUrl) throws IOException, BDRestException, URISyntaxException {
 
 		final ClientResource resource = getRestConnection().createClientResource(reportUrl);
-		resource.setMethod(Method.DELETE);
-		getRestConnection().handleRequest(resource);
+		try {
+			resource.setMethod(Method.DELETE);
+			getRestConnection().handleRequest(resource);
 
-		final int responseCode = resource.getResponse().getStatus().getCode();
-		if (!getRestConnection().isSuccess(responseCode)) {
-			throw new BDRestException("There was a problem deleting this report. Error Code: " + responseCode,
-					resource);
+			final int responseCode = resource.getResponse().getStatus().getCode();
+			if (!getRestConnection().isSuccess(responseCode)) {
+				throw new BDRestException("There was a problem deleting this report. Error Code: " + responseCode,
+						resource);
+			}
+			return responseCode;
+		} finally {
+			releaseResource(resource);
 		}
-		return responseCode;
 	}
 
 	public ReportInformationItem getReportInformation(final String reportUrl)
 			throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = getRestConnection().createClientResource(reportUrl);
+		try {
+			@SuppressWarnings("unchecked")
+			Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
+					.get(HeaderConstants.ATTRIBUTE_HEADERS);
+			if (requestHeaders == null) {
+				requestHeaders = new Series<>(Header.class);
+				resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
+			}
+			requestHeaders.add(new Header("Accept", MediaType.APPLICATION_JSON.toString()));
 
-		@SuppressWarnings("unchecked")
-		Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
-				.get(HeaderConstants.ATTRIBUTE_HEADERS);
-		if (requestHeaders == null) {
-			requestHeaders = new Series<>(Header.class);
-			resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
-		}
-		requestHeaders.add(new Header("Accept", MediaType.APPLICATION_JSON.toString()));
+			// Restlet 2.3.4 and higher
+			// resource.accept(MediaType.APPLICATION_JSON);
 
-		// Restlet 2.3.4 and higher
-		// resource.accept(MediaType.APPLICATION_JSON);
+			resource.setMethod(Method.GET);
 
-		resource.setMethod(Method.GET);
+			getRestConnection().handleRequest(resource);
+			final int responseCode = resource.getResponse().getStatus().getCode();
 
-		getRestConnection().handleRequest(resource);
-		final int responseCode = resource.getResponse().getStatus().getCode();
-
-		if (getRestConnection().isSuccess(responseCode)) {
-			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-			return new Gson().fromJson(response, ReportInformationItem.class);
-		} else {
-			throw new BDRestException(
-					"There was a problem getting the links for the specified report. Error Code: " + responseCode,
-					resource);
+			if (getRestConnection().isSuccess(responseCode)) {
+				final String response = getRestConnection().readResponseAsString(resource.getResponse());
+				return new Gson().fromJson(response, ReportInformationItem.class);
+			} else {
+				throw new BDRestException(
+						"There was a problem getting the links for the specified report. Error Code: " + responseCode,
+						resource);
+			}
+		} finally {
+			releaseResource(resource);
 		}
 	}
 
@@ -562,35 +592,39 @@ public class HubIntRestService {
 	public VersionReport getReportContent(final String reportContentUrl)
 			throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = getRestConnection().createClientResource(reportContentUrl);
+		try {
+			resource.setMethod(Method.GET);
 
-		resource.setMethod(Method.GET);
+			getRestConnection().handleRequest(resource);
+			final int responseCode = resource.getResponse().getStatus().getCode();
 
-		getRestConnection().handleRequest(resource);
-		final int responseCode = resource.getResponse().getStatus().getCode();
+			if (getRestConnection().isSuccess(responseCode)) {
+				final String response = getRestConnection().readResponseAsString(resource.getResponse());
 
-		if (getRestConnection().isSuccess(responseCode)) {
-			final String response = getRestConnection().readResponseAsString(resource.getResponse());
+				final Gson gson = new GsonBuilder().create();
 
-			final Gson gson = new GsonBuilder().create();
+				final JsonParser parser = new JsonParser();
+				final JsonObject json = parser.parse(response).getAsJsonObject();
+				final JsonElement content = json.get("reportContent");
+				final JsonArray reportConentArray = content.getAsJsonArray();
+				final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
 
-			final JsonParser parser = new JsonParser();
-			final JsonObject json = parser.parse(response).getAsJsonObject();
-			final JsonElement content = json.get("reportContent");
-			final JsonArray reportConentArray = content.getAsJsonArray();
-			final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
+				final VersionReport report = gson.fromJson(reportFile.get("fileContent"), VersionReport.class);
 
-			final VersionReport report = gson.fromJson(reportFile.get("fileContent"), VersionReport.class);
-
-			return report;
-		} else if (responseCode == 412) {
-			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-			final JsonParser parser = new JsonParser();
-			final JsonObject json = parser.parse(response).getAsJsonObject();
-			final String errorMessage = json.get("errorMessage").getAsString();
-			throw new BDRestException(errorMessage + " Error Code: " + responseCode, resource);
-		} else {
-			throw new BDRestException(
-					"There was a problem getting the content of this Report. Error Code: " + responseCode, resource);
+				return report;
+			} else if (responseCode == 412) {
+				final String response = getRestConnection().readResponseAsString(resource.getResponse());
+				final JsonParser parser = new JsonParser();
+				final JsonObject json = parser.parse(response).getAsJsonObject();
+				final String errorMessage = json.get("errorMessage").getAsString();
+				throw new BDRestException(errorMessage + " Error Code: " + responseCode, resource);
+			} else {
+				throw new BDRestException(
+						"There was a problem getting the content of this Report. Error Code: " + responseCode,
+						resource);
+			}
+		} finally {
+			releaseResource(resource);
 		}
 	}
 
@@ -604,26 +638,29 @@ public class HubIntRestService {
 			throw new IllegalArgumentException("Missing the policy status URL.");
 		}
 		final ClientResource resource = getRestConnection().createClientResource(policyStatusUrl);
+		try {
+			resource.setMethod(Method.GET);
 
-		resource.setMethod(Method.GET);
+			getRestConnection().handleRequest(resource);
 
-		getRestConnection().handleRequest(resource);
+			final int responseCode = resource.getResponse().getStatus().getCode();
 
-		final int responseCode = resource.getResponse().getStatus().getCode();
+			if (getRestConnection().isSuccess(responseCode)) {
+				final String response = getRestConnection().readResponseAsString(resource.getResponse());
 
-		if (getRestConnection().isSuccess(responseCode)) {
-			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-
-			final Gson gson = new GsonBuilder().create();
-			final PolicyStatus status = gson.fromJson(response, PolicyStatus.class);
-			return status;
-		}
-		if (responseCode == 404) {
-			throw new MissingPolicyStatusException(
-					"There was no policy status found for this version. The BOM may be empty.");
-		} else {
-			throw new BDRestException("There was a problem getting the policy status. Error Code: " + responseCode,
-					resource);
+				final Gson gson = new GsonBuilder().create();
+				final PolicyStatus status = gson.fromJson(response, PolicyStatus.class);
+				return status;
+			}
+			if (responseCode == 404) {
+				throw new MissingPolicyStatusException(
+						"There was no policy status found for this version. The BOM may be empty.");
+			} else {
+				throw new BDRestException("There was a problem getting the policy status. Error Code: " + responseCode,
+						resource);
+			}
+		} finally {
+			releaseResource(resource);
 		}
 	}
 
@@ -633,22 +670,25 @@ public class HubIntRestService {
 	public ScanStatusToPoll checkScanStatus(final String scanStatusUrl)
 			throws IOException, BDRestException, URISyntaxException {
 		final ClientResource resource = getRestConnection().createClientResource(scanStatusUrl);
+		try {
+			resource.setMethod(Method.GET);
 
-		resource.setMethod(Method.GET);
+			getRestConnection().handleRequest(resource);
+			final int responseCode = resource.getResponse().getStatus().getCode();
 
-		getRestConnection().handleRequest(resource);
-		final int responseCode = resource.getResponse().getStatus().getCode();
+			if (getRestConnection().isSuccess(responseCode)) {
+				final String response = getRestConnection().readResponseAsString(resource.getResponse());
 
-		if (getRestConnection().isSuccess(responseCode)) {
-			final String response = getRestConnection().readResponseAsString(resource.getResponse());
+				final Gson gson = new GsonBuilder().create();
 
-			final Gson gson = new GsonBuilder().create();
-
-			final ScanStatusToPoll status = gson.fromJson(response, ScanStatusToPoll.class);
-			return status;
-		} else {
-			throw new BDRestException("There was a problem getting the scan status. Error Code: " + responseCode,
-					resource);
+				final ScanStatusToPoll status = gson.fromJson(response, ScanStatusToPoll.class);
+				return status;
+			} else {
+				throw new BDRestException("There was a problem getting the scan status. Error Code: " + responseCode,
+						resource);
+			}
+		} finally {
+			releaseResource(resource);
 		}
 	}
 
@@ -663,25 +703,35 @@ public class HubIntRestService {
 	 */
 	public String getRegistrationId() throws URISyntaxException, BDRestException, IOException, JsonSyntaxException {
 		final ClientResource resource = getRestConnection().createClientResource();
-		resource.addSegment("api");
-		resource.addSegment("v1");
-		resource.addSegment("registrations");
-		resource.setMethod(Method.GET);
+		try {
+			resource.addSegment("api");
+			resource.addSegment("v1");
+			resource.addSegment("registrations");
+			resource.setMethod(Method.GET);
 
-		getRestConnection().handleRequest(resource);
-		final int responseCode = resource.getResponse().getStatus().getCode();
-		if (responseCode == 200) {
-			final String response = getRestConnection().readResponseAsString(resource.getResponse());
-			final JsonParser parser = new JsonParser();
-			final JsonElement je = parser.parse(response);
-			final JsonObject jo = je.getAsJsonObject();
-			final JsonElement je2 = jo.get("registrationId");
-			final String regId = je2.getAsString();
-			return regId;
-		} else {
-			throw new BDRestException("There was a problem getting the registration ID. Error Code: " + responseCode,
-					resource);
+			getRestConnection().handleRequest(resource);
+			final int responseCode = resource.getResponse().getStatus().getCode();
+			if (responseCode == 200) {
+				final String response = getRestConnection().readResponseAsString(resource.getResponse());
+				final JsonParser parser = new JsonParser();
+				final JsonElement je = parser.parse(response);
+				final JsonObject jo = je.getAsJsonObject();
+				final JsonElement je2 = jo.get("registrationId");
+				final String regId = je2.getAsString();
+				return regId;
+			} else {
+				throw new BDRestException(
+						"There was a problem getting the registration ID. Error Code: " + responseCode, resource);
+			}
+		} finally {
+			releaseResource(resource);
 		}
 	}
 
+	private void releaseResource(final ClientResource resource) {
+		if (resource.getResponse() != null) {
+			resource.getResponse().release();
+		}
+		resource.release();
+	}
 }

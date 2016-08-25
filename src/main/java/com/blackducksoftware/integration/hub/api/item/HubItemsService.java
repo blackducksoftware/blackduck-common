@@ -137,23 +137,28 @@ public class HubItemsService<T> {
 
 		final List<T> items = new ArrayList<T>();
 		final ClientResource resource = restConnection.createClientResource(urlSegments, queryParameters);
-		resource.setMethod(Method.GET);
-		restConnection.handleRequest(resource);
-		final int responseCode = restConnection.getResponseStatusCode(resource);
+		try {
+			resource.setMethod(Method.GET);
+			restConnection.handleRequest(resource);
+			final int responseCode = restConnection.getResponseStatusCode(resource);
 
-		if (restConnection.isSuccess(responseCode)) {
-			final JsonArray array = parseJsonArray(resource);
+			if (restConnection.isSuccess(responseCode)) {
+				final JsonArray array = parseJsonArray(resource);
 
-			for (final JsonElement elem : array) {
-				final T genericItem = gson.fromJson(elem, requestListTypeToken.getType());
-				items.add(genericItem);
+				for (final JsonElement elem : array) {
+					final T genericItem = gson.fromJson(elem, requestListTypeToken.getType());
+					items.add(genericItem);
+				}
+			} else {
+				throw new ResourceDoesNotExistException(
+						"Error getting resource from relative url segments " + urlSegments + " and query parameters "
+								+ queryParameters + "; errorCode: " + responseCode + "; " + resource,
+						resource);
 			}
-		} else {
-			throw new ResourceDoesNotExistException("Error getting resource from relative url segments " + urlSegments
-					+ " and query parameters " + queryParameters + "; errorCode: " + responseCode + "; " + resource,
-					resource);
+			return items;
+		} finally {
+			releaseResource(resource);
 		}
-		return items;
 	}
 
 	private JsonArray parseJsonArray(final ClientResource resource) throws IOException {
@@ -165,4 +170,10 @@ public class HubItemsService<T> {
 		return array;
 	}
 
+	private void releaseResource(final ClientResource resource) {
+		if (resource.getResponse() != null) {
+			resource.getResponse().release();
+		}
+		resource.release();
+	}
 }

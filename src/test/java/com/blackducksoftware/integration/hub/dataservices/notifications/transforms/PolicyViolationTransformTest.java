@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.transforms;
+package com.blackducksoftware.integration.hub.dataservices.notifications.transforms;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,9 +25,10 @@ import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotif
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
-import com.blackducksoftware.integration.hub.dataservices.items.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservices.items.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.dataservices.items.PolicyViolationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationTransform;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
@@ -41,6 +42,7 @@ public class PolicyViolationTransformTest {
 	private final static UUID COMPONENT_ID = UUID.randomUUID();
 	private final static UUID COMPONENT_VERSION_ID = UUID.randomUUID();
 	private final static String POLICY_NAME = "Policy Name";
+	private final static String PROJECT_VERSION_LINK = "projectversionlink";
 	private final static String POLICY_LINK = "url1";
 
 	private NotificationRestService notificationService;
@@ -107,13 +109,14 @@ public class PolicyViolationTransformTest {
 	private RuleViolationNotificationItem createNotificationItem() throws MissingUUIDException {
 		final RuleViolationNotificationItem item = Mockito.mock(RuleViolationNotificationItem.class);
 		final RuleViolationNotificationContent content = Mockito.mock(RuleViolationNotificationContent.class);
+		Mockito.when(content.getProjectVersionLink()).thenReturn(PROJECT_VERSION_LINK);
 		final List<ComponentVersionStatus> versionStatusList = new ArrayList<>();
 		final ComponentVersionStatus status = Mockito.mock(ComponentVersionStatus.class);
 		Mockito.when(status.getComponentName()).thenReturn(COMPONENT_NAME);
 		Mockito.when(status.getBomComponentVersionPolicyStatusLink()).thenReturn("PolicyRule");
 		Mockito.when(status.getComponentVersionLink())
-		.thenReturn("/" + ComponentVersionStatus.COMPONENT_URL_IDENTIFIER + "/" + COMPONENT_ID + "/"
-				+ ComponentVersionStatus.COMPONENT_VERSION_URL_IDENTIFIER + "/" + COMPONENT_VERSION_ID);
+				.thenReturn("/" + ComponentVersionStatus.COMPONENT_URL_IDENTIFIER + "/" + COMPONENT_ID + "/"
+						+ ComponentVersionStatus.COMPONENT_VERSION_URL_IDENTIFIER + "/" + COMPONENT_VERSION_ID);
 		Mockito.when(status.getComponentId()).thenReturn(COMPONENT_ID);
 		Mockito.when(status.getComponentVersionId()).thenReturn(COMPONENT_VERSION_ID);
 		versionStatusList.add(status);

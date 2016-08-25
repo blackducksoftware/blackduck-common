@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.items;
+package com.blackducksoftware.integration.hub.dataservices.notification.items;
 
 import java.util.List;
 import java.util.UUID;
