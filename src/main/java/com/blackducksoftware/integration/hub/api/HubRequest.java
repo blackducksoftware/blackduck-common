@@ -35,33 +35,48 @@ public class HubRequest {
 
 	public JsonObject executeForResponseJson() throws IOException, URISyntaxException, BDRestException {
 		final ClientResource clientResource = buildClientResource(restConnection);
-		restConnection.handleRequest(clientResource);
+		try {
+			restConnection.handleRequest(clientResource);
 
-		final Response response = clientResource.getResponse();
-		final int responseCode = response.getStatus().getCode();
-		if (restConnection.isSuccess(responseCode)) {
-			final String responseString = restConnection.readResponseAsString(response);
-			final JsonObject jsonObject = jsonParser.parse(responseString).getAsJsonObject();
-			return jsonObject;
-		} else {
-			final String message = String.format("Request was not successful. (responseCode: %s)", responseCode);
-			throw new BDRestException(message, clientResource);
+			final Response response = clientResource.getResponse();
+			final int responseCode = response.getStatus().getCode();
+			if (restConnection.isSuccess(responseCode)) {
+				final String responseString = restConnection.readResponseAsString(response);
+				final JsonObject jsonObject = jsonParser.parse(responseString).getAsJsonObject();
+				return jsonObject;
+			} else {
+				final String message = String.format("Request was not successful. (responseCode: %s)", responseCode);
+				throw new BDRestException(message, clientResource);
+			}
+		} finally {
+			releaseResource(clientResource);
 		}
 	}
 
 	public String executeForResponseString() throws IOException, URISyntaxException, BDRestException {
 		final ClientResource clientResource = buildClientResource(restConnection);
-		restConnection.handleRequest(clientResource);
+		try {
+			restConnection.handleRequest(clientResource);
 
-		final Response response = clientResource.getResponse();
-		final int responseCode = response.getStatus().getCode();
-		if (restConnection.isSuccess(responseCode)) {
-			final String responseString = restConnection.readResponseAsString(response);
-			return responseString;
-		} else {
-			final String message = String.format("Request was not successful. (responseCode: %s)", responseCode);
-			throw new BDRestException(message, clientResource);
+			final Response response = clientResource.getResponse();
+			final int responseCode = response.getStatus().getCode();
+			if (restConnection.isSuccess(responseCode)) {
+				final String responseString = restConnection.readResponseAsString(response);
+				return responseString;
+			} else {
+				final String message = String.format("Request was not successful. (responseCode: %s)", responseCode);
+				throw new BDRestException(message, clientResource);
+			}
+		} finally {
+			releaseResource(clientResource);
 		}
+	}
+
+	private void releaseResource(final ClientResource resource) {
+		if (resource.getResponse() != null) {
+			resource.getResponse().release();
+		}
+		resource.release();
 	}
 
 	private ClientResource buildClientResource(final RestConnection restConnection) throws URISyntaxException {
