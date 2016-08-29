@@ -8,10 +8,12 @@ import com.blackducksoftware.integration.hub.api.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
+import com.blackducksoftware.integration.hub.dataservices.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
-public abstract class AbstractNotificationTransform {
+public abstract class AbstractNotificationTransform
+		implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
 	private final NotificationRestService notificationService;
 	private final ProjectVersionRestService projectVersionService;
 	private final PolicyRestService policyService;
@@ -49,5 +51,6 @@ public abstract class AbstractNotificationTransform {
 		return componentVersionService;
 	}
 
+	@Override
 	public abstract List<NotificationContentItem> transform(NotificationItem item) throws HubItemTransformException;
 }
