@@ -34,8 +34,9 @@ public abstract class AbstractNotificationCounter {
 			return getCountBuilderMap().get(key);
 		} else {
 			NotificationCountBuilder builder = new NotificationCountBuilder();
-			if (projectVersion.getProjectVersionLink() != null) {
+			if (key != null) {
 				builder = builder.updateProjectVersion(projectVersion);
+				getCountBuilderMap().put(key, builder);
 			}
 			return builder;
 		}

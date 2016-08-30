@@ -26,8 +26,8 @@ import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotif
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountData;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountBuilder;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountData;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationTransform;
@@ -141,10 +141,10 @@ public class NotificationDataService extends AbstractDataService {
 			}
 		}
 
-		// reset counters
 		final List<NotificationCountData> dataList = new ArrayList<>();
 		for (final Map.Entry<String, NotificationCountBuilder> entry : projectCounterMap.entrySet()) {
-			dataList.add(entry.getValue().build());
+			final NotificationCountBuilder builder = entry.getValue().updateDateRange(startDate, endDate);
+			dataList.add(builder.build());
 		}
 		return dataList;
 	}

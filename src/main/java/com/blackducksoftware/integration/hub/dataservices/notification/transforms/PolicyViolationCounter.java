@@ -9,14 +9,14 @@ import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountDataBuilder;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountBuilder;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
-public class PolicyViolationCountTransform extends AbstractNotificationCounter {
+public class PolicyViolationCounter extends AbstractNotificationCounter {
 
-	public PolicyViolationCountTransform(final ProjectVersionRestService projectVersionService,
-			final Map<String, NotificationCountDataBuilder> countBuilderMap) {
+	public PolicyViolationCounter(final ProjectVersionRestService projectVersionService,
+			final Map<String, NotificationCountBuilder> countBuilderMap) {
 		super(projectVersionService, countBuilderMap);
 	}
 
@@ -31,7 +31,7 @@ public class PolicyViolationCountTransform extends AbstractNotificationCounter {
 			projectVersion.setProjectName(projectName);
 			projectVersion.setProjectVersionName(releaseItem.getVersionName());
 			projectVersion.setProjectVersionLink(policyViolation.getContent().getProjectVersionLink());
-			final NotificationCountDataBuilder builder = getCountBuilder(projectVersion);
+			final NotificationCountBuilder builder = getCountBuilder(projectVersion);
 			builder.incrementPolicyCounts(policyViolation);
 		} catch (final Exception e) {
 			throw new HubItemTransformException(e);
