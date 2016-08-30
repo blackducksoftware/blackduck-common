@@ -75,9 +75,10 @@ public class NotificationCountData {
 
 	@Override
 	public String toString() {
-		return "NotificationCountData [startDate=" + startDate + ", endDate=" + endDate + ", total=" + total
-				+ ", policyViolationCount=" + policyViolationCount + ", policyOverrideCount=" + policyOverrideCount
-				+ ", vulnerabilityCount=" + vulnerabilityCount + ", vulnAddedCount=" + vulnAddedCount
-				+ ", vulnUpdatedCount=" + vulnUpdatedCount + ", vulnDeletedCount=" + vulnDeletedCount + "]";
+		return "NotificationCountData [startDate=" + startDate + ", endDate=" + endDate + ", projectVersion="
+				+ projectVersion + ", total=" + total + ", policyViolationCount=" + policyViolationCount
+				+ ", policyOverrideCount=" + policyOverrideCount + ", vulnerabilityCount=" + vulnerabilityCount
+				+ ", vulnAddedCount=" + vulnAddedCount + ", vulnUpdatedCount=" + vulnUpdatedCount
+				+ ", vulnDeletedCount=" + vulnDeletedCount + "]";
 	}
 }
