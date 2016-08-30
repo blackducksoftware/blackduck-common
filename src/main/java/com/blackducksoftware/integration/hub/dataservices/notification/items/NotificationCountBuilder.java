@@ -8,7 +8,7 @@ import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotif
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 
-public class NotificationCountDataBuilder {
+public class NotificationCountBuilder {
 
 	private final ProjectVersion projectVersion;
 	private final Date startDate;
@@ -20,13 +20,13 @@ public class NotificationCountDataBuilder {
 	private int updatedVulnCount;
 	private int deletedVulnCount;
 
-	public NotificationCountDataBuilder() {
+	public NotificationCountBuilder() {
 		projectVersion = new ProjectVersion();
 		this.startDate = new Date();
 		this.endDate = new Date();
 	}
 
-	private NotificationCountDataBuilder(final Date startDate, final Date endDate, final ProjectVersion projectVersion,
+	private NotificationCountBuilder(final Date startDate, final Date endDate, final ProjectVersion projectVersion,
 			final int policyViolationCount, final int policyOverrideCount, final int totalVulnCount,
 			final int addedVulnCount, final int updatedVulnCount, final int deletedVulnCount) {
 		this.startDate = startDate;
@@ -64,13 +64,13 @@ public class NotificationCountDataBuilder {
 		return policyViolationCount + policyOverrideCount + totalVulnCount;
 	}
 
-	public NotificationCountDataBuilder updateProjectVersion(final ProjectVersion projectVersion) {
-		return new NotificationCountDataBuilder(startDate, endDate, projectVersion, policyViolationCount,
+	public NotificationCountBuilder updateProjectVersion(final ProjectVersion projectVersion) {
+		return new NotificationCountBuilder(startDate, endDate, projectVersion, policyViolationCount,
 				policyOverrideCount, totalVulnCount, addedVulnCount, updatedVulnCount, deletedVulnCount);
 	}
 
-	public NotificationCountDataBuilder updateDateRange(final Date startDate, final Date endDate) {
-		return new NotificationCountDataBuilder(startDate, endDate, projectVersion, policyViolationCount,
+	public NotificationCountBuilder updateDateRange(final Date startDate, final Date endDate) {
+		return new NotificationCountBuilder(startDate, endDate, projectVersion, policyViolationCount,
 				policyOverrideCount, totalVulnCount, addedVulnCount, updatedVulnCount, deletedVulnCount);
 	}
 

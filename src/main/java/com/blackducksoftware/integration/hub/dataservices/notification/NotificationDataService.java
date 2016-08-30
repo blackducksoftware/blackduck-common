@@ -27,15 +27,15 @@ import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotif
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountData;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountDataBuilder;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountBuilder;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationTransform;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyOverrideCountTransform;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationCountTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyOverrideCounter;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationOverrideTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationTransform;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.VulnerabilityCountTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.VulnerabilityCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.VulnerabilityTransform;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
@@ -82,14 +82,14 @@ public class NotificationDataService extends AbstractDataService {
 	}
 
 	private Map<Class<?>, AbstractNotificationCounter> createCounterMap(
-			final Map<String, NotificationCountDataBuilder> projectCounterMap) {
+			final Map<String, NotificationCountBuilder> projectCounterMap) {
 		final Map<Class<?>, AbstractNotificationCounter> transformMap = new HashMap<>();
 		transformMap.put(RuleViolationNotificationItem.class,
-				new PolicyViolationCountTransform(projectVersionService, projectCounterMap));
+				new PolicyViolationCounter(projectVersionService, projectCounterMap));
 		transformMap.put(PolicyOverrideNotificationItem.class,
-				new PolicyOverrideCountTransform(projectVersionService, projectCounterMap));
+				new PolicyOverrideCounter(projectVersionService, projectCounterMap));
 		transformMap.put(VulnerabilityNotificationItem.class,
-				new VulnerabilityCountTransform(projectVersionService, projectCounterMap));
+				new VulnerabilityCounter(projectVersionService, projectCounterMap));
 
 		return transformMap;
 	}
@@ -126,7 +126,7 @@ public class NotificationDataService extends AbstractDataService {
 			throws IOException, URISyntaxException, BDRestException {
 
 		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
-		final Map<String, NotificationCountDataBuilder> projectCounterMap = new HashMap<>();
+		final Map<String, NotificationCountBuilder> projectCounterMap = new HashMap<>();
 		final Map<Class<?>, AbstractNotificationCounter> transformMap = createCounterMap(projectCounterMap);
 
 		for (final NotificationItem item : itemList) {
@@ -143,7 +143,7 @@ public class NotificationDataService extends AbstractDataService {
 
 		// reset counters
 		final List<NotificationCountData> dataList = new ArrayList<>();
-		for (final Map.Entry<String, NotificationCountDataBuilder> entry : projectCounterMap.entrySet()) {
+		for (final Map.Entry<String, NotificationCountBuilder> entry : projectCounterMap.entrySet()) {
 			dataList.add(entry.getValue().build());
 		}
 		return dataList;

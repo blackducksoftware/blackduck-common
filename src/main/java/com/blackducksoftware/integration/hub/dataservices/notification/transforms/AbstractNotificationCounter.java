@@ -5,15 +5,15 @@ import java.util.Map;
 import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountDataBuilder;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountBuilder;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
 public abstract class AbstractNotificationCounter {
 	private final ProjectVersionRestService projectVersionService;
-	private final Map<String, NotificationCountDataBuilder> countBuilderMap;
+	private final Map<String, NotificationCountBuilder> countBuilderMap;
 
 	public AbstractNotificationCounter(final ProjectVersionRestService projectVersionService,
-			final Map<String, NotificationCountDataBuilder> countBuilderMap) {
+			final Map<String, NotificationCountBuilder> countBuilderMap) {
 		this.projectVersionService = projectVersionService;
 		this.countBuilderMap = countBuilderMap;
 	}
@@ -24,16 +24,16 @@ public abstract class AbstractNotificationCounter {
 
 	public abstract void count(NotificationItem item) throws HubItemTransformException;
 
-	public Map<String, NotificationCountDataBuilder> getCountBuilderMap() {
+	public Map<String, NotificationCountBuilder> getCountBuilderMap() {
 		return countBuilderMap;
 	}
 
-	public NotificationCountDataBuilder getCountBuilder(final ProjectVersion projectVersion) {
+	public NotificationCountBuilder getCountBuilder(final ProjectVersion projectVersion) {
 		final String key = projectVersion.getProjectVersionLink();
 		if (getCountBuilderMap().containsKey(key)) {
 			return getCountBuilderMap().get(key);
 		} else {
-			NotificationCountDataBuilder builder = new NotificationCountDataBuilder();
+			NotificationCountBuilder builder = new NotificationCountBuilder();
 			if (projectVersion.getProjectVersionLink() != null) {
 				builder = builder.updateProjectVersion(projectVersion);
 			}
