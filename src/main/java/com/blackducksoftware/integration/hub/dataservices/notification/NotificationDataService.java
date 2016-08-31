@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -25,15 +27,17 @@ import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNoti
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.AbstractItemCount;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountBuilder;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountData;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationItemCount;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.VulnerabilityItemCount;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyOverrideCounter;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationOverrideTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.VulnerabilityCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.VulnerabilityTransform;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -47,7 +51,6 @@ public class NotificationDataService extends AbstractDataService {
 	private final VersionBomPolicyRestService bomVersionPolicyService;
 	private final ComponentVersionRestService componentVersionService;
 	private final Map<Class<?>, AbstractNotificationTransform> transformMap;
-	private final Map<Class<?>, AbstractItemCount> counterMap;
 	private final ExecutorService executorService;
 	private final ExecutorCompletionService<List<NotificationContentItem>> completionService;
 	private final PolicyNotificationFilter policyFilter;
@@ -62,7 +65,6 @@ public class NotificationDataService extends AbstractDataService {
 		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
 		this.policyFilter = policyFilter;
 		transformMap = createTransformMap();
-		counterMap = createCounterMap();
 		final ThreadFactory threadFactory = Executors.defaultThreadFactory();
 		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
 		completionService = new ExecutorCompletionService<>(executorService);
@@ -80,13 +82,17 @@ public class NotificationDataService extends AbstractDataService {
 		return transformMap;
 	}
 
-	private Map<Class<?>, AbstractItemCount> createCounterMap() {
-		final Map<Class<?>, AbstractItemCount> counterMap = new HashMap<>();
-		counterMap.put(RuleViolationNotificationItem.class, new NotificationItemCount());
-		counterMap.put(PolicyOverrideNotificationItem.class, new NotificationItemCount());
-		counterMap.put(VulnerabilityNotificationItem.class, new VulnerabilityItemCount());
+	private Map<Class<?>, AbstractNotificationCounter> createCounterMap(
+			final Map<String, NotificationCountBuilder> projectCounterMap) {
+		final Map<Class<?>, AbstractNotificationCounter> transformMap = new HashMap<>();
+		transformMap.put(RuleViolationNotificationItem.class,
+				new PolicyViolationCounter(projectVersionService, projectCounterMap));
+		transformMap.put(PolicyOverrideNotificationItem.class,
+				new PolicyOverrideCounter(projectVersionService, projectCounterMap));
+		transformMap.put(VulnerabilityNotificationItem.class,
+				new VulnerabilityCounter(projectVersionService, projectCounterMap));
 
-		return counterMap;
+		return transformMap;
 	}
 
 	public List<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
@@ -117,39 +123,30 @@ public class NotificationDataService extends AbstractDataService {
 		return contentList;
 	}
 
-	public NotificationCountData getNotificationCounts(final Date startDate, final Date endDate)
-			throws IOException, URISyntaxException, BDRestException {
+	public List<NotificationCountData> getNotificationCounts(final Date startDate, final Date endDate)
+			throws IOException, URISyntaxException, BDRestException, InterruptedException {
 
 		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
-		final int count = itemList.size();
+		final Map<String, NotificationCountBuilder> projectCounterMap = new ConcurrentHashMap<>();
+		final Map<Class<?>, AbstractNotificationCounter> transformMap = createCounterMap(projectCounterMap);
 
+		final CountDownLatch latch = new CountDownLatch(itemList.size());
 		for (final NotificationItem item : itemList) {
 			final Class<? extends NotificationItem> key = item.getClass();
-			if (counterMap.containsKey(key)) {
-				final AbstractItemCount counter = counterMap.get(key);
-				counter.increment(item);
+			if (transformMap.containsKey(key)) {
+				final AbstractNotificationCounter counter = transformMap.get(key);
+				final CountNotificationRunnable runnable = new CountNotificationRunnable(item, counter, latch);
+				executorService.submit(runnable);
 			}
 		}
 
-		final AbstractItemCount policyRuleCounter = counterMap.get(RuleViolationNotificationItem.class);
-		final AbstractItemCount policyOverrideCounter = counterMap.get(PolicyOverrideNotificationItem.class);
-		final VulnerabilityItemCount vulnCounter = (VulnerabilityItemCount) counterMap
-				.get(VulnerabilityNotificationItem.class);
-
-		final int policyViolationCount = policyRuleCounter.getCount();
-		final int policyOverrideCount = policyOverrideCounter.getCount();
-		final int vulnCount = vulnCounter.getCount();
-		final int vulnAddedCount = vulnCounter.getAddedCount();
-		final int vulnUpdatedCount = vulnCounter.getUpdatedCount();
-		final int vulnDeletedCount = vulnCounter.getDeletedCount();
-
-		// reset counters
-		for (final Map.Entry<Class<?>, AbstractItemCount> entry : counterMap.entrySet()) {
-			entry.getValue().reset();
+		latch.await();
+		final List<NotificationCountData> dataList = new ArrayList<>();
+		for (final Map.Entry<String, NotificationCountBuilder> entry : projectCounterMap.entrySet()) {
+			final NotificationCountBuilder builder = entry.getValue().updateDateRange(startDate, endDate);
+			dataList.add(builder.build());
 		}
-
-		return new NotificationCountData(startDate, endDate, count, policyViolationCount, policyOverrideCount,
-				vulnCount, vulnAddedCount, vulnUpdatedCount, vulnDeletedCount);
+		return dataList;
 	}
 
 	private class TransformCallable implements Callable<List<NotificationContentItem>> {
@@ -166,4 +163,29 @@ public class NotificationDataService extends AbstractDataService {
 			return converter.transform(item);
 		}
 	}
+
+	private class CountNotificationRunnable implements Runnable {
+		private final NotificationItem item;
+		private final AbstractNotificationCounter counter;
+		private final CountDownLatch latch;
+
+		public CountNotificationRunnable(final NotificationItem item, final AbstractNotificationCounter counter,
+				final CountDownLatch latch) {
+			this.item = item;
+			this.counter = counter;
+			this.latch = latch;
+		}
+
+		@Override
+		public void run() {
+			try {
+				counter.count(item);
+			} catch (final Exception e) {
+
+			} finally {
+				latch.countDown();
+			}
+		}
+	}
+
 }
