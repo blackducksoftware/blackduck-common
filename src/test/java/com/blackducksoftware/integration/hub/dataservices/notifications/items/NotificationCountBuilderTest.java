@@ -3,62 +3,102 @@ package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
-import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationContent;
-import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountBuilder;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountData;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyOverrideContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.VulnerabilityContentItem;
 
 public class NotificationCountBuilderTest {
 
 	private static final String PROJECT_LINK = "aLink";
 	private static final String PROJECT_VERSION = "0.0.1-TEST";
 	private static final String PROJECT_NAME = "Project1";
-
-	private VulnerabilityNotificationItem createVulnerability() {
-		final VulnerabilityNotificationItem item = Mockito.mock(VulnerabilityNotificationItem.class);
-		final VulnerabilityNotificationContent content = Mockito.mock(VulnerabilityNotificationContent.class);
-		Mockito.when(item.getContent()).thenReturn(content);
-		Mockito.when(content.getNewVulnerabilityCount()).thenReturn(1);
-		Mockito.when(content.getUpdatedVulnerabilityCount()).thenReturn(1);
-		Mockito.when(content.getDeletedVulnerabilityCount()).thenReturn(1);
-
-		return item;
-	}
+	private static final String COMPONENT_NAME = "Component1";
+	private static final String COMPONENT_VERSION = "Component-Version";
+	private static final String POLICY_RULE_NAME = "PolicyRule";
+	private static final String FIRST_NAME = "FirstName";
+	private static final String LAST_NAME = "LastName";
+	private static final String VULN_ID = "VulnId";
+	private static final String VULN_SOURCE = "VulnSource";
 
 	private ProjectVersion createProjectVersion() {
-		final ProjectVersion projectVersion = Mockito.mock(ProjectVersion.class);
-		Mockito.when(projectVersion.getProjectName()).thenReturn(PROJECT_NAME);
-		Mockito.when(projectVersion.getProjectVersionName()).thenReturn(PROJECT_VERSION);
-		Mockito.when(projectVersion.getProjectVersionLink()).thenReturn(PROJECT_LINK);
+		final ProjectVersion projectVersion = new ProjectVersion();
+		projectVersion.setProjectName(PROJECT_NAME);
+		projectVersion.setProjectVersionName(PROJECT_VERSION);
+		projectVersion.setProjectVersionLink(PROJECT_LINK);
 		return projectVersion;
 	}
 
+	private PolicyViolationContentItem createPolicyViolationContentItem() {
+		final UUID componentID = UUID.randomUUID();
+		final UUID componentVersionID = UUID.randomUUID();
+
+		final List<PolicyRule> policyRuleList = new ArrayList<>();
+		final PolicyRule rule = new PolicyRule(null, POLICY_RULE_NAME, "", true, true, null, "", "", "", "");
+		policyRuleList.add(rule);
+		final PolicyViolationContentItem item = new PolicyViolationContentItem(createProjectVersion(), COMPONENT_NAME,
+				COMPONENT_VERSION, componentID, componentVersionID, policyRuleList);
+		return item;
+	}
+
+	private PolicyOverrideContentItem createPolicyOverrideContentItem() {
+		final UUID componentID = UUID.randomUUID();
+		final UUID componentVersionID = UUID.randomUUID();
+
+		final List<PolicyRule> policyRuleList = new ArrayList<>();
+		final PolicyRule rule = new PolicyRule(null, POLICY_RULE_NAME, "", true, true, null, "", "", "", "");
+		policyRuleList.add(rule);
+		final PolicyOverrideContentItem item = new PolicyOverrideContentItem(createProjectVersion(), COMPONENT_NAME,
+				COMPONENT_VERSION, componentID, componentVersionID, policyRuleList, FIRST_NAME, LAST_NAME);
+		return item;
+	}
+
+	private VulnerabilityContentItem createVulnerabilityContentItem() {
+		final UUID componentID = UUID.randomUUID();
+		final UUID componentVersionID = UUID.randomUUID();
+
+		final VulnerabilitySourceQualifiedId vuln = new VulnerabilitySourceQualifiedId(VULN_SOURCE, VULN_ID);
+		final List<VulnerabilitySourceQualifiedId> added = new ArrayList<>();
+		final List<VulnerabilitySourceQualifiedId> updated = new ArrayList<>();
+		final List<VulnerabilitySourceQualifiedId> deleted = new ArrayList<>();
+		added.add(vuln);
+		updated.add(vuln);
+		deleted.add(vuln);
+
+		final VulnerabilityContentItem item = new VulnerabilityContentItem(createProjectVersion(), COMPONENT_NAME,
+				COMPONENT_VERSION, componentID, componentVersionID, added, updated, deleted);
+		return item;
+	}
+
 	private void updatePolicyViolationCounts(final NotificationCountBuilder builder, final int iterations) {
-		final RuleViolationNotificationItem item = Mockito.mock(RuleViolationNotificationItem.class);
+		final PolicyViolationContentItem item = createPolicyViolationContentItem();
 		for (int index = 0; index < iterations; index++) {
-			builder.incrementPolicyCounts(item);
+			builder.increment(item);
 		}
 	}
 
 	private void updatePolicyOverrideCounts(final NotificationCountBuilder builder, final int iterations) {
-		final PolicyOverrideNotificationItem item = Mockito.mock(PolicyOverrideNotificationItem.class);
+		final PolicyOverrideContentItem item = createPolicyOverrideContentItem();
 		for (int index = 0; index < iterations; index++) {
-			builder.incrementPolicyOverrideCounts(item);
+			builder.increment(item);
 		}
 	}
 
 	private void updateVulnerabilityCounts(final NotificationCountBuilder builder, final int iterations) {
-		final VulnerabilityNotificationItem item = createVulnerability();
+		final VulnerabilityContentItem item = createVulnerabilityContentItem();
 		for (int index = 0; index < iterations; index++) {
-			builder.incrementVulnerabilityCounts(item);
+			builder.increment(item);
 		}
 	}
 
@@ -91,10 +131,10 @@ public class NotificationCountBuilderTest {
 	@Test
 	public void testPolicyViolationIncrement() {
 		final NotificationCountBuilder builder = new NotificationCountBuilder();
-		final RuleViolationNotificationItem item = Mockito.mock(RuleViolationNotificationItem.class);
+		final PolicyViolationContentItem item = createPolicyViolationContentItem();
 		final int count = 5;
 		for (int index = 0; index < count; index++) {
-			builder.incrementPolicyCounts(item);
+			builder.increment(item);
 		}
 		final NotificationCountData data = builder.build();
 		assertEquals(count, data.getPolicyViolationCount());
@@ -103,10 +143,10 @@ public class NotificationCountBuilderTest {
 	@Test
 	public void testPolicyOverrideIncrement() {
 		final NotificationCountBuilder builder = new NotificationCountBuilder();
-		final PolicyOverrideNotificationItem item = Mockito.mock(PolicyOverrideNotificationItem.class);
+		final PolicyOverrideContentItem item = createPolicyOverrideContentItem();
 		final int count = 5;
 		for (int index = 0; index < count; index++) {
-			builder.incrementPolicyOverrideCounts(item);
+			builder.increment(item);
 		}
 		final NotificationCountData data = builder.build();
 		assertEquals(count, data.getPolicyOverrideCount());
@@ -115,10 +155,10 @@ public class NotificationCountBuilderTest {
 	@Test
 	public void testVulnerabilityIncrement() {
 		final NotificationCountBuilder builder = new NotificationCountBuilder();
-		final VulnerabilityNotificationItem item = createVulnerability();
+		final VulnerabilityContentItem item = createVulnerabilityContentItem();
 		final int count = 5;
 		for (int index = 0; index < count; index++) {
-			builder.incrementVulnerabilityCounts(item);
+			builder.increment(item);
 		}
 		final NotificationCountData data = builder.build();
 		assertEquals(count, data.getVulnerabilityCount());

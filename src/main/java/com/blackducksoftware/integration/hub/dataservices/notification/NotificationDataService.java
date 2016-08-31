@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -31,13 +30,10 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Not
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountBuilder;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountData;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationTransform;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyOverrideCounter;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationCounter;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.NotificationCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationOverrideTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationTransform;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.VulnerabilityCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.VulnerabilityTransform;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -82,19 +78,6 @@ public class NotificationDataService extends AbstractDataService {
 		return transformMap;
 	}
 
-	private Map<Class<?>, AbstractNotificationCounter> createCounterMap(
-			final Map<String, NotificationCountBuilder> projectCounterMap) {
-		final Map<Class<?>, AbstractNotificationCounter> transformMap = new HashMap<>();
-		transformMap.put(RuleViolationNotificationItem.class,
-				new PolicyViolationCounter(projectVersionService, projectCounterMap));
-		transformMap.put(PolicyOverrideNotificationItem.class,
-				new PolicyOverrideCounter(projectVersionService, projectCounterMap));
-		transformMap.put(VulnerabilityNotificationItem.class,
-				new VulnerabilityCounter(projectVersionService, projectCounterMap));
-
-		return transformMap;
-	}
-
 	public List<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
 			throws IOException, URISyntaxException, BDRestException {
 		final List<NotificationContentItem> contentList = new ArrayList<>();
@@ -126,21 +109,13 @@ public class NotificationDataService extends AbstractDataService {
 	public List<NotificationCountData> getNotificationCounts(final Date startDate, final Date endDate)
 			throws IOException, URISyntaxException, BDRestException, InterruptedException {
 
-		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
 		final Map<String, NotificationCountBuilder> projectCounterMap = new ConcurrentHashMap<>();
-		final Map<Class<?>, AbstractNotificationCounter> transformMap = createCounterMap(projectCounterMap);
-
-		final CountDownLatch latch = new CountDownLatch(itemList.size());
-		for (final NotificationItem item : itemList) {
-			final Class<? extends NotificationItem> key = item.getClass();
-			if (transformMap.containsKey(key)) {
-				final AbstractNotificationCounter counter = transformMap.get(key);
-				final CountNotificationRunnable runnable = new CountNotificationRunnable(item, counter, latch);
-				executorService.submit(runnable);
-			}
+		final NotificationCounter counter = new NotificationCounter(projectCounterMap);
+		final List<NotificationContentItem> itemList = getAllNotifications(startDate, endDate);
+		for (final NotificationContentItem item : itemList) {
+			counter.count(item);
 		}
 
-		latch.await();
 		final List<NotificationCountData> dataList = new ArrayList<>();
 		for (final Map.Entry<String, NotificationCountBuilder> entry : projectCounterMap.entrySet()) {
 			final NotificationCountBuilder builder = entry.getValue().updateDateRange(startDate, endDate);
@@ -163,29 +138,4 @@ public class NotificationDataService extends AbstractDataService {
 			return converter.transform(item);
 		}
 	}
-
-	private class CountNotificationRunnable implements Runnable {
-		private final NotificationItem item;
-		private final AbstractNotificationCounter counter;
-		private final CountDownLatch latch;
-
-		public CountNotificationRunnable(final NotificationItem item, final AbstractNotificationCounter counter,
-				final CountDownLatch latch) {
-			this.item = item;
-			this.counter = counter;
-			this.latch = latch;
-		}
-
-		@Override
-		public void run() {
-			try {
-				counter.count(item);
-			} catch (final Exception e) {
-
-			} finally {
-				latch.countDown();
-			}
-		}
-	}
-
 }

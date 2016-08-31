@@ -1,7 +1,9 @@
 package com.blackducksoftware.integration.hub.dataservices.notification.items;
 
 import java.util.Date;
+import java.util.Set;
 
+import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 
 public class NotificationCountData {
@@ -16,11 +18,12 @@ public class NotificationCountData {
 	private final int vulnAddedCount;
 	private final int vulnUpdatedCount;
 	private final int vulnDeletedCount;
+	private final Set<PolicyRule> policyRuleSet;
 
 	public NotificationCountData(final Date startDate, final Date endDate, final ProjectVersion projectVersion,
 			final int total, final int policyViolationCount, final int policyOverrideCount,
-			final int vulnerabilityCount, final int vulnAddedCount, final int vulnUpdatedCount,
-			final int vulnDeletedCount) {
+			final Set<PolicyRule> policyRuleSet, final int vulnerabilityCount, final int vulnAddedCount,
+			final int vulnUpdatedCount, final int vulnDeletedCount) {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.projectVersion = projectVersion;
@@ -31,6 +34,7 @@ public class NotificationCountData {
 		this.vulnAddedCount = vulnAddedCount;
 		this.vulnUpdatedCount = vulnUpdatedCount;
 		this.vulnDeletedCount = vulnDeletedCount;
+		this.policyRuleSet = policyRuleSet;
 	}
 
 	public Date getStartDate() {
@@ -73,12 +77,16 @@ public class NotificationCountData {
 		return vulnDeletedCount;
 	}
 
+	public Set<PolicyRule> getPolicyRuleSet() {
+		return policyRuleSet;
+	}
+
 	@Override
 	public String toString() {
 		return "NotificationCountData [startDate=" + startDate + ", endDate=" + endDate + ", projectVersion="
 				+ projectVersion + ", total=" + total + ", policyViolationCount=" + policyViolationCount
 				+ ", policyOverrideCount=" + policyOverrideCount + ", vulnerabilityCount=" + vulnerabilityCount
 				+ ", vulnAddedCount=" + vulnAddedCount + ", vulnUpdatedCount=" + vulnUpdatedCount
-				+ ", vulnDeletedCount=" + vulnDeletedCount + "]";
+				+ ", vulnDeletedCount=" + vulnDeletedCount + ", policyRuleSet=" + policyRuleSet + "]";
 	}
 }

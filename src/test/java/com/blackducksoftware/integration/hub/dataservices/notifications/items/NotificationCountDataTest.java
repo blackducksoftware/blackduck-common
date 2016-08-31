@@ -4,9 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountData;
 
@@ -26,9 +29,12 @@ public class NotificationCountDataTest {
 		final int vulnAddedCount = 4;
 		final int vulnUpdatedCount = 5;
 		final int vulnDeletedCount = 6;
+		final Set<PolicyRule> ruleSet = new HashSet<>();
+		final PolicyRule rule = new PolicyRule(null, "aRule", "", true, true, null, "", "", "", "");
+		ruleSet.add(rule);
 		final Date endDate = new Date();
 		final NotificationCountData data = new NotificationCountData(startDate, endDate, projectVersion, total,
-				policyViolationCount, policyOverrideCount, vulnCount, vulnAddedCount, vulnUpdatedCount,
+				policyViolationCount, policyOverrideCount, ruleSet, vulnCount, vulnAddedCount, vulnUpdatedCount,
 				vulnDeletedCount);
 		assertNotNull(data);
 		assertEquals(startDate, data.getStartDate());
@@ -41,5 +47,6 @@ public class NotificationCountDataTest {
 		assertEquals(vulnAddedCount, data.getVulnAddedCount());
 		assertEquals(vulnUpdatedCount, data.getVulnUpdatedCount());
 		assertEquals(vulnDeletedCount, data.getVulnDeletedCount());
+		assertEquals(ruleSet, data.getPolicyRuleSet());
 	}
 }

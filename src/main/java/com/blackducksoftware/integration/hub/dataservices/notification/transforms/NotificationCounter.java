@@ -2,27 +2,21 @@ package com.blackducksoftware.integration.hub.dataservices.notification.transfor
 
 import java.util.Map;
 
-import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountBuilder;
-import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
-public abstract class AbstractNotificationCounter {
-	private final ProjectVersionRestService projectVersionService;
+public class NotificationCounter {
 	private final Map<String, NotificationCountBuilder> countBuilderMap;
 
-	public AbstractNotificationCounter(final ProjectVersionRestService projectVersionService,
-			final Map<String, NotificationCountBuilder> countBuilderMap) {
-		this.projectVersionService = projectVersionService;
+	public NotificationCounter(final Map<String, NotificationCountBuilder> countBuilderMap) {
 		this.countBuilderMap = countBuilderMap;
 	}
 
-	public ProjectVersionRestService getProjectVersionService() {
-		return projectVersionService;
+	public void count(final NotificationContentItem item) {
+		final NotificationCountBuilder builder = getCountBuilder(item.getProjectVersion());
+		builder.increment(item);
 	}
-
-	public abstract void count(NotificationItem item) throws HubItemTransformException;
 
 	public Map<String, NotificationCountBuilder> getCountBuilderMap() {
 		return countBuilderMap;
