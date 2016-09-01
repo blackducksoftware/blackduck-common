@@ -27,8 +27,8 @@ import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotif
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountBuilder;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountData;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateBuilder;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateData;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.NotificationCounter;
@@ -106,19 +106,19 @@ public class NotificationDataService extends AbstractDataService {
 		return contentList;
 	}
 
-	public List<NotificationCountData> getNotificationCounts(final Date startDate, final Date endDate)
+	public List<ProjectAggregateData> getNotificationCounts(final Date startDate, final Date endDate)
 			throws IOException, URISyntaxException, BDRestException, InterruptedException {
 
-		final Map<String, NotificationCountBuilder> projectCounterMap = new ConcurrentHashMap<>();
+		final Map<String, ProjectAggregateBuilder> projectCounterMap = new ConcurrentHashMap<>();
 		final NotificationCounter counter = new NotificationCounter(projectCounterMap);
 		final List<NotificationContentItem> itemList = getAllNotifications(startDate, endDate);
 		for (final NotificationContentItem item : itemList) {
 			counter.count(item);
 		}
 
-		final List<NotificationCountData> dataList = new ArrayList<>();
-		for (final Map.Entry<String, NotificationCountBuilder> entry : projectCounterMap.entrySet()) {
-			final NotificationCountBuilder builder = entry.getValue().updateDateRange(startDate, endDate);
+		final List<ProjectAggregateData> dataList = new ArrayList<>();
+		for (final Map.Entry<String, ProjectAggregateBuilder> entry : projectCounterMap.entrySet()) {
+			final ProjectAggregateBuilder builder = entry.getValue().updateDateRange(startDate, endDate);
 			dataList.add(builder.build());
 		}
 		return dataList;

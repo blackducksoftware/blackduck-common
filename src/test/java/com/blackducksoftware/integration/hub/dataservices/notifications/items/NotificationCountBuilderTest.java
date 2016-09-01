@@ -13,8 +13,8 @@ import org.junit.Test;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountBuilder;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountData;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateBuilder;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateData;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.VulnerabilityContentItem;
@@ -81,21 +81,21 @@ public class NotificationCountBuilderTest {
 		return item;
 	}
 
-	private void updatePolicyViolationCounts(final NotificationCountBuilder builder, final int iterations) {
+	private void updatePolicyViolationCounts(final ProjectAggregateBuilder builder, final int iterations) {
 		final PolicyViolationContentItem item = createPolicyViolationContentItem();
 		for (int index = 0; index < iterations; index++) {
 			builder.increment(item);
 		}
 	}
 
-	private void updatePolicyOverrideCounts(final NotificationCountBuilder builder, final int iterations) {
+	private void updatePolicyOverrideCounts(final ProjectAggregateBuilder builder, final int iterations) {
 		final PolicyOverrideContentItem item = createPolicyOverrideContentItem();
 		for (int index = 0; index < iterations; index++) {
 			builder.increment(item);
 		}
 	}
 
-	private void updateVulnerabilityCounts(final NotificationCountBuilder builder, final int iterations) {
+	private void updateVulnerabilityCounts(final ProjectAggregateBuilder builder, final int iterations) {
 		final VulnerabilityContentItem item = createVulnerabilityContentItem();
 		for (int index = 0; index < iterations; index++) {
 			builder.increment(item);
@@ -104,13 +104,13 @@ public class NotificationCountBuilderTest {
 
 	@Test
 	public void testConstructor() {
-		final NotificationCountBuilder builder = new NotificationCountBuilder();
+		final ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
 		assertNotNull(builder);
 	}
 
 	@Test
 	public void testUpdateProjectVersion() {
-		NotificationCountBuilder builder = new NotificationCountBuilder();
+		ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
 		builder = builder.updateProjectVersion(createProjectVersion());
 		assertEquals(PROJECT_NAME, builder.getProjectVersion().getProjectName());
 		assertEquals(PROJECT_VERSION, builder.getProjectVersion().getProjectVersionName());
@@ -122,7 +122,7 @@ public class NotificationCountBuilderTest {
 		final long currentTime = System.currentTimeMillis();
 		final Date start = new Date(currentTime - 10000);
 		final Date end = new Date(currentTime);
-		NotificationCountBuilder builder = new NotificationCountBuilder();
+		ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
 		builder = builder.updateDateRange(start, end);
 		assertEquals(start, builder.getStartDate());
 		assertEquals(end, builder.getEndDate());
@@ -130,37 +130,37 @@ public class NotificationCountBuilderTest {
 
 	@Test
 	public void testPolicyViolationIncrement() {
-		final NotificationCountBuilder builder = new NotificationCountBuilder();
+		final ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
 		final PolicyViolationContentItem item = createPolicyViolationContentItem();
 		final int count = 5;
 		for (int index = 0; index < count; index++) {
 			builder.increment(item);
 		}
-		final NotificationCountData data = builder.build();
+		final ProjectAggregateData data = builder.build();
 		assertEquals(count, data.getPolicyViolationCount());
 	}
 
 	@Test
 	public void testPolicyOverrideIncrement() {
-		final NotificationCountBuilder builder = new NotificationCountBuilder();
+		final ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
 		final PolicyOverrideContentItem item = createPolicyOverrideContentItem();
 		final int count = 5;
 		for (int index = 0; index < count; index++) {
 			builder.increment(item);
 		}
-		final NotificationCountData data = builder.build();
+		final ProjectAggregateData data = builder.build();
 		assertEquals(count, data.getPolicyOverrideCount());
 	}
 
 	@Test
 	public void testVulnerabilityIncrement() {
-		final NotificationCountBuilder builder = new NotificationCountBuilder();
+		final ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
 		final VulnerabilityContentItem item = createVulnerabilityContentItem();
 		final int count = 5;
 		for (int index = 0; index < count; index++) {
 			builder.increment(item);
 		}
-		final NotificationCountData data = builder.build();
+		final ProjectAggregateData data = builder.build();
 		assertEquals(count, data.getVulnerabilityCount());
 		assertEquals(count, data.getVulnAddedCount());
 		assertEquals(count, data.getVulnUpdatedCount());
@@ -172,7 +172,7 @@ public class NotificationCountBuilderTest {
 		final long currentTime = System.currentTimeMillis();
 		final Date start = new Date(currentTime - 10000);
 		final Date end = new Date(currentTime);
-		NotificationCountBuilder builder = new NotificationCountBuilder();
+		ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
 		builder = builder.updateDateRange(start, end);
 		builder = builder.updateProjectVersion(createProjectVersion());
 
@@ -185,7 +185,7 @@ public class NotificationCountBuilderTest {
 		updatePolicyOverrideCounts(builder, 3);
 		updateVulnerabilityCounts(builder, 10);
 
-		final NotificationCountData data = builder.build();
+		final ProjectAggregateData data = builder.build();
 		assertEquals(start, builder.getStartDate());
 		assertEquals(end, builder.getEndDate());
 		assertEquals(PROJECT_NAME, builder.getProjectVersion().getProjectName());
