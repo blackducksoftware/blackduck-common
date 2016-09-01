@@ -29,13 +29,15 @@ public class NotificationCountDataTest {
 		final int vulnAddedCount = 4;
 		final int vulnUpdatedCount = 5;
 		final int vulnDeletedCount = 6;
-		final Set<PolicyRule> ruleSet = new HashSet<>();
+		final Set<PolicyRule> violationSet = new HashSet<>();
+		final Set<PolicyRule> overrideSet = new HashSet<>();
 		final PolicyRule rule = new PolicyRule(null, "aRule", "", true, true, null, "", "", "", "");
-		ruleSet.add(rule);
+		violationSet.add(rule);
+		overrideSet.add(rule);
 		final Date endDate = new Date();
 		final NotificationCountData data = new NotificationCountData(startDate, endDate, projectVersion, total,
-				policyViolationCount, policyOverrideCount, ruleSet, vulnCount, vulnAddedCount, vulnUpdatedCount,
-				vulnDeletedCount);
+				policyViolationCount, policyOverrideCount, violationSet, overrideSet, vulnCount, vulnAddedCount,
+				vulnUpdatedCount, vulnDeletedCount);
 		assertNotNull(data);
 		assertEquals(startDate, data.getStartDate());
 		assertEquals(endDate, data.getEndDate());
@@ -47,6 +49,7 @@ public class NotificationCountDataTest {
 		assertEquals(vulnAddedCount, data.getVulnAddedCount());
 		assertEquals(vulnUpdatedCount, data.getVulnUpdatedCount());
 		assertEquals(vulnDeletedCount, data.getVulnDeletedCount());
-		assertEquals(ruleSet, data.getPolicyRuleSet());
+		assertEquals(violationSet, data.getPolicyViolationSet());
+		assertEquals(overrideSet, data.getPolicyOverrideSet());
 	}
 }

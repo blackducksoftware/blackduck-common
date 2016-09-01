@@ -19,19 +19,21 @@ public class NotificationCountBuilder {
 	private int addedVulnCount;
 	private int updatedVulnCount;
 	private int deletedVulnCount;
-	private final Set<PolicyRule> policyRuleSet;
+	private final Set<PolicyRule> policyViolationSet;
+	private final Set<PolicyRule> policyOverrideSet;
 
 	public NotificationCountBuilder() {
 		projectVersion = new ProjectVersion();
 		this.startDate = new Date();
 		this.endDate = new Date();
-		policyRuleSet = new HashSet<>();
+		policyViolationSet = new HashSet<>();
+		policyOverrideSet = new HashSet<>();
 	}
 
 	private NotificationCountBuilder(final Date startDate, final Date endDate, final ProjectVersion projectVersion,
-			final int policyViolationCount, final int policyOverrideCount, final Set<PolicyRule> policyRuleSet,
-			final int totalVulnCount, final int addedVulnCount, final int updatedVulnCount,
-			final int deletedVulnCount) {
+			final int policyViolationCount, final int policyOverrideCount, final Set<PolicyRule> policyViolationSet,
+			final Set<PolicyRule> policyOverrideSet, final int totalVulnCount, final int addedVulnCount,
+			final int updatedVulnCount, final int deletedVulnCount) {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.projectVersion = projectVersion;
@@ -41,7 +43,8 @@ public class NotificationCountBuilder {
 		this.addedVulnCount = addedVulnCount;
 		this.updatedVulnCount = updatedVulnCount;
 		this.deletedVulnCount = deletedVulnCount;
-		this.policyRuleSet = policyRuleSet;
+		this.policyViolationSet = policyViolationSet;
+		this.policyOverrideSet = policyOverrideSet;
 	}
 
 	public ProjectVersion getProjectVersion() {
@@ -70,27 +73,36 @@ public class NotificationCountBuilder {
 
 	public NotificationCountBuilder updateProjectVersion(final ProjectVersion projectVersion) {
 		return new NotificationCountBuilder(startDate, endDate, projectVersion, policyViolationCount,
-				policyOverrideCount, policyRuleSet, totalVulnCount, addedVulnCount, updatedVulnCount, deletedVulnCount);
+				policyOverrideCount, policyViolationSet, policyOverrideSet, totalVulnCount, addedVulnCount,
+				updatedVulnCount, deletedVulnCount);
 	}
 
 	public NotificationCountBuilder updateDateRange(final Date startDate, final Date endDate) {
 		return new NotificationCountBuilder(startDate, endDate, projectVersion, policyViolationCount,
-				policyOverrideCount, policyRuleSet, totalVulnCount, addedVulnCount, updatedVulnCount, deletedVulnCount);
+				policyOverrideCount, policyViolationSet, policyOverrideSet, totalVulnCount, addedVulnCount,
+				updatedVulnCount, deletedVulnCount);
 	}
 
 	public NotificationCountData build() {
 		return new NotificationCountData(startDate, endDate, projectVersion, calculateTotal(), policyViolationCount,
-				policyOverrideCount, policyRuleSet, totalVulnCount, addedVulnCount, updatedVulnCount, deletedVulnCount);
+				policyOverrideCount, policyViolationSet, policyOverrideSet, totalVulnCount, addedVulnCount,
+				updatedVulnCount, deletedVulnCount);
 	}
 
-	private void addPolicyRules(final Collection<PolicyRule> rules) {
-		policyRuleSet.addAll(rules);
+	private void addPolicyViolations(final Collection<PolicyRule> rules) {
+		policyViolationSet.addAll(rules);
+	}
+
+	private void addPolicyOverrides(final Collection<PolicyRule> rules) {
+		policyOverrideSet.addAll(rules);
 	}
 
 	public void increment(final NotificationContentItem item) {
 		if (item instanceof PolicyOverrideContentItem) {
 			incrementPolicyOverrideCounts((PolicyOverrideContentItem) item);
 		} else if (item instanceof PolicyViolationContentItem) {
+			// order matters PolicyOverrideContentItem is a sub-class of
+			// PolicyViolationContentItem need to check it first.
 			incrementPolicyCounts((PolicyViolationContentItem) item);
 		} else if (item instanceof VulnerabilityContentItem) {
 			incrementVulnerabilityCounts((VulnerabilityContentItem) item);
@@ -99,12 +111,12 @@ public class NotificationCountBuilder {
 
 	private void incrementPolicyCounts(final PolicyViolationContentItem item) {
 		policyViolationCount++;
-		addPolicyRules(item.getPolicyRuleList());
+		addPolicyViolations(item.getPolicyRuleList());
 	}
 
 	private void incrementPolicyOverrideCounts(final PolicyOverrideContentItem item) {
 		policyOverrideCount++;
-		addPolicyRules(item.getPolicyRuleList());
+		addPolicyOverrides(item.getPolicyRuleList());
 	}
 
 	private void incrementVulnerabilityCounts(final VulnerabilityContentItem item) {

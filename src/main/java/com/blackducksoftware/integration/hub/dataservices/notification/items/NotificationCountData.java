@@ -18,12 +18,14 @@ public class NotificationCountData {
 	private final int vulnAddedCount;
 	private final int vulnUpdatedCount;
 	private final int vulnDeletedCount;
-	private final Set<PolicyRule> policyRuleSet;
+	private final Set<PolicyRule> policyViolationSet;
+	private final Set<PolicyRule> policyOverrideSet;
 
 	public NotificationCountData(final Date startDate, final Date endDate, final ProjectVersion projectVersion,
 			final int total, final int policyViolationCount, final int policyOverrideCount,
-			final Set<PolicyRule> policyRuleSet, final int vulnerabilityCount, final int vulnAddedCount,
-			final int vulnUpdatedCount, final int vulnDeletedCount) {
+			final Set<PolicyRule> policyViolationSet, final Set<PolicyRule> policyOverrideSet,
+			final int vulnerabilityCount, final int vulnAddedCount, final int vulnUpdatedCount,
+			final int vulnDeletedCount) {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.projectVersion = projectVersion;
@@ -34,7 +36,8 @@ public class NotificationCountData {
 		this.vulnAddedCount = vulnAddedCount;
 		this.vulnUpdatedCount = vulnUpdatedCount;
 		this.vulnDeletedCount = vulnDeletedCount;
-		this.policyRuleSet = policyRuleSet;
+		this.policyViolationSet = policyViolationSet;
+		this.policyOverrideSet = policyOverrideSet;
 	}
 
 	public Date getStartDate() {
@@ -77,8 +80,12 @@ public class NotificationCountData {
 		return vulnDeletedCount;
 	}
 
-	public Set<PolicyRule> getPolicyRuleSet() {
-		return policyRuleSet;
+	public Set<PolicyRule> getPolicyViolationSet() {
+		return policyViolationSet;
+	}
+
+	public Set<PolicyRule> getPolicyOverrideSet() {
+		return policyOverrideSet;
 	}
 
 	@Override
@@ -87,6 +94,7 @@ public class NotificationCountData {
 				+ projectVersion + ", total=" + total + ", policyViolationCount=" + policyViolationCount
 				+ ", policyOverrideCount=" + policyOverrideCount + ", vulnerabilityCount=" + vulnerabilityCount
 				+ ", vulnAddedCount=" + vulnAddedCount + ", vulnUpdatedCount=" + vulnUpdatedCount
-				+ ", vulnDeletedCount=" + vulnDeletedCount + ", policyRuleSet=" + policyRuleSet + "]";
+				+ ", vulnDeletedCount=" + vulnDeletedCount + ", policyViolationSet=" + policyViolationSet
+				+ ", policyOverrideSet=" + policyOverrideSet + "]";
 	}
 }
