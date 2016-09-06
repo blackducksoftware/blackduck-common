@@ -13,24 +13,27 @@ public class ProjectAggregateData {
 	private final int vulnAddedCount;
 	private final int vulnUpdatedCount;
 	private final int vulnDeletedCount;
-	private final List<PolicyViolationContentItem> policyViolationList;
-	private final List<PolicyOverrideContentItem> policyOverrideList;
-	private final List<VulnerabilityContentItem> vulnerabilityList;
+	private final int policyViolationCount;
+	private final int policyOverrideCount;
+	private final int vulnerabilityCount;
+	private final int totalCount;
+	private final List<ComponentAggregateData> componentList;
 
 	public ProjectAggregateData(final Date startDate, final Date endDate, final ProjectVersion projectVersion,
-			final List<PolicyViolationContentItem> policyViolationList,
-			final List<PolicyOverrideContentItem> policyOverrideList,
-			final List<VulnerabilityContentItem> vulnerabilityList, final int vulnAddedCount,
-			final int vulnUpdatedCount, final int vulnDeletedCount) {
+			final int policyViolationCount, final int policyOverrideCount, final int vulnerabilityCount,
+			final int totalCount, final int vulnAddedCount, final int vulnUpdatedCount, final int vulnDeletedCount,
+			final List<ComponentAggregateData> componentList) {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.projectVersion = projectVersion;
+		this.policyViolationCount = policyViolationCount;
+		this.policyOverrideCount = policyOverrideCount;
+		this.vulnerabilityCount = vulnerabilityCount;
+		this.totalCount = totalCount;
 		this.vulnAddedCount = vulnAddedCount;
 		this.vulnUpdatedCount = vulnUpdatedCount;
 		this.vulnDeletedCount = vulnDeletedCount;
-		this.policyViolationList = policyViolationList;
-		this.policyOverrideList = policyOverrideList;
-		this.vulnerabilityList = vulnerabilityList;
+		this.componentList = componentList;
 	}
 
 	public Date getStartDate() {
@@ -46,31 +49,7 @@ public class ProjectAggregateData {
 	}
 
 	public int getTotal() {
-		return getPolicyViolationCount() + getPolicyOverrideCount() + getVulnerabilityCount();
-	}
-
-	public int getPolicyViolationCount() {
-		if (policyViolationList == null) {
-			return 0;
-		} else {
-			return policyViolationList.size();
-		}
-	}
-
-	public int getPolicyOverrideCount() {
-		if (policyOverrideList == null) {
-			return 0;
-		} else {
-			return policyOverrideList.size();
-		}
-	}
-
-	public int getVulnerabilityCount() {
-		if (vulnerabilityList == null) {
-			return 0;
-		} else {
-			return vulnerabilityList.size();
-		}
+		return totalCount;
 	}
 
 	public int getVulnAddedCount() {
@@ -85,26 +64,32 @@ public class ProjectAggregateData {
 		return vulnDeletedCount;
 	}
 
-	public List<PolicyViolationContentItem> getPolicyViolationList() {
-		return policyViolationList;
+	public int getPolicyViolationCount() {
+		return policyViolationCount;
 	}
 
-	public List<PolicyOverrideContentItem> getPolicyOverrideList() {
-		return policyOverrideList;
+	public int getPolicyOverrideCount() {
+		return policyOverrideCount;
 	}
 
-	public List<VulnerabilityContentItem> getVulnerabilityList() {
-		return vulnerabilityList;
+	public int getVulnerabilityCount() {
+		return vulnerabilityCount;
+	}
+
+	public int getTotalCount() {
+		return totalCount;
+	}
+
+	public List<ComponentAggregateData> getComponentList() {
+		return componentList;
 	}
 
 	@Override
 	public String toString() {
-		return "NotificationCountData [startDate=" + startDate + ", endDate=" + endDate + ", projectVersion="
-				+ projectVersion + ", total=" + getTotal() + ", policyViolationCount=" + getPolicyViolationCount()
-				+ ", policyOverrideCount=" + getPolicyOverrideCount() + ", vulnerabilityCount="
-				+ getVulnerabilityCount() + ", vulnAddedCount=" + vulnAddedCount + ", vulnUpdatedCount="
-				+ vulnUpdatedCount + ", vulnDeletedCount=" + vulnDeletedCount + ", policyViolationList="
-				+ policyViolationList + ", policyOverrideList=" + policyOverrideList + ", vulnerabilityList="
-				+ vulnerabilityList + "]";
+		return "ProjectAggregateData [startDate=" + startDate + ", endDate=" + endDate + ", projectVersion="
+				+ projectVersion + ", vulnAddedCount=" + vulnAddedCount + ", vulnUpdatedCount=" + vulnUpdatedCount
+				+ ", vulnDeletedCount=" + vulnDeletedCount + ", policyViolationCount=" + policyViolationCount
+				+ ", policyOverrideCount=" + policyOverrideCount + ", vulnerabilityCount=" + vulnerabilityCount
+				+ ", totalCount=" + totalCount + ", componentList=" + componentList + "]";
 	}
 }

@@ -13,13 +13,13 @@ import org.junit.Test;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateBuilder;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateData;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.ComponentAggregateBuilder;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.ComponentAggregateData;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.VulnerabilityContentItem;
 
-public class NotificationCountBuilderTest {
+public class ComponentAggregateBuilderTest {
 
 	private static final String PROJECT_LINK = "aLink";
 	private static final String PROJECT_VERSION = "0.0.1-TEST";
@@ -81,21 +81,21 @@ public class NotificationCountBuilderTest {
 		return item;
 	}
 
-	private void updatePolicyViolationCounts(final ProjectAggregateBuilder builder, final int iterations) {
+	private void updatePolicyViolationCounts(final ComponentAggregateBuilder builder, final int iterations) {
 		final PolicyViolationContentItem item = createPolicyViolationContentItem();
 		for (int index = 0; index < iterations; index++) {
 			builder.increment(item);
 		}
 	}
 
-	private void updatePolicyOverrideCounts(final ProjectAggregateBuilder builder, final int iterations) {
+	private void updatePolicyOverrideCounts(final ComponentAggregateBuilder builder, final int iterations) {
 		final PolicyOverrideContentItem item = createPolicyOverrideContentItem();
 		for (int index = 0; index < iterations; index++) {
 			builder.increment(item);
 		}
 	}
 
-	private void updateVulnerabilityCounts(final ProjectAggregateBuilder builder, final int iterations) {
+	private void updateVulnerabilityCounts(final ComponentAggregateBuilder builder, final int iterations) {
 		final VulnerabilityContentItem item = createVulnerabilityContentItem();
 		for (int index = 0; index < iterations; index++) {
 			builder.increment(item);
@@ -104,63 +104,43 @@ public class NotificationCountBuilderTest {
 
 	@Test
 	public void testConstructor() {
-		final ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
+		final ComponentAggregateBuilder builder = new ComponentAggregateBuilder();
 		assertNotNull(builder);
 	}
 
 	@Test
-	public void testUpdateProjectVersion() {
-		ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
-		builder = builder.updateProjectVersion(createProjectVersion());
-		assertEquals(PROJECT_NAME, builder.getProjectVersion().getProjectName());
-		assertEquals(PROJECT_VERSION, builder.getProjectVersion().getProjectVersionName());
-		assertEquals(PROJECT_LINK, builder.getProjectVersion().getProjectVersionLink());
-	}
-
-	@Test
-	public void testUpdateDateRange() {
-		final long currentTime = System.currentTimeMillis();
-		final Date start = new Date(currentTime - 10000);
-		final Date end = new Date(currentTime);
-		ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
-		builder = builder.updateDateRange(start, end);
-		assertEquals(start, builder.getStartDate());
-		assertEquals(end, builder.getEndDate());
-	}
-
-	@Test
 	public void testPolicyViolationIncrement() {
-		final ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
+		final ComponentAggregateBuilder builder = new ComponentAggregateBuilder();
 		final PolicyViolationContentItem item = createPolicyViolationContentItem();
 		final int count = 5;
 		for (int index = 0; index < count; index++) {
 			builder.increment(item);
 		}
-		final ProjectAggregateData data = builder.build();
+		final ComponentAggregateData data = builder.build();
 		assertEquals(count, data.getPolicyViolationCount());
 	}
 
 	@Test
 	public void testPolicyOverrideIncrement() {
-		final ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
+		final ComponentAggregateBuilder builder = new ComponentAggregateBuilder();
 		final PolicyOverrideContentItem item = createPolicyOverrideContentItem();
 		final int count = 5;
 		for (int index = 0; index < count; index++) {
 			builder.increment(item);
 		}
-		final ProjectAggregateData data = builder.build();
+		final ComponentAggregateData data = builder.build();
 		assertEquals(count, data.getPolicyOverrideCount());
 	}
 
 	@Test
 	public void testVulnerabilityIncrement() {
-		final ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
+		final ComponentAggregateBuilder builder = new ComponentAggregateBuilder();
 		final VulnerabilityContentItem item = createVulnerabilityContentItem();
 		final int count = 5;
 		for (int index = 0; index < count; index++) {
 			builder.increment(item);
 		}
-		final ProjectAggregateData data = builder.build();
+		final ComponentAggregateData data = builder.build();
 		assertEquals(count, data.getVulnerabilityCount());
 		assertEquals(count, data.getVulnAddedCount());
 		assertEquals(count, data.getVulnUpdatedCount());
@@ -172,9 +152,7 @@ public class NotificationCountBuilderTest {
 		final long currentTime = System.currentTimeMillis();
 		final Date start = new Date(currentTime - 10000);
 		final Date end = new Date(currentTime);
-		ProjectAggregateBuilder builder = new ProjectAggregateBuilder();
-		builder = builder.updateDateRange(start, end);
-		builder = builder.updateProjectVersion(createProjectVersion());
+		final ComponentAggregateBuilder builder = new ComponentAggregateBuilder();
 
 		final int policyCount = 2;
 		final int policyOverrideCount = 3;
@@ -185,12 +163,7 @@ public class NotificationCountBuilderTest {
 		updatePolicyOverrideCounts(builder, 3);
 		updateVulnerabilityCounts(builder, 10);
 
-		final ProjectAggregateData data = builder.build();
-		assertEquals(start, builder.getStartDate());
-		assertEquals(end, builder.getEndDate());
-		assertEquals(PROJECT_NAME, builder.getProjectVersion().getProjectName());
-		assertEquals(PROJECT_VERSION, builder.getProjectVersion().getProjectVersionName());
-		assertEquals(PROJECT_LINK, builder.getProjectVersion().getProjectVersionLink());
+		final ComponentAggregateData data = builder.build();
 		assertEquals(policyCount, data.getPolicyViolationCount());
 		assertEquals(policyOverrideCount, data.getPolicyOverrideCount());
 		assertEquals(vulnCount, data.getVulnerabilityCount());

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,13 +15,12 @@ import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.ComponentAggregateData;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationContentItem;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateData;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.VulnerabilityContentItem;
 
-public class ProjectAggregateTest {
+public class ComponentAggregateTest {
 
 	@Test
-	public void testProjectAggregateCount() {
+	public void testComponentAggregateCount() {
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName("Project Name");
 		projectVersion.setProjectVersionName("1.0");
@@ -33,7 +31,6 @@ public class ProjectAggregateTest {
 		final String lastName = "lastName";
 		final UUID componentId = UUID.randomUUID();
 		final UUID componentVersionId = UUID.randomUUID();
-		final Date startDate = new Date();
 		final int total = 3;
 		final List<PolicyViolationContentItem> violationList = new ArrayList<>();
 		final List<PolicyOverrideContentItem> overrideList = new ArrayList<>();
@@ -55,19 +52,10 @@ public class ProjectAggregateTest {
 		overrideList.add(overrideContent);
 		vulnerabilityList.add(vulnerabilityContent);
 		final int vulnSize = sourceIdList.size();
-		final ComponentAggregateData componentData = new ComponentAggregateData(componentName, componentVersion,
-				violationList, overrideList, vulnerabilityList, vulnSize, vulnSize, vulnSize);
-		final List<ComponentAggregateData> componentList = new ArrayList<>();
-		componentList.add(componentData);
-		final Date endDate = new Date();
+		final ComponentAggregateData data = new ComponentAggregateData(componentName, componentVersion, violationList,
+				overrideList, vulnerabilityList, vulnSize, vulnSize, vulnSize);
 
-		final ProjectAggregateData data = new ProjectAggregateData(startDate, endDate, projectVersion,
-				violationList.size(), overrideList.size(), vulnerabilityList.size(), total, vulnSize, vulnSize,
-				vulnSize, componentList);
 		assertNotNull(data);
-		assertEquals(startDate, data.getStartDate());
-		assertEquals(endDate, data.getEndDate());
-		assertEquals(projectVersion, data.getProjectVersion());
 		assertEquals(total, data.getTotal());
 		assertEquals(violationList.size(), data.getPolicyViolationCount());
 		assertEquals(overrideList.size(), data.getPolicyOverrideCount());
@@ -75,9 +63,8 @@ public class ProjectAggregateTest {
 		assertEquals(sourceIdList.size(), data.getVulnAddedCount());
 		assertEquals(sourceIdList.size(), data.getVulnUpdatedCount());
 		assertEquals(sourceIdList.size(), data.getVulnDeletedCount());
-		assertEquals(violationList.size(), data.getPolicyViolationCount());
-		assertEquals(overrideList.size(), data.getPolicyOverrideCount());
-		assertEquals(vulnerabilityList.size(), data.getVulnerabilityCount());
-		assertEquals(componentList, data.getComponentList());
+		assertEquals(violationList, data.getPolicyViolationList());
+		assertEquals(overrideList, data.getPolicyOverrideList());
+		assertEquals(vulnerabilityList, data.getVulnerabilityList());
 	}
 }
