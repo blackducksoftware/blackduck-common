@@ -46,7 +46,6 @@ import org.restlet.Response;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.Cookie;
 import org.restlet.data.CookieSetting;
-import org.restlet.data.Header;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
@@ -55,6 +54,7 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
+import org.restlet.util.NamedValue;
 import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -327,7 +327,7 @@ public class RestConnection {
 	 */
 	public <T> T httpGetFromRelativeUrl(final Class<T> modelClass, final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
-			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+					throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
 
 		final ClientResource resource = createClientResource(urlSegments, queryParameters);
 		try {
@@ -343,7 +343,7 @@ public class RestConnection {
 				throw new ResourceDoesNotExistException(
 						"Error getting resource from relative url segments " + urlSegments + " and query parameters "
 								+ queryParameters + "; errorCode: " + responseCode + "; " + resource.toString(),
-						resource);
+								resource);
 			}
 		} finally {
 			releaseResource(resource);
@@ -441,11 +441,12 @@ public class RestConnection {
 					logMessage(LogLevel.TRACE, "");
 				}
 				@SuppressWarnings("unchecked")
-				final Series<Header> responseheaders = (Series<Header>) requestOrResponse.getAttributes()
-						.get(HeaderConstants.ATTRIBUTE_HEADERS);
+				final Series<? extends NamedValue> responseheaders = (Series<? extends NamedValue>) requestOrResponse
+				.getAttributes()
+				.get(HeaderConstants.ATTRIBUTE_HEADERS);
 				if (responseheaders != null) {
 					logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
-					for (final Header header : responseheaders) {
+					for (final NamedValue header : responseheaders) {
 						if (null == header) {
 							logMessage(LogLevel.TRACE, "received a null header");
 						} else {
@@ -527,7 +528,7 @@ public class RestConnection {
 
 	public String httpPostFromRelativeUrl(final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters, final Representation content)
-			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+					throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
 
 		final ClientResource resource = createClientResource(urlSegments, queryParameters);
 		try {
@@ -557,15 +558,16 @@ public class RestConnection {
 				return "";
 			} else {
 				@SuppressWarnings("unchecked")
-				final Series<Header> responseHeaders = (Series<Header>) resource.getResponse().getAttributes()
-						.get(HeaderConstants.ATTRIBUTE_HEADERS);
-				final Header resourceUrl = responseHeaders.getFirst("location", true);
-
-				if (resourceUrl == null || StringUtils.isBlank(resourceUrl.getValue())) {
+				final Series<? extends NamedValue> responseHeaders = (Series<? extends NamedValue>) resource
+						.getResponse().getAttributes()
+				.get(HeaderConstants.ATTRIBUTE_HEADERS);
+				final NamedValue resourceUrl = responseHeaders.getFirst("location", true);
+				final String value = (String) resourceUrl.getValue();
+				if (resourceUrl == null || StringUtils.isBlank(value)) {
 					throw new ResourceDoesNotExistException("Could not get the resource URL from the response headers.",
 							resource);
 				}
-				return resourceUrl.getValue();
+				return value;
 			}
 		} else {
 			throw new ResourceDoesNotExistException(

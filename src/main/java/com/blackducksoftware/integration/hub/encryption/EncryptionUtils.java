@@ -21,9 +21,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.encryption;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.Key;
 import java.security.KeyStore;
@@ -53,11 +53,11 @@ public class EncryptionUtils {
 	private static final char[] KEY_PASS = { 'b', 'l', 'a', 'c', 'k', 'd', 'u', 'c', 'k', '1', '2', '3', 'I', 'n', 't',
 			'e', 'g', 'r', 'a', 't', 'i', 'o', 'n' };
 
-	public String alterString(final String password, final String absolutePathForKeyFile, final int cipherMode)
+	public String alterString(final String password, final InputStream encryptionKeyStream, final int cipherMode)
 			throws EncryptionException {
 		assertValidPassword(password);
 
-		final Key key = getKey(absolutePathForKeyFile);
+		final Key key = getKey(encryptionKeyStream);
 
 		final String alteredString = getAlteredString(password, cipherMode, key);
 		return alteredString;
@@ -69,22 +69,21 @@ public class EncryptionUtils {
 		}
 	}
 
-	private Key getKey(final String absolutePathForKey) throws EncryptionException {
+	private Key getKey(final InputStream encryptionKeyStream) throws EncryptionException {
 		Key key = null;
-		if (StringUtils.isNotBlank(absolutePathForKey)) {
+		if (encryptionKeyStream != null) {
 			try {
-				final FileInputStream fileInputStream = new FileInputStream(absolutePathForKey);
-				key = retrieveKeyFromInputStream(fileInputStream);
+				key = retrieveKeyFromInputStream(encryptionKeyStream);
 			} catch (final Exception e) {
-				throw new EncryptionException("Failed to retrieve the encryption key from file: " + absolutePathForKey);
+				throw new EncryptionException("Failed to retrieve the encryption key from the provided input stream.");
 			}
 		} else {
 			try {
-				final InputStream inputStream = EncryptionUtils.class.getResourceAsStream(EMBEDDED_SUN_KEY_FILE);
+				final InputStream inputStream = getResourceAsStream(EMBEDDED_SUN_KEY_FILE);
 				key = retrieveKeyFromInputStream(inputStream);
 			} catch (final Exception e) {
 				try {
-					final InputStream inputStream = EncryptionUtils.class.getResourceAsStream(EMBEDDED_IBM_KEY_FILE);
+					final InputStream inputStream = getResourceAsStream(EMBEDDED_IBM_KEY_FILE);
 					key = retrieveKeyFromInputStream(inputStream);
 				} catch (final Exception e1) {
 					throw new EncryptionException("Failed to retrieve the encryption key from classpath", e);
@@ -141,7 +140,7 @@ public class EncryptionUtils {
 	}
 
 	private Key retrieveKeyFromInputStream(final InputStream inputStream) throws NoSuchAlgorithmException,
-			CertificateException, IOException, UnrecoverableKeyException, KeyStoreException {
+	CertificateException, IOException, UnrecoverableKeyException, KeyStoreException {
 		try {
 			final KeyStore keystore = KeyStore.getInstance("JCEKS");
 			keystore.load(inputStream, KEY_PASS);
@@ -150,6 +149,17 @@ public class EncryptionUtils {
 		} finally {
 			IOUtils.closeQuietly(inputStream);
 		}
+	}
+
+	private InputStream getResourceAsStream(final String resourceName) throws IOException {
+		URL url = Thread.currentThread().getContextClassLoader().getResource(resourceName);
+		if (url == null) {
+			url = EncryptionUtils.class.getResource(resourceName);
+		}
+		if (url != null) {
+			return url.openStream();
+		}
+		throw new IOException("Failed to retrieve the resource from classpath");
 	}
 
 }
