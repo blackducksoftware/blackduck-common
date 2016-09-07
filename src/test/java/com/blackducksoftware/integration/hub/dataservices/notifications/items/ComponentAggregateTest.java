@@ -57,6 +57,8 @@ public class ComponentAggregateTest {
 
 		assertNotNull(data);
 		assertEquals(total, data.getTotal());
+		assertEquals(componentName, data.getComponentName());
+		assertEquals(componentVersion, data.getComponentVersion());
 		assertEquals(violationList.size(), data.getPolicyViolationCount());
 		assertEquals(overrideList.size(), data.getPolicyOverrideCount());
 		assertEquals(vulnerabilityList.size(), data.getVulnerabilityCount());

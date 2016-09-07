@@ -3,6 +3,8 @@ package com.blackducksoftware.integration.hub.dataservices.notification.items;
 import java.util.List;
 
 public class ComponentAggregateData {
+	private final String componentName;
+	private final String componentVersion;
 	private final int vulnAddedCount;
 	private final int vulnUpdatedCount;
 	private final int vulnDeletedCount;
@@ -15,12 +17,22 @@ public class ComponentAggregateData {
 			final List<PolicyOverrideContentItem> policyOverrideList,
 			final List<VulnerabilityContentItem> vulnerabilityList, final int vulnAddedCount,
 			final int vulnUpdatedCount, final int vulnDeletedCount) {
+		this.componentName = componentName;
+		this.componentVersion = componentVersion;
 		this.vulnAddedCount = vulnAddedCount;
 		this.vulnUpdatedCount = vulnUpdatedCount;
 		this.vulnDeletedCount = vulnDeletedCount;
 		this.policyViolationList = policyViolationList;
 		this.policyOverrideList = policyOverrideList;
 		this.vulnerabilityList = vulnerabilityList;
+	}
+
+	public String getComponentName() {
+		return componentName;
+	}
+
+	public String getComponentVersion() {
+		return componentVersion;
 	}
 
 	public int getTotal() {
