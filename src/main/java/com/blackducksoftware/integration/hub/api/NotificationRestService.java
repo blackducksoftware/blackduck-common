@@ -24,7 +24,9 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class NotificationRestService extends HubRestService<NotificationItem> {
-	private final List<String> getNotificationSegments = Arrays.asList("api", "notifications");
+
+	private final List<String> getNotificationSegments = Arrays.asList(UrlConstants.SEGMENT_API,
+			UrlConstants.SEGMENT_NOTIFICATIONS);
 	private final Type notificationItemListType = new TypeToken<List<NotificationItem>>() {
 	}.getType();
 
@@ -56,7 +58,7 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 
 		final HubRequest notificationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
 		notificationItemRequest.setMethod(Method.GET);
-		notificationItemRequest.setBatchSize(100);
+		notificationItemRequest.setLimit(100);
 		notificationItemRequest.addUrlSegments(getNotificationSegments);
 		notificationItemRequest.addQueryParameter("startDate", startDateString);
 		notificationItemRequest.addQueryParameter("endDate", endDateString);

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.restlet.Response;
 import org.restlet.data.Method;
 import org.restlet.resource.ClientResource;
@@ -25,8 +24,9 @@ public class HubRequest {
 	private Method method;
 	private String url;
 	private final List<String> urlSegments = new ArrayList<>();
-	private int batchSize = 10;
+	private int limit = 10;
 	private final Map<String, String> queryParameters = new HashMap<>();
+	private int offset = 0;
 
 	public HubRequest(final RestConnection restConnection, final JsonParser jsonParser) {
 		this.restConnection = restConnection;
@@ -92,18 +92,17 @@ public class HubRequest {
 		}
 
 		// if limit is not provided, the default is 10
-		int limit = batchSize;
 		if (limit <= 0) {
 			limit = 10;
 		}
-		if (!queryParameters.containsKey("limit") || NumberUtils.toInt(queryParameters.get("limit")) <= 0) {
-			queryParameters.put("limit", Integer.toString(limit));
-		}
 
 		// if offset is not provided, the default is 0
-		if (!queryParameters.containsKey("offset") || NumberUtils.toInt(queryParameters.get("offset")) <= 0) {
-			queryParameters.put("offset", "0");
+		if (offset < 0) {
+			offset = 0;
 		}
+		queryParameters.put(UrlConstants.QUERY_LIMIT, String.valueOf(limit));
+		queryParameters.put(UrlConstants.QUERY_OFFSET, String.valueOf(offset));
+
 		for (final Map.Entry<String, String> entry : queryParameters.entrySet()) {
 			resource.addQueryParameter(entry.getKey(), entry.getValue());
 		}
@@ -140,12 +139,12 @@ public class HubRequest {
 		urlSegments.addAll(urlSegment);
 	}
 
-	public int getBatchSize() {
-		return batchSize;
+	public int getLimit() {
+		return limit;
 	}
 
-	public void setBatchSize(final int batchSize) {
-		this.batchSize = batchSize;
+	public void setLimit(final int limit) {
+		this.limit = limit;
 	}
 
 	public Map<String, String> getQueryParameters() {
@@ -158,6 +157,14 @@ public class HubRequest {
 
 	public void addQueryParameters(final Map<String, String> queryParameters) {
 		queryParameters.putAll(queryParameters);
+	}
+
+	public int getOffset() {
+		return offset;
+	}
+
+	public void setOffset(final int offset) {
+		this.offset = offset;
 	}
 
 }

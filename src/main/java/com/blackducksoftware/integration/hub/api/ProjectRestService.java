@@ -19,7 +19,9 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ProjectRestService extends HubRestService<ProjectItem> {
-	private final List<String> getProjectsSegments = Arrays.asList("api", "projects");
+
+	private final List<String> getProjectsSegments = Arrays.asList(UrlConstants.SEGMENT_API,
+			UrlConstants.SEGMENT_PROJECTS);
 	private final Type projectItemListType = new TypeToken<List<ProjectItem>>() {
 	}.getType();
 	private final Type projectItemType = new TypeToken<ProjectItem>() {
@@ -32,7 +34,7 @@ public class ProjectRestService extends HubRestService<ProjectItem> {
 	public List<ProjectItem> getAllProjects() throws IOException, BDRestException, URISyntaxException {
 		final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
 		projectItemRequest.setMethod(Method.GET);
-		projectItemRequest.setBatchSize(100);
+		projectItemRequest.setLimit(100);
 		projectItemRequest.addUrlSegments(getProjectsSegments);
 
 		final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
@@ -44,7 +46,7 @@ public class ProjectRestService extends HubRestService<ProjectItem> {
 			throws IOException, BDRestException, URISyntaxException {
 		final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
 		projectItemRequest.setMethod(Method.GET);
-		projectItemRequest.setBatchSize(100);
+		projectItemRequest.setLimit(100);
 		projectItemRequest.addUrlSegments(getProjectsSegments);
 		if (StringUtils.isNotBlank(projectName)) {
 			projectItemRequest.addQueryParameter("q", "name:" + projectName);
@@ -59,7 +61,7 @@ public class ProjectRestService extends HubRestService<ProjectItem> {
 			throws IOException, BDRestException, URISyntaxException {
 		final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
 		projectItemRequest.setMethod(Method.GET);
-		projectItemRequest.setBatchSize(limit);
+		projectItemRequest.setLimit(limit);
 		projectItemRequest.addUrlSegments(getProjectsSegments);
 		if (StringUtils.isNotBlank(projectName)) {
 			projectItemRequest.addQueryParameter("q", "name:" + projectName);
