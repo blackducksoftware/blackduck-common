@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.VulnerabilitiesRestService;
+import com.blackducksoftware.integration.hub.api.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 
@@ -21,7 +21,7 @@ public class ComponentAggregateBuilder {
 	private final List<PolicyViolationContentItem> policyViolationSet;
 	private final List<PolicyOverrideContentItem> policyOverrideSet;
 	private final List<VulnerabilityContentItem> vulnerabilityList;
-	private VulnerabilitiesRestService restService;
+	private VulnerabilityRestService restService;
 
 	public ComponentAggregateBuilder() {
 		policyViolationSet = new ArrayList<>();
@@ -61,11 +61,11 @@ public class ComponentAggregateBuilder {
 		this.componentVersionId = componentVersionId;
 	}
 
-	public VulnerabilitiesRestService getRestService() {
+	public VulnerabilityRestService getRestService() {
 		return restService;
 	}
 
-	public void setRestService(final VulnerabilitiesRestService restService) {
+	public void setRestService(final VulnerabilityRestService restService) {
 		this.restService = restService;
 	}
 

@@ -21,7 +21,7 @@ import com.blackducksoftware.integration.hub.api.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
-import com.blackducksoftware.integration.hub.api.VulnerabilitiesRestService;
+import com.blackducksoftware.integration.hub.api.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
@@ -51,7 +51,7 @@ public class NotificationDataService extends AbstractDataService {
 	private final ExecutorService executorService;
 	private final ExecutorCompletionService<List<NotificationContentItem>> completionService;
 	private final PolicyNotificationFilter policyFilter;
-	private final VulnerabilitiesRestService vulnerabilityRestService;
+	private final VulnerabilityRestService vulnerabilityRestService;
 
 	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
 			final PolicyNotificationFilter policyFilter) {
@@ -61,7 +61,7 @@ public class NotificationDataService extends AbstractDataService {
 		policyService = new PolicyRestService(restConnection, gson, jsonParser);
 		bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
-		vulnerabilityRestService = new VulnerabilitiesRestService(restConnection, gson, jsonParser);
+		vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
 		this.policyFilter = policyFilter;
 		transformMap = createTransformMap();
 		final ThreadFactory threadFactory = Executors.defaultThreadFactory();

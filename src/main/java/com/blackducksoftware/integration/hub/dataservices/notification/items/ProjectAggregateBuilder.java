@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.blackducksoftware.integration.hub.api.VulnerabilitiesRestService;
+import com.blackducksoftware.integration.hub.api.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 
 public class ProjectAggregateBuilder {
@@ -23,24 +23,24 @@ public class ProjectAggregateBuilder {
 	private int totalCount = 0;
 
 	private final Map<String, ComponentAggregateBuilder> compBuilderMap;
-	private final VulnerabilitiesRestService vulnerabilitiesRestService;
+	private final VulnerabilityRestService vulnerabilityRestService;
 
 	public ProjectAggregateBuilder() {
 		projectVersion = new ProjectVersion();
 		this.startDate = new Date();
 		this.endDate = new Date();
 		compBuilderMap = new HashMap<>();
-		vulnerabilitiesRestService = null;
+		vulnerabilityRestService = null;
 	}
 
 	private ProjectAggregateBuilder(final Date startDate, final Date endDate, final ProjectVersion projectVersion,
 			final Map<String, ComponentAggregateBuilder> compBuilderMap,
-			final VulnerabilitiesRestService vulnerabilitiesRestService) {
+			final VulnerabilityRestService vulnerabilitiesRestService) {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.projectVersion = projectVersion;
 		this.compBuilderMap = compBuilderMap;
-		this.vulnerabilitiesRestService = vulnerabilitiesRestService;
+		this.vulnerabilityRestService = vulnerabilitiesRestService;
 	}
 
 	public ProjectVersion getProjectVersion() {
@@ -57,16 +57,16 @@ public class ProjectAggregateBuilder {
 
 	public ProjectAggregateBuilder updateProjectVersion(final ProjectVersion projectVersion) {
 		return new ProjectAggregateBuilder(startDate, endDate, projectVersion, compBuilderMap,
-				vulnerabilitiesRestService);
+				vulnerabilityRestService);
 	}
 
 	public ProjectAggregateBuilder updateDateRange(final Date startDate, final Date endDate) {
 		return new ProjectAggregateBuilder(startDate, endDate, projectVersion, compBuilderMap,
-				vulnerabilitiesRestService);
+				vulnerabilityRestService);
 	}
 
 	public ProjectAggregateBuilder updateVulnerabilitiesRestService(
-			final VulnerabilitiesRestService vulnerabilitiesRestService) {
+			final VulnerabilityRestService vulnerabilitiesRestService) {
 		return new ProjectAggregateBuilder(startDate, endDate, projectVersion, compBuilderMap,
 				vulnerabilitiesRestService);
 	}
@@ -102,7 +102,7 @@ public class ProjectAggregateBuilder {
 
 		for (final Map.Entry<String, ComponentAggregateBuilder> entry : compBuilderMap.entrySet()) {
 			final ComponentAggregateBuilder compBuilder = entry.getValue();
-			compBuilder.setRestService(vulnerabilitiesRestService);
+			compBuilder.setRestService(vulnerabilityRestService);
 			final ComponentAggregateData compData = compBuilder.build();
 			policyViolationCount += compData.getPolicyViolationCount();
 			policyOverrideCount += compData.getPolicyOverrideCount();
