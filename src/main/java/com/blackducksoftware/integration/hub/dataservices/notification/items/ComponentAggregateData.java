@@ -11,12 +11,14 @@ public class ComponentAggregateData {
 	private final List<PolicyViolationContentItem> policyViolationList;
 	private final List<PolicyOverrideContentItem> policyOverrideList;
 	private final List<VulnerabilityContentItem> vulnerabilityList;
+	private final ComponentVulnerabilitySummary vulnerabilitySummary;
 
 	public ComponentAggregateData(final String componentName, final String componentVersion,
 			final List<PolicyViolationContentItem> policyViolationList,
 			final List<PolicyOverrideContentItem> policyOverrideList,
 			final List<VulnerabilityContentItem> vulnerabilityList, final int vulnAddedCount,
-			final int vulnUpdatedCount, final int vulnDeletedCount) {
+			final int vulnUpdatedCount, final int vulnDeletedCount,
+			final ComponentVulnerabilitySummary vulnerabilitySummary) {
 		this.componentName = componentName;
 		this.componentVersion = componentVersion;
 		this.vulnAddedCount = vulnAddedCount;
@@ -25,6 +27,7 @@ public class ComponentAggregateData {
 		this.policyViolationList = policyViolationList;
 		this.policyOverrideList = policyOverrideList;
 		this.vulnerabilityList = vulnerabilityList;
+		this.vulnerabilitySummary = vulnerabilitySummary;
 	}
 
 	public String getComponentName() {
@@ -85,5 +88,9 @@ public class ComponentAggregateData {
 
 	public List<VulnerabilityContentItem> getVulnerabilityList() {
 		return vulnerabilityList;
+	}
+
+	public ComponentVulnerabilitySummary getVulnerabilitySummary() {
+		return vulnerabilitySummary;
 	}
 }

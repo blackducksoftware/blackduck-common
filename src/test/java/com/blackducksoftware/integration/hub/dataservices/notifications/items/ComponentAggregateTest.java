@@ -13,6 +13,7 @@ import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourc
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.ComponentAggregateData;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.ComponentVulnerabilitySummary;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.VulnerabilityContentItem;
@@ -52,8 +53,10 @@ public class ComponentAggregateTest {
 		overrideList.add(overrideContent);
 		vulnerabilityList.add(vulnerabilityContent);
 		final int vulnSize = sourceIdList.size();
+		final ComponentVulnerabilitySummary vulnSummary = new ComponentVulnerabilitySummary(componentName,
+				componentVersion, 1, 2, 3, 6);
 		final ComponentAggregateData data = new ComponentAggregateData(componentName, componentVersion, violationList,
-				overrideList, vulnerabilityList, vulnSize, vulnSize, vulnSize);
+				overrideList, vulnerabilityList, vulnSize, vulnSize, vulnSize, vulnSummary);
 
 		assertNotNull(data);
 		assertEquals(total, data.getTotal());
@@ -68,5 +71,6 @@ public class ComponentAggregateTest {
 		assertEquals(violationList, data.getPolicyViolationList());
 		assertEquals(overrideList, data.getPolicyOverrideList());
 		assertEquals(vulnerabilityList, data.getVulnerabilityList());
+		assertEquals(vulnSummary, data.getVulnerabilitySummary());
 	}
 }
