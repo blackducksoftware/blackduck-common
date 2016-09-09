@@ -163,16 +163,20 @@ public class ComponentAggregateBuilder {
 	public ComponentAggregateData build() {
 		List<VulnerabilityItem> itemList = new ArrayList<>();
 		final ComponentVulnerabilitySummaryBuilder summaryBuilder = new ComponentVulnerabilitySummaryBuilder();
-		if (getRestService() != null) {
-			try {
-				itemList = getRestService().getComponentVersionVulnerabilities(getComponentId(),
-						getComponentVersionId());
-			} catch (IOException | URISyntaxException | BDRestException e) {
+
+		if (getVulnerabilityCount() > 0) { // received vulnerability
+											// notifications
+			if (getRestService() != null) {
+				try {
+					itemList = getRestService().getComponentVersionVulnerabilities(getComponentId(),
+							getComponentVersionId());
+				} catch (IOException | URISyntaxException | BDRestException e) {
+				}
 			}
+			summaryBuilder.setComponentName(getComponentName());
+			summaryBuilder.setComponentVersion(getComponentVersion());
+			summaryBuilder.setVulnerabilityList(itemList);
 		}
-		summaryBuilder.setComponentName(getComponentName());
-		summaryBuilder.setComponentVersion(getComponentVersion());
-		summaryBuilder.setVulnerabilityList(itemList);
 		final ComponentVulnerabilitySummary vulnSummary = summaryBuilder.build();
 		return new ComponentAggregateData(getComponentName(), getComponentVersion(), policyViolationSet,
 				policyOverrideSet, vulnerabilityList, addedVulnCount, updatedVulnCount, deletedVulnCount, vulnSummary);
