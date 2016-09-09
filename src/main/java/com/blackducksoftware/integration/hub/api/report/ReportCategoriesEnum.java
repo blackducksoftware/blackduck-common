@@ -7,13 +7,15 @@ public enum ReportCategoriesEnum {
 		if (reportCategory == null) {
 			return ReportCategoriesEnum.UNKNOWN_CATEGORY;
 		}
+
 		ReportCategoriesEnum reportCategoriesEnum;
 		try {
 			reportCategoriesEnum = ReportCategoriesEnum.valueOf(reportCategory.toUpperCase());
 		} catch (final IllegalArgumentException e) {
-			// ignore expection
 			reportCategoriesEnum = UNKNOWN_CATEGORY;
 		}
+
 		return reportCategoriesEnum;
 	}
+
 }
