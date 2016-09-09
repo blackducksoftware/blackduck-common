@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.restlet.data.Method;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
@@ -35,11 +34,10 @@ public class HubRestService<T extends HubItem> {
 		allItems.addAll(items);
 
 		while (allItems.size() < totalCount) {
-			final String currentOffsetString = hubRequest.getQueryParameters().get("offset");
-			final int currentOffset = NumberUtils.toInt(currentOffsetString);
+			final int currentOffset = hubRequest.getOffset();
 			final int increasedOffset = currentOffset + items.size();
 
-			hubRequest.addQueryParameter("offset", Integer.toString(increasedOffset));
+			hubRequest.setOffset(increasedOffset);
 			final JsonObject nextResponse = hubRequest.executeForResponseJson();
 			items = getItems(type, nextResponse);
 			allItems.addAll(items);
@@ -56,6 +54,15 @@ public class HubRestService<T extends HubItem> {
 	private int getTotalCount(final JsonObject jsonObject) {
 		final int totalCount = jsonObject.get("totalCount").getAsInt();
 		return totalCount;
+	}
+
+	public List<T> getItems(final Type type, final String url) throws IOException, URISyntaxException, BDRestException {
+		final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
+		itemRequest.setMethod(Method.GET);
+		itemRequest.setUrl(url);
+
+		final String response = itemRequest.executeForResponseString();
+		return getGson().fromJson(response, type);
 	}
 
 	public T getItem(final Type type, final String url) throws IOException, BDRestException, URISyntaxException {

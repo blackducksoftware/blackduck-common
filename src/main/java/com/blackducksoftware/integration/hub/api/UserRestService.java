@@ -17,7 +17,8 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class UserRestService extends HubRestService<UserItem> {
-	private final List<String> getUsersSegments = Arrays.asList("api", "users");
+
+	private final List<String> getUsersSegments = Arrays.asList(UrlConstants.SEGMENT_API, UrlConstants.SEGMENT_USERS);
 	private final Type userItemListType = new TypeToken<List<UserItem>>() {
 	}.getType();
 
@@ -29,11 +30,10 @@ public class UserRestService extends HubRestService<UserItem> {
 		final HubRequest userRequest = new HubRequest(getRestConnection(), getJsonParser());
 		userRequest.setMethod(Method.GET);
 		userRequest.addUrlSegments(getUsersSegments);
-		userRequest.addQueryParameter("limit", "100");
+		userRequest.setLimit(100);
 
 		final JsonObject jsonObject = userRequest.executeForResponseJson();
 		final List<UserItem> allUserItems = getAll(userItemListType, jsonObject, userRequest);
 		return allUserItems;
 	}
-
 }

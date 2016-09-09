@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -20,18 +21,18 @@ import com.blackducksoftware.integration.hub.api.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
+import com.blackducksoftware.integration.hub.api.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.AbstractItemCount;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationCountData;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationItemCount;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.VulnerabilityItemCount;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateBuilder;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateData;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.NotificationCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationOverrideTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.VulnerabilityTransform;
@@ -47,10 +48,10 @@ public class NotificationDataService extends AbstractDataService {
 	private final VersionBomPolicyRestService bomVersionPolicyService;
 	private final ComponentVersionRestService componentVersionService;
 	private final Map<Class<?>, AbstractNotificationTransform> transformMap;
-	private final Map<Class<?>, AbstractItemCount> counterMap;
 	private final ExecutorService executorService;
 	private final ExecutorCompletionService<List<NotificationContentItem>> completionService;
 	private final PolicyNotificationFilter policyFilter;
+	private final VulnerabilityRestService vulnerabilityRestService;
 
 	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
 			final PolicyNotificationFilter policyFilter) {
@@ -60,9 +61,9 @@ public class NotificationDataService extends AbstractDataService {
 		policyService = new PolicyRestService(restConnection, gson, jsonParser);
 		bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
+		vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
 		this.policyFilter = policyFilter;
 		transformMap = createTransformMap();
-		counterMap = createCounterMap();
 		final ThreadFactory threadFactory = Executors.defaultThreadFactory();
 		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
 		completionService = new ExecutorCompletionService<>(executorService);
@@ -78,15 +79,6 @@ public class NotificationDataService extends AbstractDataService {
 				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
 
 		return transformMap;
-	}
-
-	private Map<Class<?>, AbstractItemCount> createCounterMap() {
-		final Map<Class<?>, AbstractItemCount> counterMap = new HashMap<>();
-		counterMap.put(RuleViolationNotificationItem.class, new NotificationItemCount());
-		counterMap.put(PolicyOverrideNotificationItem.class, new NotificationItemCount());
-		counterMap.put(VulnerabilityNotificationItem.class, new VulnerabilityItemCount());
-
-		return counterMap;
 	}
 
 	public List<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
@@ -117,39 +109,23 @@ public class NotificationDataService extends AbstractDataService {
 		return contentList;
 	}
 
-	public NotificationCountData getNotificationCounts(final Date startDate, final Date endDate)
-			throws IOException, URISyntaxException, BDRestException {
+	public List<ProjectAggregateData> getNotificationCounts(final Date startDate, final Date endDate)
+			throws IOException, URISyntaxException, BDRestException, InterruptedException {
 
-		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
-		final int count = itemList.size();
-
-		for (final NotificationItem item : itemList) {
-			final Class<? extends NotificationItem> key = item.getClass();
-			if (counterMap.containsKey(key)) {
-				final AbstractItemCount counter = counterMap.get(key);
-				counter.increment(item);
-			}
+		final Map<String, ProjectAggregateBuilder> projectCounterMap = new ConcurrentHashMap<>();
+		final NotificationCounter counter = new NotificationCounter(projectCounterMap);
+		final List<NotificationContentItem> itemList = getAllNotifications(startDate, endDate);
+		for (final NotificationContentItem item : itemList) {
+			counter.count(item);
 		}
 
-		final AbstractItemCount policyRuleCounter = counterMap.get(RuleViolationNotificationItem.class);
-		final AbstractItemCount policyOverrideCounter = counterMap.get(PolicyOverrideNotificationItem.class);
-		final VulnerabilityItemCount vulnCounter = (VulnerabilityItemCount) counterMap
-				.get(VulnerabilityNotificationItem.class);
-
-		final int policyViolationCount = policyRuleCounter.getCount();
-		final int policyOverrideCount = policyOverrideCounter.getCount();
-		final int vulnCount = vulnCounter.getCount();
-		final int vulnAddedCount = vulnCounter.getAddedCount();
-		final int vulnUpdatedCount = vulnCounter.getUpdatedCount();
-		final int vulnDeletedCount = vulnCounter.getDeletedCount();
-
-		// reset counters
-		for (final Map.Entry<Class<?>, AbstractItemCount> entry : counterMap.entrySet()) {
-			entry.getValue().reset();
+		final List<ProjectAggregateData> dataList = new ArrayList<>();
+		for (final Map.Entry<String, ProjectAggregateBuilder> entry : projectCounterMap.entrySet()) {
+			ProjectAggregateBuilder builder = entry.getValue().updateDateRange(startDate, endDate);
+			builder = builder.updateVulnerabilitiesRestService(vulnerabilityRestService);
+			dataList.add(builder.build());
 		}
-
-		return new NotificationCountData(startDate, endDate, count, policyViolationCount, policyOverrideCount,
-				vulnCount, vulnAddedCount, vulnUpdatedCount, vulnDeletedCount);
+		return dataList;
 	}
 
 	private class TransformCallable implements Callable<List<NotificationContentItem>> {
