@@ -27,6 +27,7 @@ public class HubRequest {
 	private int limit = 10;
 	private final Map<String, String> queryParameters = new HashMap<>();
 	private int offset = 0;
+	private String q;
 
 	public HubRequest(final RestConnection restConnection, final JsonParser jsonParser) {
 		this.restConnection = restConnection;
@@ -102,6 +103,9 @@ public class HubRequest {
 		}
 		queryParameters.put(UrlConstants.QUERY_LIMIT, String.valueOf(limit));
 		queryParameters.put(UrlConstants.QUERY_OFFSET, String.valueOf(offset));
+		if (StringUtils.isNotBlank(q)) {
+			queryParameters.put(UrlConstants.QUERY_Q, q);
+		}
 
 		for (final Map.Entry<String, String> entry : queryParameters.entrySet()) {
 			resource.addQueryParameter(entry.getKey(), entry.getValue());
@@ -165,6 +169,14 @@ public class HubRequest {
 
 	public void setOffset(final int offset) {
 		this.offset = offset;
+	}
+
+	public String getQ() {
+		return q;
+	}
+
+	public void setQ(final String q) {
+		this.q = q;
 	}
 
 }
