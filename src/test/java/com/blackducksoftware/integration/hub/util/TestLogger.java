@@ -32,15 +32,15 @@ import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.logging.LogLevel;
 
 public class TestLogger extends IntLogger {
-	private ArrayList<String> outputList = new ArrayList<>();
-	private ArrayList<Throwable> errorList = new ArrayList<>();
+	private List<String> outputList = new ArrayList<>();
+	private List<Throwable> errorList = new ArrayList<>();
 	private LogLevel logLevel = LogLevel.TRACE;
 
-	public ArrayList<String> getOutputList() {
+	public List<String> getOutputList() {
 		return outputList;
 	}
 
-	public ArrayList<Throwable> getErrorList() {
+	public List<Throwable> getErrorList() {
 		return errorList;
 	}
 
@@ -62,7 +62,7 @@ public class TestLogger extends IntLogger {
 	}
 
 	public String getErrorOutputString() {
-		if (null == errorList) {
+		if (null == errorList || errorList.isEmpty()) {
 			return "";
 		}
 
