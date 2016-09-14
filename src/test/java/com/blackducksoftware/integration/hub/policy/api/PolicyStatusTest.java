@@ -37,13 +37,9 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-
 public class PolicyStatusTest {
 	@Test
 	public void testPolicyStatus() {
-		final String overallStatus1 = PolicyStatusEnum.UNKNOWN.toString();
 		final String updatedAt1 = "time1";
 		final int value1 = 3214;
 		final ComponentVersionStatusCount statusCount1 = new ComponentVersionStatusCount(PolicyStatusEnum.UNKNOWN,
@@ -59,7 +55,6 @@ public class PolicyStatusTest {
 		links1.add(link1);
 		final MetaInformation _meta1 = new MetaInformation(allows1, href1, links1);
 
-		final String overallStatus2 = PolicyStatusEnum.IN_VIOLATION.toString();
 		final String updatedAt2 = new DateTime().toString();
 		final int value2 = 0;
 		final ComponentVersionStatusCount statusCount2 = new ComponentVersionStatusCount(
@@ -80,14 +75,12 @@ public class PolicyStatusTest {
 		final PolicyStatusItem item3 = new PolicyStatusItem(PolicyStatusEnum.UNKNOWN, updatedAt1, counts1, _meta1);
 		final PolicyStatusItem item4 = new PolicyStatusItem(PolicyStatusEnum.UNKNOWN, null, null, null);
 
-		assertEquals(overallStatus1, item1.getOverallStatus());
 		assertEquals(PolicyStatusEnum.UNKNOWN, item1.getOverallStatus());
 		assertEquals(updatedAt1, item1.getUpdatedAt());
 		assertNull(item1.getUpdatedAtTime());
 		assertEquals(counts1, item1.getComponentVersionStatusCounts());
 		assertEquals(_meta1, item1.getMeta());
 
-		assertEquals(overallStatus2, item2.getOverallStatus());
 		assertEquals(PolicyStatusEnum.IN_VIOLATION, item2.getOverallStatus());
 		assertEquals(updatedAt2, item2.getUpdatedAt());
 		assertEquals(updatedAt2, item2.getUpdatedAtTime().toString());
@@ -100,23 +93,8 @@ public class PolicyStatusTest {
 		assertTrue(!item1.equals(item2));
 		assertTrue(item1.equals(item3));
 
-		EqualsVerifier.forClass(PolicyStatusItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
-
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());
-
-		final StringBuilder builder = new StringBuilder();
-		builder.append("PolicyStatus [overallStatus=");
-		builder.append(item1.getOverallStatus());
-		builder.append(", updatedAt=");
-		builder.append(item1.getUpdatedAt());
-		builder.append(", componentVersionStatusCounts=");
-		builder.append(item1.getComponentVersionStatusCounts());
-		builder.append(", meta=");
-		builder.append(item1.getMeta());
-		builder.append("]");
-
-		assertEquals(builder.toString(), item1.toString());
 	}
 
 	@Test

@@ -11,10 +11,6 @@ import org.junit.Test;
 import com.blackducksoftware.integration.hub.api.policy.PolicyExpression;
 import com.blackducksoftware.integration.hub.api.policy.PolicyExpressions;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRuleConditionEnum;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 public class PolicyExpressionsTest {
 
@@ -51,18 +47,8 @@ public class PolicyExpressionsTest {
 		assertTrue(!item1.equals(item2));
 		assertTrue(item1.equals(item3));
 
-		EqualsVerifier.forClass(PolicyStatusItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
-
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());
-
-		final StringBuilder builder = new StringBuilder();
-		builder.append("PolicyExpressions [operator=");
-		builder.append(item1.getOperator());
-		builder.append(", expressions=");
-		builder.append(item1.getExpressions());
-		builder.append("]");
-		assertEquals(builder.toString(), item1.toString());
 	}
 
 	@Test
