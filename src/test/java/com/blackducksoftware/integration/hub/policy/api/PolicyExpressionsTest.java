@@ -11,7 +11,7 @@ import org.junit.Test;
 import com.blackducksoftware.integration.hub.api.policy.PolicyExpression;
 import com.blackducksoftware.integration.hub.api.policy.PolicyExpressions;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRuleConditionEnum;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatus;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -26,12 +26,12 @@ public class PolicyExpressionsTest {
 
 		final PolicyExpression expression1 = new PolicyExpression(name1, null, null);
 
-		final List<PolicyExpression> expressions1 = new ArrayList<PolicyExpression>();
+		final List<PolicyExpression> expressions1 = new ArrayList<>();
 		expressions1.add(expression1);
 
 		final PolicyExpression expression2 = new PolicyExpression(name2, null, null);
 
-		final List<PolicyExpression> expressions2 = new ArrayList<PolicyExpression>();
+		final List<PolicyExpression> expressions2 = new ArrayList<>();
 		expressions2.add(expression2);
 
 		final String operator1 = "operator1";
@@ -51,7 +51,7 @@ public class PolicyExpressionsTest {
 		assertTrue(!item1.equals(item2));
 		assertTrue(item1.equals(item3));
 
-		EqualsVerifier.forClass(PolicyStatus.class).suppress(Warning.STRICT_INHERITANCE).verify();
+		EqualsVerifier.forClass(PolicyStatusItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
 
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());
@@ -70,7 +70,7 @@ public class PolicyExpressionsTest {
 		final PolicyExpressions item1 = new PolicyExpressions(null, null);
 		assertTrue(item1.hasOnlyProjectLevelConditions());
 
-		final List<PolicyExpression> expressions = new ArrayList<PolicyExpression>();
+		final List<PolicyExpression> expressions = new ArrayList<>();
 
 		final PolicyExpressions item2 = new PolicyExpressions(null, expressions);
 		assertTrue(item2.hasOnlyProjectLevelConditions());

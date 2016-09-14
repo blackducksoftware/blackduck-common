@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyExpression;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRuleConditionEnum;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatus;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyValue;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -29,10 +29,10 @@ public class PolicyExpressionTest {
 		final PolicyValue policyValue1 = new PolicyValue(label1, value1);
 		final PolicyValue policyValue2 = new PolicyValue(label2, value2);
 
-		final List<PolicyValue> values1 = new ArrayList<PolicyValue>();
+		final List<PolicyValue> values1 = new ArrayList<>();
 		values1.add(policyValue1);
 
-		final List<PolicyValue> values2 = new ArrayList<PolicyValue>();
+		final List<PolicyValue> values2 = new ArrayList<>();
 		values2.add(policyValue2);
 
 		final String name1 = "name1";
@@ -56,7 +56,7 @@ public class PolicyExpressionTest {
 		assertTrue(!item1.equals(item2));
 		assertTrue(item1.equals(item3));
 
-		EqualsVerifier.forClass(PolicyStatus.class).suppress(Warning.STRICT_INHERITANCE).verify();
+		EqualsVerifier.forClass(PolicyStatusItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
 
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());

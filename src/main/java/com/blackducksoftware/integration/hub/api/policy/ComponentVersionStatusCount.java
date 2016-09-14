@@ -22,21 +22,16 @@
 package com.blackducksoftware.integration.hub.api.policy;
 
 public class ComponentVersionStatusCount {
-	private final String name;
-
+	private final PolicyStatusEnum name;
 	private final int value;
 
-	public ComponentVersionStatusCount(final String name, final int value) {
+	public ComponentVersionStatusCount(final PolicyStatusEnum name, final int value) {
 		this.name = name;
 		this.value = value;
 	}
 
-	public String getName() {
+	public PolicyStatusEnum getName() {
 		return name;
-	}
-
-	public PolicyStatusEnum getPolicyStatusFromName() {
-		return PolicyStatusEnum.getPolicyStatusEnum(name);
 	}
 
 	public int getValue() {
@@ -60,15 +55,11 @@ public class ComponentVersionStatusCount {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof ComponentVersionStatusCount)) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		final ComponentVersionStatusCount other = (ComponentVersionStatusCount) obj;
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
+		if (name != other.name) {
 			return false;
 		}
 		if (value != other.value) {
@@ -79,13 +70,7 @@ public class ComponentVersionStatusCount {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("ComponentVersionStatusCount [name=");
-		builder.append(name);
-		builder.append(", value=");
-		builder.append(value);
-		builder.append("]");
-		return builder.toString();
+		return "ComponentVersionStatusCount [name=" + name + ", value=" + value + "]";
 	}
 
 }

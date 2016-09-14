@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatus;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyValue;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -33,7 +33,7 @@ public class PolicyValueTest {
 		assertTrue(!item1.equals(item2));
 		assertTrue(item1.equals(item3));
 
-		EqualsVerifier.forClass(PolicyStatus.class).suppress(Warning.STRICT_INHERITANCE).verify();
+		EqualsVerifier.forClass(PolicyStatusItem.class).suppress(Warning.STRICT_INHERITANCE).verify();
 
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());
