@@ -34,7 +34,7 @@ public final class PasswordDecrypter {
 
 		final String decryptedPassword = encryptionUtils.alterString(password, null, Cipher.DECRYPT_MODE);
 
-		if (null == decryptedPassword) {
+		if (decryptedPassword == null) {
 			throw new EncryptionException("The decrypted password is null");
 		}
 

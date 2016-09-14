@@ -177,7 +177,7 @@ public class CLIInstaller {
 		final String cacertsFilename = "cacerts";
 		if (ciEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
 			final File securityDirectory = cliLocation.getJreSecurityDirectory();
-			if (null == securityDirectory) {
+			if (securityDirectory == null) {
 				// the cli might not have the jre included
 				return;
 			}

@@ -91,7 +91,7 @@ public class EncryptionUtils {
 			}
 		}
 
-		if (null == key) {
+		if (key == null) {
 			throw new EncryptionException("The encryption key is null");
 		}
 
@@ -140,7 +140,7 @@ public class EncryptionUtils {
 	}
 
 	private Key retrieveKeyFromInputStream(final InputStream inputStream) throws NoSuchAlgorithmException,
-	CertificateException, IOException, UnrecoverableKeyException, KeyStoreException {
+			CertificateException, IOException, UnrecoverableKeyException, KeyStoreException {
 		try {
 			final KeyStore keystore = KeyStore.getInstance("JCEKS");
 			keystore.load(inputStream, KEY_PASS);

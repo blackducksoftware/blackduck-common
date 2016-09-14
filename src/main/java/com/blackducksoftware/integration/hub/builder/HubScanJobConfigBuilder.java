@@ -49,7 +49,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 	private boolean shouldGenerateRiskReport;
 	private String maxWaitTimeForBomUpdate;
 	private String scanMemory;
-	private final Set<String> scanTargetPaths = new HashSet<String>();
+	private final Set<String> scanTargetPaths = new HashSet<>();
 	private boolean dryRun;
 	private boolean disableScanTargetPathExistenceCheck;
 
@@ -72,7 +72,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 
 	@Override
 	public ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> assertValid() {
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<>();
 
 		validateProjectAndVersion(result);
 
@@ -91,7 +91,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 		if (dryRun) {
 			result.addResult(HubScanJobFieldEnum.PROJECT, new ValidationResult(ValidationResultEnum.OK, ""));
 			result.addResult(HubScanJobFieldEnum.VERSION, new ValidationResult(ValidationResultEnum.OK, ""));
-		} else if (null == projectName && null == version) {
+		} else if (projectName == null && version == null) {
 			result.addResult(HubScanJobFieldEnum.VERSION, new ValidationResult(ValidationResultEnum.WARN,
 					"No Project name or Version were found. Any scans run will not be mapped to a Version."));
 		} else {
@@ -101,7 +101,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 	}
 
 	public void validateProject(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result) {
-		if (null == projectName) {
+		if (projectName == null) {
 			result.addResult(HubScanJobFieldEnum.PROJECT,
 					new ValidationResult(ValidationResultEnum.ERROR, "No Project name was found."));
 		} else {
@@ -110,7 +110,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 	}
 
 	public void validateVersion(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result) {
-		if (null == version) {
+		if (version == null) {
 			result.addResult(HubScanJobFieldEnum.VERSION,
 					new ValidationResult(ValidationResultEnum.ERROR, "No Version was found."));
 		} else {
@@ -157,7 +157,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 		if (dryRun) {
 			result.addResult(HubScanJobFieldEnum.GENERATE_RISK_REPORT,
 					new ValidationResult(ValidationResultEnum.OK, ""));
-		} else if ((null == projectName || null == version) && shouldGenerateRiskReport) {
+		} else if ((projectName == null || version == null) && shouldGenerateRiskReport) {
 			result.addResult(HubScanJobFieldEnum.GENERATE_RISK_REPORT, new ValidationResult(ValidationResultEnum.ERROR,
 					"To generate the Risk Report, you need to provide a Project name or version."));
 		} else {
@@ -227,7 +227,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 		}
 
 		boolean valid = true;
-		final Set<String> targetPaths = new HashSet<String>();
+		final Set<String> targetPaths = new HashSet<>();
 		for (final String currentTargetPath : scanTargetPaths) {
 			String targetPath;
 			if (StringUtils.isBlank(currentTargetPath) && defaultTargetPath != null) {
@@ -244,7 +244,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 					// Since we dont know the defaultTargetPath at this point we
 					// only validate non blank entries
 					final File target = new File(targetPath);
-					if (null == target || !target.exists()) {
+					if (target == null || !target.exists()) {
 						result.addResult(HubScanJobFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
 								"The scan target '" + target.getAbsolutePath() + "' does not exist."));
 						valid = false;

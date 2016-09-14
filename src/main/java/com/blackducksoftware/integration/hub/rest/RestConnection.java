@@ -327,7 +327,7 @@ public class RestConnection {
 	 */
 	public <T> T httpGetFromRelativeUrl(final Class<T> modelClass, final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
-					throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
 
 		final ClientResource resource = createClientResource(urlSegments, queryParameters);
 		try {
@@ -343,7 +343,7 @@ public class RestConnection {
 				throw new ResourceDoesNotExistException(
 						"Error getting resource from relative url segments " + urlSegments + " and query parameters "
 								+ queryParameters + "; errorCode: " + responseCode + "; " + resource.toString(),
-								resource);
+						resource);
 			}
 		} finally {
 			releaseResource(resource);
@@ -442,12 +442,11 @@ public class RestConnection {
 				}
 				@SuppressWarnings("unchecked")
 				final Series<? extends NamedValue> responseheaders = (Series<? extends NamedValue>) requestOrResponse
-				.getAttributes()
-				.get(HeaderConstants.ATTRIBUTE_HEADERS);
+						.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
 				if (responseheaders != null) {
 					logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
 					for (final NamedValue header : responseheaders) {
-						if (null == header) {
+						if (header == null) {
 							logMessage(LogLevel.TRACE, "received a null header");
 						} else {
 							logMessage(LogLevel.TRACE, "Header name : " + header.getName());
@@ -528,7 +527,7 @@ public class RestConnection {
 
 	public String httpPostFromRelativeUrl(final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters, final Representation content)
-					throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
 
 		final ClientResource resource = createClientResource(urlSegments, queryParameters);
 		try {
@@ -559,8 +558,7 @@ public class RestConnection {
 			} else {
 				@SuppressWarnings("unchecked")
 				final Series<? extends NamedValue> responseHeaders = (Series<? extends NamedValue>) resource
-						.getResponse().getAttributes()
-				.get(HeaderConstants.ATTRIBUTE_HEADERS);
+						.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
 				final NamedValue resourceUrl = responseHeaders.getFirst("location", true);
 				final String value = (String) resourceUrl.getValue();
 				if (resourceUrl == null || StringUtils.isBlank(value)) {
