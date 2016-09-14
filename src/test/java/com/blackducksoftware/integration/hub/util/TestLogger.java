@@ -24,6 +24,7 @@ package com.blackducksoftware.integration.hub.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,26 +32,24 @@ import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.logging.LogLevel;
 
 public class TestLogger extends IntLogger {
-	private ArrayList<String> outputList = new ArrayList<String>();
-
-	private ArrayList<Throwable> errorList = new ArrayList<Throwable>();
-
+	private List<String> outputList = new ArrayList<>();
+	private List<Throwable> errorList = new ArrayList<>();
 	private LogLevel logLevel = LogLevel.TRACE;
 
-	public ArrayList<String> getOutputList() {
+	public List<String> getOutputList() {
 		return outputList;
 	}
 
-	public ArrayList<Throwable> getErrorList() {
+	public List<Throwable> getErrorList() {
 		return errorList;
 	}
 
 	public void resetOutputList() {
-		outputList = new ArrayList<String>();
+		outputList = new ArrayList<>();
 	}
 
 	public void resetErrorList() {
-		errorList = new ArrayList<Throwable>();
+		errorList = new ArrayList<>();
 	}
 
 	public void resetAllOutput() {
@@ -63,65 +62,74 @@ public class TestLogger extends IntLogger {
 	}
 
 	public String getErrorOutputString() {
-		final StringBuilder sb = new StringBuilder();
-		if (errorList != null && !errorList.isEmpty()) {
-			for (final Throwable e : errorList) {
-				if (sb.length() > 0) {
-					sb.append(System.getProperty("line.separator"));
-				}
-				final StringWriter sw = new StringWriter();
-				e.printStackTrace(new PrintWriter(sw));
-				sb.append(sw.toString());
-			}
+		if (null == errorList || errorList.isEmpty()) {
+			return "";
 		}
-		return sb.toString();
+
+		final List<String> stackTraces = new ArrayList<>();
+		for (final Throwable e : errorList) {
+			final StringWriter stringWriter = new StringWriter();
+			e.printStackTrace(new PrintWriter(stringWriter));
+			stackTraces.add(stringWriter.toString());
+		}
+
+		return StringUtils.join(stackTraces, System.getProperty("line.separator"));
 	}
 
 	@Override
 	public void debug(final String txt) {
+		System.out.println(String.format("debug: %s", txt));
 		outputList.add(txt);
 	}
 
 	@Override
 	public void debug(final String txt, final Throwable e) {
+		System.out.println(String.format("debug: %s, exception: %s", txt, e.getMessage()));
 		outputList.add(txt);
 		errorList.add(e);
 	}
 
 	@Override
 	public void error(final Throwable e) {
+		System.out.println(String.format("error: exception: %s", e.getMessage()));
 		errorList.add(e);
 	}
 
 	@Override
 	public void error(final String txt) {
+		System.out.println(String.format("error: %s", txt));
 		outputList.add(txt);
 	}
 
 	@Override
 	public void error(final String txt, final Throwable e) {
+		System.out.println(String.format("error: %s, exception: %s", txt, e.getMessage()));
 		outputList.add(txt);
 		errorList.add(e);
 	}
 
 	@Override
 	public void info(final String txt) {
+		System.out.println(String.format("info: %s", txt));
 		outputList.add(txt);
 	}
 
 	@Override
 	public void trace(final String txt) {
+		System.out.println(String.format("trace: %s", txt));
 		outputList.add(txt);
 	}
 
 	@Override
 	public void trace(final String txt, final Throwable e) {
+		System.out.println(String.format("trace: %s, exception: %s", txt, e.getMessage()));
 		outputList.add(txt);
 		errorList.add(e);
 	}
 
 	@Override
 	public void warn(final String txt) {
+		System.out.println(String.format("warn: %s", txt));
 		outputList.add(txt);
 	}
 
