@@ -55,7 +55,7 @@ public class CLILocation {
 
 		final File[] files = cliHomeFile.listFiles();
 		final File jreFolder = findFileByName(files, "jre");
-		if (null == jreFolder) {
+		if (jreFolder == null) {
 			return null;
 		}
 
@@ -150,7 +150,7 @@ public class CLILocation {
 
 		final File[] files = cliHomeFile.listFiles();
 		final File jreFolder = findFileByName(files, "jre");
-		if (null == jreFolder) {
+		if (jreFolder == null) {
 			return null;
 		}
 
@@ -171,7 +171,7 @@ public class CLILocation {
 
 	public boolean getCLIExists(final IntLogger logger) throws IOException, InterruptedException {
 		final File cli = getCLI(logger);
-		return null != cli && cli.exists();
+		return cli != null && cli.exists();
 	}
 
 	public File getCLI(final IntLogger logger) throws IOException, InterruptedException {
@@ -183,7 +183,7 @@ public class CLILocation {
 		// find the lib folder in the iScan directory
 		logger.debug("BlackDuck scan directory: " + cliHomeFile.getCanonicalPath());
 		final File[] files = cliHomeFile.listFiles();
-		if (null == files || files.length <= 0) {
+		if (files == null || files.length <= 0) {
 			logger.error("No files found in the BlackDuck scan directory.");
 			return null;
 		}

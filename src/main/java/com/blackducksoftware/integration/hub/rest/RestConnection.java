@@ -445,7 +445,7 @@ public class RestConnection {
 				if (responseheaders != null) {
 					logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
 					for (final NamedValue header : responseheaders) {
-						if (null == header) {
+						if (header == null) {
 							logMessage(LogLevel.TRACE, "received a null header");
 						} else {
 							logMessage(LogLevel.TRACE, "Header name : " + header.getName());

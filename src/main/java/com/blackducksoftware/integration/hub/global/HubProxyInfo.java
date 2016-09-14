@@ -93,7 +93,7 @@ public class HubProxyInfo implements Serializable {
 	 *
 	 */
 	private boolean shouldIgnoreHost(final String hostToMatch, final List<Pattern> ignoredProxyHostPatterns) {
-		if (StringUtils.isBlank(hostToMatch) || null == ignoredProxyHostPatterns
+		if (StringUtils.isBlank(hostToMatch) || ignoredProxyHostPatterns == null
 				|| ignoredProxyHostPatterns.isEmpty()) {
 			return false;
 		}
@@ -106,7 +106,7 @@ public class HubProxyInfo implements Serializable {
 	}
 
 	private List<Pattern> getIgnoredProxyHostPatterns() {
-		final List<Pattern> ignoredProxyHostPatterns = new ArrayList<Pattern>();
+		final List<Pattern> ignoredProxyHostPatterns = new ArrayList<>();
 		if (StringUtils.isNotBlank(ignoredProxyHosts)) {
 			String[] ignoreHosts = null;
 			if (ignoredProxyHosts.contains(",")) {

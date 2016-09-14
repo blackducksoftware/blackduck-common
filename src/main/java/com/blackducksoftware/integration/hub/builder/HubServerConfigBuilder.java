@@ -89,7 +89,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 	public ValidationResults<GlobalFieldKey, HubServerConfig> assertValid() {
 		final ValidationResults<GlobalFieldKey, HubProxyInfo> proxyResult = assertProxyValid();
 		final ValidationResults<GlobalFieldKey, HubCredentials> credentialResult = assertCredentialsValid();
-		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<GlobalFieldKey, HubServerConfig>();
+		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
 		result.addAllResults(proxyResult.getResultMap());
 		result.addAllResults(credentialResult.getResultMap());
 		validateHubUrl(result);
@@ -156,7 +156,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 
 		try {
 			URLConnection connection = null;
-			if (null != proxyInfo) {
+			if (proxyInfo != null) {
 				if (!hubURL.getProtocol().equals("https") && proxyInfo.getUsername() != null
 						&& proxyInfo.getEncryptedPassword() != null) {
 					result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,

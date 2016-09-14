@@ -34,7 +34,7 @@ public final class PasswordEncrypter {
 
 		final String encryptedPassword = encryptionUtils.alterString(password, null, Cipher.ENCRYPT_MODE);
 
-		if (null == encryptedPassword) {
+		if (encryptedPassword == null) {
 			throw new EncryptionException("The encrypted password is null");
 		}
 

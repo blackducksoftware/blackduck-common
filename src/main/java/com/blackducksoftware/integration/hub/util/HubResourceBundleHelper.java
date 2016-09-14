@@ -31,7 +31,7 @@ public class HubResourceBundleHelper {
 	private String keyPrefix;
 
 	public String getString(String key) {
-		if (null != keyPrefix) {
+		if (keyPrefix != null) {
 			key = keyPrefix + "." + key;
 		}
 
