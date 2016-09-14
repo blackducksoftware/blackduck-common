@@ -62,7 +62,7 @@ public class TestLogger extends IntLogger {
 	}
 
 	public String getErrorOutputString() {
-		if (null == errorList || errorList.isEmpty()) {
+		if (errorList == null || errorList.isEmpty()) {
 			return "";
 		}
 
