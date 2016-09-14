@@ -140,7 +140,7 @@ public class TestLogger extends IntLogger {
 
 	@Override
 	public LogLevel getLogLevel() {
-		return logLevel;
+		return null;
 	}
 
 }
