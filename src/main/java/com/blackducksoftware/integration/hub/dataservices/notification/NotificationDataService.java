@@ -24,6 +24,7 @@ import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.RuleViolationClearedNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
@@ -33,6 +34,7 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Pro
 import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateData;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.NotificationCounter;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationClearedTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationOverrideTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.VulnerabilityTransform;
@@ -77,6 +79,9 @@ public class NotificationDataService extends AbstractDataService {
 				projectVersionService, policyService, bomVersionPolicyService, componentVersionService, policyFilter));
 		transformMap.put(VulnerabilityNotificationItem.class, new VulnerabilityTransform(notificationService,
 				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
+		transformMap.put(RuleViolationClearedNotificationItem.class,
+				new PolicyViolationClearedTransform(notificationService, projectVersionService, policyService,
+						bomVersionPolicyService, componentVersionService, policyFilter));
 
 		return transformMap;
 	}
@@ -86,18 +91,18 @@ public class NotificationDataService extends AbstractDataService {
 		final List<NotificationContentItem> contentList = new ArrayList<>();
 		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
 
-		final int count = itemList.size();
-
+		int submitted = 0;
 		for (final NotificationItem item : itemList) {
 			final Class<? extends NotificationItem> key = item.getClass();
 			if (transformMap.containsKey(key)) {
 				final AbstractNotificationTransform converter = transformMap.get(key);
 				final TransformCallable callable = new TransformCallable(item, converter);
 				completionService.submit(callable);
+				submitted++;
 			}
 		}
 
-		for (int index = 0; index < count; index++) {
+		for (int index = 0; index < submitted; index++) {
 			try {
 				final Future<List<NotificationContentItem>> future = completionService.take();
 				contentList.addAll(future.get());
