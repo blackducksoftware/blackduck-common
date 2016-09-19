@@ -39,7 +39,7 @@ import org.mockito.Mockito;
 
 import com.blackducksoftware.integration.hub.ScanExecutor.Result;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.util.TestLogger;
+import com.blackducksoftware.integration.hub.test.TestLogger;
 
 public class ScanExecutorTest {
 	@Rule

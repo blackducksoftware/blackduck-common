@@ -23,6 +23,7 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
@@ -32,8 +33,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
 public class ScanStatusService {
-	private static final long FIVE_SECONDS = 5 * 1000;
-
 	private final IntLogger logger;
 
 	private final ProjectRestService projectRestService;
@@ -68,9 +67,10 @@ public class ScanStatusService {
 		policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
 	}
 
-	public PolicyStatusItem waitForCompleteScanStatus(final String groupId, final String artifactId,
-			final String version, final int timeoutInSeconds) throws IllegalArgumentException, URISyntaxException,
-			BDRestException, EncryptionException, IOException, UnexpectedHubResponseException, InterruptedException {
+	public PolicyStatusItem checkPolicies(final String groupId, final String artifactId, final String version,
+			final long timeoutInMilliseconds)
+			throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException, IOException,
+			UnexpectedHubResponseException, InterruptedException, HubIntegrationException {
 		populateApplicableScansAndProjectVersions(groupId, artifactId, version);
 
 		final List<ScanSummaryItem> scanSummaries = new ArrayList<>();
@@ -85,7 +85,36 @@ public class ScanStatusService {
 			}
 		}
 
-		waitUntilPendingScansAreComplete(pendingScanSummaries, timeoutInSeconds, System.currentTimeMillis());
+		if (scanSummariesLinks.isEmpty()) {
+			// perhaps the Hub has not started the scan yet - since we expect
+			// one to have started, let's wait a bit
+			Thread.sleep(5000);
+			for (final String scanSummaryLink : scanSummariesLinks) {
+				scanSummaries.addAll(scanSummaryRestService.getAllScanSummaryItems(scanSummaryLink));
+			}
+			for (final ScanSummaryItem scanSummaryItem : scanSummaries) {
+				if (scanSummaryItem.getStatus().isPending()) {
+					pendingScanSummaries.add(scanSummaryItem);
+				}
+			}
+		}
+
+		if (scanSummariesLinks.isEmpty()) {
+			// try one more time...
+			Thread.sleep(5000);
+			for (final String scanSummaryLink : scanSummariesLinks) {
+				scanSummaries.addAll(scanSummaryRestService.getAllScanSummaryItems(scanSummaryLink));
+			}
+			for (final ScanSummaryItem scanSummaryItem : scanSummaries) {
+				if (scanSummaryItem.getStatus().isPending()) {
+					pendingScanSummaries.add(scanSummaryItem);
+				}
+			}
+		}
+
+		final ScanStatusChecker scanStatusChecker = new ScanStatusChecker(logger, scanSummaryRestService,
+				pendingScanSummaries, timeoutInMilliseconds);
+		scanStatusChecker.waitForCompleteScans();
 
 		final PolicyStatusItem policyStatusItem = policyStatusRestService.getItem(policyStatusLink);
 		return policyStatusItem;
@@ -115,38 +144,6 @@ public class ScanStatusService {
 		}
 
 		scanSummariesLinks = mappedProjectVersionToScanSummariesLinks.get(mappedProjectVersionLink);
-	}
-
-	private void waitUntilPendingScansAreComplete(final List<ScanSummaryItem> pendingScanSummaries,
-			final int timeoutInSeconds, final long startedTime)
-			throws InterruptedException, IOException, BDRestException, URISyntaxException {
-		if (pendingScanSummaries.isEmpty()) {
-			return;
-		}
-
-		if (takenTooLong(timeoutInSeconds, startedTime)) {
-			logger.info("the hub processing took too long...");
-			return;
-		}
-
-		Thread.sleep(FIVE_SECONDS);
-		final List<ScanSummaryItem> currentPendingScanSummaries = new ArrayList<>();
-		for (final ScanSummaryItem scanSummaryItem : pendingScanSummaries) {
-			logger.info("waiting for scan: " + scanSummaryItem);
-			final String scanSummaryLink = scanSummaryItem.getMeta().getHref();
-			final ScanSummaryItem currentScanSummaryItem = scanSummaryRestService.getItem(scanSummaryLink);
-			if (currentScanSummaryItem.getStatus().isPending()) {
-				currentPendingScanSummaries.add(currentScanSummaryItem);
-			}
-		}
-
-		waitUntilPendingScansAreComplete(currentPendingScanSummaries, timeoutInSeconds, startedTime);
-	}
-
-	private boolean takenTooLong(final int timeoutInSeconds, final long startedTime) {
-		final double timeout = timeoutInSeconds * 1.00;
-		final double elapsed = (System.currentTimeMillis() - startedTime) / 1000.00;
-		return elapsed > timeout;
 	}
 
 	private String determineHubProjectAndVersionLink(final Set<String> mappedProjectVersionLinks,

@@ -33,10 +33,9 @@ import org.restlet.resource.ResourceException;
 import com.blackducksoftware.integration.hub.api.VersionComparison;
 import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.util.TestLogger;
+import com.blackducksoftware.integration.hub.test.TestLogger;
 
 public class HubSupportHelperTest {
-
 	private HubIntRestService getMockedService(final String returnVersion) throws Exception {
 		final HubIntRestService service = Mockito.mock(HubIntRestService.class);
 		Mockito.when(service.getHubVersion()).thenReturn(returnVersion);
@@ -64,8 +63,6 @@ public class HubSupportHelperTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		assertTrue(supportHelper.isHasBeenChecked());
-		assertTrue(supportHelper.isJreProvidedSupport());
-		assertTrue(supportHelper.isPolicyApiSupport());
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.JRE_PROVIDED));
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.POLICY_API));
 
@@ -75,9 +72,6 @@ public class HubSupportHelperTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		assertTrue(supportHelper.isHasBeenChecked());
-		assertTrue(supportHelper.isJreProvidedSupport());
-		assertTrue(supportHelper.isPolicyApiSupport());
-		assertTrue(supportHelper.isCliStatusDirOptionSupport());
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.JRE_PROVIDED));
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.POLICY_API));
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION));
@@ -88,10 +82,6 @@ public class HubSupportHelperTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		assertTrue(supportHelper.isHasBeenChecked());
-		assertTrue(supportHelper.isJreProvidedSupport());
-		assertTrue(supportHelper.isPolicyApiSupport());
-		assertTrue(supportHelper.isCliStatusDirOptionSupport());
-		assertTrue(supportHelper.isCliPasswordEnvironmentVar());
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.JRE_PROVIDED));
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.POLICY_API));
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION));
@@ -103,10 +93,6 @@ public class HubSupportHelperTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		assertTrue(supportHelper.isHasBeenChecked());
-		assertTrue(supportHelper.isJreProvidedSupport());
-		assertTrue(supportHelper.isPolicyApiSupport());
-		assertTrue(supportHelper.isCliStatusDirOptionSupport());
-		assertTrue(supportHelper.isCliPasswordEnvironmentVar());
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.JRE_PROVIDED));
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.POLICY_API));
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION));
@@ -119,10 +105,6 @@ public class HubSupportHelperTest {
 		supportHelper.checkHubSupport(service, logger);
 
 		assertTrue(supportHelper.isHasBeenChecked());
-		assertTrue(supportHelper.isJreProvidedSupport());
-		assertTrue(supportHelper.isPolicyApiSupport());
-		assertTrue(supportHelper.isCliStatusDirOptionSupport());
-		assertTrue(supportHelper.isCliPasswordEnvironmentVar());
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.JRE_PROVIDED));
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.POLICY_API));
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION));
@@ -157,8 +139,6 @@ public class HubSupportHelperTest {
 		TestLogger logger = new TestLogger();
 		supportHelper.checkHubSupport(service, logger);
 
-		assertTrue(supportHelper.isJreProvidedSupport());
-		assertTrue(supportHelper.isPolicyApiSupport());
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.JRE_PROVIDED));
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.POLICY_API));
 
@@ -167,11 +147,8 @@ public class HubSupportHelperTest {
 		logger = new TestLogger();
 		supportHelper.checkHubSupport(service, logger);
 
-		assertTrue(supportHelper.isJreProvidedSupport());
-		assertTrue(supportHelper.isPolicyApiSupport());
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.JRE_PROVIDED));
 		assertTrue(supportHelper.hasCapability(HubCapabilitiesEnum.POLICY_API));
-
 	}
 
 	@Test

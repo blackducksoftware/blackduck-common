@@ -36,7 +36,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.report.HubRiskReportData;
-import com.blackducksoftware.integration.hub.util.XStreamHelper;
+import com.blackducksoftware.integration.hub.test.TestUtils;
 
 public class XStreamHelperTest {
 	public static final String toWriteClasspathEntry = "com/blackducksoftware/integration/hub/util/XStreamHelperTestToWriteTo.xml";
@@ -46,8 +46,8 @@ public class XStreamHelperTest {
 	@BeforeClass
 	public static void beforeAllTests() throws Exception {
 		// test that output file is initially empty
-		InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(toWriteClasspathEntry);
-		String contents = IOUtils.toString(inputStream);
+		final InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(toWriteClasspathEntry);
+		final String contents = IOUtils.toString(inputStream);
 		IOUtils.closeQuietly(inputStream);
 		assertTrue(contents.isEmpty());
 	}
@@ -55,39 +55,39 @@ public class XStreamHelperTest {
 	@AfterClass
 	public static void afterAllTests() throws Exception {
 		// clear contents of output file
-		OutputStream outputStream = TestUtils.getOutputStreamFromClasspathFile(toWriteClasspathEntry);
+		final OutputStream outputStream = TestUtils.getOutputStreamFromClasspathFile(toWriteClasspathEntry);
 		IOUtils.write((String) null, outputStream);
 		IOUtils.closeQuietly(outputStream);
 	}
 
 	@Test
 	public void testWritingXmlToOutputStream() throws IOException {
-		HubRiskReportData hubRiskReportData = new HubRiskReportData();
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskHighCount", 1);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskMediumCount", 2);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskLowCount", 3);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskNoneCount", 4);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskHighCount", 5);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskMediumCount", 6);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskLowCount", 7);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskNoneCount", 8);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskHighCount", 9);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskMediumCount", 10);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskLowCount", 11);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskNoneCount", 12);
+		final HubRiskReportData hubRiskReportData = new HubRiskReportData();
+		TestUtils.setField(hubRiskReportData, "vulnerabilityRiskHighCount", 1);
+		TestUtils.setField(hubRiskReportData, "vulnerabilityRiskMediumCount", 2);
+		TestUtils.setField(hubRiskReportData, "vulnerabilityRiskLowCount", 3);
+		TestUtils.setField(hubRiskReportData, "vulnerabilityRiskNoneCount", 4);
+		TestUtils.setField(hubRiskReportData, "licenseRiskHighCount", 5);
+		TestUtils.setField(hubRiskReportData, "licenseRiskMediumCount", 6);
+		TestUtils.setField(hubRiskReportData, "licenseRiskLowCount", 7);
+		TestUtils.setField(hubRiskReportData, "licenseRiskNoneCount", 8);
+		TestUtils.setField(hubRiskReportData, "operationalRiskHighCount", 9);
+		TestUtils.setField(hubRiskReportData, "operationalRiskMediumCount", 10);
+		TestUtils.setField(hubRiskReportData, "operationalRiskLowCount", 11);
+		TestUtils.setField(hubRiskReportData, "operationalRiskNoneCount", 12);
 
-		XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<HubRiskReportData>();
-		String xml = xStreamHelper.toXML(hubRiskReportData);
+		final XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<>();
+		final String xml = xStreamHelper.toXML(hubRiskReportData);
 		assertFalse(xml.isEmpty());
 
 		// write to output file
-		OutputStream outputStream = TestUtils.getOutputStreamFromClasspathFile(toWriteClasspathEntry);
+		final OutputStream outputStream = TestUtils.getOutputStreamFromClasspathFile(toWriteClasspathEntry);
 		xStreamHelper.toXML(hubRiskReportData, outputStream);
 		IOUtils.closeQuietly(outputStream);
 
 		// test that output file is no longer empty
-		InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(toWriteClasspathEntry);
-		String contents = IOUtils.toString(inputStream);
+		final InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(toWriteClasspathEntry);
+		final String contents = IOUtils.toString(inputStream);
 		IOUtils.closeQuietly(inputStream);
 		assertFalse(contents.isEmpty());
 
@@ -98,9 +98,9 @@ public class XStreamHelperTest {
 
 	@Test
 	public void testReadingXmlFromInputStream() {
-		XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<HubRiskReportData>();
-		InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(toReadClasspathEntry);
-		HubRiskReportData hubRiskReportData = xStreamHelper.fromXML(inputStream);
+		final XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<>();
+		final InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(toReadClasspathEntry);
+		final HubRiskReportData hubRiskReportData = xStreamHelper.fromXML(inputStream);
 		IOUtils.closeQuietly(inputStream);
 
 		assertNull(hubRiskReportData.getReport());

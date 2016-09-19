@@ -39,7 +39,7 @@ import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskCategories;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskCounts;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskProfile;
-import com.blackducksoftware.integration.hub.util.TestUtils;
+import com.blackducksoftware.integration.hub.test.TestUtils;
 import com.blackducksoftware.integration.hub.util.XStreamHelperTest;
 
 public class HubRiskReportDataTest {
@@ -50,7 +50,7 @@ public class HubRiskReportDataTest {
 		final RiskProfile riskProfile = new RiskProfile(0, categories);
 		final AggregateBomViewEntry bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null,
 				null, null, null, null, riskProfile, null);
-		final List<AggregateBomViewEntry> aggregateBomViewEntries = new ArrayList<AggregateBomViewEntry>();
+		final List<AggregateBomViewEntry> aggregateBomViewEntries = new ArrayList<>();
 		aggregateBomViewEntries.add(bomEntry);
 		final VersionReport report = new VersionReport(null, aggregateBomViewEntries);
 		final HubRiskReportData hubRiskReportData = new HubRiskReportData();
@@ -79,7 +79,7 @@ public class HubRiskReportDataTest {
 		final RiskProfile riskProfile = new RiskProfile(0, categories);
 		final AggregateBomViewEntry bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null,
 				null, null, null, null, riskProfile, null);
-		final List<AggregateBomViewEntry> aggregateBomViewEntries = new ArrayList<AggregateBomViewEntry>();
+		final List<AggregateBomViewEntry> aggregateBomViewEntries = new ArrayList<>();
 		aggregateBomViewEntries.add(bomEntry);
 		final VersionReport report = new VersionReport(null, aggregateBomViewEntries);
 		final HubRiskReportData hubRiskReportData = new HubRiskReportData();
@@ -98,7 +98,7 @@ public class HubRiskReportDataTest {
 		final RiskProfile riskProfile = new RiskProfile(0, categories);
 		final AggregateBomViewEntry bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null,
 				null, null, null, null, riskProfile, null);
-		final List<AggregateBomViewEntry> aggregateBomViewEntries = new ArrayList<AggregateBomViewEntry>();
+		final List<AggregateBomViewEntry> aggregateBomViewEntries = new ArrayList<>();
 		aggregateBomViewEntries.add(bomEntry);
 		final VersionReport report = new VersionReport(null, aggregateBomViewEntries);
 		final HubRiskReportData hubRiskReportData = new HubRiskReportData();
@@ -117,7 +117,7 @@ public class HubRiskReportDataTest {
 		final RiskProfile riskProfile = new RiskProfile(0, categories);
 		final AggregateBomViewEntry bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null,
 				null, null, null, null, riskProfile, null);
-		final List<AggregateBomViewEntry> aggregateBomViewEntries = new ArrayList<AggregateBomViewEntry>();
+		final List<AggregateBomViewEntry> aggregateBomViewEntries = new ArrayList<>();
 		aggregateBomViewEntries.add(bomEntry);
 		final VersionReport report = new VersionReport(null, aggregateBomViewEntries);
 		final HubRiskReportData hubRiskReportData = new HubRiskReportData();
@@ -146,7 +146,7 @@ public class HubRiskReportDataTest {
 		final RiskProfile riskProfile = new RiskProfile(0, categories);
 		final AggregateBomViewEntry bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null,
 				null, null, null, null, riskProfile, null);
-		final List<AggregateBomViewEntry> aggregateBomViewEntries = new ArrayList<AggregateBomViewEntry>();
+		final List<AggregateBomViewEntry> aggregateBomViewEntries = new ArrayList<>();
 		aggregateBomViewEntries.add(bomEntry);
 		final VersionReport report = new VersionReport(null, aggregateBomViewEntries);
 		final HubRiskReportData hubRiskReportData = new HubRiskReportData();
@@ -175,7 +175,7 @@ public class HubRiskReportDataTest {
 		final RiskProfile riskProfile = new RiskProfile(0, categories);
 		final AggregateBomViewEntry bomEntry = new AggregateBomViewEntry(null, null, null, null, null, null, null, null,
 				null, null, null, null, riskProfile, null);
-		final List<AggregateBomViewEntry> aggregateBomViewEntries = new ArrayList<AggregateBomViewEntry>();
+		final List<AggregateBomViewEntry> aggregateBomViewEntries = new ArrayList<>();
 		aggregateBomViewEntries.add(bomEntry);
 		final VersionReport report = new VersionReport(null, aggregateBomViewEntries);
 		final HubRiskReportData hubRiskReportData = new HubRiskReportData();
@@ -200,20 +200,20 @@ public class HubRiskReportDataTest {
 	@Test
 	public void testReadingFromInputStream() {
 		final HubRiskReportData hubRiskReportData = new HubRiskReportData();
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskHighCount", 1000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskMediumCount", 2000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskLowCount", 3000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskNoneCount", 4000);
+		TestUtils.setField(hubRiskReportData, "vulnerabilityRiskHighCount", 1000);
+		TestUtils.setField(hubRiskReportData, "vulnerabilityRiskMediumCount", 2000);
+		TestUtils.setField(hubRiskReportData, "vulnerabilityRiskLowCount", 3000);
+		TestUtils.setField(hubRiskReportData, "vulnerabilityRiskNoneCount", 4000);
 
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskHighCount", 5000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskMediumCount", 6000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskLowCount", 7000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskNoneCount", 8000);
+		TestUtils.setField(hubRiskReportData, "licenseRiskHighCount", 5000);
+		TestUtils.setField(hubRiskReportData, "licenseRiskMediumCount", 6000);
+		TestUtils.setField(hubRiskReportData, "licenseRiskLowCount", 7000);
+		TestUtils.setField(hubRiskReportData, "licenseRiskNoneCount", 8000);
 
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskHighCount", 9000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskMediumCount", 10000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskLowCount", 11000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskNoneCount", 12000);
+		TestUtils.setField(hubRiskReportData, "operationalRiskHighCount", 9000);
+		TestUtils.setField(hubRiskReportData, "operationalRiskMediumCount", 10000);
+		TestUtils.setField(hubRiskReportData, "operationalRiskLowCount", 11000);
+		TestUtils.setField(hubRiskReportData, "operationalRiskNoneCount", 12000);
 
 		assertEquals(1000, hubRiskReportData.getVulnerabilityRiskHighCount());
 		assertEquals(2000, hubRiskReportData.getVulnerabilityRiskMediumCount());
@@ -254,20 +254,20 @@ public class HubRiskReportDataTest {
 	@Test
 	public void testWritingToOutputStream() {
 		final HubRiskReportData hubRiskReportData = new HubRiskReportData();
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskHighCount", 1000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskMediumCount", 2000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskLowCount", 3000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "vulnerabilityRiskNoneCount", 4000);
+		TestUtils.setField(hubRiskReportData, "vulnerabilityRiskHighCount", 1000);
+		TestUtils.setField(hubRiskReportData, "vulnerabilityRiskMediumCount", 2000);
+		TestUtils.setField(hubRiskReportData, "vulnerabilityRiskLowCount", 3000);
+		TestUtils.setField(hubRiskReportData, "vulnerabilityRiskNoneCount", 4000);
 
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskHighCount", 5000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskMediumCount", 6000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskLowCount", 7000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "licenseRiskNoneCount", 8000);
+		TestUtils.setField(hubRiskReportData, "licenseRiskHighCount", 5000);
+		TestUtils.setField(hubRiskReportData, "licenseRiskMediumCount", 6000);
+		TestUtils.setField(hubRiskReportData, "licenseRiskLowCount", 7000);
+		TestUtils.setField(hubRiskReportData, "licenseRiskNoneCount", 8000);
 
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskHighCount", 9000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskMediumCount", 10000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskLowCount", 11000);
-		TestUtils.setValue(HubRiskReportData.class, hubRiskReportData, "operationalRiskNoneCount", 12000);
+		TestUtils.setField(hubRiskReportData, "operationalRiskHighCount", 9000);
+		TestUtils.setField(hubRiskReportData, "operationalRiskMediumCount", 10000);
+		TestUtils.setField(hubRiskReportData, "operationalRiskLowCount", 11000);
+		TestUtils.setField(hubRiskReportData, "operationalRiskNoneCount", 12000);
 
 		final OutputStream outputStream = new ByteArrayOutputStream();
 		hubRiskReportData.writeToOutputStream(outputStream);
