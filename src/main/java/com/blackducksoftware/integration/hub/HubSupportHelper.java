@@ -45,40 +45,6 @@ public class HubSupportHelper implements Serializable {
 	private boolean hasBeenChecked = false;
 	private final Set<HubCapabilitiesEnum> capabilities = EnumSet.noneOf(HubCapabilitiesEnum.class);
 
-	/**
-	 * CLI wrappers were packaged with OS specific Jre's since Hub 3.0.0
-	 */
-	@Deprecated
-	public boolean isJreProvidedSupport() {
-		return hasCapability(HubCapabilitiesEnum.JRE_PROVIDED);
-	}
-
-	/**
-	 * Policy Api's were added since Hub 3.0.0
-	 */
-	@Deprecated
-	public boolean isPolicyApiSupport() {
-		return hasCapability(HubCapabilitiesEnum.POLICY_API);
-	}
-
-	/**
-	 * The CLI started supporting an option to print status files to a directory
-	 * since Hub 3.0.0
-	 */
-	@Deprecated
-	public boolean isCliStatusDirOptionSupport() {
-		return hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION);
-	}
-
-	/**
-	 * The CLI requires the password be provided as an environment variable
-	 * since Hub 3.1.0
-	 */
-	@Deprecated
-	public boolean isCliPasswordEnvironmentVar() {
-		return hasCapability(HubCapabilitiesEnum.CLI_PASSWORD_ENVIRONMENT_VARIABLE);
-	}
-
 	public boolean isHasBeenChecked() {
 		return hasBeenChecked;
 	}
@@ -97,8 +63,8 @@ public class HubSupportHelper implements Serializable {
 		try {
 			final String hubServerVersion = service.getHubVersion();
 
-			if (compareVersion(hubServerVersion, "3.4.0", service)) {
-				setHub3_4Support();
+			if (compareVersion(hubServerVersion, "3.3.1", service)) {
+				setHub3_3_1Support();
 				setHub3_1Support();
 				setHub3_0Support();
 			} else if (compareVersion(hubServerVersion, "3.1.0", service)) {
@@ -279,7 +245,7 @@ public class HubSupportHelper implements Serializable {
 		capabilities.add(HubCapabilitiesEnum.CLI_PASSWORD_ENVIRONMENT_VARIABLE);
 	}
 
-	private void setHub3_4Support() {
+	private void setHub3_3_1Support() {
 		capabilities.add(HubCapabilitiesEnum.BOM_FILE_UPLOAD);
 	}
 

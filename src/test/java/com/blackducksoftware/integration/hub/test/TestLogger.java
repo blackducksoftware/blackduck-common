@@ -19,7 +19,7 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.util;
+package com.blackducksoftware.integration.hub.test;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

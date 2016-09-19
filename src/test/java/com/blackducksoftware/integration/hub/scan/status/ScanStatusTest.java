@@ -22,11 +22,10 @@
 package com.blackducksoftware.integration.hub.scan.status;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-
-import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 
 public class ScanStatusTest {
 
@@ -81,43 +80,46 @@ public class ScanStatusTest {
 	}
 
 	@Test
-	public void testIsFinishedStatus() {
-		assertTrue(!ScanStatus.isFinishedStatus(ScanStatus.BOM_VERSION_CHECK));
-		assertTrue(!ScanStatus.isFinishedStatus(ScanStatus.BUILDING_BOM));
-		assertTrue(ScanStatus.isFinishedStatus(ScanStatus.CANCELLED));
-		assertTrue(ScanStatus.isFinishedStatus(ScanStatus.COMPLETE));
-		assertTrue(ScanStatus.isFinishedStatus(ScanStatus.ERROR));
-		assertTrue(ScanStatus.isFinishedStatus(ScanStatus.ERROR_BUILDING_BOM));
-		assertTrue(ScanStatus.isFinishedStatus(ScanStatus.ERROR_MATCHING));
-		assertTrue(ScanStatus.isFinishedStatus(ScanStatus.ERROR_SAVING_SCAN_DATA));
-		assertTrue(ScanStatus.isFinishedStatus(ScanStatus.ERROR_SCANNING));
-		assertTrue(!ScanStatus.isFinishedStatus(ScanStatus.MATCHING));
-		assertTrue(!ScanStatus.isFinishedStatus(ScanStatus.REQUESTED_MATCH_JOB));
-		assertTrue(!ScanStatus.isFinishedStatus(ScanStatus.SAVING_SCAN_DATA));
-		assertTrue(!ScanStatus.isFinishedStatus(ScanStatus.SCANNING));
-		assertTrue(!ScanStatus.isFinishedStatus(ScanStatus.SCAN_DATA_SAVE_COMPLETE));
-		assertTrue(!ScanStatus.isFinishedStatus(ScanStatus.UNKNOWN));
-		assertTrue(!ScanStatus.isFinishedStatus(ScanStatus.UNSTARTED));
+	public void testIsDoneStatus() {
+		assertFalse(ScanStatus.BOM_VERSION_CHECK.isDone());
+		assertFalse(ScanStatus.BUILDING_BOM.isDone());
+		assertFalse(ScanStatus.MATCHING.isDone());
+		assertFalse(ScanStatus.REQUESTED_MATCH_JOB.isDone());
+		assertFalse(ScanStatus.SAVING_SCAN_DATA.isDone());
+		assertFalse(ScanStatus.SCANNING.isDone());
+		assertFalse(ScanStatus.SCAN_DATA_SAVE_COMPLETE.isDone());
+		assertFalse(ScanStatus.UNKNOWN.isDone());
+		assertFalse(ScanStatus.UNSTARTED.isDone());
+
+		assertTrue(ScanStatus.CANCELLED.isDone());
+		assertTrue(ScanStatus.CLONED.isDone());
+		assertTrue(ScanStatus.COMPLETE.isDone());
+		assertTrue(ScanStatus.ERROR.isDone());
+		assertTrue(ScanStatus.ERROR_BUILDING_BOM.isDone());
+		assertTrue(ScanStatus.ERROR_MATCHING.isDone());
+		assertTrue(ScanStatus.ERROR_SAVING_SCAN_DATA.isDone());
+		assertTrue(ScanStatus.ERROR_SCANNING.isDone());
 	}
 
 	@Test
 	public void testIsErrorStatus() {
-		assertTrue(!ScanStatus.isErrorStatus(ScanStatus.BOM_VERSION_CHECK));
-		assertTrue(!ScanStatus.isErrorStatus(ScanStatus.BUILDING_BOM));
-		assertTrue(ScanStatus.isErrorStatus(ScanStatus.CANCELLED));
-		assertTrue(!ScanStatus.isErrorStatus(ScanStatus.COMPLETE));
-		assertTrue(ScanStatus.isErrorStatus(ScanStatus.ERROR));
-		assertTrue(ScanStatus.isErrorStatus(ScanStatus.ERROR_BUILDING_BOM));
-		assertTrue(ScanStatus.isErrorStatus(ScanStatus.ERROR_MATCHING));
-		assertTrue(ScanStatus.isErrorStatus(ScanStatus.ERROR_SAVING_SCAN_DATA));
-		assertTrue(ScanStatus.isErrorStatus(ScanStatus.ERROR_SCANNING));
-		assertTrue(!ScanStatus.isErrorStatus(ScanStatus.MATCHING));
-		assertTrue(!ScanStatus.isErrorStatus(ScanStatus.REQUESTED_MATCH_JOB));
-		assertTrue(!ScanStatus.isErrorStatus(ScanStatus.SAVING_SCAN_DATA));
-		assertTrue(!ScanStatus.isErrorStatus(ScanStatus.SCANNING));
-		assertTrue(!ScanStatus.isErrorStatus(ScanStatus.SCAN_DATA_SAVE_COMPLETE));
-		assertTrue(!ScanStatus.isErrorStatus(ScanStatus.UNKNOWN));
-		assertTrue(!ScanStatus.isErrorStatus(ScanStatus.UNSTARTED));
+		assertFalse(ScanStatus.BOM_VERSION_CHECK.isError());
+		assertFalse(ScanStatus.BUILDING_BOM.isError());
+		assertFalse(ScanStatus.COMPLETE.isError());
+		assertFalse(ScanStatus.MATCHING.isError());
+		assertFalse(ScanStatus.REQUESTED_MATCH_JOB.isError());
+		assertFalse(ScanStatus.SAVING_SCAN_DATA.isError());
+		assertFalse(ScanStatus.SCANNING.isError());
+		assertFalse(ScanStatus.SCAN_DATA_SAVE_COMPLETE.isError());
+		assertFalse(ScanStatus.UNKNOWN.isError());
+		assertFalse(ScanStatus.UNSTARTED.isError());
 
+		assertTrue(ScanStatus.CANCELLED.isError());
+		assertTrue(ScanStatus.ERROR.isError());
+		assertTrue(ScanStatus.ERROR_BUILDING_BOM.isError());
+		assertTrue(ScanStatus.ERROR_MATCHING.isError());
+		assertTrue(ScanStatus.ERROR_SAVING_SCAN_DATA.isError());
+		assertTrue(ScanStatus.ERROR_SCANNING.isError());
 	}
+
 }

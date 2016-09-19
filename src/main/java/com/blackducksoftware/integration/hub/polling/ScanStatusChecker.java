@@ -21,80 +21,85 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.polling;
 
-import java.util.concurrent.CountDownLatch;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import com.blackducksoftware.integration.hub.HubIntRestService;
+import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
+import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
-import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
+import com.blackducksoftware.integration.hub.logging.IntLogger;
 
-public class ScanStatusChecker implements Runnable {
-	private ScanStatusToPoll currentStatus;
-	private final CountDownLatch countDownLock;
-	private final HubIntRestService service;
-	private HubIntegrationException exception;
-	private boolean running;
+public class ScanStatusChecker {
+	private static final long FIVE_SECONDS = 5 * 1000;
 
-	public ScanStatusChecker(final HubIntRestService service, final ScanStatusToPoll currentStatus,
-			final CountDownLatch countDownLock) {
-		this.service = service;
-		this.currentStatus = currentStatus;
-		this.countDownLock = countDownLock;
-		running = true;
+	private final ScanSummaryRestService scanSummaryRestService;
+	private List<ScanSummaryItem> scanSummaryItems;
+	private final long timeoutInMilliseconds;
+	private final IntLogger logger;
+
+	public ScanStatusChecker(final IntLogger logger, final ScanSummaryRestService scanSummaryRestService,
+			final List<ScanSummaryItem> scanSummaryItems, final long timeoutInMilliseconds) {
+		this.logger = logger;
+		this.scanSummaryRestService = scanSummaryRestService;
+		this.scanSummaryItems = scanSummaryItems;
+		this.timeoutInMilliseconds = timeoutInMilliseconds;
 	}
 
-	public boolean isRunning() {
-		return running;
+	public void waitForCompleteScans()
+			throws InterruptedException, IOException, BDRestException, URISyntaxException, HubIntegrationException {
+		final long startedTime = System.currentTimeMillis();
+
+		scanSummaryItems = getPendingScans(scanSummaryItems);
+
+		while (!done(scanSummaryItems, timeoutInMilliseconds, startedTime)) {
+			Thread.sleep(FIVE_SECONDS);
+			scanSummaryItems = getPendingScans(scanSummaryItems);
+		}
 	}
 
-	public void setRunning(final boolean running) {
-		this.running = running;
-	}
-
-	public boolean hasError() {
-		return exception != null;
-	}
-
-	public HubIntegrationException getError() {
-		return exception;
-	}
-
-	private boolean isScanFinished(final ScanStatusToPoll status) {
-		if (ScanStatus.isFinishedStatus(currentStatus.getStatusEnum()) == false) {
-			return false;
-		} else {
-			if (ScanStatus.isErrorStatus(currentStatus.getStatusEnum())) {
-				exception = new HubIntegrationException("There was a problem with one of the scans. Error Status : "
-						+ currentStatus.getStatusEnum().name());
+	private List<ScanSummaryItem> getPendingScans(final List<ScanSummaryItem> scanSummaries)
+			throws InterruptedException, IOException, BDRestException, URISyntaxException, HubIntegrationException {
+		final List<ScanSummaryItem> pendingScans = new ArrayList<>();
+		for (final ScanSummaryItem scanSummaryItem : scanSummaries) {
+			logger.info("waiting for scan: " + scanSummaryItem);
+			final String scanSummaryLink = scanSummaryItem.getMeta().getHref();
+			final ScanSummaryItem currentScanSummaryItem = scanSummaryRestService.getItem(scanSummaryLink);
+			if (currentScanSummaryItem.getStatus().isPending()) {
+				pendingScans.add(currentScanSummaryItem);
+			} else if (currentScanSummaryItem.getStatus().isError()) {
+				throw new HubIntegrationException("There was a problem with one of the scans. Error Status : "
+						+ currentScanSummaryItem.getStatus().toString());
 			}
-			// finished so unlock the parent thread
-			countDownLock.countDown();
-			setRunning(false);
+		}
+
+		return pendingScans;
+	}
+
+	private boolean done(final List<ScanSummaryItem> scanSummaryItems, final long timeoutInMilliseconds,
+			final long startedTime) throws HubIntegrationException {
+		if (scanSummaryItems.isEmpty()) {
 			return true;
 		}
 
+		if (takenTooLong(timeoutInMilliseconds, startedTime)) {
+			logger.info("the hub processing took too long...");
+			final String formattedTime = String.format("%d minutes",
+					TimeUnit.MILLISECONDS.toMinutes(timeoutInMilliseconds));
+			throw new HubIntegrationException(
+					"The Bom has not finished updating from the scan within the specified wait time : "
+							+ formattedTime);
+		}
+
+		return false;
 	}
 
-	@Override
-	public void run() {
-		while (isRunning() == true) {
-			try {
-				if (isScanFinished(currentStatus) == true) {
-					break;
-				} else {
-					// The code location is still updating or matching, etc.
-					currentStatus = service.checkScanStatus(currentStatus.getMeta().getHref());
-
-					if (isScanFinished(currentStatus) == true) {
-						break;
-					}
-				}
-
-				Thread.sleep(10000);
-			} catch (final Exception ex) {
-				setRunning(false);
-			}
-		}
+	private boolean takenTooLong(final long timeoutInMilliseconds, final long startedTime) {
+		final long elapsed = System.currentTimeMillis() - startedTime;
+		return elapsed > timeoutInMilliseconds;
 	}
 
 }

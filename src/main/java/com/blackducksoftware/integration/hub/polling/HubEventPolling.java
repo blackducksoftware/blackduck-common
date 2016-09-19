@@ -26,10 +26,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
@@ -37,15 +33,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
+import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
-import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
-import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -91,8 +87,8 @@ public class HubEventPolling {
 					final DateTime scanHistoryCreationTime = currentScanHistory.getCreatedOnTime();
 					if (scanHistoryItemWithinOurScanBoundaries(scanHistoryCreationTime, timeBeforeScan,
 							timeAfterScan)) {
-						if (ScanStatus.isFinishedStatus(currentScanHistory.getStatus())) {
-							if (ScanStatus.isErrorStatus(currentScanHistory.getStatus())) {
+						if (currentScanHistory.getStatus().isDone()) {
+							if (currentScanHistory.getStatus().isError()) {
 								throw new HubIntegrationException(
 										"There was a problem with one of the code locations. Error Status : "
 												+ currentScanHistory.getStatus().name());
@@ -159,18 +155,16 @@ public class HubEventPolling {
 					+ statusFiles.length + " status files.");
 		}
 		logger.info("Checking the directory : " + statusDirectory.getCanonicalPath() + " for the scan status's.");
-		final CountDownLatch lock = new CountDownLatch(expectedNumScans);
-		final List<ScanStatusChecker> scanStatusList = new ArrayList<ScanStatusChecker>();
+		final List<ScanSummaryItem> scanSummaryItems = new ArrayList<>();
 		for (final File currentStatusFile : statusFiles) {
-			final String fileContent = FileUtils.readFileToString(currentStatusFile);
+			final String fileContent = FileUtils.readFileToString(currentStatusFile, "UTF8");
 			final Gson gson = new GsonBuilder().create();
-			final ScanStatusToPoll status = gson.fromJson(fileContent, ScanStatusToPoll.class);
-			if (status.getMeta() == null || status.getStatus() == null) {
+			final ScanSummaryItem scanSummaryItem = gson.fromJson(fileContent, ScanSummaryItem.class);
+			if (scanSummaryItem.getMeta() == null || scanSummaryItem.getStatus() == null) {
 				throw new HubIntegrationException("The scan status file : " + currentStatusFile.getCanonicalPath()
 						+ " does not contain valid scan status json.");
 			}
-			final ScanStatusChecker checker = new ScanStatusChecker(service, status, lock);
-			scanStatusList.add(checker);
+			scanSummaryItems.add(scanSummaryItem);
 		}
 
 		logger.debug("Cleaning up the scan status files at : " + statusDirectory.getCanonicalPath());
@@ -184,45 +178,11 @@ public class HubEventPolling {
 		}
 		statusDirectory.delete();
 
-		pollScanStatusChecker(lock, hubReportGenerationInfo, scanStatusList);
-	}
-
-	public void pollScanStatusChecker(final CountDownLatch lock, final HubReportGenerationInfo hubReportGenerationInfo,
-			final List<ScanStatusChecker> scanStatusList) throws InterruptedException, HubIntegrationException {
-		// Now that we have read in all of the scan status's without error lets
-		// start polling them.
-		final ThreadFactory threadFactory = Executors.defaultThreadFactory();
-		final ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
-				threadFactory);
-		for (final ScanStatusChecker statusChecker : scanStatusList) {
-			pool.submit(statusChecker);
-		}
-		pool.shutdown();
-
-		final boolean finished = lock.await(hubReportGenerationInfo.getMaximumWaitTime(), TimeUnit.MILLISECONDS);
-
-		for (final ScanStatusChecker statusChecker : scanStatusList) {
-			statusChecker.setRunning(false); // force the thread to stop
-												// executing because we have
-												// timed out or gotten
-			// all responses.
-		}
-		for (final ScanStatusChecker statusChecker : scanStatusList) {
-			if (statusChecker.hasError() == true) {
-				throw statusChecker.getError();
-			}
-		}
-
-		// check if finished is false then the timeout occurred and we didn't
-		// finish processing.
-		// if you get here then you have finished.
-		if (!finished) {
-			final String formattedTime = String.format("%d minutes",
-					TimeUnit.MILLISECONDS.toMinutes(hubReportGenerationInfo.getMaximumWaitTime()));
-			throw new HubIntegrationException(
-					"The Bom has not finished updating from the scan within the specified wait time : "
-							+ formattedTime);
-		}
+		final long timeoutInSeconds = hubReportGenerationInfo.getMaximumWaitTime();
+		final ScanSummaryRestService scanSummaryRestService = service.getScanSummaryRestService();
+		final ScanStatusChecker statusChecker = new ScanStatusChecker(logger, scanSummaryRestService, scanSummaryItems,
+				timeoutInSeconds);
+		statusChecker.waitForCompleteScans();
 	}
 
 	/**

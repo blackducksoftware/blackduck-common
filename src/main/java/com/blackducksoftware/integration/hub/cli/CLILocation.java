@@ -31,6 +31,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
+import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 
@@ -70,12 +71,11 @@ public class CLILocation {
 			throws IOException, InterruptedException {
 		try {
 			final HubSupportHelper hubSupport = new HubSupportHelper();
-
 			hubSupport.checkHubSupport(restService, logger);
 
-			if (SystemUtils.IS_OS_MAC_OSX && hubSupport.isJreProvidedSupport()) {
+			if (SystemUtils.IS_OS_MAC_OSX && hubSupport.hasCapability(HubCapabilitiesEnum.JRE_PROVIDED)) {
 				return HubSupportHelper.getOSXCLIWrapperLink(restService.getBaseUrl());
-			} else if (SystemUtils.IS_OS_WINDOWS && hubSupport.isJreProvidedSupport()) {
+			} else if (SystemUtils.IS_OS_WINDOWS && hubSupport.hasCapability(HubCapabilitiesEnum.JRE_PROVIDED)) {
 				return HubSupportHelper.getWindowsCLIWrapperLink(restService.getBaseUrl());
 			} else {
 				return HubSupportHelper.getLinuxCLIWrapperLink(restService.getBaseUrl());

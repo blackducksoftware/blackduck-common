@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.CIEnvironmentVariables;
-import com.blackducksoftware.integration.hub.util.TestLogger;
+import com.blackducksoftware.integration.hub.test.TestLogger;
 
 public class IntLoggerTest {
 

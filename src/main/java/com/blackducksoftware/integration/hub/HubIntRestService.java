@@ -41,6 +41,7 @@ import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.hub.api.PolicyStatusRestService;
 import com.blackducksoftware.integration.hub.api.ProjectRestService;
+import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.UserRestService;
 import com.blackducksoftware.integration.hub.api.VersionComparison;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
@@ -51,6 +52,7 @@ import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanLocationResults;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -61,7 +63,6 @@ import com.blackducksoftware.integration.hub.exception.VersionDoesNotExistExcept
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -80,6 +81,7 @@ public class HubIntRestService {
 	private final ProjectRestService projectRestService;
 	private final UserRestService userRestService;
 	private final PolicyStatusRestService policyStatusRestService;
+	private final ScanSummaryRestService scanSummaryRestService;
 
 	public HubIntRestService(final RestConnection restConnection) throws URISyntaxException {
 		this.restConnection = restConnection;
@@ -87,6 +89,18 @@ public class HubIntRestService {
 		this.projectRestService = new ProjectRestService(restConnection, gson, jsonParser);
 		this.userRestService = new UserRestService(restConnection, gson, jsonParser);
 		this.policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
+		this.scanSummaryRestService = new ScanSummaryRestService(restConnection, gson, jsonParser);
+	}
+
+	public HubIntRestService(final RestConnection restConnection, final ProjectRestService projectRestService,
+			final UserRestService userRestService, final PolicyStatusRestService policyStatusRestService,
+			final ScanSummaryRestService scanSummaryRestService) {
+		this.restConnection = restConnection;
+
+		this.projectRestService = projectRestService;
+		this.userRestService = userRestService;
+		this.policyStatusRestService = policyStatusRestService;
+		this.scanSummaryRestService = scanSummaryRestService;
 	}
 
 	/**
@@ -651,29 +665,9 @@ public class HubIntRestService {
 	/**
 	 * Gets the content of the scanStatus at the provided url
 	 */
-	public ScanStatusToPoll checkScanStatus(final String scanStatusUrl)
+	public ScanSummaryItem checkScanStatus(final String scanStatusUrl)
 			throws IOException, BDRestException, URISyntaxException {
-		final ClientResource resource = getRestConnection().createClientResource(scanStatusUrl);
-		try {
-			resource.setMethod(Method.GET);
-
-			getRestConnection().handleRequest(resource);
-			final int responseCode = resource.getResponse().getStatus().getCode();
-
-			if (getRestConnection().isSuccess(responseCode)) {
-				final String response = getRestConnection().readResponseAsString(resource.getResponse());
-
-				final Gson gson = new GsonBuilder().create();
-
-				final ScanStatusToPoll status = gson.fromJson(response, ScanStatusToPoll.class);
-				return status;
-			} else {
-				throw new BDRestException("There was a problem getting the scan status. Error Code: " + responseCode,
-						resource);
-			}
-		} finally {
-			releaseResource(resource);
-		}
+		return scanSummaryRestService.getItem(scanStatusUrl);
 	}
 
 	/**
@@ -718,4 +712,21 @@ public class HubIntRestService {
 		}
 		resource.release();
 	}
+
+	public ProjectRestService getProjectRestService() {
+		return projectRestService;
+	}
+
+	public UserRestService getUserRestService() {
+		return userRestService;
+	}
+
+	public PolicyStatusRestService getPolicyStatusRestService() {
+		return policyStatusRestService;
+	}
+
+	public ScanSummaryRestService getScanSummaryRestService() {
+		return scanSummaryRestService;
+	}
+
 }

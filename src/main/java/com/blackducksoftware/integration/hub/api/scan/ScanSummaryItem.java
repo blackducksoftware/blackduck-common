@@ -4,15 +4,16 @@ import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 
 public class ScanSummaryItem extends HubItem {
-	private final ScanStatusTypeEnum status;
+	private final ScanStatus status;
 	private final String statusMessage;
 	private final Date createdAt;
 	private final Date updatedAt;
 
-	public ScanSummaryItem(final MetaInformation meta, final ScanStatusTypeEnum status, final String statusMessage,
-			final Date createdAt, final Date updatedAt) {
+	public ScanSummaryItem(final ScanStatus status, final String statusMessage, final Date createdAt,
+			final Date updatedAt, final MetaInformation meta) {
 		super(meta);
 		this.status = status;
 		this.statusMessage = statusMessage;
@@ -20,7 +21,7 @@ public class ScanSummaryItem extends HubItem {
 		this.updatedAt = updatedAt;
 	}
 
-	public ScanStatusTypeEnum getStatus() {
+	public ScanStatus getStatus() {
 		return status;
 	}
 

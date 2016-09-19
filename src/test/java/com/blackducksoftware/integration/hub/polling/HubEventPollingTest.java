@@ -39,27 +39,31 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
+import com.blackducksoftware.integration.hub.api.PolicyStatusRestService;
+import com.blackducksoftware.integration.hub.api.ProjectRestService;
+import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
+import com.blackducksoftware.integration.hub.api.UserRestService;
 import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
-import com.blackducksoftware.integration.hub.scan.status.ScanStatusToPoll;
-import com.blackducksoftware.integration.hub.util.TestLogger;
+import com.blackducksoftware.integration.hub.test.TestLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class HubEventPollingTest {
-
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
 
-	private void writeScanStatusToFile(final ScanStatusToPoll status, final File file) throws IOException {
+	private void writeScanStatusToFile(final ScanSummaryItem status, final File file) throws IOException {
 		final Gson gson = new GsonBuilder().create();
 
 		final String stringStatus = gson.toJson(status);
@@ -72,9 +76,9 @@ public class HubEventPollingTest {
 	@Test
 	public void testIsBomUpToDateStatusFiles() throws Exception {
 		final MetaInformation meta = new MetaInformation(null, "link", null);
-		final ScanStatusToPoll status1 = new ScanStatusToPoll(ScanStatus.REQUESTED_MATCH_JOB.name(), meta);
-		final ScanStatusToPoll status2 = new ScanStatusToPoll(ScanStatus.BUILDING_BOM.name(), meta);
-		final ScanStatusToPoll status3 = new ScanStatusToPoll(ScanStatus.SCANNING.name(), meta);
+		final ScanSummaryItem status1 = new ScanSummaryItem(ScanStatus.REQUESTED_MATCH_JOB, null, null, null, meta);
+		final ScanSummaryItem status2 = new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, meta);
+		final ScanSummaryItem status3 = new ScanSummaryItem(ScanStatus.SCANNING, null, null, null, meta);
 		final File scanStatusDir = folder.newFolder();
 		final File statusFile1 = new File(scanStatusDir, "status1.txt");
 		statusFile1.createNewFile();
@@ -86,13 +90,17 @@ public class HubEventPollingTest {
 		writeScanStatusToFile(status2, statusFile2);
 		writeScanStatusToFile(status3, statusFile3);
 
-		final HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+		final ScanSummaryRestService scanSummaryRestService = Mockito.mock(ScanSummaryRestService.class);
+		final MetaInformation _meta = new MetaInformation(null, "link", null);
+		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
+				.thenReturn(new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta));
 
-		Mockito.when(restService.checkScanStatus(Mockito.anyString())).then(new Answer<ScanStatusToPoll>() {
+		final HubIntRestService restService = constructMockedService(scanSummaryRestService);
+
+		Mockito.when(restService.checkScanStatus(Mockito.anyString())).then(new Answer<ScanSummaryItem>() {
 			@Override
-			public ScanStatusToPoll answer(final InvocationOnMock invocation) throws Throwable {
-				final MetaInformation meta = new MetaInformation(null, "link", null);
-				final ScanStatusToPoll status = new ScanStatusToPoll(ScanStatus.COMPLETE.name(), meta);
+			public ScanSummaryItem answer(final InvocationOnMock invocation) throws Throwable {
+				final ScanSummaryItem status = new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta);
 				return status;
 			}
 		});
@@ -100,7 +108,7 @@ public class HubEventPollingTest {
 		final TestLogger logger = new TestLogger();
 
 		final HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
-		final List<String> scanTargets = new ArrayList<String>();
+		final List<String> scanTargets = new ArrayList<>();
 		scanTargets.add("1");
 		scanTargets.add("2");
 		scanTargets.add("3");
@@ -126,9 +134,9 @@ public class HubEventPollingTest {
 		exception.expectMessage("The Bom has not finished updating from the scan within the specified wait time :");
 
 		final MetaInformation meta = new MetaInformation(null, "link", null);
-		final ScanStatusToPoll status1 = new ScanStatusToPoll(ScanStatus.REQUESTED_MATCH_JOB.name(), meta);
-		final ScanStatusToPoll status2 = new ScanStatusToPoll(ScanStatus.BUILDING_BOM.name(), meta);
-		final ScanStatusToPoll status3 = new ScanStatusToPoll(ScanStatus.SCANNING.name(), meta);
+		final ScanSummaryItem status1 = new ScanSummaryItem(ScanStatus.REQUESTED_MATCH_JOB, null, null, null, meta);
+		final ScanSummaryItem status2 = new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, meta);
+		final ScanSummaryItem status3 = new ScanSummaryItem(ScanStatus.SCANNING, null, null, null, meta);
 		final File scanStatusDir = folder.newFolder();
 		final File statusFile1 = new File(scanStatusDir, "status1.txt");
 		statusFile1.createNewFile();
@@ -140,13 +148,18 @@ public class HubEventPollingTest {
 		writeScanStatusToFile(status2, statusFile2);
 		writeScanStatusToFile(status3, statusFile3);
 
-		final HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+		final ScanSummaryRestService scanSummaryRestService = Mockito.mock(ScanSummaryRestService.class);
+		final MetaInformation _meta = new MetaInformation(null, "link", null);
+		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
+				.thenReturn(new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, _meta));
 
-		Mockito.when(restService.checkScanStatus(Mockito.anyString())).then(new Answer<ScanStatusToPoll>() {
+		final HubIntRestService restService = constructMockedService(scanSummaryRestService);
+
+		Mockito.when(restService.checkScanStatus(Mockito.anyString())).then(new Answer<ScanSummaryItem>() {
 			@Override
-			public ScanStatusToPoll answer(final InvocationOnMock invocation) throws Throwable {
+			public ScanSummaryItem answer(final InvocationOnMock invocation) throws Throwable {
 				final MetaInformation meta = new MetaInformation(null, "link", null);
-				final ScanStatusToPoll status = new ScanStatusToPoll(ScanStatus.BUILDING_BOM.name(), meta);
+				final ScanSummaryItem status = new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, meta);
 				return status;
 			}
 		});
@@ -154,7 +167,7 @@ public class HubEventPollingTest {
 		final TestLogger logger = new TestLogger();
 
 		final HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
-		final List<String> scanTargets = new ArrayList<String>();
+		final List<String> scanTargets = new ArrayList<>();
 		scanTargets.add("1");
 		scanTargets.add("2");
 		scanTargets.add("3");
@@ -171,9 +184,9 @@ public class HubEventPollingTest {
 		exception.expectMessage("There was a problem with one of the scans. Error Status : ");
 
 		final MetaInformation meta = new MetaInformation(null, "link", null);
-		final ScanStatusToPoll status1 = new ScanStatusToPoll(ScanStatus.REQUESTED_MATCH_JOB.name(), meta);
-		final ScanStatusToPoll status2 = new ScanStatusToPoll(ScanStatus.BUILDING_BOM.name(), meta);
-		final ScanStatusToPoll status3 = new ScanStatusToPoll(ScanStatus.SCANNING.name(), meta);
+		final ScanSummaryItem status1 = new ScanSummaryItem(ScanStatus.REQUESTED_MATCH_JOB, null, null, null, meta);
+		final ScanSummaryItem status2 = new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, meta);
+		final ScanSummaryItem status3 = new ScanSummaryItem(ScanStatus.SCANNING, null, null, null, meta);
 		final File scanStatusDir = folder.newFolder();
 		final File statusFile1 = new File(scanStatusDir, "status1.txt");
 		statusFile1.createNewFile();
@@ -185,13 +198,18 @@ public class HubEventPollingTest {
 		writeScanStatusToFile(status2, statusFile2);
 		writeScanStatusToFile(status3, statusFile3);
 
-		final HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+		final ScanSummaryRestService scanSummaryRestService = Mockito.mock(ScanSummaryRestService.class);
+		final MetaInformation _meta = new MetaInformation(null, "link", null);
+		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
+				.thenReturn(new ScanSummaryItem(ScanStatus.ERROR, null, null, null, _meta));
 
-		Mockito.when(restService.checkScanStatus(Mockito.anyString())).then(new Answer<ScanStatusToPoll>() {
+		final HubIntRestService restService = constructMockedService(scanSummaryRestService);
+
+		Mockito.when(restService.checkScanStatus(Mockito.anyString())).then(new Answer<ScanSummaryItem>() {
 			@Override
-			public ScanStatusToPoll answer(final InvocationOnMock invocation) throws Throwable {
+			public ScanSummaryItem answer(final InvocationOnMock invocation) throws Throwable {
 				final MetaInformation meta = new MetaInformation(null, "link", null);
-				final ScanStatusToPoll status = new ScanStatusToPoll(ScanStatus.ERROR.name(), meta);
+				final ScanSummaryItem status = new ScanSummaryItem(ScanStatus.ERROR, null, null, null, meta);
 				return status;
 			}
 		});
@@ -199,7 +217,7 @@ public class HubEventPollingTest {
 		final TestLogger logger = new TestLogger();
 
 		final HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
-		final List<String> scanTargets = new ArrayList<String>();
+		final List<String> scanTargets = new ArrayList<>();
 		scanTargets.add("1");
 		scanTargets.add("2");
 		scanTargets.add("3");
@@ -229,7 +247,7 @@ public class HubEventPollingTest {
 		final TestLogger logger = new TestLogger();
 		try {
 			final HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
-			final List<String> scanTargets = new ArrayList<String>();
+			final List<String> scanTargets = new ArrayList<>();
 			scanTargets.add("1");
 			hubReportGenerationInfo.setScanTargets(scanTargets);
 			hubReportGenerationInfo.setScanStatusDirectory(scanStatusDir.getCanonicalPath());
@@ -251,9 +269,9 @@ public class HubEventPollingTest {
 		exception.expectMessage("There were " + 5 + " scans configured and we found " + 3 + " status files.");
 
 		final MetaInformation meta = new MetaInformation(null, "link", null);
-		final ScanStatusToPoll status1 = new ScanStatusToPoll(ScanStatus.REQUESTED_MATCH_JOB.name(), meta);
-		final ScanStatusToPoll status2 = new ScanStatusToPoll(ScanStatus.BUILDING_BOM.name(), meta);
-		final ScanStatusToPoll status3 = new ScanStatusToPoll(ScanStatus.SCANNING.name(), meta);
+		final ScanSummaryItem status1 = new ScanSummaryItem(ScanStatus.REQUESTED_MATCH_JOB, null, null, null, meta);
+		final ScanSummaryItem status2 = new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, meta);
+		final ScanSummaryItem status3 = new ScanSummaryItem(ScanStatus.SCANNING, null, null, null, meta);
 		final File scanStatusDir = folder.newFolder();
 		final File statusFile1 = new File(scanStatusDir, "status1.txt");
 		statusFile1.createNewFile();
@@ -271,7 +289,7 @@ public class HubEventPollingTest {
 		final TestLogger logger = new TestLogger();
 
 		final HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
-		final List<String> scanTargets = new ArrayList<String>();
+		final List<String> scanTargets = new ArrayList<>();
 		scanTargets.add("1");
 		scanTargets.add("2");
 		scanTargets.add("3");
@@ -296,7 +314,7 @@ public class HubEventPollingTest {
 		final TestLogger logger = new TestLogger();
 
 		final HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
-		final List<String> scanTargets = new ArrayList<String>();
+		final List<String> scanTargets = new ArrayList<>();
 		hubReportGenerationInfo.setScanTargets(scanTargets);
 		hubReportGenerationInfo.setScanStatusDirectory(scanStatusDir.getCanonicalPath());
 		hubReportGenerationInfo.setMaximumWaitTime(1000);
@@ -316,7 +334,7 @@ public class HubEventPollingTest {
 		final TestLogger logger = new TestLogger();
 
 		final HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
-		final List<String> scanTargets = new ArrayList<String>();
+		final List<String> scanTargets = new ArrayList<>();
 		hubReportGenerationInfo.setScanTargets(scanTargets);
 		hubReportGenerationInfo.setScanStatusDirectory(scanStatusDir.getCanonicalPath());
 		hubReportGenerationInfo.setMaximumWaitTime(1000);
@@ -336,7 +354,7 @@ public class HubEventPollingTest {
 		final TestLogger logger = new TestLogger();
 
 		final HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
-		final List<String> scanTargets = new ArrayList<String>();
+		final List<String> scanTargets = new ArrayList<>();
 		hubReportGenerationInfo.setScanTargets(scanTargets);
 		hubReportGenerationInfo.setScanStatusDirectory(scanStatusDir.getCanonicalPath());
 		hubReportGenerationInfo.setMaximumWaitTime(1000);
@@ -354,7 +372,7 @@ public class HubEventPollingTest {
 		final TestLogger logger = new TestLogger();
 
 		final HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
-		final List<String> scanTargets = new ArrayList<String>();
+		final List<String> scanTargets = new ArrayList<>();
 		hubReportGenerationInfo.setScanTargets(scanTargets);
 		hubReportGenerationInfo.setScanStatusDirectory("");
 		hubReportGenerationInfo.setMaximumWaitTime(1000);
@@ -372,7 +390,7 @@ public class HubEventPollingTest {
 		final TestLogger logger = new TestLogger();
 
 		final HubReportGenerationInfo hubReportGenerationInfo = new HubReportGenerationInfo();
-		final List<String> scanTargets = new ArrayList<String>();
+		final List<String> scanTargets = new ArrayList<>();
 		hubReportGenerationInfo.setScanTargets(scanTargets);
 		hubReportGenerationInfo.setScanStatusDirectory(null);
 		hubReportGenerationInfo.setMaximumWaitTime(1000);
@@ -415,7 +433,7 @@ public class HubEventPollingTest {
 						historyAfterScanTime.setCreatedOn(afterScanTime.toString());
 						historyAfterScanTime.setStatus(ScanStatus.MATCHING);
 
-						final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+						final List<ScanHistoryItem> historyList = new ArrayList<>();
 						historyList.add(historyBeforeScanTime);
 						historyList.add(historyInScanTime);
 						historyList.add(historyAfterScanTime);
@@ -433,7 +451,7 @@ public class HubEventPollingTest {
 						sl3.setPath(serverPath3);
 						sl3.setScanList(historyList);
 
-						final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+						final List<ScanLocationItem> items = new ArrayList<>();
 						items.add(sl1);
 						items.add(sl2);
 						items.add(sl3);
@@ -442,7 +460,7 @@ public class HubEventPollingTest {
 					}
 				});
 
-		final List<String> scanTargets = new ArrayList<String>();
+		final List<String> scanTargets = new ArrayList<>();
 		scanTargets.add("Test/Fake/Path/Child");
 		scanTargets.add("Test\\Fake\\File");
 		final HubEventPolling eventPoller = new HubEventPolling(restService);
@@ -496,7 +514,7 @@ public class HubEventPollingTest {
 						historyAfterScanTime.setCreatedOn(afterScanTime.toString());
 						historyAfterScanTime.setStatus(ScanStatus.MATCHING);
 
-						final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+						final List<ScanHistoryItem> historyList = new ArrayList<>();
 						historyList.add(historyBeforeScanTime);
 						historyList.add(historyInScanTime);
 						historyList.add(historyAfterScanTime);
@@ -514,7 +532,7 @@ public class HubEventPollingTest {
 						sl3.setPath(serverPath3);
 						sl3.setScanList(historyList);
 
-						final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+						final List<ScanLocationItem> items = new ArrayList<>();
 						items.add(sl1);
 						items.add(sl2);
 						items.add(sl3);
@@ -523,7 +541,7 @@ public class HubEventPollingTest {
 					}
 				});
 
-		final List<String> scanTargets = new ArrayList<String>();
+		final List<String> scanTargets = new ArrayList<>();
 		scanTargets.add("Test/Fake/Path/Child");
 		scanTargets.add("Test\\Fake\\File");
 		final HubEventPolling eventPoller = new HubEventPolling(restService);
@@ -577,7 +595,7 @@ public class HubEventPollingTest {
 						historyAfterScanTime.setCreatedOn(afterScanTime.toString());
 						historyAfterScanTime.setStatus(ScanStatus.MATCHING);
 
-						final List<ScanHistoryItem> historyList = new ArrayList<ScanHistoryItem>();
+						final List<ScanHistoryItem> historyList = new ArrayList<>();
 						historyList.add(historyBeforeScanTime);
 						historyList.add(historyInScanTime);
 						historyList.add(historyAfterScanTime);
@@ -595,7 +613,7 @@ public class HubEventPollingTest {
 						sl3.setPath(serverPath3);
 						sl3.setScanList(historyList);
 
-						final List<ScanLocationItem> items = new ArrayList<ScanLocationItem>();
+						final List<ScanLocationItem> items = new ArrayList<>();
 						items.add(sl1);
 						items.add(sl2);
 						items.add(sl3);
@@ -604,7 +622,7 @@ public class HubEventPollingTest {
 					}
 				});
 
-		final List<String> scanTargets = new ArrayList<String>();
+		final List<String> scanTargets = new ArrayList<>();
 		scanTargets.add("Test/Fake/Path/Child");
 		scanTargets.add("Test\\Fake\\File");
 		final HubEventPolling eventPoller = new HubEventPolling(restService);
@@ -654,6 +672,17 @@ public class HubEventPollingTest {
 		});
 		final HubEventPolling eventPoller = new HubEventPolling(restService);
 		eventPoller.isReportFinishedGenerating("", maximumWait);
+	}
+
+	private HubIntRestService constructMockedService(final ScanSummaryRestService scanSummaryRestService) {
+		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final ProjectRestService projectRestService = Mockito.mock(ProjectRestService.class);
+		final UserRestService userRestService = Mockito.mock(UserRestService.class);
+		final PolicyStatusRestService policyStatusRestService = Mockito.mock(PolicyStatusRestService.class);
+
+		final HubIntRestService service = new HubIntRestService(restConnection, projectRestService, userRestService,
+				policyStatusRestService, scanSummaryRestService);
+		return service;
 	}
 
 }

@@ -31,8 +31,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.util.TestLogger;
-import com.blackducksoftware.integration.hub.util.TestOutputStream;
+import com.blackducksoftware.integration.hub.test.TestLogger;
+import com.blackducksoftware.integration.hub.test.TestOutputStream;
 
 public class ScannerSplitStreamTest {
 	private static final String NEW_LINE = System.getProperty("line.separator");
