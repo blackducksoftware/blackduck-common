@@ -66,10 +66,16 @@ public class ComponentVersionStatus {
 	}
 
 	public UUID getComponentId() throws MissingUUIDException {
-		if (StringUtils.isBlank(getComponentVersionLink())) {
+		if (StringUtils.isBlank(getComponentVersionLink())
+				&& StringUtils.isBlank(getBomComponentVersionPolicyStatusLink())) {
 			return null;
 		}
-		return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER, getComponentVersionLink());
+		if (StringUtils.isNotBlank(getComponentVersionLink())) {
+			return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER, getComponentVersionLink());
+		} else {
+			return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER,
+					getBomComponentVersionPolicyStatusLink());
+		}
 	}
 
 	public UUID getComponentVersionId() throws MissingUUIDException {

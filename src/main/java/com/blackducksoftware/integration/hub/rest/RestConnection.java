@@ -363,10 +363,15 @@ public class RestConnection {
 	public ClientResource createClientResource(final String providedUrl) throws URISyntaxException {
 		// Should throw timeout exception after the specified timeout, default
 		// is 2 minutes
-		final ClientResource resource = new ClientResource(client.getContext(), new URI(providedUrl));
+		final ClientResource resource = createClientResource(client.getContext(), providedUrl);
 		resource.setNext(client);
 		resource.getRequest().setCookies(getCookies());
 		return resource;
+	}
+
+	public ClientResource createClientResource(final Context context, final String providedUrl)
+			throws URISyntaxException {
+		return new ClientResource(context, new URI(providedUrl));
 	}
 
 	public ClientResource createClientResource(final List<String> urlSegments,

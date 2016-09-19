@@ -11,6 +11,7 @@ import org.restlet.data.Method;
 
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.RuleViolationClearedNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -36,6 +37,7 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 		modelClassTypeAdapter.registerSubtype(VulnerabilityNotificationItem.class, "VULNERABILITY");
 		modelClassTypeAdapter.registerSubtype(RuleViolationNotificationItem.class, "RULE_VIOLATION");
 		modelClassTypeAdapter.registerSubtype(PolicyOverrideNotificationItem.class, "POLICY_OVERRIDE");
+		modelClassTypeAdapter.registerSubtype(RuleViolationClearedNotificationItem.class, "RULE_VIOLATION_CLEARED");
 		gsonBuilder.registerTypeAdapterFactory(modelClassTypeAdapter);
 		gsonBuilder.setDateFormat(RestConnection.JSON_DATE_FORMAT);
 		return gsonBuilder.create();
