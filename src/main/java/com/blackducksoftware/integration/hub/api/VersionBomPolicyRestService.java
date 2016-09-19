@@ -1,8 +1,8 @@
 package com.blackducksoftware.integration.hub.api;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.component.BomComponentVersionPolicyStatus;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -12,16 +12,16 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class VersionBomPolicyRestService extends HubRestService<BomComponentVersionPolicyStatus> {
-	private final Type bomComponentVersionStatus = new TypeToken<BomComponentVersionPolicyStatus>() {
-	}.getType();
-
 	public VersionBomPolicyRestService(final RestConnection restConnection, final Gson gson,
 			final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser);
+		super(restConnection, gson, jsonParser, new TypeToken<BomComponentVersionPolicyStatus>() {
+		}.getType(), new TypeToken<List<BomComponentVersionPolicyStatus>>() {
+		}.getType());
 	}
 
 	public BomComponentVersionPolicyStatus getPolicyStatus(final String policyStatusUrl)
 			throws IOException, BDRestException, URISyntaxException {
-		return getItem(bomComponentVersionStatus, policyStatusUrl);
+		return getItem(policyStatusUrl);
 	}
+
 }

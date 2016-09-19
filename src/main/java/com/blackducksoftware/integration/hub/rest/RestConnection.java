@@ -104,7 +104,6 @@ public class RestConnection {
 	}
 
 	private Client createClient() {
-
 		final Context context = new Context();
 		final List<Protocol> protocolList = new ArrayList<>();
 		protocolList.add(Protocol.HTTP);

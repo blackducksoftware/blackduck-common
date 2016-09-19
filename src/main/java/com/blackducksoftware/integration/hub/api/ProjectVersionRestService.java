@@ -1,8 +1,8 @@
 package com.blackducksoftware.integration.hub.api;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -12,16 +12,16 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ProjectVersionRestService extends HubRestService<ReleaseItem> {
-	private final Type releaseItemType = new TypeToken<ReleaseItem>() {
-	}.getType();
-
 	public ProjectVersionRestService(final RestConnection restConnection, final Gson gson,
 			final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser);
+		super(restConnection, gson, jsonParser, new TypeToken<ReleaseItem>() {
+		}.getType(), new TypeToken<List<ReleaseItem>>() {
+		}.getType());
 	}
 
 	public ReleaseItem getProjectVersionReleaseItem(final String versionUrl)
 			throws IOException, BDRestException, URISyntaxException {
-		return getItem(releaseItemType, versionUrl);
+		return getItem(versionUrl);
 	}
+
 }

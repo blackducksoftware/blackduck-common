@@ -39,10 +39,11 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.util.Series;
 
+import com.blackducksoftware.integration.hub.api.PolicyStatusRestService;
 import com.blackducksoftware.integration.hub.api.ProjectRestService;
 import com.blackducksoftware.integration.hub.api.UserRestService;
 import com.blackducksoftware.integration.hub.api.VersionComparison;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatus;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
@@ -53,7 +54,6 @@ import com.blackducksoftware.integration.hub.api.scan.ScanLocationResults;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.exception.MissingPolicyStatusException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
@@ -79,12 +79,14 @@ public class HubIntRestService {
 
 	private final ProjectRestService projectRestService;
 	private final UserRestService userRestService;
+	private final PolicyStatusRestService policyStatusRestService;
 
 	public HubIntRestService(final RestConnection restConnection) throws URISyntaxException {
 		this.restConnection = restConnection;
 
 		this.projectRestService = new ProjectRestService(restConnection, gson, jsonParser);
 		this.userRestService = new UserRestService(restConnection, gson, jsonParser);
+		this.policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
 	}
 
 	/**
@@ -240,7 +242,7 @@ public class HubIntRestService {
 	 *
 	 */
 	public ReleaseItem getVersion(final ProjectItem project, final String versionName) throws IOException,
-	BDRestException, URISyntaxException, VersionDoesNotExistException, UnexpectedHubResponseException {
+			BDRestException, URISyntaxException, VersionDoesNotExistException, UnexpectedHubResponseException {
 		final List<ReleaseItem> versions = getVersionsForProject(project);
 		for (final ReleaseItem version : versions) {
 			if (version.getVersionName().equals(versionName)) {
@@ -289,7 +291,7 @@ public class HubIntRestService {
 		final List<String> versionLinks = project.getLinks(ProjectItem.VERSION_LINK);
 		if (versionLinks.size() != 1) {
 			throw new UnexpectedHubResponseException("The project " + project.getName() + " has " + versionLinks.size()
-			+ " " + ProjectItem.VERSION_LINK + " links; expected one");
+					+ " " + ProjectItem.VERSION_LINK + " links; expected one");
 		}
 		final String versionLink = versionLinks.get(0);
 		return versionLink;
@@ -504,7 +506,6 @@ public class HubIntRestService {
 		return null;
 	}
 
-
 	/**
 	 * Generates a new Hub report for the specified version.
 	 *
@@ -513,7 +514,7 @@ public class HubIntRestService {
 	 */
 	public String generateHubReport(final ReleaseItem version, final ReportFormatEnum reportFormat,
 			final ReportCategoriesEnum[] categories)
-					throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
+			throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
 		if (ReportFormatEnum.UNKNOWN == reportFormat) {
 			throw new IllegalArgumentException("Can not generate a report of format : " + reportFormat);
 		}
@@ -639,40 +640,12 @@ public class HubIntRestService {
 		}
 	}
 
-	/**
-	 * Generates a new Hub report for the specified version.
-	 *
-	 */
-	public PolicyStatus getPolicyStatus(final String policyStatusUrl)
-			throws IOException, BDRestException, URISyntaxException, MissingPolicyStatusException {
+	public PolicyStatusItem getPolicyStatus(final String policyStatusUrl)
+			throws IOException, BDRestException, URISyntaxException {
 		if (StringUtils.isBlank(policyStatusUrl)) {
 			throw new IllegalArgumentException("Missing the policy status URL.");
 		}
-		final ClientResource resource = getRestConnection().createClientResource(policyStatusUrl);
-		try {
-			resource.setMethod(Method.GET);
-
-			getRestConnection().handleRequest(resource);
-
-			final int responseCode = resource.getResponse().getStatus().getCode();
-
-			if (getRestConnection().isSuccess(responseCode)) {
-				final String response = getRestConnection().readResponseAsString(resource.getResponse());
-
-				final Gson gson = new GsonBuilder().create();
-				final PolicyStatus status = gson.fromJson(response, PolicyStatus.class);
-				return status;
-			}
-			if (responseCode == 404) {
-				throw new MissingPolicyStatusException(
-						"There was no policy status found for this version. The BOM may be empty.");
-			} else {
-				throw new BDRestException("There was a problem getting the policy status. Error Code: " + responseCode,
-						resource);
-			}
-		} finally {
-			releaseResource(resource);
-		}
+		return policyStatusRestService.getItem(policyStatusUrl);
 	}
 
 	/**

@@ -1,7 +1,6 @@
 package com.blackducksoftware.integration.hub.api;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -25,11 +24,8 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class NotificationRestService extends HubRestService<NotificationItem> {
-
 	private final List<String> getNotificationSegments = Arrays.asList(UrlConstants.SEGMENT_API,
 			UrlConstants.SEGMENT_NOTIFICATIONS);
-	private final Type notificationItemListType = new TypeToken<List<NotificationItem>>() {
-	}.getType();
 
 	private final static Gson createGsonInstance() {
 		final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -48,7 +44,9 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 	}
 
 	public NotificationRestService(final RestConnection restConnection, final JsonParser jsonParser) {
-		super(restConnection, createGsonInstance(), jsonParser);
+		super(restConnection, createGsonInstance(), jsonParser, new TypeToken<NotificationItem>() {
+		}.getType(), new TypeToken<List<NotificationItem>>() {
+		}.getType());
 	}
 
 	public List<NotificationItem> getAllNotifications(final Date startDate, final Date endDate)
@@ -66,8 +64,7 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 		notificationItemRequest.addQueryParameter("endDate", endDateString);
 
 		final JsonObject jsonObject = notificationItemRequest.executeForResponseJson();
-		final List<NotificationItem> allNotificationItems = getAll(notificationItemListType, jsonObject,
-				notificationItemRequest);
+		final List<NotificationItem> allNotificationItems = getAll(jsonObject, notificationItemRequest);
 		return allNotificationItems;
 	}
 

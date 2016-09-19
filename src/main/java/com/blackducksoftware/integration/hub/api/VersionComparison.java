@@ -22,13 +22,9 @@
 package com.blackducksoftware.integration.hub.api;
 
 public class VersionComparison {
-
 	private final String consumerVersion;
-
 	private final String producerVersion;
-
 	private final Integer numericResult;
-
 	private final String operatorResult;
 
 	public VersionComparison(final String consumerVersion, final String producerVersion, final Integer numericResult,

@@ -10,11 +10,7 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyExpression;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRuleConditionEnum;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatus;
 import com.blackducksoftware.integration.hub.api.policy.PolicyValue;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 public class PolicyExpressionTest {
 
@@ -29,10 +25,10 @@ public class PolicyExpressionTest {
 		final PolicyValue policyValue1 = new PolicyValue(label1, value1);
 		final PolicyValue policyValue2 = new PolicyValue(label2, value2);
 
-		final List<PolicyValue> values1 = new ArrayList<PolicyValue>();
+		final List<PolicyValue> values1 = new ArrayList<>();
 		values1.add(policyValue1);
 
-		final List<PolicyValue> values2 = new ArrayList<PolicyValue>();
+		final List<PolicyValue> values2 = new ArrayList<>();
 		values2.add(policyValue2);
 
 		final String name1 = "name1";
@@ -56,20 +52,8 @@ public class PolicyExpressionTest {
 		assertTrue(!item1.equals(item2));
 		assertTrue(item1.equals(item3));
 
-		EqualsVerifier.forClass(PolicyStatus.class).suppress(Warning.STRICT_INHERITANCE).verify();
-
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());
-
-		final StringBuilder builder = new StringBuilder();
-		builder.append("PolicyExpression [name=");
-		builder.append(item1.getName());
-		builder.append(", operation=");
-		builder.append(item1.getOperation());
-		builder.append(", values=");
-		builder.append(item1.getValues());
-		builder.append("]");
-		assertEquals(builder.toString(), item1.toString());
 	}
 
 	@Test
