@@ -7,6 +7,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -86,9 +89,9 @@ public class NotificationDataService extends AbstractDataService {
 		return transformMap;
 	}
 
-	public List<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
+	public SortedSet<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
 			throws IOException, URISyntaxException, BDRestException {
-		final List<NotificationContentItem> contentList = new ArrayList<>();
+		final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
 		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
 
 		int submitted = 0;
@@ -119,7 +122,7 @@ public class NotificationDataService extends AbstractDataService {
 
 		final Map<String, ProjectAggregateBuilder> projectCounterMap = new ConcurrentHashMap<>();
 		final NotificationCounter counter = new NotificationCounter(projectCounterMap);
-		final List<NotificationContentItem> itemList = getAllNotifications(startDate, endDate);
+		final Set<NotificationContentItem> itemList = getAllNotifications(startDate, endDate);
 		for (final NotificationContentItem item : itemList) {
 			counter.count(item);
 		}

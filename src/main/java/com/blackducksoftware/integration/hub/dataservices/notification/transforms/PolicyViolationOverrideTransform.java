@@ -71,7 +71,8 @@ public class PolicyViolationOverrideTransform extends AbstractPolicyTransform {
 			final List<PolicyRule> policyRuleList, final NotificationItem item,
 			final List<NotificationContentItem> templateData) {
 		final PolicyOverrideNotificationItem policyOverride = (PolicyOverrideNotificationItem) item;
-		templateData.add(new PolicyOverrideContentItem(projectVersion, componentName, componentVersion, componentId,
+		templateData.add(new PolicyOverrideContentItem(item.getCreatedAt(), projectVersion, componentName,
+				componentVersion, componentId,
 				componentVersionId,
 				policyRuleList, policyOverride.getContent().getFirstName(), policyOverride.getContent().getLastName()));
 	}

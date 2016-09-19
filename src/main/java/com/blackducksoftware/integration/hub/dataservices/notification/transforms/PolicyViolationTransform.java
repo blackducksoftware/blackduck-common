@@ -70,7 +70,8 @@ public class PolicyViolationTransform extends AbstractPolicyTransform {
 			final String componentVersion, final UUID componentId, final UUID componentVersionId,
 			final List<PolicyRule> policyRuleList, final NotificationItem item,
 			final List<NotificationContentItem> templateData) {
-		templateData.add(new PolicyViolationContentItem(projectVersion, componentName, componentVersion, componentId,
+		templateData.add(new PolicyViolationContentItem(item.getCreatedAt(), projectVersion, componentName,
+				componentVersion, componentId,
 				componentVersionId, policyRuleList));
 	}
 }

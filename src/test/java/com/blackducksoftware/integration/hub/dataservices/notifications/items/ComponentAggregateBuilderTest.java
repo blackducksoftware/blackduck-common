@@ -47,7 +47,8 @@ public class ComponentAggregateBuilderTest {
 		final List<PolicyRule> policyRuleList = new ArrayList<>();
 		final PolicyRule rule = new PolicyRule(null, POLICY_RULE_NAME, "", true, true, null, "", "", "", "");
 		policyRuleList.add(rule);
-		final PolicyViolationContentItem item = new PolicyViolationContentItem(createProjectVersion(), COMPONENT_NAME,
+		final PolicyViolationContentItem item = new PolicyViolationContentItem(new Date(), createProjectVersion(),
+				COMPONENT_NAME,
 				COMPONENT_VERSION, componentID, componentVersionID, policyRuleList);
 		return item;
 	}
@@ -59,7 +60,8 @@ public class ComponentAggregateBuilderTest {
 		final List<PolicyRule> policyRuleList = new ArrayList<>();
 		final PolicyRule rule = new PolicyRule(null, POLICY_RULE_NAME, "", true, true, null, "", "", "", "");
 		policyRuleList.add(rule);
-		final PolicyOverrideContentItem item = new PolicyOverrideContentItem(createProjectVersion(), COMPONENT_NAME,
+		final PolicyOverrideContentItem item = new PolicyOverrideContentItem(new Date(), createProjectVersion(),
+				COMPONENT_NAME,
 				COMPONENT_VERSION, componentID, componentVersionID, policyRuleList, FIRST_NAME, LAST_NAME);
 		return item;
 	}
@@ -76,7 +78,8 @@ public class ComponentAggregateBuilderTest {
 		updated.add(vuln);
 		deleted.add(vuln);
 
-		final VulnerabilityContentItem item = new VulnerabilityContentItem(createProjectVersion(), COMPONENT_NAME,
+		final VulnerabilityContentItem item = new VulnerabilityContentItem(new Date(), createProjectVersion(),
+				COMPONENT_NAME,
 				COMPONENT_VERSION, componentID, componentVersionID, added, updated, deleted);
 		return item;
 	}
