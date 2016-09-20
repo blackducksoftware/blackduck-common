@@ -120,7 +120,6 @@ public class NotificationDataService extends AbstractDataService {
 
 	public List<ProjectAggregateData> getNotificationCounts(final Date startDate, final Date endDate)
 			throws IOException, URISyntaxException, BDRestException, InterruptedException {
-
 		final Map<String, ProjectAggregateBuilder> projectCounterMap = new ConcurrentHashMap<>();
 		final NotificationCounter counter = new NotificationCounter(projectCounterMap);
 		final List<NotificationContentItem> itemList = getAllNotifications(startDate, endDate);
@@ -151,4 +150,5 @@ public class NotificationDataService extends AbstractDataService {
 			return converter.transform(item);
 		}
 	}
+
 }

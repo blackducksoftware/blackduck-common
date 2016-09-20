@@ -18,7 +18,6 @@ import com.blackducksoftware.integration.hub.api.notification.RuleViolationClear
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.json.RuntimeTypeAdapterFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -35,16 +34,6 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 
 	private final static Gson createGsonInstance() {
 		final GsonBuilder gsonBuilder = new GsonBuilder();
-
-		final RuntimeTypeAdapterFactory<NotificationItem> modelClassTypeAdapter = RuntimeTypeAdapterFactory
-				.of(NotificationItem.class, "type");
-		// When new notification types need to be supported this method needs to
-		// register the new notification type to be supported here.
-		modelClassTypeAdapter.registerSubtype(VulnerabilityNotificationItem.class, "VULNERABILITY");
-		modelClassTypeAdapter.registerSubtype(RuleViolationNotificationItem.class, "RULE_VIOLATION");
-		modelClassTypeAdapter.registerSubtype(PolicyOverrideNotificationItem.class, "POLICY_OVERRIDE");
-		modelClassTypeAdapter.registerSubtype(RuleViolationClearedNotificationItem.class, "RULE_VIOLATION_CLEARED");
-		gsonBuilder.registerTypeAdapterFactory(modelClassTypeAdapter);
 		gsonBuilder.setDateFormat(RestConnection.JSON_DATE_FORMAT);
 		return gsonBuilder.create();
 	}
@@ -79,7 +68,8 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 		return allNotificationItems;
 	}
 
-	public List<NotificationItem> getItems2(final JsonObject jsonObject) {
+	@Override
+	public List<NotificationItem> getItems(final JsonObject jsonObject) {
 		final JsonArray jsonArray = jsonObject.get("items").getAsJsonArray();
 		final List<NotificationItem> allNotificationItems = new ArrayList<>(jsonArray.size());
 		for (final JsonElement jsonElement : jsonArray) {
