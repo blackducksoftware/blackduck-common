@@ -120,6 +120,10 @@ public class RestConnection {
 		return client;
 	}
 
+	public IntLogger getLogger() {
+		return logger;
+	}
+
 	public void setLogger(final IntLogger logger) {
 		this.logger = logger;
 	}
