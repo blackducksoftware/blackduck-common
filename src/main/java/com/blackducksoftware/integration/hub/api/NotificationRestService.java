@@ -3,9 +3,12 @@ package com.blackducksoftware.integration.hub.api;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.restlet.data.Method;
 
@@ -19,6 +22,8 @@ import com.blackducksoftware.integration.hub.json.RuntimeTypeAdapterFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
@@ -26,6 +31,7 @@ import com.google.gson.reflect.TypeToken;
 public class NotificationRestService extends HubRestService<NotificationItem> {
 	private final List<String> getNotificationSegments = Arrays.asList(UrlConstants.SEGMENT_API,
 			UrlConstants.SEGMENT_NOTIFICATIONS);
+	private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();
 
 	private final static Gson createGsonInstance() {
 		final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -47,6 +53,11 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 		super(restConnection, createGsonInstance(), jsonParser, new TypeToken<NotificationItem>() {
 		}.getType(), new TypeToken<List<NotificationItem>>() {
 		}.getType());
+
+		typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);
+		typeMap.put("RULE_VIOLATION", RuleViolationNotificationItem.class);
+		typeMap.put("POLICY_OVERRIDE", PolicyOverrideNotificationItem.class);
+		typeMap.put("RULE_VIOLATION_CLEARED", RuleViolationClearedNotificationItem.class);
 	}
 
 	public List<NotificationItem> getAllNotifications(final Date startDate, final Date endDate)
@@ -65,6 +76,21 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 
 		final JsonObject jsonObject = notificationItemRequest.executeForResponseJson();
 		final List<NotificationItem> allNotificationItems = getAll(jsonObject, notificationItemRequest);
+		return allNotificationItems;
+	}
+
+	public List<NotificationItem> getItems2(final JsonObject jsonObject) {
+		final JsonArray jsonArray = jsonObject.get("items").getAsJsonArray();
+		final List<NotificationItem> allNotificationItems = new ArrayList<>(jsonArray.size());
+		for (final JsonElement jsonElement : jsonArray) {
+			final String type = jsonElement.getAsJsonObject().get("type").getAsString();
+			Class<? extends NotificationItem> clazz = NotificationItem.class;
+			if (typeMap.containsKey(type)) {
+				clazz = typeMap.get(type);
+			}
+			allNotificationItems.add(getGson().fromJson(jsonElement, clazz));
+		}
+
 		return allNotificationItems;
 	}
 

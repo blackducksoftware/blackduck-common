@@ -32,12 +32,12 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Not
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateBuilder;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateData;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.AbstractNotificationTransformer;
 import com.blackducksoftware.integration.hub.dataservices.notification.transforms.NotificationCounter;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationClearedTransform;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationOverrideTransform;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationTransform;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.VulnerabilityTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationClearedTransformer;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationOverrideTransformer;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationTransformer;
+import com.blackducksoftware.integration.hub.dataservices.notification.transforms.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
@@ -49,14 +49,13 @@ public class NotificationDataService extends AbstractDataService {
 	private final PolicyRestService policyService;
 	private final VersionBomPolicyRestService bomVersionPolicyService;
 	private final ComponentVersionRestService componentVersionService;
-	private final Map<Class<?>, AbstractNotificationTransform> transformMap;
+	private final Map<Class<?>, AbstractNotificationTransformer> transformerMap = new HashMap<>();;
 	private final ExecutorService executorService;
 	private final ExecutorCompletionService<List<NotificationContentItem>> completionService;
-	private final PolicyNotificationFilter policyFilter;
+	private PolicyNotificationFilter policyFilter = null;
 	private final VulnerabilityRestService vulnerabilityRestService;
 
-	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
-			final PolicyNotificationFilter policyFilter) {
+	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
 		super(restConnection, gson, jsonParser);
 		notificationService = new NotificationRestService(restConnection, jsonParser);
 		projectVersionService = new ProjectVersionRestService(restConnection, gson, jsonParser);
@@ -64,26 +63,31 @@ public class NotificationDataService extends AbstractDataService {
 		bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
 		vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
-		this.policyFilter = policyFilter;
-		transformMap = createTransformMap();
+
+		populateTransformerMap();
+
 		final ThreadFactory threadFactory = Executors.defaultThreadFactory();
 		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
 		completionService = new ExecutorCompletionService<>(executorService);
 	}
 
-	private Map<Class<?>, AbstractNotificationTransform> createTransformMap() {
-		final Map<Class<?>, AbstractNotificationTransform> transformMap = new HashMap<>();
-		transformMap.put(RuleViolationNotificationItem.class, new PolicyViolationTransform(notificationService,
-				projectVersionService, policyService, bomVersionPolicyService, componentVersionService, policyFilter));
-		transformMap.put(PolicyOverrideNotificationItem.class, new PolicyViolationOverrideTransform(notificationService,
-				projectVersionService, policyService, bomVersionPolicyService, componentVersionService, policyFilter));
-		transformMap.put(VulnerabilityNotificationItem.class, new VulnerabilityTransform(notificationService,
-				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
-		transformMap.put(RuleViolationClearedNotificationItem.class,
-				new PolicyViolationClearedTransform(notificationService, projectVersionService, policyService,
-						bomVersionPolicyService, componentVersionService, policyFilter));
+	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
+			final PolicyNotificationFilter policyFilter) {
+		this(restConnection, gson, jsonParser);
+		this.policyFilter = policyFilter;
+	}
 
-		return transformMap;
+	private void populateTransformerMap() {
+		transformerMap.put(RuleViolationNotificationItem.class, new PolicyViolationTransformer(notificationService,
+				projectVersionService, policyService, bomVersionPolicyService, componentVersionService, policyFilter));
+		transformerMap.put(PolicyOverrideNotificationItem.class,
+				new PolicyViolationOverrideTransformer(notificationService, projectVersionService, policyService,
+						bomVersionPolicyService, componentVersionService, policyFilter));
+		transformerMap.put(VulnerabilityNotificationItem.class, new VulnerabilityTransformer(notificationService,
+				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
+		transformerMap.put(RuleViolationClearedNotificationItem.class,
+				new PolicyViolationClearedTransformer(notificationService, projectVersionService, policyService,
+						bomVersionPolicyService, componentVersionService, policyFilter));
 	}
 
 	public List<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
@@ -94,8 +98,8 @@ public class NotificationDataService extends AbstractDataService {
 		int submitted = 0;
 		for (final NotificationItem item : itemList) {
 			final Class<? extends NotificationItem> key = item.getClass();
-			if (transformMap.containsKey(key)) {
-				final AbstractNotificationTransform converter = transformMap.get(key);
+			if (transformerMap.containsKey(key)) {
+				final AbstractNotificationTransformer converter = transformerMap.get(key);
 				final TransformCallable callable = new TransformCallable(item, converter);
 				completionService.submit(callable);
 				submitted++;
@@ -135,9 +139,9 @@ public class NotificationDataService extends AbstractDataService {
 
 	private class TransformCallable implements Callable<List<NotificationContentItem>> {
 		private final NotificationItem item;
-		private final AbstractNotificationTransform converter;
+		private final AbstractNotificationTransformer converter;
 
-		public TransformCallable(final NotificationItem item, final AbstractNotificationTransform converter) {
+		public TransformCallable(final NotificationItem item, final AbstractNotificationTransformer converter) {
 			this.item = item;
 			this.converter = converter;
 		}

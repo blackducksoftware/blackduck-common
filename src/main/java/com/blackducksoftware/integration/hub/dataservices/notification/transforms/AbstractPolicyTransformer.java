@@ -25,10 +25,10 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 
-public abstract class AbstractPolicyTransform extends AbstractNotificationTransform {
+public abstract class AbstractPolicyTransformer extends AbstractNotificationTransformer {
 	private final PolicyNotificationFilter policyFilter;
 
-	public AbstractPolicyTransform(final NotificationRestService notificationService,
+	public AbstractPolicyTransformer(final NotificationRestService notificationService,
 			final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
 			final VersionBomPolicyRestService bomVersionPolicyService,
 			final ComponentVersionRestService componentVersionService, final PolicyNotificationFilter policyFilter) {
@@ -54,7 +54,7 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 
 					ruleList = getMatchingRules(ruleList);
 					if (ruleList != null && !ruleList.isEmpty()) {
-						final List<PolicyRule> policyRuleList = new ArrayList<PolicyRule>();
+						final List<PolicyRule> policyRuleList = new ArrayList<>();
 						for (final String ruleUrl : ruleList) {
 							final PolicyRule rule = getPolicyRule(ruleUrl);
 							policyRuleList.add(rule);
@@ -102,7 +102,7 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 		if (rulesViolated == null || rulesViolated.isEmpty()) {
 			return null;
 		}
-		final List<String> matchingRules = new ArrayList<String>();
+		final List<String> matchingRules = new ArrayList<>();
 		for (final String ruleViolated : rulesViolated) {
 			final String fixedRuleUrl = fixRuleUrl(ruleViolated);
 			matchingRules.add(fixedRuleUrl);
@@ -146,4 +146,5 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 	public abstract void createContents(final ProjectVersion projectVersion, final String componentName,
 			final String componentVersion, final UUID componentId, final UUID componentVersionId,
 			List<PolicyRule> policyRuleList, NotificationItem item, List<NotificationContentItem> templateData);
+
 }

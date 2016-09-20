@@ -13,19 +13,18 @@ import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.RuleViolationClearedNotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationClearedContentItem;
+import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
-public class PolicyViolationClearedTransform extends AbstractPolicyTransform {
-
-	public PolicyViolationClearedTransform(final NotificationRestService notificationService,
+public class PolicyViolationTransformer extends AbstractPolicyTransformer {
+	public PolicyViolationTransformer(final NotificationRestService notificationService,
 			final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
 			final VersionBomPolicyRestService bomVersionPolicyService,
 			final ComponentVersionRestService componentVersionService, final PolicyNotificationFilter policyFilter) {
@@ -37,7 +36,7 @@ public class PolicyViolationClearedTransform extends AbstractPolicyTransform {
 	public List<NotificationContentItem> transform(final NotificationItem item) throws HubItemTransformException {
 		final List<NotificationContentItem> templateData = new ArrayList<>();
 		try {
-			final RuleViolationClearedNotificationItem policyViolation = (RuleViolationClearedNotificationItem) item;
+			final RuleViolationNotificationItem policyViolation = (RuleViolationNotificationItem) item;
 			final String projectName = policyViolation.getContent().getProjectName();
 			final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent()
 					.getComponentVersionStatuses();
@@ -70,8 +69,8 @@ public class PolicyViolationClearedTransform extends AbstractPolicyTransform {
 			final String componentVersion, final UUID componentId, final UUID componentVersionId,
 			final List<PolicyRule> policyRuleList, final NotificationItem item,
 			final List<NotificationContentItem> templateData) {
-		templateData.add(new PolicyViolationClearedContentItem(projectVersion, componentName, componentVersion,
-				componentId, componentVersionId, policyRuleList));
+		templateData.add(new PolicyViolationContentItem(projectVersion, componentName, componentVersion, componentId,
+				componentVersionId, policyRuleList));
 	}
 
 }
