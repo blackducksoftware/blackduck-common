@@ -73,7 +73,75 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
 	@Override
 	public int compareTo(final NotificationContentItem o) {
-		return getCreatedAt().compareTo(o.getCreatedAt());
+		final int createdAtComparison = getCreatedAt().compareTo(o.getCreatedAt());
+		if (createdAtComparison != 0) {
+			// If createdAt times are different, use createdAt to compare
+			System.out.println("\tResult (based solely on createdAt): " + createdAtComparison);
+			return createdAtComparison;
+		}
+		// If createdAt values are identical, see if they are truly equal
+		if (equals(o)) {
+			System.out.println("\tResult (the two are identical): " + 0);
+			return 0;
+		}
+		// Identify same-time non-equal items as non-equal
+		System.out.println("\tResult (same createdAt, different in some other field): " + 1);
+		return 1;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((componentId == null) ? 0 : componentId.hashCode());
+		result = prime * result + ((componentVersionId == null) ? 0 : componentVersionId.hashCode());
+		result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
+		result = prime * result + ((projectVersion == null) ? 0 : projectVersion.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final NotificationContentItem other = (NotificationContentItem) obj;
+		if (componentId == null) {
+			if (other.componentId != null) {
+				return false;
+			}
+		} else if (!componentId.equals(other.componentId)) {
+			return false;
+		}
+		if (componentVersionId == null) {
+			if (other.componentVersionId != null) {
+				return false;
+			}
+		} else if (!componentVersionId.equals(other.componentVersionId)) {
+			return false;
+		}
+		if (createdAt == null) {
+			if (other.createdAt != null) {
+				return false;
+			}
+		} else if (!createdAt.equals(other.createdAt)) {
+			return false;
+		}
+		if (projectVersion == null) {
+			if (other.projectVersion != null) {
+				return false;
+			}
+		} else if (!projectVersion.equals(other.projectVersion)) {
+			return false;
+		}
+		return true;
+	}
+
 
 }

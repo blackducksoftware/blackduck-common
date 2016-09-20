@@ -80,4 +80,42 @@ public class ProjectVersion {
 				+ ", projectVersionLink=" + projectVersionLink + "]";
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
+		result = prime * result + ((projectVersionName == null) ? 0 : projectVersionName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final ProjectVersion other = (ProjectVersion) obj;
+		if (projectName == null) {
+			if (other.projectName != null) {
+				return false;
+			}
+		} else if (!projectName.equals(other.projectName)) {
+			return false;
+		}
+		if (projectVersionName == null) {
+			if (other.projectVersionName != null) {
+				return false;
+			}
+		} else if (!projectVersionName.equals(other.projectVersionName)) {
+			return false;
+		}
+		return true;
+	}
+
 }
