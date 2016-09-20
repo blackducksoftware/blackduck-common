@@ -31,7 +31,7 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
-import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
+import com.blackducksoftware.integration.hub.api.scan.ScanStatus;
 
 public class ScanHistoryItemTest {
 

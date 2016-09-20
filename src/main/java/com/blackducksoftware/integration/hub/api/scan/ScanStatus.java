@@ -19,7 +19,7 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.scan.status;
+package com.blackducksoftware.integration.hub.api.scan;
 
 import java.util.EnumSet;
 import java.util.Set;

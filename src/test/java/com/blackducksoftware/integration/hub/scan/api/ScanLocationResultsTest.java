@@ -38,7 +38,7 @@ import com.blackducksoftware.integration.hub.api.scan.EntityTypeEnum;
 import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanLocationResults;
-import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
+import com.blackducksoftware.integration.hub.api.scan.ScanStatus;
 
 public class ScanLocationResultsTest {
 

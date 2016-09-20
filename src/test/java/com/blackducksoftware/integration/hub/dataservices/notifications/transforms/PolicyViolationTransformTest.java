@@ -28,7 +28,7 @@ import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationContentItem;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationTransformer;
+import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationTransformer;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
