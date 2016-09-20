@@ -56,7 +56,14 @@ public class NotificationDataService extends AbstractDataService {
 	private final VulnerabilityRestService vulnerabilityRestService;
 
 	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+		this(restConnection, gson, jsonParser, null);
+	}
+
+	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
+			final PolicyNotificationFilter policyFilter) {
 		super(restConnection, gson, jsonParser);
+		this.policyFilter = policyFilter;
+
 		notificationService = new NotificationRestService(restConnection, jsonParser);
 		projectVersionService = new ProjectVersionRestService(restConnection, gson, jsonParser);
 		policyService = new PolicyRestService(restConnection, gson, jsonParser);
@@ -69,12 +76,6 @@ public class NotificationDataService extends AbstractDataService {
 		final ThreadFactory threadFactory = Executors.defaultThreadFactory();
 		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
 		completionService = new ExecutorCompletionService<>(executorService);
-	}
-
-	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
-			final PolicyNotificationFilter policyFilter) {
-		this(restConnection, gson, jsonParser);
-		this.policyFilter = policyFilter;
 	}
 
 	private void populateTransformerMap() {
