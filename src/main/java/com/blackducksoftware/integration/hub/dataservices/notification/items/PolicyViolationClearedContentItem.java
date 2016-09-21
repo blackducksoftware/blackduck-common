@@ -16,4 +16,13 @@ public class PolicyViolationClearedContentItem extends PolicyViolationContentIte
 		super(createdAt, projectVersion, componentName, componentVersion, componentId, componentVersionId,
 				policyRuleList);
 	}
+
+	@Override
+	public String toString() {
+		return "PolicyViolationClearedContentItem [getPolicyRuleList()=" + getPolicyRuleList()
+				+ ", getProjectVersion()=" + getProjectVersion() + ", getComponentName()=" + getComponentName()
+				+ ", getComponentVersion()=" + getComponentVersion() + ", getComponentId()=" + getComponentId()
+				+ ", getComponentVersionId()=" + getComponentVersionId() + ", getCreatedAt()=" + getCreatedAt() + "]";
+	}
+
 }
