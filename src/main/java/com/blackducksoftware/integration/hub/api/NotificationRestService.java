@@ -49,7 +49,7 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 		}.getType());
 	}
 
-	public List<NotificationItem> getAllNotifications(final Date startDate, final Date endDate)
+	public List<NotificationItem> getAllNotifications(final Date startDate, final Date endDate, final int limit)
 			throws IOException, URISyntaxException, BDRestException {
 		final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
 
@@ -58,7 +58,7 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 
 		final HubRequest notificationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
 		notificationItemRequest.setMethod(Method.GET);
-		notificationItemRequest.setLimit(100);
+		notificationItemRequest.setLimit(limit);
 		notificationItemRequest.addUrlSegments(getNotificationSegments);
 		notificationItemRequest.addQueryParameter("startDate", startDateString);
 		notificationItemRequest.addQueryParameter("endDate", endDateString);

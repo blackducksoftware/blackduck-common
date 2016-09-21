@@ -67,7 +67,7 @@ public class NotificationDataService extends AbstractDataService {
 		this.logger = logger;
 		notificationService = new NotificationRestService(restConnection, jsonParser);
 		projectVersionService = new ProjectVersionRestService(restConnection, gson, jsonParser);
-		policyService = new PolicyRestService(restConnection, gson, jsonParser);
+		policyService = new PolicyRestService(logger, restConnection, gson, jsonParser);
 		bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
 		vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
@@ -94,10 +94,11 @@ public class NotificationDataService extends AbstractDataService {
 		return transformMap;
 	}
 
-	public SortedSet<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
-			throws IOException, URISyntaxException, BDRestException {
+	public SortedSet<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate,
+			final int limit)
+					throws IOException, URISyntaxException, BDRestException {
 		final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
-		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
+		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate, limit);
 
 		int submitted = 0;
 		for (final NotificationItem item : itemList) {
@@ -123,12 +124,12 @@ public class NotificationDataService extends AbstractDataService {
 		return contentList;
 	}
 
-	public List<ProjectAggregateData> getNotificationCounts(final Date startDate, final Date endDate)
+	public List<ProjectAggregateData> getNotificationCounts(final Date startDate, final Date endDate, final int limit)
 			throws IOException, URISyntaxException, BDRestException, InterruptedException {
 
 		final Map<String, ProjectAggregateBuilder> projectCounterMap = new ConcurrentHashMap<>();
 		final NotificationCounter counter = new NotificationCounter(projectCounterMap);
-		final Set<NotificationContentItem> itemList = getAllNotifications(startDate, endDate);
+		final Set<NotificationContentItem> itemList = getAllNotifications(startDate, endDate, limit);
 		for (final NotificationContentItem item : itemList) {
 			counter.count(item);
 		}
