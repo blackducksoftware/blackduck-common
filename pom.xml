@@ -22,7 +22,6 @@
     <url>https://www.github.com/blackducksoftware/hub-common</url>
   </scm>
 
-
   <dependencies>
     <dependency>
       <groupId>org.apache.ant</groupId>

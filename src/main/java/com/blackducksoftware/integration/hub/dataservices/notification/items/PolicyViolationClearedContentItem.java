@@ -13,4 +13,23 @@ public class PolicyViolationClearedContentItem extends PolicyViolationContentIte
 			final List<PolicyRule> policyRuleList) {
 		super(projectVersion, componentName, componentVersion, componentId, componentVersionId, policyRuleList);
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("PolicyViolationClearedContentItem [projectVersion=");
+		builder.append(getProjectVersion());
+		builder.append(", componentName=");
+		builder.append(getComponentName());
+		builder.append(", componentVersion=");
+		builder.append(getComponentVersion());
+		builder.append(", componentId=");
+		builder.append(getComponentId());
+		builder.append(", componentVersionId=");
+		builder.append(getComponentVersionId());
+		builder.append(", policyRuleList=");
+		builder.append(getPolicyRuleList());
+		builder.append("]");
+		return builder.toString();
+	}
 }
