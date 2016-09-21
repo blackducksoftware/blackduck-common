@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,6 +34,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
 public class ScanStatusService {
+	private static final long FIVE_SECONDS = 5000;
+
 	private final IntLogger logger;
 
 	private final ProjectRestService projectRestService;
@@ -67,53 +70,42 @@ public class ScanStatusService {
 		policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
 	}
 
+	/**
+	 * For a given group, artifact, and version, find the current
+	 * PolicyStatusItem. This should be used when a Hub Scan is assumed to have
+	 * started just prior to the checkPolicies invocation. Since the Hub Scan
+	 * might not start right away, the method will wait at most
+	 * scanStartedTimeoutInMilliseconds to find at least one pending scan.
+	 *
+	 * Once at least one pending scan is found, the method will wait at most
+	 * scanFinishedTimeoutInMilliseconds for all the found scans to complete.
+	 * Then, when all pending scans are finally complete, the policy status will
+	 * be checked, which will include any changes from the completed scans.
+	 *
+	 * @param groupId
+	 * @param artifactId
+	 * @param version
+	 * @param scanStartedTimeoutInMilliseconds
+	 * @param scanFinishedTimeoutInMilliseconds
+	 * @return PolicyStatusItem
+	 * @throws IllegalArgumentException
+	 * @throws URISyntaxException
+	 * @throws BDRestException
+	 * @throws EncryptionException
+	 * @throws IOException
+	 * @throws UnexpectedHubResponseException
+	 * @throws InterruptedException
+	 * @throws HubIntegrationException
+	 */
 	public PolicyStatusItem checkPolicies(final String groupId, final String artifactId, final String version,
-			final long timeoutInMilliseconds)
+			final long scanStartedTimeoutInMilliseconds, final long scanFinishedTimeoutInMilliseconds)
 			throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException, IOException,
 			UnexpectedHubResponseException, InterruptedException, HubIntegrationException {
 		populateApplicableScansAndProjectVersions(groupId, artifactId, version);
 
-		final List<ScanSummaryItem> scanSummaries = new ArrayList<>();
-		for (final String scanSummaryLink : scanSummariesLinks) {
-			scanSummaries.addAll(scanSummaryRestService.getAllScanSummaryItems(scanSummaryLink));
-		}
-
-		final List<ScanSummaryItem> pendingScanSummaries = new ArrayList<>();
-		for (final ScanSummaryItem scanSummaryItem : scanSummaries) {
-			if (scanSummaryItem.getStatus().isPending()) {
-				pendingScanSummaries.add(scanSummaryItem);
-			}
-		}
-
-		if (scanSummariesLinks.isEmpty()) {
-			// perhaps the Hub has not started the scan yet - since we expect
-			// one to have started, let's wait a bit
-			Thread.sleep(5000);
-			for (final String scanSummaryLink : scanSummariesLinks) {
-				scanSummaries.addAll(scanSummaryRestService.getAllScanSummaryItems(scanSummaryLink));
-			}
-			for (final ScanSummaryItem scanSummaryItem : scanSummaries) {
-				if (scanSummaryItem.getStatus().isPending()) {
-					pendingScanSummaries.add(scanSummaryItem);
-				}
-			}
-		}
-
-		if (scanSummariesLinks.isEmpty()) {
-			// try one more time...
-			Thread.sleep(5000);
-			for (final String scanSummaryLink : scanSummariesLinks) {
-				scanSummaries.addAll(scanSummaryRestService.getAllScanSummaryItems(scanSummaryLink));
-			}
-			for (final ScanSummaryItem scanSummaryItem : scanSummaries) {
-				if (scanSummaryItem.getStatus().isPending()) {
-					pendingScanSummaries.add(scanSummaryItem);
-				}
-			}
-		}
-
+		final List<ScanSummaryItem> pendingScanSummaries = getPendingScanSummaries(scanStartedTimeoutInMilliseconds);
 		final ScanStatusChecker scanStatusChecker = new ScanStatusChecker(logger, scanSummaryRestService,
-				pendingScanSummaries, timeoutInMilliseconds);
+				pendingScanSummaries, scanFinishedTimeoutInMilliseconds);
 		scanStatusChecker.waitForCompleteScans();
 
 		final PolicyStatusItem policyStatusItem = policyStatusRestService.getItem(policyStatusLink);
@@ -161,6 +153,58 @@ public class ScanStatusService {
 		}
 
 		return null;
+	}
+
+	private List<ScanSummaryItem> getPendingScanSummaries() throws IOException, URISyntaxException, BDRestException {
+		final List<ScanSummaryItem> allScanSummaries = new ArrayList<>();
+		for (final String scanSummaryLink : scanSummariesLinks) {
+			allScanSummaries.addAll(scanSummaryRestService.getAllScanSummaryItems(scanSummaryLink));
+		}
+
+		final List<ScanSummaryItem> pendingScanSummaries = new ArrayList<>();
+		for (final ScanSummaryItem scanSummaryItem : allScanSummaries) {
+			if (scanSummaryItem.getStatus().isPending()) {
+				pendingScanSummaries.add(scanSummaryItem);
+			}
+		}
+
+		return pendingScanSummaries;
+	}
+
+	private List<ScanSummaryItem> getPendingScanSummaries(final long scanStartedTimeoutInMilliseconds)
+			throws IOException, URISyntaxException, BDRestException, InterruptedException, HubIntegrationException {
+		List<ScanSummaryItem> pendingScanSummaries = getPendingScanSummaries();
+		final long startedTime = System.currentTimeMillis();
+		while (!done(pendingScanSummaries, scanStartedTimeoutInMilliseconds, startedTime)) {
+			// perhaps the Hub has not started the scan yet - since we expect
+			// one to have started, let's wait a bit
+			Thread.sleep(FIVE_SECONDS);
+			pendingScanSummaries = getPendingScanSummaries();
+		}
+
+		return pendingScanSummaries;
+	}
+
+	private boolean done(final List<ScanSummaryItem> pendingScanSummaries, final long timeoutInMilliseconds,
+			final long startedTime) throws HubIntegrationException {
+		if (pendingScanSummaries.size() > 0) {
+			return true;
+		}
+
+		if (takenTooLong(timeoutInMilliseconds, startedTime)) {
+			logger.info("the hub scan took too long to start...");
+			final String formattedTime = String.format("%d minutes",
+					TimeUnit.MILLISECONDS.toMinutes(timeoutInMilliseconds));
+			throw new HubIntegrationException(
+					"The Scan has not started within the specified wait time : " + formattedTime);
+		}
+
+		return false;
+	}
+
+	private boolean takenTooLong(final long timeoutInMilliseconds, final long startedTime) {
+		final long elapsed = System.currentTimeMillis() - startedTime;
+		return elapsed > timeoutInMilliseconds;
 	}
 
 }
