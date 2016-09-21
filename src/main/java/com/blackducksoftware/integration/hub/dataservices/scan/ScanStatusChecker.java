@@ -19,7 +19,7 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.polling;
+package com.blackducksoftware.integration.hub.dataservices.scan;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

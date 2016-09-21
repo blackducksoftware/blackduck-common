@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.polling;
+package com.blackducksoftware.integration.hub.dataservices.scan;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -22,18 +22,17 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
+import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
-import com.blackducksoftware.integration.hub.global.HubProxyInfo;
-import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
-public class ScanStatusService {
+public class ScanStatusDataService extends AbstractDataService {
 	private static final long FIVE_SECONDS = 5000;
 
 	private final IntLogger logger;
@@ -48,21 +47,12 @@ public class ScanStatusService {
 	private Set<String> scanSummariesLinks;
 	private String policyStatusLink;
 
-	public ScanStatusService(final HubServerConfig hubServerConfig, final IntLogger logger)
+	public ScanStatusDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
+			final IntLogger logger)
 			throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException {
+		super(restConnection, gson, jsonParser);
 		this.logger = logger;
 
-		final RestConnection restConnection = new RestConnection(hubServerConfig.getHubUrl().toString());
-		final HubProxyInfo proxyInfo = hubServerConfig.getProxyInfo();
-		if (proxyInfo.shouldUseProxyForUrl(hubServerConfig.getHubUrl())) {
-			restConnection.setProxyProperties(proxyInfo);
-		}
-
-		restConnection.setCookies(hubServerConfig.getGlobalCredentials().getUsername(),
-				hubServerConfig.getGlobalCredentials().getDecryptedPassword());
-
-		final Gson gson = new Gson();
-		final JsonParser jsonParser = new JsonParser();
 		projectRestService = new ProjectRestService(restConnection, gson, jsonParser);
 		projectVersionRestService = new ProjectVersionRestService(restConnection, gson, jsonParser);
 		codeLocationRestService = new CodeLocationRestService(restConnection, gson, jsonParser);
