@@ -41,6 +41,39 @@ public abstract class AbstractPolicyTransform extends AbstractNotificationTransf
 			final ProjectVersion projectVersion, final NotificationItem item,
 			final List<NotificationContentItem> templateData) throws HubItemTransformException;
 
+	protected void handleNotificationUsingBomComponentVersionPolicyStatusLink(
+			final List<ComponentVersionStatus> componentVersionList, final ProjectVersion projectVersion,
+			final NotificationItem item, final List<NotificationContentItem> templateData)
+			throws HubItemTransformException {
+		for (final ComponentVersionStatus componentVersion : componentVersionList) {
+			try {
+				final String componentVersionLink = componentVersion.getComponentVersionLink();
+				final String componentVersionName = getComponentVersionName(componentVersionLink);
+				final String policyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
+
+				if (StringUtils.isNotBlank(policyStatusUrl)) {
+					final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(policyStatusUrl);
+					List<String> ruleList = getRuleUrls(bomComponentVersionPolicyStatus
+							.getLinks(BomComponentVersionPolicyStatus.POLICY_RULE_URL));
+
+					ruleList = getMatchingRuleUrls(ruleList);
+					if (ruleList != null && !ruleList.isEmpty()) {
+						final List<PolicyRule> policyRuleList = new ArrayList<>();
+						for (final String ruleUrl : ruleList) {
+							final PolicyRule rule = getPolicyRule(ruleUrl);
+							policyRuleList.add(rule);
+						}
+						createContents(projectVersion, componentVersion.getComponentName(), componentVersionName,
+								componentVersion.getComponentId(), componentVersion.getComponentVersionId(),
+								policyRuleList, item, templateData);
+					}
+				}
+			} catch (final Exception e) {
+				throw new HubItemTransformException(e);
+			}
+		}
+	}
+
 	protected String getComponentVersionName(final String componentVersionLink)
 			throws NotificationServiceException, IOException, BDRestException, URISyntaxException {
 		String componentVersionName;

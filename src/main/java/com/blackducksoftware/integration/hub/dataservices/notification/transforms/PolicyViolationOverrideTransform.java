@@ -6,14 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
-import com.blackducksoftware.integration.hub.api.component.BomComponentVersionPolicyStatus;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
@@ -71,33 +68,8 @@ public class PolicyViolationOverrideTransform extends AbstractPolicyTransform {
 	public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
 			final ProjectVersion projectVersion, final NotificationItem item,
 			final List<NotificationContentItem> templateData) throws HubItemTransformException {
-		for (final ComponentVersionStatus componentVersion : componentVersionList) {
-			try {
-				final String componentVersionLink = componentVersion.getComponentVersionLink();
-				final String componentVersionName = getComponentVersionName(componentVersionLink);
-				final String policyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
-
-				if (StringUtils.isNotBlank(policyStatusUrl)) {
-					final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(policyStatusUrl);
-					List<String> ruleList = getRuleUrls(bomComponentVersionPolicyStatus
-							.getLinks(BomComponentVersionPolicyStatus.POLICY_RULE_URL));
-
-					ruleList = getMatchingRuleUrls(ruleList);
-					if (ruleList != null && !ruleList.isEmpty()) {
-						final List<PolicyRule> policyRuleList = new ArrayList<>();
-						for (final String ruleUrl : ruleList) {
-							final PolicyRule rule = getPolicyRule(ruleUrl);
-							policyRuleList.add(rule);
-						}
-						createContents(projectVersion, componentVersion.getComponentName(), componentVersionName,
-								componentVersion.getComponentId(), componentVersion.getComponentVersionId(),
-								policyRuleList, item, templateData);
-					}
-				}
-			} catch (final Exception e) {
-				throw new HubItemTransformException(e);
-			}
-		}
+		handleNotificationUsingBomComponentVersionPolicyStatusLink(componentVersionList, projectVersion, item,
+				templateData);
 	}
 
 	@Override
