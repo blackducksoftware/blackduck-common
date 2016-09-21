@@ -67,6 +67,36 @@ public class PolicyViolationClearedTransform extends AbstractPolicyTransform {
 		return templateData;
 	}
 
+	@Override
+	public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
+			final ProjectVersion projectVersion, final NotificationItem item,
+			final List<NotificationContentItem> templateData) throws HubItemTransformException {
+		for (final ComponentVersionStatus componentVersion : componentVersionList) {
+			try {
+				final String componentVersionLink = componentVersion.getComponentVersionLink();
+				final String componentVersionName = getComponentVersionName(componentVersionLink);
+				final List<String> policyIds = componentVersion.getPolicyIds();
+
+				if (policyIds != null) {
+					List<PolicyRule> ruleList = getRules(policyIds);
+
+					ruleList = getMatchingRules(ruleList);
+					if (ruleList != null && !ruleList.isEmpty()) {
+						final List<PolicyRule> policyRuleList = new ArrayList<PolicyRule>();
+						for (final PolicyRule rule : ruleList) {
+							policyRuleList.add(rule);
+						}
+						createContents(projectVersion, componentVersion.getComponentName(), componentVersionName,
+								componentVersion.getComponentId(), componentVersion.getComponentVersionId(),
+								policyRuleList, item, templateData);
+					}
+				}
+			} catch (final Exception e) {
+				throw new HubItemTransformException(e);
+			}
+		}
+	}
+
 	private ReleaseItem getReleaseItem(final String projectVersionLink)
 			throws IOException, BDRestException, URISyntaxException {
 		ReleaseItem releaseItem;
