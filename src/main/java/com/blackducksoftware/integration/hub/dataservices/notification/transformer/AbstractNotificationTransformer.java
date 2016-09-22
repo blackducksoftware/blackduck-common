@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.notification.transforms;
+package com.blackducksoftware.integration.hub.dataservices.notification.transformer;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import com.blackducksoftware.integration.hub.dataservices.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
-public abstract class AbstractNotificationTransform
+public abstract class AbstractNotificationTransformer
 		implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
 	private final NotificationRestService notificationService;
 	private final ProjectVersionRestService projectVersionService;
@@ -20,7 +20,7 @@ public abstract class AbstractNotificationTransform
 	private final VersionBomPolicyRestService bomVersionPolicyService;
 	private final ComponentVersionRestService componentVersionService;
 
-	public AbstractNotificationTransform(final NotificationRestService notificationService,
+	public AbstractNotificationTransformer(final NotificationRestService notificationService,
 			final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
 			final VersionBomPolicyRestService bomVersionPolicyService,
 			final ComponentVersionRestService componentVersionService) {
@@ -53,4 +53,5 @@ public abstract class AbstractNotificationTransform
 
 	@Override
 	public abstract List<NotificationContentItem> transform(NotificationItem item) throws HubItemTransformException;
+
 }

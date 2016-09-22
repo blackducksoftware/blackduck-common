@@ -4,7 +4,6 @@ import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
-import com.blackducksoftware.integration.hub.scan.status.ScanStatus;
 
 public class ScanSummaryItem extends HubItem {
 	private final ScanStatus status;

@@ -27,7 +27,7 @@ import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyOverrideContentItem;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationOverrideTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationOverrideTransformer;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 
@@ -48,7 +48,7 @@ public class PolicyOverrideTransformTest {
 	private PolicyRestService policyService;
 	private VersionBomPolicyRestService bomVersionPolicyService;
 	private ComponentVersionRestService componentVersionService;
-	private PolicyViolationOverrideTransform transformer;
+	private PolicyViolationOverrideTransformer transformer;
 
 	private NotificationRestService createNotificationService() {
 		final NotificationRestService service = Mockito.mock(NotificationRestService.class);
@@ -101,7 +101,7 @@ public class PolicyOverrideTransformTest {
 		policyService = createPolicyService();
 		bomVersionPolicyService = createBomVersionService();
 		componentVersionService = createComponentVersionService();
-		transformer = new PolicyViolationOverrideTransform(notificationService, projectVersionService, policyService,
+		transformer = new PolicyViolationOverrideTransformer(notificationService, projectVersionService, policyService,
 				bomVersionPolicyService, componentVersionService, new PolicyNotificationFilter(null));
 
 	}

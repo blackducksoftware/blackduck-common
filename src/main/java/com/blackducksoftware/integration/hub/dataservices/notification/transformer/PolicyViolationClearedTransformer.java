@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.notification.transforms;
+package com.blackducksoftware.integration.hub.dataservices.notification.transformer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -22,18 +22,14 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Pol
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationClearedContentItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
 
-public class PolicyViolationClearedTransform extends AbstractPolicyTransform {
-	private final IntLogger logger;
-
-	public PolicyViolationClearedTransform(final IntLogger logger, final NotificationRestService notificationService,
+public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer {
+	public PolicyViolationClearedTransformer(final NotificationRestService notificationService,
 			final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
 			final VersionBomPolicyRestService bomVersionPolicyService,
 			final ComponentVersionRestService componentVersionService, final PolicyNotificationFilter policyFilter) {
 		super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
 				componentVersionService, policyFilter);
-		this.logger = logger;
 	}
 
 	@Override
@@ -114,7 +110,6 @@ public class PolicyViolationClearedTransform extends AbstractPolicyTransform {
 				componentVersion,
 				componentId, componentVersionId,
 				policyRuleList);
-		logger.debug("createContents(): adding: " + contentItem);
 		templateData.add(contentItem);
 	}
 

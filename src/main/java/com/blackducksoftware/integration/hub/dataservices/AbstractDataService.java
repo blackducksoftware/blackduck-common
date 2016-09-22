@@ -26,4 +26,5 @@ public abstract class AbstractDataService {
 	public JsonParser getJsonParser() {
 		return jsonParser;
 	}
+
 }

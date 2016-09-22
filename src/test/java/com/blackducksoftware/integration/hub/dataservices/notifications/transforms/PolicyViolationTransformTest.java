@@ -28,7 +28,7 @@ import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationContentItem;
-import com.blackducksoftware.integration.hub.dataservices.notification.transforms.PolicyViolationTransform;
+import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationTransformer;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
@@ -50,7 +50,7 @@ public class PolicyViolationTransformTest {
 	private PolicyRestService policyService;
 	private VersionBomPolicyRestService bomVersionPolicyService;
 	private ComponentVersionRestService componentVersionService;
-	private PolicyViolationTransform transformer;
+	private PolicyViolationTransformer transformer;
 	private PolicyNotificationFilter policyNotificationFilter;
 
 	private NotificationRestService createNotificationService() {
@@ -128,7 +128,7 @@ public class PolicyViolationTransformTest {
 
 	@Test
 	public void testTransform() throws Exception {
-		transformer = new PolicyViolationTransform(notificationService, projectVersionService, policyService,
+		transformer = new PolicyViolationTransformer(notificationService, projectVersionService, policyService,
 				bomVersionPolicyService, componentVersionService, new PolicyNotificationFilter(null));
 
 		final List<NotificationContentItem> itemList = transformer.transform(createNotificationItem());
@@ -151,7 +151,7 @@ public class PolicyViolationTransformTest {
 		final List<String> ruleLinksToInclude = new ArrayList<>();
 		ruleLinksToInclude.add("FakeRule");
 
-		transformer = new PolicyViolationTransform(notificationService, projectVersionService, policyService,
+		transformer = new PolicyViolationTransformer(notificationService, projectVersionService, policyService,
 				bomVersionPolicyService, componentVersionService, new PolicyNotificationFilter(ruleLinksToInclude));
 
 		final List<NotificationContentItem> itemList = transformer.transform(createNotificationItem());
@@ -163,7 +163,7 @@ public class PolicyViolationTransformTest {
 		final List<String> ruleLinksToInclude = new ArrayList<>();
 		ruleLinksToInclude.add(POLICY_LINK);
 
-		transformer = new PolicyViolationTransform(notificationService, projectVersionService, policyService,
+		transformer = new PolicyViolationTransformer(notificationService, projectVersionService, policyService,
 				bomVersionPolicyService, componentVersionService, new PolicyNotificationFilter(ruleLinksToInclude));
 
 		final List<NotificationContentItem> itemList = transformer.transform(createNotificationItem());

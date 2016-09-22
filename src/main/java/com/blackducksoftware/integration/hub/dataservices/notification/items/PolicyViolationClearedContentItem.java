@@ -19,10 +19,20 @@ public class PolicyViolationClearedContentItem extends PolicyViolationContentIte
 
 	@Override
 	public String toString() {
-		return "PolicyViolationClearedContentItem [getPolicyRuleList()=" + getPolicyRuleList()
-				+ ", getProjectVersion()=" + getProjectVersion() + ", getComponentName()=" + getComponentName()
-				+ ", getComponentVersion()=" + getComponentVersion() + ", getComponentId()=" + getComponentId()
-				+ ", getComponentVersionId()=" + getComponentVersionId() + ", getCreatedAt()=" + getCreatedAt() + "]";
+		final StringBuilder builder = new StringBuilder();
+		builder.append("PolicyViolationClearedContentItem [projectVersion=");
+		builder.append(getProjectVersion());
+		builder.append(", componentName=");
+		builder.append(getComponentName());
+		builder.append(", componentVersion=");
+		builder.append(getComponentVersion());
+		builder.append(", componentId=");
+		builder.append(getComponentId());
+		builder.append(", componentVersionId=");
+		builder.append(getComponentVersionId());
+		builder.append(", policyRuleList=");
+		builder.append(getPolicyRuleList());
+		builder.append("]");
+		return builder.toString();
 	}
-
 }

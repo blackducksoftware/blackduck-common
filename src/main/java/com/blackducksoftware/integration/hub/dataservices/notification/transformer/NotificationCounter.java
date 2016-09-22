@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.notification.transforms;
+package com.blackducksoftware.integration.hub.dataservices.notification.transformer;
 
 import java.util.Map;
 
@@ -35,4 +35,5 @@ public class NotificationCounter {
 			return builder;
 		}
 	}
+
 }

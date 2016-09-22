@@ -3,7 +3,6 @@ package com.blackducksoftware.integration.hub.dataservices.notification.items;
 import java.util.List;
 
 public class PolicyNotificationFilter {
-
 	private final List<String> ruleLinksToInclude;
 
 	public PolicyNotificationFilter(final List<String> ruleLinksToInclude) {
@@ -22,4 +21,5 @@ public class PolicyNotificationFilter {
 		builder.append("]");
 		return builder.toString();
 	}
+
 }

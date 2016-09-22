@@ -3,9 +3,12 @@ package com.blackducksoftware.integration.hub.api;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.restlet.data.Method;
 
@@ -15,10 +18,11 @@ import com.blackducksoftware.integration.hub.api.notification.RuleViolationClear
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.json.RuntimeTypeAdapterFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
@@ -26,19 +30,10 @@ import com.google.gson.reflect.TypeToken;
 public class NotificationRestService extends HubRestService<NotificationItem> {
 	private final List<String> getNotificationSegments = Arrays.asList(UrlConstants.SEGMENT_API,
 			UrlConstants.SEGMENT_NOTIFICATIONS);
+	private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();
 
 	private final static Gson createGsonInstance() {
 		final GsonBuilder gsonBuilder = new GsonBuilder();
-
-		final RuntimeTypeAdapterFactory<NotificationItem> modelClassTypeAdapter = RuntimeTypeAdapterFactory
-				.of(NotificationItem.class, "type");
-		// When new notification types need to be supported this method needs to
-		// register the new notification type to be supported here.
-		modelClassTypeAdapter.registerSubtype(VulnerabilityNotificationItem.class, "VULNERABILITY");
-		modelClassTypeAdapter.registerSubtype(RuleViolationNotificationItem.class, "RULE_VIOLATION");
-		modelClassTypeAdapter.registerSubtype(PolicyOverrideNotificationItem.class, "POLICY_OVERRIDE");
-		modelClassTypeAdapter.registerSubtype(RuleViolationClearedNotificationItem.class, "RULE_VIOLATION_CLEARED");
-		gsonBuilder.registerTypeAdapterFactory(modelClassTypeAdapter);
 		gsonBuilder.setDateFormat(RestConnection.JSON_DATE_FORMAT);
 		return gsonBuilder.create();
 	}
@@ -47,6 +42,11 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 		super(restConnection, createGsonInstance(), jsonParser, new TypeToken<NotificationItem>() {
 		}.getType(), new TypeToken<List<NotificationItem>>() {
 		}.getType());
+
+		typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);
+		typeMap.put("RULE_VIOLATION", RuleViolationNotificationItem.class);
+		typeMap.put("POLICY_OVERRIDE", PolicyOverrideNotificationItem.class);
+		typeMap.put("RULE_VIOLATION_CLEARED", RuleViolationClearedNotificationItem.class);
 	}
 
 	public List<NotificationItem> getAllNotifications(final Date startDate, final Date endDate, final int limit)
@@ -65,6 +65,22 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 
 		final JsonObject jsonObject = notificationItemRequest.executeForResponseJson();
 		final List<NotificationItem> allNotificationItems = getAll(jsonObject, notificationItemRequest);
+		return allNotificationItems;
+	}
+
+	@Override
+	public List<NotificationItem> getItems(final JsonObject jsonObject) {
+		final JsonArray jsonArray = jsonObject.get("items").getAsJsonArray();
+		final List<NotificationItem> allNotificationItems = new ArrayList<>(jsonArray.size());
+		for (final JsonElement jsonElement : jsonArray) {
+			final String type = jsonElement.getAsJsonObject().get("type").getAsString();
+			Class<? extends NotificationItem> clazz = NotificationItem.class;
+			if (typeMap.containsKey(type)) {
+				clazz = typeMap.get(type);
+			}
+			allNotificationItems.add(getGson().fromJson(jsonElement, clazz));
+		}
+
 		return allNotificationItems;
 	}
 

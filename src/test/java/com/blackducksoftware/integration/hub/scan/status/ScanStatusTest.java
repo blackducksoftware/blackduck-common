@@ -27,6 +27,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.scan.ScanStatus;
+
 public class ScanStatusTest {
 
 	@Test

@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.scan.ScanStatus;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
