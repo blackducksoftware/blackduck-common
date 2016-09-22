@@ -76,16 +76,13 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 		final int createdAtComparison = getCreatedAt().compareTo(o.getCreatedAt());
 		if (createdAtComparison != 0) {
 			// If createdAt times are different, use createdAt to compare
-			System.out.println("\tResult (based solely on createdAt): " + createdAtComparison);
 			return createdAtComparison;
 		}
 		// If createdAt values are identical, see if they are truly equal
 		if (equals(o)) {
-			System.out.println("\tResult (the two are identical): " + 0);
 			return 0;
 		}
 		// Identify same-time non-equal items as non-equal
-		System.out.println("\tResult (same createdAt, different in some other field): " + 1);
 		return 1;
 	}
 
