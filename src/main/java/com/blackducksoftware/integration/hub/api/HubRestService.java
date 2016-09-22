@@ -51,6 +51,10 @@ public class HubRestService<T extends HubItem> {
 		return allItems;
 	}
 
+	public T getItem(final JsonObject jsonObject, final Class<T> clazz) {
+		return gson.fromJson(jsonObject, clazz);
+	}
+
 	public List<T> getItems(final JsonObject jsonObject) {
 		final List<T> items = gson.fromJson(jsonObject.get("items"), itemListType);
 		return items;

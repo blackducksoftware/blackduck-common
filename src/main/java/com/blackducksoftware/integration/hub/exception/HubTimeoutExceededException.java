@@ -21,24 +21,22 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.exception;
 
-import org.restlet.resource.ClientResource;
+public class HubTimeoutExceededException extends HubIntegrationException {
+	private static final long serialVersionUID = -7752926384289205234L;
 
-public class ResourceDoesNotExistException extends Exception {
-	private static final long serialVersionUID = -2759478991725526223L;
-	private final ClientResource resource;
+	public HubTimeoutExceededException() {
+	}
 
-	public ResourceDoesNotExistException(final String message, final ClientResource resource) {
+	public HubTimeoutExceededException(final String message) {
 		super(message);
-		this.resource = resource;
 	}
 
-	public ResourceDoesNotExistException(final String message, final Throwable cause, final ClientResource resource) {
+	public HubTimeoutExceededException(final Throwable cause) {
+		super(cause);
+	}
+
+	public HubTimeoutExceededException(final String message, final Throwable cause) {
 		super(message, cause);
-		this.resource = resource;
-	}
-
-	public ClientResource getResource() {
-		return resource;
 	}
 
 }

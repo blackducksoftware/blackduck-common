@@ -39,9 +39,13 @@ import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
-import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusChecker;
+import com.blackducksoftware.integration.hub.dataservices.codelocation.CodeLocationDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
+import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
+import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
+import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -130,9 +134,15 @@ public class HubEventPolling {
 	 * seconds, until they have all have status COMPLETE. We keep trying until
 	 * we hit the maximum wait time. If we find a scan history object that has
 	 * status cancelled or an error type then we throw an exception.
+	 *
+	 * @throws HubTimeoutExceededException
+	 * @throws UnexpectedHubResponseException
+	 * @throws MissingUUIDException
+	 * @throws ProjectDoesNotExistException
 	 */
 	public void assertBomUpToDate(final HubReportGenerationInfo hubReportGenerationInfo, final IntLogger logger)
-			throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
+			throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException,
+			ProjectDoesNotExistException, MissingUUIDException, UnexpectedHubResponseException {
 		if (StringUtils.isBlank(hubReportGenerationInfo.getScanStatusDirectory())) {
 			throw new HubIntegrationException("The scan status directory must be a non empty value.");
 		}
@@ -180,10 +190,11 @@ public class HubEventPolling {
 		statusDirectory.delete();
 
 		final long timeoutInSeconds = hubReportGenerationInfo.getMaximumWaitTime();
+		final CodeLocationDataService codeLocationDataService = new CodeLocationDataService(service.getRestConnection(),
+				service.getGson(), service.getJsonParser());
 		final ScanSummaryRestService scanSummaryRestService = service.getScanSummaryRestService();
-		final ScanStatusChecker statusChecker = new ScanStatusChecker(logger, scanSummaryRestService, scanSummaryItems,
-				timeoutInSeconds);
-		statusChecker.waitForCompleteScans();
+		codeLocationDataService.assertBomImportScansFinished(scanSummaryRestService, scanSummaryItems,
+				timeoutInSeconds * 1000);
 	}
 
 	/**

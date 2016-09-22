@@ -139,6 +139,14 @@ public class HubIntRestService {
 		return restConnection;
 	}
 
+	public Gson getGson() {
+		return gson;
+	}
+
+	public JsonParser getJsonParser() {
+		return jsonParser;
+	}
+
 	/**
 	 * The proxy settings get set as System properties. I.E. https.proxyHost,
 	 * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts

@@ -12,6 +12,7 @@ public class UrlConstants {
 	public static final String SEGMENT_VERSIONS = "versions";
 	public static final String SEGMENT_VULNERABILITIES = "vulnerabilities";
 	public static final String SEGMENT_POLICY_RULES = "policy-rules";
+	public static final String SEGMENT_POLICY_STATUS = "policy-status";
 
 	// query parameters
 	public static final String QUERY_OFFSET = "offset";

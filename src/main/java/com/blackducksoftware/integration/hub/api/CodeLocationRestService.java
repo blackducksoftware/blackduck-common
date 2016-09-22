@@ -37,14 +37,12 @@ public class CodeLocationRestService extends HubRestService<CodeLocationItem> {
 		return allCodeLocations;
 	}
 
-	public List<CodeLocationItem> getImportedCodeLocations(final String groupId, final String artifactId,
-			final String version) throws IOException, BDRestException, URISyntaxException {
-		final String gav = groupId + "/" + artifactId + "/" + version;
+	public List<CodeLocationItem> getAllCodeLocationsForCodeLocationType(final CodeLocationTypeEnum codeLocationType)
+			throws IOException, BDRestException, URISyntaxException {
 		final HubRequest codeLocationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
 		codeLocationItemRequest.setMethod(Method.GET);
 		codeLocationItemRequest.setLimit(100);
-		codeLocationItemRequest.setQ(gav);
-		codeLocationItemRequest.addQueryParameter("codeLocationType", CodeLocationTypeEnum.BOM_IMPORT.toString());
+		codeLocationItemRequest.addQueryParameter("codeLocationType", codeLocationType.toString());
 		codeLocationItemRequest.addUrlSegments(getCodeLocationsSegments);
 
 		final JsonObject jsonObject = codeLocationItemRequest.executeForResponseJson();
