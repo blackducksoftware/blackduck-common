@@ -99,11 +99,10 @@ public class NotificationDataService extends AbstractDataService {
 						bomVersionPolicyService, componentVersionService, policyFilter));
 	}
 
-	public SortedSet<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate,
-			final int limit)
-					throws IOException, URISyntaxException, BDRestException {
+	public SortedSet<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
+			throws IOException, URISyntaxException, BDRestException {
 		final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
-		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate, limit);
+		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
 
 		int submitted = 0;
 		for (final NotificationItem item : itemList) {
@@ -129,11 +128,11 @@ public class NotificationDataService extends AbstractDataService {
 		return contentList;
 	}
 
-	public List<ProjectAggregateData> getNotificationCounts(final Date startDate, final Date endDate, final int limit)
+	public List<ProjectAggregateData> getNotificationCounts(final Date startDate, final Date endDate)
 			throws IOException, URISyntaxException, BDRestException, InterruptedException {
 		final Map<String, ProjectAggregateBuilder> projectCounterMap = new ConcurrentHashMap<>();
 		final NotificationCounter counter = new NotificationCounter(projectCounterMap);
-		final Set<NotificationContentItem> itemList = getAllNotifications(startDate, endDate, limit);
+		final Set<NotificationContentItem> itemList = getAllNotifications(startDate, endDate);
 		for (final NotificationContentItem item : itemList) {
 			counter.count(item);
 		}
