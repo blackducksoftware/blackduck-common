@@ -64,7 +64,7 @@ public class NotificationDataService extends AbstractDataService {
 		super(restConnection, gson, jsonParser);
 		this.policyFilter = policyFilter;
 
-		notificationService = new NotificationRestService(restConnection, jsonParser);
+		notificationService = new NotificationRestService(restConnection, gson, jsonParser);
 		projectVersionService = new ProjectVersionRestService(restConnection, gson, jsonParser);
 		policyService = new PolicyRestService(restConnection, gson, jsonParser);
 		bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);

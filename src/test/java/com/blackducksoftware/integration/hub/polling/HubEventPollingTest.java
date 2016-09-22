@@ -39,10 +39,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
-import com.blackducksoftware.integration.hub.api.PolicyStatusRestService;
-import com.blackducksoftware.integration.hub.api.ProjectRestService;
 import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
-import com.blackducksoftware.integration.hub.api.UserRestService;
+import com.blackducksoftware.integration.hub.api.factory.ServiceFactory;
 import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
@@ -55,6 +53,7 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.test.TestLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 
 public class HubEventPollingTest {
 	@Rule
@@ -95,15 +94,13 @@ public class HubEventPollingTest {
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
 				.thenReturn(new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta));
 
-		final HubIntRestService restService = constructMockedService(scanSummaryRestService);
+		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final Gson gson = new Gson();
+		final JsonParser jsonParser = new JsonParser();
+		final ServiceFactory serviceFactory = new ServiceFactory(restConnection, gson, jsonParser);
+		serviceFactory.setScanSummaryRestService(scanSummaryRestService);
 
-		Mockito.when(restService.checkScanStatus(Mockito.anyString())).then(new Answer<ScanSummaryItem>() {
-			@Override
-			public ScanSummaryItem answer(final InvocationOnMock invocation) throws Throwable {
-				final ScanSummaryItem status = new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta);
-				return status;
-			}
-		});
+		final HubIntRestService restService = new HubIntRestService(serviceFactory);
 		final HubEventPolling eventPoller = new HubEventPolling(restService);
 		final TestLogger logger = new TestLogger();
 
@@ -153,16 +150,13 @@ public class HubEventPollingTest {
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
 				.thenReturn(new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, _meta));
 
-		final HubIntRestService restService = constructMockedService(scanSummaryRestService);
+		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final Gson gson = new Gson();
+		final JsonParser jsonParser = new JsonParser();
+		final ServiceFactory serviceFactory = new ServiceFactory(restConnection, gson, jsonParser);
+		serviceFactory.setScanSummaryRestService(scanSummaryRestService);
 
-		Mockito.when(restService.checkScanStatus(Mockito.anyString())).then(new Answer<ScanSummaryItem>() {
-			@Override
-			public ScanSummaryItem answer(final InvocationOnMock invocation) throws Throwable {
-				final MetaInformation meta = new MetaInformation(null, "link", null);
-				final ScanSummaryItem status = new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, meta);
-				return status;
-			}
-		});
+		final HubIntRestService restService = new HubIntRestService(serviceFactory);
 		final HubEventPolling eventPoller = new HubEventPolling(restService);
 		final TestLogger logger = new TestLogger();
 
@@ -203,16 +197,13 @@ public class HubEventPollingTest {
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
 				.thenReturn(new ScanSummaryItem(ScanStatus.ERROR, null, null, null, _meta));
 
-		final HubIntRestService restService = constructMockedService(scanSummaryRestService);
+		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final Gson gson = new Gson();
+		final JsonParser jsonParser = new JsonParser();
+		final ServiceFactory serviceFactory = new ServiceFactory(restConnection, gson, jsonParser);
+		serviceFactory.setScanSummaryRestService(scanSummaryRestService);
 
-		Mockito.when(restService.checkScanStatus(Mockito.anyString())).then(new Answer<ScanSummaryItem>() {
-			@Override
-			public ScanSummaryItem answer(final InvocationOnMock invocation) throws Throwable {
-				final MetaInformation meta = new MetaInformation(null, "link", null);
-				final ScanSummaryItem status = new ScanSummaryItem(ScanStatus.ERROR, null, null, null, meta);
-				return status;
-			}
-		});
+		final HubIntRestService restService = new HubIntRestService(serviceFactory);
 		final HubEventPolling eventPoller = new HubEventPolling(restService);
 		final TestLogger logger = new TestLogger();
 
@@ -672,17 +663,6 @@ public class HubEventPollingTest {
 		});
 		final HubEventPolling eventPoller = new HubEventPolling(restService);
 		eventPoller.isReportFinishedGenerating("", maximumWait);
-	}
-
-	private HubIntRestService constructMockedService(final ScanSummaryRestService scanSummaryRestService) {
-		final RestConnection restConnection = new RestConnection("FakeHubUrl");
-		final ProjectRestService projectRestService = Mockito.mock(ProjectRestService.class);
-		final UserRestService userRestService = Mockito.mock(UserRestService.class);
-		final PolicyStatusRestService policyStatusRestService = Mockito.mock(PolicyStatusRestService.class);
-
-		final HubIntRestService service = new HubIntRestService(restConnection, projectRestService, userRestService,
-				policyStatusRestService, scanSummaryRestService);
-		return service;
 	}
 
 }

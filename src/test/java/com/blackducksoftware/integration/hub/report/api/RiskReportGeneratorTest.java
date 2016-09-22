@@ -40,10 +40,8 @@ import org.mockito.stubbing.Answer;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.PolicyStatusRestService;
-import com.blackducksoftware.integration.hub.api.ProjectRestService;
 import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
-import com.blackducksoftware.integration.hub.api.UserRestService;
+import com.blackducksoftware.integration.hub.api.factory.ServiceFactory;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
 import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
@@ -64,7 +62,7 @@ import com.blackducksoftware.integration.hub.meta.MetaLink;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.test.TestLogger;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 
 public class RiskReportGeneratorTest {
 	@Rule
@@ -82,7 +80,13 @@ public class RiskReportGeneratorTest {
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
 				.thenReturn(new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta));
 
-		HubIntRestService service = constructMockedService(scanSummaryRestService);
+		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final Gson gson = new Gson();
+		final JsonParser jsonParser = new JsonParser();
+		final ServiceFactory serviceFactory = new ServiceFactory(restConnection, gson, jsonParser);
+		serviceFactory.setScanSummaryRestService(scanSummaryRestService);
+
+		HubIntRestService service = new HubIntRestService(serviceFactory);
 		service = Mockito.spy(service);
 
 		final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
@@ -97,8 +101,6 @@ public class RiskReportGeneratorTest {
 
 		generatorInfo.setScanStatusDirectory(scanStatusDirectory.getCanonicalPath());
 		final File file = new File(scanStatusDirectory, "scanStatus.txt");
-
-		final Gson gson = new Gson();
 
 		final FileWriter writer = new FileWriter(file);
 		writer.write(gson.toJson(statusBuilding));
@@ -152,7 +154,13 @@ public class RiskReportGeneratorTest {
 		final ScanSummaryItem statusComplete = new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta);
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString())).thenReturn(statusComplete);
 
-		HubIntRestService service = constructMockedService(scanSummaryRestService);
+		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final Gson gson = new Gson();
+		final JsonParser jsonParser = new JsonParser();
+		final ServiceFactory serviceFactory = new ServiceFactory(restConnection, gson, jsonParser);
+		serviceFactory.setScanSummaryRestService(scanSummaryRestService);
+
+		HubIntRestService service = new HubIntRestService(serviceFactory);
 		service = Mockito.spy(service);
 
 		final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
@@ -169,7 +177,6 @@ public class RiskReportGeneratorTest {
 		final File file = new File(scanStatusDirectory, "scanStatus.txt");
 
 		final ScanSummaryItem statusBuilding = new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, _meta);
-		final Gson gson = new GsonBuilder().create();
 
 		final FileWriter writer = new FileWriter(file);
 		writer.write(gson.toJson(statusBuilding));
@@ -210,7 +217,13 @@ public class RiskReportGeneratorTest {
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
 				.thenReturn(new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta));
 
-		HubIntRestService service = constructMockedService(scanSummaryRestService);
+		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final Gson gson = new Gson();
+		final JsonParser jsonParser = new JsonParser();
+		final ServiceFactory serviceFactory = new ServiceFactory(restConnection, gson, jsonParser);
+		serviceFactory.setScanSummaryRestService(scanSummaryRestService);
+
+		HubIntRestService service = new HubIntRestService(serviceFactory);
 		service = Mockito.spy(service);
 
 		final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
@@ -225,8 +238,6 @@ public class RiskReportGeneratorTest {
 
 		generatorInfo.setScanStatusDirectory(scanStatusDirectory.getCanonicalPath());
 		final File file = new File(scanStatusDirectory, "scanStatus.txt");
-
-		final Gson gson = new Gson();
 
 		final FileWriter writer = new FileWriter(file);
 		writer.write(gson.toJson(statusBuilding));
@@ -265,7 +276,13 @@ public class RiskReportGeneratorTest {
 		final ScanSummaryItem statusBuilding = new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, _meta);
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString())).thenReturn(statusBuilding);
 
-		HubIntRestService service = constructMockedService(scanSummaryRestService);
+		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final Gson gson = new Gson();
+		final JsonParser jsonParser = new JsonParser();
+		final ServiceFactory serviceFactory = new ServiceFactory(restConnection, gson, jsonParser);
+		serviceFactory.setScanSummaryRestService(scanSummaryRestService);
+
+		HubIntRestService service = new HubIntRestService(serviceFactory);
 		service = Mockito.spy(service);
 
 		final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
@@ -280,8 +297,6 @@ public class RiskReportGeneratorTest {
 
 		generatorInfo.setScanStatusDirectory(scanStatusDirectory.getCanonicalPath());
 		final File file = new File(scanStatusDirectory, "scanStatus.txt");
-
-		final Gson gson = new Gson();
 
 		final FileWriter writer = new FileWriter(file);
 		writer.write(gson.toJson(statusBuilding));
@@ -707,17 +722,6 @@ public class RiskReportGeneratorTest {
 
 		final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
 		generator.generateHubReport(logger, null).getReport();
-	}
-
-	private HubIntRestService constructMockedService(final ScanSummaryRestService scanSummaryRestService) {
-		final RestConnection restConnection = new RestConnection("FakeHubUrl");
-		final ProjectRestService projectRestService = Mockito.mock(ProjectRestService.class);
-		final UserRestService userRestService = Mockito.mock(UserRestService.class);
-		final PolicyStatusRestService policyStatusRestService = Mockito.mock(PolicyStatusRestService.class);
-
-		final HubIntRestService service = new HubIntRestService(restConnection, projectRestService, userRestService,
-				policyStatusRestService, scanSummaryRestService);
-		return service;
 	}
 
 }

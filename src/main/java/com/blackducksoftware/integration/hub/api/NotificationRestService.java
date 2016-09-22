@@ -20,7 +20,6 @@ import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotif
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -32,14 +31,8 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 			UrlConstants.SEGMENT_NOTIFICATIONS);
 	private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();
 
-	private final static Gson createGsonInstance() {
-		final GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.setDateFormat(RestConnection.JSON_DATE_FORMAT);
-		return gsonBuilder.create();
-	}
-
-	public NotificationRestService(final RestConnection restConnection, final JsonParser jsonParser) {
-		super(restConnection, createGsonInstance(), jsonParser, new TypeToken<NotificationItem>() {
+	public NotificationRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+		super(restConnection, gson, jsonParser, new TypeToken<NotificationItem>() {
 		}.getType(), new TypeToken<List<NotificationItem>>() {
 		}.getType());
 

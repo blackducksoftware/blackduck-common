@@ -39,11 +39,14 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.util.Series;
 
+import com.blackducksoftware.integration.hub.api.CodeLocationRestService;
 import com.blackducksoftware.integration.hub.api.PolicyStatusRestService;
 import com.blackducksoftware.integration.hub.api.ProjectRestService;
+import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.UserRestService;
 import com.blackducksoftware.integration.hub.api.VersionComparison;
+import com.blackducksoftware.integration.hub.api.factory.ServiceFactory;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
@@ -75,32 +78,29 @@ import com.google.gson.reflect.TypeToken;
 public class HubIntRestService {
 	private final RestConnection restConnection;
 
-	private final Gson gson = new Gson();
-	private final JsonParser jsonParser = new JsonParser();
+	private final Gson gson;
+	private final JsonParser jsonParser;
 
-	private final ProjectRestService projectRestService;
-	private final UserRestService userRestService;
-	private final PolicyStatusRestService policyStatusRestService;
-	private final ScanSummaryRestService scanSummaryRestService;
+	private final ServiceFactory serviceFactory;
 
 	public HubIntRestService(final RestConnection restConnection) throws URISyntaxException {
 		this.restConnection = restConnection;
 
-		this.projectRestService = new ProjectRestService(restConnection, gson, jsonParser);
-		this.userRestService = new UserRestService(restConnection, gson, jsonParser);
-		this.policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
-		this.scanSummaryRestService = new ScanSummaryRestService(restConnection, gson, jsonParser);
+		final GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.setDateFormat(RestConnection.JSON_DATE_FORMAT);
+		this.gson = gsonBuilder.create();
+
+		this.jsonParser = new JsonParser();
+
+		serviceFactory = new ServiceFactory(restConnection, gson, jsonParser);
 	}
 
-	public HubIntRestService(final RestConnection restConnection, final ProjectRestService projectRestService,
-			final UserRestService userRestService, final PolicyStatusRestService policyStatusRestService,
-			final ScanSummaryRestService scanSummaryRestService) {
-		this.restConnection = restConnection;
+	public HubIntRestService(final ServiceFactory serviceFactory) {
+		this.restConnection = serviceFactory.getRestConnection();
+		this.gson = serviceFactory.getGson();
+		this.jsonParser = serviceFactory.getJsonParser();
 
-		this.projectRestService = projectRestService;
-		this.userRestService = userRestService;
-		this.policyStatusRestService = policyStatusRestService;
-		this.scanSummaryRestService = scanSummaryRestService;
+		this.serviceFactory = serviceFactory;
 	}
 
 	/**
@@ -133,18 +133,6 @@ public class HubIntRestService {
 	@Deprecated
 	public String getBaseUrl() {
 		return getRestConnection().getBaseUrl();
-	}
-
-	public RestConnection getRestConnection() {
-		return restConnection;
-	}
-
-	public Gson getGson() {
-		return gson;
-	}
-
-	public JsonParser getJsonParser() {
-		return jsonParser;
 	}
 
 	/**
@@ -212,7 +200,7 @@ public class HubIntRestService {
 	 */
 	public List<ProjectItem> getProjectMatches(final String projectName)
 			throws IOException, BDRestException, URISyntaxException {
-		return projectRestService.getAllProjectMatches(projectName);
+		return serviceFactory.getProjectRestService().getAllProjectMatches(projectName);
 	}
 
 	/**
@@ -222,7 +210,7 @@ public class HubIntRestService {
 	 */
 	public List<ProjectItem> getProjectMatches(final String projectName, final int limit)
 			throws IOException, BDRestException, URISyntaxException {
-		return projectRestService.getProjectMatches(projectName, limit);
+		return serviceFactory.getProjectRestService().getProjectMatches(projectName, limit);
 	}
 
 	/**
@@ -231,11 +219,11 @@ public class HubIntRestService {
 	 */
 	public ProjectItem getProjectByName(final String projectName)
 			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
-		return projectRestService.getProjectByName(projectName);
+		return serviceFactory.getProjectRestService().getProjectByName(projectName);
 	}
 
 	public ProjectItem getProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
-		return projectRestService.getProject(projectUrl);
+		return serviceFactory.getProjectRestService().getProject(projectUrl);
 	}
 
 	public ReleaseItem getProjectVersion(final String versionUrl)
@@ -667,7 +655,7 @@ public class HubIntRestService {
 		if (StringUtils.isBlank(policyStatusUrl)) {
 			throw new IllegalArgumentException("Missing the policy status URL.");
 		}
-		return policyStatusRestService.getItem(policyStatusUrl);
+		return serviceFactory.getPolicyStatusRestService().getItem(policyStatusUrl);
 	}
 
 	/**
@@ -675,7 +663,7 @@ public class HubIntRestService {
 	 */
 	public ScanSummaryItem checkScanStatus(final String scanStatusUrl)
 			throws IOException, BDRestException, URISyntaxException {
-		return scanSummaryRestService.getItem(scanStatusUrl);
+		return serviceFactory.getScanSummaryRestService().getItem(scanStatusUrl);
 	}
 
 	/**
@@ -721,20 +709,44 @@ public class HubIntRestService {
 		resource.release();
 	}
 
+	public RestConnection getRestConnection() {
+		return restConnection;
+	}
+
+	public Gson getGson() {
+		return gson;
+	}
+
+	public JsonParser getJsonParser() {
+		return jsonParser;
+	}
+
+	public ServiceFactory getServiceFactory() {
+		return serviceFactory;
+	}
+
 	public ProjectRestService getProjectRestService() {
-		return projectRestService;
+		return serviceFactory.getProjectRestService();
+	}
+
+	public ProjectVersionRestService getProjectVersionRestService() {
+		return serviceFactory.getProjectVersionRestService();
 	}
 
 	public UserRestService getUserRestService() {
-		return userRestService;
+		return serviceFactory.getUserRestService();
+	}
+
+	public CodeLocationRestService getCodeLocationRestService() {
+		return serviceFactory.getCodeLocationRestService();
 	}
 
 	public PolicyStatusRestService getPolicyStatusRestService() {
-		return policyStatusRestService;
+		return serviceFactory.getPolicyStatusRestService();
 	}
 
 	public ScanSummaryRestService getScanSummaryRestService() {
-		return scanSummaryRestService;
+		return serviceFactory.getScanSummaryRestService();
 	}
 
 }

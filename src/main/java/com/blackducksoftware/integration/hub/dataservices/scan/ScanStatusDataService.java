@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.codelocation;
+package com.blackducksoftware.integration.hub.dataservices.scan;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -29,11 +29,23 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
-public class CodeLocationDataService extends AbstractDataService {
+public class ScanStatusDataService extends AbstractDataService {
 	private static final long FIVE_SECONDS = 5 * 1000;
 
-	public CodeLocationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+	private final ProjectRestService projectRestService;
+	private final ProjectVersionRestService projectVersionRestService;
+	private final CodeLocationRestService codeLocationRestService;
+	private final ScanSummaryRestService scanSummaryRestService;
+
+	public ScanStatusDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
+			final ProjectRestService projectRestService, final ProjectVersionRestService projectVersionRestService,
+			final CodeLocationRestService codeLocationRestService,
+			final ScanSummaryRestService scanSummaryRestService) {
 		super(restConnection, gson, jsonParser);
+		this.projectRestService = projectRestService;
+		this.projectVersionRestService = projectVersionRestService;
+		this.codeLocationRestService = codeLocationRestService;
+		this.scanSummaryRestService = scanSummaryRestService;
 	}
 
 	/**
@@ -65,17 +77,14 @@ public class CodeLocationDataService extends AbstractDataService {
 	 * @throws HubTimeoutExceededException
 	 * @throws InterruptedException
 	 */
-	public void assertBomImportScanStartedThenFinished(final ProjectRestService projectRestService,
-			final ProjectVersionRestService projectVersionRestService,
-			final CodeLocationRestService codeLocationRestService, final ScanSummaryRestService scanSummaryRestService,
-			final String projectName, final String projectVersion, final long scanStartedTimeoutInMilliseconds,
-			final long scanFinishedTimeoutInMilliseconds, final IntLogger logger)
+	public void assertBomImportScanStartedThenFinished(final String projectName, final String projectVersion,
+			final long scanStartedTimeoutInMilliseconds, final long scanFinishedTimeoutInMilliseconds,
+			final IntLogger logger)
 			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, MissingUUIDException,
 			UnexpectedHubResponseException, HubIntegrationException, HubTimeoutExceededException, InterruptedException {
-		final List<ScanSummaryItem> pendingScans = waitForPendingScansToStart(projectRestService,
-				projectVersionRestService, codeLocationRestService, scanSummaryRestService, projectName, projectVersion,
+		final List<ScanSummaryItem> pendingScans = waitForPendingScansToStart(projectName, projectVersion,
 				scanStartedTimeoutInMilliseconds);
-		waitForScansToComplete(scanSummaryRestService, pendingScans, scanFinishedTimeoutInMilliseconds);
+		waitForScansToComplete(pendingScans, scanFinishedTimeoutInMilliseconds);
 	}
 
 	/**
@@ -97,46 +106,40 @@ public class CodeLocationDataService extends AbstractDataService {
 	 * @throws UnexpectedHubResponseException
 	 * @throws HubTimeoutExceededException
 	 */
-	public void assertBomImportScansFinished(final ScanSummaryRestService scanSummaryRestService,
-			final List<ScanSummaryItem> pendingScans, final long scanFinishedTimeoutInMilliseconds)
-			throws InterruptedException, IOException, BDRestException, URISyntaxException, HubIntegrationException,
-			ProjectDoesNotExistException, MissingUUIDException, UnexpectedHubResponseException,
-			HubTimeoutExceededException {
-		waitForScansToComplete(scanSummaryRestService, pendingScans, scanFinishedTimeoutInMilliseconds);
+	public void assertBomImportScansFinished(final List<ScanSummaryItem> pendingScans,
+			final long scanFinishedTimeoutInMilliseconds) throws InterruptedException, IOException, BDRestException,
+			URISyntaxException, HubIntegrationException, ProjectDoesNotExistException, MissingUUIDException,
+			UnexpectedHubResponseException, HubTimeoutExceededException {
+		waitForScansToComplete(pendingScans, scanFinishedTimeoutInMilliseconds);
 	}
 
-	private List<ScanSummaryItem> waitForPendingScansToStart(final ProjectRestService projectRestService,
-			final ProjectVersionRestService projectVersionRestService,
-			final CodeLocationRestService codeLocationRestService, final ScanSummaryRestService scanSummaryRestService,
-			final String projectName, final String projectVersion, final long scanStartedTimeoutInMilliseconds)
+	private List<ScanSummaryItem> waitForPendingScansToStart(final String projectName, final String projectVersion,
+			final long scanStartedTimeoutInMilliseconds)
 			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, MissingUUIDException,
 			UnexpectedHubResponseException, HubIntegrationException, HubTimeoutExceededException, InterruptedException {
-		List<ScanSummaryItem> pendingScans = getPendingScans(projectRestService, projectVersionRestService,
-				codeLocationRestService, scanSummaryRestService, projectName, projectVersion);
+		List<ScanSummaryItem> pendingScans = getPendingScans(projectName, projectVersion);
 		final long startedTime = System.currentTimeMillis();
 		boolean pendingScansOk = pendingScans.size() > 0;
 		while (!done(pendingScansOk, scanStartedTimeoutInMilliseconds, startedTime,
 				"No scan has started within the specified wait time: %d minutes")) {
 			Thread.sleep(FIVE_SECONDS);
-			pendingScans = getPendingScans(projectRestService, projectVersionRestService, codeLocationRestService,
-					scanSummaryRestService, projectName, projectVersion);
+			pendingScans = getPendingScans(projectName, projectVersion);
 			pendingScansOk = pendingScans.size() > 0;
 		}
 
 		return pendingScans;
 	}
 
-	private void waitForScansToComplete(final ScanSummaryRestService scanSummaryRestService,
-			List<ScanSummaryItem> pendingScans, final long scanStartedTimeoutInMilliseconds)
+	private void waitForScansToComplete(List<ScanSummaryItem> pendingScans, final long scanStartedTimeoutInMilliseconds)
 			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, MissingUUIDException,
 			UnexpectedHubResponseException, HubIntegrationException, HubTimeoutExceededException, InterruptedException {
-		pendingScans = getPendingScans(scanSummaryRestService, pendingScans);
+		pendingScans = getPendingScans(pendingScans);
 		final long startedTime = System.currentTimeMillis();
 		boolean pendingScansOk = pendingScans.isEmpty();
 		while (!done(pendingScansOk, scanStartedTimeoutInMilliseconds, startedTime,
 				"The pending scans have not completed within the specified wait time: %d minutes")) {
 			Thread.sleep(FIVE_SECONDS);
-			pendingScans = getPendingScans(scanSummaryRestService, pendingScans);
+			pendingScans = getPendingScans(pendingScans);
 			pendingScansOk = pendingScans.isEmpty();
 		}
 	}
@@ -160,10 +163,7 @@ public class CodeLocationDataService extends AbstractDataService {
 		return elapsed > timeoutInMilliseconds;
 	}
 
-	private List<ScanSummaryItem> getPendingScans(final ProjectRestService projectRestService,
-			final ProjectVersionRestService projectVersionRestService,
-			final CodeLocationRestService codeLocationRestService, final ScanSummaryRestService scanSummaryRestService,
-			final String projectName, final String projectVersion)
+	private List<ScanSummaryItem> getPendingScans(final String projectName, final String projectVersion)
 			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, MissingUUIDException,
 			UnexpectedHubResponseException, HubIntegrationException {
 		final ProjectItem projectItem = projectRestService.getProjectByName(projectName);
@@ -201,8 +201,7 @@ public class CodeLocationDataService extends AbstractDataService {
 		return pendingScans;
 	}
 
-	private List<ScanSummaryItem> getPendingScans(final ScanSummaryRestService scanSummaryRestService,
-			final List<ScanSummaryItem> scanSummaries)
+	private List<ScanSummaryItem> getPendingScans(final List<ScanSummaryItem> scanSummaries)
 			throws InterruptedException, IOException, BDRestException, URISyntaxException, HubIntegrationException {
 		final List<ScanSummaryItem> pendingScans = new ArrayList<>();
 		for (final ScanSummaryItem scanSummaryItem : scanSummaries) {

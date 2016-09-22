@@ -33,13 +33,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
-import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
-import com.blackducksoftware.integration.hub.dataservices.codelocation.CodeLocationDataService;
+import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
@@ -190,11 +189,8 @@ public class HubEventPolling {
 		statusDirectory.delete();
 
 		final long timeoutInSeconds = hubReportGenerationInfo.getMaximumWaitTime();
-		final CodeLocationDataService codeLocationDataService = new CodeLocationDataService(service.getRestConnection(),
-				service.getGson(), service.getJsonParser());
-		final ScanSummaryRestService scanSummaryRestService = service.getScanSummaryRestService();
-		codeLocationDataService.assertBomImportScansFinished(scanSummaryRestService, scanSummaryItems,
-				timeoutInSeconds * 1000);
+		final ScanStatusDataService scanStatusDataService = service.getServiceFactory().getScanStatusDataService();
+		scanStatusDataService.assertBomImportScansFinished(scanSummaryItems, timeoutInSeconds * 1000);
 	}
 
 	/**

@@ -23,12 +23,13 @@ public class PolicyStatusDataService extends AbstractDataService {
 	private final ProjectVersionRestService projectVersionRestService;
 	private final PolicyStatusRestService policyStatusRestService;
 
-	public PolicyStatusDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+	public PolicyStatusDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
+			final ProjectRestService projectRestService, final ProjectVersionRestService projectVersionRestService,
+			final PolicyStatusRestService policyStatusRestService) {
 		super(restConnection, gson, jsonParser);
-
-		this.projectRestService = new ProjectRestService(restConnection, gson, jsonParser);
-		this.projectVersionRestService = new ProjectVersionRestService(restConnection, gson, jsonParser);
-		this.policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
+		this.projectRestService = projectRestService;
+		this.projectVersionRestService = projectVersionRestService;
+		this.policyStatusRestService = policyStatusRestService;
 	}
 
 	public PolicyStatusItem getPolicyStatusForProjectAndVersion(final String projectName, final String projectVersion)
