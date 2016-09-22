@@ -166,36 +166,43 @@ public class ScanStatusDataService extends AbstractDataService {
 	private List<ScanSummaryItem> getPendingScans(final String projectName, final String projectVersion)
 			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, MissingUUIDException,
 			UnexpectedHubResponseException, HubIntegrationException {
-		final ProjectItem projectItem = projectRestService.getProjectByName(projectName);
-		final String projectId = projectItem.getProjectId().toString();
+		List<ScanSummaryItem> pendingScans = new ArrayList<>();
+		try {
+			final ProjectItem projectItem = projectRestService.getProjectByName(projectName);
+			final String projectId = projectItem.getProjectId().toString();
 
-		final ReleaseItem releaseItem = projectVersionRestService
-				.getProjectVersionByName(projectItem.getProjectId().toString(), projectVersion);
-		final String versionId = releaseItem.getVersionId().toString();
+			final ReleaseItem releaseItem = projectVersionRestService
+					.getProjectVersionByName(projectItem.getProjectId().toString(), projectVersion);
+			final String versionId = releaseItem.getVersionId().toString();
 
-		final List<CodeLocationItem> allCodeLocations = codeLocationRestService
-				.getAllCodeLocationsForCodeLocationType(CodeLocationTypeEnum.BOM_IMPORT);
+			final List<CodeLocationItem> allCodeLocations = codeLocationRestService
+					.getAllCodeLocationsForCodeLocationType(CodeLocationTypeEnum.BOM_IMPORT);
 
-		final List<String> allScanSummariesLinks = new ArrayList<>();
-		for (final CodeLocationItem codeLocationItem : allCodeLocations) {
-			final String projectVersionLink = codeLocationItem.getMappedProjectVersion();
-			final String scanSummariesLink = codeLocationItem.getLink("scans");
-			if (StringUtils.isNotBlank(projectVersionLink) && projectVersionLink.contains(projectId)
-					&& projectVersionLink.contains(versionId)) {
-				allScanSummariesLinks.add(scanSummariesLink);
+			final List<String> allScanSummariesLinks = new ArrayList<>();
+			for (final CodeLocationItem codeLocationItem : allCodeLocations) {
+				final String projectVersionLink = codeLocationItem.getMappedProjectVersion();
+				final String scanSummariesLink = codeLocationItem.getLink("scans");
+				if (StringUtils.isNotBlank(projectVersionLink) && projectVersionLink.contains(projectId)
+						&& projectVersionLink.contains(versionId)) {
+					allScanSummariesLinks.add(scanSummariesLink);
+				}
 			}
-		}
 
-		final List<ScanSummaryItem> allScanSummaries = new ArrayList<>();
-		for (final String scanSummaryLink : allScanSummariesLinks) {
-			allScanSummaries.addAll(scanSummaryRestService.getAllScanSummaryItems(scanSummaryLink));
-		}
-
-		final List<ScanSummaryItem> pendingScans = new ArrayList<>();
-		for (final ScanSummaryItem scanSummaryItem : allScanSummaries) {
-			if (scanSummaryItem.getStatus().isPending()) {
-				pendingScans.add(scanSummaryItem);
+			final List<ScanSummaryItem> allScanSummaries = new ArrayList<>();
+			for (final String scanSummaryLink : allScanSummariesLinks) {
+				allScanSummaries.addAll(scanSummaryRestService.getAllScanSummaryItems(scanSummaryLink));
 			}
+
+			pendingScans = new ArrayList<>();
+			for (final ScanSummaryItem scanSummaryItem : allScanSummaries) {
+				if (scanSummaryItem.getStatus().isPending()) {
+					pendingScans.add(scanSummaryItem);
+				}
+			}
+		} catch (final Exception e) {
+			pendingScans = new ArrayList<>();
+			// ignore, since we might not have found a project or version, etc
+			// so just keep waiting until the timeout
 		}
 
 		return pendingScans;
