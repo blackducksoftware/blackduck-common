@@ -64,14 +64,24 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 	}
 
 	@Override
+	public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
+			final ProjectVersion projectVersion, final NotificationItem item,
+			final List<NotificationContentItem> templateData) throws HubItemTransformException {
+		handleNotificationUsingBomComponentVersionPolicyStatusLink(componentVersionList, projectVersion, item,
+				templateData);
+	}
+
+	@Override
 	public void createContents(final ProjectVersion projectVersion, final String componentName,
 			final String componentVersion, final UUID componentId, final UUID componentVersionId,
 			final List<PolicyRule> policyRuleList, final NotificationItem item,
 			final List<NotificationContentItem> templateData) {
 		final PolicyOverrideNotificationItem policyOverride = (PolicyOverrideNotificationItem) item;
-		templateData.add(new PolicyOverrideContentItem(projectVersion, componentName, componentVersion, componentId,
-				componentVersionId, policyRuleList, policyOverride.getContent().getFirstName(),
-				policyOverride.getContent().getLastName()));
+
+		templateData.add(new PolicyOverrideContentItem(item.getCreatedAt(), projectVersion, componentName,
+				componentVersion, componentId,
+				componentVersionId,
+				policyRuleList, policyOverride.getContent().getFirstName(), policyOverride.getContent().getLastName()));
 	}
 
 }

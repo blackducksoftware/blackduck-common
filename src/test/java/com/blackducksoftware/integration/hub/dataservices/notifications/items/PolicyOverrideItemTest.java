@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ public class PolicyOverrideItemTest {
 		policyRules.add(policy1);
 		policyRules.add(policy2);
 
-		final PolicyOverrideContentItem item = new PolicyOverrideContentItem(projectVersion, componentName,
+		final PolicyOverrideContentItem item = new PolicyOverrideContentItem(new Date(), projectVersion, componentName,
 				componentVersion, componentId, componentVersionId, policyRules, firstName, lastName);
 
 		assertEquals(projectVersion, item.getProjectVersion());

@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +31,8 @@ public class RuleViolationClearedItemTest {
 		policyRules.add(policy1);
 		policyRules.add(policy2);
 
-		final PolicyViolationContentItem item = new PolicyViolationContentItem(projectVersion, componentName,
+		final PolicyViolationContentItem item = new PolicyViolationContentItem(new Date(), projectVersion,
+				componentName,
 				componentVersion, componentId, componentVersionId, policyRules);
 
 		assertEquals(projectVersion, item.getProjectVersion());

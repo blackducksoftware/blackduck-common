@@ -19,7 +19,8 @@ public class RuleViolationClearedNotificationItem extends NotificationItem {
 
 	@Override
 	public String toString() {
-		return "RuleViolationNotificationItem [content=" + content + ", contentType=" + contentType + ", type=" + type
+		return "RuleViolationClearedNotificationItem [content=" + content + ", contentType=" + contentType + ", type="
+				+ type
 				+ ", createdAt=" + createdAt + ", Meta=" + getMeta() + "]";
 	}
 }

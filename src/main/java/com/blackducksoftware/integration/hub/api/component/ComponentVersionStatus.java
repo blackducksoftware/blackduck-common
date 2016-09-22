@@ -21,6 +21,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.component;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +41,8 @@ public class ComponentVersionStatus {
 
 	@SerializedName("bomComponentVersionPolicyStatus")
 	private String bomComponentVersionPolicyStatusLink;
+
+	private List<String> policyIds;
 
 	public String getComponentName() {
 		return componentName;
@@ -65,6 +68,14 @@ public class ComponentVersionStatus {
 		this.bomComponentVersionPolicyStatusLink = bomComponentVersionPolicyStatusLink;
 	}
 
+	public List<String> getPolicyIds() {
+		return policyIds;
+	}
+
+	private void setPolicyIds(final List<String> policyIds) {
+		this.policyIds = policyIds;
+	}
+
 	public UUID getComponentId() throws MissingUUIDException {
 		if (StringUtils.isBlank(getComponentVersionLink())
 				&& StringUtils.isBlank(getBomComponentVersionPolicyStatusLink())) {
@@ -87,8 +98,8 @@ public class ComponentVersionStatus {
 
 	@Override
 	public String toString() {
-		return "ComponentVersionStatus [componentName=" + componentName + ", componentVersion=" + componentVersionLink
-				+ ", bomComponentVersionPolicyStatusLink=" + bomComponentVersionPolicyStatusLink + "]";
+		return "ComponentVersionStatus [componentName=" + componentName + ", componentVersionLink="
+				+ componentVersionLink + ", bomComponentVersionPolicyStatusLink=" + bomComponentVersionPolicyStatusLink
+				+ ", policyIds=" + policyIds + "]";
 	}
-
 }

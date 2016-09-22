@@ -42,14 +42,15 @@ public class ProjectAggregateTest {
 		final PolicyRule rule = new PolicyRule(null, "aRule", "", true, true, null, "", "", "", "");
 		final List<PolicyRule> ruleList = new ArrayList<>();
 		ruleList.add(rule);
-		final PolicyViolationContentItem violationContent = new PolicyViolationContentItem(projectVersion,
+		final PolicyViolationContentItem violationContent = new PolicyViolationContentItem(new Date(), projectVersion,
 				componentName, componentVersion, componentId, componentVersionId, ruleList);
-		final PolicyOverrideContentItem overrideContent = new PolicyOverrideContentItem(projectVersion, componentName,
+		final PolicyOverrideContentItem overrideContent = new PolicyOverrideContentItem(new Date(), projectVersion,
+				componentName,
 				componentVersion, componentId, componentVersionId, ruleList, firstName, lastName);
 
 		final List<VulnerabilitySourceQualifiedId> sourceIdList = new ArrayList<>();
 		sourceIdList.add(new VulnerabilitySourceQualifiedId("source", "id"));
-		final VulnerabilityContentItem vulnerabilityContent = new VulnerabilityContentItem(projectVersion,
+		final VulnerabilityContentItem vulnerabilityContent = new VulnerabilityContentItem(new Date(), projectVersion,
 				componentName, componentVersion, componentId, componentVersionId, sourceIdList, sourceIdList,
 				sourceIdList);
 		violationList.add(violationContent);

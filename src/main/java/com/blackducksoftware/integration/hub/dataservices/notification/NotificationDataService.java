@@ -7,6 +7,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -39,11 +42,13 @@ import com.blackducksoftware.integration.hub.dataservices.notification.transform
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationTransformer;
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
 public class NotificationDataService extends AbstractDataService {
+	private final IntLogger logger;
 	private final NotificationRestService notificationService;
 	private final ProjectVersionRestService projectVersionService;
 	private final PolicyRestService policyService;
@@ -55,13 +60,16 @@ public class NotificationDataService extends AbstractDataService {
 	private PolicyNotificationFilter policyFilter = null;
 	private final VulnerabilityRestService vulnerabilityRestService;
 
-	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		this(restConnection, gson, jsonParser, null);
+	public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
+			final JsonParser jsonParser) {
+		this(logger, restConnection, gson, jsonParser, null);
 	}
 
-	public NotificationDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
+	public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
+			final JsonParser jsonParser,
 			final PolicyNotificationFilter policyFilter) {
 		super(restConnection, gson, jsonParser);
+		this.logger = logger;
 		this.policyFilter = policyFilter;
 
 		notificationService = new NotificationRestService(restConnection, gson, jsonParser);
@@ -91,9 +99,9 @@ public class NotificationDataService extends AbstractDataService {
 						bomVersionPolicyService, componentVersionService, policyFilter));
 	}
 
-	public List<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
+	public SortedSet<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
 			throws IOException, URISyntaxException, BDRestException {
-		final List<NotificationContentItem> contentList = new ArrayList<>();
+		final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
 		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
 
 		int submitted = 0;
@@ -110,9 +118,10 @@ public class NotificationDataService extends AbstractDataService {
 		for (int index = 0; index < submitted; index++) {
 			try {
 				final Future<List<NotificationContentItem>> future = completionService.take();
-				contentList.addAll(future.get());
+				final List<NotificationContentItem> contentItems = future.get();
+				contentList.addAll(contentItems);
 			} catch (final ExecutionException | InterruptedException e) {
-
+				logger.error(e.getMessage(), e);
 			}
 		}
 
@@ -123,7 +132,7 @@ public class NotificationDataService extends AbstractDataService {
 			throws IOException, URISyntaxException, BDRestException, InterruptedException {
 		final Map<String, ProjectAggregateBuilder> projectCounterMap = new ConcurrentHashMap<>();
 		final NotificationCounter counter = new NotificationCounter(projectCounterMap);
-		final List<NotificationContentItem> itemList = getAllNotifications(startDate, endDate);
+		final Set<NotificationContentItem> itemList = getAllNotifications(startDate, endDate);
 		for (final NotificationContentItem item : itemList) {
 			counter.count(item);
 		}

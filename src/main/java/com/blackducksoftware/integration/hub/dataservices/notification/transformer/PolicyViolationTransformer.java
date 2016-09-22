@@ -57,6 +57,15 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 		return templateData;
 	}
 
+	@Override
+	public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
+			final ProjectVersion projectVersion, final NotificationItem item,
+			final List<NotificationContentItem> templateData) throws HubItemTransformException {
+		handleNotificationUsingBomComponentVersionPolicyStatusLink(componentVersionList, projectVersion, item,
+				templateData);
+	}
+
+
 	private ReleaseItem getReleaseItem(final String projectVersionLink)
 			throws IOException, BDRestException, URISyntaxException {
 		ReleaseItem releaseItem;
@@ -69,7 +78,8 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 			final String componentVersion, final UUID componentId, final UUID componentVersionId,
 			final List<PolicyRule> policyRuleList, final NotificationItem item,
 			final List<NotificationContentItem> templateData) {
-		templateData.add(new PolicyViolationContentItem(projectVersion, componentName, componentVersion, componentId,
+		templateData.add(new PolicyViolationContentItem(item.getCreatedAt(), projectVersion, componentName,
+				componentVersion, componentId,
 				componentVersionId, policyRuleList));
 	}
 

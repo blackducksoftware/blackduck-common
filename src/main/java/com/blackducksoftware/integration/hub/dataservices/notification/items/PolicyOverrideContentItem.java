@@ -1,5 +1,6 @@
 package com.blackducksoftware.integration.hub.dataservices.notification.items;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,12 +12,13 @@ public class PolicyOverrideContentItem extends PolicyViolationContentItem {
 	private final String firstName;
 	private final String lastName;
 
-	public PolicyOverrideContentItem(final ProjectVersion projectVersion,
+	public PolicyOverrideContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
 			final String componentVersion, final UUID componentId, final UUID componentVersionId,
 			final List<PolicyRule> policyRuleList, final String firstName,
 			final String lastName) {
-		super(projectVersion, componentName, componentVersion, componentId, componentVersionId, policyRuleList);
+		super(createdAt, projectVersion, componentName, componentVersion, componentId, componentVersionId,
+				policyRuleList);
 		this.firstName = firstName;
 		this.lastName = lastName;
 	}

@@ -83,6 +83,15 @@ public class HubRestService<T extends HubItem> {
 		return getGson().fromJson(response, itemType);
 	}
 
+	public T getItem(final List<String> urlSegments) throws IOException, BDRestException, URISyntaxException {
+		final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
+		itemRequest.setMethod(Method.GET);
+		itemRequest.addUrlSegments(urlSegments);
+
+		final String response = itemRequest.executeForResponseString();
+		return getGson().fromJson(response, itemType);
+	}
+
 	public RestConnection getRestConnection() {
 		return restConnection;
 	}

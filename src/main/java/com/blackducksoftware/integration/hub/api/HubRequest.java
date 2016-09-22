@@ -65,7 +65,8 @@ public class HubRequest {
 				final String responseString = restConnection.readResponseAsString(response);
 				return responseString;
 			} else {
-				final String message = String.format("Request was not successful. (responseCode: %s)", responseCode);
+				final String message = String.format("Request was not successful. (responseCode: %s): %s",
+						responseCode, clientResource.toString());
 				throw new BDRestException(message, clientResource);
 			}
 		} finally {
