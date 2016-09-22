@@ -40,7 +40,6 @@ import org.mockito.stubbing.Answer;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
-import com.blackducksoftware.integration.hub.api.factory.ServiceFactory;
 import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
@@ -53,7 +52,6 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.test.TestLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
 
 public class HubEventPollingTest {
 	@Rule
@@ -95,12 +93,9 @@ public class HubEventPollingTest {
 				.thenReturn(new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta));
 
 		final RestConnection restConnection = new RestConnection("FakeHubUrl");
-		final Gson gson = new Gson();
-		final JsonParser jsonParser = new JsonParser();
-		final ServiceFactory serviceFactory = new ServiceFactory(restConnection, gson, jsonParser);
-		serviceFactory.setScanSummaryRestService(scanSummaryRestService);
+		final HubIntRestService restService = new HubIntRestService(restConnection);
+		restService.setScanSummaryRestService(scanSummaryRestService);
 
-		final HubIntRestService restService = new HubIntRestService(serviceFactory);
 		final HubEventPolling eventPoller = new HubEventPolling(restService);
 		final TestLogger logger = new TestLogger();
 
@@ -128,7 +123,7 @@ public class HubEventPollingTest {
 	@Test
 	public void testIsBomUpToDateStatusFilesNotUpToDate() throws Exception {
 		exception.expect(HubIntegrationException.class);
-		exception.expectMessage("The Bom has not finished updating from the scan within the specified wait time :");
+		exception.expectMessage("The pending scans have not completed within the specified wait time:");
 
 		final MetaInformation meta = new MetaInformation(null, "link", null);
 		final ScanSummaryItem status1 = new ScanSummaryItem(ScanStatus.REQUESTED_MATCH_JOB, null, null, null, meta);
@@ -151,12 +146,9 @@ public class HubEventPollingTest {
 				.thenReturn(new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, _meta));
 
 		final RestConnection restConnection = new RestConnection("FakeHubUrl");
-		final Gson gson = new Gson();
-		final JsonParser jsonParser = new JsonParser();
-		final ServiceFactory serviceFactory = new ServiceFactory(restConnection, gson, jsonParser);
-		serviceFactory.setScanSummaryRestService(scanSummaryRestService);
+		final HubIntRestService restService = new HubIntRestService(restConnection);
+		restService.setScanSummaryRestService(scanSummaryRestService);
 
-		final HubIntRestService restService = new HubIntRestService(serviceFactory);
 		final HubEventPolling eventPoller = new HubEventPolling(restService);
 		final TestLogger logger = new TestLogger();
 
@@ -167,7 +159,7 @@ public class HubEventPollingTest {
 		scanTargets.add("3");
 		hubReportGenerationInfo.setScanTargets(scanTargets);
 		hubReportGenerationInfo.setScanStatusDirectory(scanStatusDir.getCanonicalPath());
-		hubReportGenerationInfo.setMaximumWaitTime(15000);
+		hubReportGenerationInfo.setMaximumWaitTime(1000);
 
 		eventPoller.assertBomUpToDate(hubReportGenerationInfo, logger);
 	}
@@ -198,12 +190,9 @@ public class HubEventPollingTest {
 				.thenReturn(new ScanSummaryItem(ScanStatus.ERROR, null, null, null, _meta));
 
 		final RestConnection restConnection = new RestConnection("FakeHubUrl");
-		final Gson gson = new Gson();
-		final JsonParser jsonParser = new JsonParser();
-		final ServiceFactory serviceFactory = new ServiceFactory(restConnection, gson, jsonParser);
-		serviceFactory.setScanSummaryRestService(scanSummaryRestService);
+		final HubIntRestService restService = new HubIntRestService(restConnection);
+		restService.setScanSummaryRestService(scanSummaryRestService);
 
-		final HubIntRestService restService = new HubIntRestService(serviceFactory);
 		final HubEventPolling eventPoller = new HubEventPolling(restService);
 		final TestLogger logger = new TestLogger();
 

@@ -188,9 +188,9 @@ public class HubEventPolling {
 		}
 		statusDirectory.delete();
 
-		final long timeoutInSeconds = hubReportGenerationInfo.getMaximumWaitTime();
-		final ScanStatusDataService scanStatusDataService = service.getServiceFactory().getScanStatusDataService();
-		scanStatusDataService.assertBomImportScansFinished(scanSummaryItems, timeoutInSeconds * 1000);
+		final long timeoutInMilliseconds = hubReportGenerationInfo.getMaximumWaitTime();
+		final ScanStatusDataService scanStatusDataService = service.getScanStatusDataService();
+		scanStatusDataService.assertBomImportScansFinished(scanSummaryItems, timeoutInMilliseconds);
 	}
 
 	/**

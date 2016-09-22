@@ -40,13 +40,17 @@ import org.restlet.resource.ClientResource;
 import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.hub.api.CodeLocationRestService;
+import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
+import com.blackducksoftware.integration.hub.api.NotificationRestService;
+import com.blackducksoftware.integration.hub.api.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.PolicyStatusRestService;
 import com.blackducksoftware.integration.hub.api.ProjectRestService;
 import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.UserRestService;
+import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.VersionComparison;
-import com.blackducksoftware.integration.hub.api.factory.ServiceFactory;
+import com.blackducksoftware.integration.hub.api.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
@@ -57,6 +61,8 @@ import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanLocationResults;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
+import com.blackducksoftware.integration.hub.dataservices.policystatus.PolicyStatusDataService;
+import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
@@ -76,12 +82,21 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 public class HubIntRestService {
-	private final RestConnection restConnection;
-
+	private RestConnection restConnection;
 	private final Gson gson;
 	private final JsonParser jsonParser;
 
-	private final ServiceFactory serviceFactory;
+	private CodeLocationRestService codeLocationRestService;
+	private ComponentVersionRestService componentVersionRestService;
+	private NotificationRestService notificationRestService;
+	private PolicyRestService policyRestService;
+	private PolicyStatusRestService policyStatusRestService;
+	private ProjectRestService projectRestService;
+	private ProjectVersionRestService projectVersionRestService;
+	private ScanSummaryRestService scanSummaryRestService;
+	private UserRestService userRestService;
+	private VersionBomPolicyRestService versionBomPolicyRestService;
+	private VulnerabilityRestService vulnerabilityRestService;
 
 	public HubIntRestService(final RestConnection restConnection) throws URISyntaxException {
 		this.restConnection = restConnection;
@@ -92,15 +107,17 @@ public class HubIntRestService {
 
 		this.jsonParser = new JsonParser();
 
-		serviceFactory = new ServiceFactory(restConnection, gson, jsonParser);
-	}
-
-	public HubIntRestService(final ServiceFactory serviceFactory) {
-		this.restConnection = serviceFactory.getRestConnection();
-		this.gson = serviceFactory.getGson();
-		this.jsonParser = serviceFactory.getJsonParser();
-
-		this.serviceFactory = serviceFactory;
+		this.codeLocationRestService = new CodeLocationRestService(restConnection, gson, jsonParser);
+		this.componentVersionRestService = new ComponentVersionRestService(restConnection, gson, jsonParser);
+		this.notificationRestService = new NotificationRestService(restConnection, gson, jsonParser);
+		this.policyRestService = new PolicyRestService(restConnection, gson, jsonParser);
+		this.policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
+		this.projectRestService = new ProjectRestService(restConnection, gson, jsonParser);
+		this.projectVersionRestService = new ProjectVersionRestService(restConnection, gson, jsonParser);
+		this.scanSummaryRestService = new ScanSummaryRestService(restConnection, gson, jsonParser);
+		this.userRestService = new UserRestService(restConnection, gson, jsonParser);
+		this.versionBomPolicyRestService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
+		this.vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
 	}
 
 	/**
@@ -200,7 +217,7 @@ public class HubIntRestService {
 	 */
 	public List<ProjectItem> getProjectMatches(final String projectName)
 			throws IOException, BDRestException, URISyntaxException {
-		return serviceFactory.getProjectRestService().getAllProjectMatches(projectName);
+		return getProjectRestService().getAllProjectMatches(projectName);
 	}
 
 	/**
@@ -210,7 +227,7 @@ public class HubIntRestService {
 	 */
 	public List<ProjectItem> getProjectMatches(final String projectName, final int limit)
 			throws IOException, BDRestException, URISyntaxException {
-		return serviceFactory.getProjectRestService().getProjectMatches(projectName, limit);
+		return getProjectRestService().getProjectMatches(projectName, limit);
 	}
 
 	/**
@@ -219,11 +236,11 @@ public class HubIntRestService {
 	 */
 	public ProjectItem getProjectByName(final String projectName)
 			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
-		return serviceFactory.getProjectRestService().getProjectByName(projectName);
+		return getProjectRestService().getProjectByName(projectName);
 	}
 
 	public ProjectItem getProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
-		return serviceFactory.getProjectRestService().getProject(projectUrl);
+		return getProjectRestService().getProject(projectUrl);
 	}
 
 	public ReleaseItem getProjectVersion(final String versionUrl)
@@ -236,7 +253,6 @@ public class HubIntRestService {
 
 			if (getRestConnection().isSuccess(responseCode)) {
 				final String response = getRestConnection().readResponseAsString(resource.getResponse());
-				final Gson gson = new GsonBuilder().create();
 				return gson.fromJson(response, ReleaseItem.class);
 			} else {
 				throw new BDRestException("There was a problem getting the version. Error Code: " + responseCode,
@@ -280,9 +296,7 @@ public class HubIntRestService {
 			if (getRestConnection().isSuccess(responseCode)) {
 				final String response = getRestConnection().readResponseAsString(resource.getResponse());
 
-				final Gson gson = new GsonBuilder().create();
-				final JsonParser parser = new JsonParser();
-				final JsonObject json = parser.parse(response).getAsJsonObject();
+				final JsonObject json = jsonParser.parse(response).getAsJsonObject();
 				final List<ReleaseItem> versions = gson.fromJson(json.get("items"), new TypeToken<List<ReleaseItem>>() {
 				}.getType());
 
@@ -328,7 +342,6 @@ public class HubIntRestService {
 		urlSegments.add("projects");
 
 		final ProjectItem newProject = new ProjectItem(projectName, null, null);
-		final Gson gson = new GsonBuilder().create();
 		final StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
 		stringRep.setMediaType(MediaType.APPLICATION_JSON);
 		stringRep.setCharacterSet(CharacterSet.UTF_8);
@@ -353,7 +366,6 @@ public class HubIntRestService {
 			final String dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
 		final ReleaseItem newRelease = new ReleaseItem(versionName, phase, dist, null, null);
 
-		final Gson gson = new GsonBuilder().create();
 		final StringRepresentation stringRep = new StringRepresentation(gson.toJson(newRelease));
 		stringRep.setMediaType(MediaType.APPLICATION_JSON);
 		stringRep.setCharacterSet(CharacterSet.UTF_8);
@@ -418,7 +430,6 @@ public class HubIntRestService {
 
 			if (getRestConnection().isSuccess(responseCode)) {
 				final String response = getRestConnection().readResponseAsString(resource.getResponse());
-				final Gson gson = new GsonBuilder().create();
 				final VersionComparison comparison = gson.fromJson(response, VersionComparison.class);
 				return comparison;
 			} else {
@@ -471,7 +482,7 @@ public class HubIntRestService {
 
 				if (getRestConnection().isSuccess(responseCode)) {
 					final String response = getRestConnection().readResponseAsString(resource.getResponse());
-					final ScanLocationResults results = new Gson().fromJson(response, ScanLocationResults.class);
+					final ScanLocationResults results = gson.fromJson(response, ScanLocationResults.class);
 					final ScanLocationItem currentCodeLocation = getScanLocationMatch(hostname, correctedTargetPath,
 							results);
 					if (currentCodeLocation == null) {
@@ -540,7 +551,6 @@ public class HubIntRestService {
 			json.add("categories", categoriesJson);
 		}
 
-		final Gson gson = new GsonBuilder().create();
 		final StringRepresentation stringRep = new StringRepresentation(gson.toJson(json));
 		stringRep.setMediaType(MediaType.APPLICATION_JSON);
 		stringRep.setCharacterSet(CharacterSet.UTF_8);
@@ -596,7 +606,7 @@ public class HubIntRestService {
 
 			if (getRestConnection().isSuccess(responseCode)) {
 				final String response = getRestConnection().readResponseAsString(resource.getResponse());
-				return new Gson().fromJson(response, ReportInformationItem.class);
+				return gson.fromJson(response, ReportInformationItem.class);
 			} else {
 				throw new BDRestException(
 						"There was a problem getting the links for the specified report. Error Code: " + responseCode,
@@ -623,10 +633,7 @@ public class HubIntRestService {
 			if (getRestConnection().isSuccess(responseCode)) {
 				final String response = getRestConnection().readResponseAsString(resource.getResponse());
 
-				final Gson gson = new GsonBuilder().create();
-
-				final JsonParser parser = new JsonParser();
-				final JsonObject json = parser.parse(response).getAsJsonObject();
+				final JsonObject json = jsonParser.parse(response).getAsJsonObject();
 				final JsonElement content = json.get("reportContent");
 				final JsonArray reportConentArray = content.getAsJsonArray();
 				final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
@@ -636,8 +643,7 @@ public class HubIntRestService {
 				return report;
 			} else if (responseCode == 412) {
 				final String response = getRestConnection().readResponseAsString(resource.getResponse());
-				final JsonParser parser = new JsonParser();
-				final JsonObject json = parser.parse(response).getAsJsonObject();
+				final JsonObject json = jsonParser.parse(response).getAsJsonObject();
 				final String errorMessage = json.get("errorMessage").getAsString();
 				throw new BDRestException(errorMessage + " Error Code: " + responseCode, resource);
 			} else {
@@ -655,7 +661,7 @@ public class HubIntRestService {
 		if (StringUtils.isBlank(policyStatusUrl)) {
 			throw new IllegalArgumentException("Missing the policy status URL.");
 		}
-		return serviceFactory.getPolicyStatusRestService().getItem(policyStatusUrl);
+		return getPolicyStatusRestService().getItem(policyStatusUrl);
 	}
 
 	/**
@@ -663,7 +669,7 @@ public class HubIntRestService {
 	 */
 	public ScanSummaryItem checkScanStatus(final String scanStatusUrl)
 			throws IOException, BDRestException, URISyntaxException {
-		return serviceFactory.getScanSummaryRestService().getItem(scanStatusUrl);
+		return getScanSummaryRestService().getItem(scanStatusUrl);
 	}
 
 	/**
@@ -687,8 +693,7 @@ public class HubIntRestService {
 			final int responseCode = resource.getResponse().getStatus().getCode();
 			if (responseCode == 200) {
 				final String response = getRestConnection().readResponseAsString(resource.getResponse());
-				final JsonParser parser = new JsonParser();
-				final JsonElement je = parser.parse(response);
+				final JsonElement je = jsonParser.parse(response);
 				final JsonObject jo = je.getAsJsonObject();
 				final JsonElement je2 = jo.get("registrationId");
 				final String regId = je2.getAsString();
@@ -713,6 +718,10 @@ public class HubIntRestService {
 		return restConnection;
 	}
 
+	public void setRestConnection(final RestConnection restConnection) {
+		this.restConnection = restConnection;
+	}
+
 	public Gson getGson() {
 		return gson;
 	}
@@ -721,32 +730,102 @@ public class HubIntRestService {
 		return jsonParser;
 	}
 
-	public ServiceFactory getServiceFactory() {
-		return serviceFactory;
-	}
-
-	public ProjectRestService getProjectRestService() {
-		return serviceFactory.getProjectRestService();
-	}
-
-	public ProjectVersionRestService getProjectVersionRestService() {
-		return serviceFactory.getProjectVersionRestService();
-	}
-
-	public UserRestService getUserRestService() {
-		return serviceFactory.getUserRestService();
-	}
-
 	public CodeLocationRestService getCodeLocationRestService() {
-		return serviceFactory.getCodeLocationRestService();
+		return codeLocationRestService;
+	}
+
+	public void setCodeLocationRestService(final CodeLocationRestService codeLocationRestService) {
+		this.codeLocationRestService = codeLocationRestService;
+	}
+
+	public ComponentVersionRestService getComponentVersionRestService() {
+		return componentVersionRestService;
+	}
+
+	public void setComponentVersionRestService(final ComponentVersionRestService componentVersionRestService) {
+		this.componentVersionRestService = componentVersionRestService;
+	}
+
+	public NotificationRestService getNotificationRestService() {
+		return notificationRestService;
+	}
+
+	public void setNotificationRestService(final NotificationRestService notificationRestService) {
+		this.notificationRestService = notificationRestService;
+	}
+
+	public PolicyRestService getPolicyRestService() {
+		return policyRestService;
+	}
+
+	public void setPolicyRestService(final PolicyRestService policyRestService) {
+		this.policyRestService = policyRestService;
 	}
 
 	public PolicyStatusRestService getPolicyStatusRestService() {
-		return serviceFactory.getPolicyStatusRestService();
+		return policyStatusRestService;
+	}
+
+	public void setPolicyStatusRestService(final PolicyStatusRestService policyStatusRestService) {
+		this.policyStatusRestService = policyStatusRestService;
+	}
+
+	public ProjectRestService getProjectRestService() {
+		return projectRestService;
+	}
+
+	public void setProjectRestService(final ProjectRestService projectRestService) {
+		this.projectRestService = projectRestService;
+	}
+
+	public ProjectVersionRestService getProjectVersionRestService() {
+		return projectVersionRestService;
+	}
+
+	public void setProjectVersionRestService(final ProjectVersionRestService projectVersionRestService) {
+		this.projectVersionRestService = projectVersionRestService;
 	}
 
 	public ScanSummaryRestService getScanSummaryRestService() {
-		return serviceFactory.getScanSummaryRestService();
+		return scanSummaryRestService;
+	}
+
+	public void setScanSummaryRestService(final ScanSummaryRestService scanSummaryRestService) {
+		this.scanSummaryRestService = scanSummaryRestService;
+	}
+
+	public UserRestService getUserRestService() {
+		return userRestService;
+	}
+
+	public void setUserRestService(final UserRestService userRestService) {
+		this.userRestService = userRestService;
+	}
+
+	public VersionBomPolicyRestService getVersionBomPolicyRestService() {
+		return versionBomPolicyRestService;
+	}
+
+	public void setVersionBomPolicyRestService(final VersionBomPolicyRestService versionBomPolicyRestService) {
+		this.versionBomPolicyRestService = versionBomPolicyRestService;
+	}
+
+	public VulnerabilityRestService getVulnerabilityRestService() {
+		return vulnerabilityRestService;
+	}
+
+	public void setVulnerabilityRestService(final VulnerabilityRestService vulnerabilityRestService) {
+		this.vulnerabilityRestService = vulnerabilityRestService;
+	}
+
+	public PolicyStatusDataService getPolicyStatusDataService() {
+		return new PolicyStatusDataService(restConnection, gson, jsonParser, projectRestService,
+				projectVersionRestService, policyStatusRestService);
+	}
+
+	public ScanStatusDataService getScanStatusDataService() {
+		return new ScanStatusDataService(restConnection, gson, jsonParser, projectRestService,
+				projectVersionRestService, codeLocationRestService, scanSummaryRestService);
 	}
 
 }
