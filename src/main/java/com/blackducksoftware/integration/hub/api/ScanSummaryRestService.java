@@ -1,6 +1,7 @@
 package com.blackducksoftware.integration.hub.api;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -15,10 +16,13 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ScanSummaryRestService extends HubRestService<ScanSummaryItem> {
+	public static final Type TYPE_TOKEN_ITEM = new TypeToken<ScanSummaryItem>() {
+	}.getType();
+	public static final Type TYPE_TOKEN_LIST = new TypeToken<List<ScanSummaryItem>>() {
+	}.getType();
+
 	public ScanSummaryRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, new TypeToken<ScanSummaryItem>() {
-		}.getType(), new TypeToken<List<ScanSummaryItem>>() {
-		}.getType());
+		super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
 	}
 
 	public List<ScanSummaryItem> getAllScanSummaryItems(final String scanSummaryUrl)

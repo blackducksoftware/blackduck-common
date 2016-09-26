@@ -1,6 +1,7 @@
 package com.blackducksoftware.integration.hub.api;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
@@ -17,13 +18,16 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class CodeLocationRestService extends HubRestService<CodeLocationItem> {
+	public static final Type TYPE_TOKEN_ITEM = new TypeToken<CodeLocationItem>() {
+	}.getType();
+	public static final Type TYPE_TOKEN_LIST = new TypeToken<List<CodeLocationItem>>() {
+	}.getType();
+
 	private final List<String> getCodeLocationsSegments = Arrays.asList(UrlConstants.SEGMENT_API,
 			UrlConstants.SEGMENT_CODE_LOCATIONS);
 
 	public CodeLocationRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, new TypeToken<CodeLocationItem>() {
-		}.getType(), new TypeToken<List<CodeLocationItem>>() {
-		}.getType());
+		super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
 	}
 
 	public List<CodeLocationItem> getAllCodeLocations() throws IOException, BDRestException, URISyntaxException {

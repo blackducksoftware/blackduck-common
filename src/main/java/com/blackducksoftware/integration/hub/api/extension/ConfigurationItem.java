@@ -2,9 +2,12 @@ package com.blackducksoftware.integration.hub.api.extension;
 
 import java.util.List;
 
-public class ConfigurationItem {
+import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
-	private String name;
+public class ConfigurationItem extends HubItem {
+
+	private final String name;
 	private final OptionTypeEnum optionType;
 	private final String title;
 	private final boolean required;
@@ -13,9 +16,10 @@ public class ConfigurationItem {
 	private final List<OptionItem> options;
 	private final List<String> defaultValue;
 
-	public ConfigurationItem(final String name, final OptionTypeEnum optionType, final String title,
-			final boolean required, final boolean singleValue, final String description, final List<OptionItem> options,
-			final List<String> defaultValue) {
+	public ConfigurationItem(final MetaInformation meta, final String name, final OptionTypeEnum optionType,
+			final String title, final boolean required, final boolean singleValue, final String description,
+			final List<OptionItem> options, final List<String> defaultValue) {
+		super(meta);
 		this.name = name;
 		this.optionType = optionType;
 		this.title = title;
@@ -28,10 +32,6 @@ public class ConfigurationItem {
 
 	public String getName() {
 		return name;
-	}
-
-	public void setName(final String name) {
-		this.name = name;
 	}
 
 	public OptionTypeEnum getOptionType() {

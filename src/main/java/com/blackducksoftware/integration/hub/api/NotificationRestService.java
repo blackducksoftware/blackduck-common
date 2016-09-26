@@ -1,6 +1,7 @@
 package com.blackducksoftware.integration.hub.api;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,14 +28,17 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class NotificationRestService extends HubRestService<NotificationItem> {
+	public static final Type TYPE_TOKEN_ITEM = new TypeToken<NotificationItem>() {
+	}.getType();
+	public static final Type TYPE_TOKEN_LIST = new TypeToken<List<NotificationItem>>() {
+	}.getType();
+
 	private final List<String> getNotificationSegments = Arrays.asList(UrlConstants.SEGMENT_API,
 			UrlConstants.SEGMENT_NOTIFICATIONS);
 	private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();
 
 	public NotificationRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, new TypeToken<NotificationItem>() {
-		}.getType(), new TypeToken<List<NotificationItem>>() {
-		}.getType());
+		super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
 
 		typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);
 		typeMap.put("RULE_VIOLATION", RuleViolationNotificationItem.class);

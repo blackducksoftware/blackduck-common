@@ -1,6 +1,7 @@
 package com.blackducksoftware.integration.hub.api;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +17,13 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class PolicyStatusRestService extends HubRestService<PolicyStatusItem> {
+	public static final Type TYPE_TOKEN_ITEM = new TypeToken<PolicyStatusItem>() {
+	}.getType();
+	public static final Type TYPE_TOKEN_LIST = new TypeToken<List<PolicyStatusItem>>() {
+	}.getType();
+
 	public PolicyStatusRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, new TypeToken<PolicyStatusItem>() {
-		}.getType(), new TypeToken<List<PolicyStatusItem>>() {
-		}.getType());
+		super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
 	}
 
 	public PolicyStatusItem getPolicyStatusItem(final String projectId, final String versionId)

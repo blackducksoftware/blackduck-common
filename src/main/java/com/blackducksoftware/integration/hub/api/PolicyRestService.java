@@ -1,6 +1,7 @@
 package com.blackducksoftware.integration.hub.api;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,21 +18,24 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class PolicyRestService extends HubRestService<PolicyRule> {
+	public static final Type TYPE_TOKEN_ITEM = new TypeToken<PolicyRule>() {
+	}.getType();
+	public static final Type TYPE_TOKEN_LIST = new TypeToken<List<PolicyRule>>() {
+	}.getType();
+
 	private final List<String> getPolicyRuleSegments = Arrays.asList(UrlConstants.SEGMENT_API,
 			UrlConstants.SEGMENT_POLICY_RULES);
 
 	public PolicyRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, new TypeToken<PolicyRule>() {
-		}.getType(), new TypeToken<List<PolicyRule>>() {
-		}.getType());
+		super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
 	}
 
 	public PolicyRule getPolicyRule(final String policyUrl) throws IOException, BDRestException, URISyntaxException {
 		return getItem(policyUrl);
 	}
 
-	public PolicyRule getPolicyRuleById(final String policyRuleId) throws IOException,
-	BDRestException, URISyntaxException {
+	public PolicyRule getPolicyRuleById(final String policyRuleId)
+			throws IOException, BDRestException, URISyntaxException {
 		final List<String> urlSegments = new ArrayList<>();
 		urlSegments.addAll(getPolicyRuleSegments);
 		urlSegments.add(policyRuleId);

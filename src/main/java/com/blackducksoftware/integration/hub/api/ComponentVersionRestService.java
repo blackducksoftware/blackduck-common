@@ -1,6 +1,7 @@
 package com.blackducksoftware.integration.hub.api;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -13,11 +14,14 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ComponentVersionRestService extends HubRestService<ComponentVersion> {
+	public static final Type TYPE_TOKEN_ITEM = new TypeToken<ComponentVersion>() {
+	}.getType();
+	public static final Type TYPE_TOKEN_LIST = new TypeToken<List<ComponentVersion>>() {
+	}.getType();
+
 	public ComponentVersionRestService(final RestConnection restConnection, final Gson gson,
 			final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, new TypeToken<ComponentVersion>() {
-		}.getType(), new TypeToken<List<ComponentVersion>>() {
-		}.getType());
+		super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
 	}
 
 	public ComponentVersion getComponentVersion(final String componentVersionUrl)

@@ -1,6 +1,7 @@
 package com.blackducksoftware.integration.hub.api;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
@@ -16,12 +17,15 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class UserRestService extends HubRestService<UserItem> {
+	public static final Type TYPE_TOKEN_ITEM = new TypeToken<UserItem>() {
+	}.getType();
+	public static final Type TYPE_TOKEN_LIST = new TypeToken<List<UserItem>>() {
+	}.getType();
+
 	private final List<String> getUsersSegments = Arrays.asList(UrlConstants.SEGMENT_API, UrlConstants.SEGMENT_USERS);
 
 	public UserRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, new TypeToken<UserItem>() {
-		}.getType(), new TypeToken<List<UserItem>>() {
-		}.getType());
+		super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
 	}
 
 	public List<UserItem> getAllUsers() throws URISyntaxException, BDRestException, IOException {
