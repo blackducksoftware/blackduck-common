@@ -1,9 +1,15 @@
 package com.blackducksoftware.integration.hub.api.user;
 
+import java.util.UUID;
+
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class UserItem extends HubItem {
+	public static final String USER_URL_IDENTIFIER = "users";
+
 	private final String userName;
 	private final String firstName;
 	private final String lastName;
@@ -45,6 +51,13 @@ public class UserItem extends HubItem {
 
 	public boolean isActive() {
 		return active;
+	}
+
+	public UUID getUserId() throws MissingUUIDException {
+		if (getMeta() == null || getMeta().getHref() == null) {
+			return null;
+		}
+		return HubUrlParser.getUUIDFromURLString(USER_URL_IDENTIFIER, getMeta().getHref());
 	}
 
 	@Override
