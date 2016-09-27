@@ -71,10 +71,10 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
 			try {
 				final String componentVersionLink = componentVersion.getComponentVersionLink();
 				final String componentVersionName = getComponentVersionName(componentVersionLink);
-				final List<String> policyIds = componentVersion.getPolicyIds();
+				final List<String> policyUrls = componentVersion.getPolicies();
 
-				if (policyIds != null) {
-					List<PolicyRule> ruleList = getRules(policyIds);
+				if (policyUrls != null) {
+					List<PolicyRule> ruleList = getRulesFromUrls(policyUrls);
 
 					ruleList = getMatchingRules(ruleList);
 					if (ruleList != null && !ruleList.isEmpty()) {

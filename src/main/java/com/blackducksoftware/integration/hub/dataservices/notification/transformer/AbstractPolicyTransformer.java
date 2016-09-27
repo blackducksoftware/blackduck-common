@@ -88,14 +88,14 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
 		return componentVersionName;
 	}
 
-	protected List<PolicyRule> getRules(final List<String> ruleIdsViolated) throws NotificationServiceException,
+	protected List<PolicyRule> getRulesFromUrls(final List<String> ruleUrlsViolated) throws NotificationServiceException,
 	IOException, BDRestException, URISyntaxException {
-		if (ruleIdsViolated == null || ruleIdsViolated.isEmpty()) {
+		if (ruleUrlsViolated == null || ruleUrlsViolated.isEmpty()) {
 			return null;
 		}
 		final List<PolicyRule> rules = new ArrayList<PolicyRule>();
-		for (final String ruleIdViolated : ruleIdsViolated) {
-			final PolicyRule ruleViolated = getPolicyService().getPolicyRuleById(ruleIdViolated);
+		for (final String ruleUrlViolated : ruleUrlsViolated) {
+			final PolicyRule ruleViolated = getPolicyService().getPolicyRule(ruleUrlViolated);
 			rules.add(ruleViolated);
 		}
 		return rules;
