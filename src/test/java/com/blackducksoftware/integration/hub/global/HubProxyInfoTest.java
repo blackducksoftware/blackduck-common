@@ -51,15 +51,15 @@ public class HubProxyInfoTest {
 		final HubCredentialsBuilder credBuilder = new HubCredentialsBuilder();
 		credBuilder.setUsername(proxyUsername1);
 		credBuilder.setPassword(proxyPassword1);
-		final HubProxyInfo item1 = new HubProxyInfo(host1, port1, credBuilder.build().getConstructedObject(),
+		final HubProxyInfo item1 = new HubProxyInfo(host1, port1, credBuilder.buildResults().getConstructedObject(),
 				noProxyHosts1);
 		credBuilder.setUsername(proxyUsername2);
 		credBuilder.setPassword(proxyPassword2);
-		final HubProxyInfo item2 = new HubProxyInfo(host2, port2, credBuilder.build().getConstructedObject(),
+		final HubProxyInfo item2 = new HubProxyInfo(host2, port2, credBuilder.buildResults().getConstructedObject(),
 				noProxyHosts2);
 		credBuilder.setUsername(proxyUsername1);
 		credBuilder.setPassword(proxyPassword1);
-		final HubProxyInfo item3 = new HubProxyInfo(host1, port1, credBuilder.build().getConstructedObject(),
+		final HubProxyInfo item3 = new HubProxyInfo(host1, port1, credBuilder.buildResults().getConstructedObject(),
 				noProxyHosts1);
 
 		assertEquals(host1, item1.getHost());

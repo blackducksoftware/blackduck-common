@@ -58,7 +58,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder<GlobalFieldKey, HubProx
 	}
 
 	@Override
-	public ValidationResults<GlobalFieldKey, HubProxyInfo> build() {
+	public ValidationResults<GlobalFieldKey, HubProxyInfo> buildResults() {
 		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = assertValid();
 		HubProxyInfo proxyInfo;
 
@@ -69,7 +69,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder<GlobalFieldKey, HubProx
 			credBuilder.setUsername(username);
 			credBuilder.setPassword(password);
 			credBuilder.setPasswordLength(passwordLength);
-			final ValidationResults<GlobalFieldKey, HubCredentials> credResult = credBuilder.build();
+			final ValidationResults<GlobalFieldKey, HubCredentials> credResult = credBuilder.buildResults();
 
 			proxyInfo = new HubProxyInfo(host, proxyPort, credResult.getConstructedObject(), ignoredProxyHosts);
 
@@ -85,7 +85,7 @@ public class HubProxyInfoBuilder extends AbstractBuilder<GlobalFieldKey, HubProx
 
 	@Override
 	public ValidationResults<GlobalFieldKey, HubProxyInfo> assertValid() {
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<GlobalFieldKey, HubProxyInfo>();
+		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
 
 		validatePort(result);
 
