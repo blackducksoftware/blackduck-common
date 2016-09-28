@@ -30,7 +30,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.resource.ResourceException;
 
-import com.blackducksoftware.integration.hub.api.VersionComparison;
+import com.blackducksoftware.integration.hub.api.version.VersionComparison;
 import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;

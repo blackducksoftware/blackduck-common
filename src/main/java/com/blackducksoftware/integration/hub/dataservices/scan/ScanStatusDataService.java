@@ -29,14 +29,14 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.api.CodeLocationRestService;
-import com.blackducksoftware.integration.hub.api.ProjectRestService;
-import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationItem;
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationTypeEnum;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;

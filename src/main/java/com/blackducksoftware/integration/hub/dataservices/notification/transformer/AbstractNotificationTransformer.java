@@ -23,12 +23,12 @@ package com.blackducksoftware.integration.hub.dataservices.notification.transfor
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
-import com.blackducksoftware.integration.hub.api.NotificationRestService;
-import com.blackducksoftware.integration.hub.api.PolicyRestService;
-import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
+import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.dataservices.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;

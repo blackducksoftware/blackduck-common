@@ -1,11 +1,11 @@
 package com.blackducksoftware.integration.hub.dataservices;
 
-import com.blackducksoftware.integration.hub.api.BomImportRestService;
-import com.blackducksoftware.integration.hub.api.CodeLocationRestService;
-import com.blackducksoftware.integration.hub.api.PolicyStatusRestService;
-import com.blackducksoftware.integration.hub.api.ProjectRestService;
-import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
+import com.blackducksoftware.integration.hub.api.bom.BomImportRestService;
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.dataservices.notification.NotificationDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.policystatus.PolicyStatusDataService;

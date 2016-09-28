@@ -19,16 +19,23 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api;
+package com.blackducksoftware.integration.hub.api.policy;
+
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_POLICY_STATUS;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_PROJECTS;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_VERSIONS;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.restlet.data.Method;
 
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
+import com.blackducksoftware.integration.hub.api.HubItemRestService;
+import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
@@ -37,21 +44,24 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class PolicyStatusRestService extends HubItemRestService<PolicyStatusItem> {
+	private static final Type ITEM_TYPE = new TypeToken<PolicyStatusItem>() {
+	}.getType();
+	private static final Type ITEM_LIST_TYPE = new TypeToken<List<PolicyStatusItem>>() {
+	}.getType();
+
 	public PolicyStatusRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, new TypeToken<PolicyStatusItem>() {
-		}.getType(), new TypeToken<List<PolicyStatusItem>>() {
-		}.getType());
+		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
 	}
 
 	public PolicyStatusItem getPolicyStatusItem(final String projectId, final String versionId)
 			throws IOException, URISyntaxException, BDRestException {
 		final List<String> urlSegments = new ArrayList<>();
-		urlSegments.add(UrlConstants.SEGMENT_API);
-		urlSegments.add(UrlConstants.SEGMENT_PROJECTS);
+		urlSegments.add(SEGMENT_API);
+		urlSegments.add(SEGMENT_PROJECTS);
 		urlSegments.add(projectId);
-		urlSegments.add(UrlConstants.SEGMENT_VERSIONS);
+		urlSegments.add(SEGMENT_VERSIONS);
 		urlSegments.add(versionId);
-		urlSegments.add(UrlConstants.SEGMENT_POLICY_STATUS);
+		urlSegments.add(SEGMENT_POLICY_STATUS);
 
 		final HubRequest policyStatusItemRequest = new HubRequest(getRestConnection(), getJsonParser());
 		policyStatusItemRequest.setMethod(Method.GET);
