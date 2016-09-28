@@ -30,7 +30,7 @@ import org.mockito.Mockito;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
-import com.blackducksoftware.integration.hub.api.VersionComparison;
+import com.blackducksoftware.integration.hub.api.version.VersionComparison;
 import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.test.TestLogger;

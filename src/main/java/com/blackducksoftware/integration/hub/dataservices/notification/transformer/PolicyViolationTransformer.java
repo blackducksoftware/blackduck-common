@@ -27,17 +27,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
-import com.blackducksoftware.integration.hub.api.NotificationRestService;
-import com.blackducksoftware.integration.hub.api.PolicyRestService;
-import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
+import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
+import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
+import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyViolationContentItem;
@@ -86,11 +86,10 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 				templateData);
 	}
 
-
 	private ReleaseItem getReleaseItem(final String projectVersionLink)
 			throws IOException, BDRestException, URISyntaxException {
 		ReleaseItem releaseItem;
-		releaseItem = getProjectVersionService().getProjectVersionReleaseItem(projectVersionLink);
+		releaseItem = getProjectVersionService().getItem(projectVersionLink);
 		return releaseItem;
 	}
 
@@ -100,8 +99,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 			final List<PolicyRule> policyRuleList, final NotificationItem item,
 			final List<NotificationContentItem> templateData) {
 		templateData.add(new PolicyViolationContentItem(item.getCreatedAt(), projectVersion, componentName,
-				componentVersion, componentId,
-				componentVersionId, policyRuleList));
+				componentVersion, componentId, componentVersionId, policyRuleList));
 	}
 
 }
