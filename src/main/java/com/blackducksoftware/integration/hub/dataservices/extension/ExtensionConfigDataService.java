@@ -71,6 +71,11 @@ public class ExtensionConfigDataService extends AbstractDataService {
 					for (final Map.Entry<String, ConfigurationItem> entry : globalConfigMap.entrySet()) {
 						if (!userConfigMap.containsKey(entry.getKey())) {
 							userConfigMap.put(entry.getKey(), entry.getValue());
+						} else {
+							final ConfigurationItem userItem = userConfigMap.get(entry.getKey());
+							if (userItem.getValue() == null && userItem.getValue().isEmpty()) {
+								userConfigMap.put(entry.getKey(), entry.getValue());
+							}
 						}
 					}
 				}

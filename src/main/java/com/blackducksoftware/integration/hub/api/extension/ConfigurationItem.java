@@ -14,11 +14,11 @@ public class ConfigurationItem extends HubItem {
 	private final boolean singleValue;
 	private final String description;
 	private final List<OptionItem> options;
-	private final List<String> defaultValue;
+	private final List<String> value;
 
 	public ConfigurationItem(final MetaInformation meta, final String name, final OptionTypeEnum optionType,
 			final String title, final boolean required, final boolean singleValue, final String description,
-			final List<OptionItem> options, final List<String> defaultValue) {
+			final List<OptionItem> options, final List<String> value) {
 		super(meta);
 		this.name = name;
 		this.optionType = optionType;
@@ -27,7 +27,7 @@ public class ConfigurationItem extends HubItem {
 		this.singleValue = singleValue;
 		this.description = description;
 		this.options = options;
-		this.defaultValue = defaultValue;
+		this.value = value;
 	}
 
 	public String getName() {
@@ -58,7 +58,14 @@ public class ConfigurationItem extends HubItem {
 		return options;
 	}
 
-	public List<String> getDefaultValue() {
-		return defaultValue;
+	public List<String> getValue() {
+		return value;
+	}
+
+	@Override
+	public String toString() {
+		return "ConfigurationItem [name=" + name + ", optionType=" + optionType + ", title=" + title + ", required="
+				+ required + ", singleValue=" + singleValue + ", description=" + description + ", options=" + options
+				+ ", value=" + value + "]";
 	}
 }

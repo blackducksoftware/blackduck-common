@@ -18,7 +18,7 @@ import com.google.gson.reflect.TypeToken;
 public class ExtensionRestService extends HubRestService<ConfigurationItem> {
 	public static final Type TYPE_TOKEN_ITEM = new TypeToken<ConfigurationItem>() {
 	}.getType();
-	public static final Type TYPE_TOKEN_LIST = new TypeToken<ConfigurationItem>() {
+	public static final Type TYPE_TOKEN_LIST = new TypeToken<List<ConfigurationItem>>() {
 	}.getType();
 
 	public ExtensionRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {

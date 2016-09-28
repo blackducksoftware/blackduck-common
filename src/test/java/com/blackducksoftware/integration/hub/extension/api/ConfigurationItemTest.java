@@ -22,9 +22,9 @@ public class ConfigurationItemTest {
 		return itemList;
 	}
 
-	private List<String> createDefaultValue() {
+	private List<String> createValueList() {
 		final List<String> itemList = new ArrayList<>();
-		itemList.add("defaultValue");
+		itemList.add("value");
 		return itemList;
 	}
 
@@ -38,10 +38,10 @@ public class ConfigurationItemTest {
 		final boolean singleValue = true;
 		final String description = "description";
 		final List<OptionItem> options = createOptions();
-		final List<String> defaultValue = createDefaultValue();
+		final List<String> value = createValueList();
 
 		final ConfigurationItem item = new ConfigurationItem(meta, name, optionType, title, required, singleValue,
-				description, options, defaultValue);
+				description, options, value);
 
 		assertNull(item.getMeta());
 		assertEquals(name, item.getName());
@@ -51,6 +51,6 @@ public class ConfigurationItemTest {
 		assertTrue(item.isSingleValue());
 		assertEquals(description, item.getDescription());
 		assertEquals(options, item.getOptions());
-		assertEquals(defaultValue, item.getDefaultValue());
+		assertEquals(value, item.getValue());
 	}
 }
