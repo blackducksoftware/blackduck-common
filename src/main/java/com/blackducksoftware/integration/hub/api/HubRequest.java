@@ -21,6 +21,10 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api;
 
+import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_LIMIT;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_OFFSET;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_Q;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -86,8 +90,8 @@ public class HubRequest {
 				final String responseString = restConnection.readResponseAsString(response);
 				return responseString;
 			} else {
-				final String message = String.format("Request was not successful. (responseCode: %s): %s",
-						responseCode, clientResource.toString());
+				final String message = String.format("Request was not successful. (responseCode: %s): %s", responseCode,
+						clientResource.toString());
 				throw new BDRestException(message, clientResource);
 			}
 		} finally {
@@ -123,10 +127,10 @@ public class HubRequest {
 		if (offset < 0) {
 			offset = 0;
 		}
-		queryParameters.put(UrlConstants.QUERY_LIMIT, String.valueOf(limit));
-		queryParameters.put(UrlConstants.QUERY_OFFSET, String.valueOf(offset));
+		queryParameters.put(QUERY_LIMIT, String.valueOf(limit));
+		queryParameters.put(QUERY_OFFSET, String.valueOf(offset));
 		if (StringUtils.isNotBlank(q)) {
-			queryParameters.put(UrlConstants.QUERY_Q, q);
+			queryParameters.put(QUERY_Q, q);
 		}
 
 		for (final Map.Entry<String, String> entry : queryParameters.entrySet()) {

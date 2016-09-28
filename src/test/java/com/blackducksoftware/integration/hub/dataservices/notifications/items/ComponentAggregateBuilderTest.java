@@ -48,8 +48,7 @@ public class ComponentAggregateBuilderTest {
 		final PolicyRule rule = new PolicyRule(null, POLICY_RULE_NAME, "", true, true, null, "", "", "", "");
 		policyRuleList.add(rule);
 		final PolicyViolationContentItem item = new PolicyViolationContentItem(new Date(), createProjectVersion(),
-				COMPONENT_NAME,
-				COMPONENT_VERSION, componentID, componentVersionID, policyRuleList);
+				COMPONENT_NAME, COMPONENT_VERSION, componentID, componentVersionID, policyRuleList);
 		return item;
 	}
 
@@ -61,8 +60,8 @@ public class ComponentAggregateBuilderTest {
 		final PolicyRule rule = new PolicyRule(null, POLICY_RULE_NAME, "", true, true, null, "", "", "", "");
 		policyRuleList.add(rule);
 		final PolicyOverrideContentItem item = new PolicyOverrideContentItem(new Date(), createProjectVersion(),
-				COMPONENT_NAME,
-				COMPONENT_VERSION, componentID, componentVersionID, policyRuleList, FIRST_NAME, LAST_NAME);
+				COMPONENT_NAME, COMPONENT_VERSION, componentID, componentVersionID, policyRuleList, FIRST_NAME,
+				LAST_NAME);
 		return item;
 	}
 
@@ -79,8 +78,7 @@ public class ComponentAggregateBuilderTest {
 		deleted.add(vuln);
 
 		final VulnerabilityContentItem item = new VulnerabilityContentItem(new Date(), createProjectVersion(),
-				COMPONENT_NAME,
-				COMPONENT_VERSION, componentID, componentVersionID, added, updated, deleted);
+				COMPONENT_NAME, COMPONENT_VERSION, componentID, componentVersionID, added, updated, deleted);
 		return item;
 	}
 
@@ -152,9 +150,6 @@ public class ComponentAggregateBuilderTest {
 
 	@Test
 	public void testFullObjectConstruction() {
-		final long currentTime = System.currentTimeMillis();
-		final Date start = new Date(currentTime - 10000);
-		final Date end = new Date(currentTime);
 		final ComponentAggregateBuilder builder = new ComponentAggregateBuilder();
 
 		final int policyCount = 2;

@@ -19,7 +19,10 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api;
+package com.blackducksoftware.integration.hub.api.policy;
+
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_POLICY_RULES;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -30,7 +33,8 @@ import java.util.List;
 
 import org.restlet.data.Method;
 
-import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
+import com.blackducksoftware.integration.hub.api.HubItemRestService;
+import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
@@ -38,28 +42,24 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class PolicyRestService extends HubRestService<PolicyRule> {
-	public static final Type TYPE_TOKEN_ITEM = new TypeToken<PolicyRule>() {
-	}.getType();
-	public static final Type TYPE_TOKEN_LIST = new TypeToken<List<PolicyRule>>() {
-	}.getType();
+public class PolicyRestService extends HubItemRestService<PolicyRule> {
+	private static final List<String> POLICY_RULE_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_POLICY_RULES);
 
-	private final List<String> getPolicyRuleSegments = Arrays.asList(UrlConstants.SEGMENT_API,
-			UrlConstants.SEGMENT_POLICY_RULES);
+	private static final Type ITEM_TYPE = new TypeToken<PolicyRule>() {
+	}.getType();
+	private static final Type ITEM_LIST_TYPE = new TypeToken<List<PolicyRule>>() {
+	}.getType();
 
 	public PolicyRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
-	}
-
-	public PolicyRule getPolicyRule(final String policyUrl) throws IOException, BDRestException, URISyntaxException {
-		return getItem(policyUrl);
+		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
 	}
 
 	public PolicyRule getPolicyRuleById(final String policyRuleId)
 			throws IOException, BDRestException, URISyntaxException {
 		final List<String> urlSegments = new ArrayList<>();
-		urlSegments.addAll(getPolicyRuleSegments);
+		urlSegments.addAll(POLICY_RULE_SEGMENTS);
 		urlSegments.add(policyRuleId);
+
 		final PolicyRule rule = getItem(urlSegments);
 		return rule;
 	}
@@ -68,7 +68,7 @@ public class PolicyRestService extends HubRestService<PolicyRule> {
 		final HubRequest policyRuleItemRequest = new HubRequest(getRestConnection(), getJsonParser());
 		policyRuleItemRequest.setMethod(Method.GET);
 		policyRuleItemRequest.setLimit(100);
-		policyRuleItemRequest.addUrlSegments(getPolicyRuleSegments);
+		policyRuleItemRequest.addUrlSegments(POLICY_RULE_SEGMENTS);
 
 		final JsonObject jsonObject = policyRuleItemRequest.executeForResponseJson();
 		final List<PolicyRule> allPolicyRuleItems = getAll(jsonObject, policyRuleItemRequest);

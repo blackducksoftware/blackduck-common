@@ -26,8 +26,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityItem;
+import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 
 public class ComponentAggregateBuilder {

@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.hub.api.ExtensionRestService;
-import com.blackducksoftware.integration.hub.api.UserRestService;
 import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
+import com.blackducksoftware.integration.hub.api.user.UserRestService;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.dataservices.extension.items.UserConfigItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -27,11 +27,12 @@ public class ExtensionConfigDataService extends AbstractDataService {
 	private final ExtensionRestService extensionRestService;
 
 	public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
-			final JsonParser jsonParser) {
+			final JsonParser jsonParser, final UserRestService userRestService,
+			final ExtensionRestService extensionRestService) {
 		super(restConnection, gson, jsonParser);
 		this.logger = logger;
-		userService = new UserRestService(restConnection, gson, jsonParser);
-		extensionRestService = new ExtensionRestService(restConnection, gson, jsonParser);
+		this.userService = userRestService;
+		this.extensionRestService = extensionRestService;
 	}
 
 	public Map<String, ConfigurationItem> getGlobalConfigMap(final String extensionId) {
