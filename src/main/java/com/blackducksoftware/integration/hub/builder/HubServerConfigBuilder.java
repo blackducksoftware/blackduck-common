@@ -41,7 +41,6 @@ import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
 
 public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubServerConfig> {
-
 	public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
 	public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
 	public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
@@ -92,7 +91,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 				}
 			}
 
-			final String exceptionMessage = "Invalid Hub Server Configuration: ";
+			String exceptionMessage = "Invalid Hub Server Configuration: ";
 			exceptionMessage += "[WARN: " + StringUtils.join(warningMessages, ", ") + "], ";
 			exceptionMessage += "[ERROR: " + StringUtils.join(errorMessages, ", ") + "]";
 
@@ -141,7 +140,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		if (proxyPasswordLength > 0) {
 			proxyBuilder.setPasswordLength(proxyPasswordLength);
 		}
-		result = proxyBuilder.build();
+		result = proxyBuilder.buildResults();
 		proxyInfo = result.getConstructedObject();
 		return result;
 	}
@@ -154,7 +153,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		if (passwordLength > 0) {
 			credentialsBuilder.setPasswordLength(passwordLength);
 		}
-		result = credentialsBuilder.build();
+		result = credentialsBuilder.buildResults();
 		credentials = result.getConstructedObject();
 		return result;
 	}

@@ -53,7 +53,7 @@ public class HubServerConfigTest {
 
 		credBuilder.setUsername(proxyUsername1);
 		credBuilder.setPassword(proxyPassword1);
-		final HubProxyInfo proxy1 = new HubProxyInfo(host1, port1, credBuilder.build().getConstructedObject(),
+		final HubProxyInfo proxy1 = new HubProxyInfo(host1, port1, credBuilder.buildResults().getConstructedObject(),
 				noProxyHosts1);
 
 		final URL hubUrl2 = new URL("http://google.com");
@@ -69,7 +69,7 @@ public class HubServerConfigTest {
 		credBuilder.setPassword(proxyPassword2);
 
 		final HubCredentials credentials2 = new HubCredentials("hubUser2", "hubPass2");
-		final HubProxyInfo proxy2 = new HubProxyInfo(host2, port2, credBuilder.build().getConstructedObject(),
+		final HubProxyInfo proxy2 = new HubProxyInfo(host2, port2, credBuilder.buildResults().getConstructedObject(),
 				noProxyHosts2);
 
 		final HubServerConfig item1 = new HubServerConfig(hubUrl1, timeout1, credentials1, proxy1);
