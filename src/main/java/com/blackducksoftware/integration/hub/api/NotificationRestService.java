@@ -47,7 +47,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class NotificationRestService extends HubRestService<NotificationItem> {
+public class NotificationRestService extends HubItemRestService<NotificationItem> {
 	private final List<String> getNotificationSegments = Arrays.asList(UrlConstants.SEGMENT_API,
 			UrlConstants.SEGMENT_NOTIFICATIONS);
 	private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();

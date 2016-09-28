@@ -16,11 +16,9 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class BomImportRestService {
-	private final RestConnection restConnection;
-
+public class BomImportRestService extends HubRestService {
 	public BomImportRestService(final RestConnection restConnection) {
-		this.restConnection = restConnection;
+		super(restConnection);
 	}
 
 	public void importBomFile(final File file, final String mediaType)
@@ -32,7 +30,7 @@ public class BomImportRestService {
 		final Set<SimpleEntry<String, String>> queryParameters = new HashSet<>();
 		final FileRepresentation content = new FileRepresentation(file, new MediaType(mediaType));
 
-		restConnection.httpPostFromRelativeUrl(urlSegments, queryParameters, content);
+		getRestConnection().httpPostFromRelativeUrl(urlSegments, queryParameters, content);
 	}
 
 }

@@ -38,7 +38,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class ProjectRestService extends HubRestService<ProjectItem> {
+public class ProjectRestService extends HubItemRestService<ProjectItem> {
 	private final List<String> getProjectsSegments = Arrays.asList(UrlConstants.SEGMENT_API,
 			UrlConstants.SEGMENT_PROJECTS);
 

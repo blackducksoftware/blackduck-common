@@ -36,7 +36,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class UserRestService extends HubRestService<UserItem> {
+public class UserRestService extends HubItemRestService<UserItem> {
 	private final List<String> getUsersSegments = Arrays.asList(UrlConstants.SEGMENT_API, UrlConstants.SEGMENT_USERS);
 
 	public UserRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {

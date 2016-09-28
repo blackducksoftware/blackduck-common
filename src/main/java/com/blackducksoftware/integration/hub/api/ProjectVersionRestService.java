@@ -38,7 +38,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class ProjectVersionRestService extends HubRestService<ReleaseItem> {
+public class ProjectVersionRestService extends HubItemRestService<ReleaseItem> {
 	public ProjectVersionRestService(final RestConnection restConnection, final Gson gson,
 			final JsonParser jsonParser) {
 		super(restConnection, gson, jsonParser, new TypeToken<ReleaseItem>() {

@@ -32,7 +32,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class VersionBomPolicyRestService extends HubRestService<BomComponentVersionPolicyStatus> {
+public class VersionBomPolicyRestService extends HubItemRestService<BomComponentVersionPolicyStatus> {
 	public VersionBomPolicyRestService(final RestConnection restConnection, final Gson gson,
 			final JsonParser jsonParser) {
 		super(restConnection, gson, jsonParser, new TypeToken<BomComponentVersionPolicyStatus>() {

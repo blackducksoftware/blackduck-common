@@ -37,7 +37,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class CodeLocationRestService extends HubRestService<CodeLocationItem> {
+public class CodeLocationRestService extends HubItemRestService<CodeLocationItem> {
 	private final List<String> getCodeLocationsSegments = Arrays.asList(UrlConstants.SEGMENT_API,
 			UrlConstants.SEGMENT_CODE_LOCATIONS);
 

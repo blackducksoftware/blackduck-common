@@ -35,7 +35,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class ScanSummaryRestService extends HubRestService<ScanSummaryItem> {
+public class ScanSummaryRestService extends HubItemRestService<ScanSummaryItem> {
 	public ScanSummaryRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
 		super(restConnection, gson, jsonParser, new TypeToken<ScanSummaryItem>() {
 		}.getType(), new TypeToken<List<ScanSummaryItem>>() {

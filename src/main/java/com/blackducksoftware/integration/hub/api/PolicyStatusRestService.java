@@ -36,7 +36,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class PolicyStatusRestService extends HubRestService<PolicyStatusItem> {
+public class PolicyStatusRestService extends HubItemRestService<PolicyStatusItem> {
 	public PolicyStatusRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
 		super(restConnection, gson, jsonParser, new TypeToken<PolicyStatusItem>() {
 		}.getType(), new TypeToken<List<PolicyStatusItem>>() {

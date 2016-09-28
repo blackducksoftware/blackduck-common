@@ -37,7 +37,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class PolicyRestService extends HubRestService<PolicyRule> {
+public class PolicyRestService extends HubItemRestService<PolicyRule> {
 	private final List<String> getPolicyRuleSegments = Arrays.asList(UrlConstants.SEGMENT_API,
 			UrlConstants.SEGMENT_POLICY_RULES);
 
@@ -51,8 +51,8 @@ public class PolicyRestService extends HubRestService<PolicyRule> {
 		return getItem(policyUrl);
 	}
 
-	public PolicyRule getPolicyRuleById(final String policyRuleId) throws IOException,
-	BDRestException, URISyntaxException {
+	public PolicyRule getPolicyRuleById(final String policyRuleId)
+			throws IOException, BDRestException, URISyntaxException {
 		final List<String> urlSegments = new ArrayList<>();
 		urlSegments.addAll(getPolicyRuleSegments);
 		urlSegments.add(policyRuleId);
