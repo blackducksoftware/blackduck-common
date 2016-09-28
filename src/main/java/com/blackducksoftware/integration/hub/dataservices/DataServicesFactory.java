@@ -1,5 +1,6 @@
 package com.blackducksoftware.integration.hub.dataservices;
 
+import com.blackducksoftware.integration.hub.api.ExtensionRestService;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
@@ -12,6 +13,7 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.user.UserRestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRestService;
+import com.blackducksoftware.integration.hub.dataservices.extension.ExtensionConfigDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.NotificationDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.policystatus.PolicyStatusDataService;
@@ -38,6 +40,7 @@ public class DataServicesFactory {
 	private final UserRestService userRestService;
 	private final VersionBomPolicyRestService versionBomPolicyRestService;
 	private final VulnerabilityRestService vulnerabilityRestService;
+	private final ExtensionRestService extensionRestService;
 
 	public DataServicesFactory(final RestConnection restConnection) {
 		this.restConnection = restConnection;
@@ -54,6 +57,7 @@ public class DataServicesFactory {
 		userRestService = new UserRestService(restConnection, gson, jsonParser);
 		versionBomPolicyRestService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
+		extensionRestService = new ExtensionRestService(restConnection, gson, jsonParser);
 	}
 
 	public PolicyStatusDataService createPolicyStatusDataService() {
@@ -73,6 +77,11 @@ public class DataServicesFactory {
 	public NotificationDataService createNotificationDataService(final IntLogger logger,
 			final PolicyNotificationFilter policyNotificationFilter) {
 		return new NotificationDataService(logger, restConnection, gson, jsonParser, policyNotificationFilter);
+	}
+
+	public ExtensionConfigDataService createExtensionConfigDataService(final IntLogger logger) {
+		return new ExtensionConfigDataService(logger, restConnection, gson, jsonParser, userRestService,
+				extensionRestService);
 	}
 
 	public RestConnection getRestConnection() {

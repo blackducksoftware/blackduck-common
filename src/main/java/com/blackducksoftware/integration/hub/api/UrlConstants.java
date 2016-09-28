@@ -27,7 +27,11 @@ public class UrlConstants {
 	public static final String SEGMENT_BOM_IMPORT = "bom-import";
 	public static final String SEGMENT_CODE_LOCATIONS = "codelocations";
 	public static final String SEGMENT_COMPONENTS = "components";
+	public static final String SEGMENT_CURRENT_USER = "currentuser";
+	public static final String SEGMENT_EXTERNAL_EXTENSIONS = "externalextensions";
+	public static final String SEGMENT_GLOBAL = "global";
 	public static final String SEGMENT_NOTIFICATIONS = "notifications";
+	public static final String SEGMENT_OPTIONS = "options";
 	public static final String SEGMENT_ORIGIN = "origin";
 	public static final String SEGMENT_POLICY_RULES = "policy-rules";
 	public static final String SEGMENT_POLICY_STATUS = "policy-status";
