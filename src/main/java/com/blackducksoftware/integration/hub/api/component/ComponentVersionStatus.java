@@ -42,7 +42,7 @@ public class ComponentVersionStatus {
 	@SerializedName("bomComponentVersionPolicyStatus")
 	private String bomComponentVersionPolicyStatusLink;
 
-	private List<String> policyIds;
+	private List<String> policies;
 
 	public String getComponentName() {
 		return componentName;
@@ -68,12 +68,12 @@ public class ComponentVersionStatus {
 		this.bomComponentVersionPolicyStatusLink = bomComponentVersionPolicyStatusLink;
 	}
 
-	public List<String> getPolicyIds() {
-		return policyIds;
+	public List<String> getPolicies() {
+		return policies;
 	}
 
-	private void setPolicyIds(final List<String> policyIds) {
-		this.policyIds = policyIds;
+	public void setPolicies(final List<String> policies) {
+		this.policies = policies;
 	}
 
 	public UUID getComponentId() throws MissingUUIDException {
@@ -100,6 +100,6 @@ public class ComponentVersionStatus {
 	public String toString() {
 		return "ComponentVersionStatus [componentName=" + componentName + ", componentVersionLink="
 				+ componentVersionLink + ", bomComponentVersionPolicyStatusLink=" + bomComponentVersionPolicyStatusLink
-				+ ", policyIds=" + policyIds + "]";
+				+ ", policies=" + policies + "]";
 	}
 }

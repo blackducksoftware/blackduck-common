@@ -72,7 +72,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 	}
 
 	@Override
-	public ValidationResults<GlobalFieldKey, HubServerConfig> build() {
+	public ValidationResults<GlobalFieldKey, HubServerConfig> buildResults() {
 		final ValidationResults<GlobalFieldKey, HubServerConfig> result = assertValid();
 
 		URL hubURL = null;
@@ -112,7 +112,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		if (proxyPasswordLength > 0) {
 			proxyBuilder.setPasswordLength(proxyPasswordLength);
 		}
-		result = proxyBuilder.build();
+		result = proxyBuilder.buildResults();
 		proxyInfo = result.getConstructedObject();
 		return result;
 	}
@@ -125,7 +125,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		if (passwordLength > 0) {
 			credentialsBuilder.setPasswordLength(passwordLength);
 		}
-		result = credentialsBuilder.build();
+		result = credentialsBuilder.buildResults();
 		credentials = result.getConstructedObject();
 		return result;
 	}

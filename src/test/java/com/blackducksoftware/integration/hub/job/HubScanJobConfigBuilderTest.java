@@ -49,8 +49,8 @@ public class HubScanJobConfigBuilderTest {
 
 	@Before
 	public void setUp() {
-		expectedMessages = new ArrayList<String>();
-		actualMessages = new ArrayList<String>();
+		expectedMessages = new ArrayList<>();
+		actualMessages = new ArrayList<>();
 	}
 
 	@After
@@ -66,7 +66,7 @@ public class HubScanJobConfigBuilderTest {
 
 	private List<String> getMessages(final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result) {
 
-		final List<String> messageList = new ArrayList<String>();
+		final List<String> messageList = new ArrayList<>();
 		final Map<HubScanJobFieldEnum, List<ValidationResult>> resultMap = result.getResultMap();
 		for (final HubScanJobFieldEnum key : resultMap.keySet()) {
 			final List<ValidationResult> resultList = resultMap.get(key);
@@ -89,7 +89,7 @@ public class HubScanJobConfigBuilderTest {
 		expectedMessages.add("No maximum wait time for the Bom Update found.");
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<>();
 
 		builder.validateProjectAndVersion(result);
 		builder.validateScanMemory(result);
@@ -107,7 +107,7 @@ public class HubScanJobConfigBuilderTest {
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
 		builder.setProjectName("TestProject");
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<>();
 
 		builder.validateProjectAndVersion(result);
 		assertFalse(result.isSuccess());
@@ -120,7 +120,7 @@ public class HubScanJobConfigBuilderTest {
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
 		builder.setVersion("Version");
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<>();
 
 		builder.validateProjectAndVersion(result);
 		assertFalse(result.isSuccess());
@@ -133,7 +133,7 @@ public class HubScanJobConfigBuilderTest {
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
 		builder.setShouldGenerateRiskReport(true);
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<>();
 
 		builder.validateShouldGenerateRiskReport(result);
 		assertFalse(result.isSuccess());
@@ -147,7 +147,7 @@ public class HubScanJobConfigBuilderTest {
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
 		builder.setShouldGenerateRiskReport(true);
 		builder.setProjectName("TestProject");
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<>();
 
 		builder.validateShouldGenerateRiskReport(result);
 		assertFalse(result.isSuccess());
@@ -161,7 +161,7 @@ public class HubScanJobConfigBuilderTest {
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
 		builder.setShouldGenerateRiskReport(true);
 		builder.setVersion("Version");
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<>();
 
 		builder.validateShouldGenerateRiskReport(result);
 		assertFalse(result.isSuccess());
@@ -174,7 +174,7 @@ public class HubScanJobConfigBuilderTest {
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
 		builder.setShouldGenerateRiskReport(true);
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<>();
 
 		builder.validateMaxWaitTimeForBomUpdate(result);
 		assertFalse(result.isSuccess());
@@ -186,7 +186,7 @@ public class HubScanJobConfigBuilderTest {
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
 		builder.setShouldGenerateRiskReport(true);
 		builder.setMaxWaitTimeForBomUpdate(HubScanJobConfigBuilder.DEFAULT_BOM_UPDATE_WAIT_TIME_IN_MINUTES);
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<>();
 
 		builder.validateMaxWaitTimeForBomUpdate(result);
 		assertTrue(result.isSuccess());
@@ -199,7 +199,7 @@ public class HubScanJobConfigBuilderTest {
 		setBuilderDefaults(builder);
 
 		builder.addScanTargetPath(null);
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<>();
 
 		builder.validateScanTargetPaths(result);
 		assertTrue(result.isSuccess());
@@ -219,7 +219,7 @@ public class HubScanJobConfigBuilderTest {
 		setBuilderDefaultsBasic(builder);
 
 		builder.addScanTargetPath(absolutePath);
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<>();
 
 		builder.validateScanTargetPaths(result);
 		assertFalse(result.isSuccess());
@@ -240,7 +240,7 @@ public class HubScanJobConfigBuilderTest {
 
 		builder.setWorkingDirectory(workingDirectoryPath);
 		builder.addScanTargetPath(absolutePath);
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<HubScanJobFieldEnum, HubScanJobConfig>();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = new ValidationResults<>();
 
 		builder.validateScanTargetPaths(result);
 		assertTrue(result.isSuccess());
@@ -252,7 +252,7 @@ public class HubScanJobConfigBuilderTest {
 		expectedMessages.add("No Project name or Version were found. Any scans run will not be mapped to a Version.");
 
 		final HubScanJobConfigBuilder builder = new HubScanJobConfigBuilder(true);
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		actualMessages = getMessages(result);
 	}
 
@@ -262,7 +262,7 @@ public class HubScanJobConfigBuilderTest {
 
 		setBuilderDefaults(builder);
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertTrue(result.isSuccess());
 	}
 
@@ -281,7 +281,7 @@ public class HubScanJobConfigBuilderTest {
 		builder.addScanTargetPath("testPath");
 		builder.disableScanTargetPathExistenceCheck();
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertTrue(result.isSuccess());
 
 		actualMessages = getMessages(result);
@@ -305,7 +305,7 @@ public class HubScanJobConfigBuilderTest {
 		builder.addScanTargetPath("testPath");
 		builder.disableScanTargetPathExistenceCheck();
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertFalse(result.isSuccess());
 
 		actualMessages = getMessages(result);
@@ -321,7 +321,7 @@ public class HubScanJobConfigBuilderTest {
 
 		builder.setVersion("");
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertFalse(result.isSuccess());
 		actualMessages = getMessages(result);
 	}
@@ -336,7 +336,7 @@ public class HubScanJobConfigBuilderTest {
 
 		builder.setProjectName("");
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertFalse(result.isSuccess());
 		actualMessages = getMessages(result);
 	}
@@ -350,7 +350,7 @@ public class HubScanJobConfigBuilderTest {
 		builder.setShouldGenerateRiskReport(true);
 		builder.setMaxWaitTimeForBomUpdate(5);
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertTrue(result.isSuccess());
 	}
 
@@ -363,7 +363,7 @@ public class HubScanJobConfigBuilderTest {
 		builder.setShouldGenerateRiskReport(true);
 		builder.setMaxWaitTimeForBomUpdate(0);
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertTrue(result.isSuccess());
 	}
 
@@ -382,7 +382,7 @@ public class HubScanJobConfigBuilderTest {
 		builder.setProjectName(" ");
 		builder.setVersion(null);
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertFalse(result.isSuccess());
 		actualMessages = getMessages(result);
 	}
@@ -395,7 +395,7 @@ public class HubScanJobConfigBuilderTest {
 
 		builder.addScanTargetPath(null);
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertTrue(result.isSuccess());
 	}
 
@@ -414,7 +414,7 @@ public class HubScanJobConfigBuilderTest {
 
 		builder.addScanTargetPath(absolutePath);
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertFalse(result.isSuccess());
 		actualMessages = getMessages(result);
 	}
@@ -434,7 +434,7 @@ public class HubScanJobConfigBuilderTest {
 		builder.setWorkingDirectory(workingDirectoryPath);
 		builder.addScanTargetPath(absolutePath);
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertTrue(result.isSuccess());
 	}
 
@@ -449,7 +449,7 @@ public class HubScanJobConfigBuilderTest {
 		builder.setProjectName(" ");
 		builder.setVersion(" ");
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertFalse(result.isSuccess());
 		actualMessages = getMessages(result);
 	}
@@ -467,7 +467,7 @@ public class HubScanJobConfigBuilderTest {
 
 		builder.addScanTargetPath(nonExistingFilePath);
 
-		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.build();
+		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = builder.buildResults();
 		assertFalse(result.isSuccess());
 		actualMessages = getMessages(result);
 	}

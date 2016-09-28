@@ -58,7 +58,7 @@ public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum
 	}
 
 	@Override
-	public ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> build() {
+	public ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> buildResults() {
 		final ValidationResults<HubScanJobFieldEnum, HubScanJobConfig> result = assertValid();
 		final ImmutableList<String> immutableScanTargetPaths = new ImmutableList.Builder<String>()
 				.addAll(scanTargetPaths).build();

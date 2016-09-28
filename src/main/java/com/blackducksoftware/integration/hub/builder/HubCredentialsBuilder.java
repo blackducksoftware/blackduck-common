@@ -44,7 +44,7 @@ public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCr
 	}
 
 	@Override
-	public ValidationResults<GlobalFieldKey, HubCredentials> build() {
+	public ValidationResults<GlobalFieldKey, HubCredentials> buildResults() {
 		final ValidationResults<GlobalFieldKey, HubCredentials> result = assertValid();
 		HubCredentials creds = null;
 		if (StringUtils.isNotBlank(password) && passwordLength == 0) {
@@ -69,7 +69,7 @@ public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCr
 
 	@Override
 	public ValidationResults<GlobalFieldKey, HubCredentials> assertValid() {
-		final ValidationResults<GlobalFieldKey, HubCredentials> result = new ValidationResults<GlobalFieldKey, HubCredentials>();
+		final ValidationResults<GlobalFieldKey, HubCredentials> result = new ValidationResults<>();
 
 		validateCredentials(result);
 

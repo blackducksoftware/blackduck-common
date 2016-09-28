@@ -22,9 +22,11 @@
 package com.blackducksoftware.integration.hub.rest;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.CookieHandler;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
@@ -230,8 +232,17 @@ public class RestConnection {
 			resource.addSegment("j_spring_security_check");
 			resource.setMethod(Method.POST);
 
+			String encodedHubUser = null;
+			String encodedHubPassword = null;
+			try {
+				encodedHubUser = URLEncoder.encode(hubUserName, "UTF-8");
+				encodedHubPassword = URLEncoder.encode(hubPassword, "UTF-8");
+			} catch (final UnsupportedEncodingException e) {
+				throw new BDRestException("Could not encode the HubUsername and Password", e, resource);
+			}
+
 			final StringRepresentation stringRep = new StringRepresentation(
-					"j_username=" + hubUserName + "&j_password=" + hubPassword);
+					"j_username=" + encodedHubUser + "&j_password=" + encodedHubPassword);
 			stringRep.setCharacterSet(CharacterSet.UTF_8);
 			stringRep.setMediaType(MediaType.APPLICATION_WWW_FORM);
 			resource.getRequest().setEntity(stringRep);

@@ -21,17 +21,45 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.builder;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 
 public abstract class AbstractBuilder<Key, Type> {
-
 	private final boolean shouldUseDefaultValues;
 
 	public AbstractBuilder(final boolean shouldUseDefaultValues) {
 		this.shouldUseDefaultValues = shouldUseDefaultValues;
 	}
 
-	public abstract ValidationResults<Key, Type> build();
+	public Type build() throws IllegalStateException {
+		final ValidationResults<Key, Type> results = buildResults();
+		if (results.isSuccess()) {
+			return results.getConstructedObject();
+		} else {
+			final List<String> warningMessages = new ArrayList<>();
+			final List<String> errorMessages = new ArrayList<>();
+			final Set<Key> keySet = results.getResultMap().keySet();
+			for (final Key key : keySet) {
+				if (results.hasWarnings(key)) {
+					warningMessages.add(results.getResultString(key, ValidationResultEnum.WARN));
+				}
+				if (results.hasErrors(key)) {
+					errorMessages.add(results.getResultString(key, ValidationResultEnum.ERROR));
+				}
+			}
+
+			String exceptionMessage = "Invalid Configuration: ";
+			exceptionMessage += "[WARN: " + StringUtils.join(warningMessages, ", ") + "], ";
+			exceptionMessage += "[ERROR: " + StringUtils.join(errorMessages, ", ") + "]";
+
+			throw new IllegalStateException(exceptionMessage);
+		}
+	}
+
+	public abstract ValidationResults<Key, Type> buildResults();
 
 	public abstract ValidationResults<Key, Type> assertValid();
 
@@ -51,4 +79,5 @@ public abstract class AbstractBuilder<Key, Type> {
 	public boolean shouldUseDefaultValues() {
 		return shouldUseDefaultValues;
 	}
+
 }
