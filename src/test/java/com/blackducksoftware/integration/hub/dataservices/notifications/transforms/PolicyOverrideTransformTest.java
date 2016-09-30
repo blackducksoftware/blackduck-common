@@ -12,18 +12,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
-import com.blackducksoftware.integration.hub.api.NotificationRestService;
-import com.blackducksoftware.integration.hub.api.PolicyRestService;
-import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.component.BomComponentVersionPolicyStatus;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionStatus;
+import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationContent;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
+import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
+import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyOverrideContentItem;
@@ -32,7 +32,6 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 
 public class PolicyOverrideTransformTest {
-
 	private final static String PROJECT_NAME = "test project";
 	private final static String PROJECT_VERSION = "0.1.0";
 	private final static String COMPONENT_NAME = "component 1";
@@ -61,7 +60,7 @@ public class PolicyOverrideTransformTest {
 		final ProjectVersionRestService service = Mockito.mock(ProjectVersionRestService.class);
 		final ReleaseItem releaseItem = Mockito.mock(ReleaseItem.class);
 		Mockito.when(releaseItem.getVersionName()).thenReturn(PROJECT_VERSION);
-		Mockito.when(service.getProjectVersionReleaseItem(Mockito.anyString())).thenReturn(releaseItem);
+		Mockito.when(service.getItem(Mockito.anyString())).thenReturn(releaseItem);
 		return service;
 	}
 
@@ -69,7 +68,7 @@ public class PolicyOverrideTransformTest {
 		final PolicyRule rule = Mockito.mock(PolicyRule.class);
 		Mockito.when(rule.getName()).thenReturn(POLICY_NAME);
 		final PolicyRestService service = Mockito.mock(PolicyRestService.class);
-		Mockito.when(service.getPolicyRule(Mockito.anyString())).thenReturn(rule);
+		Mockito.when(service.getItem(Mockito.anyString())).thenReturn(rule);
 		return service;
 	}
 
@@ -80,7 +79,7 @@ public class PolicyOverrideTransformTest {
 		final BomComponentVersionPolicyStatus status = Mockito.mock(BomComponentVersionPolicyStatus.class);
 		Mockito.when(status.getLinks(Mockito.anyString())).thenReturn(policyRuleList);
 		final VersionBomPolicyRestService service = Mockito.mock(VersionBomPolicyRestService.class);
-		Mockito.when(service.getPolicyStatus(Mockito.anyString())).thenReturn(status);
+		Mockito.when(service.getItem(Mockito.anyString())).thenReturn(status);
 		return service;
 	}
 
@@ -90,7 +89,7 @@ public class PolicyOverrideTransformTest {
 		final ComponentVersion componentVersion = Mockito.mock(ComponentVersion.class);
 		Mockito.when(componentVersion.getVersionName()).thenReturn(COMPONENT_VERSION);
 		final ComponentVersionRestService service = Mockito.mock(ComponentVersionRestService.class);
-		Mockito.when(service.getComponentVersion(Mockito.anyString())).thenReturn(componentVersion);
+		Mockito.when(service.getItem(Mockito.anyString())).thenReturn(componentVersion);
 		return service;
 	}
 
@@ -114,8 +113,8 @@ public class PolicyOverrideTransformTest {
 		Mockito.when(content.getBomComponentVersionPolicyStatusLink()).thenReturn("PolicyRule");
 		Mockito.when(content.getComponentName()).thenReturn(COMPONENT_NAME);
 		Mockito.when(content.getComponentVersionLink())
-		.thenReturn("/" + ComponentVersionStatus.COMPONENT_URL_IDENTIFIER + "/" + COMPONENT_ID + "/"
-				+ ComponentVersionStatus.COMPONENT_VERSION_URL_IDENTIFIER + "/" + COMPONENT_VERSION_ID);
+				.thenReturn("/" + ComponentVersionStatus.COMPONENT_URL_IDENTIFIER + "/" + COMPONENT_ID + "/"
+						+ ComponentVersionStatus.COMPONENT_VERSION_URL_IDENTIFIER + "/" + COMPONENT_VERSION_ID);
 		versionStatusList.add(status);
 		Mockito.when(item.getContent()).thenReturn(content);
 		Mockito.when(content.getProjectName()).thenReturn(PROJECT_NAME);

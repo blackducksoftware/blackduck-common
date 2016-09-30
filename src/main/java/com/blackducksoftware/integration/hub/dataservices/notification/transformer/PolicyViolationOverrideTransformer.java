@@ -27,17 +27,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
-import com.blackducksoftware.integration.hub.api.NotificationRestService;
-import com.blackducksoftware.integration.hub.api.PolicyRestService;
-import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
+import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
+import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
+import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyOverrideContentItem;
@@ -69,8 +69,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 
 			componentVersionList.add(componentStatus);
 
-			releaseItem = getProjectVersionService()
-					.getProjectVersionReleaseItem(policyViolation.getContent().getProjectVersionLink());
+			releaseItem = getProjectVersionService().getItem(policyViolation.getContent().getProjectVersionLink());
 
 			final ProjectVersion projectVersion = new ProjectVersion();
 			projectVersion.setProjectName(projectName);
@@ -100,9 +99,8 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 		final PolicyOverrideNotificationItem policyOverride = (PolicyOverrideNotificationItem) item;
 
 		templateData.add(new PolicyOverrideContentItem(item.getCreatedAt(), projectVersion, componentName,
-				componentVersion, componentId,
-				componentVersionId,
-				policyRuleList, policyOverride.getContent().getFirstName(), policyOverride.getContent().getLastName()));
+				componentVersion, componentId, componentVersionId, policyRuleList,
+				policyOverride.getContent().getFirstName(), policyOverride.getContent().getLastName()));
 	}
 
 }

@@ -27,8 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.blackducksoftware.integration.hub.api.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
+import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRestService;
 
 public class ProjectAggregateBuilder {
 
@@ -107,8 +107,12 @@ public class ProjectAggregateBuilder {
 			compBuilder = new ComponentAggregateBuilder();
 			compBuilder.setComponentName(item.getComponentName());
 			compBuilder.setComponentVersion(item.getComponentVersion());
-			compBuilder.setComponentId(item.getComponentId().toString());
-			compBuilder.setComponentVersionId(item.getComponentVersionId().toString());
+			if (item.getComponentId() != null) {
+				compBuilder.setComponentId(item.getComponentId().toString());
+			}
+			if (item.getComponentVersionId() != null) {
+				compBuilder.setComponentVersionId(item.getComponentVersionId().toString());
+			}
 			compBuilderMap.put(compKey, compBuilder);
 		}
 		compBuilder.increment(item);

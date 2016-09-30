@@ -19,9 +19,13 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api;
+package com.blackducksoftware.integration.hub.api.notification;
+
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_NOTIFICATIONS;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,11 +37,8 @@ import java.util.Map;
 
 import org.restlet.data.Method;
 
-import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.RuleViolationClearedNotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
+import com.blackducksoftware.integration.hub.api.HubItemRestService;
+import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
@@ -47,15 +48,18 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class NotificationRestService extends HubRestService<NotificationItem> {
-	private final List<String> getNotificationSegments = Arrays.asList(UrlConstants.SEGMENT_API,
-			UrlConstants.SEGMENT_NOTIFICATIONS);
+public class NotificationRestService extends HubItemRestService<NotificationItem> {
+	private static final List<String> NOTIFICATIONS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_NOTIFICATIONS);
+
+	private static final Type ITEM_TYPE = new TypeToken<NotificationItem>() {
+	}.getType();
+	private static final Type ITEM_LIST_TYPE = new TypeToken<List<NotificationItem>>() {
+	}.getType();
+
 	private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();
 
 	public NotificationRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, new TypeToken<NotificationItem>() {
-		}.getType(), new TypeToken<List<NotificationItem>>() {
-		}.getType());
+		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
 
 		typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);
 		typeMap.put("RULE_VIOLATION", RuleViolationNotificationItem.class);
@@ -73,7 +77,7 @@ public class NotificationRestService extends HubRestService<NotificationItem> {
 		final HubRequest notificationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
 		notificationItemRequest.setMethod(Method.GET);
 		notificationItemRequest.setLimit(100);
-		notificationItemRequest.addUrlSegments(getNotificationSegments);
+		notificationItemRequest.addUrlSegments(NOTIFICATIONS_SEGMENTS);
 		notificationItemRequest.addQueryParameter("startDate", startDateString);
 		notificationItemRequest.addQueryParameter("endDate", endDateString);
 

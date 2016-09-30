@@ -26,6 +26,9 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -38,7 +41,6 @@ import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
 
 public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubServerConfig> {
-
 	public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
 	public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
 	public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
@@ -69,6 +71,32 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 
 	public HubServerConfigBuilder(final boolean shouldUseDefaultValues) {
 		super(shouldUseDefaultValues);
+	}
+
+	@Override
+	public HubServerConfig build() throws IllegalStateException {
+		final ValidationResults<GlobalFieldKey, HubServerConfig> results = buildResults();
+		if (results.isSuccess()) {
+			return results.getConstructedObject();
+		} else {
+			final List<String> warningMessages = new ArrayList<>();
+			final List<String> errorMessages = new ArrayList<>();
+			final Set<GlobalFieldKey> keySet = results.getResultMap().keySet();
+			for (final GlobalFieldKey key : keySet) {
+				if (results.hasWarnings(key)) {
+					warningMessages.add(results.getResultString(key, ValidationResultEnum.WARN));
+				}
+				if (results.hasErrors(key)) {
+					errorMessages.add(results.getResultString(key, ValidationResultEnum.ERROR));
+				}
+			}
+
+			String exceptionMessage = "Invalid Hub Server Configuration: ";
+			exceptionMessage += "[WARN: " + StringUtils.join(warningMessages, ", ") + "], ";
+			exceptionMessage += "[ERROR: " + StringUtils.join(errorMessages, ", ") + "]";
+
+			throw new IllegalStateException(exceptionMessage);
+		}
 	}
 
 	@Override

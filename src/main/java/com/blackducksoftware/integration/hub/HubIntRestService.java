@@ -39,20 +39,15 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.util.Series;
 
-import com.blackducksoftware.integration.hub.api.CodeLocationRestService;
-import com.blackducksoftware.integration.hub.api.ComponentVersionRestService;
-import com.blackducksoftware.integration.hub.api.NotificationRestService;
-import com.blackducksoftware.integration.hub.api.PolicyRestService;
-import com.blackducksoftware.integration.hub.api.PolicyStatusRestService;
-import com.blackducksoftware.integration.hub.api.ProjectRestService;
-import com.blackducksoftware.integration.hub.api.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.ScanSummaryRestService;
-import com.blackducksoftware.integration.hub.api.UserRestService;
-import com.blackducksoftware.integration.hub.api.VersionBomPolicyRestService;
-import com.blackducksoftware.integration.hub.api.VersionComparison;
-import com.blackducksoftware.integration.hub.api.VulnerabilityRestService;
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
+import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
+import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
@@ -60,7 +55,12 @@ import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanLocationResults;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
+import com.blackducksoftware.integration.hub.api.user.UserRestService;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
+import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
+import com.blackducksoftware.integration.hub.api.version.VersionComparison;
+import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.dataservices.policystatus.PolicyStatusDataService;
 import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -240,7 +240,7 @@ public class HubIntRestService {
 	}
 
 	public ProjectItem getProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
-		return getProjectRestService().getProject(projectUrl);
+		return getProjectRestService().getItem(projectUrl);
 	}
 
 	public ReleaseItem getProjectVersion(final String versionUrl)
