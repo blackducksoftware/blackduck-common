@@ -123,6 +123,29 @@ public class ValidationResults<Key, Type> {
 		return resultString;
 	}
 
+	public List<String> getAllResultList(final ValidationResultEnum resultEnum) {
+		final List<String> resultList = new ArrayList<String>();
+
+		for (final Entry<Key, Map<ValidationResultEnum, List<ValidationResult>>> entry : resultMap.entrySet()) {
+			if (entry.getValue().containsKey(resultEnum)) {
+				for (final ValidationResult result : entry.getValue().get(resultEnum)) {
+					resultList.add(result.getMessage());
+				}
+			}
+		}
+		return resultList;
+	}
+
+	public String getAllResultString(final ValidationResultEnum resultEnum) {
+		String resultString = "";
+
+		final List<String> resultList = getAllResultList(resultEnum);
+		if (!resultList.isEmpty()) {
+			resultString = StringUtils.join(resultList, "\n");
+		}
+		return resultString;
+	}
+
 	public List<Throwable> getResultThrowables(final Key fieldKey, final ValidationResultEnum resultEnum) {
 		final List<Throwable> throwables = new ArrayList<Throwable>();
 
