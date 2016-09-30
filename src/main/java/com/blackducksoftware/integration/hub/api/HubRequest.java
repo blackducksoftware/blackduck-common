@@ -205,4 +205,10 @@ public class HubRequest {
 		this.q = q;
 	}
 
+	@Override
+	public String toString() {
+		return "HubRequest [url=" + url + ", urlSegments=" + urlSegments + ", limit=" + limit + ", queryParameters="
+				+ queryParameters + ", offset=" + offset + ", q=" + q + "]";
+	}
+
 }
