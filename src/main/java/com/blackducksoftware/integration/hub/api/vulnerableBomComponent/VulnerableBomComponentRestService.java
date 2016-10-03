@@ -63,7 +63,6 @@ public class VulnerableBomComponentRestService extends HubItemRestService<Vulner
 		itemRequest.addUrlSegment(projectVersionId);
 		itemRequest.addUrlSegment("vulnerable-bom-components");
 		itemRequest.setQ(componentName);
-		// itemRequest.addQueryParameter("q", componentName);
 
 		final JsonObject jsonObject = itemRequest.executeForResponseJson();
 		final List<VulnerableBomComponentItem> allItems = getAll(jsonObject, itemRequest);
