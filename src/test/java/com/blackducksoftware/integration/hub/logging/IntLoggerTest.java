@@ -1,11 +1,9 @@
 package com.blackducksoftware.integration.hub.logging;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.CIEnvironmentVariables;
-import com.blackducksoftware.integration.hub.test.TestLogger;
+import com.blackducksoftware.integration.test.TestLogger;
+import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class IntLoggerTest {
 
