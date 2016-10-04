@@ -23,7 +23,7 @@ package com.blackducksoftware.integration.hub.api.version;
 
 public enum PhaseEnum {
 	PLANNING("In Planning"),
-	DEVELOPMENT("In Developement"),
+	DEVELOPMENT("In Development"),
 	RELEASED("Released"),
 	DEPRECATED("Deprecated"),
 	ARCHIVED("Archived"),
