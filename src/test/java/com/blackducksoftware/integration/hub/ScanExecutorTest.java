@@ -39,7 +39,7 @@ import org.mockito.Mockito;
 
 import com.blackducksoftware.integration.hub.ScanExecutor.Result;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.test.TestLogger;
+import com.blackducksoftware.integration.test.TestLogger;
 
 public class ScanExecutorTest {
 	@Rule
@@ -136,7 +136,7 @@ public class ScanExecutorTest {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("No build identifier provided.");
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 
 		new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
@@ -156,7 +156,7 @@ public class ScanExecutorTest {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("No HubSupportHelper provided.");
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 
 		new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
@@ -176,7 +176,7 @@ public class ScanExecutorTest {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("The HubSupportHelper has not been checked yet.");
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 
 		final HubSupportHelper supportHelper = new HubSupportHelper();
@@ -196,7 +196,7 @@ public class ScanExecutorTest {
 	@Test
 	public void testValidConstructor() throws Exception {
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
@@ -216,7 +216,7 @@ public class ScanExecutorTest {
 	@Test
 	public void testSetupNoLogger() throws Exception {
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
@@ -239,7 +239,7 @@ public class ScanExecutorTest {
 	@Test
 	public void testSetupNoScanExec() throws Exception {
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
@@ -267,7 +267,7 @@ public class ScanExecutorTest {
 	@Test
 	public void testSetupScanExecDoesNotExist() throws Exception {
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
@@ -295,7 +295,7 @@ public class ScanExecutorTest {
 	@Test
 	public void testSetupNoOneJarFile() throws Exception {
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
@@ -323,7 +323,7 @@ public class ScanExecutorTest {
 	@Test
 	public void testSetupNoJavaExec() throws Exception {
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
@@ -349,7 +349,7 @@ public class ScanExecutorTest {
 	@Test
 	public void testSetupJavaExecDoesNotExist() throws Exception {
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
@@ -375,7 +375,7 @@ public class ScanExecutorTest {
 	@Test
 	public void testSetupNoMemoryProvided() throws Exception {
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
@@ -401,10 +401,10 @@ public class ScanExecutorTest {
 	@Test
 	public void testSetupValid() throws Exception {
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 
-		final List<String> cmdList = new ArrayList<String>();
+		final List<String> cmdList = new ArrayList<>();
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
 				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
@@ -454,10 +454,10 @@ public class ScanExecutorTest {
 	@Test
 	public void testSetupProxySettings() throws Exception {
 
-		final ArrayList<String> scanTargets = new ArrayList<String>();
+		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 
-		final List<String> cmdList = new ArrayList<String>();
+		final List<String> cmdList = new ArrayList<>();
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
 				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
@@ -474,7 +474,7 @@ public class ScanExecutorTest {
 		final TestLogger logger = new TestLogger();
 		executor.setLogger(logger);
 
-		final ArrayList<Pattern> noProxyHosts = new ArrayList<Pattern>();
+		final ArrayList<Pattern> noProxyHosts = new ArrayList<>();
 		noProxyHosts.add(Pattern.compile("test"));
 		executor.setProxyHost(testProperties.getProperty("TEST_PROXY_HOST_BASIC"));
 		executor.setProxyPort(Integer.valueOf(testProperties.getProperty("TEST_PROXY_PORT_BASIC")));

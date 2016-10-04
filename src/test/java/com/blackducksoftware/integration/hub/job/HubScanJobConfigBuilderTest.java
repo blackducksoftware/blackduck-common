@@ -38,9 +38,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.builder.ValidationResult;
+import com.blackducksoftware.integration.builder.ValidationResults;
 import com.blackducksoftware.integration.hub.builder.HubScanJobConfigBuilder;
-import com.blackducksoftware.integration.hub.builder.ValidationResult;
-import com.blackducksoftware.integration.hub.builder.ValidationResults;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 
 public class HubScanJobConfigBuilderTest {

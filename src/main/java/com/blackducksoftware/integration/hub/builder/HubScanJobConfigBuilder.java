@@ -30,15 +30,17 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import com.blackducksoftware.integration.builder.AbstractBuilder;
+import com.blackducksoftware.integration.builder.ValidationResult;
+import com.blackducksoftware.integration.builder.ValidationResultEnum;
+import com.blackducksoftware.integration.builder.ValidationResults;
 import com.blackducksoftware.integration.hub.job.HubScanJobConfig;
 import com.blackducksoftware.integration.hub.job.HubScanJobFieldEnum;
 import com.google.common.collect.ImmutableList;
 
 public class HubScanJobConfigBuilder extends AbstractBuilder<HubScanJobFieldEnum, HubScanJobConfig> {
 	public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
-
 	public static final int DEFAULT_BOM_UPDATE_WAIT_TIME_IN_MINUTES = 5;
-
 	public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
 	private String projectName;

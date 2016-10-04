@@ -27,8 +27,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
-import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;

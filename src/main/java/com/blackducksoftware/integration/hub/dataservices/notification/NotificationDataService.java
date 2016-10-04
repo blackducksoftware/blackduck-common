@@ -63,8 +63,8 @@ import com.blackducksoftware.integration.hub.dataservices.notification.transform
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationTransformer;
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
@@ -87,8 +87,7 @@ public class NotificationDataService extends AbstractDataService {
 	}
 
 	public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
-			final JsonParser jsonParser,
-			final PolicyNotificationFilter policyFilter) {
+			final JsonParser jsonParser, final PolicyNotificationFilter policyFilter) {
 		super(restConnection, gson, jsonParser);
 		this.logger = logger;
 		this.policyFilter = policyFilter;

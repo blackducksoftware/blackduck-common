@@ -35,7 +35,6 @@ public class VersionReport {
 	private final List<AggregateBomViewEntry> aggregateBomViewEntries;
 
 	public VersionReport(final DetailedReleaseSummary detailedReleaseSummary,
-			// List<DetailedCodeLocation> detailedCodeLocations,
 			final List<AggregateBomViewEntry> aggregateBomViewEntries) {
 		this.detailedReleaseSummary = detailedReleaseSummary;
 		this.aggregateBomViewEntries = aggregateBomViewEntries;

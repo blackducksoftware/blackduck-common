@@ -33,7 +33,7 @@ import org.restlet.resource.ResourceException;
 import com.blackducksoftware.integration.hub.api.version.VersionComparison;
 import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class HubSupportHelper implements Serializable {
 	private static final long serialVersionUID = 6440466357358359056L;
