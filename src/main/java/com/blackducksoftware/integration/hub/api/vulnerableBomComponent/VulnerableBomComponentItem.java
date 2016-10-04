@@ -33,13 +33,19 @@ public class VulnerableBomComponentItem extends HubItem {
 	@SerializedName("componentVersion")
 	private String componentVersionLink;
 
+	private VulnerabilityWithRemediation vulnerabilityWithRemediation;
+
+	// Also in Hub's response: License
+
 	public VulnerableBomComponentItem(final MetaInformation meta, final String componentName,
-			final String componentVersionName, final String componentVersionLink) {
+			final String componentVersionName, final String componentVersionLink,
+			final VulnerabilityWithRemediation vulnerabilityWithRemediation) {
 		super(meta);
 
 		this.componentName = componentName;
 		this.componentVersionName = componentVersionName;
 		this.componentVersionLink = componentVersionLink;
+		this.vulnerabilityWithRemediation = vulnerabilityWithRemediation;
 	}
 
 	public String getComponentName() {
@@ -66,9 +72,18 @@ public class VulnerableBomComponentItem extends HubItem {
 		this.componentVersionLink = componentVersionLink;
 	}
 
+	public VulnerabilityWithRemediation getVulnerabilityWithRemediation() {
+		return vulnerabilityWithRemediation;
+	}
+
+	public void setVulnerabilityWithRemediation(final VulnerabilityWithRemediation vulnerabilityWithRemediation) {
+		this.vulnerabilityWithRemediation = vulnerabilityWithRemediation;
+	}
+
 	@Override
 	public String toString() {
 		return "VulnerableBomComponentItem [componentName=" + componentName + ", componentVersionName="
-				+ componentVersionName + ", componentVersionLink=" + componentVersionLink + "]";
+				+ componentVersionName + ", componentVersionLink=" + componentVersionLink
+				+ ", vulnerabilityWithRemediation=" + vulnerabilityWithRemediation + "]";
 	}
 }

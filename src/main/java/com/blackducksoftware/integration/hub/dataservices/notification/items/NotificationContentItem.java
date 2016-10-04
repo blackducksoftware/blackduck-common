@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
+import com.google.common.base.Joiner;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {
 	private final ProjectVersion projectVersion;
@@ -94,17 +95,25 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
 	@Override
 	public int compareTo(final NotificationContentItem o) {
+		if (equals(o)) {
+			return 0;
+		}
+
 		final int createdAtComparison = getCreatedAt().compareTo(o.getCreatedAt());
 		if (createdAtComparison != 0) {
 			// If createdAt times are different, use createdAt to compare
 			return createdAtComparison;
 		}
-		// If createdAt values are identical, see if they are truly equal
-		if (equals(o)) {
-			return 0;
-		}
+
 		// Identify same-time non-equal items as non-equal
-		return 1;
+		final Joiner joiner = Joiner.on(":").skipNulls();
+		final String thisProjectVersionString = joiner.join(getProjectVersion().getProjectName(), getProjectVersion()
+				.getProjectVersionName(), getComponentId().toString(), getComponentVersionId().toString());
+		final String otherProjectVersionString = joiner.join(o.getProjectVersion().getProjectName(), o
+				.getProjectVersion().getProjectVersionName(), o.getComponentId().toString(), o.getComponentVersionId()
+				.toString());
+
+		return thisProjectVersionString.compareTo(otherProjectVersionString);
 	}
 
 	@Override
