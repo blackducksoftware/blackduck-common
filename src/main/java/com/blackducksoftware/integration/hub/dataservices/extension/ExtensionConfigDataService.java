@@ -57,38 +57,6 @@ public class ExtensionConfigDataService extends AbstractDataService {
 		return itemList;
 	}
 
-	public List<UserConfigItem> getUserOverrideConfigList(final String extensionId) {
-		List<UserConfigItem> itemList = new LinkedList<>();
-		try {
-			final List<UserItem> userList = userService.getAllUsers();
-			final Map<String, ConfigurationItem> globalConfigMap = createGlobalConfigMap(extensionId);
-			itemList = createUserConfigItemList(extensionId, userList);
-
-			for (final UserConfigItem configItem : itemList) {
-				final Map<String, ConfigurationItem> userConfigMap = configItem.getConfigMap();
-				if (userConfigMap == null || userConfigMap.isEmpty()) {
-					userConfigMap.putAll(globalConfigMap);
-				} else {
-					for (final Map.Entry<String, ConfigurationItem> entry : globalConfigMap.entrySet()) {
-						if (!userConfigMap.containsKey(entry.getKey())) {
-							userConfigMap.put(entry.getKey(), entry.getValue());
-						} else {
-							final ConfigurationItem userItem = userConfigMap.get(entry.getKey());
-							if (userItem.getValue() == null && userItem.getValue().isEmpty()) {
-								userConfigMap.put(entry.getKey(), entry.getValue());
-							}
-						}
-					}
-				}
-			}
-
-		} catch (URISyntaxException | BDRestException | IOException | MissingUUIDException e) {
-			logger.error("Error creating user configuration", e);
-		}
-
-		return itemList;
-	}
-
 	private Map<String, ConfigurationItem> createGlobalConfigMap(final String extensionId)
 			throws IOException, URISyntaxException, BDRestException {
 		final List<ConfigurationItem> itemList = extensionRestService.getGlobalOptions(extensionId);
