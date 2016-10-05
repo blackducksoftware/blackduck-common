@@ -34,8 +34,7 @@ public class ComponentAggregateBuilder {
 
 	private String componentName;
 	private String componentVersion;
-	private String componentId;
-	private String componentVersionId;
+	private String componentVersionUrl;
 	private int addedVulnCount;
 	private int updatedVulnCount;
 	private int deletedVulnCount;
@@ -66,20 +65,12 @@ public class ComponentAggregateBuilder {
 		this.componentVersion = componentVersion;
 	}
 
-	public String getComponentId() {
-		return componentId;
+	public void setComponentVersionUrl(final String componentVersionUrl) {
+		this.componentVersionUrl = componentVersionUrl;
 	}
 
-	public void setComponentId(final String componentId) {
-		this.componentId = componentId;
-	}
-
-	public String getComponentVersionId() {
-		return componentVersionId;
-	}
-
-	public void setComponentVersionId(final String componentVersionId) {
-		this.componentVersionId = componentVersionId;
+	public String getComponentVersionUrl() {
+		return componentVersionUrl;
 	}
 
 	public VulnerabilityRestService getRestService() {
@@ -186,11 +177,10 @@ public class ComponentAggregateBuilder {
 		final ComponentVulnerabilitySummaryBuilder summaryBuilder = new ComponentVulnerabilitySummaryBuilder();
 
 		if (getVulnerabilityCount() > 0) { // received vulnerability
-											// notifications
+			// notifications
 			if (getRestService() != null) {
 				try {
-					itemList = getRestService().getComponentVersionVulnerabilities(getComponentId(),
-							getComponentVersionId());
+					itemList = getRestService().getComponentVersionVulnerabilities(getComponentVersionUrl());
 				} catch (IOException | URISyntaxException | BDRestException e) {
 				}
 			}

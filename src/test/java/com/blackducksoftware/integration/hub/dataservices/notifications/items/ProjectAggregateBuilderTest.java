@@ -36,7 +36,7 @@ public class ProjectAggregateBuilderTest {
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName(PROJECT_NAME);
 		projectVersion.setProjectVersionName(PROJECT_VERSION);
-		projectVersion.setProjectVersionLink(PROJECT_LINK);
+		projectVersion.setUrl(PROJECT_LINK);
 		return projectVersion;
 	}
 
@@ -117,7 +117,7 @@ public class ProjectAggregateBuilderTest {
 		builder = builder.updateProjectVersion(createProjectVersion());
 		assertEquals(PROJECT_NAME, builder.getProjectVersion().getProjectName());
 		assertEquals(PROJECT_VERSION, builder.getProjectVersion().getProjectVersionName());
-		assertEquals(PROJECT_LINK, builder.getProjectVersion().getProjectVersionLink());
+		assertEquals(PROJECT_LINK, builder.getProjectVersion().getUrl());
 	}
 
 	@Test
@@ -193,7 +193,7 @@ public class ProjectAggregateBuilderTest {
 		assertEquals(end, builder.getEndDate());
 		assertEquals(PROJECT_NAME, builder.getProjectVersion().getProjectName());
 		assertEquals(PROJECT_VERSION, builder.getProjectVersion().getProjectVersionName());
-		assertEquals(PROJECT_LINK, builder.getProjectVersion().getProjectVersionLink());
+		assertEquals(PROJECT_LINK, builder.getProjectVersion().getUrl());
 		assertEquals(policyCount, data.getPolicyViolationCount());
 		assertEquals(policyOverrideCount, data.getPolicyOverrideCount());
 		assertEquals(vulnCount, data.getVulnerabilityCount());

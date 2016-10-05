@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 
+@Deprecated
 public class HubUrlParser {
 	// Project Url :
 	// http://eng-hub-valid03.dc1.lan/api/projects/a3b48f57-9c00-453f-8672-804e08c317f2

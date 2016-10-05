@@ -42,6 +42,10 @@ public class MetaInformation {
 		return href;
 	}
 
+	public String getRelativeHref() {
+		return "fakeRelativeHref"; // TODO
+	}
+
 	public List<MetaLink> getLinks() {
 		return links;
 	}

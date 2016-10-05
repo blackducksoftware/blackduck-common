@@ -27,7 +27,7 @@ public class ProjectAggregateTest {
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName("Project Name");
 		projectVersion.setProjectVersionName("1.0");
-		projectVersion.setProjectVersionLink("versionLink");
+		projectVersion.setUrl("versionLink");
 		final String componentName = "componentName";
 		final String componentVersion = "componentVersion";
 		final String firstName = "firstName";

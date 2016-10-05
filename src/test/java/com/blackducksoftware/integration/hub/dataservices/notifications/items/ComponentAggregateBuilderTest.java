@@ -36,7 +36,7 @@ public class ComponentAggregateBuilderTest {
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName(PROJECT_NAME);
 		projectVersion.setProjectVersionName(PROJECT_VERSION);
-		projectVersion.setProjectVersionLink(PROJECT_LINK);
+		projectVersion.setUrl(PROJECT_LINK);
 		return projectVersion;
 	}
 

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -65,7 +64,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
 	protected void handleNotificationUsingBomComponentVersionPolicyStatusLink(
 			final List<ComponentVersionStatus> componentVersionList, final ProjectVersion projectVersion,
 			final NotificationItem item, final List<NotificationContentItem> templateData)
-			throws HubItemTransformException {
+					throws HubItemTransformException {
 		for (final ComponentVersionStatus componentVersion : componentVersionList) {
 			try {
 				final String componentVersionLink = componentVersion.getComponentVersionLink();
@@ -86,7 +85,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
 							policyRuleList.add(rule);
 						}
 						createContents(projectVersion, componentVersion.getComponentName(), componentVersionName,
-								componentVersion.getComponentId(), componentVersion.getComponentVersionId(),
+								componentVersion.getComponentVersionLink(),
 								policyRuleList, item, templateData);
 					}
 				}
@@ -202,6 +201,6 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
 	}
 
 	public abstract void createContents(final ProjectVersion projectVersion, final String componentName,
-			final String componentVersion, final UUID componentId, final UUID componentVersionId,
+			final String componentVersion, final String componentVersionUrl,
 			List<PolicyRule> policyRuleList, NotificationItem item, List<NotificationContentItem> templateData);
 }
