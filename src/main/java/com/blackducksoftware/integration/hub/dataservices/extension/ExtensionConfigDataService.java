@@ -12,7 +12,7 @@ import com.blackducksoftware.integration.hub.api.extension.ExtensionRestService;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.api.user.UserRestService;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
-import com.blackducksoftware.integration.hub.dataservices.extension.items.UserConfigItem;
+import com.blackducksoftware.integration.hub.dataservices.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.dataservices.extension.transformer.UserConfigTransform;
 import com.blackducksoftware.integration.hub.dataservices.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
