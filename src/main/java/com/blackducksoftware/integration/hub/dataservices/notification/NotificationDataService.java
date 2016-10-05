@@ -25,20 +25,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
@@ -56,12 +48,12 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Not
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateBuilder;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateData;
-import com.blackducksoftware.integration.hub.dataservices.notification.transformer.AbstractNotificationTransformer;
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.NotificationCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationClearedTransformer;
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationOverrideTransformer;
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationTransformer;
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.VulnerabilityTransformer;
+import com.blackducksoftware.integration.hub.dataservices.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -69,17 +61,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
 public class NotificationDataService extends AbstractDataService {
-	private final IntLogger logger;
 	private final NotificationRestService notificationService;
 	private final ProjectVersionRestService projectVersionService;
 	private final PolicyRestService policyService;
 	private final VersionBomPolicyRestService bomVersionPolicyService;
 	private final ComponentVersionRestService componentVersionService;
-	private final Map<Class<?>, AbstractNotificationTransformer> transformerMap = new HashMap<>();;
-	private final ExecutorService executorService;
-	private final ExecutorCompletionService<List<NotificationContentItem>> completionService;
 	private PolicyNotificationFilter policyFilter = null;
 	private final VulnerabilityRestService vulnerabilityRestService;
+	private final ParallelResourceProcessor<NotificationContentItem, NotificationItem> parallelProcessor;
 
 	public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
 			final JsonParser jsonParser) {
@@ -87,10 +76,8 @@ public class NotificationDataService extends AbstractDataService {
 	}
 
 	public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
-			final JsonParser jsonParser,
-			final PolicyNotificationFilter policyFilter) {
+			final JsonParser jsonParser, final PolicyNotificationFilter policyFilter) {
 		super(restConnection, gson, jsonParser);
-		this.logger = logger;
 		this.policyFilter = policyFilter;
 
 		notificationService = new NotificationRestService(restConnection, gson, jsonParser);
@@ -99,23 +86,22 @@ public class NotificationDataService extends AbstractDataService {
 		bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
 		vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
-
+		parallelProcessor = new ParallelResourceProcessor<>(logger);
 		populateTransformerMap();
-
-		final ThreadFactory threadFactory = Executors.defaultThreadFactory();
-		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
-		completionService = new ExecutorCompletionService<>(executorService);
 	}
 
 	private void populateTransformerMap() {
-		transformerMap.put(RuleViolationNotificationItem.class, new PolicyViolationTransformer(notificationService,
-				projectVersionService, policyService, bomVersionPolicyService, componentVersionService, policyFilter));
-		transformerMap.put(PolicyOverrideNotificationItem.class,
+
+		parallelProcessor.addTransform(RuleViolationNotificationItem.class,
+				new PolicyViolationTransformer(notificationService, projectVersionService, policyService,
+						bomVersionPolicyService, componentVersionService, policyFilter));
+		parallelProcessor.addTransform(PolicyOverrideNotificationItem.class,
 				new PolicyViolationOverrideTransformer(notificationService, projectVersionService, policyService,
 						bomVersionPolicyService, componentVersionService, policyFilter));
-		transformerMap.put(VulnerabilityNotificationItem.class, new VulnerabilityTransformer(notificationService,
-				projectVersionService, policyService, bomVersionPolicyService, componentVersionService));
-		transformerMap.put(RuleViolationClearedNotificationItem.class,
+		parallelProcessor.addTransform(VulnerabilityNotificationItem.class,
+				new VulnerabilityTransformer(notificationService, projectVersionService, policyService,
+						bomVersionPolicyService, componentVersionService));
+		parallelProcessor.addTransform(RuleViolationClearedNotificationItem.class,
 				new PolicyViolationClearedTransformer(notificationService, projectVersionService, policyService,
 						bomVersionPolicyService, componentVersionService, policyFilter));
 	}
@@ -124,28 +110,7 @@ public class NotificationDataService extends AbstractDataService {
 			throws IOException, URISyntaxException, BDRestException {
 		final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
 		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
-
-		int submitted = 0;
-		for (final NotificationItem item : itemList) {
-			final Class<? extends NotificationItem> key = item.getClass();
-			if (transformerMap.containsKey(key)) {
-				final AbstractNotificationTransformer converter = transformerMap.get(key);
-				final TransformCallable callable = new TransformCallable(item, converter);
-				completionService.submit(callable);
-				submitted++;
-			}
-		}
-
-		for (int index = 0; index < submitted; index++) {
-			try {
-				final Future<List<NotificationContentItem>> future = completionService.take();
-				final List<NotificationContentItem> contentItems = future.get();
-				contentList.addAll(contentItems);
-			} catch (final ExecutionException | InterruptedException e) {
-				logger.error(e.getMessage(), e);
-			}
-		}
-
+		contentList.addAll(parallelProcessor.process(itemList));
 		return contentList;
 	}
 
@@ -166,20 +131,4 @@ public class NotificationDataService extends AbstractDataService {
 		}
 		return dataList;
 	}
-
-	private class TransformCallable implements Callable<List<NotificationContentItem>> {
-		private final NotificationItem item;
-		private final AbstractNotificationTransformer converter;
-
-		public TransformCallable(final NotificationItem item, final AbstractNotificationTransformer converter) {
-			this.item = item;
-			this.converter = converter;
-		}
-
-		@Override
-		public List<NotificationContentItem> call() throws Exception {
-			return converter.transform(item);
-		}
-	}
-
 }
