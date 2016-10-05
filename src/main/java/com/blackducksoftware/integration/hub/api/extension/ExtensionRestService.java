@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.api;
+package com.blackducksoftware.integration.hub.api.extension;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -7,7 +7,9 @@ import java.util.List;
 
 import org.restlet.data.Method;
 
-import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
+import com.blackducksoftware.integration.hub.api.HubItemRestService;
+import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.UrlConstants;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;

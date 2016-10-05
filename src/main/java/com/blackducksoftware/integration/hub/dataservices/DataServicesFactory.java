@@ -1,9 +1,9 @@
 package com.blackducksoftware.integration.hub.dataservices;
 
-import com.blackducksoftware.integration.hub.api.ExtensionRestService;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRestService;
