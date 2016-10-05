@@ -2,9 +2,9 @@ package com.blackducksoftware.integration.hub.dataservices.extension.transformer
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +31,8 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
 			if (!item.isActive()) {
 				return Collections.emptyList();
 			} else {
-				final LinkedList<UserConfigItem> itemList = new LinkedList<>();
 				final Map<String, ConfigurationItem> configItems = getUserConfigOptions(extensionId, item);
+				final List<UserConfigItem> itemList = new ArrayList<>(configItems.size());
 				itemList.add(new UserConfigItem(item, configItems));
 				return itemList;
 			}
