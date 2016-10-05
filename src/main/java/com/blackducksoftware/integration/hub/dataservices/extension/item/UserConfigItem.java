@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.dataservices.extension.items;
+package com.blackducksoftware.integration.hub.dataservices.extension.item;
 
 import java.util.Map;
 

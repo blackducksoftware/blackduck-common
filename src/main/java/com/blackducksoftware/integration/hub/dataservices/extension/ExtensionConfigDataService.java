@@ -2,20 +2,20 @@ package com.blackducksoftware.integration.hub.dataservices.extension;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.blackducksoftware.integration.hub.api.ExtensionRestService;
 import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionRestService;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.api.user.UserRestService;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
-import com.blackducksoftware.integration.hub.dataservices.extension.items.UserConfigItem;
+import com.blackducksoftware.integration.hub.dataservices.extension.item.UserConfigItem;
+import com.blackducksoftware.integration.hub.dataservices.extension.transformer.UserConfigTransform;
+import com.blackducksoftware.integration.hub.dataservices.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.Gson;
@@ -25,6 +25,9 @@ public class ExtensionConfigDataService extends AbstractDataService {
 	private final IntLogger logger;
 	private final UserRestService userService;
 	private final ExtensionRestService extensionRestService;
+	private final UserConfigTransform userConfigTransform;
+
+	private final ParallelResourceProcessor<UserConfigItem, UserItem> parallelProcessor;
 
 	public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
 			final JsonParser jsonParser, final UserRestService userRestService,
@@ -33,6 +36,10 @@ public class ExtensionConfigDataService extends AbstractDataService {
 		this.logger = logger;
 		this.userService = userRestService;
 		this.extensionRestService = extensionRestService;
+		userConfigTransform = new UserConfigTransform(extensionRestService);
+		parallelProcessor = new ParallelResourceProcessor<>(logger);
+		parallelProcessor.addTransform(UserItem.class, userConfigTransform);
+
 	}
 
 	public Map<String, ConfigurationItem> getGlobalConfigMap(final String extensionId) {
@@ -49,40 +56,9 @@ public class ExtensionConfigDataService extends AbstractDataService {
 		List<UserConfigItem> itemList = new LinkedList<>();
 		try {
 			final List<UserItem> userList = userService.getAllUsers();
-			itemList = createUserConfigItemList(extensionId, userList);
-		} catch (URISyntaxException | BDRestException | IOException | MissingUUIDException e) {
-			logger.error("Error creating user configuration", e);
-		}
-
-		return itemList;
-	}
-
-	public List<UserConfigItem> getUserOverrideConfigList(final String extensionId) {
-		List<UserConfigItem> itemList = new LinkedList<>();
-		try {
-			final List<UserItem> userList = userService.getAllUsers();
-			final Map<String, ConfigurationItem> globalConfigMap = createGlobalConfigMap(extensionId);
-			itemList = createUserConfigItemList(extensionId, userList);
-
-			for (final UserConfigItem configItem : itemList) {
-				final Map<String, ConfigurationItem> userConfigMap = configItem.getConfigMap();
-				if (userConfigMap == null || userConfigMap.isEmpty()) {
-					userConfigMap.putAll(globalConfigMap);
-				} else {
-					for (final Map.Entry<String, ConfigurationItem> entry : globalConfigMap.entrySet()) {
-						if (!userConfigMap.containsKey(entry.getKey())) {
-							userConfigMap.put(entry.getKey(), entry.getValue());
-						} else {
-							final ConfigurationItem userItem = userConfigMap.get(entry.getKey());
-							if (userItem.getValue() == null && userItem.getValue().isEmpty()) {
-								userConfigMap.put(entry.getKey(), entry.getValue());
-							}
-						}
-					}
-				}
-			}
-
-		} catch (URISyntaxException | BDRestException | IOException | MissingUUIDException e) {
+			userConfigTransform.setExtensionId(extensionId);
+			itemList = parallelProcessor.process(userList);
+		} catch (URISyntaxException | BDRestException | IOException e) {
 			logger.error("Error creating user configuration", e);
 		}
 
@@ -93,28 +69,6 @@ public class ExtensionConfigDataService extends AbstractDataService {
 			throws IOException, URISyntaxException, BDRestException {
 		final List<ConfigurationItem> itemList = extensionRestService.getGlobalOptions(extensionId);
 		final Map<String, ConfigurationItem> itemMap = createConfigMap(itemList);
-		return itemMap;
-	}
-
-	private List<UserConfigItem> createUserConfigItemList(final String extensionId, final List<UserItem> userList)
-			throws IOException, URISyntaxException, BDRestException, MissingUUIDException {
-		final List<UserConfigItem> itemList = new ArrayList<>(userList.size());
-		for (final UserItem user : userList) {
-			if (user.isActive()) { // only get active users extension config
-				final Map<String, ConfigurationItem> configItems = getUserConfigOptions(extensionId, user);
-				itemList.add(new UserConfigItem(user, configItems));
-			}
-		}
-		return itemList;
-	}
-
-	private Map<String, ConfigurationItem> getUserConfigOptions(final String extensionId, final UserItem user)
-			throws IOException, URISyntaxException, BDRestException, MissingUUIDException {
-		// get user ID
-		final String userId = user.getUserId().toString();
-		final List<ConfigurationItem> userItemList = extensionRestService.getUserConfiguration(extensionId, userId);
-		final Map<String, ConfigurationItem> itemMap = createConfigMap(userItemList);
-
 		return itemMap;
 	}
 
