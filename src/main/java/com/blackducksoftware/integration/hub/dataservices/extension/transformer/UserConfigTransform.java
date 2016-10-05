@@ -2,6 +2,7 @@ package com.blackducksoftware.integration.hub.dataservices.extension.transformer
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +18,6 @@ import com.blackducksoftware.integration.hub.exception.HubItemTransformException
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 
 public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, UserItem> {
-
 	private String extensionId;
 	private final ExtensionRestService extensionRestService;
 
@@ -29,7 +29,7 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
 	public List<UserConfigItem> transform(final UserItem item) throws HubItemTransformException {
 		try {
 			if (!item.isActive()) {
-				return new LinkedList<>();
+				return Collections.emptyList();
 			} else {
 				final LinkedList<UserConfigItem> itemList = new LinkedList<>();
 				final Map<String, ConfigurationItem> configItems = getUserConfigOptions(extensionId, item);
@@ -43,11 +43,9 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
 
 	private Map<String, ConfigurationItem> getUserConfigOptions(final String extensionId, final UserItem user)
 			throws IOException, URISyntaxException, BDRestException, MissingUUIDException {
-		// get user ID
 		final String userId = user.getUserId().toString();
 		final List<ConfigurationItem> userItemList = extensionRestService.getUserConfiguration(extensionId, userId);
 		final Map<String, ConfigurationItem> itemMap = createConfigMap(userItemList);
-
 		return itemMap;
 	}
 
