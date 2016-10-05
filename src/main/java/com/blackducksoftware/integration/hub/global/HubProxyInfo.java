@@ -34,9 +34,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.encryption.PasswordDecrypter;
-import com.blackducksoftware.integration.hub.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.util.AuthenticatorUtil;
+import com.blackducksoftware.integration.encryption.PasswordDecrypter;
+import com.blackducksoftware.integration.exception.EncryptionException;
+import com.blackducksoftware.integration.util.AuthenticatorUtil;
 
 public class HubProxyInfo implements Serializable {
 	private static final long serialVersionUID = -7476704373593358472L;

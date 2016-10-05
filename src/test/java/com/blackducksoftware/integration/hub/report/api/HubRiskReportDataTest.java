@@ -39,8 +39,8 @@ import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskCategories;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskCounts;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskProfile;
-import com.blackducksoftware.integration.hub.test.TestUtils;
 import com.blackducksoftware.integration.hub.util.XStreamHelperTest;
+import com.blackducksoftware.integration.test.TestUtils;
 
 public class HubRiskReportDataTest {
 	@Test

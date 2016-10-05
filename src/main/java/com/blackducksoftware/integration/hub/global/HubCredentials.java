@@ -24,9 +24,9 @@ package com.blackducksoftware.integration.hub.global;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import com.blackducksoftware.integration.hub.encryption.PasswordDecrypter;
-import com.blackducksoftware.integration.hub.encryption.PasswordEncrypter;
-import com.blackducksoftware.integration.hub.exception.EncryptionException;
+import com.blackducksoftware.integration.encryption.PasswordDecrypter;
+import com.blackducksoftware.integration.encryption.PasswordEncrypter;
+import com.blackducksoftware.integration.exception.EncryptionException;
 
 public class HubCredentials implements Serializable {
 	private static final long serialVersionUID = 7924589951692259151L;

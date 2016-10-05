@@ -33,7 +33,7 @@ import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class CLILocation {
 	public static final String CLI_UNZIP_DIR = "Hub_Scan_Installation";

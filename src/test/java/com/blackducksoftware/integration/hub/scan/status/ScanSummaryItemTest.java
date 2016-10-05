@@ -22,13 +22,21 @@
 package com.blackducksoftware.integration.hub.scan.status;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Calendar;
+
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.scan.ScanStatus;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.test.TestUtils;
+import com.google.gson.Gson;
 
 public class ScanSummaryItemTest {
 	@Test
@@ -54,6 +62,30 @@ public class ScanSummaryItemTest {
 
 		assertTrue(item1.hashCode() != item2.hashCode());
 		assertEquals(item1.hashCode(), item3.hashCode());
+	}
+
+	@Test
+	public void testPopulatingScanSummaryItemFromJson() throws IOException {
+		final InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(
+				"com/blackducksoftware/integration/hub/scan/status/scanSummaryItemJson.txt");
+		final String json = IOUtils.toString(inputStream, "UTF-8");
+
+		final Gson gson = new Gson();
+		final ScanSummaryItem scanSummaryItem = gson.fromJson(json, ScanSummaryItem.class);
+		assertNotNull(scanSummaryItem.getCreatedAt());
+		assertNotNull(scanSummaryItem.getUpdatedAt());
+
+		final Calendar createdAt = Calendar.getInstance();
+		createdAt.setTime(scanSummaryItem.getCreatedAt());
+		assertEquals(4, createdAt.get(Calendar.DAY_OF_MONTH));
+		assertEquals(Calendar.OCTOBER, createdAt.get(Calendar.MONTH));
+		assertEquals(479, createdAt.get(Calendar.MILLISECOND));
+
+		final Calendar updatedAt = Calendar.getInstance();
+		updatedAt.setTime(scanSummaryItem.getUpdatedAt());
+		assertEquals(4, updatedAt.get(Calendar.DAY_OF_MONTH));
+		assertEquals(Calendar.OCTOBER, updatedAt.get(Calendar.MONTH));
+		assertEquals(982, updatedAt.get(Calendar.MILLISECOND));
 	}
 
 }

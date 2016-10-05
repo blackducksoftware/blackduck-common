@@ -36,9 +36,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.builder.ValidationResult;
+import com.blackducksoftware.integration.builder.ValidationResults;
 import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
-import com.blackducksoftware.integration.hub.builder.ValidationResult;
-import com.blackducksoftware.integration.hub.builder.ValidationResults;
 
 public class HubCredentialsBuilderTest {
 	private static final String VALID_PASSWORD = "Password";

@@ -42,12 +42,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
-import com.blackducksoftware.integration.hub.CIEnvironmentVariables;
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
-import com.blackducksoftware.integration.hub.util.AuthenticatorUtil;
+import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.util.AuthenticatorUtil;
+import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class CLIInstaller {
 	private String proxyHost;

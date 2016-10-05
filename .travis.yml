@@ -3,10 +3,6 @@ language: java
 jdk:
   - oraclejdk8
 
-cache:
-  directories:
-    - $HOME/.m2
-
 notifications:
   email:
     recipients:
@@ -17,6 +13,6 @@ notifications:
 
 install: true
 script:
-  - mvn clean package
+  - mvn -U clean package
 after_success:
   - mvn jacoco:report coveralls:report

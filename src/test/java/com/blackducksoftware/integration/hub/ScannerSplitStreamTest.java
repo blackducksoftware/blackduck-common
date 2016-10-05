@@ -31,8 +31,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.test.TestLogger;
-import com.blackducksoftware.integration.hub.test.TestOutputStream;
+import com.blackducksoftware.integration.test.TestLogger;
+import com.blackducksoftware.integration.test.TestOutputStream;
 
 public class ScannerSplitStreamTest {
 	private static final String NEW_LINE = System.getProperty("line.separator");
@@ -94,7 +94,7 @@ public class ScannerSplitStreamTest {
 		}
 		splitStream.flush();
 		// Should write all the bytes to the TestOutputStream
-		assertEquals(notLoggable, stream.buffer.toString());
+		assertEquals(notLoggable, stream.stringBuilder.toString());
 
 		assertTrue(StringUtils.isBlank(logger.getOutputString()));
 		splitStream.close();
@@ -116,7 +116,7 @@ public class ScannerSplitStreamTest {
 		writeCodePointsToScannerSplitStream(codePoints, splitStream);
 
 		// Should write all the bytes to the TestOutputStream
-		assertEquals(loggable, stream.buffer.toString());
+		assertEquals(loggable, stream.stringBuilder.toString());
 		assertEquals(loggable, logger.getOutputString());
 		assertTrue(splitStream.hasOutput());
 		assertEquals(loggable, splitStream.getOutput().trim());
@@ -128,7 +128,7 @@ public class ScannerSplitStreamTest {
 		writeCodePointsToScannerSplitStream(codePoints, splitStream);
 
 		// Should write all the bytes to the TestOutputStream
-		assertEquals(notLoggable, stream.buffer.toString());
+		assertEquals(notLoggable, stream.stringBuilder.toString());
 
 		assertTrue(StringUtils.isBlank(logger.getOutputString()));
 		splitStream.close();
@@ -145,7 +145,7 @@ public class ScannerSplitStreamTest {
 		splitStream.write(notLoggable.getBytes());
 		splitStream.flush();
 		// Should write all the bytes to the TestOutputStream
-		assertEquals(notLoggable, stream.buffer.toString());
+		assertEquals(notLoggable, stream.stringBuilder.toString());
 
 		assertTrue(StringUtils.isBlank(logger.getOutputString()));
 		splitStream.close();
@@ -167,7 +167,7 @@ public class ScannerSplitStreamTest {
 		splitStream.flush();
 
 		// Should write all the bytes to the TestOutputStream
-		assertEquals(loggable, stream.buffer.toString());
+		assertEquals(loggable, stream.stringBuilder.toString());
 		assertEquals(loggable, logger.getOutputString());
 		assertTrue(splitStream.hasOutput());
 		assertEquals(loggable, splitStream.getOutput().trim());
@@ -178,7 +178,7 @@ public class ScannerSplitStreamTest {
 		splitStream.write(notLoggable.getBytes());
 		splitStream.flush();
 		// Should write all the bytes to the TestOutputStream
-		assertEquals(notLoggable, stream.buffer.toString());
+		assertEquals(notLoggable, stream.stringBuilder.toString());
 
 		assertTrue(StringUtils.isBlank(logger.getOutputString()));
 		splitStream.close();
@@ -195,7 +195,7 @@ public class ScannerSplitStreamTest {
 		splitStream.write(notLoggable.getBytes(), 0, notLoggable.length());
 		splitStream.flush();
 		// Should write all the bytes to the TestOutputStream
-		assertEquals(notLoggable, stream.buffer.toString());
+		assertEquals(notLoggable, stream.stringBuilder.toString());
 
 		assertTrue(StringUtils.isBlank(logger.getOutputString()));
 		splitStream.close();
@@ -217,7 +217,7 @@ public class ScannerSplitStreamTest {
 		splitStream.flush();
 
 		// Should write all the bytes to the TestOutputStream
-		assertEquals(loggable, stream.buffer.toString());
+		assertEquals(loggable, stream.stringBuilder.toString());
 		assertEquals(loggable, logger.getOutputString());
 		assertTrue(splitStream.hasOutput());
 		assertEquals(loggable, splitStream.getOutput().trim());
@@ -228,14 +228,14 @@ public class ScannerSplitStreamTest {
 		splitStream.write(notLoggable.getBytes(), 0, notLoggable.length());
 		splitStream.flush();
 		// Should write all the bytes to the TestOutputStream
-		assertEquals(notLoggable, stream.buffer.toString());
+		assertEquals(notLoggable, stream.stringBuilder.toString());
 
 		assertTrue(StringUtils.isBlank(logger.getOutputString()));
 		splitStream.close();
 	}
 
 	private List<Integer> getCodePoints(final String s) {
-		final List<Integer> codePoints = new ArrayList<Integer>();
+		final List<Integer> codePoints = new ArrayList<>();
 		for (int i = 0; i < s.length(); i++) {
 			codePoints.add(s.codePointAt(i));
 		}

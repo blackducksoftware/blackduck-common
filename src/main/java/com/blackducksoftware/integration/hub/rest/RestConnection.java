@@ -59,14 +59,14 @@ import org.restlet.resource.ResourceException;
 import org.restlet.util.NamedValue;
 import org.restlet.util.Series;
 
+import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
-import com.blackducksoftware.integration.hub.logging.LogLevel;
-import com.blackducksoftware.integration.hub.util.AuthenticatorUtil;
+import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.log.LogLevel;
+import com.blackducksoftware.integration.util.AuthenticatorUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -341,7 +341,7 @@ public class RestConnection {
 	 */
 	public <T> T httpGetFromRelativeUrl(final Class<T> modelClass, final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
-					throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
 
 		final ClientResource resource = createClientResource(urlSegments, queryParameters);
 		try {
@@ -357,7 +357,7 @@ public class RestConnection {
 				throw new ResourceDoesNotExistException(
 						"Error getting resource from relative url segments " + urlSegments + " and query parameters "
 								+ queryParameters + "; errorCode: " + responseCode + "; " + resource.toString(),
-								resource);
+						resource);
 			}
 		} finally {
 			releaseResource(resource);
@@ -461,7 +461,7 @@ public class RestConnection {
 				}
 				@SuppressWarnings("unchecked")
 				final Series<? extends NamedValue> responseheaders = (Series<? extends NamedValue>) requestOrResponse
-				.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+						.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
 				if (responseheaders != null) {
 					logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
 					for (final NamedValue header : responseheaders) {
@@ -546,7 +546,7 @@ public class RestConnection {
 
 	public String httpPostFromRelativeUrl(final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters, final Representation content)
-					throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
 
 		final ClientResource resource = createClientResource(urlSegments, queryParameters);
 		try {
@@ -577,7 +577,7 @@ public class RestConnection {
 			} else {
 				@SuppressWarnings("unchecked")
 				final Series<? extends NamedValue> responseHeaders = (Series<? extends NamedValue>) resource
-				.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+						.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
 				final NamedValue resourceUrl = responseHeaders.getFirst("location", true);
 				if (resourceUrl == null) {
 					throw new ResourceDoesNotExistException("Could not get the resource URL from the response headers.",

@@ -49,7 +49,7 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.test.TestLogger;
+import com.blackducksoftware.integration.test.TestLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

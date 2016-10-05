@@ -37,9 +37,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.builder.ValidationResult;
+import com.blackducksoftware.integration.builder.ValidationResults;
 import com.blackducksoftware.integration.hub.builder.HubProxyInfoBuilder;
-import com.blackducksoftware.integration.hub.builder.ValidationResult;
-import com.blackducksoftware.integration.hub.builder.ValidationResults;
 
 public class HubProxyInfoBuilderTest {
 	private static final int VALID_PORT = 2303;

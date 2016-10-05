@@ -33,9 +33,9 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 import com.blackducksoftware.integration.hub.polling.HubEventPolling;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class RiskReportGenerator {
 	private final HubReportGenerationInfo hubReportGenerationInfo;

@@ -33,7 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public abstract class ScanExecutor {
 	public static final int DEFAULT_MEMORY = 4096;
@@ -256,7 +256,7 @@ public abstract class ScanExecutor {
 			try {
 
 				final URL url = new URL(getHubUrl());
-				final List<String> cmd = new ArrayList<String>();
+				final List<String> cmd = new ArrayList<>();
 
 				final String javaPath = javaExec;
 

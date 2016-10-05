@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.dataservices.ItemTransform;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.test.TestLogger;
+import com.blackducksoftware.integration.test.TestLogger;
 
 public class ParallelResourceProcessorTest {
 

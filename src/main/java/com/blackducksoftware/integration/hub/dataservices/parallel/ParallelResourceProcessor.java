@@ -13,7 +13,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
 import com.blackducksoftware.integration.hub.dataservices.ItemTransform;
-import com.blackducksoftware.integration.hub.logging.IntLogger;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class ParallelResourceProcessor<R, S> {
 	private final Map<Class<?>, ItemTransform<List<R>, S>> transformerMap = new HashMap<>();;
