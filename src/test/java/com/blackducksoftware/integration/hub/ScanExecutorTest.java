@@ -27,11 +27,9 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -45,7 +43,14 @@ public class ScanExecutorTest {
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
-	private static Properties testProperties;
+	private static final String FAKE_HUB_SERVER_URL = "http://www.google.com";
+	private static final String FAKE_USERNAME = "Bugs Bunny";
+	private static final String FAKE_PASSWORD = "Daffy Duck";
+
+	private static final String FAKE_PROXY_HOST_BASIC = "www.yahoo.com";
+	private static final String FAKE_PROXY_PORT_BASIC = "1234";
+	private static final String FAKE_PROXY_USER_BASIC = "ramanujan";
+	private static final String FAKE_PROXY_PASSWORD_BASIC = "euler";
 
 	private HubSupportHelper getCheckedHubSupportHelper(final String hubVersion) throws Exception {
 		final HubIntRestService service = Mockito.mock(HubIntRestService.class);
@@ -54,19 +59,6 @@ public class ScanExecutorTest {
 		supportHelper.checkHubSupport(service, new TestLogger());
 
 		return supportHelper;
-	}
-
-	@BeforeClass
-	public static void testInit() {
-		testProperties = new Properties();
-		testProperties.put("TEST_HUB_SERVER_URL", "http://www.google.com");
-		testProperties.put("TEST_USERNAME", "Bugs Bunny");
-		testProperties.put("TEST_PASSWORD", "Daffy Duck");
-
-		testProperties.put("TEST_PROXY_HOST_BASIC", "www.yahoo.com");
-		testProperties.put("TEST_PROXY_PORT_BASIC", "1234");
-		testProperties.put("TEST_PROXY_USER_BASIC", "ramanujan");
-		testProperties.put("TEST_PROXY_PASSWORD_BASIC", "euler");
 	}
 
 	@Test
@@ -88,7 +80,7 @@ public class ScanExecutorTest {
 	public void testNoUsername() throws Exception {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("No Hub username provided.");
-		new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), null, null, null, null, null) {
+		new ScanExecutor(FAKE_HUB_SERVER_URL, null, null, null, null, null) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -103,8 +95,7 @@ public class ScanExecutorTest {
 	public void testNoPassword() throws Exception {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("No Hub password provided.");
-		new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
-				null, null, null, null) {
+		new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, null, null, null, null) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -119,8 +110,7 @@ public class ScanExecutorTest {
 	public void testNoTargets() throws Exception {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("No scan targets provided.");
-		new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
-				testProperties.getProperty("TEST_PASSWORD"), null, null, null) {
+		new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, null, null, null) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -139,8 +129,7 @@ public class ScanExecutorTest {
 		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 
-		new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
-				testProperties.getProperty("TEST_PASSWORD"), scanTargets, null, null) {
+		new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets, null, null) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -159,8 +148,7 @@ public class ScanExecutorTest {
 		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 
-		new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
-				testProperties.getProperty("TEST_PASSWORD"), scanTargets, "123", null) {
+		new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets, "123", null) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -181,8 +169,7 @@ public class ScanExecutorTest {
 
 		final HubSupportHelper supportHelper = new HubSupportHelper();
 
-		new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
-				testProperties.getProperty("TEST_PASSWORD"), scanTargets, "123", supportHelper) {
+		new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets, "123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -201,8 +188,7 @@ public class ScanExecutorTest {
 
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 
-		new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"), testProperties.getProperty("TEST_USERNAME"),
-				testProperties.getProperty("TEST_PASSWORD"), scanTargets, "123", supportHelper) {
+		new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets, "123", supportHelper) {
 
 			@Override
 			protected Result executeScan(final List<String> cmd, final String logDirectory)
@@ -221,8 +207,7 @@ public class ScanExecutorTest {
 
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 
-		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
-				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
+		final ScanExecutor executor = new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets,
 				"123", supportHelper) {
 
 			@Override
@@ -244,8 +229,7 @@ public class ScanExecutorTest {
 
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 
-		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
-				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
+		final ScanExecutor executor = new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets,
 				"123", supportHelper) {
 
 			@Override
@@ -272,8 +256,7 @@ public class ScanExecutorTest {
 
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 
-		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
-				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
+		final ScanExecutor executor = new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets,
 				"123", supportHelper) {
 
 			@Override
@@ -300,8 +283,7 @@ public class ScanExecutorTest {
 
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
 
-		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
-				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
+		final ScanExecutor executor = new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets,
 				"123", supportHelper) {
 
 			@Override
@@ -326,8 +308,7 @@ public class ScanExecutorTest {
 		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
-		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
-				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
+		final ScanExecutor executor = new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets,
 				"123", supportHelper) {
 
 			@Override
@@ -352,8 +333,7 @@ public class ScanExecutorTest {
 		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
-		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
-				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
+		final ScanExecutor executor = new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets,
 				"123", supportHelper) {
 
 			@Override
@@ -378,8 +358,7 @@ public class ScanExecutorTest {
 		final ArrayList<String> scanTargets = new ArrayList<>();
 		scanTargets.add((new File("")).getAbsolutePath());
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
-		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
-				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
+		final ScanExecutor executor = new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets,
 				"123", supportHelper) {
 
 			@Override
@@ -406,8 +385,7 @@ public class ScanExecutorTest {
 
 		final List<String> cmdList = new ArrayList<>();
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
-		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
-				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
+		final ScanExecutor executor = new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets,
 				"123", supportHelper) {
 
 			@Override
@@ -459,8 +437,7 @@ public class ScanExecutorTest {
 
 		final List<String> cmdList = new ArrayList<>();
 		final HubSupportHelper supportHelper = getCheckedHubSupportHelper("3.0.0");
-		final ScanExecutor executor = new ScanExecutor(testProperties.getProperty("TEST_HUB_SERVER_URL"),
-				testProperties.getProperty("TEST_USERNAME"), testProperties.getProperty("TEST_PASSWORD"), scanTargets,
+		final ScanExecutor executor = new ScanExecutor(FAKE_HUB_SERVER_URL, FAKE_USERNAME, FAKE_PASSWORD, scanTargets,
 				"123", supportHelper) {
 
 			@Override
@@ -476,10 +453,10 @@ public class ScanExecutorTest {
 
 		final ArrayList<Pattern> noProxyHosts = new ArrayList<>();
 		noProxyHosts.add(Pattern.compile("test"));
-		executor.setProxyHost(testProperties.getProperty("TEST_PROXY_HOST_BASIC"));
-		executor.setProxyPort(Integer.valueOf(testProperties.getProperty("TEST_PROXY_PORT_BASIC")));
-		executor.setProxyUsername(testProperties.getProperty("TEST_PROXY_USER_BASIC"));
-		executor.setProxyPassword(testProperties.getProperty("TEST_PROXY_PASSWORD_BASIC"));
+		executor.setProxyHost(FAKE_PROXY_HOST_BASIC);
+		executor.setProxyPort(Integer.valueOf(FAKE_PROXY_PORT_BASIC));
+		executor.setProxyUsername(FAKE_PROXY_USER_BASIC);
+		executor.setProxyPassword(FAKE_PROXY_PASSWORD_BASIC);
 		executor.setNoProxyHosts(noProxyHosts);
 
 		final Result result = executor.setupAndRunScan(".", ".", ".");
