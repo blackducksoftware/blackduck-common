@@ -22,11 +22,11 @@ import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class UserConfigTransformTest {
 
-	private UserItem createUserItem() {
+	private UserItem createUserItem(final boolean active) {
 		final String id = UUID.randomUUID().toString();
 		final MetaInformation meta = new MetaInformation(null, "http://localhost/api/users/" + id, null);
 		return new UserItem(meta, "username", "firstName", "lastName", "user@blackducksoftware.com", UserType.INTERNAL,
-				true);
+				active);
 	}
 
 	private List<ConfigurationItem> createConfigurationItemList() {
@@ -54,7 +54,7 @@ public class UserConfigTransformTest {
 				.thenReturn(configItemList);
 
 		final UserConfigTransform converter = new UserConfigTransform(extensionRestService);
-		final UserItem user = createUserItem();
+		final UserItem user = createUserItem(true);
 		final List<UserConfigItem> result = converter.transform(user);
 
 		assertNotNull(result);
@@ -67,5 +67,20 @@ public class UserConfigTransformTest {
 			assertTrue(userConfigItem.getConfigMap().containsKey(key));
 			assertEquals(configItem, userConfigItem.getConfigMap().get(key));
 		}
+	}
+
+	@Test
+	public void testTransformInactiveUser() throws Exception {
+		final List<ConfigurationItem> configItemList = createConfigurationItemList();
+		final ExtensionRestService extensionRestService = Mockito.mock(ExtensionRestService.class);
+		Mockito.when(extensionRestService.getUserConfiguration(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(configItemList);
+
+		final UserConfigTransform converter = new UserConfigTransform(extensionRestService);
+		final UserItem user = createUserItem(false);
+		final List<UserConfigItem> result = converter.transform(user);
+
+		assertNotNull(result);
+		assertTrue(result.isEmpty());
 	}
 }
