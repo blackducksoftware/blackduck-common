@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +23,7 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Vul
 public class ComponentAggregateTest {
 
 	@Test
-	public void testComponentAggregateCount() {
+	public void testComponentAggregateCount() throws URISyntaxException {
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName("Project Name");
 		projectVersion.setProjectVersionName("1.0");

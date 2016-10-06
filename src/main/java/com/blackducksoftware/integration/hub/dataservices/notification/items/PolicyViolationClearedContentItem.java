@@ -21,6 +21,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservices.notification.items;
 
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
@@ -31,8 +32,8 @@ public class PolicyViolationClearedContentItem extends PolicyViolationContentIte
 
 	public PolicyViolationClearedContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
- final String componentVersion, final String componentVersionUrl,
-			final List<PolicyRule> policyRuleList) {
+			final String componentVersion, final String componentVersionUrl,
+			final List<PolicyRule> policyRuleList) throws URISyntaxException {
 		super(createdAt, projectVersion, componentName, componentVersion, componentVersionUrl,
 				policyRuleList);
 	}

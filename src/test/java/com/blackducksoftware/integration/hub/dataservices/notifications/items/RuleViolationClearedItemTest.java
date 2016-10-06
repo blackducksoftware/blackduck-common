@@ -2,6 +2,7 @@ package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 
 import static org.junit.Assert.assertEquals;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +17,7 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Pol
 public class RuleViolationClearedItemTest {
 
 	@Test
-	public void contentItemConstructorTest() {
+	public void contentItemConstructorTest() throws URISyntaxException {
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName("test project");
 		projectVersion.setProjectVersionName("0.1.0");
@@ -33,7 +34,7 @@ public class RuleViolationClearedItemTest {
 
 		final PolicyViolationContentItem item = new PolicyViolationContentItem(new Date(), projectVersion,
 				componentName,
- componentVersion, componentVersionUrl, policyRules);
+				componentVersion, componentVersionUrl, policyRules);
 
 		assertEquals(projectVersion, item.getProjectVersion());
 		assertEquals(componentName, item.getComponentName());

@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,7 +24,7 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Vul
 public class ProjectAggregateTest {
 
 	@Test
-	public void testProjectAggregateCount() {
+	public void testProjectAggregateCount() throws URISyntaxException {
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName("Project Name");
 		projectVersion.setProjectVersionName("1.0");
@@ -46,7 +47,7 @@ public class ProjectAggregateTest {
 				componentName, componentVersion, componentVersionUrl, ruleList);
 		final PolicyOverrideContentItem overrideContent = new PolicyOverrideContentItem(new Date(), projectVersion,
 				componentName,
- componentVersion, componentVersionUrl, ruleList, firstName, lastName);
+				componentVersion, componentVersionUrl, ruleList, firstName, lastName);
 
 		final List<VulnerabilitySourceQualifiedId> sourceIdList = new ArrayList<>();
 		sourceIdList.add(new VulnerabilitySourceQualifiedId("source", "id"));

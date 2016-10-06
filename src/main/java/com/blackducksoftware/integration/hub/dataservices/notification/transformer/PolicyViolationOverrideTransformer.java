@@ -57,23 +57,24 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 		final List<NotificationContentItem> templateData = new ArrayList<>();
 		try {
 			final ReleaseItem releaseItem;
-			final PolicyOverrideNotificationItem policyViolation = (PolicyOverrideNotificationItem) item;
-			final String projectName = policyViolation.getContent().getProjectName();
+			final PolicyOverrideNotificationItem policyOverride = (PolicyOverrideNotificationItem) item;
+			final String projectName = policyOverride.getContent().getProjectName();
 			final List<ComponentVersionStatus> componentVersionList = new ArrayList<>();
 			final ComponentVersionStatus componentStatus = new ComponentVersionStatus();
 			componentStatus.setBomComponentVersionPolicyStatusLink(
-					policyViolation.getContent().getBomComponentVersionPolicyStatusLink());
-			componentStatus.setComponentName(policyViolation.getContent().getComponentName());
-			componentStatus.setComponentVersionLink(policyViolation.getContent().getComponentVersionLink());
+policyOverride.getContent()
+					.getBomComponentVersionPolicyStatusLink());
+			componentStatus.setComponentName(policyOverride.getContent().getComponentName());
+			componentStatus.setComponentVersionLink(policyOverride.getContent().getComponentVersionLink());
 
 			componentVersionList.add(componentStatus);
 
-			releaseItem = getProjectVersionService().getItem(policyViolation.getContent().getProjectVersionLink());
+			releaseItem = getProjectVersionService().getItem(policyOverride.getContent().getProjectVersionLink());
 
 			final ProjectVersion projectVersion = new ProjectVersion();
 			projectVersion.setProjectName(projectName);
 			projectVersion.setProjectVersionName(releaseItem.getVersionName());
-			projectVersion.setUrl(policyViolation.getContent().getProjectVersionLink());
+			projectVersion.setUrl(policyOverride.getContent().getProjectVersionLink());
 
 			handleNotification(componentVersionList, projectVersion, item, templateData);
 		} catch (IOException | BDRestException | URISyntaxException e) {
@@ -94,7 +95,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 	public void createContents(final ProjectVersion projectVersion, final String componentName,
 			final String componentVersion, final String componentVersionUrl,
 			final List<PolicyRule> policyRuleList, final NotificationItem item,
-			final List<NotificationContentItem> templateData) {
+			final List<NotificationContentItem> templateData) throws URISyntaxException {
 		final PolicyOverrideNotificationItem policyOverride = (PolicyOverrideNotificationItem) item;
 
 		templateData.add(new PolicyOverrideContentItem(item.getCreatedAt(), projectVersion, componentName,

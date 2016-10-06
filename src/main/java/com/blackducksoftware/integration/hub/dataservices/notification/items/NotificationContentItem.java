@@ -21,9 +21,11 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservices.notification.items;
 
+import java.net.URISyntaxException;
 import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.common.base.Joiner;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {
@@ -32,6 +34,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 	private final String componentVersion;
 
 	private final String componentVersionUrl;
+	private final String componentVersionRelativeUrl;
 
 	// We need createdAt (from the enclosing notificationItem) so we can order
 	// them after
@@ -40,12 +43,14 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
 	public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
-			final String componentVersion, final String componentVersionUrl) {
+ final String componentVersion, final String componentVersionUrl)
+			throws URISyntaxException {
 		this.createdAt = createdAt;
 		this.projectVersion = projectVersion;
 		this.componentName = componentName;
 		this.componentVersion = componentVersion;
 		this.componentVersionUrl = componentVersionUrl;
+		this.componentVersionRelativeUrl = RestConnection.getBaseUrl(componentVersionUrl);
 	}
 
 	public ProjectVersion getProjectVersion() {
@@ -65,7 +70,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 	}
 
 	public String getComponentVersionRelativeUrl() {
-		return "RELATIVIZED" + componentVersionUrl; // TODO
+		return componentVersionRelativeUrl;
 	}
 
 	public Date getCreatedAt() {

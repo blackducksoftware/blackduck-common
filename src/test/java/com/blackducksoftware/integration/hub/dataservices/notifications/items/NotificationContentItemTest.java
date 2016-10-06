@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
@@ -17,7 +18,7 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Not
 public class NotificationContentItemTest {
 
 	@Test
-	public void testSortingInOrder() throws InterruptedException {
+	public void testSortingInOrder() throws InterruptedException, URISyntaxException {
 		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
 				+ "/versions/" + UUID.randomUUID() + "/";
 		final NotificationContentItem notif1 = new NotificationContentItem(new Date(), new ProjectVersion(),
@@ -40,7 +41,7 @@ public class NotificationContentItemTest {
 	}
 
 	@Test
-	public void testSortingReverseOrder() throws InterruptedException {
+	public void testSortingReverseOrder() throws InterruptedException, URISyntaxException {
 		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
 				+ "/versions/" + UUID.randomUUID() + "/";
 		final NotificationContentItem notif1 = new NotificationContentItem(new Date(), new ProjectVersion(),
@@ -63,7 +64,7 @@ public class NotificationContentItemTest {
 	}
 
 	@Test
-	public void testSymmetry() throws InterruptedException {
+	public void testSymmetry() throws InterruptedException, URISyntaxException {
 		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
 				+ "/versions/" + UUID.randomUUID() + "/";
 		final ProjectVersion projectVersion = new ProjectVersion();

@@ -36,7 +36,9 @@ public class PolicyOverrideTransformTest {
 	private final static String PROJECT_VERSION = "0.1.0";
 	private final static String COMPONENT_NAME = "component 1";
 	private final static String COMPONENT_VERSION = "0.9.8";
-	private final static String COMPONENT_VERSION_URL = "http://hub.blackducksoftware.com/api/projects/"
+	private final static String COMPONENT_VERSION_URL = "http://hub.blackducksoftware.com/api/components/"
+			+ UUID.randomUUID() + "/versions/" + UUID.randomUUID() + "/";
+	private final static String PROJECT_VERSION_URL = "http://hub.blackducksoftware.com/api/projects/"
 			+ UUID.randomUUID()
 			+ "/versions/" + UUID.randomUUID() + "/";
 	private final static String POLICY_NAME = "Policy Name";
@@ -111,15 +113,19 @@ public class PolicyOverrideTransformTest {
 		final PolicyOverrideNotificationContent content = Mockito.mock(PolicyOverrideNotificationContent.class);
 		final List<ComponentVersionStatus> versionStatusList = new ArrayList<>();
 		final ComponentVersionStatus status = Mockito.mock(ComponentVersionStatus.class);
-		Mockito.when(content.getBomComponentVersionPolicyStatusLink()).thenReturn("PolicyRule");
+		Mockito.when(content.getBomComponentVersionPolicyStatusLink()).thenReturn("http://hub.bds.com/api/rules/1");
 		Mockito.when(content.getComponentName()).thenReturn(COMPONENT_NAME);
 		Mockito.when(content.getComponentVersionLink())
-.thenReturn(COMPONENT_VERSION_URL);
+		.thenReturn(COMPONENT_VERSION_URL);
+		Mockito.when(content.getProjectVersionLink()).thenReturn(PROJECT_VERSION_URL);
 		versionStatusList.add(status);
 		Mockito.when(item.getContent()).thenReturn(content);
 		Mockito.when(content.getProjectName()).thenReturn(PROJECT_NAME);
 		Mockito.when(content.getFirstName()).thenReturn(FIRST_NAME);
 		Mockito.when(content.getLastName()).thenReturn(LAST_NAME);
+
+		// policyOverride.getContent().getProjectVersionLink()
+
 		return item;
 	}
 
