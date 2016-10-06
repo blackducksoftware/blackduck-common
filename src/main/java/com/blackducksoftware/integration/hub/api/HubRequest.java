@@ -43,6 +43,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class HubRequest {
+	public static final int EXCLUDE_INTEGER_QUERY_PARAMETER = -999;
 	private final RestConnection restConnection;
 	private final JsonParser jsonParser;
 
@@ -117,18 +118,23 @@ public class HubRequest {
 		for (final String segment : urlSegments) {
 			resource.addSegment(segment);
 		}
-
-		// if limit is not provided, the default is 10
-		if (limit <= 0) {
-			limit = 10;
+		// TODO this will need to be refactored out with the new version of hub
+		// common.
+		if (limit != EXCLUDE_INTEGER_QUERY_PARAMETER) {
+			// if limit is not provided, the default is 10
+			if (limit <= 0) {
+				limit = 10;
+			}
+			queryParameters.put(QUERY_LIMIT, String.valueOf(limit));
 		}
 
-		// if offset is not provided, the default is 0
-		if (offset < 0) {
-			offset = 0;
+		if (offset != EXCLUDE_INTEGER_QUERY_PARAMETER) {
+			// if offset is not provided, the default is 0
+			if (offset != EXCLUDE_INTEGER_QUERY_PARAMETER && offset < 0) {
+				offset = 0;
+			}
+			queryParameters.put(QUERY_OFFSET, String.valueOf(offset));
 		}
-		queryParameters.put(QUERY_LIMIT, String.valueOf(limit));
-		queryParameters.put(QUERY_OFFSET, String.valueOf(offset));
 		if (StringUtils.isNotBlank(q)) {
 			queryParameters.put(QUERY_Q, q);
 		}

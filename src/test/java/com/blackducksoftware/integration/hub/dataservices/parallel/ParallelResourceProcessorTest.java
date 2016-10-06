@@ -4,6 +4,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -54,6 +58,24 @@ public class ParallelResourceProcessorTest {
 				return numberList;
 			}
 		};
+	}
+
+	@Test
+	public void testConstructor() {
+		final TestLogger logger = new TestLogger();
+		final ThreadFactory threadFactory = Executors.defaultThreadFactory();
+		final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
+				threadFactory);
+		final ExecutorCompletionService<List<Number>> completionService = new ExecutorCompletionService<>(
+				executorService);
+		final ParallelResourceProcessor<Number, String> parallelProcessor = new ParallelResourceProcessor<>(logger,
+				executorService, completionService);
+		parallelProcessor.addTransform(String.class, createTransform());
+		final List<Number> numberList = createNumberList();
+		final List<String> stringList = createStringList(numberList);
+		final List<Number> transformedNumberList = parallelProcessor.process(stringList);
+		// NOTE: order is not guaranteed by the processor
+		assertTrue(transformedNumberList.containsAll(numberList));
 	}
 
 	@Test

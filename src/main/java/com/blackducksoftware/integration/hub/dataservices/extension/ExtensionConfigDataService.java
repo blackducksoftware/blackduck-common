@@ -8,14 +8,18 @@ import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionItem;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionRestService;
-import com.blackducksoftware.integration.hub.api.user.UserItem;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRestService;
+import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkItem;
 import com.blackducksoftware.integration.hub.api.user.UserRestService;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.dataservices.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.dataservices.extension.transformer.UserConfigTransform;
 import com.blackducksoftware.integration.hub.dataservices.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.Gson;
@@ -23,41 +27,48 @@ import com.google.gson.JsonParser;
 
 public class ExtensionConfigDataService extends AbstractDataService {
 	private final IntLogger logger;
-	private final UserRestService userService;
 	private final ExtensionRestService extensionRestService;
+	private final ExtensionConfigRestService extensionConfigRestService;
 	private final UserConfigTransform userConfigTransform;
+	private final ExtensionUserOptionRestService extensionUserOptionRestService;
 
-	private final ParallelResourceProcessor<UserConfigItem, UserItem> parallelProcessor;
+	private final ParallelResourceProcessor<UserConfigItem, UserOptionLinkItem> parallelProcessor;
 
 	public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
 			final JsonParser jsonParser, final UserRestService userRestService,
-			final ExtensionRestService extensionRestService) {
+			final ExtensionRestService extensionRestService,
+			final ExtensionConfigRestService extensionConfigRestService,
+			final ExtensionUserOptionRestService extensionUserOptionRestService) {
 		super(restConnection, gson, jsonParser);
 		this.logger = logger;
-		this.userService = userRestService;
 		this.extensionRestService = extensionRestService;
-		userConfigTransform = new UserConfigTransform(extensionRestService);
+		this.extensionConfigRestService = extensionConfigRestService;
+		this.extensionUserOptionRestService = extensionUserOptionRestService;
+		userConfigTransform = new UserConfigTransform(userRestService, extensionConfigRestService);
 		parallelProcessor = new ParallelResourceProcessor<>(logger);
-		parallelProcessor.addTransform(UserItem.class, userConfigTransform);
+		parallelProcessor.addTransform(UserOptionLinkItem.class, userConfigTransform);
 
 	}
 
-	public Map<String, ConfigurationItem> getGlobalConfigMap(final String extensionId) {
+	public Map<String, ConfigurationItem> getGlobalConfigMap(final String extensionUrl)
+			throws UnexpectedHubResponseException {
 		Map<String, ConfigurationItem> globalConfigMap = new HashMap<>();
 		try {
-			globalConfigMap = createGlobalConfigMap(extensionId);
+			final ExtensionItem extension = extensionRestService.getExtensionItem(extensionUrl);
+			globalConfigMap = createGlobalConfigMap(extension.getLink("global-options"));
 		} catch (IOException | URISyntaxException | BDRestException e) {
 			logger.error("Error creating global configurationMap", e);
 		}
 		return globalConfigMap;
 	}
 
-	public List<UserConfigItem> getUserConfigList(final String extensionId) {
+	public List<UserConfigItem> getUserConfigList(final String extensionUrl) throws UnexpectedHubResponseException {
 		List<UserConfigItem> itemList = new LinkedList<>();
 		try {
-			final List<UserItem> userList = userService.getAllUsers();
-			userConfigTransform.setExtensionId(extensionId);
-			itemList = parallelProcessor.process(userList);
+			final ExtensionItem extension = extensionRestService.getExtensionItem(extensionUrl);
+			final List<UserOptionLinkItem> userOptionList = extensionUserOptionRestService
+					.getUserOptions(extension.getLink("user-options"));
+			itemList = parallelProcessor.process(userOptionList);
 		} catch (URISyntaxException | BDRestException | IOException e) {
 			logger.error("Error creating user configuration", e);
 		}
@@ -65,9 +76,9 @@ public class ExtensionConfigDataService extends AbstractDataService {
 		return itemList;
 	}
 
-	private Map<String, ConfigurationItem> createGlobalConfigMap(final String extensionId)
+	private Map<String, ConfigurationItem> createGlobalConfigMap(final String globalConfigUrl)
 			throws IOException, URISyntaxException, BDRestException {
-		final List<ConfigurationItem> itemList = extensionRestService.getGlobalOptions(extensionId);
+		final List<ConfigurationItem> itemList = extensionConfigRestService.getGlobalOptions(globalConfigUrl);
 		final Map<String, ConfigurationItem> itemMap = createConfigMap(itemList);
 		return itemMap;
 	}
