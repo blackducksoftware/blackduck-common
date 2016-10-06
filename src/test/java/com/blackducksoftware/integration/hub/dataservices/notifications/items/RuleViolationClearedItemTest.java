@@ -22,8 +22,8 @@ public class RuleViolationClearedItemTest {
 		projectVersion.setProjectVersionName("0.1.0");
 		final String componentName = "component 1";
 		final String componentVersion = "0.9.8";
-		final UUID componentId = UUID.randomUUID();
-		final UUID componentVersionId = UUID.randomUUID();
+		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
+				+ "/versions/" + UUID.randomUUID() + "/";
 
 		final List<PolicyRule> policyRules = new ArrayList<>();
 		final PolicyRule policy1 = new PolicyRule(null, "Policy 1", null, null, null, null, null, null, null, null);
@@ -33,13 +33,12 @@ public class RuleViolationClearedItemTest {
 
 		final PolicyViolationContentItem item = new PolicyViolationContentItem(new Date(), projectVersion,
 				componentName,
-				componentVersion, componentId, componentVersionId, policyRules);
+ componentVersion, componentVersionUrl, policyRules);
 
 		assertEquals(projectVersion, item.getProjectVersion());
 		assertEquals(componentName, item.getComponentName());
 		assertEquals(componentVersion, item.getComponentVersion());
-		assertEquals(componentId, item.getComponentId());
-		assertEquals(componentVersionId, item.getComponentVersionId());
+		assertEquals(componentVersionUrl, item.getComponentVersionUrl());
 		assertEquals(policyRules, item.getPolicyRuleList());
 	}
 }

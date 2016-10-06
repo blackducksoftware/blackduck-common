@@ -22,8 +22,8 @@ public class PolicyOverrideItemTest {
 		projectVersion.setProjectVersionName("0.1.0");
 		final String componentName = "component 1";
 		final String componentVersion = "0.9.8";
-		final UUID componentId = UUID.randomUUID();
-		final UUID componentVersionId = UUID.randomUUID();
+		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
+				+ "/versions/" + UUID.randomUUID() + "/";
 		final String firstName = "myName";
 		final String lastName = "noMyName";
 		final List<PolicyRule> policyRules = new ArrayList<>();
@@ -33,13 +33,12 @@ public class PolicyOverrideItemTest {
 		policyRules.add(policy2);
 
 		final PolicyOverrideContentItem item = new PolicyOverrideContentItem(new Date(), projectVersion, componentName,
-				componentVersion, componentId, componentVersionId, policyRules, firstName, lastName);
+				componentVersion, componentVersionUrl, policyRules, firstName, lastName);
 
 		assertEquals(projectVersion, item.getProjectVersion());
 		assertEquals(componentName, item.getComponentName());
 		assertEquals(componentVersion, item.getComponentVersion());
-		assertEquals(componentId, item.getComponentId());
-		assertEquals(componentVersionId, item.getComponentVersionId());
+		assertEquals(componentVersionUrl, item.getComponentVersionUrl());
 		assertEquals(firstName, item.getFirstName());
 		assertEquals(lastName, item.getLastName());
 		assertEquals(policyRules, item.getPolicyRuleList());

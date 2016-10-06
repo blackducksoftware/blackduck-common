@@ -38,8 +38,9 @@ public class PolicyViolationTransformTest {
 	private final static String PROJECT_VERSION = "0.1.0";
 	private final static String COMPONENT_NAME = "component 1";
 	private final static String COMPONENT_VERSION = "0.9.8";
-	private final static UUID COMPONENT_ID = UUID.randomUUID();
-	private final static UUID COMPONENT_VERSION_ID = UUID.randomUUID();
+	private final static String COMPONENT_VERSION_URL = "http://hub.blackducksoftware.com/api/projects/"
+			+ UUID.randomUUID()
+			+ "/versions/" + UUID.randomUUID() + "/";
 	private final static String POLICY_NAME = "Policy Name";
 	private final static String PROJECT_VERSION_LINK = "projectversionlink";
 	private final static String POLICY_LINK = "url1";
@@ -113,10 +114,7 @@ public class PolicyViolationTransformTest {
 		Mockito.when(status.getComponentName()).thenReturn(COMPONENT_NAME);
 		Mockito.when(status.getBomComponentVersionPolicyStatusLink()).thenReturn("PolicyRule");
 		Mockito.when(status.getComponentVersionLink())
-				.thenReturn("/" + ComponentVersionStatus.COMPONENT_URL_IDENTIFIER + "/" + COMPONENT_ID + "/"
-						+ ComponentVersionStatus.COMPONENT_VERSION_URL_IDENTIFIER + "/" + COMPONENT_VERSION_ID);
-		Mockito.when(status.getComponentId()).thenReturn(COMPONENT_ID);
-		Mockito.when(status.getComponentVersionId()).thenReturn(COMPONENT_VERSION_ID);
+.thenReturn(COMPONENT_VERSION_URL);
 		versionStatusList.add(status);
 		Mockito.when(item.getContent()).thenReturn(content);
 		Mockito.when(content.getProjectName()).thenReturn(PROJECT_NAME);
@@ -137,8 +135,7 @@ public class PolicyViolationTransformTest {
 			assertEquals(PROJECT_VERSION, contentItem.getProjectVersion().getProjectVersionName());
 			assertEquals(COMPONENT_NAME, contentItem.getComponentName());
 			assertEquals(COMPONENT_VERSION, contentItem.getComponentVersion());
-			assertEquals(COMPONENT_ID, contentItem.getComponentId());
-			assertEquals(COMPONENT_VERSION_ID, contentItem.getComponentVersionId());
+			assertEquals(COMPONENT_VERSION_URL, contentItem.getComponentVersionUrl());
 			assertEquals(1, contentItem.getPolicyRuleList().size());
 			assertEquals(POLICY_NAME, contentItem.getPolicyRuleList().get(0).getName());
 		}
@@ -172,8 +169,7 @@ public class PolicyViolationTransformTest {
 			assertEquals(PROJECT_VERSION, contentItem.getProjectVersion().getProjectVersionName());
 			assertEquals(COMPONENT_NAME, contentItem.getComponentName());
 			assertEquals(COMPONENT_VERSION, contentItem.getComponentVersion());
-			assertEquals(COMPONENT_ID, contentItem.getComponentId());
-			assertEquals(COMPONENT_VERSION_ID, contentItem.getComponentVersionId());
+			assertEquals(COMPONENT_VERSION_URL, contentItem.getComponentVersionUrl());
 			assertEquals(1, contentItem.getPolicyRuleList().size());
 			assertEquals(POLICY_NAME, contentItem.getPolicyRuleList().get(0).getName());
 		}

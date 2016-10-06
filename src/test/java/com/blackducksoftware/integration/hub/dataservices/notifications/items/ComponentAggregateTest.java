@@ -31,8 +31,8 @@ public class ComponentAggregateTest {
 		final String componentVersion = "componentVersion";
 		final String firstName = "firstName";
 		final String lastName = "lastName";
-		final UUID componentId = UUID.randomUUID();
-		final UUID componentVersionId = UUID.randomUUID();
+		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
+				+ "/versions/" + UUID.randomUUID() + "/";
 		final int total = 3;
 		final List<PolicyViolationContentItem> violationList = new ArrayList<>();
 		final List<PolicyOverrideContentItem> overrideList = new ArrayList<>();
@@ -41,15 +41,15 @@ public class ComponentAggregateTest {
 		final List<PolicyRule> ruleList = new ArrayList<>();
 		ruleList.add(rule);
 		final PolicyViolationContentItem violationContent = new PolicyViolationContentItem(new Date(), projectVersion,
-				componentName, componentVersion, componentId, componentVersionId, ruleList);
+				componentName, componentVersion, componentVersionUrl, ruleList);
 		final PolicyOverrideContentItem overrideContent = new PolicyOverrideContentItem(new Date(), projectVersion,
 				componentName,
-				componentVersion, componentId, componentVersionId, ruleList, firstName, lastName);
+				componentVersion, componentVersionUrl, ruleList, firstName, lastName);
 
 		final List<VulnerabilitySourceQualifiedId> sourceIdList = new ArrayList<>();
 		sourceIdList.add(new VulnerabilitySourceQualifiedId("source", "id"));
 		final VulnerabilityContentItem vulnerabilityContent = new VulnerabilityContentItem(new Date(), projectVersion,
-				componentName, componentVersion, componentId, componentVersionId, sourceIdList, sourceIdList,
+				componentName, componentVersion, componentVersionUrl, sourceIdList, sourceIdList,
 				sourceIdList);
 		violationList.add(violationContent);
 		overrideList.add(overrideContent);

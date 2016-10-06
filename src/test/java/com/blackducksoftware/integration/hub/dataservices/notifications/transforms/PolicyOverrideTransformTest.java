@@ -36,8 +36,9 @@ public class PolicyOverrideTransformTest {
 	private final static String PROJECT_VERSION = "0.1.0";
 	private final static String COMPONENT_NAME = "component 1";
 	private final static String COMPONENT_VERSION = "0.9.8";
-	private final static UUID COMPONENT_ID = UUID.randomUUID();
-	private final static UUID COMPONENT_VERSION_ID = UUID.randomUUID();
+	private final static String COMPONENT_VERSION_URL = "http://hub.blackducksoftware.com/api/projects/"
+			+ UUID.randomUUID()
+			+ "/versions/" + UUID.randomUUID() + "/";
 	private final static String POLICY_NAME = "Policy Name";
 	private final static String FIRST_NAME = "myName";
 	private final static String LAST_NAME = "noMyName";
@@ -113,8 +114,7 @@ public class PolicyOverrideTransformTest {
 		Mockito.when(content.getBomComponentVersionPolicyStatusLink()).thenReturn("PolicyRule");
 		Mockito.when(content.getComponentName()).thenReturn(COMPONENT_NAME);
 		Mockito.when(content.getComponentVersionLink())
-				.thenReturn("/" + ComponentVersionStatus.COMPONENT_URL_IDENTIFIER + "/" + COMPONENT_ID + "/"
-						+ ComponentVersionStatus.COMPONENT_VERSION_URL_IDENTIFIER + "/" + COMPONENT_VERSION_ID);
+.thenReturn(COMPONENT_VERSION_URL);
 		versionStatusList.add(status);
 		Mockito.when(item.getContent()).thenReturn(content);
 		Mockito.when(content.getProjectName()).thenReturn(PROJECT_NAME);
@@ -132,8 +132,7 @@ public class PolicyOverrideTransformTest {
 			assertEquals(PROJECT_VERSION, contentItem.getProjectVersion().getProjectVersionName());
 			assertEquals(COMPONENT_NAME, contentItem.getComponentName());
 			assertEquals(COMPONENT_VERSION, contentItem.getComponentVersion());
-			assertEquals(COMPONENT_ID, contentItem.getComponentId());
-			assertEquals(COMPONENT_VERSION_ID, contentItem.getComponentVersionId());
+			assertEquals(COMPONENT_VERSION_URL, contentItem.getComponentVersionUrl());
 			assertEquals(FIRST_NAME, contentItem.getFirstName());
 			assertEquals(LAST_NAME, contentItem.getLastName());
 			assertEquals(1, contentItem.getPolicyRuleList().size());

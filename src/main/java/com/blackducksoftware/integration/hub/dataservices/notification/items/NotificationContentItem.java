@@ -61,11 +61,11 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 	}
 
 	public String getComponentVersionUrl() {
-		return "ComponentVersionUrl";
+		return componentVersionUrl;
 	}
 
 	public String getComponentVersionRelativeUrl() {
-		return "ComponentVersionRelativeUrl";
+		return "RELATIVIZED" + componentVersionUrl; // TODO
 	}
 
 	public Date getCreatedAt() {

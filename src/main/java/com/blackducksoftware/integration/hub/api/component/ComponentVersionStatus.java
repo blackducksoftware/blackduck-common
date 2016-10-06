@@ -31,7 +31,9 @@ import com.blackducksoftware.integration.hub.util.HubUrlParser;
 import com.google.gson.annotations.SerializedName;
 
 public class ComponentVersionStatus {
+	@Deprecated
 	public static final String COMPONENT_URL_IDENTIFIER = "components";
+	@Deprecated
 	public static final String COMPONENT_VERSION_URL_IDENTIFIER = "versions";
 
 	private String componentName;
@@ -76,6 +78,7 @@ public class ComponentVersionStatus {
 		this.policies = policies;
 	}
 
+	@Deprecated
 	public UUID getComponentId() throws MissingUUIDException {
 		if (StringUtils.isBlank(getComponentVersionLink())
 				&& StringUtils.isBlank(getBomComponentVersionPolicyStatusLink())) {
@@ -89,6 +92,7 @@ public class ComponentVersionStatus {
 		}
 	}
 
+	@Deprecated
 	public UUID getComponentVersionId() throws MissingUUIDException {
 		if (StringUtils.isBlank(getComponentVersionLink())) {
 			return null;
