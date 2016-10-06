@@ -71,13 +71,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName(projectName);
 		projectVersion.setProjectVersionName(releaseItem.getVersionName());
-		try {
 			projectVersion.setUrl(projectVersionLink);
-		} catch (final URISyntaxException e1) {
-			throw new HubItemTransformException(
-					"Error setting project version url in project version (read from the policy violation content) for item "
-							+ item + "; projectVersionLink: " + projectVersionLink + ": " + e1.getMessage(), e1);
-		}
 
 		try {
 			handleNotification(componentVersionList, projectVersion, item, templateData);

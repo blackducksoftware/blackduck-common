@@ -68,7 +68,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 			projectVersion.setUrl(policyViolation.getContent().getProjectVersionLink());
 
 			handleNotification(componentVersionList, projectVersion, item, templateData);
-		} catch (final IOException | BDRestException | URISyntaxException e) {
+		} catch (final IOException | BDRestException e) {
 			throw new HubItemTransformException(e);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
@@ -96,7 +96,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 	public void createContents(final ProjectVersion projectVersion, final String componentName,
 			final String componentVersion, final String componentVersionUrl,
 			final List<PolicyRule> policyRuleList, final NotificationItem item,
- final List<NotificationContentItem> templateData) throws URISyntaxException {
+			final List<NotificationContentItem> templateData) throws URISyntaxException {
 		templateData.add(new PolicyViolationContentItem(item.getCreatedAt(), projectVersion, componentName,
 				componentVersion, componentVersionUrl, policyRuleList));
 	}

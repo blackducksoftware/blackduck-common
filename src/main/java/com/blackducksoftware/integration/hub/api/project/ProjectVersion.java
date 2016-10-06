@@ -37,7 +37,6 @@ public class ProjectVersion {
 
 	@SerializedName("projectVersion")
 	private String url;
-	private String relativeUrl;
 
 	public String getProjectName() {
 		return projectName;
@@ -56,8 +55,8 @@ public class ProjectVersion {
 		return url;
 	}
 
-	public String getRelativeUrl() {
-		return relativeUrl;
+	public String getRelativeUrl() throws URISyntaxException {
+		return RestConnection.getRelativeUrl(url);
 	}
 
 	public void setProjectName(final String projectName) {
@@ -69,13 +68,12 @@ public class ProjectVersion {
 	}
 
 	@Deprecated
-	public void setProjectVersionLink(final String url) throws URISyntaxException {
+	public void setProjectVersionLink(final String url) {
 		setUrl(url);
 	}
 
-	public void setUrl(final String url) throws URISyntaxException {
+	public void setUrl(final String url) {
 		this.url = url;
-		this.relativeUrl = RestConnection.getRelativeUrl(url);
 	}
 
 	@Deprecated

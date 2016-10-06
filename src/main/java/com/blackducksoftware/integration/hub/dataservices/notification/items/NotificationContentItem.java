@@ -34,7 +34,6 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 	private final String componentVersion;
 
 	private final String componentVersionUrl;
-	private final String componentVersionRelativeUrl;
 
 	// We need createdAt (from the enclosing notificationItem) so we can order
 	// them after
@@ -43,14 +42,12 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
 	public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
-			final String componentVersion, final String componentVersionUrl)
-					throws URISyntaxException {
+ final String componentVersion, final String componentVersionUrl) {
 		this.createdAt = createdAt;
 		this.projectVersion = projectVersion;
 		this.componentName = componentName;
 		this.componentVersion = componentVersion;
 		this.componentVersionUrl = componentVersionUrl;
-		this.componentVersionRelativeUrl = RestConnection.getRelativeUrl(componentVersionUrl);
 	}
 
 	public ProjectVersion getProjectVersion() {
@@ -69,8 +66,8 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 		return componentVersionUrl;
 	}
 
-	public String getComponentVersionRelativeUrl() {
-		return componentVersionRelativeUrl;
+	public String getComponentVersionRelativeUrl() throws URISyntaxException {
+		return RestConnection.getRelativeUrl(componentVersionUrl);
 	}
 
 	public Date getCreatedAt() {
