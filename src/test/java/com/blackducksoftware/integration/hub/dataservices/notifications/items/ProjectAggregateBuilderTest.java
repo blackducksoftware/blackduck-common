@@ -22,7 +22,7 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Vul
 
 public class ProjectAggregateBuilderTest {
 
-	private static final String PROJECT_LINK = "aLink";
+	private static final String PROJECT_LINK = "http://hub.bds.com/api/projects/1234";
 	private static final String PROJECT_VERSION = "0.0.1-TEST";
 	private static final String PROJECT_NAME = "Project1";
 	private static final String COMPONENT_NAME = "Component1";

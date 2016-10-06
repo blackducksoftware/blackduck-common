@@ -42,7 +42,7 @@ public class PolicyViolationTransformTest {
 			+ UUID.randomUUID()
 			+ "/versions/" + UUID.randomUUID() + "/";
 	private final static String POLICY_NAME = "Policy Name";
-	private final static String PROJECT_VERSION_LINK = "projectversionlink";
+	private static final String PROJECT_VERSION_LINK = "http://hub.bds.com/api/projects/1234/versions/5678";
 	private final static String POLICY_LINK = "url1";
 
 	private NotificationRestService notificationService;
@@ -114,7 +114,7 @@ public class PolicyViolationTransformTest {
 		Mockito.when(status.getComponentName()).thenReturn(COMPONENT_NAME);
 		Mockito.when(status.getBomComponentVersionPolicyStatusLink()).thenReturn("PolicyRule");
 		Mockito.when(status.getComponentVersionLink())
-.thenReturn(COMPONENT_VERSION_URL);
+		.thenReturn(COMPONENT_VERSION_URL);
 		versionStatusList.add(status);
 		Mockito.when(item.getContent()).thenReturn(content);
 		Mockito.when(content.getProjectName()).thenReturn(PROJECT_NAME);

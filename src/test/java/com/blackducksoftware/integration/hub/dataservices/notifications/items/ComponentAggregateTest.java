@@ -27,7 +27,7 @@ public class ComponentAggregateTest {
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName("Project Name");
 		projectVersion.setProjectVersionName("1.0");
-		projectVersion.setUrl("versionLink");
+		projectVersion.setUrl("http://hub.bds.com/api/projects/1234/versions/5678");
 		final String componentName = "componentName";
 		final String componentVersion = "componentVersion";
 		final String firstName = "firstName";

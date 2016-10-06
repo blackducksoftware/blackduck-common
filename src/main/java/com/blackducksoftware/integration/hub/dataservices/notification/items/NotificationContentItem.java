@@ -43,14 +43,14 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
 	public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
- final String componentVersion, final String componentVersionUrl)
-			throws URISyntaxException {
+			final String componentVersion, final String componentVersionUrl)
+					throws URISyntaxException {
 		this.createdAt = createdAt;
 		this.projectVersion = projectVersion;
 		this.componentName = componentName;
 		this.componentVersion = componentVersion;
 		this.componentVersionUrl = componentVersionUrl;
-		this.componentVersionRelativeUrl = RestConnection.getBaseUrl(componentVersionUrl);
+		this.componentVersionRelativeUrl = RestConnection.getRelativeUrl(componentVersionUrl);
 	}
 
 	public ProjectVersion getProjectVersion() {

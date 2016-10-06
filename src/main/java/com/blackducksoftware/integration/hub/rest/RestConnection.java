@@ -157,6 +157,14 @@ public class RestConnection {
 		return derivedUrlPrefix;
 	}
 
+	public static String getRelativeUrl(final String url) throws URISyntaxException {
+		final String baseUrl = getBaseUrl(url);
+		final URI baseUri = new URI(baseUrl);
+		final URI origUri = new URI(url);
+		final URI relativeUri = baseUri.relativize(origUri);
+		return relativeUri.toString();
+	}
+
 	/**
 	 * The proxy settings get set as System properties. I.E. https.proxyHost,
 	 * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts

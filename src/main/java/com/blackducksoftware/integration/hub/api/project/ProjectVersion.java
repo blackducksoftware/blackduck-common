@@ -75,7 +75,7 @@ public class ProjectVersion {
 
 	public void setUrl(final String url) throws URISyntaxException {
 		this.url = url;
-		this.relativeUrl = RestConnection.getBaseUrl(url);
+		this.relativeUrl = RestConnection.getRelativeUrl(url);
 	}
 
 	@Deprecated
