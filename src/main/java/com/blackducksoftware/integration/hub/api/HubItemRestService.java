@@ -94,6 +94,8 @@ public class HubItemRestService<T extends HubItem> extends HubRestService {
 		final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
 		itemRequest.setMethod(Method.GET);
 		itemRequest.setUrl(url);
+		itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
+		itemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
 
 		final String response = itemRequest.executeForResponseString();
 		return gson.fromJson(response, itemType);
@@ -103,6 +105,8 @@ public class HubItemRestService<T extends HubItem> extends HubRestService {
 		final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
 		itemRequest.setMethod(Method.GET);
 		itemRequest.addUrlSegments(urlSegments);
+		itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
+		itemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
 
 		final String response = itemRequest.executeForResponseString();
 		return gson.fromJson(response, itemType);

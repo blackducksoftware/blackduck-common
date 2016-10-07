@@ -12,10 +12,12 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionRestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRestService;
 import com.blackducksoftware.integration.hub.api.extension.OptionItem;
 import com.blackducksoftware.integration.hub.api.extension.OptionTypeEnum;
+import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkItem;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
+import com.blackducksoftware.integration.hub.api.user.UserRestService;
 import com.blackducksoftware.integration.hub.api.user.UserType;
 import com.blackducksoftware.integration.hub.dataservices.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
@@ -46,17 +48,28 @@ public class UserConfigTransformTest {
 		return itemList;
 	}
 
+	private UserOptionLinkItem userOptionItem;
+	private UserItem user;
+	private List<ConfigurationItem> configItemList;
+	private UserRestService userRestService;
+	private ExtensionConfigRestService extensionRestService;
+	private UserConfigTransform converter;
+
+	public void initTest(final boolean activeUser) throws Exception {
+		userOptionItem = Mockito.mock(UserOptionLinkItem.class);
+		user = createUserItem(activeUser);
+		configItemList = createConfigurationItemList();
+		userRestService = Mockito.mock(UserRestService.class);
+		Mockito.when(userRestService.getItem(Mockito.anyString())).thenReturn(user);
+		extensionRestService = Mockito.mock(ExtensionConfigRestService.class);
+		Mockito.when(extensionRestService.getUserConfiguration(Mockito.anyString())).thenReturn(configItemList);
+		converter = new UserConfigTransform(userRestService, extensionRestService);
+	}
+
 	@Test
 	public void testTransform() throws Exception {
-		final List<ConfigurationItem> configItemList = createConfigurationItemList();
-		final ExtensionRestService extensionRestService = Mockito.mock(ExtensionRestService.class);
-		Mockito.when(extensionRestService.getUserConfiguration(Mockito.anyString(), Mockito.anyString()))
-				.thenReturn(configItemList);
-
-		final UserConfigTransform converter = new UserConfigTransform(extensionRestService);
-		final UserItem user = createUserItem(true);
-		final List<UserConfigItem> result = converter.transform(user);
-
+		initTest(true);
+		final List<UserConfigItem> result = converter.transform(userOptionItem);
 		assertNotNull(result);
 		assertEquals(1, result.size());
 		final UserConfigItem userConfigItem = result.get(0);
@@ -71,15 +84,8 @@ public class UserConfigTransformTest {
 
 	@Test
 	public void testTransformInactiveUser() throws Exception {
-		final List<ConfigurationItem> configItemList = createConfigurationItemList();
-		final ExtensionRestService extensionRestService = Mockito.mock(ExtensionRestService.class);
-		Mockito.when(extensionRestService.getUserConfiguration(Mockito.anyString(), Mockito.anyString()))
-				.thenReturn(configItemList);
-
-		final UserConfigTransform converter = new UserConfigTransform(extensionRestService);
-		final UserItem user = createUserItem(false);
-		final List<UserConfigItem> result = converter.transform(user);
-
+		initTest(false);
+		final List<UserConfigItem> result = converter.transform(userOptionItem);
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 	}

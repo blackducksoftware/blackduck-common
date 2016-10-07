@@ -25,7 +25,7 @@ import java.net.URISyntaxException;
 import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.util.HubUrlParser;
 import com.google.common.base.Joiner;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {
@@ -42,7 +42,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
 	public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
- final String componentVersion, final String componentVersionUrl) {
+			final String componentVersion, final String componentVersionUrl) {
 		this.createdAt = createdAt;
 		this.projectVersion = projectVersion;
 		this.componentName = componentName;
@@ -67,7 +67,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 	}
 
 	public String getComponentVersionRelativeUrl() throws URISyntaxException {
-		return RestConnection.getRelativeUrl(componentVersionUrl);
+		return HubUrlParser.getRelativeUrl(componentVersionUrl);
 	}
 
 	public Date getCreatedAt() {

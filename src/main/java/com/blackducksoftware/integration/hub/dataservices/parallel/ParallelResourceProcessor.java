@@ -28,6 +28,13 @@ public class ParallelResourceProcessor<R, S> {
 		completionService = new ExecutorCompletionService<>(executorService);
 	}
 
+	public ParallelResourceProcessor(final IntLogger logger, final ExecutorService executorService,
+			final ExecutorCompletionService<List<R>> completionService) {
+		this.logger = logger;
+		this.executorService = executorService;
+		this.completionService = completionService;
+	}
+
 	public void addTransform(final Class<?> clazz, final ItemTransform<List<R>, S> transform) {
 		transformerMap.put(clazz, transform);
 	}

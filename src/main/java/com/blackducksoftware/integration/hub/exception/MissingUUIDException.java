@@ -21,7 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.exception;
 
-@Deprecated
 public class MissingUUIDException extends Exception {
 
 	private static final long serialVersionUID = -1688109859108681082L;

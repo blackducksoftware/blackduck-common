@@ -85,6 +85,5 @@ public class MetaInformationTest {
 		builder.append("]");
 
 		assertEquals(builder.toString(), item1.toString());
-
 	}
 }

@@ -44,4 +44,13 @@ public class RestConnectionTest {
 
 		assertEquals(projectVersionRelativeUrl, RestConnection.getRelativeUrl(projectVersionUrl));
 	}
+
+	@Test
+	public void testGetRelativeUrlTrailingSlashNormalization() throws URISyntaxException {
+		final String urlPrefix = "https://hub.bds.com:8080/";
+		final String projectVersionRelativeUrl = "api/projects/1234/versions/5678" + "/";
+		final String projectVersionUrl = urlPrefix + projectVersionRelativeUrl;
+
+		assertEquals(projectVersionRelativeUrl, RestConnection.getRelativeUrl(projectVersionUrl));
+	}
 }

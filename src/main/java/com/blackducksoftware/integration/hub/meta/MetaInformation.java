@@ -24,7 +24,7 @@ package com.blackducksoftware.integration.hub.meta;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class MetaInformation {
 	private final List<String> allow;
@@ -46,7 +46,7 @@ public class MetaInformation {
 	}
 
 	public String getRelativeHref() throws URISyntaxException {
-		return RestConnection.getRelativeUrl(href);
+		return HubUrlParser.getRelativeUrl(href);
 	}
 
 	public List<MetaLink> getLinks() {

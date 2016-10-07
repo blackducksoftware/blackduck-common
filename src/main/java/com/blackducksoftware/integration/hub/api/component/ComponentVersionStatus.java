@@ -31,9 +31,7 @@ import com.blackducksoftware.integration.hub.util.HubUrlParser;
 import com.google.gson.annotations.SerializedName;
 
 public class ComponentVersionStatus {
-	@Deprecated
 	public static final String COMPONENT_URL_IDENTIFIER = "components";
-	@Deprecated
 	public static final String COMPONENT_VERSION_URL_IDENTIFIER = "versions";
 
 	private String componentName;

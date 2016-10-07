@@ -25,7 +25,6 @@ import java.net.URISyntaxException;
 import java.util.UUID;
 
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.util.HubUrlParser;
 import com.google.gson.annotations.SerializedName;
 
@@ -46,6 +45,11 @@ public class ProjectVersion {
 		return projectVersionName;
 	}
 
+	/**
+	 * Use getUrl() instead.
+	 *
+	 * @return
+	 */
 	@Deprecated
 	public String getProjectVersionLink() {
 		return getUrl();
@@ -56,7 +60,7 @@ public class ProjectVersion {
 	}
 
 	public String getRelativeUrl() throws URISyntaxException {
-		return RestConnection.getRelativeUrl(url);
+		return HubUrlParser.getRelativeUrl(url);
 	}
 
 	public void setProjectName(final String projectName) {
@@ -67,6 +71,11 @@ public class ProjectVersion {
 		this.projectVersionName = projectVersionName;
 	}
 
+	/**
+	 * Use setUrl() instead.
+	 *
+	 * @param url
+	 */
 	@Deprecated
 	public void setProjectVersionLink(final String url) {
 		setUrl(url);
