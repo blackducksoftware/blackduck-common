@@ -98,7 +98,6 @@ public class ProjectAggregateBuilder {
 				vulnerabilityCount, totalCount, addedVulnCount, updatedVulnCount, deletedVulnCount, compList);
 	}
 
-	// TODO ask Paulo to check this
 	public void increment(final NotificationContentItem item) {
 		final String compKey = getComponentKey(item);
 		ComponentAggregateBuilder compBuilder;
