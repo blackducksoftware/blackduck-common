@@ -42,7 +42,6 @@ import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
-import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -92,7 +91,6 @@ public class ScanStatusDataService extends AbstractDataService {
 	 * @throws BDRestException
 	 * @throws URISyntaxException
 	 * @throws ProjectDoesNotExistException
-	 * @throws MissingUUIDException
 	 * @throws UnexpectedHubResponseException
 	 * @throws HubIntegrationException
 	 * @throws HubTimeoutExceededException
