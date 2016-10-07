@@ -8,6 +8,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.util.HubUrlParser;
+
 public class RestConnectionTest {
 
 	@BeforeClass
@@ -24,7 +26,7 @@ public class RestConnectionTest {
 		final String projectVersionRelativeUrl = "api/projects/1234/versions/5678";
 		final String projectVersionUrl = urlPrefix + projectVersionRelativeUrl;
 
-		assertEquals(urlPrefix, RestConnection.getBaseUrl(projectVersionUrl));
+		assertEquals(urlPrefix, HubUrlParser.getBaseUrl(projectVersionUrl));
 	}
 
 	@Test
@@ -33,7 +35,7 @@ public class RestConnectionTest {
 		final String projectVersionRelativeUrl = "api/projects/1234/versions/5678";
 		final String projectVersionUrl = urlPrefix + projectVersionRelativeUrl;
 
-		assertEquals(urlPrefix, RestConnection.getBaseUrl(projectVersionUrl));
+		assertEquals(urlPrefix, HubUrlParser.getBaseUrl(projectVersionUrl));
 	}
 
 	@Test
@@ -42,7 +44,7 @@ public class RestConnectionTest {
 		final String projectVersionRelativeUrl = "api/projects/1234/versions/5678";
 		final String projectVersionUrl = urlPrefix + projectVersionRelativeUrl;
 
-		assertEquals(projectVersionRelativeUrl, RestConnection.getRelativeUrl(projectVersionUrl));
+		assertEquals(projectVersionRelativeUrl, HubUrlParser.getRelativeUrl(projectVersionUrl));
 	}
 
 	@Test
@@ -51,6 +53,6 @@ public class RestConnectionTest {
 		final String projectVersionRelativeUrl = "api/projects/1234/versions/5678" + "/";
 		final String projectVersionUrl = urlPrefix + projectVersionRelativeUrl;
 
-		assertEquals(projectVersionRelativeUrl, RestConnection.getRelativeUrl(projectVersionUrl));
+		assertEquals(projectVersionRelativeUrl, HubUrlParser.getRelativeUrl(projectVersionUrl));
 	}
 }
