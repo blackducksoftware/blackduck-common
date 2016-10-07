@@ -42,7 +42,6 @@ import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusDataSer
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
-import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -136,12 +135,11 @@ public class HubEventPolling {
 	 *
 	 * @throws HubTimeoutExceededException
 	 * @throws UnexpectedHubResponseException
-	 * @throws MissingUUIDException
 	 * @throws ProjectDoesNotExistException
 	 */
 	public void assertBomUpToDate(final HubReportGenerationInfo hubReportGenerationInfo, final IntLogger logger)
 			throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException,
-			ProjectDoesNotExistException, MissingUUIDException, UnexpectedHubResponseException {
+			ProjectDoesNotExistException, UnexpectedHubResponseException {
 		if (StringUtils.isBlank(hubReportGenerationInfo.getScanStatusDirectory())) {
 			throw new HubIntegrationException("The scan status directory must be a non empty value.");
 		}
