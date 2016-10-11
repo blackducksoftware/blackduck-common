@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +22,7 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Vul
 
 public class ComponentAggregateBuilderTest {
 
-	private static final String PROJECT_LINK = "aLink";
+	private static final String PROJECT_LINK = "http://hub.bds.com/api/projects/1234";
 	private static final String PROJECT_VERSION = "0.0.1-TEST";
 	private static final String PROJECT_NAME = "Project1";
 	private static final String COMPONENT_NAME = "Component1";
@@ -32,42 +33,42 @@ public class ComponentAggregateBuilderTest {
 	private static final String VULN_ID = "VulnId";
 	private static final String VULN_SOURCE = "VulnSource";
 
-	private ProjectVersion createProjectVersion() {
+	private ProjectVersion createProjectVersion() throws URISyntaxException {
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName(PROJECT_NAME);
 		projectVersion.setProjectVersionName(PROJECT_VERSION);
-		projectVersion.setProjectVersionLink(PROJECT_LINK);
+		projectVersion.setUrl(PROJECT_LINK);
 		return projectVersion;
 	}
 
-	private PolicyViolationContentItem createPolicyViolationContentItem() {
-		final UUID componentID = UUID.randomUUID();
-		final UUID componentVersionID = UUID.randomUUID();
+	private PolicyViolationContentItem createPolicyViolationContentItem() throws URISyntaxException {
+		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
+				+ "/versions/" + UUID.randomUUID() + "/";
 
 		final List<PolicyRule> policyRuleList = new ArrayList<>();
 		final PolicyRule rule = new PolicyRule(null, POLICY_RULE_NAME, "", true, true, null, "", "", "", "");
 		policyRuleList.add(rule);
 		final PolicyViolationContentItem item = new PolicyViolationContentItem(new Date(), createProjectVersion(),
-				COMPONENT_NAME, COMPONENT_VERSION, componentID, componentVersionID, policyRuleList);
+				COMPONENT_NAME, COMPONENT_VERSION, componentVersionUrl, policyRuleList);
 		return item;
 	}
 
-	private PolicyOverrideContentItem createPolicyOverrideContentItem() {
-		final UUID componentID = UUID.randomUUID();
-		final UUID componentVersionID = UUID.randomUUID();
+	private PolicyOverrideContentItem createPolicyOverrideContentItem() throws URISyntaxException {
+		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
+				+ "/versions/" + UUID.randomUUID() + "/";
 
 		final List<PolicyRule> policyRuleList = new ArrayList<>();
 		final PolicyRule rule = new PolicyRule(null, POLICY_RULE_NAME, "", true, true, null, "", "", "", "");
 		policyRuleList.add(rule);
 		final PolicyOverrideContentItem item = new PolicyOverrideContentItem(new Date(), createProjectVersion(),
-				COMPONENT_NAME, COMPONENT_VERSION, componentID, componentVersionID, policyRuleList, FIRST_NAME,
+				COMPONENT_NAME, COMPONENT_VERSION, componentVersionUrl, policyRuleList, FIRST_NAME,
 				LAST_NAME);
 		return item;
 	}
 
-	private VulnerabilityContentItem createVulnerabilityContentItem() {
-		final UUID componentID = UUID.randomUUID();
-		final UUID componentVersionID = UUID.randomUUID();
+	private VulnerabilityContentItem createVulnerabilityContentItem() throws URISyntaxException {
+		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
+				+ "/versions/" + UUID.randomUUID() + "/";
 
 		final VulnerabilitySourceQualifiedId vuln = new VulnerabilitySourceQualifiedId(VULN_SOURCE, VULN_ID);
 		final List<VulnerabilitySourceQualifiedId> added = new ArrayList<>();
@@ -78,25 +79,28 @@ public class ComponentAggregateBuilderTest {
 		deleted.add(vuln);
 
 		final VulnerabilityContentItem item = new VulnerabilityContentItem(new Date(), createProjectVersion(),
-				COMPONENT_NAME, COMPONENT_VERSION, componentID, componentVersionID, added, updated, deleted);
+				COMPONENT_NAME, COMPONENT_VERSION, componentVersionUrl, added, updated, deleted);
 		return item;
 	}
 
-	private void updatePolicyViolationCounts(final ComponentAggregateBuilder builder, final int iterations) {
+	private void updatePolicyViolationCounts(final ComponentAggregateBuilder builder, final int iterations)
+			throws URISyntaxException {
 		final PolicyViolationContentItem item = createPolicyViolationContentItem();
 		for (int index = 0; index < iterations; index++) {
 			builder.increment(item);
 		}
 	}
 
-	private void updatePolicyOverrideCounts(final ComponentAggregateBuilder builder, final int iterations) {
+	private void updatePolicyOverrideCounts(final ComponentAggregateBuilder builder, final int iterations)
+			throws URISyntaxException {
 		final PolicyOverrideContentItem item = createPolicyOverrideContentItem();
 		for (int index = 0; index < iterations; index++) {
 			builder.increment(item);
 		}
 	}
 
-	private void updateVulnerabilityCounts(final ComponentAggregateBuilder builder, final int iterations) {
+	private void updateVulnerabilityCounts(final ComponentAggregateBuilder builder, final int iterations)
+			throws URISyntaxException {
 		final VulnerabilityContentItem item = createVulnerabilityContentItem();
 		for (int index = 0; index < iterations; index++) {
 			builder.increment(item);
@@ -110,7 +114,7 @@ public class ComponentAggregateBuilderTest {
 	}
 
 	@Test
-	public void testPolicyViolationIncrement() {
+	public void testPolicyViolationIncrement() throws URISyntaxException {
 		final ComponentAggregateBuilder builder = new ComponentAggregateBuilder();
 		final PolicyViolationContentItem item = createPolicyViolationContentItem();
 		final int count = 5;
@@ -122,7 +126,7 @@ public class ComponentAggregateBuilderTest {
 	}
 
 	@Test
-	public void testPolicyOverrideIncrement() {
+	public void testPolicyOverrideIncrement() throws URISyntaxException {
 		final ComponentAggregateBuilder builder = new ComponentAggregateBuilder();
 		final PolicyOverrideContentItem item = createPolicyOverrideContentItem();
 		final int count = 5;
@@ -134,7 +138,7 @@ public class ComponentAggregateBuilderTest {
 	}
 
 	@Test
-	public void testVulnerabilityIncrement() {
+	public void testVulnerabilityIncrement() throws URISyntaxException {
 		final ComponentAggregateBuilder builder = new ComponentAggregateBuilder();
 		final VulnerabilityContentItem item = createVulnerabilityContentItem();
 		final int count = 5;
@@ -149,7 +153,7 @@ public class ComponentAggregateBuilderTest {
 	}
 
 	@Test
-	public void testFullObjectConstruction() {
+	public void testFullObjectConstruction() throws URISyntaxException {
 		final ComponentAggregateBuilder builder = new ComponentAggregateBuilder();
 
 		final int policyCount = 2;

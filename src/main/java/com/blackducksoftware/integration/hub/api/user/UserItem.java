@@ -74,6 +74,7 @@ public class UserItem extends HubItem {
 		return active;
 	}
 
+	@Deprecated
 	public UUID getUserId() throws MissingUUIDException {
 		if (getMeta() == null || getMeta().getHref() == null) {
 			return null;

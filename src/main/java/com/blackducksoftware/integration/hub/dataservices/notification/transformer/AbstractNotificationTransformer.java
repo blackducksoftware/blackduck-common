@@ -34,7 +34,7 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Not
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
 public abstract class AbstractNotificationTransformer
-		implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
+implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
 	private final NotificationRestService notificationService;
 	private final ProjectVersionRestService projectVersionService;
 	private final PolicyRestService policyService;

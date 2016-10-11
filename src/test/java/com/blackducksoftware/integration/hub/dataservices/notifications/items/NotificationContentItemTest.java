@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
@@ -17,14 +18,16 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Not
 public class NotificationContentItemTest {
 
 	@Test
-	public void testSortingInOrder() throws InterruptedException {
+	public void testSortingInOrder() throws InterruptedException, URISyntaxException {
+		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
+				+ "/versions/" + UUID.randomUUID() + "/";
 		final NotificationContentItem notif1 = new NotificationContentItem(new Date(), new ProjectVersion(),
-				"componentName1", "componentVersion1", new UUID(0, 0), new UUID(0, 0));
+				"componentName1", "componentVersion1", componentVersionUrl);
 
 		Thread.sleep(10L);
 
 		final NotificationContentItem notif2 = new NotificationContentItem(new Date(), new ProjectVersion(),
-				"componentName2", "componentVersion2", new UUID(0, 0), new UUID(0, 0));
+				"componentName2", "componentVersion2", componentVersionUrl);
 
 		final Set<NotificationContentItem> items = new TreeSet<>();
 		items.add(notif1);
@@ -38,14 +41,16 @@ public class NotificationContentItemTest {
 	}
 
 	@Test
-	public void testSortingReverseOrder() throws InterruptedException {
+	public void testSortingReverseOrder() throws InterruptedException, URISyntaxException {
+		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
+				+ "/versions/" + UUID.randomUUID() + "/";
 		final NotificationContentItem notif1 = new NotificationContentItem(new Date(), new ProjectVersion(),
-				"componentName1", "componentVersion1", new UUID(0, 0), new UUID(0, 0));
+				"componentName1", "componentVersion1", componentVersionUrl);
 
 		Thread.sleep(10L);
 
 		final NotificationContentItem notif2 = new NotificationContentItem(new Date(), new ProjectVersion(),
-				"componentName2", "componentVersion2", new UUID(0, 0), new UUID(0, 0));
+				"componentName2", "componentVersion2", componentVersionUrl);
 
 		final Set<NotificationContentItem> items = new TreeSet<>();
 		items.add(notif2);
@@ -59,17 +64,21 @@ public class NotificationContentItemTest {
 	}
 
 	@Test
-	public void testSymmetry() throws InterruptedException {
+	public void testSymmetry() throws InterruptedException, URISyntaxException {
+		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
+				+ "/versions/" + UUID.randomUUID() + "/";
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName("projectName");
 		projectVersion.setProjectVersionName("projectVersionName");
 
 		final Date createdAt = new Date();
 		final NotificationContentItem notif1 = new NotificationContentItem(createdAt, projectVersion,
-				"componentName1", "componentVersion1", new UUID(0, 0), new UUID(1, 1));
+				"componentName1",
+				"componentVersion1", componentVersionUrl);
 
 		final NotificationContentItem notif2 = new NotificationContentItem(createdAt, projectVersion,
-				"componentName2", "componentVersion2", new UUID(2, 2), new UUID(3, 3));
+				"componentName2",
+				"componentVersion2", componentVersionUrl);
 
 		final int notif1CompareToResult = notif1.compareTo(notif2);
 		final int notif2CompareToResult = notif2.compareTo(notif1);

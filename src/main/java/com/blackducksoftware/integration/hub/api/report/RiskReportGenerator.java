@@ -30,7 +30,6 @@ import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
@@ -55,7 +54,7 @@ public class RiskReportGenerator {
 
 	public HubRiskReportData generateHubReport(final IntLogger logger, final ReportCategoriesEnum[] categories)
 			throws IOException, BDRestException, URISyntaxException, InterruptedException, HubIntegrationException,
-			UnexpectedHubResponseException, ProjectDoesNotExistException, MissingUUIDException {
+			UnexpectedHubResponseException, ProjectDoesNotExistException {
 		logger.debug("Waiting for the bom to be updated with the scan results.");
 		final HubEventPolling hubEventPolling = getHubEventPolling(hubReportGenerationInfo.getService());
 

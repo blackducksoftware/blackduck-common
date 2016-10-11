@@ -44,7 +44,7 @@ public class NotificationCounter {
 	}
 
 	public ProjectAggregateBuilder getCountBuilder(final ProjectVersion projectVersion) {
-		final String key = projectVersion.getProjectVersionLink();
+		final String key = projectVersion.getUrl();
 		if (getCountBuilderMap().containsKey(key)) {
 			return getCountBuilderMap().get(key);
 		} else {

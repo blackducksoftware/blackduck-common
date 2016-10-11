@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,17 +23,17 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Vul
 public class ComponentAggregateTest {
 
 	@Test
-	public void testComponentAggregateCount() {
+	public void testComponentAggregateCount() throws URISyntaxException {
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName("Project Name");
 		projectVersion.setProjectVersionName("1.0");
-		projectVersion.setProjectVersionLink("versionLink");
+		projectVersion.setUrl("http://hub.bds.com/api/projects/1234/versions/5678");
 		final String componentName = "componentName";
 		final String componentVersion = "componentVersion";
 		final String firstName = "firstName";
 		final String lastName = "lastName";
-		final UUID componentId = UUID.randomUUID();
-		final UUID componentVersionId = UUID.randomUUID();
+		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
+				+ "/versions/" + UUID.randomUUID() + "/";
 		final int total = 3;
 		final List<PolicyViolationContentItem> violationList = new ArrayList<>();
 		final List<PolicyOverrideContentItem> overrideList = new ArrayList<>();
@@ -41,15 +42,15 @@ public class ComponentAggregateTest {
 		final List<PolicyRule> ruleList = new ArrayList<>();
 		ruleList.add(rule);
 		final PolicyViolationContentItem violationContent = new PolicyViolationContentItem(new Date(), projectVersion,
-				componentName, componentVersion, componentId, componentVersionId, ruleList);
+				componentName, componentVersion, componentVersionUrl, ruleList);
 		final PolicyOverrideContentItem overrideContent = new PolicyOverrideContentItem(new Date(), projectVersion,
 				componentName,
-				componentVersion, componentId, componentVersionId, ruleList, firstName, lastName);
+				componentVersion, componentVersionUrl, ruleList, firstName, lastName);
 
 		final List<VulnerabilitySourceQualifiedId> sourceIdList = new ArrayList<>();
 		sourceIdList.add(new VulnerabilitySourceQualifiedId("source", "id"));
 		final VulnerabilityContentItem vulnerabilityContent = new VulnerabilityContentItem(new Date(), projectVersion,
-				componentName, componentVersion, componentId, componentVersionId, sourceIdList, sourceIdList,
+				componentName, componentVersion, componentVersionUrl, sourceIdList, sourceIdList,
 				sourceIdList);
 		violationList.add(violationContent);
 		overrideList.add(overrideContent);

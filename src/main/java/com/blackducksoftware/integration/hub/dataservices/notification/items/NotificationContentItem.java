@@ -21,10 +21,11 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservices.notification.items;
 
+import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.UUID;
 
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
+import com.blackducksoftware.integration.hub.util.HubUrlParser;
 import com.google.common.base.Joiner;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {
@@ -32,8 +33,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 	private final String componentName;
 	private final String componentVersion;
 
-	private final UUID componentId;
-	private final UUID componentVersionId;
+	private final String componentVersionUrl;
 
 	// We need createdAt (from the enclosing notificationItem) so we can order
 	// them after
@@ -42,14 +42,12 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
 	public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
-			final String componentVersion, final UUID componentId, final UUID componentVersionId) {
+			final String componentVersion, final String componentVersionUrl) {
 		this.createdAt = createdAt;
 		this.projectVersion = projectVersion;
 		this.componentName = componentName;
 		this.componentVersion = componentVersion;
-		this.componentId = componentId;
-		this.componentVersionId = componentVersionId;
-
+		this.componentVersionUrl = componentVersionUrl;
 	}
 
 	public ProjectVersion getProjectVersion() {
@@ -64,12 +62,12 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 		return componentVersion;
 	}
 
-	public UUID getComponentId() {
-		return componentId;
+	public String getComponentVersionUrl() {
+		return componentVersionUrl;
 	}
 
-	public UUID getComponentVersionId() {
-		return componentVersionId;
+	public String getComponentVersionRelativeUrl() throws URISyntaxException {
+		return HubUrlParser.getRelativeUrl(componentVersionUrl);
 	}
 
 	public Date getCreatedAt() {
@@ -85,10 +83,8 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 		builder.append(componentName);
 		builder.append(", componentVersion=");
 		builder.append(componentVersion);
-		builder.append(", componentId=");
-		builder.append(componentId);
-		builder.append(", componentVersionId=");
-		builder.append(componentVersionId);
+		builder.append(", componentVersionUrl=");
+		builder.append(componentVersionUrl);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -108,10 +104,9 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 		// Identify same-time non-equal items as non-equal
 		final Joiner joiner = Joiner.on(":").skipNulls();
 		final String thisProjectVersionString = joiner.join(getProjectVersion().getProjectName(), getProjectVersion()
-				.getProjectVersionName(), getComponentId().toString(), getComponentVersionId().toString());
+				.getProjectVersionName(), getComponentVersionUrl());
 		final String otherProjectVersionString = joiner.join(o.getProjectVersion().getProjectName(), o
-				.getProjectVersion().getProjectVersionName(), o.getComponentId().toString(), o.getComponentVersionId()
-				.toString());
+				.getProjectVersion().getProjectVersionName(), o.getComponentVersionUrl().toString());
 
 		return thisProjectVersionString.compareTo(otherProjectVersionString);
 	}
@@ -120,8 +115,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((componentId == null) ? 0 : componentId.hashCode());
-		result = prime * result + ((componentVersionId == null) ? 0 : componentVersionId.hashCode());
+		result = prime * result + ((getComponentVersionUrl() == null) ? 0 : getComponentVersionUrl().hashCode());
 		result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
 		result = prime * result + ((projectVersion == null) ? 0 : projectVersion.hashCode());
 		return result;
@@ -139,18 +133,11 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 			return false;
 		}
 		final NotificationContentItem other = (NotificationContentItem) obj;
-		if (componentId == null) {
-			if (other.componentId != null) {
+		if (getComponentVersionUrl() == null) {
+			if (other.getComponentVersionUrl() != null) {
 				return false;
 			}
-		} else if (!componentId.equals(other.componentId)) {
-			return false;
-		}
-		if (componentVersionId == null) {
-			if (other.componentVersionId != null) {
-				return false;
-			}
-		} else if (!componentVersionId.equals(other.componentVersionId)) {
+		} else if (!getComponentVersionUrl().equals(other.getComponentVersionUrl())) {
 			return false;
 		}
 		if (createdAt == null) {

@@ -107,11 +107,9 @@ public class ProjectAggregateBuilder {
 			compBuilder = new ComponentAggregateBuilder();
 			compBuilder.setComponentName(item.getComponentName());
 			compBuilder.setComponentVersion(item.getComponentVersion());
-			if (item.getComponentId() != null) {
-				compBuilder.setComponentId(item.getComponentId().toString());
-			}
-			if (item.getComponentVersionId() != null) {
-				compBuilder.setComponentVersionId(item.getComponentVersionId().toString());
+
+			if (item.getComponentVersionUrl() != null) {
+				compBuilder.setComponentVersionUrl(item.getComponentVersionUrl());
 			}
 			compBuilderMap.put(compKey, compBuilder);
 		}
