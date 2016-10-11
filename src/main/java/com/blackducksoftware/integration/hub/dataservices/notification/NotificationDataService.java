@@ -23,14 +23,10 @@ package com.blackducksoftware.integration.hub.dataservices.notification;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
@@ -42,13 +38,9 @@ import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotif
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
-import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateBuilder;
-import com.blackducksoftware.integration.hub.dataservices.notification.items.ProjectAggregateData;
-import com.blackducksoftware.integration.hub.dataservices.notification.transformer.NotificationCounter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationClearedTransformer;
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationOverrideTransformer;
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationTransformer;
@@ -67,7 +59,6 @@ public class NotificationDataService extends AbstractDataService {
 	private final VersionBomPolicyRestService bomVersionPolicyService;
 	private final ComponentVersionRestService componentVersionService;
 	private PolicyNotificationFilter policyFilter = null;
-	private final VulnerabilityRestService vulnerabilityRestService;
 	private final ParallelResourceProcessor<NotificationContentItem, NotificationItem> parallelProcessor;
 
 	public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
@@ -85,7 +76,6 @@ public class NotificationDataService extends AbstractDataService {
 		policyService = new PolicyRestService(restConnection, gson, jsonParser);
 		bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
-		vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
 		parallelProcessor = new ParallelResourceProcessor<>(logger);
 		populateTransformerMap();
 	}
@@ -112,23 +102,5 @@ public class NotificationDataService extends AbstractDataService {
 		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
 		contentList.addAll(parallelProcessor.process(itemList));
 		return contentList;
-	}
-
-	public List<ProjectAggregateData> getNotificationCounts(final Date startDate, final Date endDate)
-			throws IOException, URISyntaxException, BDRestException, InterruptedException {
-		final Map<String, ProjectAggregateBuilder> projectCounterMap = new ConcurrentHashMap<>();
-		final NotificationCounter counter = new NotificationCounter(projectCounterMap);
-		final Set<NotificationContentItem> itemList = getAllNotifications(startDate, endDate);
-		for (final NotificationContentItem item : itemList) {
-			counter.count(item);
-		}
-
-		final List<ProjectAggregateData> dataList = new ArrayList<>();
-		for (final Map.Entry<String, ProjectAggregateBuilder> entry : projectCounterMap.entrySet()) {
-			ProjectAggregateBuilder builder = entry.getValue().updateDateRange(startDate, endDate);
-			builder = builder.updateVulnerabilitiesRestService(vulnerabilityRestService);
-			dataList.add(builder.build());
-		}
-		return dataList;
 	}
 }
