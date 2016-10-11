@@ -15,7 +15,6 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.user.UserRestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRestService;
-import com.blackducksoftware.integration.hub.api.vulnerableBomComponent.VulnerableBomComponentRestService;
 import com.blackducksoftware.integration.hub.dataservices.extension.ExtensionConfigDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.NotificationDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
@@ -43,10 +42,10 @@ public class DataServicesFactory {
 	private final UserRestService userRestService;
 	private final VersionBomPolicyRestService versionBomPolicyRestService;
 	private final VulnerabilityRestService vulnerabilityRestService;
-	private final ExtensionConfigRestService extensionConfigRestService;
-	private final VulnerableBomComponentRestService vulnerableBomComponentRestService;
 	private final ExtensionRestService extensionRestService;
+	private final ExtensionConfigRestService extensionConfigRestService;
 	private final ExtensionUserOptionRestService extensionUserOptionRestService;
+
 
 	public DataServicesFactory(final RestConnection restConnection) {
 		this.restConnection = restConnection;
@@ -63,10 +62,10 @@ public class DataServicesFactory {
 		userRestService = new UserRestService(restConnection, gson, jsonParser);
 		versionBomPolicyRestService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
-		extensionConfigRestService = new ExtensionConfigRestService(restConnection, gson, jsonParser);
-		vulnerableBomComponentRestService = new VulnerableBomComponentRestService(restConnection, gson, jsonParser);
 		extensionRestService = new ExtensionRestService(restConnection, gson, jsonParser);
+		extensionConfigRestService = new ExtensionConfigRestService(restConnection, gson, jsonParser);
 		extensionUserOptionRestService = new ExtensionUserOptionRestService(restConnection, gson, jsonParser);
+
 	}
 
 	public PolicyStatusDataService createPolicyStatusDataService() {
@@ -151,10 +150,6 @@ public class DataServicesFactory {
 
 	public VulnerabilityRestService getVulnerabilityRestService() {
 		return vulnerabilityRestService;
-	}
-
-	public VulnerableBomComponentRestService getVulnerableBomComponentRestService() {
-		return vulnerableBomComponentRestService;
 	}
 
 	public ExtensionConfigRestService getExtensionConfigRestService() {

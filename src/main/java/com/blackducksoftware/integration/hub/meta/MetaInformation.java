@@ -21,7 +21,10 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.meta;
 
+import java.net.URISyntaxException;
 import java.util.List;
+
+import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class MetaInformation {
 	private final List<String> allow;
@@ -40,6 +43,10 @@ public class MetaInformation {
 
 	public String getHref() {
 		return href;
+	}
+
+	public String getRelativeHref() throws URISyntaxException {
+		return HubUrlParser.getRelativeUrl(href);
 	}
 
 	public List<MetaLink> getLinks() {

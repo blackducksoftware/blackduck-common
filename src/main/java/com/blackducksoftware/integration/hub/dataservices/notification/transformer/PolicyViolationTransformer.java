@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionStatus;
@@ -66,10 +65,10 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 			final ProjectVersion projectVersion = new ProjectVersion();
 			projectVersion.setProjectName(projectName);
 			projectVersion.setProjectVersionName(releaseItem.getVersionName());
-			projectVersion.setProjectVersionLink(policyViolation.getContent().getProjectVersionLink());
+			projectVersion.setUrl(policyViolation.getContent().getProjectVersionLink());
 
 			handleNotification(componentVersionList, projectVersion, item, templateData);
-		} catch (final IOException | BDRestException | URISyntaxException e) {
+		} catch (final IOException | BDRestException e) {
 			throw new HubItemTransformException(e);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
@@ -95,11 +94,11 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 
 	@Override
 	public void createContents(final ProjectVersion projectVersion, final String componentName,
-			final String componentVersion, final UUID componentId, final UUID componentVersionId,
+			final String componentVersion, final String componentVersionUrl,
 			final List<PolicyRule> policyRuleList, final NotificationItem item,
-			final List<NotificationContentItem> templateData) {
+			final List<NotificationContentItem> templateData) throws URISyntaxException {
 		templateData.add(new PolicyViolationContentItem(item.getCreatedAt(), projectVersion, componentName,
-				componentVersion, componentId, componentVersionId, policyRuleList));
+				componentVersion, componentVersionUrl, policyRuleList));
 	}
 
 }

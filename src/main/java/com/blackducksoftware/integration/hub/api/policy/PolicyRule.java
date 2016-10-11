@@ -102,6 +102,7 @@ public class PolicyRule extends HubItem {
 		return getDateTime(createdAt);
 	}
 
+	@Deprecated
 	public UUID getPolicyRuleId() throws MissingUUIDException {
 		if (getMeta() == null || getMeta().getHref() == null) {
 			return null;

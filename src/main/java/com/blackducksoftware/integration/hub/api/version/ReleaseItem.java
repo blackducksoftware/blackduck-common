@@ -74,6 +74,7 @@ public class ReleaseItem extends HubItem {
 		return source;
 	}
 
+	@Deprecated
 	public UUID getProjectId() throws MissingUUIDException {
 		if (getMeta() == null || getMeta().getHref() == null) {
 			return null;
@@ -81,6 +82,7 @@ public class ReleaseItem extends HubItem {
 		return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getMeta().getHref());
 	}
 
+	@Deprecated
 	public UUID getVersionId() throws MissingUUIDException {
 		if (getMeta() == null || getMeta().getHref() == null) {
 			return null;

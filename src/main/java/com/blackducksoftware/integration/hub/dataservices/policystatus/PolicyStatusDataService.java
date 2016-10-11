@@ -53,6 +53,7 @@ public class PolicyStatusDataService extends AbstractDataService {
 		this.policyStatusRestService = policyStatusRestService;
 	}
 
+	// TODO Needs to be rewritten without using IDs
 	public PolicyStatusItem getPolicyStatusForProjectAndVersion(final String projectName, final String projectVersion)
 			throws IOException, URISyntaxException, BDRestException, ProjectDoesNotExistException,
 			HubIntegrationException, MissingUUIDException {

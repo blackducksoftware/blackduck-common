@@ -66,6 +66,7 @@ public class ComponentVersion extends HubItem {
 		this.releasedOn = releasedOn;
 	}
 
+	@Deprecated
 	public UUID getComponentId() throws MissingUUIDException {
 		if (getMeta() == null || getMeta().getHref() == null) {
 			return null;
@@ -73,6 +74,7 @@ public class ComponentVersion extends HubItem {
 		return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER, getMeta().getHref());
 	}
 
+	@Deprecated
 	public UUID getVersionId() throws MissingUUIDException {
 		if (getMeta() == null || getMeta().getHref() == null) {
 			return null;
