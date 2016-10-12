@@ -2,6 +2,7 @@ package com.blackducksoftware.integration.hub.dataservices.notifications.items;
 
 import static org.junit.Assert.assertEquals;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,14 +17,14 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Pol
 public class PolicyViolationItemTest {
 
 	@Test
-	public void contentItemConstructorTest() {
+	public void contentItemConstructorTest() throws URISyntaxException {
 		final ProjectVersion projectVersion = new ProjectVersion();
 		projectVersion.setProjectName("test project");
 		projectVersion.setProjectVersionName("0.1.0");
 		final String componentName = "component 1";
 		final String componentVersion = "0.9.8";
-		final UUID componentId = UUID.randomUUID();
-		final UUID componentVersionId = UUID.randomUUID();
+		final String componentVersionUrl = "http://hub.blackducksoftware.com/api/projects/" + UUID.randomUUID()
+				+ "/versions/" + UUID.randomUUID() + "/";
 
 		final List<PolicyRule> policyRules = new ArrayList<>();
 		final PolicyRule policy1 = new PolicyRule(null, "Policy 1", null, null, null, null, null, null, null, null);
@@ -33,13 +34,12 @@ public class PolicyViolationItemTest {
 
 		final PolicyViolationContentItem item = new PolicyViolationContentItem(new Date(), projectVersion,
 				componentName,
-				componentVersion, componentId, componentVersionId, policyRules);
+				componentVersion, componentVersionUrl, policyRules);
 
 		assertEquals(projectVersion, item.getProjectVersion());
 		assertEquals(componentName, item.getComponentName());
 		assertEquals(componentVersion, item.getComponentVersion());
-		assertEquals(componentId, item.getComponentId());
-		assertEquals(componentVersionId, item.getComponentVersionId());
+		assertEquals(componentVersionUrl, item.getComponentVersionUrl());
 		assertEquals(policyRules, item.getPolicyRuleList());
 	}
 }

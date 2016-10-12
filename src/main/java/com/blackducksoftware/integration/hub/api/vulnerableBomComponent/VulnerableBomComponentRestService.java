@@ -21,10 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.vulnerableBomComponent;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_PROJECTS;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_VERSIONS;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
@@ -47,21 +43,17 @@ public class VulnerableBomComponentRestService extends HubItemRestService<Vulner
 	private static final Type ITEM_LIST_TYPE = new TypeToken<List<VulnerableBomComponentItem>>() {
 	}.getType();
 
-	public VulnerableBomComponentRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+	public VulnerableBomComponentRestService(final RestConnection restConnection, final Gson gson,
+			final JsonParser jsonParser) {
 		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
 	}
 
-	public List<VulnerableBomComponentItem> getVulnerableComponentsMatchingComponentName(final String projectId,
-			final String projectVersionId, final String componentName) throws IOException, URISyntaxException,
-			BDRestException {
+	public List<VulnerableBomComponentItem> getVulnerableComponentsMatchingComponentName(
+			final String vulnerableBomComponentsUrl, final String componentName)
+			throws IOException, URISyntaxException, BDRestException {
 		final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
 		itemRequest.setMethod(Method.GET);
-		itemRequest.addUrlSegment(SEGMENT_API);
-		itemRequest.addUrlSegment(SEGMENT_PROJECTS);
-		itemRequest.addUrlSegment(projectId);
-		itemRequest.addUrlSegment(SEGMENT_VERSIONS);
-		itemRequest.addUrlSegment(projectVersionId);
-		itemRequest.addUrlSegment("vulnerable-bom-components");
+		itemRequest.setUrl(vulnerableBomComponentsUrl);
 		itemRequest.setQ(componentName);
 
 		final JsonObject jsonObject = itemRequest.executeForResponseJson();

@@ -21,6 +21,8 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.util;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.UUID;
 
@@ -29,6 +31,21 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 
 public class HubUrlParser {
+
+	public static String getBaseUrl(final String url) throws URISyntaxException {
+		final URI uri = new URI(url);
+		final String derivedUrlPrefix = StringUtils.join(uri.getScheme(), "://", uri.getAuthority(), "/");
+		return derivedUrlPrefix;
+	}
+
+	public static String getRelativeUrl(final String url) throws URISyntaxException {
+		final String baseUrl = getBaseUrl(url);
+		final URI baseUri = new URI(baseUrl);
+		final URI origUri = new URI(url);
+		final URI relativeUri = baseUri.relativize(origUri);
+		return relativeUri.toString();
+	}
+
 	// Project Url :
 	// http://eng-hub-valid03.dc1.lan/api/projects/a3b48f57-9c00-453f-8672-804e08c317f2
 	// Version Url :

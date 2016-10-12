@@ -50,6 +50,7 @@ public class ProjectItem extends HubItem {
 		return source;
 	}
 
+	@Deprecated
 	public UUID getProjectId() throws MissingUUIDException {
 		if (getMeta() == null || getMeta().getHref() == null) {
 			return null;

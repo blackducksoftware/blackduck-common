@@ -21,9 +21,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservices.notification.items;
 
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
@@ -34,9 +34,9 @@ public class PolicyViolationContentItem extends NotificationContentItem {
 
 	public PolicyViolationContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
-			final String componentVersion, final UUID componentId, final UUID componentVersionId,
-			final List<PolicyRule> policyRuleList) {
-		super(createdAt, projectVersion, componentName, componentVersion, componentId, componentVersionId);
+			final String componentVersion, final String componentVersionUrl,
+			final List<PolicyRule> policyRuleList) throws URISyntaxException {
+		super(createdAt, projectVersion, componentName, componentVersion, componentVersionUrl);
 		this.policyRuleList = policyRuleList;
 	}
 
@@ -53,10 +53,8 @@ public class PolicyViolationContentItem extends NotificationContentItem {
 		builder.append(getComponentName());
 		builder.append(", componentVersion=");
 		builder.append(getComponentVersion());
-		builder.append(", componentId=");
-		builder.append(getComponentId());
-		builder.append(", componentVersionId=");
-		builder.append(getComponentVersionId());
+		builder.append(", componentVersionUrl=");
+		builder.append(getComponentVersionUrl());
 		builder.append(", policyRuleList=");
 		builder.append(policyRuleList);
 		builder.append("]");

@@ -21,6 +21,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.project;
 
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
@@ -34,7 +35,7 @@ public class ProjectVersion {
 	private String projectVersionName;
 
 	@SerializedName("projectVersion")
-	private String projectVersionLink;
+	private String url;
 
 	public String getProjectName() {
 		return projectName;
@@ -44,8 +45,22 @@ public class ProjectVersion {
 		return projectVersionName;
 	}
 
+	/**
+	 * Use getUrl() instead.
+	 *
+	 * @return
+	 */
+	@Deprecated
 	public String getProjectVersionLink() {
-		return projectVersionLink;
+		return getUrl();
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public String getRelativeUrl() throws URISyntaxException {
+		return HubUrlParser.getRelativeUrl(url);
 	}
 
 	public void setProjectName(final String projectName) {
@@ -56,28 +71,40 @@ public class ProjectVersion {
 		this.projectVersionName = projectVersionName;
 	}
 
-	public void setProjectVersionLink(final String projectVersionLink) {
-		this.projectVersionLink = projectVersionLink;
+	/**
+	 * Use setUrl() instead.
+	 *
+	 * @param url
+	 */
+	@Deprecated
+	public void setProjectVersionLink(final String url) {
+		setUrl(url);
 	}
 
+	public void setUrl(final String url) {
+		this.url = url;
+	}
+
+	@Deprecated
 	public UUID getProjectId() throws MissingUUIDException {
-		if (getProjectVersionLink() == null) {
+		if (getUrl() == null) {
 			return null;
 		}
-		return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getProjectVersionLink());
+		return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getUrl());
 	}
 
+	@Deprecated
 	public UUID getVersionId() throws MissingUUIDException {
-		if (getProjectVersionLink() == null) {
+		if (getUrl() == null) {
 			return null;
 		}
-		return HubUrlParser.getUUIDFromURLString(VERSION_URL_IDENTIFIER, getProjectVersionLink());
+		return HubUrlParser.getUUIDFromURLString(VERSION_URL_IDENTIFIER, getUrl());
 	}
 
 	@Override
 	public String toString() {
 		return "ProjectVersion [projectName=" + projectName + ", projectVersionName=" + projectVersionName
-				+ ", projectVersionLink=" + projectVersionLink + "]";
+				+ ", projectVersionLink=" + getUrl() + "]";
 	}
 
 	@Override

@@ -76,6 +76,7 @@ public class ComponentVersionStatus {
 		this.policies = policies;
 	}
 
+	@Deprecated
 	public UUID getComponentId() throws MissingUUIDException {
 		if (StringUtils.isBlank(getComponentVersionLink())
 				&& StringUtils.isBlank(getBomComponentVersionPolicyStatusLink())) {
@@ -89,6 +90,7 @@ public class ComponentVersionStatus {
 		}
 	}
 
+	@Deprecated
 	public UUID getComponentVersionId() throws MissingUUIDException {
 		if (StringUtils.isBlank(getComponentVersionLink())) {
 			return null;

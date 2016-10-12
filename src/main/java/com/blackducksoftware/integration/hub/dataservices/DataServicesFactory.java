@@ -3,7 +3,9 @@ package com.blackducksoftware.integration.hub.dataservices;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionRestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRestService;
@@ -42,6 +44,8 @@ public class DataServicesFactory {
 	private final VersionBomPolicyRestService versionBomPolicyRestService;
 	private final VulnerabilityRestService vulnerabilityRestService;
 	private final ExtensionRestService extensionRestService;
+	private final ExtensionConfigRestService extensionConfigRestService;
+	private final ExtensionUserOptionRestService extensionUserOptionRestService;
 	private final VulnerableBomComponentRestService vulnerableBomComponentRestService;
 
 	public DataServicesFactory(final RestConnection restConnection) {
@@ -60,6 +64,8 @@ public class DataServicesFactory {
 		versionBomPolicyRestService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
 		extensionRestService = new ExtensionRestService(restConnection, gson, jsonParser);
+		extensionConfigRestService = new ExtensionConfigRestService(restConnection, gson, jsonParser);
+		extensionUserOptionRestService = new ExtensionUserOptionRestService(restConnection, gson, jsonParser);
 		vulnerableBomComponentRestService = new VulnerableBomComponentRestService(restConnection, gson, jsonParser);
 	}
 
@@ -84,7 +90,7 @@ public class DataServicesFactory {
 
 	public ExtensionConfigDataService createExtensionConfigDataService(final IntLogger logger) {
 		return new ExtensionConfigDataService(logger, restConnection, gson, jsonParser, userRestService,
-				extensionRestService);
+				extensionRestService, extensionConfigRestService, extensionUserOptionRestService);
 	}
 
 	public RestConnection getRestConnection() {
@@ -147,8 +153,19 @@ public class DataServicesFactory {
 		return vulnerabilityRestService;
 	}
 
+	public ExtensionConfigRestService getExtensionConfigRestService() {
+		return extensionConfigRestService;
+	}
+
+	public ExtensionRestService getExtensionRestService() {
+		return extensionRestService;
+	}
+
+	public ExtensionUserOptionRestService getExtensionUserOptionRestService() {
+		return extensionUserOptionRestService;
+	}
+
 	public VulnerableBomComponentRestService getVulnerableBomComponentRestService() {
 		return vulnerableBomComponentRestService;
 	}
-
 }
