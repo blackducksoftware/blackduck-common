@@ -84,4 +84,20 @@
       <version>1.7.21</version>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+        <plugin>
+          <groupId>com.blackducksoftware.integration</groupId>
+          <artifactId>hub-maven-plugin</artifactId>
+          <version>1.0.5-SNAPSHOT</version>
+          <configuration>
+            <hubUrl>http://integration-hub.blackducksoftware.com</hubUrl>
+            <hubUsername>sysadmin</hubUsername>
+            <hubPassword>blackduck</hubPassword>
+            <hubTimeout>120</hubTimeout>
+          </configuration>
+        </plugin>
+    </plugins>
+  </build>
 </project>
