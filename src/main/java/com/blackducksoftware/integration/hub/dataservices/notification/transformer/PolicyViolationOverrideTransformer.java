@@ -62,7 +62,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 			final List<ComponentVersionStatus> componentVersionList = new ArrayList<>();
 			final ComponentVersionStatus componentStatus = new ComponentVersionStatus();
 			componentStatus.setBomComponentVersionPolicyStatusLink(
-policyOverride.getContent()
+					policyOverride.getContent()
 					.getBomComponentVersionPolicyStatusLink());
 			componentStatus.setComponentName(policyOverride.getContent().getComponentName());
 			componentStatus.setComponentVersionLink(policyOverride.getContent().getComponentVersionLink());
@@ -93,13 +93,13 @@ policyOverride.getContent()
 
 	@Override
 	public void createContents(final ProjectVersion projectVersion, final String componentName,
-			final String componentVersion, final String componentVersionUrl,
+			final String componentVersion, final String componentUrl, final String componentVersionUrl,
 			final List<PolicyRule> policyRuleList, final NotificationItem item,
 			final List<NotificationContentItem> templateData) throws URISyntaxException {
 		final PolicyOverrideNotificationItem policyOverride = (PolicyOverrideNotificationItem) item;
 
 		templateData.add(new PolicyOverrideContentItem(item.getCreatedAt(), projectVersion, componentName,
-				componentVersion, componentVersionUrl, policyRuleList,
+				componentVersion, componentUrl, componentVersionUrl, policyRuleList,
 				policyOverride.getContent().getFirstName(), policyOverride.getContent().getLastName()));
 	}
 

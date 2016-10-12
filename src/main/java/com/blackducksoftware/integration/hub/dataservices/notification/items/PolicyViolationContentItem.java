@@ -34,9 +34,10 @@ public class PolicyViolationContentItem extends NotificationContentItem {
 
 	public PolicyViolationContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
-			final String componentVersion, final String componentVersionUrl,
+ final String componentVersion, final String componentUrl,
+			final String componentVersionUrl,
 			final List<PolicyRule> policyRuleList) throws URISyntaxException {
-		super(createdAt, projectVersion, componentName, componentVersion, componentVersionUrl);
+		super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl);
 		this.policyRuleList = policyRuleList;
 	}
 
@@ -46,19 +47,25 @@ public class PolicyViolationContentItem extends NotificationContentItem {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("PolicyViolationContentItem [projectVersion=");
-		builder.append(getProjectVersion());
-		builder.append(", componentName=");
-		builder.append(getComponentName());
-		builder.append(", componentVersion=");
-		builder.append(getComponentVersion());
-		builder.append(", componentVersionUrl=");
-		builder.append(getComponentVersionUrl());
-		builder.append(", policyRuleList=");
-		builder.append(policyRuleList);
-		builder.append("]");
-		return builder.toString();
+		String cru;
+		try {
+			cru = getComponentRelativeUrl();
+		} catch (final URISyntaxException e) {
+			cru = null;
+		}
+		String cvru;
+		try {
+			cvru = getComponentVersionRelativeUrl();
+		} catch (final URISyntaxException e) {
+			cvru = null;
+		}
+
+		return "PolicyViolationContentItem [policyRuleList=" + policyRuleList + ", getProjectVersion()="
+		+ getProjectVersion() + ", getComponentName()=" + getComponentName() + ", getComponentVersion()="
+		+ getComponentVersion() + ", getComponentUrl()=" + getComponentUrl() + ", getComponentVersionUrl()="
+		+ getComponentVersionUrl() + ", getComponentVersionRelativeUrl()=" + cvru
+		+ ", getComponentRelativeUrl()=" + cru + ", getCreatedAt()=" + getCreatedAt() + "]";
 	}
+
 
 }

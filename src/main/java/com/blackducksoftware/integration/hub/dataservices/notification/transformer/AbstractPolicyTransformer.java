@@ -85,6 +85,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
 							policyRuleList.add(rule);
 						}
 						createContents(projectVersion, componentVersion.getComponentName(), componentVersionName,
+								componentVersion.getComponentLink(),
 								componentVersion.getComponentVersionLink(),
 								policyRuleList, item, templateData);
 					}
@@ -201,7 +202,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
 	}
 
 	public abstract void createContents(final ProjectVersion projectVersion, final String componentName,
-			final String componentVersion, final String componentVersionUrl,
+			final String componentVersion, String componentUrl, final String componentVersionUrl,
 			List<PolicyRule> policyRuleList,
 			NotificationItem item, List<NotificationContentItem> templateData) throws URISyntaxException;
 }

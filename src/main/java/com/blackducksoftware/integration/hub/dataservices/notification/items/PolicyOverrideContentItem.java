@@ -35,11 +35,12 @@ public class PolicyOverrideContentItem extends PolicyViolationContentItem {
 
 	public PolicyOverrideContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
-			final String componentVersion, final String componentVersionUrl,
+			final String componentVersion, final String componentUrl,
+			final String componentVersionUrl,
 			final List<PolicyRule> policyRuleList, final String firstName,
- final String lastName)
-			throws URISyntaxException {
-		super(createdAt, projectVersion, componentName, componentVersion, componentVersionUrl,
+			final String lastName)
+					throws URISyntaxException {
+		super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl,
 				policyRuleList);
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -55,23 +56,27 @@ public class PolicyOverrideContentItem extends PolicyViolationContentItem {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("PolicyOverrideContentItem [projectVersion=");
-		builder.append(getProjectVersion());
-		builder.append(", componentName=");
-		builder.append(getComponentName());
-		builder.append(", componentVersion=");
-		builder.append(getComponentVersion());
-		builder.append(", componentVersionUrl=");
-		builder.append(getComponentVersionUrl());
-		builder.append(", policyRuleList=");
-		builder.append(getPolicyRuleList());
-		builder.append(", firstName=");
-		builder.append(firstName);
-		builder.append(", lastName=");
-		builder.append(lastName);
-		builder.append("]");
-		return builder.toString();
+
+		String cru;
+		try {
+			cru = getComponentRelativeUrl();
+		} catch (final URISyntaxException e) {
+			cru = null;
+		}
+		String cvru;
+		try {
+			cvru = getComponentVersionRelativeUrl();
+		} catch (final URISyntaxException e) {
+			cvru = null;
+		}
+
+		return "PolicyOverrideContentItem [firstName=" + firstName + ", lastName=" + lastName + ", createdAt="
+		+ createdAt + ", getPolicyRuleList()=" + getPolicyRuleList() + ", getProjectVersion()="
+		+ getProjectVersion() + ", getComponentName()=" + getComponentName() + ", getComponentVersion()="
+		+ getComponentVersion() + ", getComponentUrl()=" + getComponentUrl() + ", getComponentVersionUrl()="
+		+ getComponentVersionUrl() + ", getComponentVersionRelativeUrl()=" + cvru
+		+ ", getComponentRelativeUrl()=" + cru + ", getCreatedAt()=" + getCreatedAt() + "]";
 	}
+
 
 }

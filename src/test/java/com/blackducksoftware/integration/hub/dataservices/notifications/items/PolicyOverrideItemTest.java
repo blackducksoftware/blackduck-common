@@ -34,7 +34,7 @@ public class PolicyOverrideItemTest {
 		policyRules.add(policy2);
 
 		final PolicyOverrideContentItem item = new PolicyOverrideContentItem(new Date(), projectVersion, componentName,
-				componentVersion, componentVersionUrl, policyRules, firstName, lastName);
+				componentVersion, null, componentVersionUrl, policyRules, firstName, lastName);
 
 		assertEquals(projectVersion, item.getProjectVersion());
 		assertEquals(componentName, item.getComponentName());

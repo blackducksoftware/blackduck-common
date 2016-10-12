@@ -34,7 +34,7 @@ public class PolicyViolationItemTest {
 
 		final PolicyViolationContentItem item = new PolicyViolationContentItem(new Date(), projectVersion,
 				componentName,
-				componentVersion, componentVersionUrl, policyRules);
+ componentVersion, null, componentVersionUrl, policyRules);
 
 		assertEquals(projectVersion, item.getProjectVersion());
 		assertEquals(componentName, item.getComponentName());

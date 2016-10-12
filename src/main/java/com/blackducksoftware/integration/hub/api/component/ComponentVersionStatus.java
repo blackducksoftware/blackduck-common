@@ -36,8 +36,15 @@ public class ComponentVersionStatus {
 
 	private String componentName;
 
+	// If version is specified, componentVersionLink will be populated
+	// otherwise it will be null
 	@SerializedName("componentVersion")
 	private String componentVersionLink;
+
+	// If version is not specified, componentLink will be populated
+	// otherwise it will be null
+	@SerializedName("component")
+	private String componentLink;
 
 	@SerializedName("bomComponentVersionPolicyStatus")
 	private String bomComponentVersionPolicyStatusLink;
@@ -50,6 +57,10 @@ public class ComponentVersionStatus {
 
 	public String getComponentVersionLink() {
 		return componentVersionLink;
+	}
+
+	public String getComponentLink() {
+		return componentLink;
 	}
 
 	public String getBomComponentVersionPolicyStatusLink() {
