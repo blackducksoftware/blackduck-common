@@ -32,7 +32,6 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 	private final ProjectVersion projectVersion;
 	private final String componentName;
 	private final String componentVersion;
-	private final String componentUrl;
 	private final String componentVersionUrl;
 
 	// We need createdAt (from the enclosing notificationItem) so we can order
@@ -42,13 +41,12 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
 	public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
-			final String componentVersion, final String componentUrl,
+ final String componentVersion,
 			final String componentVersionUrl) {
 		this.createdAt = createdAt;
 		this.projectVersion = projectVersion;
 		this.componentName = componentName;
 		this.componentVersion = componentVersion;
-		this.componentUrl = componentUrl;
 		this.componentVersionUrl = componentVersionUrl;
 	}
 
@@ -64,20 +62,12 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 		return componentVersion;
 	}
 
-	public String getComponentUrl() {
-		return componentUrl;
-	}
-
 	public String getComponentVersionUrl() {
 		return componentVersionUrl;
 	}
 
 	public String getComponentVersionRelativeUrl() throws URISyntaxException {
 		return HubUrlParser.getRelativeUrl(componentVersionUrl);
-	}
-
-	public String getComponentRelativeUrl() throws URISyntaxException {
-		return HubUrlParser.getRelativeUrl(componentUrl);
 	}
 
 	public Date getCreatedAt() {
@@ -88,7 +78,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 	@Override
 	public String toString() {
 		return "NotificationContentItem [projectVersion=" + projectVersion + ", componentName=" + componentName
-				+ ", componentVersion=" + componentVersion + ", componentUrl=" + componentUrl
+				+ ", componentVersion=" + componentVersion
 				+ ", componentVersionUrl=" + componentVersionUrl + ", createdAt=" + createdAt + "]";
 	}
 

@@ -28,13 +28,13 @@ import java.util.List;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 
-public class PolicyViolationContentItem extends NotificationContentItem {
+public class PolicyViolationContentItem extends PolicyContentItem {
 
 	private final List<PolicyRule> policyRuleList;
 
 	public PolicyViolationContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
- final String componentVersion, final String componentUrl,
+			final String componentVersion, final String componentUrl,
 			final String componentVersionUrl,
 			final List<PolicyRule> policyRuleList) throws URISyntaxException {
 		super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl);
