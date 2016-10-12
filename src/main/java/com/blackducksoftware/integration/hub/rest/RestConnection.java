@@ -64,6 +64,7 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
+import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.util.AuthenticatorUtil;
@@ -98,6 +99,17 @@ public class RestConnection {
 		final SimpleDateFormat sdf = new SimpleDateFormat(JSON_DATE_FORMAT);
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		return sdf.format(date);
+	}
+
+	public RestConnection(final HubServerConfig hubServerConfig)
+			throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException {
+		this(hubServerConfig.getHubUrl().toString());
+		final HubProxyInfo proxyInfo = hubServerConfig.getProxyInfo();
+		if (proxyInfo.shouldUseProxyForUrl(hubServerConfig.getHubUrl())) {
+			setProxyProperties(proxyInfo);
+		}
+		setCookies(hubServerConfig.getGlobalCredentials().getUsername(),
+				hubServerConfig.getGlobalCredentials().getDecryptedPassword());
 	}
 
 	public RestConnection(final String baseUrl) {
