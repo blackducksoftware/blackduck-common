@@ -15,6 +15,7 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.user.UserRestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRestService;
+import com.blackducksoftware.integration.hub.api.vulnerableBomComponent.VulnerableBomComponentRestService;
 import com.blackducksoftware.integration.hub.dataservices.extension.ExtensionConfigDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.NotificationDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
@@ -45,7 +46,7 @@ public class DataServicesFactory {
 	private final ExtensionRestService extensionRestService;
 	private final ExtensionConfigRestService extensionConfigRestService;
 	private final ExtensionUserOptionRestService extensionUserOptionRestService;
-
+	private final VulnerableBomComponentRestService vulnerableBomComponentRestService;
 
 	public DataServicesFactory(final RestConnection restConnection) {
 		this.restConnection = restConnection;
@@ -65,7 +66,7 @@ public class DataServicesFactory {
 		extensionRestService = new ExtensionRestService(restConnection, gson, jsonParser);
 		extensionConfigRestService = new ExtensionConfigRestService(restConnection, gson, jsonParser);
 		extensionUserOptionRestService = new ExtensionUserOptionRestService(restConnection, gson, jsonParser);
-
+		vulnerableBomComponentRestService = new VulnerableBomComponentRestService(restConnection, gson, jsonParser);
 	}
 
 	public PolicyStatusDataService createPolicyStatusDataService() {
@@ -162,5 +163,9 @@ public class DataServicesFactory {
 
 	public ExtensionUserOptionRestService getExtensionUserOptionRestService() {
 		return extensionUserOptionRestService;
+	}
+
+	public VulnerableBomComponentRestService getVulnerableBomComponentRestService() {
+		return vulnerableBomComponentRestService;
 	}
 }
