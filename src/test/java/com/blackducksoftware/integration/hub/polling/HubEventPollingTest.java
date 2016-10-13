@@ -26,10 +26,13 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -47,7 +50,11 @@ import com.blackducksoftware.integration.hub.api.scan.ScanStatus;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.global.HubCredentials;
+import com.blackducksoftware.integration.hub.global.HubProxyInfo;
+import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.test.TestLogger;
 import com.google.gson.Gson;
@@ -59,6 +66,27 @@ public class HubEventPollingTest {
 
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
+
+	private HubServerConfig hubServerConfig;
+
+	@Before
+	public void initTest() throws MalformedURLException {
+		final HubProxyInfo proxyInfo = Mockito.mock(HubProxyInfo.class);
+		Mockito.when(proxyInfo.getUsername()).thenReturn("");
+		Mockito.when(proxyInfo.getEncryptedPassword()).thenReturn("");
+		Mockito.when(proxyInfo.getActualPasswordLength()).thenReturn(0);
+
+		final HubCredentials credentials = Mockito.mock(HubCredentials.class);
+		Mockito.when(credentials.getUsername()).thenReturn("");
+		Mockito.when(credentials.getActualPasswordLength()).thenReturn(0);
+		Mockito.when(credentials.getEncryptedPassword()).thenReturn("");
+		hubServerConfig = Mockito.mock(HubServerConfig.class);
+
+		Mockito.when(hubServerConfig.getHubUrl()).thenReturn(new URL("http://fakeURL"));
+		Mockito.when(hubServerConfig.getTimeout()).thenReturn(120);
+		Mockito.when(hubServerConfig.getGlobalCredentials()).thenReturn(credentials);
+		Mockito.when(hubServerConfig.getProxyInfo()).thenReturn(proxyInfo);
+	}
 
 	private void writeScanStatusToFile(final ScanSummaryItem status, final File file) throws IOException {
 		final Gson gson = new GsonBuilder().create();
@@ -92,7 +120,7 @@ public class HubEventPollingTest {
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
 				.thenReturn(new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta));
 
-		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final RestConnection restConnection = new CredentialsRestConnection(hubServerConfig);
 		final HubIntRestService restService = new HubIntRestService(restConnection);
 		restService.setScanSummaryRestService(scanSummaryRestService);
 
@@ -145,7 +173,7 @@ public class HubEventPollingTest {
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
 				.thenReturn(new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, _meta));
 
-		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final RestConnection restConnection = new CredentialsRestConnection(hubServerConfig);
 		final HubIntRestService restService = new HubIntRestService(restConnection);
 		restService.setScanSummaryRestService(scanSummaryRestService);
 
@@ -189,7 +217,7 @@ public class HubEventPollingTest {
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
 				.thenReturn(new ScanSummaryItem(ScanStatus.ERROR, null, null, null, _meta));
 
-		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final RestConnection restConnection = new CredentialsRestConnection(hubServerConfig);
 		final HubIntRestService restService = new HubIntRestService(restConnection);
 		restService.setScanSummaryRestService(scanSummaryRestService);
 

@@ -26,10 +26,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -55,8 +58,12 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.global.HubCredentials;
+import com.blackducksoftware.integration.hub.global.HubProxyInfo;
+import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
+import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.test.TestLogger;
 
@@ -67,6 +74,27 @@ public class RiskReportGeneratorTest {
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
+	private HubServerConfig hubServerConfig;
+
+	@Before
+	public void initTest() throws MalformedURLException {
+		final HubProxyInfo proxyInfo = Mockito.mock(HubProxyInfo.class);
+		Mockito.when(proxyInfo.getUsername()).thenReturn("");
+		Mockito.when(proxyInfo.getEncryptedPassword()).thenReturn("");
+		Mockito.when(proxyInfo.getActualPasswordLength()).thenReturn(0);
+
+		final HubCredentials credentials = Mockito.mock(HubCredentials.class);
+		Mockito.when(credentials.getUsername()).thenReturn("");
+		Mockito.when(credentials.getActualPasswordLength()).thenReturn(0);
+		Mockito.when(credentials.getEncryptedPassword()).thenReturn("");
+		hubServerConfig = Mockito.mock(HubServerConfig.class);
+
+		Mockito.when(hubServerConfig.getHubUrl()).thenReturn(new URL("http://fakeURL"));
+		Mockito.when(hubServerConfig.getTimeout()).thenReturn(120);
+		Mockito.when(hubServerConfig.getGlobalCredentials()).thenReturn(credentials);
+		Mockito.when(hubServerConfig.getProxyInfo()).thenReturn(proxyInfo);
+	}
+
 	@Test
 	public void generateReportWithScanStatusFiles() throws Exception {
 		final ScanSummaryRestService scanSummaryRestService = Mockito.mock(ScanSummaryRestService.class);
@@ -76,7 +104,7 @@ public class RiskReportGeneratorTest {
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
 				.thenReturn(new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta));
 
-		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final RestConnection restConnection = new CredentialsRestConnection(hubServerConfig);
 		HubIntRestService service = new HubIntRestService(restConnection);
 		service.setScanSummaryRestService(scanSummaryRestService);
 		service = Mockito.spy(service);
@@ -146,7 +174,8 @@ public class RiskReportGeneratorTest {
 		final ScanSummaryItem statusComplete = new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta);
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString())).thenReturn(statusComplete);
 
-		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final RestConnection restConnection = new CredentialsRestConnection(hubServerConfig);
+		;
 		HubIntRestService service = new HubIntRestService(restConnection);
 		service.setScanSummaryRestService(scanSummaryRestService);
 		service = Mockito.spy(service);
@@ -205,7 +234,7 @@ public class RiskReportGeneratorTest {
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString()))
 				.thenReturn(new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta));
 
-		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final RestConnection restConnection = new CredentialsRestConnection(hubServerConfig);
 		HubIntRestService service = new HubIntRestService(restConnection);
 		service.setScanSummaryRestService(scanSummaryRestService);
 		service = Mockito.spy(service);
@@ -260,7 +289,7 @@ public class RiskReportGeneratorTest {
 		final ScanSummaryItem statusBuilding = new ScanSummaryItem(ScanStatus.BUILDING_BOM, null, null, null, _meta);
 		Mockito.when(scanSummaryRestService.getItem(Mockito.anyString())).thenReturn(statusBuilding);
 
-		final RestConnection restConnection = new RestConnection("FakeHubUrl");
+		final RestConnection restConnection = new CredentialsRestConnection(hubServerConfig);
 		HubIntRestService service = new HubIntRestService(restConnection);
 		service.setScanSummaryRestService(scanSummaryRestService);
 		service = Mockito.spy(service);
@@ -298,8 +327,7 @@ public class RiskReportGeneratorTest {
 
 	@Test
 	public void generateReportWithCodeLocations() throws Exception {
-		HubIntRestService service = new HubIntRestService("FakeHubUrl");
-		service = Mockito.spy(service);
+		final HubIntRestService service = Mockito.mock(HubIntRestService.class);
 
 		final String hostName = "FakeHostName";
 
@@ -412,8 +440,7 @@ public class RiskReportGeneratorTest {
 		exception.expect(HubIntegrationException.class);
 		exception.expectMessage("Could not find content link for the report at : ");
 
-		HubIntRestService service = new HubIntRestService("FakeHubUrl");
-		service = Mockito.spy(service);
+		final HubIntRestService service = Mockito.mock(HubIntRestService.class);
 
 		final String hostName = "FakeHostName";
 
@@ -516,8 +543,7 @@ public class RiskReportGeneratorTest {
 		exception.expect(HubIntegrationException.class);
 		exception.expectMessage("The Report has not finished generating in : ");
 
-		HubIntRestService service = new HubIntRestService("FakeHubUrl");
-		service = Mockito.spy(service);
+		final HubIntRestService service = Mockito.mock(HubIntRestService.class);
 
 		final String hostName = "FakeHostName";
 
@@ -616,8 +642,7 @@ public class RiskReportGeneratorTest {
 		exception.expect(HubIntegrationException.class);
 		exception.expectMessage("The Bom has not finished updating from the scan within the specified wait time : ");
 
-		HubIntRestService service = new HubIntRestService("FakeHubUrl");
-		service = Mockito.spy(service);
+		final HubIntRestService service = Mockito.mock(HubIntRestService.class);
 
 		final String hostName = "FakeHostName";
 
