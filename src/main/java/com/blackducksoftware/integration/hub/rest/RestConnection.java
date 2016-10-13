@@ -114,6 +114,8 @@ public class RestConnection {
 			setCookies(hubServerConfig.getGlobalCredentials().getUsername(),
 					hubServerConfig.getGlobalCredentials().getDecryptedPassword());
 		}
+
+		setTimeout(hubServerConfig.getTimeout());
 	}
 
 	public RestConnection(final String baseUrl) {
