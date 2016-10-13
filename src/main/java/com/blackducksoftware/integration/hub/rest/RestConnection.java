@@ -148,6 +148,10 @@ public class RestConnection {
 		this.logger = logger;
 	}
 
+	public int getTimeout() {
+		return timeout;
+	}
+
 	public void setTimeout(final int timeout) {
 		if (timeout == 0) {
 			throw new IllegalArgumentException("Can not set the timeout to zero.");
