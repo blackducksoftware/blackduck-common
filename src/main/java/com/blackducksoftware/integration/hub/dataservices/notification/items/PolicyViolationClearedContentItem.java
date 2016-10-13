@@ -32,26 +32,18 @@ public class PolicyViolationClearedContentItem extends PolicyViolationContentIte
 
 	public PolicyViolationClearedContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
-			final String componentVersion, final String componentVersionUrl,
+			final String componentVersion, final String componentUrl,
+			final String componentVersionUrl,
 			final List<PolicyRule> policyRuleList) throws URISyntaxException {
-		super(createdAt, projectVersion, componentName, componentVersion, componentVersionUrl,
+		super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl,
 				policyRuleList);
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("PolicyViolationClearedContentItem [projectVersion=");
-		builder.append(getProjectVersion());
-		builder.append(", componentName=");
-		builder.append(getComponentName());
-		builder.append(", componentVersion=");
-		builder.append(getComponentVersion());
-		builder.append(", componentVersionUrl=");
-		builder.append(getComponentVersionUrl());
-		builder.append(", policyRuleList=");
-		builder.append(getPolicyRuleList());
-		builder.append("]");
-		return builder.toString();
+		return "PolicyViolationClearedContentItem [getPolicyRuleList()=" + getPolicyRuleList() + ", getComponentUrl()="
+				+ getComponentUrl() + ", getProjectVersion()=" + getProjectVersion() + ", getComponentName()="
+				+ getComponentName() + ", getComponentVersion()=" + getComponentVersion()
+				+ ", getComponentVersionUrl()=" + getComponentVersionUrl() + ", getCreatedAt()=" + getCreatedAt() + "]";
 	}
 }

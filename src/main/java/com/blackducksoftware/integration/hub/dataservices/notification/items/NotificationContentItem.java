@@ -32,7 +32,6 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 	private final ProjectVersion projectVersion;
 	private final String componentName;
 	private final String componentVersion;
-
 	private final String componentVersionUrl;
 
 	// We need createdAt (from the enclosing notificationItem) so we can order
@@ -42,7 +41,8 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
 	public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
-			final String componentVersion, final String componentVersionUrl) {
+ final String componentVersion,
+			final String componentVersionUrl) {
 		this.createdAt = createdAt;
 		this.projectVersion = projectVersion;
 		this.componentName = componentName;
@@ -74,19 +74,12 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 		return createdAt;
 	}
 
+
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("NotificationContentItem [projectVersion=");
-		builder.append(projectVersion);
-		builder.append(", componentName=");
-		builder.append(componentName);
-		builder.append(", componentVersion=");
-		builder.append(componentVersion);
-		builder.append(", componentVersionUrl=");
-		builder.append(componentVersionUrl);
-		builder.append("]");
-		return builder.toString();
+		return "NotificationContentItem [projectVersion=" + projectVersion + ", componentName=" + componentName
+				+ ", componentVersion=" + componentVersion
+				+ ", componentVersionUrl=" + componentVersionUrl + ", createdAt=" + createdAt + "]";
 	}
 
 	@Override

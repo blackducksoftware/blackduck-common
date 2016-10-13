@@ -94,11 +94,11 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 
 	@Override
 	public void createContents(final ProjectVersion projectVersion, final String componentName,
-			final String componentVersion, final String componentVersionUrl,
+			final String componentVersion, final String componentUrl, final String componentVersionUrl,
 			final List<PolicyRule> policyRuleList, final NotificationItem item,
 			final List<NotificationContentItem> templateData) throws URISyntaxException {
 		templateData.add(new PolicyViolationContentItem(item.getCreatedAt(), projectVersion, componentName,
-				componentVersion, componentVersionUrl, policyRuleList));
+				componentVersion, componentUrl, componentVersionUrl, policyRuleList));
 	}
 
 }

@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.UUID;
 
@@ -148,5 +149,22 @@ public class HubUrlParserTest {
 		final UUID uuidFound = HubUrlParser.getUUIDFromURLString(identifier, url);
 		assertNotNull(uuidFound);
 		assertEquals(uuid2, uuidFound);
+	}
+
+	@Test
+	public void testGetBaseUrl() throws URISyntaxException {
+		assertEquals("http://server.bds.com:8080/", HubUrlParser.getBaseUrl("http://server.bds.com:8080/api/projects"));
+		assertEquals("https://server.bds.com:8080/",
+				HubUrlParser.getBaseUrl("https://server.bds.com:8080/api/projects"));
+		assertEquals("http://server.bds.com/", HubUrlParser.getBaseUrl("http://server.bds.com/api/projects"));
+	}
+
+	@Test
+	public void testGetRelativeUrl() throws URISyntaxException {
+		assertEquals("api/projects", HubUrlParser.getRelativeUrl("http://server.bds.com:8080/api/projects"));
+		assertEquals("api/projects", HubUrlParser.getRelativeUrl("https://server.bds.com:8080/api/projects"));
+		assertEquals("api/projects", HubUrlParser.getRelativeUrl("http://server.bds.com/api/projects"));
+
+		assertEquals(null, HubUrlParser.getRelativeUrl(null));
 	}
 }

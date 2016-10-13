@@ -34,8 +34,15 @@ public class PolicyOverrideNotificationContent {
 	@SerializedName("projectVersion")
 	private String projectVersionLink;
 
+	// If version is specified, componentVersionLink will be populated
+	// otherwise it will be null
 	@SerializedName("componentVersion")
 	private String componentVersionLink;
+
+	// If version is not specified, componentLink will be populated
+	// otherwise it will be null
+	@SerializedName("component")
+	private String componentLink;
 
 	@SerializedName("bomComponentVersionPolicyStatus")
 	private String bomComponentVersionPolicyStatusLink;
@@ -66,6 +73,14 @@ public class PolicyOverrideNotificationContent {
 
 	public String getProjectVersionLink() {
 		return projectVersionLink;
+	}
+
+	public String getComponentLink() {
+		return componentLink;
+	}
+
+	public void setComponentLink(final String componentLink) {
+		this.componentLink = componentLink;
 	}
 
 	public String getComponentVersionLink() {

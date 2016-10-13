@@ -39,6 +39,9 @@ public class HubUrlParser {
 	}
 
 	public static String getRelativeUrl(final String url) throws URISyntaxException {
+		if (url == null) {
+			return null;
+		}
 		final String baseUrl = getBaseUrl(url);
 		final URI baseUri = new URI(baseUrl);
 		final URI origUri = new URI(url);

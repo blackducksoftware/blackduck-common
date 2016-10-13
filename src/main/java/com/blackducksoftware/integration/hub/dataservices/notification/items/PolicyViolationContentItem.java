@@ -28,15 +28,16 @@ import java.util.List;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 
-public class PolicyViolationContentItem extends NotificationContentItem {
+public class PolicyViolationContentItem extends PolicyContentItem {
 
 	private final List<PolicyRule> policyRuleList;
 
 	public PolicyViolationContentItem(final Date createdAt, final ProjectVersion projectVersion,
 			final String componentName,
-			final String componentVersion, final String componentVersionUrl,
+			final String componentVersion, final String componentUrl,
+			final String componentVersionUrl,
 			final List<PolicyRule> policyRuleList) throws URISyntaxException {
-		super(createdAt, projectVersion, componentName, componentVersion, componentVersionUrl);
+		super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl);
 		this.policyRuleList = policyRuleList;
 	}
 
@@ -46,19 +47,9 @@ public class PolicyViolationContentItem extends NotificationContentItem {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("PolicyViolationContentItem [projectVersion=");
-		builder.append(getProjectVersion());
-		builder.append(", componentName=");
-		builder.append(getComponentName());
-		builder.append(", componentVersion=");
-		builder.append(getComponentVersion());
-		builder.append(", componentVersionUrl=");
-		builder.append(getComponentVersionUrl());
-		builder.append(", policyRuleList=");
-		builder.append(policyRuleList);
-		builder.append("]");
-		return builder.toString();
+		return "PolicyViolationContentItem [policyRuleList=" + policyRuleList + ", getComponentUrl()="
+				+ getComponentUrl() + ", getProjectVersion()=" + getProjectVersion() + ", getComponentName()="
+				+ getComponentName() + ", getComponentVersion()=" + getComponentVersion()
+				+ ", getComponentVersionUrl()=" + getComponentVersionUrl() + ", getCreatedAt()=" + getCreatedAt() + "]";
 	}
-
 }
