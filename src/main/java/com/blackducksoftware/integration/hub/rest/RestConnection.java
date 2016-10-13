@@ -84,7 +84,7 @@ public class RestConnection {
 
 	private final String baseUrl;
 	private Series<Cookie> cookies;
-	private int timeout = 120000;
+	private int timeout = 120;
 	private IntLogger logger;
 	private final Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
 	private final Client client;
@@ -156,13 +156,13 @@ public class RestConnection {
 		if (timeout == 0) {
 			throw new IllegalArgumentException("Can not set the timeout to zero.");
 		}
-		// the User sets the timeout in seconds, so we translate to ms
-		this.timeout = timeout * 1000;
+		this.timeout = timeout;
 		setClientTimeout(this.timeout);
 	}
 
 	private void setClientTimeout(final int timeout) {
-		final String stringTimeout = String.valueOf(timeout);
+		// the User sets the timeout in seconds, so we translate to ms
+		final String stringTimeout = String.valueOf(timeout * 1000);
 
 		client.getContext().getParameters().add("socketTimeout", stringTimeout);
 		client.getContext().getParameters().add("socketConnectTimeoutMs", stringTimeout);
