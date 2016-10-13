@@ -47,25 +47,9 @@ public class PolicyViolationContentItem extends PolicyContentItem {
 
 	@Override
 	public String toString() {
-		String cru;
-		try {
-			cru = getComponentRelativeUrl();
-		} catch (final URISyntaxException e) {
-			cru = null;
-		}
-		String cvru;
-		try {
-			cvru = getComponentVersionRelativeUrl();
-		} catch (final URISyntaxException e) {
-			cvru = null;
-		}
-
-		return "PolicyViolationContentItem [policyRuleList=" + policyRuleList + ", getProjectVersion()="
-		+ getProjectVersion() + ", getComponentName()=" + getComponentName() + ", getComponentVersion()="
-		+ getComponentVersion() + ", getComponentUrl()=" + getComponentUrl() + ", getComponentVersionUrl()="
-		+ getComponentVersionUrl() + ", getComponentVersionRelativeUrl()=" + cvru
-		+ ", getComponentRelativeUrl()=" + cru + ", getCreatedAt()=" + getCreatedAt() + "]";
+		return "PolicyViolationContentItem [policyRuleList=" + policyRuleList + ", getComponentUrl()="
+				+ getComponentUrl() + ", getProjectVersion()=" + getProjectVersion() + ", getComponentName()="
+				+ getComponentName() + ", getComponentVersion()=" + getComponentVersion()
+				+ ", getComponentVersionUrl()=" + getComponentVersionUrl() + ", getCreatedAt()=" + getCreatedAt() + "]";
 	}
-
-
 }
