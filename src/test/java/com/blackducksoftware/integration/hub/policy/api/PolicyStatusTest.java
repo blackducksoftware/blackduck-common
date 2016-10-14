@@ -34,6 +34,7 @@ import org.junit.Test;
 import com.blackducksoftware.integration.hub.api.policy.ComponentVersionStatusCount;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
+import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 
@@ -46,9 +47,8 @@ public class PolicyStatusTest {
 				value1);
 		final List<ComponentVersionStatusCount> counts1 = new ArrayList<>();
 		counts1.add(statusCount1);
-		final String allow1 = "allow1";
-		final List<String> allows1 = new ArrayList<>();
-		allows1.add(allow1);
+		final List<MetaAllowEnum> allows1 = new ArrayList<>();
+		allows1.add(MetaAllowEnum.PUT);
 		final String href1 = "href1";
 		final MetaLink link1 = new MetaLink("rel1", "link1");
 		final List<MetaLink> links1 = new ArrayList<>();
@@ -61,9 +61,8 @@ public class PolicyStatusTest {
 				PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN, value2);
 		final List<ComponentVersionStatusCount> counts2 = new ArrayList<>();
 		counts2.add(statusCount2);
-		final String allow2 = "allow2";
-		final List<String> allows2 = new ArrayList<>();
-		allows2.add(allow2);
+		final List<MetaAllowEnum> allows2 = new ArrayList<>();
+		allows2.add(MetaAllowEnum.GET);
 		final String href2 = "href2";
 		final MetaLink link2 = new MetaLink("rel2", "link2");
 		final List<MetaLink> links2 = new ArrayList<>();

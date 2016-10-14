@@ -59,7 +59,7 @@ public class HubItem {
 	}
 
 	public List<String> getLinks(final String linkRel) {
-		final List<String> links = new ArrayList<String>();
+		final List<String> links = new ArrayList<>();
 		if (linksExist()) {
 			for (final MetaLink link : getLinks()) {
 				if (isRequestedLink(linkRel, link)) {

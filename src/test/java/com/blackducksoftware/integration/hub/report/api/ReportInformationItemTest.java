@@ -28,15 +28,16 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-
 import org.joda.time.DateTime;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
+import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class ReportInformationItemTest {
 
@@ -50,13 +51,13 @@ public class ReportInformationItemTest {
 		final String updatedAt1 = null;
 		final String finishedAt1 = null;
 		final String createdBy1 = "user1";
-		final List<MetaLink> links1 = new ArrayList<MetaLink>();
+		final List<MetaLink> links1 = new ArrayList<>();
 		final String href1 = "href1";
 		final String rel1 = "rel1";
 		final MetaLink metaLink1 = new MetaLink(rel1, href1);
 		links1.add(metaLink1);
-		final List<String> allow1 = new ArrayList<String>();
-		allow1.add("GET");
+		final List<MetaAllowEnum> allow1 = new ArrayList<>();
+		allow1.add(MetaAllowEnum.GET);
 		final MetaInformation _meta1 = new MetaInformation(allow1, href1, links1);
 
 		final DateTime date = new DateTime();
@@ -69,12 +70,12 @@ public class ReportInformationItemTest {
 		final String updatedAt2 = date.toString();
 		final String finishedAt2 = date.toString();
 		final String createdBy2 = "user2";
-		final List<MetaLink> links2 = new ArrayList<MetaLink>();
+		final List<MetaLink> links2 = new ArrayList<>();
 		final String href2 = "href2";
 		final String rel2 = "rel2";
 		final MetaLink metaLink2 = new MetaLink(rel2, href2);
 		links2.add(metaLink2);
-		final List<String> allow2 = new ArrayList<String>();
+		final List<MetaAllowEnum> allow2 = new ArrayList<>();
 		final MetaInformation _meta2 = new MetaInformation(allow2, href2, links2);
 
 		final MetaInformation _meta3 = new MetaInformation(allow1, href1, links1);

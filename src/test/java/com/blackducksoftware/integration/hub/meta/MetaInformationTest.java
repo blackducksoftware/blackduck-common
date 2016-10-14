@@ -22,15 +22,19 @@
 package com.blackducksoftware.integration.hub.meta;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-
-import org.junit.Test;
 
 public class MetaInformationTest {
 
@@ -43,18 +47,19 @@ public class MetaInformationTest {
 		final String href2 = "href2";
 
 		final MetaLink link1 = new MetaLink(rel1, href1);
-		final List<MetaLink> links1 = new ArrayList<MetaLink>();
+		final List<MetaLink> links1 = new ArrayList<>();
 		links1.add(link1);
 
 		final MetaLink link2 = new MetaLink(rel2, href2);
-		final List<MetaLink> links2 = new ArrayList<MetaLink>();
+		final List<MetaLink> links2 = new ArrayList<>();
 		links2.add(link2);
 
-		final List<String> allow1 = new ArrayList<String>();
-		allow1.add("GET");
+		final List<MetaAllowEnum> allow1 = new ArrayList<>();
+		allow1.add(MetaAllowEnum.GET);
 
-		final List<String> allow2 = new ArrayList<String>();
-		allow2.add("PUT");
+		final List<MetaAllowEnum> allow2 = new ArrayList<>();
+		allow2.add(MetaAllowEnum.GET);
+		allow2.add(MetaAllowEnum.PUT);
 
 		final MetaInformation item1 = new MetaInformation(allow1, href1, links1);
 		final MetaInformation item2 = new MetaInformation(allow2, href2, links2);
@@ -66,6 +71,9 @@ public class MetaInformationTest {
 		assertEquals(allow2, item2.getAllow());
 		assertEquals(href2, item2.getHref());
 		assertEquals(links2, item2.getLinks());
+
+		assertTrue(!item1.isAccessible());
+		assertTrue(item2.isAccessible());
 
 		assertTrue(item1.equals(item3));
 		assertTrue(!item1.equals(item2));
@@ -85,5 +93,22 @@ public class MetaInformationTest {
 		builder.append("]");
 
 		assertEquals(builder.toString(), item1.toString());
+	}
+
+	@Test
+	public void conversionTest(){
+		final String metaJson = "{'allow': ['GET'],'href': 'https://test/api/projects/aacfcbd6-3625-4f3b-ba93-d1da3047d186','links': [{'rel': 'versions','href': 'https://test/api/projects/aacfcbd6-3625-4f3b-ba93-d1da3047d186/versions'},{'rel': 'canonicalVersion','href': 'https://test/api/projects/aacfcbd6-3625-4f3b-ba93-d1da3047d186/versions/bdd15fe4-3728-4b1a-af5e-b8972b2699a5'}]}";
+		final Gson gson = new GsonBuilder().create();
+
+		final MetaInformation meta = gson.fromJson(metaJson, MetaInformation.class);
+		assertNotNull(meta);
+		assertNotNull(meta.getAllow());
+		assertTrue(!meta.getAllow().isEmpty());
+		assertNotNull(meta.getLinks());
+		assertTrue(!meta.getLinks().isEmpty());
+		assertNotNull(meta.getHref());
+
+		assertEquals(MetaAllowEnum.GET, meta.getAllow().get(0));
+		assertEquals("https://test/api/projects/aacfcbd6-3625-4f3b-ba93-d1da3047d186", meta.getHref());
 	}
 }
