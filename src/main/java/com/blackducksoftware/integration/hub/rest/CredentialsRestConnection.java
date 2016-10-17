@@ -23,11 +23,11 @@ public class CredentialsRestConnection extends RestConnection {
 			setProxyProperties(proxyInfo);
 		}
 		setTimeout(hubServerConfig.getTimeout());
-		final String userName = hubServerConfig.getGlobalCredentials().getUsername();
-		final String password = hubServerConfig.getGlobalCredentials().getEncryptedPassword();
-		if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(password)) {
-			setCookies(hubServerConfig.getGlobalCredentials().getUsername(),
-					hubServerConfig.getGlobalCredentials().getDecryptedPassword());
+		final String username = hubServerConfig.getGlobalCredentials().getUsername();
+		String password = hubServerConfig.getGlobalCredentials().getEncryptedPassword();
+		if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+			password = hubServerConfig.getGlobalCredentials().getDecryptedPassword();
+			setCookies(username, password);
 		}
 	}
 
