@@ -34,7 +34,7 @@ import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestSe
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationTypeEnum;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
@@ -53,12 +53,12 @@ public class ScanStatusDataService extends AbstractDataService {
 	private static final long FIVE_SECONDS = 5 * 1000;
 
 	private final ProjectRestService projectRestService;
-	private final ProjectVersionRestService projectVersionRestService;
+	private final ReleaseItemRestService projectVersionRestService;
 	private final CodeLocationRestService codeLocationRestService;
 	private final ScanSummaryRestService scanSummaryRestService;
 
 	public ScanStatusDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
-			final ProjectRestService projectRestService, final ProjectVersionRestService projectVersionRestService,
+			final ProjectRestService projectRestService, final ReleaseItemRestService projectVersionRestService,
 			final CodeLocationRestService codeLocationRestService,
 			final ScanSummaryRestService scanSummaryRestService) {
 		super(restConnection, gson, jsonParser);

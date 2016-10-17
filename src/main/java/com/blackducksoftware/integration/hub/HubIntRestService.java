@@ -47,7 +47,9 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
@@ -79,7 +81,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
 public class HubIntRestService {
 	private RestConnection restConnection;
@@ -93,6 +94,7 @@ public class HubIntRestService {
 	private PolicyStatusRestService policyStatusRestService;
 	private ProjectRestService projectRestService;
 	private ProjectVersionRestService projectVersionRestService;
+	private ReleaseItemRestService releaseItemRestService;
 	private ScanSummaryRestService scanSummaryRestService;
 	private UserRestService userRestService;
 	private VersionBomPolicyRestService versionBomPolicyRestService;
@@ -114,6 +116,7 @@ public class HubIntRestService {
 		this.policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
 		this.projectRestService = new ProjectRestService(restConnection, gson, jsonParser);
 		this.projectVersionRestService = new ProjectVersionRestService(restConnection, gson, jsonParser);
+		this.releaseItemRestService = new ReleaseItemRestService(restConnection, gson, jsonParser);
 		this.scanSummaryRestService = new ScanSummaryRestService(restConnection, gson, jsonParser);
 		this.userRestService = new UserRestService(restConnection, gson, jsonParser);
 		this.versionBomPolicyRestService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
@@ -267,10 +270,10 @@ public class HubIntRestService {
 	 * Gets the list of Versions for the specified Project
 	 *
 	 */
-	public ReleaseItem getVersion(final ProjectItem project, final String versionName) throws IOException,
+	public ProjectVersionItem getVersion(final ProjectItem project, final String versionName) throws IOException,
 			BDRestException, URISyntaxException, VersionDoesNotExistException, UnexpectedHubResponseException {
-		final List<ReleaseItem> versions = getVersionsForProject(project);
-		for (final ReleaseItem version : versions) {
+		final List<ProjectVersionItem> versions = getProjectVersionsForProject(project);
+		for (final ProjectVersionItem version : versions) {
 			if (version.getVersionName().equals(versionName)) {
 				return version;
 			}
@@ -279,39 +282,15 @@ public class HubIntRestService {
 				"This Version does not exist. Project : " + project.getName() + " Version : " + versionName);
 	}
 
-	/**
-	 * Gets the list of Versions for the specified Project
-	 *
-	 */
-	public List<ReleaseItem> getVersionsForProject(final ProjectItem project)
-			throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
-		final String versionLink = getVersionLink(project);
-		final ClientResource resource = getRestConnection().createClientResource(versionLink);
-		try {
-			resource.addQueryParameter("limit", "10000000");
-			resource.setMethod(Method.GET);
-			getRestConnection().handleRequest(resource);
-			final int responseCode = resource.getResponse().getStatus().getCode();
-
-			if (getRestConnection().isSuccess(responseCode)) {
-				final String response = getRestConnection().readResponseAsString(resource.getResponse());
-
-				final JsonObject json = jsonParser.parse(response).getAsJsonObject();
-				final List<ReleaseItem> versions = gson.fromJson(json.get("items"), new TypeToken<List<ReleaseItem>>() {
-				}.getType());
-
-				return versions;
-			} else {
-				throw new BDRestException(
-						"There was a problem getting the versions for this Project. Error Code: " + responseCode,
-						resource);
-			}
-		} finally {
-			releaseResource(resource);
-		}
+	public List<ProjectVersionItem> getProjectVersionsForProject(final ProjectItem project)
+			throws UnexpectedHubResponseException, IOException, URISyntaxException, BDRestException {
+		final String versionsUrl = getVersionsUrl(project);
+		final List<ProjectVersionItem> allProjectVersions = projectVersionRestService
+				.getAllProjectVersions(versionsUrl);
+		return allProjectVersions;
 	}
 
-	private String getVersionLink(final ProjectItem project) throws UnexpectedHubResponseException {
+	private String getVersionsUrl(final ProjectItem project) throws UnexpectedHubResponseException {
 		final List<String> versionLinks = project.getLinks(ProjectItem.VERSION_LINK);
 		if (versionLinks.size() != 1) {
 			throw new UnexpectedHubResponseException("The project " + project.getName() + " has " + versionLinks.size()
@@ -321,7 +300,7 @@ public class HubIntRestService {
 		return versionLink;
 	}
 
-	private String getVersionReportLink(final ReleaseItem version) throws UnexpectedHubResponseException {
+	private String getVersionReportLink(final ProjectVersionItem version) throws UnexpectedHubResponseException {
 		final List<String> versionLinks = version.getLinks(ReleaseItem.VERSION_REPORT_LINK);
 		if (versionLinks.size() != 1) {
 			throw new UnexpectedHubResponseException("The release " + version.getVersionName() + " has "
@@ -371,7 +350,7 @@ public class HubIntRestService {
 		stringRep.setCharacterSet(CharacterSet.UTF_8);
 		String location = null;
 		try {
-			location = getRestConnection().httpPostFromAbsoluteUrl(getVersionLink(project), stringRep);
+			location = getRestConnection().httpPostFromAbsoluteUrl(getVersionsUrl(project), stringRep);
 		} catch (final ResourceDoesNotExistException ex) {
 			throw new BDRestException("There was a problem creating this Version for the specified Hub Project. ", ex,
 					ex.getResource());
@@ -533,7 +512,7 @@ public class HubIntRestService {
 	 * @return the Report URL
 	 *
 	 */
-	public String generateHubReport(final ReleaseItem version, final ReportFormatEnum reportFormat,
+	public String generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
 			final ReportCategoriesEnum[] categories)
 			throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
 		if (ReportFormatEnum.UNKNOWN == reportFormat) {
@@ -786,6 +765,14 @@ public class HubIntRestService {
 		this.projectVersionRestService = projectVersionRestService;
 	}
 
+	public ReleaseItemRestService getReleaseItemRestService() {
+		return releaseItemRestService;
+	}
+
+	public void setReleaseItemRestService(final ReleaseItemRestService releaseItemRestService) {
+		this.releaseItemRestService = releaseItemRestService;
+	}
+
 	public ScanSummaryRestService getScanSummaryRestService() {
 		return scanSummaryRestService;
 	}
@@ -824,8 +811,8 @@ public class HubIntRestService {
 	}
 
 	public ScanStatusDataService getScanStatusDataService() {
-		return new ScanStatusDataService(restConnection, gson, jsonParser, projectRestService,
-				projectVersionRestService, codeLocationRestService, scanSummaryRestService);
+		return new ScanStatusDataService(restConnection, gson, jsonParser, projectRestService, releaseItemRestService,
+				codeLocationRestService, scanSummaryRestService);
 	}
 
 }

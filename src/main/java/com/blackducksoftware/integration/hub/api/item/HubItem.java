@@ -52,7 +52,8 @@ public class HubItem {
 		final List<String> links = getLinks(linkRel);
 		if (links.size() != 1) {
 			final String combinedLinks = StringUtils.join(links, ", ");
-			throw new UnexpectedHubResponseException("Only 1 link was expected: " + combinedLinks);
+			throw new UnexpectedHubResponseException(
+					String.format("1 link was expected, but found %s: %s", links.size(), combinedLinks));
 		}
 
 		return links.get(0);

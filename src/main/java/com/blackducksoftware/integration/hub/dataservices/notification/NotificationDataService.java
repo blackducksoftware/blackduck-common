@@ -36,7 +36,7 @@ import com.blackducksoftware.integration.hub.api.notification.RuleViolationClear
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
@@ -54,7 +54,7 @@ import com.google.gson.JsonParser;
 
 public class NotificationDataService extends AbstractDataService {
 	private final NotificationRestService notificationService;
-	private final ProjectVersionRestService projectVersionService;
+	private final ReleaseItemRestService releaseItemService;
 	private final PolicyRestService policyService;
 	private final VersionBomPolicyRestService bomVersionPolicyService;
 	private final ComponentVersionRestService componentVersionService;
@@ -72,7 +72,7 @@ public class NotificationDataService extends AbstractDataService {
 		this.policyFilter = policyFilter;
 
 		notificationService = new NotificationRestService(restConnection, gson, jsonParser);
-		projectVersionService = new ProjectVersionRestService(restConnection, gson, jsonParser);
+		releaseItemService = new ReleaseItemRestService(restConnection, gson, jsonParser);
 		policyService = new PolicyRestService(restConnection, gson, jsonParser);
 		bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
 		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
@@ -81,18 +81,17 @@ public class NotificationDataService extends AbstractDataService {
 	}
 
 	private void populateTransformerMap() {
-
 		parallelProcessor.addTransform(RuleViolationNotificationItem.class,
-				new PolicyViolationTransformer(notificationService, projectVersionService, policyService,
+				new PolicyViolationTransformer(notificationService, releaseItemService, policyService,
 						bomVersionPolicyService, componentVersionService, policyFilter));
 		parallelProcessor.addTransform(PolicyOverrideNotificationItem.class,
-				new PolicyViolationOverrideTransformer(notificationService, projectVersionService, policyService,
+				new PolicyViolationOverrideTransformer(notificationService, releaseItemService, policyService,
 						bomVersionPolicyService, componentVersionService, policyFilter));
 		parallelProcessor.addTransform(VulnerabilityNotificationItem.class,
-				new VulnerabilityTransformer(notificationService, projectVersionService, policyService,
+				new VulnerabilityTransformer(notificationService, releaseItemService, policyService,
 						bomVersionPolicyService, componentVersionService));
 		parallelProcessor.addTransform(RuleViolationClearedNotificationItem.class,
-				new PolicyViolationClearedTransformer(notificationService, projectVersionService, policyService,
+				new PolicyViolationClearedTransformer(notificationService, releaseItemService, policyService,
 						bomVersionPolicyService, componentVersionService, policyFilter));
 	}
 
