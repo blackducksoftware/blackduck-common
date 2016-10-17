@@ -45,14 +45,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class ProjectVersionRestService extends HubItemRestService<ReleaseItem> {
+public class ReleaseItemRestService extends HubItemRestService<ReleaseItem> {
 	private static final Type ITEM_TYPE = new TypeToken<ReleaseItem>() {
 	}.getType();
 	private static final Type ITEM_LIST_TYPE = new TypeToken<List<ReleaseItem>>() {
 	}.getType();
 
-	public ProjectVersionRestService(final RestConnection restConnection, final Gson gson,
-			final JsonParser jsonParser) {
+	public ReleaseItemRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
 		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
 	}
 

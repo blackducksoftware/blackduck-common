@@ -42,7 +42,7 @@ import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNoti
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
-import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
@@ -67,7 +67,7 @@ public class PolicyOverrideTransformTest {
 	private final static String LAST_NAME = "noMyName";
 
 	private NotificationRestService notificationService;
-	private ProjectVersionRestService projectVersionService;
+	private ReleaseItemRestService projectVersionService;
 	private PolicyRestService policyService;
 	private VersionBomPolicyRestService bomVersionPolicyService;
 	private ComponentVersionRestService componentVersionService;
@@ -78,10 +78,10 @@ public class PolicyOverrideTransformTest {
 		return service;
 	}
 
-	private ProjectVersionRestService createProjectVersionService()
+	private ReleaseItemRestService createProjectVersionService()
 			throws IOException, BDRestException, URISyntaxException {
 
-		final ProjectVersionRestService service = Mockito.mock(ProjectVersionRestService.class);
+		final ReleaseItemRestService service = Mockito.mock(ReleaseItemRestService.class);
 		final ReleaseItem releaseItem = Mockito.mock(ReleaseItem.class);
 		Mockito.when(releaseItem.getVersionName()).thenReturn(PROJECT_VERSION);
 		Mockito.when(service.getItem(Mockito.anyString())).thenReturn(releaseItem);

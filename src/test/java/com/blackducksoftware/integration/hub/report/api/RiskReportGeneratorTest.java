@@ -44,6 +44,7 @@ import org.mockito.stubbing.Answer;
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
 import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
 import com.blackducksoftware.integration.hub.api.report.HubRiskReportData;
@@ -56,7 +57,6 @@ import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanStatus;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
-import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
@@ -112,7 +112,7 @@ public class RiskReportGeneratorTest {
 		final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
 		generatorInfo.setMaximumWaitTime(20000);
 		generatorInfo.setProject(new ProjectItem(null, null, null));
-		generatorInfo.setVersion(new ReleaseItem(null, null, null, null, null));
+		generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
 		final List<String> scanTargets = new ArrayList<>();
 		scanTargets.add("test");
 		generatorInfo.setScanTargets(scanTargets);
@@ -128,7 +128,7 @@ public class RiskReportGeneratorTest {
 
 		final ScanSummaryItem statusComplete = new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta);
 		Mockito.doReturn(statusComplete).when(service).checkScanStatus(Mockito.anyString());
-		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
+		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ProjectVersionItem.class),
 				Mockito.any(ReportFormatEnum.class), Mockito.any(ReportCategoriesEnum[].class));
 
 		final List<MetaLink> links = new ArrayList<>();
@@ -183,7 +183,7 @@ public class RiskReportGeneratorTest {
 		final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
 		generatorInfo.setMaximumWaitTime(20000);
 		generatorInfo.setProject(new ProjectItem(null, null, null));
-		generatorInfo.setVersion(new ReleaseItem(null, null, null, null, null));
+		generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
 		final List<String> scanTargets = new ArrayList<>();
 		scanTargets.add("test");
 		generatorInfo.setScanTargets(scanTargets);
@@ -200,7 +200,7 @@ public class RiskReportGeneratorTest {
 		writer.close();
 
 		Mockito.doReturn(statusComplete).when(service).checkScanStatus(Mockito.anyString());
-		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
+		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ProjectVersionItem.class),
 				Mockito.any(ReportFormatEnum.class), Mockito.any(ReportCategoriesEnum[].class));
 
 		final List<MetaLink> links = new ArrayList<>();
@@ -242,7 +242,7 @@ public class RiskReportGeneratorTest {
 		final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
 		generatorInfo.setMaximumWaitTime(5000);
 		generatorInfo.setProject(new ProjectItem(null, null, null));
-		generatorInfo.setVersion(new ReleaseItem(null, null, null, null, null));
+		generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
 		final List<String> scanTargets = new ArrayList<>();
 		scanTargets.add("test");
 		generatorInfo.setScanTargets(scanTargets);
@@ -258,7 +258,7 @@ public class RiskReportGeneratorTest {
 
 		final ScanSummaryItem statusComplete = new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, _meta);
 		Mockito.doReturn(statusComplete).when(service).checkScanStatus(Mockito.anyString());
-		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
+		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ProjectVersionItem.class),
 				Mockito.any(ReportFormatEnum.class), Mockito.any(ReportCategoriesEnum[].class));
 
 		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0,
@@ -297,7 +297,7 @@ public class RiskReportGeneratorTest {
 		final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
 		generatorInfo.setMaximumWaitTime(5000);
 		generatorInfo.setProject(new ProjectItem(null, null, null));
-		generatorInfo.setVersion(new ReleaseItem(null, null, null, null, null));
+		generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
 		final List<String> scanTargets = new ArrayList<>();
 		scanTargets.add("test");
 		generatorInfo.setScanTargets(scanTargets);
@@ -395,13 +395,13 @@ public class RiskReportGeneratorTest {
 		final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
 		generatorInfo.setMaximumWaitTime(20000);
 		generatorInfo.setProject(new ProjectItem(null, null, null));
-		generatorInfo.setVersion(new ReleaseItem(null, null, null, null, null));
+		generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
 		generatorInfo.setScanTargets(scanTargets);
 		generatorInfo.setHostname(hostName);
 		generatorInfo.setBeforeScanTime(startScanTime);
 		generatorInfo.setAfterScanTime(endScanTime);
 
-		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
+		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ProjectVersionItem.class),
 				Mockito.any(ReportFormatEnum.class), Mockito.any(ReportCategoriesEnum[].class));
 
 		final List<MetaLink> links = new ArrayList<>();
@@ -508,13 +508,13 @@ public class RiskReportGeneratorTest {
 		final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
 		generatorInfo.setMaximumWaitTime(20000);
 		generatorInfo.setProject(new ProjectItem(null, null, null));
-		generatorInfo.setVersion(new ReleaseItem(null, null, null, null, null));
+		generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
 		generatorInfo.setScanTargets(scanTargets);
 		generatorInfo.setHostname(hostName);
 		generatorInfo.setBeforeScanTime(startScanTime);
 		generatorInfo.setAfterScanTime(endScanTime);
 
-		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
+		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ProjectVersionItem.class),
 				Mockito.any(ReportFormatEnum.class), Mockito.any(ReportCategoriesEnum[].class));
 
 		final List<MetaLink> links = new ArrayList<>();
@@ -611,13 +611,13 @@ public class RiskReportGeneratorTest {
 		final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
 		generatorInfo.setMaximumWaitTime(5000);
 		generatorInfo.setProject(new ProjectItem(null, null, null));
-		generatorInfo.setVersion(new ReleaseItem(null, null, null, null, null));
+		generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
 		generatorInfo.setScanTargets(scanTargets);
 		generatorInfo.setHostname(hostName);
 		generatorInfo.setBeforeScanTime(startScanTime);
 		generatorInfo.setAfterScanTime(endScanTime);
 
-		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ReleaseItem.class),
+		Mockito.doReturn("FakeReportUrl").when(service).generateHubReport(Mockito.any(ProjectVersionItem.class),
 				Mockito.any(ReportFormatEnum.class), Mockito.any(ReportCategoriesEnum[].class));
 
 		final ReportInformationItem reportInfo = new ReportInformationItem(ReportFormatEnum.JSON.name(), null, null, 0,
@@ -711,7 +711,7 @@ public class RiskReportGeneratorTest {
 		final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
 		generatorInfo.setMaximumWaitTime(5000);
 		generatorInfo.setProject(new ProjectItem(null, null, null));
-		generatorInfo.setVersion(new ReleaseItem(null, null, null, null, null));
+		generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
 		generatorInfo.setScanTargets(scanTargets);
 		generatorInfo.setHostname(hostName);
 		generatorInfo.setBeforeScanTime(startScanTime);

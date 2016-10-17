@@ -23,18 +23,20 @@ package com.blackducksoftware.integration.hub.dataservices.policystatus;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
+import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
@@ -53,18 +55,28 @@ public class PolicyStatusDataService extends AbstractDataService {
 		this.policyStatusRestService = policyStatusRestService;
 	}
 
-	// TODO Needs to be rewritten without using IDs
-	public PolicyStatusItem getPolicyStatusForProjectAndVersion(final String projectName, final String projectVersion)
+	public PolicyStatusItem getPolicyStatusForProjectAndVersion(final String projectName,
+			final String projectVersionName)
 			throws IOException, URISyntaxException, BDRestException, ProjectDoesNotExistException,
-			HubIntegrationException, MissingUUIDException {
+			HubIntegrationException, MissingUUIDException, UnexpectedHubResponseException {
 		final ProjectItem projectItem = projectRestService.getProjectByName(projectName);
-		final String projectId = projectItem.getProjectId().toString();
+		final String versionsUrl = projectItem.getLink("versions");
 
-		final ReleaseItem releaseItem = projectVersionRestService
-				.getProjectVersionByName(projectItem.getProjectId().toString(), projectVersion);
-		final String versionId = releaseItem.getVersionId().toString();
+		final List<ProjectVersionItem> projectVersions = projectVersionRestService.getAllProjectVersions(versionsUrl);
+		final String policyStatusUrl = findPolicyStatusUrl(projectVersions, projectVersionName);
 
-		return policyStatusRestService.getPolicyStatusItem(projectId, versionId);
+		return policyStatusRestService.getItem(policyStatusUrl);
+	}
+
+	private String findPolicyStatusUrl(final List<ProjectVersionItem> projectVersions, final String projectVersionName)
+			throws UnexpectedHubResponseException {
+		for (final ProjectVersionItem version : projectVersions) {
+			if (projectVersionName.equals(version.getVersionName())) {
+				return version.getLink("policy-status");
+			}
+		}
+
+		return null;
 	}
 
 }

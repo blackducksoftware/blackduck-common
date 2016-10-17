@@ -27,7 +27,7 @@ import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestS
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.dataservices.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
@@ -36,13 +36,13 @@ import com.blackducksoftware.integration.hub.exception.HubItemTransformException
 public abstract class AbstractNotificationTransformer
 implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
 	private final NotificationRestService notificationService;
-	private final ProjectVersionRestService projectVersionService;
+	private final ReleaseItemRestService projectVersionService;
 	private final PolicyRestService policyService;
 	private final VersionBomPolicyRestService bomVersionPolicyService;
 	private final ComponentVersionRestService componentVersionService;
 
 	public AbstractNotificationTransformer(final NotificationRestService notificationService,
-			final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
+			final ReleaseItemRestService projectVersionService, final PolicyRestService policyService,
 			final VersionBomPolicyRestService bomVersionPolicyService,
 			final ComponentVersionRestService componentVersionService) {
 		this.notificationService = notificationService;
@@ -56,7 +56,7 @@ implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
 		return notificationService;
 	}
 
-	public ProjectVersionRestService getProjectVersionService() {
+	public ReleaseItemRestService getProjectVersionService() {
 		return projectVersionService;
 	}
 

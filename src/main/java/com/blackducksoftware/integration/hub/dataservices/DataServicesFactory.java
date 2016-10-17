@@ -31,7 +31,8 @@ import com.blackducksoftware.integration.hub.api.notification.NotificationRestSe
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.user.UserRestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
@@ -60,6 +61,7 @@ public class DataServicesFactory {
 	private final PolicyStatusRestService policyStatusRestService;
 	private final ProjectRestService projectRestService;
 	private final ProjectVersionRestService projectVersionRestService;
+	private final ReleaseItemRestService releaseItemRestService;
 	private final ScanSummaryRestService scanSummaryRestService;
 	private final UserRestService userRestService;
 	private final VersionBomPolicyRestService versionBomPolicyRestService;
@@ -80,6 +82,7 @@ public class DataServicesFactory {
 		policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
 		projectRestService = new ProjectRestService(restConnection, gson, jsonParser);
 		projectVersionRestService = new ProjectVersionRestService(restConnection, gson, jsonParser);
+		releaseItemRestService = new ReleaseItemRestService(restConnection, gson, jsonParser);
 		scanSummaryRestService = new ScanSummaryRestService(restConnection, gson, jsonParser);
 		userRestService = new UserRestService(restConnection, gson, jsonParser);
 		versionBomPolicyRestService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
@@ -96,8 +99,8 @@ public class DataServicesFactory {
 	}
 
 	public ScanStatusDataService createScanStatusDataService() {
-		return new ScanStatusDataService(restConnection, gson, jsonParser, projectRestService,
-				projectVersionRestService, codeLocationRestService, scanSummaryRestService);
+		return new ScanStatusDataService(restConnection, gson, jsonParser, projectRestService, releaseItemRestService,
+				codeLocationRestService, scanSummaryRestService);
 	}
 
 	public NotificationDataService createNotificationDataService(final IntLogger logger) {
@@ -156,6 +159,10 @@ public class DataServicesFactory {
 
 	public ProjectVersionRestService getProjectVersionRestService() {
 		return projectVersionRestService;
+	}
+
+	public ReleaseItemRestService getReleaseItemRestService() {
+		return releaseItemRestService;
 	}
 
 	public ScanSummaryRestService getScanSummaryRestService() {

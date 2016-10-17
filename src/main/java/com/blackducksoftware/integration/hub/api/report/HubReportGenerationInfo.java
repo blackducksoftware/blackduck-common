@@ -27,14 +27,14 @@ import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
-import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 
 public class HubReportGenerationInfo {
 	private HubIntRestService service;
 
 	private ProjectItem project;
 
-	private ReleaseItem version;
+	private ProjectVersionItem version;
 
 	private String hostname;
 
@@ -56,7 +56,7 @@ public class HubReportGenerationInfo {
 		return project;
 	}
 
-	public ReleaseItem getVersion() {
+	public ProjectVersionItem getVersion() {
 		return version;
 	}
 
@@ -88,7 +88,7 @@ public class HubReportGenerationInfo {
 		this.project = project;
 	}
 
-	public void setVersion(final ReleaseItem version) {
+	public void setVersion(final ProjectVersionItem version) {
 		this.version = version;
 	}
 
