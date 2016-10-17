@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.restlet.data.Method;
 
@@ -70,7 +71,7 @@ public class NotificationRestService extends HubItemRestService<NotificationItem
 	public List<NotificationItem> getAllNotifications(final Date startDate, final Date endDate)
 			throws IOException, URISyntaxException, BDRestException {
 		final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
-
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		final String startDateString = sdf.format(startDate);
 		final String endDateString = sdf.format(endDate);
 

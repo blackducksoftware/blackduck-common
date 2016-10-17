@@ -26,8 +26,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -36,7 +39,10 @@ import org.mockito.Mockito;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.global.HubCredentials;
+import com.blackducksoftware.integration.hub.global.HubProxyInfo;
+import com.blackducksoftware.integration.hub.global.HubServerConfig;
+import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 
 public class CLILocationTest {
 	@Rule
@@ -44,6 +50,27 @@ public class CLILocationTest {
 
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
+
+	private HubServerConfig hubServerConfig;
+
+	@Before
+	public void initTest() throws MalformedURLException {
+		final HubProxyInfo proxyInfo = Mockito.mock(HubProxyInfo.class);
+		Mockito.when(proxyInfo.getUsername()).thenReturn("");
+		Mockito.when(proxyInfo.getEncryptedPassword()).thenReturn("");
+		Mockito.when(proxyInfo.getActualPasswordLength()).thenReturn(0);
+
+		final HubCredentials credentials = Mockito.mock(HubCredentials.class);
+		Mockito.when(credentials.getUsername()).thenReturn("");
+		Mockito.when(credentials.getActualPasswordLength()).thenReturn(0);
+		Mockito.when(credentials.getEncryptedPassword()).thenReturn("");
+		hubServerConfig = Mockito.mock(HubServerConfig.class);
+
+		Mockito.when(hubServerConfig.getHubUrl()).thenReturn(new URL("http://test-hub-server"));
+		Mockito.when(hubServerConfig.getTimeout()).thenReturn(120);
+		Mockito.when(hubServerConfig.getGlobalCredentials()).thenReturn(credentials);
+		Mockito.when(hubServerConfig.getProxyInfo()).thenReturn(proxyInfo);
+	}
 
 	@Test
 	public void testConstructorNull() throws Exception {
@@ -71,7 +98,7 @@ public class CLILocationTest {
 
 		final File directoryToInstallTo = folder.newFolder();
 		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
-		HubIntRestService restService = new HubIntRestService(new RestConnection(baseUrl));
+		HubIntRestService restService = new HubIntRestService(new CredentialsRestConnection(hubServerConfig));
 		restService = Mockito.spy(restService);
 		Mockito.doReturn("3.0.1").when(restService).getHubVersion();
 
@@ -98,7 +125,7 @@ public class CLILocationTest {
 
 		final File directoryToInstallTo = folder.newFolder();
 		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
-		HubIntRestService restService = new HubIntRestService(new RestConnection(baseUrl));
+		HubIntRestService restService = new HubIntRestService(new CredentialsRestConnection(hubServerConfig));
 		restService = Mockito.spy(restService);
 		Mockito.doReturn("2.4.0").when(restService).getHubVersion();
 
