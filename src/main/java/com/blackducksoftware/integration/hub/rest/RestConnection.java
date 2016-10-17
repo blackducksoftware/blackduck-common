@@ -24,7 +24,6 @@ package com.blackducksoftware.integration.hub.rest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.CookieHandler;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -64,7 +63,6 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
-import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.util.AuthenticatorUtil;
@@ -79,10 +77,10 @@ import com.google.gson.JsonParser;
  * @author sbillings
  *
  */
-public class RestConnection {
+public abstract class RestConnection {
 	public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
 
-	private final String baseUrl;
+	private String baseUrl;
 	private Series<Cookie> cookies;
 	private int timeout = 120;
 	private IntLogger logger;
@@ -101,25 +99,7 @@ public class RestConnection {
 		return sdf.format(date);
 	}
 
-	public RestConnection(final HubServerConfig hubServerConfig)
-			throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException {
-		this(hubServerConfig.getHubUrl().toString());
-		final HubProxyInfo proxyInfo = hubServerConfig.getProxyInfo();
-		if (proxyInfo.shouldUseProxyForUrl(hubServerConfig.getHubUrl())) {
-			setProxyProperties(proxyInfo);
-		}
-		final String userName = hubServerConfig.getGlobalCredentials().getUsername();
-		final String password = hubServerConfig.getGlobalCredentials().getEncryptedPassword();
-		if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(password)) {
-			setCookies(hubServerConfig.getGlobalCredentials().getUsername(),
-					hubServerConfig.getGlobalCredentials().getDecryptedPassword());
-		}
-
-		setTimeout(hubServerConfig.getTimeout());
-	}
-
-	public RestConnection(final String baseUrl) {
-		this.baseUrl = baseUrl;
+	public RestConnection() {
 		client = createClient();
 	}
 
@@ -171,6 +151,10 @@ public class RestConnection {
 
 	public String getBaseUrl() {
 		return baseUrl;
+	}
+
+	public void setBaseUrl(final String baseUrl) {
+		this.baseUrl = baseUrl;
 	}
 
 	/**
@@ -406,10 +390,8 @@ public class RestConnection {
 		return resource;
 	}
 
-	public ClientResource createClientResource(final Context context, final String providedUrl)
-			throws URISyntaxException {
-		return new ClientResource(context, new URI(providedUrl));
-	}
+	public abstract ClientResource createClientResource(final Context context, final String providedUrl)
+			throws URISyntaxException;
 
 	public ClientResource createClientResource(final List<String> urlSegments,
 			final Set<AbstractMap.SimpleEntry<String, String>> queryParameters) throws URISyntaxException {

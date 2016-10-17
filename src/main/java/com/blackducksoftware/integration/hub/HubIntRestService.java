@@ -124,14 +124,6 @@ public class HubIntRestService {
 	 * @deprecated moved to RestConnection.
 	 */
 	@Deprecated
-	public HubIntRestService(final String baseUrl) throws URISyntaxException {
-		this(new RestConnection(baseUrl));
-	}
-
-	/**
-	 * @deprecated moved to RestConnection.
-	 */
-	@Deprecated
 	public void setTimeout(final int timeout) {
 		getRestConnection().setTimeout(timeout);
 	}
