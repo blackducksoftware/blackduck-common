@@ -238,24 +238,9 @@ public class HubIntRestService {
 		return getProjectRestService().getItem(projectUrl);
 	}
 
-	public ReleaseItem getProjectVersion(final String versionUrl)
+	public ProjectVersionItem getProjectVersion(final String versionUrl)
 			throws IOException, BDRestException, URISyntaxException {
-		final ClientResource resource = getRestConnection().createClientResource(versionUrl);
-		try {
-			resource.setMethod(Method.GET);
-			getRestConnection().handleRequest(resource);
-			final int responseCode = resource.getResponse().getStatus().getCode();
-
-			if (getRestConnection().isSuccess(responseCode)) {
-				final String response = getRestConnection().readResponseAsString(resource.getResponse());
-				return gson.fromJson(response, ReleaseItem.class);
-			} else {
-				throw new BDRestException("There was a problem getting the version. Error Code: " + responseCode,
-						resource);
-			}
-		} finally {
-			releaseResource(resource);
-		}
+		return projectVersionRestService.getItem(versionUrl);
 	}
 
 	/**
