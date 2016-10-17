@@ -27,18 +27,26 @@ import java.util.List;
 import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class MetaInformation {
-	private final List<String> allow;
+	private final List<MetaAllowEnum> allow;
 	private final String href;
 	private final List<MetaLink> links;
 
-	public MetaInformation(final List<String> allow, final String href, final List<MetaLink> links) {
+	public MetaInformation(final List<MetaAllowEnum> allow, final String href, final List<MetaLink> links) {
 		this.allow = allow;
 		this.href = href;
 		this.links = links;
 	}
 
-	public List<String> getAllow() {
+	public List<MetaAllowEnum> getAllow() {
 		return allow;
+	}
+
+	public boolean isAccessible() {
+		if (allow != null && !allow.isEmpty() && allow.contains(MetaAllowEnum.GET)
+				&& allow.contains(MetaAllowEnum.PUT)) {
+			return true;
+		}
+		return false;
 	}
 
 	public String getHref() {

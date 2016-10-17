@@ -33,6 +33,7 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyExpressions;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
+import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 
@@ -52,12 +53,11 @@ public class PolicyRuleTest {
 		final String updatedAt1 = "updatedAt1";
 		final String updatedBy1 = "updatedBy1";
 
-		final String allow1 = "allow1";
-		final List<String> allows1 = new ArrayList<String>();
-		allows1.add(allow1);
+		final List<MetaAllowEnum> allows1 = new ArrayList<>();
+		allows1.add(MetaAllowEnum.GET);
 		final String href1 = "href1";
 		final MetaLink link1 = new MetaLink("rel1", "link1");
-		final List<MetaLink> links1 = new ArrayList<MetaLink>();
+		final List<MetaLink> links1 = new ArrayList<>();
 		links1.add(link1);
 		final MetaInformation _meta1 = new MetaInformation(allows1, href1, links1);
 
@@ -70,12 +70,11 @@ public class PolicyRuleTest {
 		final DateTime updatedAt2 = new DateTime();
 		final String updatedBy2 = "updatedBy2";
 
-		final String allow2 = "allow2";
-		final List<String> allows2 = new ArrayList<String>();
-		allows2.add(allow2);
+		final List<MetaAllowEnum> allows2 = new ArrayList<>();
+		allows2.add(MetaAllowEnum.PUT);
 		final String href2 = "href2";
 		final MetaLink link2 = new MetaLink("rel2", "link2");
-		final List<MetaLink> links2 = new ArrayList<MetaLink>();
+		final List<MetaLink> links2 = new ArrayList<>();
 		links2.add(link2);
 		final MetaInformation _meta2 = new MetaInformation(allows2, href2, links2);
 
