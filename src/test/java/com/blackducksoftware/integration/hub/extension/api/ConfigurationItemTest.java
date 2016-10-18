@@ -37,41 +37,41 @@ import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ConfigurationItemTest {
 
-	private List<OptionItem> createOptions() {
-		final List<OptionItem> itemList = new ArrayList<>();
-		itemList.add(new OptionItem("optionName", "optionTitle"));
-		return itemList;
-	}
+    private List<OptionItem> createOptions() {
+        final List<OptionItem> itemList = new ArrayList<>();
+        itemList.add(new OptionItem("optionName", "optionTitle"));
+        return itemList;
+    }
 
-	private List<String> createValueList() {
-		final List<String> itemList = new ArrayList<>();
-		itemList.add("value");
-		return itemList;
-	}
+    private List<String> createValueList() {
+        final List<String> itemList = new ArrayList<>();
+        itemList.add("value");
+        return itemList;
+    }
 
-	@Test
-	public void testConfigurationItemConstructor() {
-		final MetaInformation meta = null;
-		final String name = "name";
-		final OptionTypeEnum optionType = OptionTypeEnum.STRING;
-		final String title = "title";
-		final boolean required = true;
-		final boolean singleValue = true;
-		final String description = "description";
-		final List<OptionItem> options = createOptions();
-		final List<String> value = createValueList();
+    @Test
+    public void testConfigurationItemConstructor() {
+        final MetaInformation meta = null;
+        final String name = "name";
+        final OptionTypeEnum optionType = OptionTypeEnum.STRING;
+        final String title = "title";
+        final boolean required = true;
+        final boolean singleValue = true;
+        final String description = "description";
+        final List<OptionItem> options = createOptions();
+        final List<String> value = createValueList();
 
-		final ConfigurationItem item = new ConfigurationItem(meta, name, optionType, title, required, singleValue,
-				description, options, value);
+        final ConfigurationItem item = new ConfigurationItem(meta, name, optionType, title, required, singleValue,
+                description, options, value);
 
-		assertNull(item.getMeta());
-		assertEquals(name, item.getName());
-		assertEquals(optionType, item.getOptionType());
-		assertEquals(title, item.getTitle());
-		assertTrue(item.isRequired());
-		assertTrue(item.isSingleValue());
-		assertEquals(description, item.getDescription());
-		assertEquals(options, item.getOptions());
-		assertEquals(value, item.getValue());
-	}
+        assertNull(item.getMeta());
+        assertEquals(name, item.getName());
+        assertEquals(optionType, item.getOptionType());
+        assertEquals(title, item.getTitle());
+        assertTrue(item.isRequired());
+        assertTrue(item.isSingleValue());
+        assertEquals(description, item.getDescription());
+        assertEquals(options, item.getOptions());
+        assertEquals(value, item.getValue());
+    }
 }

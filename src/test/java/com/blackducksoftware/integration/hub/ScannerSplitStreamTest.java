@@ -35,220 +35,220 @@ import com.blackducksoftware.integration.test.TestLogger;
 import com.blackducksoftware.integration.test.TestOutputStream;
 
 public class ScannerSplitStreamTest {
-	private static final String NEW_LINE = System.getProperty("line.separator");
+    private static final String NEW_LINE = System.getProperty("line.separator");
 
-	@Test
-	public void testWritingTextWithWindowsLineSeparator() throws IOException {
-		final TestLogger logger = new TestLogger();
-		final TestOutputStream stream = new TestOutputStream();
-		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
+    @Test
+    public void testWritingTextWithWindowsLineSeparator() throws IOException {
+        final TestLogger logger = new TestLogger();
+        final TestOutputStream stream = new TestOutputStream();
+        final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String originalLineSeparator = System.getProperty("line.separator");
-		try {
-			System.setProperty("line.separator", "\r\n");
-			final String text = "Exception: one fish\r\nException: two fish";
-			final List<Integer> codePoints = getCodePoints(text);
+        final String originalLineSeparator = System.getProperty("line.separator");
+        try {
+            System.setProperty("line.separator", "\r\n");
+            final String text = "Exception: one fish\r\nException: two fish";
+            final List<Integer> codePoints = getCodePoints(text);
 
-			writeCodePointsToScannerSplitStream(codePoints, splitStream);
+            writeCodePointsToScannerSplitStream(codePoints, splitStream);
 
-			final String output = splitStream.getOutput().trim();
-			assertEquals(text, output);
-		} finally {
-			System.setProperty("line.separator", originalLineSeparator);
-			splitStream.close();
-		}
-	}
+            final String output = splitStream.getOutput().trim();
+            assertEquals(text, output);
+        } finally {
+            System.setProperty("line.separator", originalLineSeparator);
+            splitStream.close();
+        }
+    }
 
-	@Test
-	public void testWritingTextWithNonWindowsLineSeparator() throws IOException {
-		final TestLogger logger = new TestLogger();
-		final TestOutputStream stream = new TestOutputStream();
-		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
+    @Test
+    public void testWritingTextWithNonWindowsLineSeparator() throws IOException {
+        final TestLogger logger = new TestLogger();
+        final TestOutputStream stream = new TestOutputStream();
+        final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String originalLineSeparator = System.getProperty("line.separator");
-		try {
-			System.setProperty("line.separator", "\n");
-			final String text = "Exception: red fish\nException: blue fish";
-			final List<Integer> codePoints = getCodePoints(text);
+        final String originalLineSeparator = System.getProperty("line.separator");
+        try {
+            System.setProperty("line.separator", "\n");
+            final String text = "Exception: red fish\nException: blue fish";
+            final List<Integer> codePoints = getCodePoints(text);
 
-			writeCodePointsToScannerSplitStream(codePoints, splitStream);
+            writeCodePointsToScannerSplitStream(codePoints, splitStream);
 
-			final String output = splitStream.getOutput().trim();
-			assertEquals(text, output);
-		} finally {
-			System.setProperty("line.separator", originalLineSeparator);
-			splitStream.close();
-		}
-	}
+            final String output = splitStream.getOutput().trim();
+            assertEquals(text, output);
+        } finally {
+            System.setProperty("line.separator", originalLineSeparator);
+            splitStream.close();
+        }
+    }
 
-	@Test
-	public void testWriteBytes() throws Exception {
-		final TestLogger logger = new TestLogger();
-		final TestOutputStream stream = new TestOutputStream();
-		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
+    @Test
+    public void testWriteBytes() throws Exception {
+        final TestLogger logger = new TestLogger();
+        final TestOutputStream stream = new TestOutputStream();
+        final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String notLoggable = "Test 1 2 3, test 1 2 3, can you hear me? " + NEW_LINE + " What about now?";
+        final String notLoggable = "Test 1 2 3, test 1 2 3, can you hear me? " + NEW_LINE + " What about now?";
 
-		for (int i = 0; i < notLoggable.length(); i++) {
-			splitStream.write(notLoggable.codePointAt(i));
-		}
-		splitStream.flush();
-		// Should write all the bytes to the TestOutputStream
-		assertEquals(notLoggable, stream.stringBuilder.toString());
+        for (int i = 0; i < notLoggable.length(); i++) {
+            splitStream.write(notLoggable.codePointAt(i));
+        }
+        splitStream.flush();
+        // Should write all the bytes to the TestOutputStream
+        assertEquals(notLoggable, stream.stringBuilder.toString());
 
-		assertTrue(StringUtils.isBlank(logger.getOutputString()));
-		splitStream.close();
-	}
+        assertTrue(StringUtils.isBlank(logger.getOutputString()));
+        splitStream.close();
+    }
 
-	@Test
-	public void testWriteBytesLoggable() throws Exception {
-		final TestLogger logger = new TestLogger();
-		final TestOutputStream stream = new TestOutputStream();
-		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
+    @Test
+    public void testWriteBytesLoggable() throws Exception {
+        final TestLogger logger = new TestLogger();
+        final TestOutputStream stream = new TestOutputStream();
+        final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String loggable = "Exception: Test 1 2 3, test 1 2 3, can you hear me?  " + NEW_LINE
-				+ " WARN: about to explode " + NEW_LINE + " INFO: breaking news " + NEW_LINE
-				+ " Finished in What about now? " + NEW_LINE + " ERROR: something happened";
+        final String loggable = "Exception: Test 1 2 3, test 1 2 3, can you hear me?  " + NEW_LINE
+                + " WARN: about to explode " + NEW_LINE + " INFO: breaking news " + NEW_LINE
+                + " Finished in What about now? " + NEW_LINE + " ERROR: something happened";
 
-		final String notLoggable = "DEBUG: found something " + NEW_LINE + " TRACE: reading pg 876";
+        final String notLoggable = "DEBUG: found something " + NEW_LINE + " TRACE: reading pg 876";
 
-		List<Integer> codePoints = getCodePoints(loggable);
-		writeCodePointsToScannerSplitStream(codePoints, splitStream);
+        List<Integer> codePoints = getCodePoints(loggable);
+        writeCodePointsToScannerSplitStream(codePoints, splitStream);
 
-		// Should write all the bytes to the TestOutputStream
-		assertEquals(loggable, stream.stringBuilder.toString());
-		assertEquals(loggable, logger.getOutputString());
-		assertTrue(splitStream.hasOutput());
-		assertEquals(loggable, splitStream.getOutput().trim());
+        // Should write all the bytes to the TestOutputStream
+        assertEquals(loggable, stream.stringBuilder.toString());
+        assertEquals(loggable, logger.getOutputString());
+        assertTrue(splitStream.hasOutput());
+        assertEquals(loggable, splitStream.getOutput().trim());
 
-		stream.resetBuffer();
-		logger.resetAllOutput();
+        stream.resetBuffer();
+        logger.resetAllOutput();
 
-		codePoints = getCodePoints(notLoggable);
-		writeCodePointsToScannerSplitStream(codePoints, splitStream);
+        codePoints = getCodePoints(notLoggable);
+        writeCodePointsToScannerSplitStream(codePoints, splitStream);
 
-		// Should write all the bytes to the TestOutputStream
-		assertEquals(notLoggable, stream.stringBuilder.toString());
+        // Should write all the bytes to the TestOutputStream
+        assertEquals(notLoggable, stream.stringBuilder.toString());
 
-		assertTrue(StringUtils.isBlank(logger.getOutputString()));
-		splitStream.close();
-	}
+        assertTrue(StringUtils.isBlank(logger.getOutputString()));
+        splitStream.close();
+    }
 
-	@Test
-	public void testWriteByteArray() throws Exception {
-		final TestLogger logger = new TestLogger();
-		final TestOutputStream stream = new TestOutputStream();
-		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
+    @Test
+    public void testWriteByteArray() throws Exception {
+        final TestLogger logger = new TestLogger();
+        final TestOutputStream stream = new TestOutputStream();
+        final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String notLoggable = "Test 1 2 3, test 1 2 3, can you hear me? " + NEW_LINE + " What about now?";
+        final String notLoggable = "Test 1 2 3, test 1 2 3, can you hear me? " + NEW_LINE + " What about now?";
 
-		splitStream.write(notLoggable.getBytes());
-		splitStream.flush();
-		// Should write all the bytes to the TestOutputStream
-		assertEquals(notLoggable, stream.stringBuilder.toString());
+        splitStream.write(notLoggable.getBytes());
+        splitStream.flush();
+        // Should write all the bytes to the TestOutputStream
+        assertEquals(notLoggable, stream.stringBuilder.toString());
 
-		assertTrue(StringUtils.isBlank(logger.getOutputString()));
-		splitStream.close();
-	}
+        assertTrue(StringUtils.isBlank(logger.getOutputString()));
+        splitStream.close();
+    }
 
-	@Test
-	public void testWriteByteArrayLoggable() throws Exception {
-		final TestLogger logger = new TestLogger();
-		final TestOutputStream stream = new TestOutputStream();
-		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
+    @Test
+    public void testWriteByteArrayLoggable() throws Exception {
+        final TestLogger logger = new TestLogger();
+        final TestOutputStream stream = new TestOutputStream();
+        final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String loggable = "Exception: Test 1 2 3, test 1 2 3, can you hear me?  " + NEW_LINE
-				+ " WARN: about to explode " + NEW_LINE + " INFO: breaking news " + NEW_LINE
-				+ " Finished in What about now? " + NEW_LINE + " ERROR: something happened";
+        final String loggable = "Exception: Test 1 2 3, test 1 2 3, can you hear me?  " + NEW_LINE
+                + " WARN: about to explode " + NEW_LINE + " INFO: breaking news " + NEW_LINE
+                + " Finished in What about now? " + NEW_LINE + " ERROR: something happened";
 
-		final String notLoggable = "DEBUG: found something " + NEW_LINE + " TRACE: reading pg 876";
+        final String notLoggable = "DEBUG: found something " + NEW_LINE + " TRACE: reading pg 876";
 
-		splitStream.write(loggable.getBytes());
-		splitStream.flush();
+        splitStream.write(loggable.getBytes());
+        splitStream.flush();
 
-		// Should write all the bytes to the TestOutputStream
-		assertEquals(loggable, stream.stringBuilder.toString());
-		assertEquals(loggable, logger.getOutputString());
-		assertTrue(splitStream.hasOutput());
-		assertEquals(loggable, splitStream.getOutput().trim());
+        // Should write all the bytes to the TestOutputStream
+        assertEquals(loggable, stream.stringBuilder.toString());
+        assertEquals(loggable, logger.getOutputString());
+        assertTrue(splitStream.hasOutput());
+        assertEquals(loggable, splitStream.getOutput().trim());
 
-		stream.resetBuffer();
-		logger.resetAllOutput();
+        stream.resetBuffer();
+        logger.resetAllOutput();
 
-		splitStream.write(notLoggable.getBytes());
-		splitStream.flush();
-		// Should write all the bytes to the TestOutputStream
-		assertEquals(notLoggable, stream.stringBuilder.toString());
+        splitStream.write(notLoggable.getBytes());
+        splitStream.flush();
+        // Should write all the bytes to the TestOutputStream
+        assertEquals(notLoggable, stream.stringBuilder.toString());
 
-		assertTrue(StringUtils.isBlank(logger.getOutputString()));
-		splitStream.close();
-	}
+        assertTrue(StringUtils.isBlank(logger.getOutputString()));
+        splitStream.close();
+    }
 
-	@Test
-	public void testWriteByteArrayWithOffset() throws Exception {
-		final TestLogger logger = new TestLogger();
-		final TestOutputStream stream = new TestOutputStream();
-		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
+    @Test
+    public void testWriteByteArrayWithOffset() throws Exception {
+        final TestLogger logger = new TestLogger();
+        final TestOutputStream stream = new TestOutputStream();
+        final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String notLoggable = "Test 1 2 3, test 1 2 3, can you hear me? " + NEW_LINE + " What about now?";
+        final String notLoggable = "Test 1 2 3, test 1 2 3, can you hear me? " + NEW_LINE + " What about now?";
 
-		splitStream.write(notLoggable.getBytes(), 0, notLoggable.length());
-		splitStream.flush();
-		// Should write all the bytes to the TestOutputStream
-		assertEquals(notLoggable, stream.stringBuilder.toString());
+        splitStream.write(notLoggable.getBytes(), 0, notLoggable.length());
+        splitStream.flush();
+        // Should write all the bytes to the TestOutputStream
+        assertEquals(notLoggable, stream.stringBuilder.toString());
 
-		assertTrue(StringUtils.isBlank(logger.getOutputString()));
-		splitStream.close();
-	}
+        assertTrue(StringUtils.isBlank(logger.getOutputString()));
+        splitStream.close();
+    }
 
-	@Test
-	public void testWriteByteArrayWithOffsetLoggable() throws Exception {
-		final TestLogger logger = new TestLogger();
-		final TestOutputStream stream = new TestOutputStream();
-		final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
+    @Test
+    public void testWriteByteArrayWithOffsetLoggable() throws Exception {
+        final TestLogger logger = new TestLogger();
+        final TestOutputStream stream = new TestOutputStream();
+        final ScannerSplitStream splitStream = new ScannerSplitStream(logger, stream);
 
-		final String loggable = "Exception: Test 1 2 3, test 1 2 3, can you hear me?  " + NEW_LINE
-				+ " WARN: about to explode " + NEW_LINE + " INFO: breaking news " + NEW_LINE
-				+ " Finished in What about now? " + NEW_LINE + " ERROR: something happened";
+        final String loggable = "Exception: Test 1 2 3, test 1 2 3, can you hear me?  " + NEW_LINE
+                + " WARN: about to explode " + NEW_LINE + " INFO: breaking news " + NEW_LINE
+                + " Finished in What about now? " + NEW_LINE + " ERROR: something happened";
 
-		final String notLoggable = "DEBUG: found something " + NEW_LINE + " TRACE: reading pg 876";
+        final String notLoggable = "DEBUG: found something " + NEW_LINE + " TRACE: reading pg 876";
 
-		splitStream.write(loggable.getBytes(), 0, loggable.length());
-		splitStream.flush();
+        splitStream.write(loggable.getBytes(), 0, loggable.length());
+        splitStream.flush();
 
-		// Should write all the bytes to the TestOutputStream
-		assertEquals(loggable, stream.stringBuilder.toString());
-		assertEquals(loggable, logger.getOutputString());
-		assertTrue(splitStream.hasOutput());
-		assertEquals(loggable, splitStream.getOutput().trim());
+        // Should write all the bytes to the TestOutputStream
+        assertEquals(loggable, stream.stringBuilder.toString());
+        assertEquals(loggable, logger.getOutputString());
+        assertTrue(splitStream.hasOutput());
+        assertEquals(loggable, splitStream.getOutput().trim());
 
-		stream.resetBuffer();
-		logger.resetAllOutput();
+        stream.resetBuffer();
+        logger.resetAllOutput();
 
-		splitStream.write(notLoggable.getBytes(), 0, notLoggable.length());
-		splitStream.flush();
-		// Should write all the bytes to the TestOutputStream
-		assertEquals(notLoggable, stream.stringBuilder.toString());
+        splitStream.write(notLoggable.getBytes(), 0, notLoggable.length());
+        splitStream.flush();
+        // Should write all the bytes to the TestOutputStream
+        assertEquals(notLoggable, stream.stringBuilder.toString());
 
-		assertTrue(StringUtils.isBlank(logger.getOutputString()));
-		splitStream.close();
-	}
+        assertTrue(StringUtils.isBlank(logger.getOutputString()));
+        splitStream.close();
+    }
 
-	private List<Integer> getCodePoints(final String s) {
-		final List<Integer> codePoints = new ArrayList<>();
-		for (int i = 0; i < s.length(); i++) {
-			codePoints.add(s.codePointAt(i));
-		}
+    private List<Integer> getCodePoints(final String s) {
+        final List<Integer> codePoints = new ArrayList<>();
+        for (int i = 0; i < s.length(); i++) {
+            codePoints.add(s.codePointAt(i));
+        }
 
-		return codePoints;
-	}
+        return codePoints;
+    }
 
-	private void writeCodePointsToScannerSplitStream(final List<Integer> codePoints, final ScannerSplitStream stream)
-			throws IOException {
-		for (final Integer codePoint : codePoints) {
-			stream.write(codePoint);
-		}
-		stream.flush();
-	}
+    private void writeCodePointsToScannerSplitStream(final List<Integer> codePoints, final ScannerSplitStream stream)
+            throws IOException {
+        for (final Integer codePoint : codePoints) {
+            stream.write(codePoint);
+        }
+        stream.flush();
+    }
 
 }

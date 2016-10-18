@@ -45,96 +45,96 @@ import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 
 public class CLILocationTest {
-	@Rule
-	public TemporaryFolder folder = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
-	private HubServerConfig hubServerConfig;
+    private HubServerConfig hubServerConfig;
 
-	@Before
-	public void initTest() throws MalformedURLException {
-		final HubProxyInfo proxyInfo = Mockito.mock(HubProxyInfo.class);
-		Mockito.when(proxyInfo.getUsername()).thenReturn("");
-		Mockito.when(proxyInfo.getEncryptedPassword()).thenReturn("");
-		Mockito.when(proxyInfo.getActualPasswordLength()).thenReturn(0);
+    @Before
+    public void initTest() throws MalformedURLException {
+        final HubProxyInfo proxyInfo = Mockito.mock(HubProxyInfo.class);
+        Mockito.when(proxyInfo.getUsername()).thenReturn("");
+        Mockito.when(proxyInfo.getEncryptedPassword()).thenReturn("");
+        Mockito.when(proxyInfo.getActualPasswordLength()).thenReturn(0);
 
-		final HubCredentials credentials = Mockito.mock(HubCredentials.class);
-		Mockito.when(credentials.getUsername()).thenReturn("");
-		Mockito.when(credentials.getActualPasswordLength()).thenReturn(0);
-		Mockito.when(credentials.getEncryptedPassword()).thenReturn("");
-		hubServerConfig = Mockito.mock(HubServerConfig.class);
+        final HubCredentials credentials = Mockito.mock(HubCredentials.class);
+        Mockito.when(credentials.getUsername()).thenReturn("");
+        Mockito.when(credentials.getActualPasswordLength()).thenReturn(0);
+        Mockito.when(credentials.getEncryptedPassword()).thenReturn("");
+        hubServerConfig = Mockito.mock(HubServerConfig.class);
 
-		Mockito.when(hubServerConfig.getHubUrl()).thenReturn(new URL("http://test-hub-server"));
-		Mockito.when(hubServerConfig.getTimeout()).thenReturn(120);
-		Mockito.when(hubServerConfig.getGlobalCredentials()).thenReturn(credentials);
-		Mockito.when(hubServerConfig.getProxyInfo()).thenReturn(proxyInfo);
-	}
+        Mockito.when(hubServerConfig.getHubUrl()).thenReturn(new URL("http://test-hub-server"));
+        Mockito.when(hubServerConfig.getTimeout()).thenReturn(120);
+        Mockito.when(hubServerConfig.getGlobalCredentials()).thenReturn(credentials);
+        Mockito.when(hubServerConfig.getProxyInfo()).thenReturn(proxyInfo);
+    }
 
-	@Test
-	public void testConstructorNull() throws Exception {
-		exception.expect(IllegalArgumentException.class);
-		exception.expectMessage("You must provided a directory to install the CLI to.");
-		new CLILocation(null);
-	}
+    @Test
+    public void testConstructorNull() throws Exception {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("You must provided a directory to install the CLI to.");
+        new CLILocation(null);
+    }
 
-	@Test
-	public void testConstructor() throws Exception {
-		final File directoryToInstallTo = folder.newFolder();
-		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
+    @Test
+    public void testConstructor() throws Exception {
+        final File directoryToInstallTo = folder.newFolder();
+        final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
-		assertEquals(new File(directoryToInstallTo, CLILocation.CLI_UNZIP_DIR), cliLocation.getCLIInstallDir());
-		assertNull(cliLocation.getCLIHome());
-		assertNull(cliLocation.getProvidedJavaExec());
-		assertFalse(cliLocation.getCLIExists(null));
-		assertNull(cliLocation.getCLI(null));
-		assertNull(cliLocation.getOneJarFile());
-	}
+        assertEquals(new File(directoryToInstallTo, CLILocation.CLI_UNZIP_DIR), cliLocation.getCLIInstallDir());
+        assertNull(cliLocation.getCLIHome());
+        assertNull(cliLocation.getProvidedJavaExec());
+        assertFalse(cliLocation.getCLIExists(null));
+        assertNull(cliLocation.getCLI(null));
+        assertNull(cliLocation.getOneJarFile());
+    }
 
-	@Test
-	public void testGetCLIDownloadUrlJreSupported() throws Exception {
-		final String baseUrl = "http://test-hub-server";
+    @Test
+    public void testGetCLIDownloadUrlJreSupported() throws Exception {
+        final String baseUrl = "http://test-hub-server";
 
-		final File directoryToInstallTo = folder.newFolder();
-		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
-		HubIntRestService restService = new HubIntRestService(new CredentialsRestConnection(hubServerConfig));
-		restService = Mockito.spy(restService);
-		Mockito.doReturn("3.0.1").when(restService).getHubVersion();
+        final File directoryToInstallTo = folder.newFolder();
+        final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
+        HubIntRestService restService = new HubIntRestService(new CredentialsRestConnection(hubServerConfig));
+        restService = Mockito.spy(restService);
+        Mockito.doReturn("3.0.1").when(restService).getHubVersion();
 
-		final String downloadUrl = cliLocation.getCLIDownloadUrl(null, restService);
+        final String downloadUrl = cliLocation.getCLIDownloadUrl(null, restService);
 
-		final StringBuilder urlBuilder = new StringBuilder();
-		urlBuilder.append(baseUrl + "/download/");
+        final StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(baseUrl + "/download/");
 
-		if (SystemUtils.IS_OS_MAC_OSX) {
-			urlBuilder.append(HubSupportHelper.MAC_CLI_DOWNLOAD);
-			assertEquals(urlBuilder.toString(), downloadUrl);
-		} else if (SystemUtils.IS_OS_WINDOWS) {
-			urlBuilder.append(HubSupportHelper.WINDOWS_CLI_DOWNLOAD);
-			assertEquals(urlBuilder.toString(), downloadUrl);
-		} else {
-			urlBuilder.append(HubSupportHelper.DEFAULT_CLI_DOWNLOAD);
-			assertEquals(urlBuilder.toString(), downloadUrl);
-		}
-	}
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            urlBuilder.append(HubSupportHelper.MAC_CLI_DOWNLOAD);
+            assertEquals(urlBuilder.toString(), downloadUrl);
+        } else if (SystemUtils.IS_OS_WINDOWS) {
+            urlBuilder.append(HubSupportHelper.WINDOWS_CLI_DOWNLOAD);
+            assertEquals(urlBuilder.toString(), downloadUrl);
+        } else {
+            urlBuilder.append(HubSupportHelper.DEFAULT_CLI_DOWNLOAD);
+            assertEquals(urlBuilder.toString(), downloadUrl);
+        }
+    }
 
-	@Test
-	public void testGetCLIDownloadUrlJreNotSupported() throws Exception {
-		final String baseUrl = "http://test-hub-server";
+    @Test
+    public void testGetCLIDownloadUrlJreNotSupported() throws Exception {
+        final String baseUrl = "http://test-hub-server";
 
-		final File directoryToInstallTo = folder.newFolder();
-		final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
-		HubIntRestService restService = new HubIntRestService(new CredentialsRestConnection(hubServerConfig));
-		restService = Mockito.spy(restService);
-		Mockito.doReturn("2.4.0").when(restService).getHubVersion();
+        final File directoryToInstallTo = folder.newFolder();
+        final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
+        HubIntRestService restService = new HubIntRestService(new CredentialsRestConnection(hubServerConfig));
+        restService = Mockito.spy(restService);
+        Mockito.doReturn("2.4.0").when(restService).getHubVersion();
 
-		final String downloadUrl = cliLocation.getCLIDownloadUrl(null, restService);
+        final String downloadUrl = cliLocation.getCLIDownloadUrl(null, restService);
 
-		final StringBuilder urlBuilder = new StringBuilder();
-		urlBuilder.append(baseUrl + "/download/");
-		urlBuilder.append(HubSupportHelper.DEFAULT_CLI_DOWNLOAD);
-		assertEquals(urlBuilder.toString(), downloadUrl);
-	}
+        final StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(baseUrl + "/download/");
+        urlBuilder.append(HubSupportHelper.DEFAULT_CLI_DOWNLOAD);
+        assertEquals(urlBuilder.toString(), downloadUrl);
+    }
 
 }

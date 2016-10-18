@@ -23,8 +23,8 @@ package com.blackducksoftware.integration.hub.report.api;
 
 @Deprecated
 public class ReleaseData extends com.blackducksoftware.integration.hub.api.report.ReleaseData {
-	// Need this package and the objects for backwards compatability
-	public ReleaseData(final String id, final String version) {
-		super(id, version);
-	}
+    // Need this package and the objects for backwards compatability
+    public ReleaseData(final String id, final String version) {
+        super(id, version);
+    }
 }

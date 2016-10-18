@@ -22,24 +22,25 @@
 package com.blackducksoftware.integration.hub.api.extension;
 
 public class OptionItem {
-	private final String name;
-	private final String title;
+    private final String name;
 
-	public OptionItem(final String name, final String title) {
-		this.name = name;
-		this.title = title;
-	}
+    private final String title;
 
-	public String getName() {
-		return name;
-	}
+    public OptionItem(final String name, final String title) {
+        this.name = name;
+        this.title = title;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public String toString() {
-		return "OptionItem [name=" + name + ", title=" + title + "]";
-	}
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
+    public String toString() {
+        return "OptionItem [name=" + name + ", title=" + title + "]";
+    }
 }

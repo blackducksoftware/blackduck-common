@@ -39,25 +39,26 @@ import com.google.gson.reflect.TypeToken;
 
 public class ExtensionUserOptionRestService extends HubItemRestService<UserOptionLinkItem> {
 
-	private static final Type TYPE_TOKEN_ITEM = new TypeToken<UserOptionLinkItem>() {
-	}.getType();
-	private static final Type TYPE_TOKEN_LIST = new TypeToken<List<UserOptionLinkItem>>() {
-	}.getType();
+    private static final Type TYPE_TOKEN_ITEM = new TypeToken<UserOptionLinkItem>() {
+    }.getType();
 
-	public ExtensionUserOptionRestService(final RestConnection restConnection, final Gson gson,
-			final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
-	}
+    private static final Type TYPE_TOKEN_LIST = new TypeToken<List<UserOptionLinkItem>>() {
+    }.getType();
 
-	public List<UserOptionLinkItem> getUserOptions(final String userOptionsUrl)
-			throws IOException, URISyntaxException, BDRestException {
-		final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		itemRequest.setUrl(userOptionsUrl);
-		itemRequest.setMethod(Method.GET);
-		itemRequest.setLimit(100);
+    public ExtensionUserOptionRestService(final RestConnection restConnection, final Gson gson,
+            final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
+    }
 
-		final JsonObject jsonObject = itemRequest.executeForResponseJson();
-		final List<UserOptionLinkItem> allItems = getAll(jsonObject, itemRequest);
-		return allItems;
-	}
+    public List<UserOptionLinkItem> getUserOptions(final String userOptionsUrl)
+            throws IOException, URISyntaxException, BDRestException {
+        final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        itemRequest.setUrl(userOptionsUrl);
+        itemRequest.setMethod(Method.GET);
+        itemRequest.setLimit(100);
+
+        final JsonObject jsonObject = itemRequest.executeForResponseJson();
+        final List<UserOptionLinkItem> allItems = getAll(jsonObject, itemRequest);
+        return allItems;
+    }
 }

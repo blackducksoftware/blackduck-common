@@ -22,21 +22,21 @@
 package com.blackducksoftware.integration.hub.exception;
 
 public class BDMavenRetrieverException extends Exception {
-	private static final long serialVersionUID = -2827651172106082507L;
+    private static final long serialVersionUID = -2827651172106082507L;
 
-	public BDMavenRetrieverException() {
-	}
+    public BDMavenRetrieverException() {
+    }
 
-	public BDMavenRetrieverException(final String message) {
-		super(message);
-	}
+    public BDMavenRetrieverException(final String message) {
+        super(message);
+    }
 
-	public BDMavenRetrieverException(final Throwable cause) {
-		super(cause);
-	}
+    public BDMavenRetrieverException(final Throwable cause) {
+        super(cause);
+    }
 
-	public BDMavenRetrieverException(final String message, final Throwable cause) {
-		super(message, cause);
-	}
+    public BDMavenRetrieverException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
 }

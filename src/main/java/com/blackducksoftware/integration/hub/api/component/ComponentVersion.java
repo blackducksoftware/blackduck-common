@@ -32,59 +32,62 @@ import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class ComponentVersion extends HubItem {
-	public static final String COMPONENT_URL_IDENTIFIER = "components";
-	public static final String VERSION_URL_IDENTIFIER = "versions";
-	private String versionName;
-	private String releasedOn;
+    public static final String COMPONENT_URL_IDENTIFIER = "components";
 
-	public ComponentVersion(final MetaInformation meta) {
-		super(meta);
-	}
+    public static final String VERSION_URL_IDENTIFIER = "versions";
 
-	// License goes here
+    private String versionName;
 
-	public String getVersionName() {
-		return versionName;
-	}
+    private String releasedOn;
 
-	public void setVersionName(final String versionName) {
-		this.versionName = versionName;
-	}
+    public ComponentVersion(final MetaInformation meta) {
+        super(meta);
+    }
 
-	public String getReleasedOn() {
-		return releasedOn;
-	}
+    // License goes here
 
-	public DateTime getReleasedOnDate() {
-		if (StringUtils.isNotBlank(releasedOn)) {
-			return DateTime.parse(releasedOn);
-		}
-		return null;
-	}
+    public String getVersionName() {
+        return versionName;
+    }
 
-	public void setReleasedOn(final String releasedOn) {
-		this.releasedOn = releasedOn;
-	}
+    public void setVersionName(final String versionName) {
+        this.versionName = versionName;
+    }
 
-	@Deprecated
-	public UUID getComponentId() throws MissingUUIDException {
-		if (getMeta() == null || getMeta().getHref() == null) {
-			return null;
-		}
-		return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER, getMeta().getHref());
-	}
+    public String getReleasedOn() {
+        return releasedOn;
+    }
 
-	@Deprecated
-	public UUID getVersionId() throws MissingUUIDException {
-		if (getMeta() == null || getMeta().getHref() == null) {
-			return null;
-		}
-		return HubUrlParser.getUUIDFromURLString(VERSION_URL_IDENTIFIER, getMeta().getHref());
-	}
+    public DateTime getReleasedOnDate() {
+        if (StringUtils.isNotBlank(releasedOn)) {
+            return DateTime.parse(releasedOn);
+        }
+        return null;
+    }
 
-	@Override
-	public String toString() {
-		return "ComponentVersion [versionName=" + versionName + ", releasedOn=" + releasedOn + "]";
-	}
+    public void setReleasedOn(final String releasedOn) {
+        this.releasedOn = releasedOn;
+    }
+
+    @Deprecated
+    public UUID getComponentId() throws MissingUUIDException {
+        if (getMeta() == null || getMeta().getHref() == null) {
+            return null;
+        }
+        return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER, getMeta().getHref());
+    }
+
+    @Deprecated
+    public UUID getVersionId() throws MissingUUIDException {
+        if (getMeta() == null || getMeta().getHref() == null) {
+            return null;
+        }
+        return HubUrlParser.getUUIDFromURLString(VERSION_URL_IDENTIFIER, getMeta().getHref());
+    }
+
+    @Override
+    public String toString() {
+        return "ComponentVersion [versionName=" + versionName + ", releasedOn=" + releasedOn + "]";
+    }
 
 }

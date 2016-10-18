@@ -38,53 +38,53 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
 public class HubCredentialsTest {
-	@Test
-	public void testHubCredentials() throws IllegalArgumentException, EncryptionException, NoSuchMethodException,
-			IllegalAccessException, InvocationTargetException, HubIntegrationException {
+    @Test
+    public void testHubCredentials() throws IllegalArgumentException, EncryptionException, NoSuchMethodException,
+            IllegalAccessException, InvocationTargetException, HubIntegrationException {
 
-		final String hubUser1 = "hubUser1";
-		final String hubPass1 = "hubPass1";
+        final String hubUser1 = "hubUser1";
+        final String hubPass1 = "hubPass1";
 
-		final String hubUser2 = "hubUser2";
-		final String hubPass2Clear = "hubPass2";
-		final String hubPass2 = PasswordEncrypter.encrypt(hubPass2Clear);
+        final String hubUser2 = "hubUser2";
+        final String hubPass2Clear = "hubPass2";
+        final String hubPass2 = PasswordEncrypter.encrypt(hubPass2Clear);
 
-		HubCredentialsBuilder builder = new HubCredentialsBuilder();
-		builder.setUsername(hubUser1);
-		builder.setPassword(hubPass1);
-		final HubCredentials item1 = builder.buildResults().getConstructedObject();
+        HubCredentialsBuilder builder = new HubCredentialsBuilder();
+        builder.setUsername(hubUser1);
+        builder.setPassword(hubPass1);
+        final HubCredentials item1 = builder.buildResults().getConstructedObject();
 
-		builder = new HubCredentialsBuilder();
-		builder.setUsername(hubUser2);
-		builder.setPassword(hubPass2Clear);
-		final HubCredentials item2 = builder.buildResults().getConstructedObject();
+        builder = new HubCredentialsBuilder();
+        builder.setUsername(hubUser2);
+        builder.setPassword(hubPass2Clear);
+        final HubCredentials item2 = builder.buildResults().getConstructedObject();
 
-		builder = new HubCredentialsBuilder();
-		builder.setUsername(hubUser1);
-		builder.setPassword(hubPass1);
-		final HubCredentials item3 = builder.buildResults().getConstructedObject();
+        builder = new HubCredentialsBuilder();
+        builder.setUsername(hubUser1);
+        builder.setPassword(hubPass1);
+        final HubCredentials item3 = builder.buildResults().getConstructedObject();
 
-		assertEquals(hubUser1, item1.getUsername());
-		assertEquals(hubPass1, item1.getDecryptedPassword());
-		assertEquals("********", item1.getMaskedPassword());
+        assertEquals(hubUser1, item1.getUsername());
+        assertEquals(hubPass1, item1.getDecryptedPassword());
+        assertEquals("********", item1.getMaskedPassword());
 
-		assertEquals(hubUser2, item2.getUsername());
-		assertEquals(hubPass2, item2.getEncryptedPassword());
+        assertEquals(hubUser2, item2.getUsername());
+        assertEquals(hubPass2, item2.getEncryptedPassword());
 
-		assertEquals(hubPass2Clear, item2.getDecryptedPassword());
-		assertEquals("********", item2.getMaskedPassword());
+        assertEquals(hubPass2Clear, item2.getDecryptedPassword());
+        assertEquals("********", item2.getMaskedPassword());
 
-		assertTrue(item1.equals(item3));
-		assertTrue(!item1.equals(item2));
+        assertTrue(item1.equals(item3));
+        assertTrue(!item1.equals(item2));
 
-		EqualsVerifier.forClass(HubCredentials.class).suppress(Warning.STRICT_INHERITANCE).verify();
+        EqualsVerifier.forClass(HubCredentials.class).suppress(Warning.STRICT_INHERITANCE).verify();
 
-		assertTrue(item1.hashCode() != item2.hashCode());
-		assertEquals(item1.hashCode(), item3.hashCode());
+        assertTrue(item1.hashCode() != item2.hashCode());
+        assertEquals(item1.hashCode(), item3.hashCode());
 
-		final String expected = "HubCredentials [username=" + item1.getUsername() + ", encryptedPassword="
-				+ item1.getEncryptedPassword() + ", actualPasswordLength=" + item1.getActualPasswordLength() + "]";
-		assertEquals(expected, item1.toString());
-	}
+        final String expected = "HubCredentials [username=" + item1.getUsername() + ", encryptedPassword="
+                + item1.getEncryptedPassword() + ", actualPasswordLength=" + item1.getActualPasswordLength() + "]";
+        assertEquals(expected, item1.toString());
+    }
 
 }

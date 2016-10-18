@@ -29,126 +29,127 @@ import com.blackducksoftware.integration.hub.util.HubUrlParser;
 import com.google.common.base.Joiner;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {
-	private final ProjectVersion projectVersion;
-	private final String componentName;
-	private final String componentVersion;
-	private final String componentVersionUrl;
+    private final ProjectVersion projectVersion;
 
-	// We need createdAt (from the enclosing notificationItem) so we can order
-	// them after
-	// they are collected multi-threaded
-	public final Date createdAt;
+    private final String componentName;
 
-	public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
-			final String componentName,
- final String componentVersion,
-			final String componentVersionUrl) {
-		this.createdAt = createdAt;
-		this.projectVersion = projectVersion;
-		this.componentName = componentName;
-		this.componentVersion = componentVersion;
-		this.componentVersionUrl = componentVersionUrl;
-	}
+    private final String componentVersion;
 
-	public ProjectVersion getProjectVersion() {
-		return projectVersion;
-	}
+    private final String componentVersionUrl;
 
-	public String getComponentName() {
-		return componentName;
-	}
+    // We need createdAt (from the enclosing notificationItem) so we can order
+    // them after
+    // they are collected multi-threaded
+    public final Date createdAt;
 
-	public String getComponentVersion() {
-		return componentVersion;
-	}
+    public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
+            final String componentName,
+            final String componentVersion,
+            final String componentVersionUrl) {
+        this.createdAt = createdAt;
+        this.projectVersion = projectVersion;
+        this.componentName = componentName;
+        this.componentVersion = componentVersion;
+        this.componentVersionUrl = componentVersionUrl;
+    }
 
-	public String getComponentVersionUrl() {
-		return componentVersionUrl;
-	}
+    public ProjectVersion getProjectVersion() {
+        return projectVersion;
+    }
 
-	public String getComponentVersionRelativeUrl() throws URISyntaxException {
-		return HubUrlParser.getRelativeUrl(componentVersionUrl);
-	}
+    public String getComponentName() {
+        return componentName;
+    }
 
-	public Date getCreatedAt() {
-		return createdAt;
-	}
+    public String getComponentVersion() {
+        return componentVersion;
+    }
 
+    public String getComponentVersionUrl() {
+        return componentVersionUrl;
+    }
 
-	@Override
-	public String toString() {
-		return "NotificationContentItem [projectVersion=" + projectVersion + ", componentName=" + componentName
-				+ ", componentVersion=" + componentVersion
-				+ ", componentVersionUrl=" + componentVersionUrl + ", createdAt=" + createdAt + "]";
-	}
+    public String getComponentVersionRelativeUrl() throws URISyntaxException {
+        return HubUrlParser.getRelativeUrl(componentVersionUrl);
+    }
 
-	@Override
-	public int compareTo(final NotificationContentItem o) {
-		if (equals(o)) {
-			return 0;
-		}
+    public Date getCreatedAt() {
+        return createdAt;
+    }
 
-		final int createdAtComparison = getCreatedAt().compareTo(o.getCreatedAt());
-		if (createdAtComparison != 0) {
-			// If createdAt times are different, use createdAt to compare
-			return createdAtComparison;
-		}
+    @Override
+    public String toString() {
+        return "NotificationContentItem [projectVersion=" + projectVersion + ", componentName=" + componentName
+                + ", componentVersion=" + componentVersion
+                + ", componentVersionUrl=" + componentVersionUrl + ", createdAt=" + createdAt + "]";
+    }
 
-		// Identify same-time non-equal items as non-equal
-		final Joiner joiner = Joiner.on(":").skipNulls();
-		final String thisProjectVersionString = joiner.join(getProjectVersion().getProjectName(), getProjectVersion()
-				.getProjectVersionName(), getComponentVersionUrl());
-		final String otherProjectVersionString = joiner.join(o.getProjectVersion().getProjectName(), o
-				.getProjectVersion().getProjectVersionName(), o.getComponentVersionUrl().toString());
+    @Override
+    public int compareTo(final NotificationContentItem o) {
+        if (equals(o)) {
+            return 0;
+        }
 
-		return thisProjectVersionString.compareTo(otherProjectVersionString);
-	}
+        final int createdAtComparison = getCreatedAt().compareTo(o.getCreatedAt());
+        if (createdAtComparison != 0) {
+            // If createdAt times are different, use createdAt to compare
+            return createdAtComparison;
+        }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((getComponentVersionUrl() == null) ? 0 : getComponentVersionUrl().hashCode());
-		result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
-		result = prime * result + ((projectVersion == null) ? 0 : projectVersion.hashCode());
-		return result;
-	}
+        // Identify same-time non-equal items as non-equal
+        final Joiner joiner = Joiner.on(":").skipNulls();
+        final String thisProjectVersionString = joiner.join(getProjectVersion().getProjectName(), getProjectVersion()
+                .getProjectVersionName(), getComponentVersionUrl());
+        final String otherProjectVersionString = joiner.join(o.getProjectVersion().getProjectName(), o
+                .getProjectVersion().getProjectVersionName(), o.getComponentVersionUrl().toString());
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final NotificationContentItem other = (NotificationContentItem) obj;
-		if (getComponentVersionUrl() == null) {
-			if (other.getComponentVersionUrl() != null) {
-				return false;
-			}
-		} else if (!getComponentVersionUrl().equals(other.getComponentVersionUrl())) {
-			return false;
-		}
-		if (createdAt == null) {
-			if (other.createdAt != null) {
-				return false;
-			}
-		} else if (!createdAt.equals(other.createdAt)) {
-			return false;
-		}
-		if (projectVersion == null) {
-			if (other.projectVersion != null) {
-				return false;
-			}
-		} else if (!projectVersion.equals(other.projectVersion)) {
-			return false;
-		}
-		return true;
-	}
+        return thisProjectVersionString.compareTo(otherProjectVersionString);
+    }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((getComponentVersionUrl() == null) ? 0 : getComponentVersionUrl().hashCode());
+        result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
+        result = prime * result + ((projectVersion == null) ? 0 : projectVersion.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NotificationContentItem other = (NotificationContentItem) obj;
+        if (getComponentVersionUrl() == null) {
+            if (other.getComponentVersionUrl() != null) {
+                return false;
+            }
+        } else if (!getComponentVersionUrl().equals(other.getComponentVersionUrl())) {
+            return false;
+        }
+        if (createdAt == null) {
+            if (other.createdAt != null) {
+                return false;
+            }
+        } else if (!createdAt.equals(other.createdAt)) {
+            return false;
+        }
+        if (projectVersion == null) {
+            if (other.projectVersion != null) {
+                return false;
+            }
+        } else if (!projectVersion.equals(other.projectVersion)) {
+            return false;
+        }
+        return true;
+    }
 
 }

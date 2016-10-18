@@ -35,17 +35,18 @@ import com.google.gson.reflect.TypeToken;
 
 public class ExtensionRestService extends HubItemRestService<ExtensionItem> {
 
-	private static final Type TYPE_TOKEN_ITEM = new TypeToken<ExtensionItem>() {
-	}.getType();
-	private static final Type TYPE_TOKEN_LIST = new TypeToken<List<ExtensionItem>>() {
-	}.getType();
+    private static final Type TYPE_TOKEN_ITEM = new TypeToken<ExtensionItem>() {
+    }.getType();
 
-	public ExtensionRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
-	}
+    private static final Type TYPE_TOKEN_LIST = new TypeToken<List<ExtensionItem>>() {
+    }.getType();
 
-	public ExtensionItem getExtensionItem(final String extensionUrl)
-			throws IOException, BDRestException, URISyntaxException {
-		return getItem(extensionUrl);
-	}
+    public ExtensionRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
+    }
+
+    public ExtensionItem getExtensionItem(final String extensionUrl)
+            throws IOException, BDRestException, URISyntaxException {
+        return getItem(extensionUrl);
+    }
 }

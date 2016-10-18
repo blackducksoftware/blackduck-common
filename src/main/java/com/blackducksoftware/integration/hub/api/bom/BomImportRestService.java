@@ -43,18 +43,18 @@ import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistExcep
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
 public class BomImportRestService extends HubRestService {
-	private static final List<String> BOM_IMPORT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_BOM_IMPORT);
+    private static final List<String> BOM_IMPORT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_BOM_IMPORT);
 
-	public BomImportRestService(final RestConnection restConnection) {
-		super(restConnection);
-	}
+    public BomImportRestService(final RestConnection restConnection) {
+        super(restConnection);
+    }
 
-	public void importBomFile(final File file, final String mediaType)
-			throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
-		final Set<SimpleEntry<String, String>> queryParameters = new HashSet<>();
-		final FileRepresentation content = new FileRepresentation(file, new MediaType(mediaType));
+    public void importBomFile(final File file, final String mediaType)
+            throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+        final Set<SimpleEntry<String, String>> queryParameters = new HashSet<>();
+        final FileRepresentation content = new FileRepresentation(file, new MediaType(mediaType));
 
-		getRestConnection().httpPostFromRelativeUrl(BOM_IMPORT_SEGMENTS, queryParameters, content);
-	}
+        getRestConnection().httpPostFromRelativeUrl(BOM_IMPORT_SEGMENTS, queryParameters, content);
+    }
 
 }

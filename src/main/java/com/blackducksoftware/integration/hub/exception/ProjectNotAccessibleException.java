@@ -22,14 +22,14 @@
 package com.blackducksoftware.integration.hub.exception;
 
 public class ProjectNotAccessibleException extends Exception {
-	private static final long serialVersionUID = 6616918212644568568L;
+    private static final long serialVersionUID = 6616918212644568568L;
 
-	public ProjectNotAccessibleException(final String message) {
-		super(message);
-	}
+    public ProjectNotAccessibleException(final String message) {
+        super(message);
+    }
 
-	public ProjectNotAccessibleException(final String message, final Throwable cause) {
-		super(message, cause);
-	}
+    public ProjectNotAccessibleException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
 }

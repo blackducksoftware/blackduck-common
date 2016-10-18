@@ -23,11 +23,11 @@ package com.blackducksoftware.integration.hub.report.api;
 
 @Deprecated
 public class DetailedReleaseSummary extends com.blackducksoftware.integration.hub.api.report.DetailedReleaseSummary {
-	// Need this package and the objects for backwards compatability
-	public DetailedReleaseSummary(final String projectId, final String versionId, final String projectName,
-			final String version, final String versionComments, final String nickname, final String releasedOn,
-			final String phase, final String distribution, final URLProvider uiUrlGenerator) {
-		super(projectId, versionId, projectName, version, versionComments, nickname, releasedOn, phase, distribution,
-				uiUrlGenerator);
-	}
+    // Need this package and the objects for backwards compatability
+    public DetailedReleaseSummary(final String projectId, final String versionId, final String projectName,
+            final String version, final String versionComments, final String nickname, final String releasedOn,
+            final String phase, final String distribution, final URLProvider uiUrlGenerator) {
+        super(projectId, versionId, projectName, version, versionComments, nickname, releasedOn, phase, distribution,
+                uiUrlGenerator);
+    }
 }

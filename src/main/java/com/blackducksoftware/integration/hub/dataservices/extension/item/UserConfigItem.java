@@ -27,19 +27,20 @@ import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
 
 public class UserConfigItem {
-	private final UserItem user;
-	private final Map<String, ConfigurationItem> configMap;
+    private final UserItem user;
 
-	public UserConfigItem(final UserItem user, final Map<String, ConfigurationItem> configItems) {
-		this.user = user;
-		this.configMap = configItems;
-	}
+    private final Map<String, ConfigurationItem> configMap;
 
-	public UserItem getUser() {
-		return user;
-	}
+    public UserConfigItem(final UserItem user, final Map<String, ConfigurationItem> configItems) {
+        this.user = user;
+        this.configMap = configItems;
+    }
 
-	public Map<String, ConfigurationItem> getConfigMap() {
-		return configMap;
-	}
+    public UserItem getUser() {
+        return user;
+    }
+
+    public Map<String, ConfigurationItem> getConfigMap() {
+        return configMap;
+    }
 }

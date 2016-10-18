@@ -24,24 +24,24 @@ package com.blackducksoftware.integration.hub.api.notification;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class RuleViolationNotificationItem extends NotificationItem {
-	public RuleViolationNotificationContent content;
+    public RuleViolationNotificationContent content;
 
-	public RuleViolationNotificationItem(final MetaInformation meta) {
-		super(meta);
-	}
+    public RuleViolationNotificationItem(final MetaInformation meta) {
+        super(meta);
+    }
 
-	public RuleViolationNotificationContent getContent() {
-		return content;
-	}
+    public RuleViolationNotificationContent getContent() {
+        return content;
+    }
 
-	public void setContent(final RuleViolationNotificationContent content) {
-		this.content = content;
-	}
+    public void setContent(final RuleViolationNotificationContent content) {
+        this.content = content;
+    }
 
-	@Override
-	public String toString() {
-		return "RuleViolationNotificationItem [content=" + content + ", contentType=" + contentType + ", type=" + type
-				+ ", createdAt=" + createdAt + ", Meta=" + getMeta() + "]";
-	}
+    @Override
+    public String toString() {
+        return "RuleViolationNotificationItem [content=" + content + ", contentType=" + contentType + ", type=" + type
+                + ", createdAt=" + createdAt + ", Meta=" + getMeta() + "]";
+    }
 
 }

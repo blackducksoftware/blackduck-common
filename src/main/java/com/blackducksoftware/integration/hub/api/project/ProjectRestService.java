@@ -44,68 +44,69 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ProjectRestService extends HubItemRestService<ProjectItem> {
-	private static final List<String> PROJECTS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS);
+    private static final List<String> PROJECTS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS);
 
-	private static final Type ITEM_TYPE = new TypeToken<ProjectItem>() {
-	}.getType();
-	private static final Type ITEM_LIST_TYPE = new TypeToken<List<ProjectItem>>() {
-	}.getType();
+    private static final Type ITEM_TYPE = new TypeToken<ProjectItem>() {
+    }.getType();
 
-	public ProjectRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    private static final Type ITEM_LIST_TYPE = new TypeToken<List<ProjectItem>>() {
+    }.getType();
 
-	public List<ProjectItem> getAllProjects() throws IOException, BDRestException, URISyntaxException {
-		final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		projectItemRequest.setMethod(Method.GET);
-		projectItemRequest.setLimit(100);
-		projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
+    public ProjectRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
-		final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
-		final List<ProjectItem> allProjectItems = getAll(jsonObject, projectItemRequest);
-		return allProjectItems;
-	}
+    public List<ProjectItem> getAllProjects() throws IOException, BDRestException, URISyntaxException {
+        final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        projectItemRequest.setMethod(Method.GET);
+        projectItemRequest.setLimit(100);
+        projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
 
-	public List<ProjectItem> getAllProjectMatches(final String projectName)
-			throws IOException, BDRestException, URISyntaxException {
-		final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		projectItemRequest.setMethod(Method.GET);
-		projectItemRequest.setLimit(100);
-		projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
-		if (StringUtils.isNotBlank(projectName)) {
-			projectItemRequest.setQ("name:" + projectName);
-		}
+        final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
+        final List<ProjectItem> allProjectItems = getAll(jsonObject, projectItemRequest);
+        return allProjectItems;
+    }
 
-		final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
-		final List<ProjectItem> allProjectItems = getAll(jsonObject, projectItemRequest);
-		return allProjectItems;
-	}
+    public List<ProjectItem> getAllProjectMatches(final String projectName)
+            throws IOException, BDRestException, URISyntaxException {
+        final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        projectItemRequest.setMethod(Method.GET);
+        projectItemRequest.setLimit(100);
+        projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
+        if (StringUtils.isNotBlank(projectName)) {
+            projectItemRequest.setQ("name:" + projectName);
+        }
 
-	public List<ProjectItem> getProjectMatches(final String projectName, final int limit)
-			throws IOException, BDRestException, URISyntaxException {
-		final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		projectItemRequest.setMethod(Method.GET);
-		projectItemRequest.setLimit(limit);
-		projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
-		if (StringUtils.isNotBlank(projectName)) {
-			projectItemRequest.setQ("name:" + projectName);
-		}
+        final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
+        final List<ProjectItem> allProjectItems = getAll(jsonObject, projectItemRequest);
+        return allProjectItems;
+    }
 
-		final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
-		final List<ProjectItem> allProjectItems = getItems(jsonObject);
-		return allProjectItems;
-	}
+    public List<ProjectItem> getProjectMatches(final String projectName, final int limit)
+            throws IOException, BDRestException, URISyntaxException {
+        final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        projectItemRequest.setMethod(Method.GET);
+        projectItemRequest.setLimit(limit);
+        projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
+        if (StringUtils.isNotBlank(projectName)) {
+            projectItemRequest.setQ("name:" + projectName);
+        }
 
-	public ProjectItem getProjectByName(String projectName)
-			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
-		projectName = StringUtils.trimToEmpty(projectName);
-		final List<ProjectItem> allProjectItems = getAllProjectMatches(projectName);
-		for (final ProjectItem project : allProjectItems) {
-			if (projectName.equals(project.getName())) {
-				return project;
-			}
-		}
-		throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName);
-	}
+        final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
+        final List<ProjectItem> allProjectItems = getItems(jsonObject);
+        return allProjectItems;
+    }
+
+    public ProjectItem getProjectByName(String projectName)
+            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
+        projectName = StringUtils.trimToEmpty(projectName);
+        final List<ProjectItem> allProjectItems = getAllProjectMatches(projectName);
+        for (final ProjectItem project : allProjectItems) {
+            if (projectName.equals(project.getName())) {
+                return project;
+            }
+        }
+        throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName);
+    }
 
 }

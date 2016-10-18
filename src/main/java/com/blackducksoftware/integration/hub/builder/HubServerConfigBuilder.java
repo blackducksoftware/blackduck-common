@@ -45,315 +45,329 @@ import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
 
 public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubServerConfig> {
-	public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
-	public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
-	public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
-	public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
+    public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
 
-	public static final String ERROR_MSG_AUTHENTICATED_PROXY_WITH_HTTPS = "Using an authenticated proxy to connect to an http Hub server is not supported.";
+    public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
 
-	public static int DEFAULT_TIMEOUT = 120;
+    public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
 
-	private String hubUrl;
-	private String timeout;
-	private String username;
-	private String password;
-	private int passwordLength;
-	private String proxyHost;
-	private String proxyPort;
-	private String proxyUsername;
-	private String proxyPassword;
-	private int proxyPasswordLength;
-	private String ignoredProxyHosts;
+    public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
 
-	HubProxyInfo proxyInfo;
-	HubCredentials credentials;
+    public static final String ERROR_MSG_AUTHENTICATED_PROXY_WITH_HTTPS = "Using an authenticated proxy to connect to an http Hub server is not supported.";
 
-	public HubServerConfigBuilder() {
-		super(false);
-	}
+    public static int DEFAULT_TIMEOUT = 120;
 
-	public HubServerConfigBuilder(final boolean shouldUseDefaultValues) {
-		super(shouldUseDefaultValues);
-	}
+    private String hubUrl;
 
-	@Override
-	public HubServerConfig build() throws IllegalStateException {
-		final ValidationResults<GlobalFieldKey, HubServerConfig> results = buildResults();
-		if (results.isSuccess()) {
-			return results.getConstructedObject();
-		} else {
-			final List<String> warningMessages = new ArrayList<>();
-			final List<String> errorMessages = new ArrayList<>();
-			final Set<GlobalFieldKey> keySet = results.getResultMap().keySet();
-			for (final GlobalFieldKey key : keySet) {
-				if (results.hasWarnings(key)) {
-					warningMessages.add(results.getResultString(key, ValidationResultEnum.WARN));
-				}
-				if (results.hasErrors(key)) {
-					errorMessages.add(results.getResultString(key, ValidationResultEnum.ERROR));
-				}
-			}
+    private String timeout;
 
-			String exceptionMessage = "Invalid Hub Server Configuration: ";
-			exceptionMessage += "[WARN: " + StringUtils.join(warningMessages, ", ") + "], ";
-			exceptionMessage += "[ERROR: " + StringUtils.join(errorMessages, ", ") + "]";
+    private String username;
 
-			throw new IllegalStateException(exceptionMessage);
-		}
-	}
+    private String password;
 
-	@Override
-	public ValidationResults<GlobalFieldKey, HubServerConfig> buildResults() {
-		final ValidationResults<GlobalFieldKey, HubServerConfig> result = assertValid();
+    private int passwordLength;
 
-		URL hubURL = null;
-		try {
-			hubURL = new URL(hubUrl);
-		} catch (final MalformedURLException e) {
-		}
-		final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeout), credentials, proxyInfo);
-		result.setConstructedObject(config);
-		return result;
-	}
+    private String proxyHost;
 
-	@Override
-	public ValidationResults<GlobalFieldKey, HubServerConfig> assertValid() {
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> proxyResult = assertProxyValid();
-		final ValidationResults<GlobalFieldKey, HubCredentials> credentialResult = assertCredentialsValid();
-		final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
-		result.addAllResults(proxyResult.getResultMap());
-		result.addAllResults(credentialResult.getResultMap());
-		validateHubUrl(result);
-		if (shouldUseDefaultValues()) {
-			validateTimeout(result, DEFAULT_TIMEOUT);
-		} else {
-			validateTimeout(result, null);
-		}
-		return result;
-	}
+    private String proxyPort;
 
-	public ValidationResults<GlobalFieldKey, HubProxyInfo> assertProxyValid() {
-		ValidationResults<GlobalFieldKey, HubProxyInfo> result = null;
-		final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder(shouldUseDefaultValues());
-		proxyBuilder.setHost(proxyHost);
-		proxyBuilder.setPort(proxyPort);
-		proxyBuilder.setIgnoredProxyHosts(ignoredProxyHosts);
-		proxyBuilder.setUsername(proxyUsername);
-		proxyBuilder.setPassword(proxyPassword);
-		if (proxyPasswordLength > 0) {
-			proxyBuilder.setPasswordLength(proxyPasswordLength);
-		}
-		result = proxyBuilder.buildResults();
-		proxyInfo = result.getConstructedObject();
-		return result;
-	}
+    private String proxyUsername;
 
-	public ValidationResults<GlobalFieldKey, HubCredentials> assertCredentialsValid() {
-		ValidationResults<GlobalFieldKey, HubCredentials> result = null;
-		final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder(shouldUseDefaultValues());
-		credentialsBuilder.setUsername(username);
-		credentialsBuilder.setPassword(password);
-		if (passwordLength > 0) {
-			credentialsBuilder.setPasswordLength(passwordLength);
-		}
-		result = credentialsBuilder.buildResults();
-		credentials = result.getConstructedObject();
-		return result;
-	}
+    private String proxyPassword;
 
-	public void validateHubUrl(final ValidationResults<GlobalFieldKey, HubServerConfig> result) {
-		assertProxyValid();
-		if (hubUrl == null) {
-			result.addResult(HubServerConfigFieldEnum.HUBURL,
-					new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_FOUND));
-			return;
-		}
+    private int proxyPasswordLength;
 
-		URL hubURL = null;
-		try {
-			hubURL = new URL(hubUrl);
-			hubURL.toURI();
-		} catch (final MalformedURLException e) {
-			result.addResult(HubServerConfigFieldEnum.HUBURL,
-					new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
-		} catch (final URISyntaxException e) {
-			result.addResult(HubServerConfigFieldEnum.HUBURL,
-					new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
-		}
+    private String ignoredProxyHosts;
 
-		if (hubURL == null) {
-			return;
-		}
+    HubProxyInfo proxyInfo;
 
-		try {
-			URLConnection connection = null;
-			if (proxyInfo != null) {
-				if (!hubURL.getProtocol().equals("https") && proxyInfo.getUsername() != null
-						&& proxyInfo.getEncryptedPassword() != null) {
-					result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
-							new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_AUTHENTICATED_PROXY_WITH_HTTPS));
-					return;
-				}
-				connection = proxyInfo.openConnection(hubURL);
-			} else {
-				connection = hubURL.openConnection();
-			}
-			connection.getContent();
-		} catch (final IOException ioe) {
-			result.addResult(HubServerConfigFieldEnum.HUBURL,
-					new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, ioe));
-			return;
-		} catch (final RuntimeException e) {
-			result.addResult(HubServerConfigFieldEnum.HUBURL,
-					new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl, e));
-			return;
-		}
+    HubCredentials credentials;
 
-		result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.OK, ""));
-	}
+    public HubServerConfigBuilder() {
+        super(false);
+    }
 
-	public void validateTimeout(final ValidationResults<GlobalFieldKey, HubServerConfig> result) {
-		validateTimeout(result, null);
-	}
+    public HubServerConfigBuilder(final boolean shouldUseDefaultValues) {
+        super(shouldUseDefaultValues);
+    }
 
-	private void validateTimeout(final ValidationResults<GlobalFieldKey, HubServerConfig> result,
-			final Integer defaultTimeout) {
-		if (shouldUseDefaultValues() && defaultTimeout != null) {
-			int timeoutToValidate = 0;
-			try {
-				timeoutToValidate = stringToInteger(timeout);
-			} catch (final IllegalArgumentException e) {
-				timeout = String.valueOf(defaultTimeout);
-			}
-			if (timeoutToValidate <= 0) {
-				timeout = String.valueOf(defaultTimeout);
-			}
-			return;
-		}
-		if (StringUtils.isBlank(timeout)) {
-			result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
-					new ValidationResult(ValidationResultEnum.ERROR, "No Hub Timeout was found."));
-			return;
-		}
-		int timeoutToValidate = 0;
-		try {
-			timeoutToValidate = stringToInteger(timeout);
-		} catch (final IllegalArgumentException e) {
-			result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
-					new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
-			return;
-		}
-		if (timeoutToValidate <= 0) {
-			result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
-					new ValidationResult(ValidationResultEnum.ERROR, "The Timeout must be greater than 0."));
-		} else {
-			result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT, new ValidationResult(ValidationResultEnum.OK, ""));
-		}
-	}
+    @Override
+    public HubServerConfig build() throws IllegalStateException {
+        final ValidationResults<GlobalFieldKey, HubServerConfig> results = buildResults();
+        if (results.isSuccess()) {
+            return results.getConstructedObject();
+        } else {
+            final List<String> warningMessages = new ArrayList<>();
+            final List<String> errorMessages = new ArrayList<>();
+            final Set<GlobalFieldKey> keySet = results.getResultMap().keySet();
+            for (final GlobalFieldKey key : keySet) {
+                if (results.hasWarnings(key)) {
+                    warningMessages.add(results.getResultString(key, ValidationResultEnum.WARN));
+                }
+                if (results.hasErrors(key)) {
+                    errorMessages.add(results.getResultString(key, ValidationResultEnum.ERROR));
+                }
+            }
 
-	public void setHubUrl(final String hubUrl) {
-		this.hubUrl = StringUtils.trimToNull(hubUrl);
-	}
+            String exceptionMessage = "Invalid Hub Server Configuration: ";
+            exceptionMessage += "[WARN: " + StringUtils.join(warningMessages, ", ") + "], ";
+            exceptionMessage += "[ERROR: " + StringUtils.join(errorMessages, ", ") + "]";
 
-	public void setTimeout(final String timeout) {
-		this.timeout = timeout;
-	}
+            throw new IllegalStateException(exceptionMessage);
+        }
+    }
 
-	public String getTimeout() {
-		return timeout;
-	}
+    @Override
+    public ValidationResults<GlobalFieldKey, HubServerConfig> buildResults() {
+        final ValidationResults<GlobalFieldKey, HubServerConfig> result = assertValid();
 
-	public void setTimeout(final int timeout) {
-		setTimeout(String.valueOf(timeout));
-	}
+        URL hubURL = null;
+        try {
+            hubURL = new URL(hubUrl);
+        } catch (final MalformedURLException e) {
+        }
+        final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeout), credentials, proxyInfo);
+        result.setConstructedObject(config);
+        return result;
+    }
 
-	public String getHubUrl() {
-		return hubUrl;
-	}
+    @Override
+    public ValidationResults<GlobalFieldKey, HubServerConfig> assertValid() {
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> proxyResult = assertProxyValid();
+        final ValidationResults<GlobalFieldKey, HubCredentials> credentialResult = assertCredentialsValid();
+        final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
+        result.addAllResults(proxyResult.getResultMap());
+        result.addAllResults(credentialResult.getResultMap());
+        validateHubUrl(result);
+        if (shouldUseDefaultValues()) {
+            validateTimeout(result, DEFAULT_TIMEOUT);
+        } else {
+            validateTimeout(result, null);
+        }
+        return result;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public ValidationResults<GlobalFieldKey, HubProxyInfo> assertProxyValid() {
+        ValidationResults<GlobalFieldKey, HubProxyInfo> result = null;
+        final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder(shouldUseDefaultValues());
+        proxyBuilder.setHost(proxyHost);
+        proxyBuilder.setPort(proxyPort);
+        proxyBuilder.setIgnoredProxyHosts(ignoredProxyHosts);
+        proxyBuilder.setUsername(proxyUsername);
+        proxyBuilder.setPassword(proxyPassword);
+        if (proxyPasswordLength > 0) {
+            proxyBuilder.setPasswordLength(proxyPasswordLength);
+        }
+        result = proxyBuilder.buildResults();
+        proxyInfo = result.getConstructedObject();
+        return result;
+    }
 
-	public void setUsername(final String username) {
-		this.username = username;
-	}
+    public ValidationResults<GlobalFieldKey, HubCredentials> assertCredentialsValid() {
+        ValidationResults<GlobalFieldKey, HubCredentials> result = null;
+        final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder(shouldUseDefaultValues());
+        credentialsBuilder.setUsername(username);
+        credentialsBuilder.setPassword(password);
+        if (passwordLength > 0) {
+            credentialsBuilder.setPasswordLength(passwordLength);
+        }
+        result = credentialsBuilder.buildResults();
+        credentials = result.getConstructedObject();
+        return result;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void validateHubUrl(final ValidationResults<GlobalFieldKey, HubServerConfig> result) {
+        assertProxyValid();
+        if (hubUrl == null) {
+            result.addResult(HubServerConfigFieldEnum.HUBURL,
+                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_FOUND));
+            return;
+        }
 
-	public void setPassword(final String password) {
-		this.password = password;
-	}
+        URL hubURL = null;
+        try {
+            hubURL = new URL(hubUrl);
+            hubURL.toURI();
+        } catch (final MalformedURLException e) {
+            result.addResult(HubServerConfigFieldEnum.HUBURL,
+                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
+        } catch (final URISyntaxException e) {
+            result.addResult(HubServerConfigFieldEnum.HUBURL,
+                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
+        }
 
-	public int getPasswordLength() {
-		return passwordLength;
-	}
+        if (hubURL == null) {
+            return;
+        }
 
-	/**
-	 * IMPORTANT : The password length should only be set if the password is
-	 * already encrypted
-	 */
-	public void setPasswordLength(final int passwordLength) {
-		this.passwordLength = passwordLength;
-	}
+        try {
+            URLConnection connection = null;
+            if (proxyInfo != null) {
+                if (!hubURL.getProtocol().equals("https") && proxyInfo.getUsername() != null
+                        && proxyInfo.getEncryptedPassword() != null) {
+                    result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
+                            new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_AUTHENTICATED_PROXY_WITH_HTTPS));
+                    return;
+                }
+                connection = proxyInfo.openConnection(hubURL);
+            } else {
+                connection = hubURL.openConnection();
+            }
+            connection.getContent();
+        } catch (final IOException ioe) {
+            result.addResult(HubServerConfigFieldEnum.HUBURL,
+                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, ioe));
+            return;
+        } catch (final RuntimeException e) {
+            result.addResult(HubServerConfigFieldEnum.HUBURL,
+                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl, e));
+            return;
+        }
 
-	public String getProxyHost() {
-		return proxyHost;
-	}
+        result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.OK, ""));
+    }
 
-	public void setProxyHost(final String proxyHost) {
-		this.proxyHost = proxyHost;
-	}
+    public void validateTimeout(final ValidationResults<GlobalFieldKey, HubServerConfig> result) {
+        validateTimeout(result, null);
+    }
 
-	public String getProxyPort() {
-		return proxyPort;
-	}
+    private void validateTimeout(final ValidationResults<GlobalFieldKey, HubServerConfig> result,
+            final Integer defaultTimeout) {
+        if (shouldUseDefaultValues() && defaultTimeout != null) {
+            int timeoutToValidate = 0;
+            try {
+                timeoutToValidate = stringToInteger(timeout);
+            } catch (final IllegalArgumentException e) {
+                timeout = String.valueOf(defaultTimeout);
+            }
+            if (timeoutToValidate <= 0) {
+                timeout = String.valueOf(defaultTimeout);
+            }
+            return;
+        }
+        if (StringUtils.isBlank(timeout)) {
+            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
+                    new ValidationResult(ValidationResultEnum.ERROR, "No Hub Timeout was found."));
+            return;
+        }
+        int timeoutToValidate = 0;
+        try {
+            timeoutToValidate = stringToInteger(timeout);
+        } catch (final IllegalArgumentException e) {
+            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
+                    new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
+            return;
+        }
+        if (timeoutToValidate <= 0) {
+            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
+                    new ValidationResult(ValidationResultEnum.ERROR, "The Timeout must be greater than 0."));
+        } else {
+            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT, new ValidationResult(ValidationResultEnum.OK, ""));
+        }
+    }
 
-	public void setProxyPort(final int proxyPort) {
-		setProxyPort(String.valueOf(proxyPort));
-	}
+    public void setHubUrl(final String hubUrl) {
+        this.hubUrl = StringUtils.trimToNull(hubUrl);
+    }
 
-	public void setProxyPort(final String proxyPort) {
-		this.proxyPort = proxyPort;
-	}
+    public void setTimeout(final String timeout) {
+        this.timeout = timeout;
+    }
 
-	public String getProxyUsername() {
-		return proxyUsername;
-	}
+    public String getTimeout() {
+        return timeout;
+    }
 
-	public void setProxyUsername(final String proxyUsername) {
-		this.proxyUsername = proxyUsername;
-	}
+    public void setTimeout(final int timeout) {
+        setTimeout(String.valueOf(timeout));
+    }
 
-	public String getProxyPassword() {
-		return proxyPassword;
-	}
+    public String getHubUrl() {
+        return hubUrl;
+    }
 
-	public void setProxyPassword(final String proxyPassword) {
-		this.proxyPassword = proxyPassword;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public int getProxyPasswordLength() {
-		return proxyPasswordLength;
-	}
+    public void setUsername(final String username) {
+        this.username = username;
+    }
 
-	/**
-	 * IMPORTANT : The proxy password length should only be set if the proxy
-	 * password is already encrypted
-	 */
-	public void setProxyPasswordLength(final int proxyPasswordLength) {
-		this.proxyPasswordLength = proxyPasswordLength;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public String getIgnoredProxyHosts() {
-		return ignoredProxyHosts;
-	}
+    public void setPassword(final String password) {
+        this.password = password;
+    }
 
-	public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
-		this.ignoredProxyHosts = ignoredProxyHosts;
-	}
+    public int getPasswordLength() {
+        return passwordLength;
+    }
+
+    /**
+     * IMPORTANT : The password length should only be set if the password is
+     * already encrypted
+     */
+    public void setPasswordLength(final int passwordLength) {
+        this.passwordLength = passwordLength;
+    }
+
+    public String getProxyHost() {
+        return proxyHost;
+    }
+
+    public void setProxyHost(final String proxyHost) {
+        this.proxyHost = proxyHost;
+    }
+
+    public String getProxyPort() {
+        return proxyPort;
+    }
+
+    public void setProxyPort(final int proxyPort) {
+        setProxyPort(String.valueOf(proxyPort));
+    }
+
+    public void setProxyPort(final String proxyPort) {
+        this.proxyPort = proxyPort;
+    }
+
+    public String getProxyUsername() {
+        return proxyUsername;
+    }
+
+    public void setProxyUsername(final String proxyUsername) {
+        this.proxyUsername = proxyUsername;
+    }
+
+    public String getProxyPassword() {
+        return proxyPassword;
+    }
+
+    public void setProxyPassword(final String proxyPassword) {
+        this.proxyPassword = proxyPassword;
+    }
+
+    public int getProxyPasswordLength() {
+        return proxyPasswordLength;
+    }
+
+    /**
+     * IMPORTANT : The proxy password length should only be set if the proxy
+     * password is already encrypted
+     */
+    public void setProxyPasswordLength(final int proxyPasswordLength) {
+        this.proxyPasswordLength = proxyPasswordLength;
+    }
+
+    public String getIgnoredProxyHosts() {
+        return ignoredProxyHosts;
+    }
+
+    public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
+        this.ignoredProxyHosts = ignoredProxyHosts;
+    }
 
 }

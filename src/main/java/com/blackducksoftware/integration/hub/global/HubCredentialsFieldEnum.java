@@ -22,16 +22,16 @@
 package com.blackducksoftware.integration.hub.global;
 
 public enum HubCredentialsFieldEnum implements GlobalFieldKey {
-	USERNAME("hubUsername"), PASSWORD("hubPassword");
+    USERNAME("hubUsername"), PASSWORD("hubPassword");
 
-	private String key;
+    private String key;
 
-	private HubCredentialsFieldEnum(final String key) {
-		this.key = key;
-	}
+    private HubCredentialsFieldEnum(final String key) {
+        this.key = key;
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+        return key;
+    }
 
 }

@@ -23,8 +23,8 @@ package com.blackducksoftware.integration.hub.report.api;
 
 @Deprecated
 public class ProjectData extends com.blackducksoftware.integration.hub.api.report.ProjectData {
-	// Need this package and the objects for backwards compatability
-	public ProjectData(final String id, final String name, final Boolean restructured) {
-		super(id, name, restructured);
-	}
+    // Need this package and the objects for backwards compatability
+    public ProjectData(final String id, final String name, final Boolean restructured) {
+        super(id, name, restructured);
+    }
 }

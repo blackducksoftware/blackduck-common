@@ -37,95 +37,98 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class HubItemRestService<T extends HubItem> extends HubRestService {
-	private final Gson gson;
-	private final JsonParser jsonParser;
-	private final Type itemType;
-	private final Type itemListType;
+    private final Gson gson;
 
-	public HubItemRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
-			final Type itemType, final Type itemListType) {
-		super(restConnection);
+    private final JsonParser jsonParser;
 
-		this.gson = gson;
-		this.jsonParser = jsonParser;
-		this.itemType = itemType;
-		this.itemListType = itemListType;
-	}
+    private final Type itemType;
 
-	public List<T> getAll(final JsonObject jsonObject, final HubRequest hubRequest)
-			throws BDRestException, IOException, URISyntaxException {
-		final List<T> allItems = new ArrayList<>();
-		final int totalCount = jsonObject.get("totalCount").getAsInt();
-		List<T> items = getItems(jsonObject);
-		allItems.addAll(items);
+    private final Type itemListType;
 
-		while (allItems.size() < totalCount) {
-			final int currentOffset = hubRequest.getOffset();
-			final int increasedOffset = currentOffset + items.size();
+    public HubItemRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
+            final Type itemType, final Type itemListType) {
+        super(restConnection);
 
-			hubRequest.setOffset(increasedOffset);
-			final JsonObject nextResponse = hubRequest.executeForResponseJson();
-			items = getItems(nextResponse);
-			allItems.addAll(items);
-		}
+        this.gson = gson;
+        this.jsonParser = jsonParser;
+        this.itemType = itemType;
+        this.itemListType = itemListType;
+    }
 
-		return allItems;
-	}
+    public List<T> getAll(final JsonObject jsonObject, final HubRequest hubRequest)
+            throws BDRestException, IOException, URISyntaxException {
+        final List<T> allItems = new ArrayList<>();
+        final int totalCount = jsonObject.get("totalCount").getAsInt();
+        List<T> items = getItems(jsonObject);
+        allItems.addAll(items);
 
-	public List<T> getItems(final JsonObject jsonObject) {
-		final List<T> items = gson.fromJson(jsonObject.get("items"), itemListType);
-		return items;
-	}
+        while (allItems.size() < totalCount) {
+            final int currentOffset = hubRequest.getOffset();
+            final int increasedOffset = currentOffset + items.size();
 
-	public List<T> getItems(final String url) throws IOException, URISyntaxException, BDRestException {
-		final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
-		itemRequest.setMethod(Method.GET);
-		itemRequest.setUrl(url);
+            hubRequest.setOffset(increasedOffset);
+            final JsonObject nextResponse = hubRequest.executeForResponseJson();
+            items = getItems(nextResponse);
+            allItems.addAll(items);
+        }
 
-		final String response = itemRequest.executeForResponseString();
-		return gson.fromJson(response, itemListType);
-	}
+        return allItems;
+    }
 
-	public T getItem(final JsonObject jsonObject, final Class<T> clazz) {
-		return gson.fromJson(jsonObject, clazz);
-	}
+    public List<T> getItems(final JsonObject jsonObject) {
+        final List<T> items = gson.fromJson(jsonObject.get("items"), itemListType);
+        return items;
+    }
 
-	public T getItem(final String url) throws IOException, BDRestException, URISyntaxException {
-		final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
-		itemRequest.setMethod(Method.GET);
-		itemRequest.setUrl(url);
-		itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
-		itemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
+    public List<T> getItems(final String url) throws IOException, URISyntaxException, BDRestException {
+        final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
+        itemRequest.setMethod(Method.GET);
+        itemRequest.setUrl(url);
 
-		final String response = itemRequest.executeForResponseString();
-		return gson.fromJson(response, itemType);
-	}
+        final String response = itemRequest.executeForResponseString();
+        return gson.fromJson(response, itemListType);
+    }
 
-	public T getItem(final List<String> urlSegments) throws IOException, BDRestException, URISyntaxException {
-		final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
-		itemRequest.setMethod(Method.GET);
-		itemRequest.addUrlSegments(urlSegments);
-		itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
-		itemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
+    public T getItem(final JsonObject jsonObject, final Class<T> clazz) {
+        return gson.fromJson(jsonObject, clazz);
+    }
 
-		final String response = itemRequest.executeForResponseString();
-		return gson.fromJson(response, itemType);
-	}
+    public T getItem(final String url) throws IOException, BDRestException, URISyntaxException {
+        final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
+        itemRequest.setMethod(Method.GET);
+        itemRequest.setUrl(url);
+        itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
+        itemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
 
-	public Gson getGson() {
-		return gson;
-	}
+        final String response = itemRequest.executeForResponseString();
+        return gson.fromJson(response, itemType);
+    }
 
-	public JsonParser getJsonParser() {
-		return jsonParser;
-	}
+    public T getItem(final List<String> urlSegments) throws IOException, BDRestException, URISyntaxException {
+        final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
+        itemRequest.setMethod(Method.GET);
+        itemRequest.addUrlSegments(urlSegments);
+        itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
+        itemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
 
-	public Type getItemType() {
-		return itemType;
-	}
+        final String response = itemRequest.executeForResponseString();
+        return gson.fromJson(response, itemType);
+    }
 
-	public Type getItemListType() {
-		return itemListType;
-	}
+    public Gson getGson() {
+        return gson;
+    }
+
+    public JsonParser getJsonParser() {
+        return jsonParser;
+    }
+
+    public Type getItemType() {
+        return itemType;
+    }
+
+    public Type getItemListType() {
+        return itemListType;
+    }
 
 }

@@ -53,53 +53,59 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
 public class NotificationDataService extends AbstractDataService {
-	private final NotificationRestService notificationService;
-	private final ReleaseItemRestService releaseItemService;
-	private final PolicyRestService policyService;
-	private final VersionBomPolicyRestService bomVersionPolicyService;
-	private final ComponentVersionRestService componentVersionService;
-	private PolicyNotificationFilter policyFilter = null;
-	private final ParallelResourceProcessor<NotificationContentItem, NotificationItem> parallelProcessor;
+    private final NotificationRestService notificationService;
 
-	public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
-			final JsonParser jsonParser) {
-		this(logger, restConnection, gson, jsonParser, null);
-	}
+    private final ReleaseItemRestService releaseItemService;
 
-	public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
-			final JsonParser jsonParser, final PolicyNotificationFilter policyFilter) {
-		super(restConnection, gson, jsonParser);
-		this.policyFilter = policyFilter;
+    private final PolicyRestService policyService;
 
-		notificationService = new NotificationRestService(restConnection, gson, jsonParser);
-		releaseItemService = new ReleaseItemRestService(restConnection, gson, jsonParser);
-		policyService = new PolicyRestService(restConnection, gson, jsonParser);
-		bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
-		componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
-		parallelProcessor = new ParallelResourceProcessor<>(logger);
-		populateTransformerMap();
-	}
+    private final VersionBomPolicyRestService bomVersionPolicyService;
 
-	private void populateTransformerMap() {
-		parallelProcessor.addTransform(RuleViolationNotificationItem.class,
-				new PolicyViolationTransformer(notificationService, releaseItemService, policyService,
-						bomVersionPolicyService, componentVersionService, policyFilter));
-		parallelProcessor.addTransform(PolicyOverrideNotificationItem.class,
-				new PolicyViolationOverrideTransformer(notificationService, releaseItemService, policyService,
-						bomVersionPolicyService, componentVersionService, policyFilter));
-		parallelProcessor.addTransform(VulnerabilityNotificationItem.class,
-				new VulnerabilityTransformer(notificationService, releaseItemService, policyService,
-						bomVersionPolicyService, componentVersionService));
-		parallelProcessor.addTransform(RuleViolationClearedNotificationItem.class,
-				new PolicyViolationClearedTransformer(notificationService, releaseItemService, policyService,
-						bomVersionPolicyService, componentVersionService, policyFilter));
-	}
+    private final ComponentVersionRestService componentVersionService;
 
-	public SortedSet<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
-			throws IOException, URISyntaxException, BDRestException {
-		final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
-		final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
-		contentList.addAll(parallelProcessor.process(itemList));
-		return contentList;
-	}
+    private PolicyNotificationFilter policyFilter = null;
+
+    private final ParallelResourceProcessor<NotificationContentItem, NotificationItem> parallelProcessor;
+
+    public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
+            final JsonParser jsonParser) {
+        this(logger, restConnection, gson, jsonParser, null);
+    }
+
+    public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
+            final JsonParser jsonParser, final PolicyNotificationFilter policyFilter) {
+        super(restConnection, gson, jsonParser);
+        this.policyFilter = policyFilter;
+
+        notificationService = new NotificationRestService(restConnection, gson, jsonParser);
+        releaseItemService = new ReleaseItemRestService(restConnection, gson, jsonParser);
+        policyService = new PolicyRestService(restConnection, gson, jsonParser);
+        bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
+        componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
+        parallelProcessor = new ParallelResourceProcessor<>(logger);
+        populateTransformerMap();
+    }
+
+    private void populateTransformerMap() {
+        parallelProcessor.addTransform(RuleViolationNotificationItem.class,
+                new PolicyViolationTransformer(notificationService, releaseItemService, policyService,
+                        bomVersionPolicyService, componentVersionService, policyFilter));
+        parallelProcessor.addTransform(PolicyOverrideNotificationItem.class,
+                new PolicyViolationOverrideTransformer(notificationService, releaseItemService, policyService,
+                        bomVersionPolicyService, componentVersionService, policyFilter));
+        parallelProcessor.addTransform(VulnerabilityNotificationItem.class,
+                new VulnerabilityTransformer(notificationService, releaseItemService, policyService,
+                        bomVersionPolicyService, componentVersionService));
+        parallelProcessor.addTransform(RuleViolationClearedNotificationItem.class,
+                new PolicyViolationClearedTransformer(notificationService, releaseItemService, policyService,
+                        bomVersionPolicyService, componentVersionService, policyFilter));
+    }
+
+    public SortedSet<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
+            throws IOException, URISyntaxException, BDRestException {
+        final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
+        final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
+        contentList.addAll(parallelProcessor.process(itemList));
+        return contentList;
+    }
 }

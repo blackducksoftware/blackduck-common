@@ -38,26 +38,27 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class VulnerableBomComponentRestService extends HubItemRestService<VulnerableBomComponentItem> {
-	private static final Type ITEM_TYPE = new TypeToken<VulnerableBomComponentItem>() {
-	}.getType();
-	private static final Type ITEM_LIST_TYPE = new TypeToken<List<VulnerableBomComponentItem>>() {
-	}.getType();
+    private static final Type ITEM_TYPE = new TypeToken<VulnerableBomComponentItem>() {
+    }.getType();
 
-	public VulnerableBomComponentRestService(final RestConnection restConnection, final Gson gson,
-			final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    private static final Type ITEM_LIST_TYPE = new TypeToken<List<VulnerableBomComponentItem>>() {
+    }.getType();
 
-	public List<VulnerableBomComponentItem> getVulnerableComponentsMatchingComponentName(
-			final String vulnerableBomComponentsUrl, final String componentName)
-			throws IOException, URISyntaxException, BDRestException {
-		final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		itemRequest.setMethod(Method.GET);
-		itemRequest.setUrl(vulnerableBomComponentsUrl);
-		itemRequest.setQ(componentName);
+    public VulnerableBomComponentRestService(final RestConnection restConnection, final Gson gson,
+            final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
-		final JsonObject jsonObject = itemRequest.executeForResponseJson();
-		final List<VulnerableBomComponentItem> allItems = getAll(jsonObject, itemRequest);
-		return allItems;
-	}
+    public List<VulnerableBomComponentItem> getVulnerableComponentsMatchingComponentName(
+            final String vulnerableBomComponentsUrl, final String componentName)
+            throws IOException, URISyntaxException, BDRestException {
+        final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        itemRequest.setMethod(Method.GET);
+        itemRequest.setUrl(vulnerableBomComponentsUrl);
+        itemRequest.setQ(componentName);
+
+        final JsonObject jsonObject = itemRequest.executeForResponseJson();
+        final List<VulnerableBomComponentItem> allItems = getAll(jsonObject, itemRequest);
+        return allItems;
+    }
 }

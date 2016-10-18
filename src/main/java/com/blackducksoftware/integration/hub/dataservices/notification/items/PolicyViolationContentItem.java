@@ -30,26 +30,26 @@ import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 
 public class PolicyViolationContentItem extends PolicyContentItem {
 
-	private final List<PolicyRule> policyRuleList;
+    private final List<PolicyRule> policyRuleList;
 
-	public PolicyViolationContentItem(final Date createdAt, final ProjectVersion projectVersion,
-			final String componentName,
-			final String componentVersion, final String componentUrl,
-			final String componentVersionUrl,
-			final List<PolicyRule> policyRuleList) throws URISyntaxException {
-		super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl);
-		this.policyRuleList = policyRuleList;
-	}
+    public PolicyViolationContentItem(final Date createdAt, final ProjectVersion projectVersion,
+            final String componentName,
+            final String componentVersion, final String componentUrl,
+            final String componentVersionUrl,
+            final List<PolicyRule> policyRuleList) throws URISyntaxException {
+        super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl);
+        this.policyRuleList = policyRuleList;
+    }
 
-	public List<PolicyRule> getPolicyRuleList() {
-		return policyRuleList;
-	}
+    public List<PolicyRule> getPolicyRuleList() {
+        return policyRuleList;
+    }
 
-	@Override
-	public String toString() {
-		return "PolicyViolationContentItem [policyRuleList=" + policyRuleList + ", getComponentUrl()="
-				+ getComponentUrl() + ", getProjectVersion()=" + getProjectVersion() + ", getComponentName()="
-				+ getComponentName() + ", getComponentVersion()=" + getComponentVersion()
-				+ ", getComponentVersionUrl()=" + getComponentVersionUrl() + ", getCreatedAt()=" + getCreatedAt() + "]";
-	}
+    @Override
+    public String toString() {
+        return "PolicyViolationContentItem [policyRuleList=" + policyRuleList + ", getComponentUrl()="
+                + getComponentUrl() + ", getProjectVersion()=" + getProjectVersion() + ", getComponentName()="
+                + getComponentName() + ", getComponentVersion()=" + getComponentVersion()
+                + ", getComponentVersionUrl()=" + getComponentVersionUrl() + ", getCreatedAt()=" + getCreatedAt() + "]";
+    }
 }

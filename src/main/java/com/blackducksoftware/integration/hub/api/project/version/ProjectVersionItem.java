@@ -8,59 +8,66 @@ import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ProjectVersionItem extends HubItem {
-	private final DistributionEnum distribution;
-	private final ComplexLicense license;
-	private final String nickname;
-	private final PhaseEnum phase;
-	private final String releaseComments;
-	private final DateTime releasedOn;
-	private final SourceEnum source;
-	private final String versionName;
+    private final DistributionEnum distribution;
 
-	public ProjectVersionItem(final MetaInformation meta, final DistributionEnum distribution,
-			final ComplexLicense license, final String nickname, final PhaseEnum phase, final String releaseComments,
-			final DateTime releasedOn, final SourceEnum source, final String versionName) {
-		super(meta);
-		this.distribution = distribution;
-		this.license = license;
-		this.nickname = nickname;
-		this.phase = phase;
-		this.releaseComments = releaseComments;
-		this.releasedOn = releasedOn;
-		this.source = source;
-		this.versionName = versionName;
-	}
+    private final ComplexLicense license;
 
-	public DistributionEnum getDistribution() {
-		return distribution;
-	}
+    private final String nickname;
 
-	public ComplexLicense getLicense() {
-		return license;
-	}
+    private final PhaseEnum phase;
 
-	public String getNickname() {
-		return nickname;
-	}
+    private final String releaseComments;
 
-	public PhaseEnum getPhase() {
-		return phase;
-	}
+    private final DateTime releasedOn;
 
-	public String getReleaseComments() {
-		return releaseComments;
-	}
+    private final SourceEnum source;
 
-	public DateTime getReleasedOn() {
-		return releasedOn;
-	}
+    private final String versionName;
 
-	public SourceEnum getSource() {
-		return source;
-	}
+    public ProjectVersionItem(final MetaInformation meta, final DistributionEnum distribution,
+            final ComplexLicense license, final String nickname, final PhaseEnum phase, final String releaseComments,
+            final DateTime releasedOn, final SourceEnum source, final String versionName) {
+        super(meta);
+        this.distribution = distribution;
+        this.license = license;
+        this.nickname = nickname;
+        this.phase = phase;
+        this.releaseComments = releaseComments;
+        this.releasedOn = releasedOn;
+        this.source = source;
+        this.versionName = versionName;
+    }
 
-	public String getVersionName() {
-		return versionName;
-	}
+    public DistributionEnum getDistribution() {
+        return distribution;
+    }
+
+    public ComplexLicense getLicense() {
+        return license;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public PhaseEnum getPhase() {
+        return phase;
+    }
+
+    public String getReleaseComments() {
+        return releaseComments;
+    }
+
+    public DateTime getReleasedOn() {
+        return releasedOn;
+    }
+
+    public SourceEnum getSource() {
+        return source;
+    }
+
+    public String getVersionName() {
+        return versionName;
+    }
 
 }

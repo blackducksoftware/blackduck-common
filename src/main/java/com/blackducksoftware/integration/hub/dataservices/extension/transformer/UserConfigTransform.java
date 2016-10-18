@@ -41,44 +41,45 @@ import com.blackducksoftware.integration.hub.exception.HubItemTransformException
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 
 public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, UserOptionLinkItem> {
-	private final UserRestService userRestService;
-	private final ExtensionConfigRestService extensionConfigRestService;
+    private final UserRestService userRestService;
 
-	public UserConfigTransform(final UserRestService userRestService,
-			final ExtensionConfigRestService extensionConfigRestService) {
-		this.userRestService = userRestService;
-		this.extensionConfigRestService = extensionConfigRestService;
-	}
+    private final ExtensionConfigRestService extensionConfigRestService;
 
-	@Override
-	public List<UserConfigItem> transform(final UserOptionLinkItem item) throws HubItemTransformException {
-		try {
-			final UserItem user = userRestService.getItem(item.getUser());
-			if (!user.isActive()) {
-				return Collections.emptyList();
-			} else {
-				final Map<String, ConfigurationItem> configItems = getUserConfigOptions(item.getExtensionOptions());
-				final List<UserConfigItem> itemList = new ArrayList<>(configItems.size());
-				itemList.add(new UserConfigItem(user, configItems));
-				return itemList;
-			}
-		} catch (final IOException | URISyntaxException | BDRestException | MissingUUIDException e) {
-			throw new HubItemTransformException("Error processing user config for extension", e);
-		}
-	}
+    public UserConfigTransform(final UserRestService userRestService,
+            final ExtensionConfigRestService extensionConfigRestService) {
+        this.userRestService = userRestService;
+        this.extensionConfigRestService = extensionConfigRestService;
+    }
 
-	private Map<String, ConfigurationItem> getUserConfigOptions(final String userConfigUrl)
-			throws IOException, URISyntaxException, BDRestException, MissingUUIDException {
-		final List<ConfigurationItem> userItemList = extensionConfigRestService.getUserConfiguration(userConfigUrl);
-		final Map<String, ConfigurationItem> itemMap = createConfigMap(userItemList);
-		return itemMap;
-	}
+    @Override
+    public List<UserConfigItem> transform(final UserOptionLinkItem item) throws HubItemTransformException {
+        try {
+            final UserItem user = userRestService.getItem(item.getUser());
+            if (!user.isActive()) {
+                return Collections.emptyList();
+            } else {
+                final Map<String, ConfigurationItem> configItems = getUserConfigOptions(item.getExtensionOptions());
+                final List<UserConfigItem> itemList = new ArrayList<>(configItems.size());
+                itemList.add(new UserConfigItem(user, configItems));
+                return itemList;
+            }
+        } catch (final IOException | URISyntaxException | BDRestException | MissingUUIDException e) {
+            throw new HubItemTransformException("Error processing user config for extension", e);
+        }
+    }
 
-	private Map<String, ConfigurationItem> createConfigMap(final List<ConfigurationItem> itemList) {
-		final Map<String, ConfigurationItem> itemMap = new HashMap<>(itemList.size());
-		for (final ConfigurationItem item : itemList) {
-			itemMap.put(item.getName(), item);
-		}
-		return itemMap;
-	}
+    private Map<String, ConfigurationItem> getUserConfigOptions(final String userConfigUrl)
+            throws IOException, URISyntaxException, BDRestException, MissingUUIDException {
+        final List<ConfigurationItem> userItemList = extensionConfigRestService.getUserConfiguration(userConfigUrl);
+        final Map<String, ConfigurationItem> itemMap = createConfigMap(userItemList);
+        return itemMap;
+    }
+
+    private Map<String, ConfigurationItem> createConfigMap(final List<ConfigurationItem> itemList) {
+        final Map<String, ConfigurationItem> itemMap = new HashMap<>(itemList.size());
+        for (final ConfigurationItem item : itemList) {
+            itemMap.put(item.getName(), item);
+        }
+        return itemMap;
+    }
 }

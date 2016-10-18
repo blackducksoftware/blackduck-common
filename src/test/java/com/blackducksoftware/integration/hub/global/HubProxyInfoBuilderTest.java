@@ -42,383 +42,391 @@ import com.blackducksoftware.integration.builder.ValidationResults;
 import com.blackducksoftware.integration.hub.builder.HubProxyInfoBuilder;
 
 public class HubProxyInfoBuilderTest {
-	private static final int VALID_PORT = 2303;
-	private static final String VALID_HOST = "just need a non-empty string";
-	private static final String VALID_PASSWORD = "itsasecret";
-	private static final String VALID_USERNAME = "memyselfandi";
-	private static final String VALID_IGNORE_HOST_LIST = "google,msn,yahoo";
-	private static final String VALID_IGNORE_HOST = "google";
-	private static final String INVALID_IGNORE_HOST_LIST = "google,[^-z!,abc";
-	private static final String INVALID_IGNORE_HOST = "[^-z!";
+    private static final int VALID_PORT = 2303;
 
-	private List<String> expectedMessages;
-	private List<String> actualMessages;
+    private static final String VALID_HOST = "just need a non-empty string";
 
-	@Before
-	public void setUp() {
-		expectedMessages = new ArrayList<>();
-		actualMessages = new ArrayList<>();
-	}
+    private static final String VALID_PASSWORD = "itsasecret";
 
-	@After
-	public void tearDown() {
-		assertEquals("Too many/not enough messages expected: \n" + actualMessages.size(), expectedMessages.size(),
-				actualMessages.size());
+    private static final String VALID_USERNAME = "memyselfandi";
 
-		for (final String expectedMessage : expectedMessages) {
-			assertTrue("Did not find the expected message : " + expectedMessage,
-					actualMessages.contains(expectedMessage));
-		}
-	}
+    private static final String VALID_IGNORE_HOST_LIST = "google,msn,yahoo";
 
-	private List<String> getMessages(final ValidationResults<GlobalFieldKey, HubProxyInfo> result) {
+    private static final String VALID_IGNORE_HOST = "google";
 
-		final List<String> messageList = new ArrayList<>();
-		final Map<GlobalFieldKey, List<ValidationResult>> resultMap = result.getResultMap();
-		for (final GlobalFieldKey key : resultMap.keySet()) {
-			final List<ValidationResult> resultList = resultMap.get(key);
+    private static final String INVALID_IGNORE_HOST_LIST = "google,[^-z!,abc";
 
-			for (final ValidationResult item : resultList) {
-				final String message = item.getMessage();
+    private static final String INVALID_IGNORE_HOST = "[^-z!";
 
-				if (StringUtils.isNotBlank(message)) {
-					messageList.add(item.getMessage());
-				}
-			}
-		}
-		return messageList;
-	}
+    private List<String> expectedMessages;
 
-	@Test
-	public void testValidateProxyConfigHubUrlIgnored() throws Exception {
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setPort(VALID_PORT);
-		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST);
+    private List<String> actualMessages;
 
-		final HubProxyInfo proxyInfo = builder.buildResults().getConstructedObject();
-		final boolean useProxy = proxyInfo.shouldUseProxyForUrl(new URL("https://google.com"));
-		assertFalse(useProxy);
-	}
+    @Before
+    public void setUp() {
+        expectedMessages = new ArrayList<>();
+        actualMessages = new ArrayList<>();
+    }
 
-	@Test
-	public void testValidateProxyConfigHubUrlNotIgnored() throws Exception {
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setPort(VALID_PORT);
-		builder.setIgnoredProxyHosts("test");
+    @After
+    public void tearDown() {
+        assertEquals("Too many/not enough messages expected: \n" + actualMessages.size(), expectedMessages.size(),
+                actualMessages.size());
 
-		final HubProxyInfo proxyInfo = builder.buildResults().getConstructedObject();
-		final boolean useProxy = proxyInfo.shouldUseProxyForUrl(new URL("https://google.com"));
-		assertTrue(useProxy);
-	}
+        for (final String expectedMessage : expectedMessages) {
+            assertTrue("Did not find the expected message : " + expectedMessage,
+                    actualMessages.contains(expectedMessage));
+        }
+    }
 
-	@Test
-	public void testValidateProxyPort() throws Exception {
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setPort(VALID_PORT);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
-		builder.validatePort(result);
-		assertTrue(result.isSuccess());
-	}
+    private List<String> getMessages(final ValidationResults<GlobalFieldKey, HubProxyInfo> result) {
 
-	@Test
-	public void testValidateProxyPortNoHost() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_PROXY_HOST_REQUIRED);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost("");
-		builder.setPort(VALID_PORT);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
-		builder.validatePort(result);
-		assertFalse(result.isSuccess());
+        final List<String> messageList = new ArrayList<>();
+        final Map<GlobalFieldKey, List<ValidationResult>> resultMap = result.getResultMap();
+        for (final GlobalFieldKey key : resultMap.keySet()) {
+            final List<ValidationResult> resultList = resultMap.get(key);
 
-		actualMessages = getMessages(result);
-	}
+            for (final ValidationResult item : resultList) {
+                final String message = item.getMessage();
 
-	@Test
-	public void testValidateCredentialsNoHost() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_PROXY_HOST_NOT_SPECIFIED);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost("");
-		builder.setUsername(VALID_USERNAME);
-		builder.setPassword(VALID_PASSWORD);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
-		builder.validateCredentials(result);
-		assertTrue(result.hasErrors());
+                if (StringUtils.isNotBlank(message)) {
+                    messageList.add(item.getMessage());
+                }
+            }
+        }
+        return messageList;
+    }
 
-		actualMessages = getMessages(result);
-	}
+    @Test
+    public void testValidateProxyConfigHubUrlIgnored() throws Exception {
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setPort(VALID_PORT);
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST);
 
-	@Test
-	public void testValidateCredentialsBothEmpty() throws Exception {
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setUsername("");
-		builder.setPassword("");
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
-		builder.validateCredentials(result);
-		assertTrue(result.isSuccess());
-	}
+        final HubProxyInfo proxyInfo = builder.buildResults().getConstructedObject();
+        final boolean useProxy = proxyInfo.shouldUseProxyForUrl(new URL("https://google.com"));
+        assertFalse(useProxy);
+    }
 
-	@Test
-	public void testValidateCredentialsBothNotEmpty() throws Exception {
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setUsername(VALID_USERNAME);
-		builder.setPassword(VALID_PASSWORD);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
-		builder.validateCredentials(result);
-		assertTrue(result.isSuccess());
-	}
+    @Test
+    public void testValidateProxyConfigHubUrlNotIgnored() throws Exception {
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setPort(VALID_PORT);
+        builder.setIgnoredProxyHosts("test");
 
-	@Test
-	public void testValidateCredentialsUserOnly() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
-		expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setUsername(VALID_USERNAME);
-		builder.setPassword("");
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
-		builder.validateCredentials(result);
-		assertFalse(result.isSuccess());
+        final HubProxyInfo proxyInfo = builder.buildResults().getConstructedObject();
+        final boolean useProxy = proxyInfo.shouldUseProxyForUrl(new URL("https://google.com"));
+        assertTrue(useProxy);
+    }
 
-		actualMessages = getMessages(result);
-	}
+    @Test
+    public void testValidateProxyPort() throws Exception {
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setPort(VALID_PORT);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
+        builder.validatePort(result);
+        assertTrue(result.isSuccess());
+    }
 
-	@Test
-	public void testValidateCredentialsPasswordOnly() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
-		expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setUsername("");
-		builder.setPassword(VALID_PASSWORD);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
-		builder.validateCredentials(result);
-		assertFalse(result.isSuccess());
+    @Test
+    public void testValidateProxyPortNoHost() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_PROXY_HOST_REQUIRED);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost("");
+        builder.setPort(VALID_PORT);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
+        builder.validatePort(result);
+        assertFalse(result.isSuccess());
 
-		actualMessages = getMessages(result);
-	}
+        actualMessages = getMessages(result);
+    }
 
-	@Test
-	public void testValidateIgnoreHostNoProxyHost() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_PROXY_HOST_NOT_SPECIFIED);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost("");
-		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
-		builder.validateIgnoreHosts(result);
-		assertTrue(result.hasErrors());
+    @Test
+    public void testValidateCredentialsNoHost() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_PROXY_HOST_NOT_SPECIFIED);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost("");
+        builder.setUsername(VALID_USERNAME);
+        builder.setPassword(VALID_PASSWORD);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
+        builder.validateCredentials(result);
+        assertTrue(result.hasErrors());
 
-		actualMessages = getMessages(result);
-	}
+        actualMessages = getMessages(result);
+    }
 
-	@Test
-	public void testValidateIgnoreHost() throws Exception {
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
-		builder.validateIgnoreHosts(result);
-		assertTrue(result.isSuccess());
-	}
+    @Test
+    public void testValidateCredentialsBothEmpty() throws Exception {
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setUsername("");
+        builder.setPassword("");
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
+        builder.validateCredentials(result);
+        assertTrue(result.isSuccess());
+    }
 
-	@Test
-	public void testValidateIgnoreHostList() throws Exception {
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
-		builder.validateIgnoreHosts(result);
-		assertTrue(result.isSuccess());
-	}
+    @Test
+    public void testValidateCredentialsBothNotEmpty() throws Exception {
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setUsername(VALID_USERNAME);
+        builder.setPassword(VALID_PASSWORD);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
+        builder.validateCredentials(result);
+        assertTrue(result.isSuccess());
+    }
 
-	@Test
-	public void testValidateIgnoreHostBadPattern() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_IGNORE_HOSTS_INVALID);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setIgnoredProxyHosts(INVALID_IGNORE_HOST);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
-		builder.validateIgnoreHosts(result);
-		assertFalse(result.isSuccess());
+    @Test
+    public void testValidateCredentialsUserOnly() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
+        expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setUsername(VALID_USERNAME);
+        builder.setPassword("");
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
+        builder.validateCredentials(result);
+        assertFalse(result.isSuccess());
 
-		actualMessages = getMessages(result);
-	}
+        actualMessages = getMessages(result);
+    }
 
-	@Test
-	public void testValidateIgnoreHostListBadPattern() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_IGNORE_HOSTS_INVALID);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setIgnoredProxyHosts(INVALID_IGNORE_HOST_LIST);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
-		builder.validateIgnoreHosts(result);
-		assertFalse(result.isSuccess());
+    @Test
+    public void testValidateCredentialsPasswordOnly() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
+        expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setUsername("");
+        builder.setPassword(VALID_PASSWORD);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
+        builder.validateCredentials(result);
+        assertFalse(result.isSuccess());
 
-		actualMessages = getMessages(result);
-	}
+        actualMessages = getMessages(result);
+    }
 
-	@Test
-	public void testAssertWithNoHost() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_PROXY_HOST_NOT_SPECIFIED);
-		expectedMessages.add(HubProxyInfoBuilder.MSG_PROXY_HOST_REQUIRED);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost("");
-		builder.setPort(VALID_PORT);
-		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
-		assertFalse(result.isSuccess());
+    @Test
+    public void testValidateIgnoreHostNoProxyHost() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_PROXY_HOST_NOT_SPECIFIED);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost("");
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
+        builder.validateIgnoreHosts(result);
+        assertTrue(result.hasErrors());
 
-		actualMessages = getMessages(result);
-	}
+        actualMessages = getMessages(result);
+    }
 
-	@Test
-	public void testAssertWithInvalidPort() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_PROXY_PORT_INVALID);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setPort(-1);
-		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
-		assertFalse(result.isSuccess());
+    @Test
+    public void testValidateIgnoreHost() throws Exception {
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
+        builder.validateIgnoreHosts(result);
+        assertTrue(result.isSuccess());
+    }
 
-		actualMessages = getMessages(result);
-	}
+    @Test
+    public void testValidateIgnoreHostList() throws Exception {
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
+        builder.validateIgnoreHosts(result);
+        assertTrue(result.isSuccess());
+    }
 
-	@Test
-	public void testAssertWithInvalidUser() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
-		expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setPort(VALID_PORT);
-		builder.setUsername("");
-		builder.setPassword(VALID_PASSWORD);
-		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
-		assertFalse(result.isSuccess());
+    @Test
+    public void testValidateIgnoreHostBadPattern() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_IGNORE_HOSTS_INVALID);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setIgnoredProxyHosts(INVALID_IGNORE_HOST);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
+        builder.validateIgnoreHosts(result);
+        assertFalse(result.isSuccess());
 
-		actualMessages = getMessages(result);
-	}
+        actualMessages = getMessages(result);
+    }
 
-	@Test
-	public void testAssertWithInvalidPassword() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
-		expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setPort(VALID_PORT);
-		builder.setUsername(VALID_USERNAME);
-		builder.setPassword("");
-		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
-		assertFalse(result.isSuccess());
+    @Test
+    public void testValidateIgnoreHostListBadPattern() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_IGNORE_HOSTS_INVALID);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setIgnoredProxyHosts(INVALID_IGNORE_HOST_LIST);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = new ValidationResults<>();
+        builder.validateIgnoreHosts(result);
+        assertFalse(result.isSuccess());
 
-		actualMessages = getMessages(result);
-	}
+        actualMessages = getMessages(result);
+    }
 
-	@Test
-	public void testAssertWithInvalidIgnoreHost() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_IGNORE_HOSTS_INVALID);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setPort(VALID_PORT);
-		builder.setUsername(VALID_USERNAME);
-		builder.setPassword(VALID_PASSWORD);
-		builder.setIgnoredProxyHosts(INVALID_IGNORE_HOST);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
-		assertFalse(result.isSuccess());
+    @Test
+    public void testAssertWithNoHost() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_PROXY_HOST_NOT_SPECIFIED);
+        expectedMessages.add(HubProxyInfoBuilder.MSG_PROXY_HOST_REQUIRED);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost("");
+        builder.setPort(VALID_PORT);
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
+        assertFalse(result.isSuccess());
 
-		actualMessages = getMessages(result);
-	}
+        actualMessages = getMessages(result);
+    }
 
-	@Test
-	public void testAssertWithInvalidIgnoreHostList() throws Exception {
-		expectedMessages.add(HubProxyInfoBuilder.MSG_IGNORE_HOSTS_INVALID);
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setPort(VALID_PORT);
-		builder.setUsername(VALID_USERNAME);
-		builder.setPassword(VALID_PASSWORD);
-		builder.setIgnoredProxyHosts(INVALID_IGNORE_HOST_LIST);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
-		assertFalse(result.isSuccess());
+    @Test
+    public void testAssertWithInvalidPort() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_PROXY_PORT_INVALID);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setPort(-1);
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
+        assertFalse(result.isSuccess());
 
-		actualMessages = getMessages(result);
-	}
+        actualMessages = getMessages(result);
+    }
 
-	@Test
-	public void testAssertWithValidInput() throws Exception {
+    @Test
+    public void testAssertWithInvalidUser() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
+        expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setPort(VALID_PORT);
+        builder.setUsername("");
+        builder.setPassword(VALID_PASSWORD);
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
+        assertFalse(result.isSuccess());
 
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setPort(VALID_PORT);
-		builder.setUsername(VALID_USERNAME);
-		builder.setPassword(VALID_PASSWORD);
-		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
-		assertTrue(result.isSuccess());
-	}
+        actualMessages = getMessages(result);
+    }
 
-	@Test
-	public void testBuildWithValidInput() throws Exception {
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setHost(VALID_HOST);
-		builder.setPort(VALID_PORT);
-		builder.setUsername(VALID_USERNAME);
-		builder.setPassword(VALID_PASSWORD);
-		builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
+    @Test
+    public void testAssertWithInvalidPassword() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
+        expectedMessages.add(HubProxyInfoBuilder.MSG_CREDENTIALS_INVALID);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setPort(VALID_PORT);
+        builder.setUsername(VALID_USERNAME);
+        builder.setPassword("");
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
+        assertFalse(result.isSuccess());
 
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.buildResults();
-		assertNotNull(result);
-		assertTrue(result.isSuccess());
+        actualMessages = getMessages(result);
+    }
 
-		final HubProxyInfo proxyInfo = result.getConstructedObject();
-		assertNotNull(proxyInfo);
-		assertEquals(VALID_HOST, proxyInfo.getHost());
-		assertEquals(VALID_PORT, proxyInfo.getPort());
-		assertEquals(VALID_USERNAME, proxyInfo.getUsername());
-		assertEquals(VALID_PASSWORD, proxyInfo.getDecryptedPassword());
-		assertEquals(VALID_IGNORE_HOST_LIST, proxyInfo.getIgnoredProxyHosts());
-	}
+    @Test
+    public void testAssertWithInvalidIgnoreHost() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_IGNORE_HOSTS_INVALID);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setPort(VALID_PORT);
+        builder.setUsername(VALID_USERNAME);
+        builder.setPassword(VALID_PASSWORD);
+        builder.setIgnoredProxyHosts(INVALID_IGNORE_HOST);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
+        assertFalse(result.isSuccess());
 
-	@Test
-	public void testBuildWithInValidInput() throws Exception {
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-		builder.setPort(-512431);
-		builder.setUsername(VALID_USERNAME);
+        actualMessages = getMessages(result);
+    }
 
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.buildResults();
-		assertNotNull(result);
-		assertFalse(result.isSuccess());
+    @Test
+    public void testAssertWithInvalidIgnoreHostList() throws Exception {
+        expectedMessages.add(HubProxyInfoBuilder.MSG_IGNORE_HOSTS_INVALID);
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setPort(VALID_PORT);
+        builder.setUsername(VALID_USERNAME);
+        builder.setPassword(VALID_PASSWORD);
+        builder.setIgnoredProxyHosts(INVALID_IGNORE_HOST_LIST);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
+        assertFalse(result.isSuccess());
 
-		final HubProxyInfo proxyInfo = result.getConstructedObject();
-		assertNotNull(proxyInfo);
-		assertNull(proxyInfo.getHost());
-		assertEquals(-512431, proxyInfo.getPort());
-		assertNull(proxyInfo.getUsername());
-		assertNull(proxyInfo.getDecryptedPassword());
-		assertNull(proxyInfo.getIgnoredProxyHosts());
-	}
+        actualMessages = getMessages(result);
+    }
 
-	@Test
-	public void testBuildWithEmptyInput() throws Exception {
-		final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+    @Test
+    public void testAssertWithValidInput() throws Exception {
 
-		final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.buildResults();
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setPort(VALID_PORT);
+        builder.setUsername(VALID_USERNAME);
+        builder.setPassword(VALID_PASSWORD);
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.assertValid();
+        assertTrue(result.isSuccess());
+    }
 
-		assertNotNull(result);
-		assertTrue(result.isSuccess());
+    @Test
+    public void testBuildWithValidInput() throws Exception {
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setHost(VALID_HOST);
+        builder.setPort(VALID_PORT);
+        builder.setUsername(VALID_USERNAME);
+        builder.setPassword(VALID_PASSWORD);
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
 
-		final HubProxyInfo proxyInfo = result.getConstructedObject();
-		assertNotNull(proxyInfo);
-		assertNull(proxyInfo.getHost());
-		assertEquals(0, proxyInfo.getPort());
-		assertNull(proxyInfo.getUsername());
-		assertNull(proxyInfo.getEncryptedPassword());
-		assertNull(proxyInfo.getIgnoredProxyHosts());
-	}
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.buildResults();
+        assertNotNull(result);
+        assertTrue(result.isSuccess());
+
+        final HubProxyInfo proxyInfo = result.getConstructedObject();
+        assertNotNull(proxyInfo);
+        assertEquals(VALID_HOST, proxyInfo.getHost());
+        assertEquals(VALID_PORT, proxyInfo.getPort());
+        assertEquals(VALID_USERNAME, proxyInfo.getUsername());
+        assertEquals(VALID_PASSWORD, proxyInfo.getDecryptedPassword());
+        assertEquals(VALID_IGNORE_HOST_LIST, proxyInfo.getIgnoredProxyHosts());
+    }
+
+    @Test
+    public void testBuildWithInValidInput() throws Exception {
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+        builder.setPort(-512431);
+        builder.setUsername(VALID_USERNAME);
+
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.buildResults();
+        assertNotNull(result);
+        assertFalse(result.isSuccess());
+
+        final HubProxyInfo proxyInfo = result.getConstructedObject();
+        assertNotNull(proxyInfo);
+        assertNull(proxyInfo.getHost());
+        assertEquals(-512431, proxyInfo.getPort());
+        assertNull(proxyInfo.getUsername());
+        assertNull(proxyInfo.getDecryptedPassword());
+        assertNull(proxyInfo.getIgnoredProxyHosts());
+    }
+
+    @Test
+    public void testBuildWithEmptyInput() throws Exception {
+        final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
+
+        final ValidationResults<GlobalFieldKey, HubProxyInfo> result = builder.buildResults();
+
+        assertNotNull(result);
+        assertTrue(result.isSuccess());
+
+        final HubProxyInfo proxyInfo = result.getConstructedObject();
+        assertNotNull(proxyInfo);
+        assertNull(proxyInfo.getHost());
+        assertEquals(0, proxyInfo.getPort());
+        assertNull(proxyInfo.getUsername());
+        assertNull(proxyInfo.getEncryptedPassword());
+        assertNull(proxyInfo.getIgnoredProxyHosts());
+    }
 }

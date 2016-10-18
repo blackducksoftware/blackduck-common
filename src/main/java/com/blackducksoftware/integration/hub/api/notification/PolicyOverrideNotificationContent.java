@@ -24,116 +24,121 @@ package com.blackducksoftware.integration.hub.api.notification;
 import com.google.gson.annotations.SerializedName;
 
 public class PolicyOverrideNotificationContent {
-	private String projectName;
-	private String projectVersionName;
-	private String componentName;
-	private String componentVersionName;
-	private String firstName;
-	private String lastName;
+    private String projectName;
 
-	@SerializedName("projectVersion")
-	private String projectVersionLink;
+    private String projectVersionName;
 
-	// If version is specified, componentVersionLink will be populated
-	// otherwise it will be null
-	@SerializedName("componentVersion")
-	private String componentVersionLink;
+    private String componentName;
 
-	// If version is not specified, componentLink will be populated
-	// otherwise it will be null
-	@SerializedName("component")
-	private String componentLink;
+    private String componentVersionName;
 
-	@SerializedName("bomComponentVersionPolicyStatus")
-	private String bomComponentVersionPolicyStatusLink;
+    private String firstName;
 
-	public String getProjectName() {
-		return projectName;
-	}
+    private String lastName;
 
-	public String getProjectVersionName() {
-		return projectVersionName;
-	}
+    @SerializedName("projectVersion")
+    private String projectVersionLink;
 
-	public String getComponentName() {
-		return componentName;
-	}
+    // If version is specified, componentVersionLink will be populated
+    // otherwise it will be null
+    @SerializedName("componentVersion")
+    private String componentVersionLink;
 
-	public String getComponentVersionName() {
-		return componentVersionName;
-	}
+    // If version is not specified, componentLink will be populated
+    // otherwise it will be null
+    @SerializedName("component")
+    private String componentLink;
 
-	public String getFirstName() {
-		return firstName;
-	}
+    @SerializedName("bomComponentVersionPolicyStatus")
+    private String bomComponentVersionPolicyStatusLink;
 
-	public String getLastName() {
-		return lastName;
-	}
+    public String getProjectName() {
+        return projectName;
+    }
 
-	public String getProjectVersionLink() {
-		return projectVersionLink;
-	}
+    public String getProjectVersionName() {
+        return projectVersionName;
+    }
 
-	public String getComponentLink() {
-		return componentLink;
-	}
+    public String getComponentName() {
+        return componentName;
+    }
 
-	public void setComponentLink(final String componentLink) {
-		this.componentLink = componentLink;
-	}
+    public String getComponentVersionName() {
+        return componentVersionName;
+    }
 
-	public String getComponentVersionLink() {
-		return componentVersionLink;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public String getBomComponentVersionPolicyStatusLink() {
-		return bomComponentVersionPolicyStatusLink;
-	}
+    public String getLastName() {
+        return lastName;
+    }
 
-	public void setProjectName(final String projectName) {
-		this.projectName = projectName;
-	}
+    public String getProjectVersionLink() {
+        return projectVersionLink;
+    }
 
-	public void setProjectVersionName(final String projectVersionName) {
-		this.projectVersionName = projectVersionName;
-	}
+    public String getComponentLink() {
+        return componentLink;
+    }
 
-	public void setComponentName(final String componentName) {
-		this.componentName = componentName;
-	}
+    public void setComponentLink(final String componentLink) {
+        this.componentLink = componentLink;
+    }
 
-	public void setComponentVersionName(final String componentVersionName) {
-		this.componentVersionName = componentVersionName;
-	}
+    public String getComponentVersionLink() {
+        return componentVersionLink;
+    }
 
-	public void setFirstName(final String firstName) {
-		this.firstName = firstName;
-	}
+    public String getBomComponentVersionPolicyStatusLink() {
+        return bomComponentVersionPolicyStatusLink;
+    }
 
-	public void setLastName(final String lastName) {
-		this.lastName = lastName;
-	}
+    public void setProjectName(final String projectName) {
+        this.projectName = projectName;
+    }
 
-	public void setProjectVersionLink(final String projectVersionLink) {
-		this.projectVersionLink = projectVersionLink;
-	}
+    public void setProjectVersionName(final String projectVersionName) {
+        this.projectVersionName = projectVersionName;
+    }
 
-	public void setComponentVersionLink(final String componentVersionLink) {
-		this.componentVersionLink = componentVersionLink;
-	}
+    public void setComponentName(final String componentName) {
+        this.componentName = componentName;
+    }
 
-	public void setBomComponentVersionPolicyStatusLink(final String bomComponentVersionPolicyStatusLink) {
-		this.bomComponentVersionPolicyStatusLink = bomComponentVersionPolicyStatusLink;
-	}
+    public void setComponentVersionName(final String componentVersionName) {
+        this.componentVersionName = componentVersionName;
+    }
 
-	@Override
-	public String toString() {
-		return "PolicyOverrideNotificationContent [projectName=" + projectName + ", projectVersionName="
-				+ projectVersionName + ", componentName=" + componentName + ", componentVersionName="
-				+ componentVersionName + ", firstName=" + firstName + ", lastName=" + lastName + ", projectVersionLink="
-				+ projectVersionLink + ", componentVersionLink=" + componentVersionLink
-				+ ", bomComponentVersionPolicyStatusLink=" + bomComponentVersionPolicyStatusLink + "]";
-	}
+    public void setFirstName(final String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(final String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setProjectVersionLink(final String projectVersionLink) {
+        this.projectVersionLink = projectVersionLink;
+    }
+
+    public void setComponentVersionLink(final String componentVersionLink) {
+        this.componentVersionLink = componentVersionLink;
+    }
+
+    public void setBomComponentVersionPolicyStatusLink(final String bomComponentVersionPolicyStatusLink) {
+        this.bomComponentVersionPolicyStatusLink = bomComponentVersionPolicyStatusLink;
+    }
+
+    @Override
+    public String toString() {
+        return "PolicyOverrideNotificationContent [projectName=" + projectName + ", projectVersionName="
+                + projectVersionName + ", componentName=" + componentName + ", componentVersionName="
+                + componentVersionName + ", firstName=" + firstName + ", lastName=" + lastName + ", projectVersionLink="
+                + projectVersionLink + ", componentVersionLink=" + componentVersionLink
+                + ", bomComponentVersionPolicyStatusLink=" + bomComponentVersionPolicyStatusLink + "]";
+    }
 
 }

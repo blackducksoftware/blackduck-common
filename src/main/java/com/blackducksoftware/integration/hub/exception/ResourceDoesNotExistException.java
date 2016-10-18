@@ -24,21 +24,22 @@ package com.blackducksoftware.integration.hub.exception;
 import org.restlet.resource.ClientResource;
 
 public class ResourceDoesNotExistException extends Exception {
-	private static final long serialVersionUID = -2759478991725526223L;
-	private final ClientResource resource;
+    private static final long serialVersionUID = -2759478991725526223L;
 
-	public ResourceDoesNotExistException(final String message, final ClientResource resource) {
-		super(message);
-		this.resource = resource;
-	}
+    private final ClientResource resource;
 
-	public ResourceDoesNotExistException(final String message, final Throwable cause, final ClientResource resource) {
-		super(message, cause);
-		this.resource = resource;
-	}
+    public ResourceDoesNotExistException(final String message, final ClientResource resource) {
+        super(message);
+        this.resource = resource;
+    }
 
-	public ClientResource getResource() {
-		return resource;
-	}
+    public ResourceDoesNotExistException(final String message, final Throwable cause, final ClientResource resource) {
+        super(message, cause);
+        this.resource = resource;
+    }
+
+    public ClientResource getResource() {
+        return resource;
+    }
 
 }

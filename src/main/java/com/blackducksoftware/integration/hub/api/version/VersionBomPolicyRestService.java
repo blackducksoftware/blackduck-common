@@ -32,14 +32,15 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class VersionBomPolicyRestService extends HubItemRestService<BomComponentVersionPolicyStatus> {
-	private static final Type ITEM_TYPE = new TypeToken<BomComponentVersionPolicyStatus>() {
-	}.getType();
-	private static final Type ITEM_LIST_TYPE = new TypeToken<List<BomComponentVersionPolicyStatus>>() {
-	}.getType();
+    private static final Type ITEM_TYPE = new TypeToken<BomComponentVersionPolicyStatus>() {
+    }.getType();
 
-	public VersionBomPolicyRestService(final RestConnection restConnection, final Gson gson,
-			final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    private static final Type ITEM_LIST_TYPE = new TypeToken<List<BomComponentVersionPolicyStatus>>() {
+    }.getType();
+
+    public VersionBomPolicyRestService(final RestConnection restConnection, final Gson gson,
+            final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
 }

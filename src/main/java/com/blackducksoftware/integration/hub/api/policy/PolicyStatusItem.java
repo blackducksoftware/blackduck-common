@@ -30,124 +30,126 @@ import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class PolicyStatusItem extends HubItem {
-	private final PolicyStatusEnum overallStatus;
-	private final String updatedAt;
-	private final List<ComponentVersionStatusCount> componentVersionStatusCounts;
+    private final PolicyStatusEnum overallStatus;
 
-	public PolicyStatusItem(final PolicyStatusEnum overallStatus, final String updatedAt,
-			final List<ComponentVersionStatusCount> componentVersionStatusCounts, final MetaInformation meta) {
-		super(meta);
-		this.overallStatus = overallStatus;
-		this.updatedAt = updatedAt;
-		this.componentVersionStatusCounts = componentVersionStatusCounts;
-	}
+    private final String updatedAt;
 
-	public ComponentVersionStatusCount getCountInViolation() {
-		if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
-			return null;
-		}
-		for (final ComponentVersionStatusCount count : componentVersionStatusCounts) {
-			if (PolicyStatusEnum.IN_VIOLATION == count.getName()) {
-				return count;
-			}
-		}
-		return null;
-	}
+    private final List<ComponentVersionStatusCount> componentVersionStatusCounts;
 
-	public ComponentVersionStatusCount getCountNotInViolation() {
-		if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
-			return null;
-		}
-		for (final ComponentVersionStatusCount count : componentVersionStatusCounts) {
-			if (PolicyStatusEnum.NOT_IN_VIOLATION == count.getName()) {
-				return count;
-			}
-		}
-		return null;
-	}
+    public PolicyStatusItem(final PolicyStatusEnum overallStatus, final String updatedAt,
+            final List<ComponentVersionStatusCount> componentVersionStatusCounts, final MetaInformation meta) {
+        super(meta);
+        this.overallStatus = overallStatus;
+        this.updatedAt = updatedAt;
+        this.componentVersionStatusCounts = componentVersionStatusCounts;
+    }
 
-	public ComponentVersionStatusCount getCountInViolationOverridden() {
-		if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
-			return null;
-		}
-		for (final ComponentVersionStatusCount count : componentVersionStatusCounts) {
-			if (PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN == count.getName()) {
-				return count;
-			}
-		}
-		return null;
-	}
+    public ComponentVersionStatusCount getCountInViolation() {
+        if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
+            return null;
+        }
+        for (final ComponentVersionStatusCount count : componentVersionStatusCounts) {
+            if (PolicyStatusEnum.IN_VIOLATION == count.getName()) {
+                return count;
+            }
+        }
+        return null;
+    }
 
-	public DateTime getUpdatedAtTime() {
-		if (StringUtils.isBlank(updatedAt)) {
-			return null;
-		}
-		try {
-			return new DateTime(updatedAt);
-		} catch (final IllegalArgumentException e) {
-			return null;
-		}
-	}
+    public ComponentVersionStatusCount getCountNotInViolation() {
+        if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
+            return null;
+        }
+        for (final ComponentVersionStatusCount count : componentVersionStatusCounts) {
+            if (PolicyStatusEnum.NOT_IN_VIOLATION == count.getName()) {
+                return count;
+            }
+        }
+        return null;
+    }
 
-	public PolicyStatusEnum getOverallStatus() {
-		return overallStatus;
-	}
+    public ComponentVersionStatusCount getCountInViolationOverridden() {
+        if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
+            return null;
+        }
+        for (final ComponentVersionStatusCount count : componentVersionStatusCounts) {
+            if (PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN == count.getName()) {
+                return count;
+            }
+        }
+        return null;
+    }
 
-	public String getUpdatedAt() {
-		return updatedAt;
-	}
+    public DateTime getUpdatedAtTime() {
+        if (StringUtils.isBlank(updatedAt)) {
+            return null;
+        }
+        try {
+            return new DateTime(updatedAt);
+        } catch (final IllegalArgumentException e) {
+            return null;
+        }
+    }
 
-	public List<ComponentVersionStatusCount> getComponentVersionStatusCounts() {
-		return componentVersionStatusCounts;
-	}
+    public PolicyStatusEnum getOverallStatus() {
+        return overallStatus;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((componentVersionStatusCounts == null) ? 0 : componentVersionStatusCounts.hashCode());
-		result = prime * result + ((overallStatus == null) ? 0 : overallStatus.hashCode());
-		result = prime * result + ((updatedAt == null) ? 0 : updatedAt.hashCode());
-		return result;
-	}
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final PolicyStatusItem other = (PolicyStatusItem) obj;
-		if (componentVersionStatusCounts == null) {
-			if (other.componentVersionStatusCounts != null) {
-				return false;
-			}
-		} else if (!componentVersionStatusCounts.equals(other.componentVersionStatusCounts)) {
-			return false;
-		}
-		if (overallStatus != other.overallStatus) {
-			return false;
-		}
-		if (updatedAt == null) {
-			if (other.updatedAt != null) {
-				return false;
-			}
-		} else if (!updatedAt.equals(other.updatedAt)) {
-			return false;
-		}
-		return true;
-	}
+    public List<ComponentVersionStatusCount> getComponentVersionStatusCounts() {
+        return componentVersionStatusCounts;
+    }
 
-	@Override
-	public String toString() {
-		return "PolicyStatusItem [overallStatus=" + overallStatus + ", updatedAt=" + updatedAt
-				+ ", componentVersionStatusCounts=" + componentVersionStatusCounts + "]";
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((componentVersionStatusCounts == null) ? 0 : componentVersionStatusCounts.hashCode());
+        result = prime * result + ((overallStatus == null) ? 0 : overallStatus.hashCode());
+        result = prime * result + ((updatedAt == null) ? 0 : updatedAt.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PolicyStatusItem other = (PolicyStatusItem) obj;
+        if (componentVersionStatusCounts == null) {
+            if (other.componentVersionStatusCounts != null) {
+                return false;
+            }
+        } else if (!componentVersionStatusCounts.equals(other.componentVersionStatusCounts)) {
+            return false;
+        }
+        if (overallStatus != other.overallStatus) {
+            return false;
+        }
+        if (updatedAt == null) {
+            if (other.updatedAt != null) {
+                return false;
+            }
+        } else if (!updatedAt.equals(other.updatedAt)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "PolicyStatusItem [overallStatus=" + overallStatus + ", updatedAt=" + updatedAt
+                + ", componentVersionStatusCounts=" + componentVersionStatusCounts + "]";
+    }
 
 }

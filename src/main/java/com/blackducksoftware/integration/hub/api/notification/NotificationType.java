@@ -22,19 +22,19 @@
 package com.blackducksoftware.integration.hub.api.notification;
 
 public enum NotificationType {
-	POLICY_VIOLATION("Policy Violation"),
-	POLICY_OVERRIDE("Policy Override"),
-	VULNERABILITY("Vulnerability"),
-	POLICY_VIOLATION_CLEARED("Policy Violation Cleared");
+    POLICY_VIOLATION("Policy Violation"),
+    POLICY_OVERRIDE("Policy Override"),
+    VULNERABILITY("Vulnerability"),
+    POLICY_VIOLATION_CLEARED("Policy Violation Cleared");
 
-	private final String displayName;
+    private final String displayName;
 
-	private NotificationType(final String displayName) {
-		this.displayName = displayName;
-	}
+    private NotificationType(final String displayName) {
+        this.displayName = displayName;
+    }
 
-	public String getDisplayName() {
-		return displayName;
-	}
+    public String getDisplayName() {
+        return displayName;
+    }
 
 }

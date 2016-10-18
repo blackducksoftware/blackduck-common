@@ -24,28 +24,29 @@ package com.blackducksoftware.integration.hub.api.item;
 import java.util.List;
 
 public class HubItems {
-	private int totalCount;
-	private List<HubItem> items;
+    private int totalCount;
 
-	public int getTotalCount() {
-		return totalCount;
-	}
+    private List<HubItem> items;
 
-	public List<HubItem> getItems() {
-		return items;
-	}
+    public int getTotalCount() {
+        return totalCount;
+    }
 
-	public void setTotalCount(final int totalCount) {
-		this.totalCount = totalCount;
-	}
+    public List<HubItem> getItems() {
+        return items;
+    }
 
-	public void setItems(final List<HubItem> items) {
-		this.items = items;
-	}
+    public void setTotalCount(final int totalCount) {
+        this.totalCount = totalCount;
+    }
 
-	@Override
-	public String toString() {
-		return "HubItemList [totalCount=" + totalCount + ", items=" + items + "]";
-	}
+    public void setItems(final List<HubItem> items) {
+        this.items = items;
+    }
+
+    @Override
+    public String toString() {
+        return "HubItemList [totalCount=" + totalCount + ", items=" + items + "]";
+    }
 
 }

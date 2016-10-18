@@ -25,33 +25,34 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class HubResourceBundleHelper {
-	private static final String RESOURCE_BASE_NAME = "com.blackducksoftware.integration.hub.resources.HubResources";
+    private static final String RESOURCE_BASE_NAME = "com.blackducksoftware.integration.hub.resources.HubResources";
 
-	private Locale locale = Locale.US;
-	private String keyPrefix;
+    private Locale locale = Locale.US;
 
-	public String getString(String key) {
-		if (keyPrefix != null) {
-			key = keyPrefix + "." + key;
-		}
+    private String keyPrefix;
 
-		return ResourceBundle.getBundle(RESOURCE_BASE_NAME, locale).getString(key);
-	}
+    public String getString(String key) {
+        if (keyPrefix != null) {
+            key = keyPrefix + "." + key;
+        }
 
-	public Locale getLocale() {
-		return locale;
-	}
+        return ResourceBundle.getBundle(RESOURCE_BASE_NAME, locale).getString(key);
+    }
 
-	public void setLocale(final Locale locale) {
-		this.locale = locale;
-	}
+    public Locale getLocale() {
+        return locale;
+    }
 
-	public String getKeyPrefix() {
-		return keyPrefix;
-	}
+    public void setLocale(final Locale locale) {
+        this.locale = locale;
+    }
 
-	public void setKeyPrefix(final String keyPrefix) {
-		this.keyPrefix = keyPrefix;
-	}
+    public String getKeyPrefix() {
+        return keyPrefix;
+    }
+
+    public void setKeyPrefix(final String keyPrefix) {
+        this.keyPrefix = keyPrefix;
+    }
 
 }

@@ -31,88 +31,89 @@ import com.blackducksoftware.integration.hub.util.HubUrlParser;
 import com.google.gson.annotations.SerializedName;
 
 public class ComponentVersionStatus {
-	public static final String COMPONENT_URL_IDENTIFIER = "components";
-	public static final String COMPONENT_VERSION_URL_IDENTIFIER = "versions";
+    public static final String COMPONENT_URL_IDENTIFIER = "components";
 
-	private String componentName;
+    public static final String COMPONENT_VERSION_URL_IDENTIFIER = "versions";
 
-	// If version is specified, componentVersionLink will be populated
-	// otherwise it will be null
-	@SerializedName("componentVersion")
-	private String componentVersionLink;
+    private String componentName;
 
-	// If version is not specified, componentLink will be populated
-	// otherwise it will be null
-	@SerializedName("component")
-	private String componentLink;
+    // If version is specified, componentVersionLink will be populated
+    // otherwise it will be null
+    @SerializedName("componentVersion")
+    private String componentVersionLink;
 
-	@SerializedName("bomComponentVersionPolicyStatus")
-	private String bomComponentVersionPolicyStatusLink;
+    // If version is not specified, componentLink will be populated
+    // otherwise it will be null
+    @SerializedName("component")
+    private String componentLink;
 
-	private List<String> policies;
+    @SerializedName("bomComponentVersionPolicyStatus")
+    private String bomComponentVersionPolicyStatusLink;
 
-	public String getComponentName() {
-		return componentName;
-	}
+    private List<String> policies;
 
-	public String getComponentVersionLink() {
-		return componentVersionLink;
-	}
+    public String getComponentName() {
+        return componentName;
+    }
 
-	public String getComponentLink() {
-		return componentLink;
-	}
+    public String getComponentVersionLink() {
+        return componentVersionLink;
+    }
 
-	public String getBomComponentVersionPolicyStatusLink() {
-		return bomComponentVersionPolicyStatusLink;
-	}
+    public String getComponentLink() {
+        return componentLink;
+    }
 
-	public void setComponentName(final String componentName) {
-		this.componentName = componentName;
-	}
+    public String getBomComponentVersionPolicyStatusLink() {
+        return bomComponentVersionPolicyStatusLink;
+    }
 
-	public void setComponentVersionLink(final String componentVersionLink) {
-		this.componentVersionLink = componentVersionLink;
-	}
+    public void setComponentName(final String componentName) {
+        this.componentName = componentName;
+    }
 
-	public void setBomComponentVersionPolicyStatusLink(final String bomComponentVersionPolicyStatusLink) {
-		this.bomComponentVersionPolicyStatusLink = bomComponentVersionPolicyStatusLink;
-	}
+    public void setComponentVersionLink(final String componentVersionLink) {
+        this.componentVersionLink = componentVersionLink;
+    }
 
-	public List<String> getPolicies() {
-		return policies;
-	}
+    public void setBomComponentVersionPolicyStatusLink(final String bomComponentVersionPolicyStatusLink) {
+        this.bomComponentVersionPolicyStatusLink = bomComponentVersionPolicyStatusLink;
+    }
 
-	public void setPolicies(final List<String> policies) {
-		this.policies = policies;
-	}
+    public List<String> getPolicies() {
+        return policies;
+    }
 
-	@Deprecated
-	public UUID getComponentId() throws MissingUUIDException {
-		if (StringUtils.isBlank(getComponentVersionLink())
-				&& StringUtils.isBlank(getBomComponentVersionPolicyStatusLink())) {
-			return null;
-		}
-		if (StringUtils.isNotBlank(getComponentVersionLink())) {
-			return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER, getComponentVersionLink());
-		} else {
-			return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER,
-					getBomComponentVersionPolicyStatusLink());
-		}
-	}
+    public void setPolicies(final List<String> policies) {
+        this.policies = policies;
+    }
 
-	@Deprecated
-	public UUID getComponentVersionId() throws MissingUUIDException {
-		if (StringUtils.isBlank(getComponentVersionLink())) {
-			return null;
-		}
-		return HubUrlParser.getUUIDFromURLString(COMPONENT_VERSION_URL_IDENTIFIER, getComponentVersionLink());
-	}
+    @Deprecated
+    public UUID getComponentId() throws MissingUUIDException {
+        if (StringUtils.isBlank(getComponentVersionLink())
+                && StringUtils.isBlank(getBomComponentVersionPolicyStatusLink())) {
+            return null;
+        }
+        if (StringUtils.isNotBlank(getComponentVersionLink())) {
+            return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER, getComponentVersionLink());
+        } else {
+            return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER,
+                    getBomComponentVersionPolicyStatusLink());
+        }
+    }
 
-	@Override
-	public String toString() {
-		return "ComponentVersionStatus [componentName=" + componentName + ", componentVersionLink="
-				+ componentVersionLink + ", bomComponentVersionPolicyStatusLink=" + bomComponentVersionPolicyStatusLink
-				+ ", policies=" + policies + "]";
-	}
+    @Deprecated
+    public UUID getComponentVersionId() throws MissingUUIDException {
+        if (StringUtils.isBlank(getComponentVersionLink())) {
+            return null;
+        }
+        return HubUrlParser.getUUIDFromURLString(COMPONENT_VERSION_URL_IDENTIFIER, getComponentVersionLink());
+    }
+
+    @Override
+    public String toString() {
+        return "ComponentVersionStatus [componentName=" + componentName + ", componentVersionLink="
+                + componentVersionLink + ", bomComponentVersionPolicyStatusLink=" + bomComponentVersionPolicyStatusLink
+                + ", policies=" + policies + "]";
+    }
 }

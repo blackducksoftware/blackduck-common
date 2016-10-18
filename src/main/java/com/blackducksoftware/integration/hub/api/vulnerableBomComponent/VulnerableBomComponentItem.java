@@ -27,63 +27,64 @@ import com.google.gson.annotations.SerializedName;
 
 public class VulnerableBomComponentItem extends HubItem {
 
-	private String componentName;
-	private String componentVersionName;
+    private String componentName;
 
-	@SerializedName("componentVersion")
-	private String componentVersionLink;
+    private String componentVersionName;
 
-	private VulnerabilityWithRemediation vulnerabilityWithRemediation;
+    @SerializedName("componentVersion")
+    private String componentVersionLink;
 
-	// Also in Hub's response: License
+    private VulnerabilityWithRemediation vulnerabilityWithRemediation;
 
-	public VulnerableBomComponentItem(final MetaInformation meta, final String componentName,
-			final String componentVersionName, final String componentVersionLink,
-			final VulnerabilityWithRemediation vulnerabilityWithRemediation) {
-		super(meta);
+    // Also in Hub's response: License
 
-		this.componentName = componentName;
-		this.componentVersionName = componentVersionName;
-		this.componentVersionLink = componentVersionLink;
-		this.vulnerabilityWithRemediation = vulnerabilityWithRemediation;
-	}
+    public VulnerableBomComponentItem(final MetaInformation meta, final String componentName,
+            final String componentVersionName, final String componentVersionLink,
+            final VulnerabilityWithRemediation vulnerabilityWithRemediation) {
+        super(meta);
 
-	public String getComponentName() {
-		return componentName;
-	}
+        this.componentName = componentName;
+        this.componentVersionName = componentVersionName;
+        this.componentVersionLink = componentVersionLink;
+        this.vulnerabilityWithRemediation = vulnerabilityWithRemediation;
+    }
 
-	public void setComponentName(final String componentName) {
-		this.componentName = componentName;
-	}
+    public String getComponentName() {
+        return componentName;
+    }
 
-	public String getComponentVersionName() {
-		return componentVersionName;
-	}
+    public void setComponentName(final String componentName) {
+        this.componentName = componentName;
+    }
 
-	public void setComponentVersionName(final String componentVersionName) {
-		this.componentVersionName = componentVersionName;
-	}
+    public String getComponentVersionName() {
+        return componentVersionName;
+    }
 
-	public String getComponentVersionLink() {
-		return componentVersionLink;
-	}
+    public void setComponentVersionName(final String componentVersionName) {
+        this.componentVersionName = componentVersionName;
+    }
 
-	public void setComponentVersionLink(final String componentVersionLink) {
-		this.componentVersionLink = componentVersionLink;
-	}
+    public String getComponentVersionLink() {
+        return componentVersionLink;
+    }
 
-	public VulnerabilityWithRemediation getVulnerabilityWithRemediation() {
-		return vulnerabilityWithRemediation;
-	}
+    public void setComponentVersionLink(final String componentVersionLink) {
+        this.componentVersionLink = componentVersionLink;
+    }
 
-	public void setVulnerabilityWithRemediation(final VulnerabilityWithRemediation vulnerabilityWithRemediation) {
-		this.vulnerabilityWithRemediation = vulnerabilityWithRemediation;
-	}
+    public VulnerabilityWithRemediation getVulnerabilityWithRemediation() {
+        return vulnerabilityWithRemediation;
+    }
 
-	@Override
-	public String toString() {
-		return "VulnerableBomComponentItem [componentName=" + componentName + ", componentVersionName="
-				+ componentVersionName + ", componentVersionLink=" + componentVersionLink
-				+ ", vulnerabilityWithRemediation=" + vulnerabilityWithRemediation + "]";
-	}
+    public void setVulnerabilityWithRemediation(final VulnerabilityWithRemediation vulnerabilityWithRemediation) {
+        this.vulnerabilityWithRemediation = vulnerabilityWithRemediation;
+    }
+
+    @Override
+    public String toString() {
+        return "VulnerableBomComponentItem [componentName=" + componentName + ", componentVersionName="
+                + componentVersionName + ", componentVersionLink=" + componentVersionLink
+                + ", vulnerabilityWithRemediation=" + vulnerabilityWithRemediation + "]";
+    }
 }
