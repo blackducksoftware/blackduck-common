@@ -37,65 +37,65 @@ import com.blackducksoftware.integration.hub.polling.HubEventPolling;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class RiskReportGenerator {
-	private final HubReportGenerationInfo hubReportGenerationInfo;
+    private final HubReportGenerationInfo hubReportGenerationInfo;
 
-	private final HubSupportHelper supportHelper;
+    private final HubSupportHelper supportHelper;
 
-	/**
-	 * Make sure supportHelper.checkHubSupport() has already been run before
-	 * passing in the supportHelper.
-	 *
-	 */
-	public RiskReportGenerator(final HubReportGenerationInfo hubReportGenerationInfo,
-			final HubSupportHelper supportHelper) {
-		this.hubReportGenerationInfo = hubReportGenerationInfo;
-		this.supportHelper = supportHelper;
-	}
+    /**
+     * Make sure supportHelper.checkHubSupport() has already been run before
+     * passing in the supportHelper.
+     *
+     */
+    public RiskReportGenerator(final HubReportGenerationInfo hubReportGenerationInfo,
+            final HubSupportHelper supportHelper) {
+        this.hubReportGenerationInfo = hubReportGenerationInfo;
+        this.supportHelper = supportHelper;
+    }
 
-	public HubRiskReportData generateHubReport(final IntLogger logger, final ReportCategoriesEnum[] categories)
-			throws IOException, BDRestException, URISyntaxException, InterruptedException, HubIntegrationException,
-			UnexpectedHubResponseException, ProjectDoesNotExistException {
-		logger.debug("Waiting for the bom to be updated with the scan results.");
-		final HubEventPolling hubEventPolling = getHubEventPolling(hubReportGenerationInfo.getService());
+    public HubRiskReportData generateHubReport(final IntLogger logger, final ReportCategoriesEnum[] categories)
+            throws IOException, BDRestException, URISyntaxException, InterruptedException, HubIntegrationException,
+            UnexpectedHubResponseException, ProjectDoesNotExistException {
+        logger.debug("Waiting for the bom to be updated with the scan results.");
+        final HubEventPolling hubEventPolling = getHubEventPolling(hubReportGenerationInfo.getService());
 
-		if (supportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
-			hubEventPolling.assertBomUpToDate(hubReportGenerationInfo, logger);
-		} else {
-			hubEventPolling.assertBomUpToDate(hubReportGenerationInfo);
-		}
+        if (supportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
+            hubEventPolling.assertBomUpToDate(hubReportGenerationInfo, logger);
+        } else {
+            hubEventPolling.assertBomUpToDate(hubReportGenerationInfo);
+        }
 
-		logger.debug("The bom has been updated, generating the report.");
-		final String reportUrl = hubReportGenerationInfo.getService()
-				.generateHubReport(hubReportGenerationInfo.getVersion(), ReportFormatEnum.JSON, categories);
+        logger.debug("The bom has been updated, generating the report.");
+        final String reportUrl = hubReportGenerationInfo.getService()
+                .generateHubReport(hubReportGenerationInfo.getVersion(), ReportFormatEnum.JSON, categories);
 
-		final ReportInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl,
-				hubReportGenerationInfo.getMaximumWaitTime());
+        final ReportInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl,
+                hubReportGenerationInfo.getMaximumWaitTime());
 
-		final List<MetaLink> links = reportInfo.getMeta().getLinks();
+        final List<MetaLink> links = reportInfo.getMeta().getLinks();
 
-		MetaLink contentLink = null;
-		for (final MetaLink link : links) {
-			if (link.getRel().equalsIgnoreCase("content")) {
-				contentLink = link;
-				break;
-			}
-		}
-		if (contentLink == null) {
-			throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
-		}
+        MetaLink contentLink = null;
+        for (final MetaLink link : links) {
+            if (link.getRel().equalsIgnoreCase("content")) {
+                contentLink = link;
+                break;
+            }
+        }
+        if (contentLink == null) {
+            throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
+        }
 
-		final HubRiskReportData hubRiskReportData = new HubRiskReportData();
-		final VersionReport report = hubReportGenerationInfo.getService().getReportContent(contentLink.getHref());
-		hubRiskReportData.setReport(report);
-		logger.debug("Finished retrieving the report.");
+        final HubRiskReportData hubRiskReportData = new HubRiskReportData();
+        final VersionReport report = hubReportGenerationInfo.getService().getReportContent(contentLink.getHref());
+        hubRiskReportData.setReport(report);
+        logger.debug("Finished retrieving the report.");
 
-		hubReportGenerationInfo.getService().deleteHubReport(reportUrl);
+        hubReportGenerationInfo.getService().deleteHubReport(reportUrl);
 
-		return hubRiskReportData;
-	}
+        return hubRiskReportData;
+    }
 
-	public HubEventPolling getHubEventPolling(final HubIntRestService service) {
-		return new HubEventPolling(service);
-	}
+    public HubEventPolling getHubEventPolling(final HubIntRestService service) {
+        return new HubEventPolling(service);
+    }
 
 }

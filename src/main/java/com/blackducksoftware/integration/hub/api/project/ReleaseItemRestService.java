@@ -46,39 +46,40 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ReleaseItemRestService extends HubItemRestService<ReleaseItem> {
-	private static final Type ITEM_TYPE = new TypeToken<ReleaseItem>() {
-	}.getType();
-	private static final Type ITEM_LIST_TYPE = new TypeToken<List<ReleaseItem>>() {
-	}.getType();
+    private static final Type ITEM_TYPE = new TypeToken<ReleaseItem>() {
+    }.getType();
 
-	public ReleaseItemRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    private static final Type ITEM_LIST_TYPE = new TypeToken<List<ReleaseItem>>() {
+    }.getType();
 
-	public ReleaseItem getProjectVersionByName(final String projectId, final String projectVersionName)
-			throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException,
-			HubIntegrationException {
-		final List<String> urlSegments = new ArrayList<>();
-		urlSegments.add(SEGMENT_API);
-		urlSegments.add(SEGMENT_PROJECTS);
-		urlSegments.add(projectId);
-		urlSegments.add(SEGMENT_VERSIONS);
+    public ReleaseItemRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
-		final HubRequest projectVersionItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		projectVersionItemRequest.setMethod(Method.GET);
-		projectVersionItemRequest.setLimit(5);
-		projectVersionItemRequest.addUrlSegments(urlSegments);
+    public ReleaseItem getProjectVersionByName(final String projectId, final String projectVersionName)
+            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException,
+            HubIntegrationException {
+        final List<String> urlSegments = new ArrayList<>();
+        urlSegments.add(SEGMENT_API);
+        urlSegments.add(SEGMENT_PROJECTS);
+        urlSegments.add(projectId);
+        urlSegments.add(SEGMENT_VERSIONS);
 
-		final JsonObject jsonObject = projectVersionItemRequest.executeForResponseJson();
-		final List<ReleaseItem> allReleaseItems = getItems(jsonObject);
-		for (final ReleaseItem releaseItem : allReleaseItems) {
-			if (projectVersionName.equals(releaseItem.getVersionName())) {
-				return releaseItem;
-			}
-		}
+        final HubRequest projectVersionItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        projectVersionItemRequest.setMethod(Method.GET);
+        projectVersionItemRequest.setLimit(5);
+        projectVersionItemRequest.addUrlSegments(urlSegments);
 
-		throw new HubIntegrationException(
-				String.format("The version %s does not exist for projecId %s.", projectVersionName, projectId));
-	}
+        final JsonObject jsonObject = projectVersionItemRequest.executeForResponseJson();
+        final List<ReleaseItem> allReleaseItems = getItems(jsonObject);
+        for (final ReleaseItem releaseItem : allReleaseItems) {
+            if (projectVersionName.equals(releaseItem.getVersionName())) {
+                return releaseItem;
+            }
+        }
+
+        throw new HubIntegrationException(
+                String.format("The version %s does not exist for projecId %s.", projectVersionName, projectId));
+    }
 
 }

@@ -43,36 +43,37 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class PolicyRestService extends HubItemRestService<PolicyRule> {
-	private static final List<String> POLICY_RULE_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_POLICY_RULES);
+    private static final List<String> POLICY_RULE_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_POLICY_RULES);
 
-	private static final Type ITEM_TYPE = new TypeToken<PolicyRule>() {
-	}.getType();
-	private static final Type ITEM_LIST_TYPE = new TypeToken<List<PolicyRule>>() {
-	}.getType();
+    private static final Type ITEM_TYPE = new TypeToken<PolicyRule>() {
+    }.getType();
 
-	public PolicyRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    private static final Type ITEM_LIST_TYPE = new TypeToken<List<PolicyRule>>() {
+    }.getType();
 
-	public PolicyRule getPolicyRuleById(final String policyRuleId)
-			throws IOException, BDRestException, URISyntaxException {
-		final List<String> urlSegments = new ArrayList<>();
-		urlSegments.addAll(POLICY_RULE_SEGMENTS);
-		urlSegments.add(policyRuleId);
+    public PolicyRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
-		final PolicyRule rule = getItem(urlSegments);
-		return rule;
-	}
+    public PolicyRule getPolicyRuleById(final String policyRuleId)
+            throws IOException, BDRestException, URISyntaxException {
+        final List<String> urlSegments = new ArrayList<>();
+        urlSegments.addAll(POLICY_RULE_SEGMENTS);
+        urlSegments.add(policyRuleId);
 
-	public List<PolicyRule> getAllPolicyRules() throws IOException, BDRestException, URISyntaxException {
-		final HubRequest policyRuleItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		policyRuleItemRequest.setMethod(Method.GET);
-		policyRuleItemRequest.setLimit(100);
-		policyRuleItemRequest.addUrlSegments(POLICY_RULE_SEGMENTS);
+        final PolicyRule rule = getItem(urlSegments);
+        return rule;
+    }
 
-		final JsonObject jsonObject = policyRuleItemRequest.executeForResponseJson();
-		final List<PolicyRule> allPolicyRuleItems = getAll(jsonObject, policyRuleItemRequest);
-		return allPolicyRuleItems;
-	}
+    public List<PolicyRule> getAllPolicyRules() throws IOException, BDRestException, URISyntaxException {
+        final HubRequest policyRuleItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        policyRuleItemRequest.setMethod(Method.GET);
+        policyRuleItemRequest.setLimit(100);
+        policyRuleItemRequest.addUrlSegments(POLICY_RULE_SEGMENTS);
+
+        final JsonObject jsonObject = policyRuleItemRequest.executeForResponseJson();
+        final List<PolicyRule> allPolicyRuleItems = getAll(jsonObject, policyRuleItemRequest);
+        return allPolicyRuleItems;
+    }
 
 }

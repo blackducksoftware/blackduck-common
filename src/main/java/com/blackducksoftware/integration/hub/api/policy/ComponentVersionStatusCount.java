@@ -22,55 +22,56 @@
 package com.blackducksoftware.integration.hub.api.policy;
 
 public class ComponentVersionStatusCount {
-	private final PolicyStatusEnum name;
-	private final int value;
+    private final PolicyStatusEnum name;
 
-	public ComponentVersionStatusCount(final PolicyStatusEnum name, final int value) {
-		this.name = name;
-		this.value = value;
-	}
+    private final int value;
 
-	public PolicyStatusEnum getName() {
-		return name;
-	}
+    public ComponentVersionStatusCount(final PolicyStatusEnum name, final int value) {
+        this.name = name;
+        this.value = value;
+    }
 
-	public int getValue() {
-		return value;
-	}
+    public PolicyStatusEnum getName() {
+        return name;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + value;
-		return result;
-	}
+    public int getValue() {
+        return value;
+    }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final ComponentVersionStatusCount other = (ComponentVersionStatusCount) obj;
-		if (name != other.name) {
-			return false;
-		}
-		if (value != other.value) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + value;
+        return result;
+    }
 
-	@Override
-	public String toString() {
-		return "ComponentVersionStatusCount [name=" + name + ", value=" + value + "]";
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ComponentVersionStatusCount other = (ComponentVersionStatusCount) obj;
+        if (name != other.name) {
+            return false;
+        }
+        if (value != other.value) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "ComponentVersionStatusCount [name=" + name + ", value=" + value + "]";
+    }
 
 }

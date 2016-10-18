@@ -17,26 +17,27 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ProjectVersionRestService extends HubItemRestService<ProjectVersionItem> {
-	private static final Type ITEM_TYPE = new TypeToken<ProjectVersionItem>() {
-	}.getType();
-	private static final Type ITEM_LIST_TYPE = new TypeToken<List<ProjectVersionItem>>() {
-	}.getType();
+    private static final Type ITEM_TYPE = new TypeToken<ProjectVersionItem>() {
+    }.getType();
 
-	public ProjectVersionRestService(final RestConnection restConnection, final Gson gson,
-			final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    private static final Type ITEM_LIST_TYPE = new TypeToken<List<ProjectVersionItem>>() {
+    }.getType();
 
-	public List<ProjectVersionItem> getAllProjectVersions(final String versionsUrl)
-			throws IOException, URISyntaxException, BDRestException {
-		final HubRequest projectVersionItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		projectVersionItemRequest.setMethod(Method.GET);
-		projectVersionItemRequest.setLimit(100);
-		projectVersionItemRequest.setUrl(versionsUrl);
+    public ProjectVersionRestService(final RestConnection restConnection, final Gson gson,
+            final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
-		final JsonObject jsonObject = projectVersionItemRequest.executeForResponseJson();
-		final List<ProjectVersionItem> allProjectVersionItems = getAll(jsonObject, projectVersionItemRequest);
-		return allProjectVersionItems;
-	}
+    public List<ProjectVersionItem> getAllProjectVersions(final String versionsUrl)
+            throws IOException, URISyntaxException, BDRestException {
+        final HubRequest projectVersionItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        projectVersionItemRequest.setMethod(Method.GET);
+        projectVersionItemRequest.setLimit(100);
+        projectVersionItemRequest.setUrl(versionsUrl);
+
+        final JsonObject jsonObject = projectVersionItemRequest.executeForResponseJson();
+        final List<ProjectVersionItem> allProjectVersionItems = getAll(jsonObject, projectVersionItemRequest);
+        return allProjectVersionItems;
+    }
 
 }

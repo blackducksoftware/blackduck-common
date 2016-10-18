@@ -30,12 +30,12 @@ import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class UserOptionLinkItemTest {
 
-	@Test
-	public void testConstructor() {
-		final MetaInformation meta = new MetaInformation(null, null, null);
-		final UserOptionLinkItem item = new UserOptionLinkItem(meta, "userUrl", "userExtensionOptionsUrl");
+    @Test
+    public void testConstructor() {
+        final MetaInformation meta = new MetaInformation(null, null, null);
+        final UserOptionLinkItem item = new UserOptionLinkItem(meta, "userUrl", "userExtensionOptionsUrl");
 
-		assertEquals("userUrl", item.getUser());
-		assertEquals("userExtensionOptionsUrl", item.getExtensionOptions());
-	}
+        assertEquals("userUrl", item.getUser());
+        assertEquals("userExtensionOptionsUrl", item.getExtensionOptions());
+    }
 }

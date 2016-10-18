@@ -38,49 +38,50 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ExtensionConfigRestService extends HubItemRestService<ConfigurationItem> {
-	public static final Type TYPE_TOKEN_ITEM = new TypeToken<ConfigurationItem>() {
-	}.getType();
-	public static final Type TYPE_TOKEN_LIST = new TypeToken<List<ConfigurationItem>>() {
-	}.getType();
+    public static final Type TYPE_TOKEN_ITEM = new TypeToken<ConfigurationItem>() {
+    }.getType();
 
-	public ExtensionConfigRestService(final RestConnection restConnection, final Gson gson,
-			final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
-	}
+    public static final Type TYPE_TOKEN_LIST = new TypeToken<List<ConfigurationItem>>() {
+    }.getType();
 
-	public List<ConfigurationItem> getGlobalOptions(final String globalConfigUrl)
-			throws IOException, URISyntaxException, BDRestException {
-		final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		itemRequest.setUrl(globalConfigUrl);
-		itemRequest.setMethod(Method.GET);
-		itemRequest.setLimit(100);
+    public ExtensionConfigRestService(final RestConnection restConnection, final Gson gson,
+            final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
+    }
 
-		final JsonObject jsonObject = itemRequest.executeForResponseJson();
-		final List<ConfigurationItem> allItems = getAll(jsonObject, itemRequest);
-		return allItems;
-	}
+    public List<ConfigurationItem> getGlobalOptions(final String globalConfigUrl)
+            throws IOException, URISyntaxException, BDRestException {
+        final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        itemRequest.setUrl(globalConfigUrl);
+        itemRequest.setMethod(Method.GET);
+        itemRequest.setLimit(100);
 
-	public List<ConfigurationItem> getCurrentUserOptions(final String currentUserConfigUrl)
-			throws IOException, URISyntaxException, BDRestException {
-		final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		itemRequest.setUrl(currentUserConfigUrl);
-		itemRequest.setMethod(Method.GET);
-		itemRequest.setLimit(100);
+        final JsonObject jsonObject = itemRequest.executeForResponseJson();
+        final List<ConfigurationItem> allItems = getAll(jsonObject, itemRequest);
+        return allItems;
+    }
 
-		final JsonObject jsonObject = itemRequest.executeForResponseJson();
-		final List<ConfigurationItem> allItems = getAll(jsonObject, itemRequest);
-		return allItems;
-	}
+    public List<ConfigurationItem> getCurrentUserOptions(final String currentUserConfigUrl)
+            throws IOException, URISyntaxException, BDRestException {
+        final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        itemRequest.setUrl(currentUserConfigUrl);
+        itemRequest.setMethod(Method.GET);
+        itemRequest.setLimit(100);
 
-	public List<ConfigurationItem> getUserConfiguration(final String userConfigUrl)
-			throws IOException, URISyntaxException, BDRestException {
-		final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		itemRequest.setUrl(userConfigUrl);
-		itemRequest.setMethod(Method.GET);
-		itemRequest.setLimit(100);
+        final JsonObject jsonObject = itemRequest.executeForResponseJson();
+        final List<ConfigurationItem> allItems = getAll(jsonObject, itemRequest);
+        return allItems;
+    }
 
-		final JsonObject jsonObject = itemRequest.executeForResponseJson();
-		final List<ConfigurationItem> allItems = getAll(jsonObject, itemRequest);
-		return allItems;
-	}
+    public List<ConfigurationItem> getUserConfiguration(final String userConfigUrl)
+            throws IOException, URISyntaxException, BDRestException {
+        final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        itemRequest.setUrl(userConfigUrl);
+        itemRequest.setMethod(Method.GET);
+        itemRequest.setLimit(100);
+
+        final JsonObject jsonObject = itemRequest.executeForResponseJson();
+        final List<ConfigurationItem> allItems = getAll(jsonObject, itemRequest);
+        return allItems;
+    }
 }

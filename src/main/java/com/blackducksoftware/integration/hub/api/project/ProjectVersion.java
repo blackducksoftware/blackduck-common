@@ -29,120 +29,123 @@ import com.blackducksoftware.integration.hub.util.HubUrlParser;
 import com.google.gson.annotations.SerializedName;
 
 public class ProjectVersion {
-	public static final String PROJECT_URL_IDENTIFIER = "projects";
-	public static final String VERSION_URL_IDENTIFIER = "versions";
-	private String projectName;
-	private String projectVersionName;
+    public static final String PROJECT_URL_IDENTIFIER = "projects";
 
-	@SerializedName("projectVersion")
-	private String url;
+    public static final String VERSION_URL_IDENTIFIER = "versions";
 
-	public String getProjectName() {
-		return projectName;
-	}
+    private String projectName;
 
-	public String getProjectVersionName() {
-		return projectVersionName;
-	}
+    private String projectVersionName;
 
-	/**
-	 * Use getUrl() instead.
-	 *
-	 * @return
-	 */
-	@Deprecated
-	public String getProjectVersionLink() {
-		return getUrl();
-	}
+    @SerializedName("projectVersion")
+    private String url;
 
-	public String getUrl() {
-		return url;
-	}
+    public String getProjectName() {
+        return projectName;
+    }
 
-	public String getRelativeUrl() throws URISyntaxException {
-		return HubUrlParser.getRelativeUrl(url);
-	}
+    public String getProjectVersionName() {
+        return projectVersionName;
+    }
 
-	public void setProjectName(final String projectName) {
-		this.projectName = projectName;
-	}
+    /**
+     * Use getUrl() instead.
+     *
+     * @return
+     */
+    @Deprecated
+    public String getProjectVersionLink() {
+        return getUrl();
+    }
 
-	public void setProjectVersionName(final String projectVersionName) {
-		this.projectVersionName = projectVersionName;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	/**
-	 * Use setUrl() instead.
-	 *
-	 * @param url
-	 */
-	@Deprecated
-	public void setProjectVersionLink(final String url) {
-		setUrl(url);
-	}
+    public String getRelativeUrl() throws URISyntaxException {
+        return HubUrlParser.getRelativeUrl(url);
+    }
 
-	public void setUrl(final String url) {
-		this.url = url;
-	}
+    public void setProjectName(final String projectName) {
+        this.projectName = projectName;
+    }
 
-	@Deprecated
-	public UUID getProjectId() throws MissingUUIDException {
-		if (getUrl() == null) {
-			return null;
-		}
-		return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getUrl());
-	}
+    public void setProjectVersionName(final String projectVersionName) {
+        this.projectVersionName = projectVersionName;
+    }
 
-	@Deprecated
-	public UUID getVersionId() throws MissingUUIDException {
-		if (getUrl() == null) {
-			return null;
-		}
-		return HubUrlParser.getUUIDFromURLString(VERSION_URL_IDENTIFIER, getUrl());
-	}
+    /**
+     * Use setUrl() instead.
+     *
+     * @param url
+     */
+    @Deprecated
+    public void setProjectVersionLink(final String url) {
+        setUrl(url);
+    }
 
-	@Override
-	public String toString() {
-		return "ProjectVersion [projectName=" + projectName + ", projectVersionName=" + projectVersionName
-				+ ", projectVersionLink=" + getUrl() + "]";
-	}
+    public void setUrl(final String url) {
+        this.url = url;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
-		result = prime * result + ((projectVersionName == null) ? 0 : projectVersionName.hashCode());
-		return result;
-	}
+    @Deprecated
+    public UUID getProjectId() throws MissingUUIDException {
+        if (getUrl() == null) {
+            return null;
+        }
+        return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getUrl());
+    }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final ProjectVersion other = (ProjectVersion) obj;
-		if (projectName == null) {
-			if (other.projectName != null) {
-				return false;
-			}
-		} else if (!projectName.equals(other.projectName)) {
-			return false;
-		}
-		if (projectVersionName == null) {
-			if (other.projectVersionName != null) {
-				return false;
-			}
-		} else if (!projectVersionName.equals(other.projectVersionName)) {
-			return false;
-		}
-		return true;
-	}
+    @Deprecated
+    public UUID getVersionId() throws MissingUUIDException {
+        if (getUrl() == null) {
+            return null;
+        }
+        return HubUrlParser.getUUIDFromURLString(VERSION_URL_IDENTIFIER, getUrl());
+    }
+
+    @Override
+    public String toString() {
+        return "ProjectVersion [projectName=" + projectName + ", projectVersionName=" + projectVersionName
+                + ", projectVersionLink=" + getUrl() + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
+        result = prime * result + ((projectVersionName == null) ? 0 : projectVersionName.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ProjectVersion other = (ProjectVersion) obj;
+        if (projectName == null) {
+            if (other.projectName != null) {
+                return false;
+            }
+        } else if (!projectName.equals(other.projectName)) {
+            return false;
+        }
+        if (projectVersionName == null) {
+            if (other.projectVersionName != null) {
+                return false;
+            }
+        } else if (!projectVersionName.equals(other.projectVersionName)) {
+            return false;
+        }
+        return true;
+    }
 
 }

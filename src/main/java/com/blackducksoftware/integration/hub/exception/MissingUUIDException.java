@@ -23,21 +23,21 @@ package com.blackducksoftware.integration.hub.exception;
 
 public class MissingUUIDException extends Exception {
 
-	private static final long serialVersionUID = -1688109859108681082L;
+    private static final long serialVersionUID = -1688109859108681082L;
 
-	public MissingUUIDException() {
-	}
+    public MissingUUIDException() {
+    }
 
-	public MissingUUIDException(final String message) {
-		super(message);
-	}
+    public MissingUUIDException(final String message) {
+        super(message);
+    }
 
-	public MissingUUIDException(final Throwable cause) {
-		super(cause);
-	}
+    public MissingUUIDException(final Throwable cause) {
+        super(cause);
+    }
 
-	public MissingUUIDException(final String message, final Throwable cause) {
-		super(message, cause);
-	}
+    public MissingUUIDException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
 }

@@ -50,236 +50,241 @@ import com.blackducksoftware.integration.util.AuthenticatorUtil;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class CLIInstaller {
-	private String proxyHost;
-	private Integer proxyPort;
-	private String proxyUserName;
-	private String proxyPassword;
-	private final CLILocation cliLocation;
-	private final CIEnvironmentVariables ciEnvironmentVariables;
+    private String proxyHost;
 
-	public CLIInstaller(final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables) {
-		this.cliLocation = cliLocation;
-		this.ciEnvironmentVariables = ciEnvironmentVariables;
-	}
+    private Integer proxyPort;
 
-	public void performInstallation(final IntLogger logger, final HubIntRestService restService,
-			final String localHostName)
-			throws IOException, InterruptedException, BDRestException, URISyntaxException, HubIntegrationException {
-		if (StringUtils.isBlank(localHostName)) {
-			throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
-		}
+    private String proxyUserName;
 
-		final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(logger, restService);
-		if (StringUtils.isNotBlank(cliDownloadUrl)) {
-			customInstall(new URL(cliDownloadUrl), restService.getHubVersion(), localHostName, logger);
-		} else {
-			logger.error("Could not find the correct Hub CLI download URL.");
-		}
-	}
+    private String proxyPassword;
 
-	public void customInstall(final URL archive, String hubVersion, final String localHostName, final IntLogger logger)
-			throws IOException, InterruptedException, HubIntegrationException {
-		boolean cliMismatch = true;
-		// For some reason the Hub returns the Version inside quotes
-		hubVersion = hubVersion.replace("\"", "");
+    private final CLILocation cliLocation;
 
-		try {
-			final File hubVersionFile = cliLocation.createHubVersionFile();
-			if (hubVersionFile.exists()) {
-				final String storedHubVersion = IOUtils.toString(new FileInputStream(hubVersionFile));
-				if (hubVersion.equals(storedHubVersion)) {
-					cliMismatch = false;
-				} else {
-					hubVersionFile.delete();
-					hubVersionFile.createNewFile();
-				}
-			}
-			final File cliInstallDirectory = cliLocation.getCLIInstallDir();
-			if (!cliInstallDirectory.exists()) {
-				cliMismatch = true;
-			}
+    private final CIEnvironmentVariables ciEnvironmentVariables;
 
-			if (cliMismatch) {
-				logger.debug("Attempting to download the Hub CLI.");
-				final FileWriter writer = new FileWriter(hubVersionFile);
-				writer.write(hubVersion);
-				writer.close();
-				hubVersionFile.setLastModified(0L);
-			}
-			final long cliTimestamp = hubVersionFile.lastModified();
+    public CLIInstaller(final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables) {
+        this.cliLocation = cliLocation;
+        this.ciEnvironmentVariables = ciEnvironmentVariables;
+    }
 
-			URLConnection connection = null;
-			try {
-				Proxy proxy = null;
+    public void performInstallation(final IntLogger logger, final HubIntRestService restService,
+            final String localHostName)
+            throws IOException, InterruptedException, BDRestException, URISyntaxException, HubIntegrationException {
+        if (StringUtils.isBlank(localHostName)) {
+            throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
+        }
 
-				if (StringUtils.isNotBlank(proxyHost)) {
-					proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
-				}
-				if (proxy != null) {
-					if (StringUtils.isNotBlank(proxyUserName) && StringUtils.isNotBlank(proxyPassword)) {
-						AuthenticatorUtil.setAuthenticator(proxyUserName, proxyPassword);
-					} else {
-						AuthenticatorUtil.resetAuthenticator();
-					}
-				}
-				if (proxy != null) {
-					connection = archive.openConnection(proxy);
-				} else {
-					connection = archive.openConnection();
-				}
-				connection.setIfModifiedSince(cliTimestamp);
-				connection.connect();
-			} catch (final IOException ioe) {
-				logger.error("Skipping installation of " + archive + " to " + cliLocation.getCanonicalPath() + ": "
-						+ ioe.toString());
-				return;
-			}
+        final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(logger, restService);
+        if (StringUtils.isNotBlank(cliDownloadUrl)) {
+            customInstall(new URL(cliDownloadUrl), restService.getHubVersion(), localHostName, logger);
+        } else {
+            logger.error("Could not find the correct Hub CLI download URL.");
+        }
+    }
 
-			if (connection instanceof HttpURLConnection
-					&& ((HttpURLConnection) connection).getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
-				// CLI has not been modified
-				return;
-			}
+    public void customInstall(final URL archive, String hubVersion, final String localHostName, final IntLogger logger)
+            throws IOException, InterruptedException, HubIntegrationException {
+        boolean cliMismatch = true;
+        // For some reason the Hub returns the Version inside quotes
+        hubVersion = hubVersion.replace("\"", "");
 
-			final long sourceTimestamp = connection.getLastModified();
+        try {
+            final File hubVersionFile = cliLocation.createHubVersionFile();
+            if (hubVersionFile.exists()) {
+                final String storedHubVersion = IOUtils.toString(new FileInputStream(hubVersionFile));
+                if (hubVersion.equals(storedHubVersion)) {
+                    cliMismatch = false;
+                } else {
+                    hubVersionFile.delete();
+                    hubVersionFile.createNewFile();
+                }
+            }
+            final File cliInstallDirectory = cliLocation.getCLIInstallDir();
+            if (!cliInstallDirectory.exists()) {
+                cliMismatch = true;
+            }
 
-			if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
-				if (!cliMismatch && sourceTimestamp == cliTimestamp) {
-					logger.debug("The current Hub CLI is up to date.");
-					return;
-				}
-				for (final File file : cliInstallDirectory.listFiles()) {
-					FileUtils.deleteDirectory(file);
-				}
-			} else {
-				cliInstallDirectory.mkdir();
-			}
-			logger.debug("Updating the Hub CLI.");
-			hubVersionFile.setLastModified(sourceTimestamp);
+            if (cliMismatch) {
+                logger.debug("Attempting to download the Hub CLI.");
+                final FileWriter writer = new FileWriter(hubVersionFile);
+                writer.write(hubVersion);
+                writer.close();
+                hubVersionFile.setLastModified(0L);
+            }
+            final long cliTimestamp = hubVersionFile.lastModified();
 
-			logger.info("Unpacking " + archive.toString() + " to " + cliInstallDirectory.getCanonicalPath() + " on "
-					+ localHostName);
+            URLConnection connection = null;
+            try {
+                Proxy proxy = null;
 
-			final CountingInputStream cis = new CountingInputStream(connection.getInputStream());
-			try {
-				unzip(cliInstallDirectory, cis, logger);
-				updateJreSecurity(logger);
-			} catch (final IOException e) {
-				throw new IOException(String.format("Failed to unpack %s (%d bytes read of total %d)", archive,
-						cis.getByteCount(), connection.getContentLength()), e);
-			}
-		} catch (final IOException e) {
-			throw new IOException("Failed to install " + archive + " to " + cliLocation.getCanonicalPath(), e);
-		}
-	}
+                if (StringUtils.isNotBlank(proxyHost)) {
+                    proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
+                }
+                if (proxy != null) {
+                    if (StringUtils.isNotBlank(proxyUserName) && StringUtils.isNotBlank(proxyPassword)) {
+                        AuthenticatorUtil.setAuthenticator(proxyUserName, proxyPassword);
+                    } else {
+                        AuthenticatorUtil.resetAuthenticator();
+                    }
+                }
+                if (proxy != null) {
+                    connection = archive.openConnection(proxy);
+                } else {
+                    connection = archive.openConnection();
+                }
+                connection.setIfModifiedSince(cliTimestamp);
+                connection.connect();
+            } catch (final IOException ioe) {
+                logger.error("Skipping installation of " + archive + " to " + cliLocation.getCanonicalPath() + ": "
+                        + ioe.toString());
+                return;
+            }
 
-	private void updateJreSecurity(final IntLogger logger) throws IOException {
-		final String cacertsFilename = "cacerts";
-		if (ciEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
-			final File securityDirectory = cliLocation.getJreSecurityDirectory();
-			if (securityDirectory == null) {
-				// the cli might not have the jre included
-				return;
-			}
-			final String customCacertsPath = ciEnvironmentVariables
-					.getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
-			final File customCacerts = new File(customCacertsPath);
+            if (connection instanceof HttpURLConnection
+                    && ((HttpURLConnection) connection).getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
+                // CLI has not been modified
+                return;
+            }
 
-			final File cacerts = new File(securityDirectory, cacertsFilename);
-			final File cacertsBackup = new File(securityDirectory, cacertsFilename + System.currentTimeMillis());
+            final long sourceTimestamp = connection.getLastModified();
 
-			try {
-				FileUtils.moveFile(cacerts, cacertsBackup);
-				FileUtils.copyFile(customCacerts, cacerts);
-			} catch (final IOException e) {
-				logger.error("Could not copy the custom cacerts file from: " + customCacertsPath + " to: "
-						+ cacerts.getAbsolutePath() + " msg: " + e.getMessage());
-				throw e;
-			}
-		}
-	}
+            if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
+                if (!cliMismatch && sourceTimestamp == cliTimestamp) {
+                    logger.debug("The current Hub CLI is up to date.");
+                    return;
+                }
+                for (final File file : cliInstallDirectory.listFiles()) {
+                    FileUtils.deleteDirectory(file);
+                }
+            } else {
+                cliInstallDirectory.mkdir();
+            }
+            logger.debug("Updating the Hub CLI.");
+            hubVersionFile.setLastModified(sourceTimestamp);
 
-	private void unzip(final File dir, final InputStream in, final IntLogger logger) throws IOException {
-		// uses java.io.tmpdir
-		final File tmpFile = File.createTempFile("tmpzip", null);
+            logger.info("Unpacking " + archive.toString() + " to " + cliInstallDirectory.getCanonicalPath() + " on "
+                    + localHostName);
 
-		try {
-			copyInputStreamToFile(in, tmpFile);
-			unzip(dir, tmpFile, logger);
-		} finally {
-			tmpFile.delete();
-		}
-	}
+            final CountingInputStream cis = new CountingInputStream(connection.getInputStream());
+            try {
+                unzip(cliInstallDirectory, cis, logger);
+                updateJreSecurity(logger);
+            } catch (final IOException e) {
+                throw new IOException(String.format("Failed to unpack %s (%d bytes read of total %d)", archive,
+                        cis.getByteCount(), connection.getContentLength()), e);
+            }
+        } catch (final IOException e) {
+            throw new IOException("Failed to install " + archive + " to " + cliLocation.getCanonicalPath(), e);
+        }
+    }
 
-	private void unzip(File dir, final File zipFile, final IntLogger logger) throws IOException {
-		// without getAbsoluteFile, getParentFile below seems to fail
-		dir = dir.getAbsoluteFile();
-		final ZipFile zip = new ZipFile(zipFile);
-		final Enumeration<ZipEntry> entries = zip.getEntries();
-		try {
-			while (entries.hasMoreElements()) {
-				final ZipEntry e = entries.nextElement();
-				final File f = new File(dir, e.getName());
-				if (e.isDirectory()) {
-					f.mkdirs();
-				} else {
-					final File p = f.getParentFile();
-					if (p != null) {
-						p.mkdirs();
-					}
-					final InputStream input = zip.getInputStream(e);
-					try {
-						copyInputStreamToFile(input, f);
-					} finally {
-						input.close();
-					}
-					f.setLastModified(e.getTime());
-				}
-			}
-		} finally {
-			zip.close();
-		}
-	}
+    private void updateJreSecurity(final IntLogger logger) throws IOException {
+        final String cacertsFilename = "cacerts";
+        if (ciEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
+            final File securityDirectory = cliLocation.getJreSecurityDirectory();
+            if (securityDirectory == null) {
+                // the cli might not have the jre included
+                return;
+            }
+            final String customCacertsPath = ciEnvironmentVariables
+                    .getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
+            final File customCacerts = new File(customCacertsPath);
 
-	private void copyInputStreamToFile(final InputStream in, final File f) throws IOException {
-		final FileOutputStream fos = new FileOutputStream(f);
-		try {
-			org.apache.commons.io.IOUtils.copy(in, fos);
-		} finally {
-			org.apache.commons.io.IOUtils.closeQuietly(fos);
-		}
-	}
+            final File cacerts = new File(securityDirectory, cacertsFilename);
+            final File cacertsBackup = new File(securityDirectory, cacertsFilename + System.currentTimeMillis());
 
-	public String getProxyHost() {
-		return proxyHost;
-	}
+            try {
+                FileUtils.moveFile(cacerts, cacertsBackup);
+                FileUtils.copyFile(customCacerts, cacerts);
+            } catch (final IOException e) {
+                logger.error("Could not copy the custom cacerts file from: " + customCacertsPath + " to: "
+                        + cacerts.getAbsolutePath() + " msg: " + e.getMessage());
+                throw e;
+            }
+        }
+    }
 
-	public void setProxyHost(final String proxyHost) {
-		this.proxyHost = proxyHost;
-	}
+    private void unzip(final File dir, final InputStream in, final IntLogger logger) throws IOException {
+        // uses java.io.tmpdir
+        final File tmpFile = File.createTempFile("tmpzip", null);
 
-	public Integer getProxyPort() {
-		return proxyPort;
-	}
+        try {
+            copyInputStreamToFile(in, tmpFile);
+            unzip(dir, tmpFile, logger);
+        } finally {
+            tmpFile.delete();
+        }
+    }
 
-	public void setProxyPort(final Integer proxyPort) {
-		this.proxyPort = proxyPort;
-	}
+    private void unzip(File dir, final File zipFile, final IntLogger logger) throws IOException {
+        // without getAbsoluteFile, getParentFile below seems to fail
+        dir = dir.getAbsoluteFile();
+        final ZipFile zip = new ZipFile(zipFile);
+        final Enumeration<ZipEntry> entries = zip.getEntries();
+        try {
+            while (entries.hasMoreElements()) {
+                final ZipEntry e = entries.nextElement();
+                final File f = new File(dir, e.getName());
+                if (e.isDirectory()) {
+                    f.mkdirs();
+                } else {
+                    final File p = f.getParentFile();
+                    if (p != null) {
+                        p.mkdirs();
+                    }
+                    final InputStream input = zip.getInputStream(e);
+                    try {
+                        copyInputStreamToFile(input, f);
+                    } finally {
+                        input.close();
+                    }
+                    f.setLastModified(e.getTime());
+                }
+            }
+        } finally {
+            zip.close();
+        }
+    }
 
-	public String getProxyUserName() {
-		return proxyUserName;
-	}
+    private void copyInputStreamToFile(final InputStream in, final File f) throws IOException {
+        final FileOutputStream fos = new FileOutputStream(f);
+        try {
+            org.apache.commons.io.IOUtils.copy(in, fos);
+        } finally {
+            org.apache.commons.io.IOUtils.closeQuietly(fos);
+        }
+    }
 
-	public void setProxyUserName(final String proxyUserName) {
-		this.proxyUserName = proxyUserName;
-	}
+    public String getProxyHost() {
+        return proxyHost;
+    }
 
-	public String getProxyPassword() {
-		return proxyPassword;
-	}
+    public void setProxyHost(final String proxyHost) {
+        this.proxyHost = proxyHost;
+    }
 
-	public void setProxyPassword(final String proxyPassword) {
-		this.proxyPassword = proxyPassword;
-	}
+    public Integer getProxyPort() {
+        return proxyPort;
+    }
+
+    public void setProxyPort(final Integer proxyPort) {
+        this.proxyPort = proxyPort;
+    }
+
+    public String getProxyUserName() {
+        return proxyUserName;
+    }
+
+    public void setProxyUserName(final String proxyUserName) {
+        this.proxyUserName = proxyUserName;
+    }
+
+    public String getProxyPassword() {
+        return proxyPassword;
+    }
+
+    public void setProxyPassword(final String proxyPassword) {
+        this.proxyPassword = proxyPassword;
+    }
 
 }

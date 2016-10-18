@@ -27,42 +27,44 @@ import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class NotificationItem extends HubItem {
-	public String contentType;
-	public NotificationType type;
-	public Date createdAt;
+    public String contentType;
 
-	public NotificationItem(final MetaInformation meta) {
-		super(meta);
-	}
+    public NotificationType type;
 
-	public String getContentType() {
-		return contentType;
-	}
+    public Date createdAt;
 
-	public NotificationType getType() {
-		return type;
-	}
+    public NotificationItem(final MetaInformation meta) {
+        super(meta);
+    }
 
-	public Date getCreatedAt() {
-		return createdAt;
-	}
+    public String getContentType() {
+        return contentType;
+    }
 
-	public void setContentType(final String contentType) {
-		this.contentType = contentType;
-	}
+    public NotificationType getType() {
+        return type;
+    }
 
-	public void setType(final NotificationType type) {
-		this.type = type;
-	}
+    public Date getCreatedAt() {
+        return createdAt;
+    }
 
-	public void setCreatedAt(final Date createdAt) {
-		this.createdAt = createdAt;
-	}
+    public void setContentType(final String contentType) {
+        this.contentType = contentType;
+    }
 
-	@Override
-	public String toString() {
-		return "NotificationItem [contentType=" + contentType + ", type=" + type + ", createdAt=" + createdAt
-				+ ", Meta=" + getMeta() + "]";
-	}
+    public void setType(final NotificationType type) {
+        this.type = type;
+    }
+
+    public void setCreatedAt(final Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public String toString() {
+        return "NotificationItem [contentType=" + contentType + ", type=" + type + ", createdAt=" + createdAt
+                + ", Meta=" + getMeta() + "]";
+    }
 
 }

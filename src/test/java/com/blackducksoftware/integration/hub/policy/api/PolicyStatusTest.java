@@ -39,163 +39,163 @@ import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 
 public class PolicyStatusTest {
-	@Test
-	public void testPolicyStatus() {
-		final String updatedAt1 = "time1";
-		final int value1 = 3214;
-		final ComponentVersionStatusCount statusCount1 = new ComponentVersionStatusCount(PolicyStatusEnum.UNKNOWN,
-				value1);
-		final List<ComponentVersionStatusCount> counts1 = new ArrayList<>();
-		counts1.add(statusCount1);
-		final List<MetaAllowEnum> allows1 = new ArrayList<>();
-		allows1.add(MetaAllowEnum.PUT);
-		final String href1 = "href1";
-		final MetaLink link1 = new MetaLink("rel1", "link1");
-		final List<MetaLink> links1 = new ArrayList<>();
-		links1.add(link1);
-		final MetaInformation _meta1 = new MetaInformation(allows1, href1, links1);
+    @Test
+    public void testPolicyStatus() {
+        final String updatedAt1 = "time1";
+        final int value1 = 3214;
+        final ComponentVersionStatusCount statusCount1 = new ComponentVersionStatusCount(PolicyStatusEnum.UNKNOWN,
+                value1);
+        final List<ComponentVersionStatusCount> counts1 = new ArrayList<>();
+        counts1.add(statusCount1);
+        final List<MetaAllowEnum> allows1 = new ArrayList<>();
+        allows1.add(MetaAllowEnum.PUT);
+        final String href1 = "href1";
+        final MetaLink link1 = new MetaLink("rel1", "link1");
+        final List<MetaLink> links1 = new ArrayList<>();
+        links1.add(link1);
+        final MetaInformation _meta1 = new MetaInformation(allows1, href1, links1);
 
-		final String updatedAt2 = new DateTime().toString();
-		final int value2 = 0;
-		final ComponentVersionStatusCount statusCount2 = new ComponentVersionStatusCount(
-				PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN, value2);
-		final List<ComponentVersionStatusCount> counts2 = new ArrayList<>();
-		counts2.add(statusCount2);
-		final List<MetaAllowEnum> allows2 = new ArrayList<>();
-		allows2.add(MetaAllowEnum.GET);
-		final String href2 = "href2";
-		final MetaLink link2 = new MetaLink("rel2", "link2");
-		final List<MetaLink> links2 = new ArrayList<>();
-		links2.add(link2);
-		final MetaInformation _meta2 = new MetaInformation(allows2, href2, links2);
+        final String updatedAt2 = new DateTime().toString();
+        final int value2 = 0;
+        final ComponentVersionStatusCount statusCount2 = new ComponentVersionStatusCount(
+                PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN, value2);
+        final List<ComponentVersionStatusCount> counts2 = new ArrayList<>();
+        counts2.add(statusCount2);
+        final List<MetaAllowEnum> allows2 = new ArrayList<>();
+        allows2.add(MetaAllowEnum.GET);
+        final String href2 = "href2";
+        final MetaLink link2 = new MetaLink("rel2", "link2");
+        final List<MetaLink> links2 = new ArrayList<>();
+        links2.add(link2);
+        final MetaInformation _meta2 = new MetaInformation(allows2, href2, links2);
 
-		final PolicyStatusItem item1 = new PolicyStatusItem(PolicyStatusEnum.UNKNOWN, updatedAt1, counts1, _meta1);
-		final PolicyStatusItem item2 = new PolicyStatusItem(PolicyStatusEnum.IN_VIOLATION, updatedAt2, counts2, _meta2);
-		final PolicyStatusItem item3 = new PolicyStatusItem(PolicyStatusEnum.UNKNOWN, updatedAt1, counts1, _meta1);
-		final PolicyStatusItem item4 = new PolicyStatusItem(PolicyStatusEnum.UNKNOWN, null, null, null);
+        final PolicyStatusItem item1 = new PolicyStatusItem(PolicyStatusEnum.UNKNOWN, updatedAt1, counts1, _meta1);
+        final PolicyStatusItem item2 = new PolicyStatusItem(PolicyStatusEnum.IN_VIOLATION, updatedAt2, counts2, _meta2);
+        final PolicyStatusItem item3 = new PolicyStatusItem(PolicyStatusEnum.UNKNOWN, updatedAt1, counts1, _meta1);
+        final PolicyStatusItem item4 = new PolicyStatusItem(PolicyStatusEnum.UNKNOWN, null, null, null);
 
-		assertEquals(PolicyStatusEnum.UNKNOWN, item1.getOverallStatus());
-		assertEquals(updatedAt1, item1.getUpdatedAt());
-		assertNull(item1.getUpdatedAtTime());
-		assertEquals(counts1, item1.getComponentVersionStatusCounts());
-		assertEquals(_meta1, item1.getMeta());
+        assertEquals(PolicyStatusEnum.UNKNOWN, item1.getOverallStatus());
+        assertEquals(updatedAt1, item1.getUpdatedAt());
+        assertNull(item1.getUpdatedAtTime());
+        assertEquals(counts1, item1.getComponentVersionStatusCounts());
+        assertEquals(_meta1, item1.getMeta());
 
-		assertEquals(PolicyStatusEnum.IN_VIOLATION, item2.getOverallStatus());
-		assertEquals(updatedAt2, item2.getUpdatedAt());
-		assertEquals(updatedAt2, item2.getUpdatedAtTime().toString());
-		assertEquals(counts2, item2.getComponentVersionStatusCounts());
-		assertEquals(_meta2, item2.getMeta());
+        assertEquals(PolicyStatusEnum.IN_VIOLATION, item2.getOverallStatus());
+        assertEquals(updatedAt2, item2.getUpdatedAt());
+        assertEquals(updatedAt2, item2.getUpdatedAtTime().toString());
+        assertEquals(counts2, item2.getComponentVersionStatusCounts());
+        assertEquals(_meta2, item2.getMeta());
 
-		assertEquals(PolicyStatusEnum.UNKNOWN, item4.getOverallStatus());
-		assertNull(item4.getUpdatedAtTime());
+        assertEquals(PolicyStatusEnum.UNKNOWN, item4.getOverallStatus());
+        assertNull(item4.getUpdatedAtTime());
 
-		assertTrue(!item1.equals(item2));
-		assertTrue(item1.equals(item3));
+        assertTrue(!item1.equals(item2));
+        assertTrue(item1.equals(item3));
 
-		assertTrue(item1.hashCode() != item2.hashCode());
-		assertEquals(item1.hashCode(), item3.hashCode());
-	}
+        assertTrue(item1.hashCode() != item2.hashCode());
+        assertEquals(item1.hashCode(), item3.hashCode());
+    }
 
-	@Test
-	public void testGetCountInViolation() {
-		PolicyStatusItem status = new PolicyStatusItem(null, null, null, null);
+    @Test
+    public void testGetCountInViolation() {
+        PolicyStatusItem status = new PolicyStatusItem(null, null, null, null);
 
-		assertNull(status.getCountInViolation());
+        assertNull(status.getCountInViolation());
 
-		int value = 346;
-		ComponentVersionStatusCount statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.UNKNOWN, value);
-		List<ComponentVersionStatusCount> counts = new ArrayList<>();
-		counts.add(statusCount);
+        int value = 346;
+        ComponentVersionStatusCount statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.UNKNOWN, value);
+        List<ComponentVersionStatusCount> counts = new ArrayList<>();
+        counts.add(statusCount);
 
-		status = new PolicyStatusItem(null, null, counts, null);
+        status = new PolicyStatusItem(null, null, counts, null);
 
-		assertNull(status.getCountInViolation());
+        assertNull(status.getCountInViolation());
 
-		value = 435;
-		statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.NOT_IN_VIOLATION, value);
-		counts = new ArrayList<>();
-		counts.add(statusCount);
+        value = 435;
+        statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.NOT_IN_VIOLATION, value);
+        counts = new ArrayList<>();
+        counts.add(statusCount);
 
-		status = new PolicyStatusItem(null, null, counts, null);
+        status = new PolicyStatusItem(null, null, counts, null);
 
-		assertNull(status.getCountInViolation());
+        assertNull(status.getCountInViolation());
 
-		value = 435;
-		statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.IN_VIOLATION, value);
-		counts = new ArrayList<>();
-		counts.add(statusCount);
+        value = 435;
+        statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.IN_VIOLATION, value);
+        counts = new ArrayList<>();
+        counts.add(statusCount);
 
-		status = new PolicyStatusItem(null, null, counts, null);
+        status = new PolicyStatusItem(null, null, counts, null);
 
-		assertEquals(statusCount, status.getCountInViolation());
-	}
+        assertEquals(statusCount, status.getCountInViolation());
+    }
 
-	@Test
-	public void testGetCountNotInViolation() {
-		PolicyStatusItem status = new PolicyStatusItem(null, null, null, null);
+    @Test
+    public void testGetCountNotInViolation() {
+        PolicyStatusItem status = new PolicyStatusItem(null, null, null, null);
 
-		assertNull(status.getCountNotInViolation());
+        assertNull(status.getCountNotInViolation());
 
-		int value = 346;
-		ComponentVersionStatusCount statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.UNKNOWN, value);
-		List<ComponentVersionStatusCount> counts = new ArrayList<>();
-		counts.add(statusCount);
+        int value = 346;
+        ComponentVersionStatusCount statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.UNKNOWN, value);
+        List<ComponentVersionStatusCount> counts = new ArrayList<>();
+        counts.add(statusCount);
 
-		status = new PolicyStatusItem(null, null, counts, null);
+        status = new PolicyStatusItem(null, null, counts, null);
 
-		assertNull(status.getCountNotInViolation());
+        assertNull(status.getCountNotInViolation());
 
-		value = 435;
-		statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.IN_VIOLATION, value);
-		counts = new ArrayList<>();
-		counts.add(statusCount);
+        value = 435;
+        statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.IN_VIOLATION, value);
+        counts = new ArrayList<>();
+        counts.add(statusCount);
 
-		status = new PolicyStatusItem(null, null, counts, null);
+        status = new PolicyStatusItem(null, null, counts, null);
 
-		assertNull(status.getCountNotInViolation());
+        assertNull(status.getCountNotInViolation());
 
-		value = 435;
-		statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.NOT_IN_VIOLATION, value);
-		counts = new ArrayList<>();
-		counts.add(statusCount);
+        value = 435;
+        statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.NOT_IN_VIOLATION, value);
+        counts = new ArrayList<>();
+        counts.add(statusCount);
 
-		status = new PolicyStatusItem(null, null, counts, null);
+        status = new PolicyStatusItem(null, null, counts, null);
 
-		assertEquals(statusCount, status.getCountNotInViolation());
-	}
+        assertEquals(statusCount, status.getCountNotInViolation());
+    }
 
-	@Test
-	public void testGetCountInViolationOveridden() {
-		PolicyStatusItem status = new PolicyStatusItem(null, null, null, null);
+    @Test
+    public void testGetCountInViolationOveridden() {
+        PolicyStatusItem status = new PolicyStatusItem(null, null, null, null);
 
-		assertNull(status.getCountInViolationOverridden());
+        assertNull(status.getCountInViolationOverridden());
 
-		int value = 346;
-		ComponentVersionStatusCount statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.UNKNOWN, value);
-		List<ComponentVersionStatusCount> counts = new ArrayList<>();
-		counts.add(statusCount);
+        int value = 346;
+        ComponentVersionStatusCount statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.UNKNOWN, value);
+        List<ComponentVersionStatusCount> counts = new ArrayList<>();
+        counts.add(statusCount);
 
-		status = new PolicyStatusItem(null, null, counts, null);
+        status = new PolicyStatusItem(null, null, counts, null);
 
-		assertNull(status.getCountInViolationOverridden());
+        assertNull(status.getCountInViolationOverridden());
 
-		value = 435;
-		statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.NOT_IN_VIOLATION, value);
-		counts = new ArrayList<>();
-		counts.add(statusCount);
+        value = 435;
+        statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.NOT_IN_VIOLATION, value);
+        counts = new ArrayList<>();
+        counts.add(statusCount);
 
-		status = new PolicyStatusItem(null, null, counts, null);
+        status = new PolicyStatusItem(null, null, counts, null);
 
-		assertNull(status.getCountInViolationOverridden());
+        assertNull(status.getCountInViolationOverridden());
 
-		value = 435;
-		statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN, value);
-		counts = new ArrayList<>();
-		counts.add(statusCount);
+        value = 435;
+        statusCount = new ComponentVersionStatusCount(PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN, value);
+        counts = new ArrayList<>();
+        counts.add(statusCount);
 
-		status = new PolicyStatusItem(null, null, counts, null);
+        status = new PolicyStatusItem(null, null, counts, null);
 
-		assertEquals(statusCount, status.getCountInViolationOverridden());
-	}
+        assertEquals(statusCount, status.getCountInViolationOverridden());
+    }
 
 }

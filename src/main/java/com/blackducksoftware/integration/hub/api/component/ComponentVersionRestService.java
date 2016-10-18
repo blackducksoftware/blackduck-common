@@ -31,14 +31,15 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ComponentVersionRestService extends HubItemRestService<ComponentVersion> {
-	private static Type ITEM_TYPE = new TypeToken<ComponentVersion>() {
-	}.getType();
-	private static Type ITEM_LIST_TYPE = new TypeToken<List<ComponentVersion>>() {
-	}.getType();
+    private static Type ITEM_TYPE = new TypeToken<ComponentVersion>() {
+    }.getType();
 
-	public ComponentVersionRestService(final RestConnection restConnection, final Gson gson,
-			final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    private static Type ITEM_LIST_TYPE = new TypeToken<List<ComponentVersion>>() {
+    }.getType();
+
+    public ComponentVersionRestService(final RestConnection restConnection, final Gson gson,
+            final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
 }

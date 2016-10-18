@@ -53,117 +53,130 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 
 public class PolicyOverrideTransformTest {
-	private final static String PROJECT_NAME = "test project";
-	private final static String PROJECT_VERSION = "0.1.0";
-	private final static String COMPONENT_NAME = "component 1";
-	private final static String COMPONENT_VERSION = "0.9.8";
-	private final static String COMPONENT_VERSION_URL = "http://hub.blackducksoftware.com/api/components/"
-			+ UUID.randomUUID() + "/versions/" + UUID.randomUUID() + "/";
-	private final static String PROJECT_VERSION_URL = "http://hub.blackducksoftware.com/api/projects/"
-			+ UUID.randomUUID()
-			+ "/versions/" + UUID.randomUUID() + "/";
-	private final static String POLICY_NAME = "Policy Name";
-	private final static String FIRST_NAME = "myName";
-	private final static String LAST_NAME = "noMyName";
+    private final static String PROJECT_NAME = "test project";
 
-	private NotificationRestService notificationService;
-	private ReleaseItemRestService projectVersionService;
-	private PolicyRestService policyService;
-	private VersionBomPolicyRestService bomVersionPolicyService;
-	private ComponentVersionRestService componentVersionService;
-	private PolicyViolationOverrideTransformer transformer;
+    private final static String PROJECT_VERSION = "0.1.0";
 
-	private NotificationRestService createNotificationService() {
-		final NotificationRestService service = Mockito.mock(NotificationRestService.class);
-		return service;
-	}
+    private final static String COMPONENT_NAME = "component 1";
 
-	private ReleaseItemRestService createProjectVersionService()
-			throws IOException, BDRestException, URISyntaxException {
+    private final static String COMPONENT_VERSION = "0.9.8";
 
-		final ReleaseItemRestService service = Mockito.mock(ReleaseItemRestService.class);
-		final ReleaseItem releaseItem = Mockito.mock(ReleaseItem.class);
-		Mockito.when(releaseItem.getVersionName()).thenReturn(PROJECT_VERSION);
-		Mockito.when(service.getItem(Mockito.anyString())).thenReturn(releaseItem);
-		return service;
-	}
+    private final static String COMPONENT_VERSION_URL = "http://hub.blackducksoftware.com/api/components/"
+            + UUID.randomUUID() + "/versions/" + UUID.randomUUID() + "/";
 
-	private PolicyRestService createPolicyService() throws IOException, BDRestException, URISyntaxException {
-		final PolicyRule rule = Mockito.mock(PolicyRule.class);
-		Mockito.when(rule.getName()).thenReturn(POLICY_NAME);
-		final PolicyRestService service = Mockito.mock(PolicyRestService.class);
-		Mockito.when(service.getItem(Mockito.anyString())).thenReturn(rule);
-		return service;
-	}
+    private final static String PROJECT_VERSION_URL = "http://hub.blackducksoftware.com/api/projects/"
+            + UUID.randomUUID()
+            + "/versions/" + UUID.randomUUID() + "/";
 
-	private VersionBomPolicyRestService createBomVersionService()
-			throws IOException, BDRestException, URISyntaxException {
-		final List<String> policyRuleList = new ArrayList<>();
-		policyRuleList.add("url1");
-		final BomComponentVersionPolicyStatus status = Mockito.mock(BomComponentVersionPolicyStatus.class);
-		Mockito.when(status.getLinks(Mockito.anyString())).thenReturn(policyRuleList);
-		final VersionBomPolicyRestService service = Mockito.mock(VersionBomPolicyRestService.class);
-		Mockito.when(service.getItem(Mockito.anyString())).thenReturn(status);
-		return service;
-	}
+    private final static String POLICY_NAME = "Policy Name";
 
-	private ComponentVersionRestService createComponentVersionService()
-			throws NotificationServiceException, IOException, BDRestException, URISyntaxException {
+    private final static String FIRST_NAME = "myName";
 
-		final ComponentVersion componentVersion = Mockito.mock(ComponentVersion.class);
-		Mockito.when(componentVersion.getVersionName()).thenReturn(COMPONENT_VERSION);
-		final ComponentVersionRestService service = Mockito.mock(ComponentVersionRestService.class);
-		Mockito.when(service.getItem(Mockito.anyString())).thenReturn(componentVersion);
-		return service;
-	}
+    private final static String LAST_NAME = "noMyName";
 
-	@Before
-	public void initTest() throws Exception {
-		notificationService = createNotificationService();
-		projectVersionService = createProjectVersionService();
-		policyService = createPolicyService();
-		bomVersionPolicyService = createBomVersionService();
-		componentVersionService = createComponentVersionService();
-		transformer = new PolicyViolationOverrideTransformer(notificationService, projectVersionService, policyService,
-				bomVersionPolicyService, componentVersionService, new PolicyNotificationFilter(null));
+    private NotificationRestService notificationService;
 
-	}
+    private ReleaseItemRestService projectVersionService;
 
-	private PolicyOverrideNotificationItem createNotificationItem() {
-		final PolicyOverrideNotificationItem item = Mockito.mock(PolicyOverrideNotificationItem.class);
-		final PolicyOverrideNotificationContent content = Mockito.mock(PolicyOverrideNotificationContent.class);
-		final List<ComponentVersionStatus> versionStatusList = new ArrayList<>();
-		final ComponentVersionStatus status = Mockito.mock(ComponentVersionStatus.class);
-		Mockito.when(content.getBomComponentVersionPolicyStatusLink()).thenReturn("http://hub.bds.com/api/rules/1");
-		Mockito.when(content.getComponentName()).thenReturn(COMPONENT_NAME);
-		Mockito.when(content.getComponentVersionLink())
-		.thenReturn(COMPONENT_VERSION_URL);
-		Mockito.when(content.getProjectVersionLink()).thenReturn(PROJECT_VERSION_URL);
-		versionStatusList.add(status);
-		Mockito.when(item.getContent()).thenReturn(content);
-		Mockito.when(content.getProjectName()).thenReturn(PROJECT_NAME);
-		Mockito.when(content.getFirstName()).thenReturn(FIRST_NAME);
-		Mockito.when(content.getLastName()).thenReturn(LAST_NAME);
+    private PolicyRestService policyService;
 
-		// policyOverride.getContent().getProjectVersionLink()
+    private VersionBomPolicyRestService bomVersionPolicyService;
 
-		return item;
-	}
+    private ComponentVersionRestService componentVersionService;
 
-	@Test
-	public void testTransform() throws Exception {
-		final List<NotificationContentItem> itemList = transformer.transform(createNotificationItem());
-		for (final NotificationContentItem item : itemList) {
-			final PolicyOverrideContentItem contentItem = (PolicyOverrideContentItem) item;
-			assertEquals(PROJECT_NAME, contentItem.getProjectVersion().getProjectName());
-			assertEquals(PROJECT_VERSION, contentItem.getProjectVersion().getProjectVersionName());
-			assertEquals(COMPONENT_NAME, contentItem.getComponentName());
-			assertEquals(COMPONENT_VERSION, contentItem.getComponentVersion());
-			assertEquals(COMPONENT_VERSION_URL, contentItem.getComponentVersionUrl());
-			assertEquals(FIRST_NAME, contentItem.getFirstName());
-			assertEquals(LAST_NAME, contentItem.getLastName());
-			assertEquals(1, contentItem.getPolicyRuleList().size());
-			assertEquals(POLICY_NAME, contentItem.getPolicyRuleList().get(0).getName());
-		}
-	}
+    private PolicyViolationOverrideTransformer transformer;
+
+    private NotificationRestService createNotificationService() {
+        final NotificationRestService service = Mockito.mock(NotificationRestService.class);
+        return service;
+    }
+
+    private ReleaseItemRestService createProjectVersionService()
+            throws IOException, BDRestException, URISyntaxException {
+
+        final ReleaseItemRestService service = Mockito.mock(ReleaseItemRestService.class);
+        final ReleaseItem releaseItem = Mockito.mock(ReleaseItem.class);
+        Mockito.when(releaseItem.getVersionName()).thenReturn(PROJECT_VERSION);
+        Mockito.when(service.getItem(Mockito.anyString())).thenReturn(releaseItem);
+        return service;
+    }
+
+    private PolicyRestService createPolicyService() throws IOException, BDRestException, URISyntaxException {
+        final PolicyRule rule = Mockito.mock(PolicyRule.class);
+        Mockito.when(rule.getName()).thenReturn(POLICY_NAME);
+        final PolicyRestService service = Mockito.mock(PolicyRestService.class);
+        Mockito.when(service.getItem(Mockito.anyString())).thenReturn(rule);
+        return service;
+    }
+
+    private VersionBomPolicyRestService createBomVersionService()
+            throws IOException, BDRestException, URISyntaxException {
+        final List<String> policyRuleList = new ArrayList<>();
+        policyRuleList.add("url1");
+        final BomComponentVersionPolicyStatus status = Mockito.mock(BomComponentVersionPolicyStatus.class);
+        Mockito.when(status.getLinks(Mockito.anyString())).thenReturn(policyRuleList);
+        final VersionBomPolicyRestService service = Mockito.mock(VersionBomPolicyRestService.class);
+        Mockito.when(service.getItem(Mockito.anyString())).thenReturn(status);
+        return service;
+    }
+
+    private ComponentVersionRestService createComponentVersionService()
+            throws NotificationServiceException, IOException, BDRestException, URISyntaxException {
+
+        final ComponentVersion componentVersion = Mockito.mock(ComponentVersion.class);
+        Mockito.when(componentVersion.getVersionName()).thenReturn(COMPONENT_VERSION);
+        final ComponentVersionRestService service = Mockito.mock(ComponentVersionRestService.class);
+        Mockito.when(service.getItem(Mockito.anyString())).thenReturn(componentVersion);
+        return service;
+    }
+
+    @Before
+    public void initTest() throws Exception {
+        notificationService = createNotificationService();
+        projectVersionService = createProjectVersionService();
+        policyService = createPolicyService();
+        bomVersionPolicyService = createBomVersionService();
+        componentVersionService = createComponentVersionService();
+        transformer = new PolicyViolationOverrideTransformer(notificationService, projectVersionService, policyService,
+                bomVersionPolicyService, componentVersionService, new PolicyNotificationFilter(null));
+
+    }
+
+    private PolicyOverrideNotificationItem createNotificationItem() {
+        final PolicyOverrideNotificationItem item = Mockito.mock(PolicyOverrideNotificationItem.class);
+        final PolicyOverrideNotificationContent content = Mockito.mock(PolicyOverrideNotificationContent.class);
+        final List<ComponentVersionStatus> versionStatusList = new ArrayList<>();
+        final ComponentVersionStatus status = Mockito.mock(ComponentVersionStatus.class);
+        Mockito.when(content.getBomComponentVersionPolicyStatusLink()).thenReturn("http://hub.bds.com/api/rules/1");
+        Mockito.when(content.getComponentName()).thenReturn(COMPONENT_NAME);
+        Mockito.when(content.getComponentVersionLink())
+                .thenReturn(COMPONENT_VERSION_URL);
+        Mockito.when(content.getProjectVersionLink()).thenReturn(PROJECT_VERSION_URL);
+        versionStatusList.add(status);
+        Mockito.when(item.getContent()).thenReturn(content);
+        Mockito.when(content.getProjectName()).thenReturn(PROJECT_NAME);
+        Mockito.when(content.getFirstName()).thenReturn(FIRST_NAME);
+        Mockito.when(content.getLastName()).thenReturn(LAST_NAME);
+
+        // policyOverride.getContent().getProjectVersionLink()
+
+        return item;
+    }
+
+    @Test
+    public void testTransform() throws Exception {
+        final List<NotificationContentItem> itemList = transformer.transform(createNotificationItem());
+        for (final NotificationContentItem item : itemList) {
+            final PolicyOverrideContentItem contentItem = (PolicyOverrideContentItem) item;
+            assertEquals(PROJECT_NAME, contentItem.getProjectVersion().getProjectName());
+            assertEquals(PROJECT_VERSION, contentItem.getProjectVersion().getProjectVersionName());
+            assertEquals(COMPONENT_NAME, contentItem.getComponentName());
+            assertEquals(COMPONENT_VERSION, contentItem.getComponentVersion());
+            assertEquals(COMPONENT_VERSION_URL, contentItem.getComponentVersionUrl());
+            assertEquals(FIRST_NAME, contentItem.getFirstName());
+            assertEquals(LAST_NAME, contentItem.getLastName());
+            assertEquals(1, contentItem.getPolicyRuleList().size());
+            assertEquals(POLICY_NAME, contentItem.getPolicyRuleList().get(0).getName());
+        }
+    }
 }

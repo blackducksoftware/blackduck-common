@@ -31,207 +31,223 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ScannerSplitStream extends OutputStream {
-	// https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
-	private static final int EOF = -1; // End of file
-	private static final int ETX = 3; // End of text, should have no more data
-	private static final int EOT = 4; // End of transmission, no more data
-	private static final int LF = 10; // Line feed, new line
-	private static final int CR = 13; // Carriage return
-	private static final String EXCEPTION = "Exception:";
-	private static final String FINISHED = "Finished in";
-	private static final String ERROR = "ERROR:";
-	private static final String WARN = "WARN:";
-	private static final String INFO = "INFO:";
-	private static final String DEBUG = "DEBUG:";
-	private static final String TRACE = "TRACE:";
+    // https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
+    private static final int EOF = -1; // End of file
 
-	private final OutputStream outputFileStream;
-	private final IntLogger logger;
-	private String output = "";
-	private String lineBuffer = "";
-	private String currentLine = "";
-	private int previousCodePoint = -1;
+    private static final int ETX = 3; // End of text, should have no more data
 
-	public ScannerSplitStream(final IntLogger logger, final OutputStream outputFileStream) {
-		this.outputFileStream = outputFileStream;
-		this.logger = logger;
-	}
+    private static final int EOT = 4; // End of transmission, no more data
 
-	public String getOutput() {
-		return output;
-	}
+    private static final int LF = 10; // Line feed, new line
 
-	public Boolean hasOutput() {
-		return StringUtils.isNotBlank(output);
-	}
+    private static final int CR = 13; // Carriage return
 
-	@Override
-	public void write(final int codePoint) throws IOException {
-		outputFileStream.write(codePoint);
+    private static final String EXCEPTION = "Exception:";
 
-		if (EOF == codePoint) {
-			throw new EOFException();
-		}
+    private static final String FINISHED = "Finished in";
 
-		boolean atLineEnd = false;
-		if (ETX == codePoint || EOT == codePoint) {
-			atLineEnd = true;
-		} else if (LF == codePoint && CR != previousCodePoint) {
-			atLineEnd = true;
-		} else if (LF == codePoint && CR == previousCodePoint) {
-			atLineEnd = true;
-			// also need to remove the previously consumed CR
-			currentLine = currentLine.substring(0, currentLine.length() - 1);
-		} else if (LF != codePoint && CR == previousCodePoint) {
-			processLine(currentLine);
-			currentLine = "";
-		}
-		previousCodePoint = codePoint;
+    private static final String ERROR = "ERROR:";
 
-		if (atLineEnd) {
-			processLine(currentLine);
-			currentLine = "";
-		} else {
-			final String stringAscii = new String(Character.toChars(codePoint));
-			currentLine += stringAscii;
-		}
-	}
+    private static final String WARN = "WARN:";
 
-	private Boolean isLoggableLine(final String line) {
-		if (StringUtils.containsIgnoreCase(line, ERROR)) {
-			return true;
-		}
-		if (StringUtils.containsIgnoreCase(line, WARN)) {
-			return true;
-		}
-		if (StringUtils.containsIgnoreCase(line, INFO)) {
-			return true;
-		}
-		if (StringUtils.containsIgnoreCase(line, DEBUG)) {
-			return true;
-		}
-		if (StringUtils.containsIgnoreCase(line, TRACE)) {
-			return true;
-		}
-		if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
-			return true;
-		}
-		if (StringUtils.containsIgnoreCase(line, FINISHED)) {
-			return true;
-		}
-		return false;
-	}
+    private static final String INFO = "INFO:";
 
-	private void processLine(final String line) throws UnsupportedEncodingException {
-		if (lineBuffer.length() == 0) {
-			// First log line found, put it in the buffer
-			lineBuffer = line;
-		} else if (isLoggableLine(line)) {
-			// next real log message came in, print the log in the buffer
-			// print stored lines
-			writeToConsole(lineBuffer);
+    private static final String DEBUG = "DEBUG:";
 
-			// replace with the current line
-			lineBuffer = line;
-		} else {
-			// We assume that each new log starts with the log level, if this
-			// line does not contain a log level it
-			// must only be a piece of a log
-			// needs to be added into the buffer
-			final StringBuilder builder = new StringBuilder();
-			builder.append(lineBuffer);
+    private static final String TRACE = "TRACE:";
 
-			builder.append(System.getProperty("line.separator"));
-			builder.append(line);
-			lineBuffer = builder.toString();
-		}
-	}
+    private final OutputStream outputFileStream;
 
-	@Override
-	public void write(final byte[] byteArray) throws IOException {
-		outputFileStream.write(byteArray);
+    private final IntLogger logger;
 
-		final String currentLine = new String(byteArray, "UTF-8");
-		if (currentLine.contains(System.getProperty("line.separator"))) {
-			final String[] splitLines = currentLine.split(System.getProperty("line.separator"));
+    private String output = "";
 
-			for (final String line : splitLines) {
-				processLine(line);
-			}
-		} else {
-			processLine(currentLine);
-		}
-	}
+    private String lineBuffer = "";
 
-	@Override
-	public void write(final byte[] byteArray, final int offset, final int length) throws IOException {
-		outputFileStream.write(byteArray, offset, length);
+    private String currentLine = "";
 
-		final String currentLine = new String(byteArray, offset, length, "UTF-8");
-		if (currentLine.contains(System.getProperty("line.separator"))) {
-			final String[] splitLines = currentLine.split(System.getProperty("line.separator"));
+    private int previousCodePoint = -1;
 
-			for (final String line : splitLines) {
-				processLine(line);
-			}
-		} else {
-			processLine(currentLine);
-		}
-	}
+    public ScannerSplitStream(final IntLogger logger, final OutputStream outputFileStream) {
+        this.outputFileStream = outputFileStream;
+        this.logger = logger;
+    }
 
-	@Override
-	public void flush() throws IOException {
-		outputFileStream.flush();
+    public String getOutput() {
+        return output;
+    }
 
-		// Print whatever is left in the buffer
-		writeToConsole(lineBuffer);
-		lineBuffer = "";
-		// Print whatever is left in the buffer
-		if (StringUtils.isNotBlank(currentLine)) {
-			writeToConsole(currentLine);
-			currentLine = "";
-		}
-	}
+    public Boolean hasOutput() {
+        return StringUtils.isNotBlank(output);
+    }
 
-	@Override
-	public void close() throws IOException {
-		outputFileStream.close();
+    @Override
+    public void write(final int codePoint) throws IOException {
+        outputFileStream.write(codePoint);
 
-		// Do not close the listener, will not be able to log to the UI anymore
-		// if you do
-	}
+        if (EOF == codePoint) {
+            throw new EOFException();
+        }
 
-	private void writeToConsole(final String line) {
-		if (StringUtils.containsIgnoreCase(line, DEBUG) || StringUtils.containsIgnoreCase(line, TRACE)) {
-			// We dont want to print Debug or Trace logs to the logger
-			return;
-		}
-		final StringBuilder outputBuilder = new StringBuilder();
-		outputBuilder.append(output);
-		if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
-			// looking for 'Exception in thread' type messages
-			outputBuilder.append(line);
-			outputBuilder.append(System.getProperty("line.separator"));
-			logger.error(line);
-		} else if (StringUtils.containsIgnoreCase(line, FINISHED)) {
-			outputBuilder.append(line);
-			outputBuilder.append(System.getProperty("line.separator"));
-			logger.info(line);
-		} else if (StringUtils.containsIgnoreCase(line, ERROR)) {
-			outputBuilder.append(line);
-			outputBuilder.append(System.getProperty("line.separator"));
-			logger.error(line);
-		} else if (StringUtils.containsIgnoreCase(line, WARN)) {
-			outputBuilder.append(line);
-			outputBuilder.append(System.getProperty("line.separator"));
-			logger.warn(line);
-		} else if (StringUtils.containsIgnoreCase(line, INFO)) {
-			outputBuilder.append(line);
-			outputBuilder.append(System.getProperty("line.separator"));
-			logger.info(line);
-		}
+        boolean atLineEnd = false;
+        if (ETX == codePoint || EOT == codePoint) {
+            atLineEnd = true;
+        } else if (LF == codePoint && CR != previousCodePoint) {
+            atLineEnd = true;
+        } else if (LF == codePoint && CR == previousCodePoint) {
+            atLineEnd = true;
+            // also need to remove the previously consumed CR
+            currentLine = currentLine.substring(0, currentLine.length() - 1);
+        } else if (LF != codePoint && CR == previousCodePoint) {
+            processLine(currentLine);
+            currentLine = "";
+        }
+        previousCodePoint = codePoint;
 
-		output = outputBuilder.toString();
-	}
+        if (atLineEnd) {
+            processLine(currentLine);
+            currentLine = "";
+        } else {
+            final String stringAscii = new String(Character.toChars(codePoint));
+            currentLine += stringAscii;
+        }
+    }
+
+    private Boolean isLoggableLine(final String line) {
+        if (StringUtils.containsIgnoreCase(line, ERROR)) {
+            return true;
+        }
+        if (StringUtils.containsIgnoreCase(line, WARN)) {
+            return true;
+        }
+        if (StringUtils.containsIgnoreCase(line, INFO)) {
+            return true;
+        }
+        if (StringUtils.containsIgnoreCase(line, DEBUG)) {
+            return true;
+        }
+        if (StringUtils.containsIgnoreCase(line, TRACE)) {
+            return true;
+        }
+        if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
+            return true;
+        }
+        if (StringUtils.containsIgnoreCase(line, FINISHED)) {
+            return true;
+        }
+        return false;
+    }
+
+    private void processLine(final String line) throws UnsupportedEncodingException {
+        if (lineBuffer.length() == 0) {
+            // First log line found, put it in the buffer
+            lineBuffer = line;
+        } else if (isLoggableLine(line)) {
+            // next real log message came in, print the log in the buffer
+            // print stored lines
+            writeToConsole(lineBuffer);
+
+            // replace with the current line
+            lineBuffer = line;
+        } else {
+            // We assume that each new log starts with the log level, if this
+            // line does not contain a log level it
+            // must only be a piece of a log
+            // needs to be added into the buffer
+            final StringBuilder builder = new StringBuilder();
+            builder.append(lineBuffer);
+
+            builder.append(System.getProperty("line.separator"));
+            builder.append(line);
+            lineBuffer = builder.toString();
+        }
+    }
+
+    @Override
+    public void write(final byte[] byteArray) throws IOException {
+        outputFileStream.write(byteArray);
+
+        final String currentLine = new String(byteArray, "UTF-8");
+        if (currentLine.contains(System.getProperty("line.separator"))) {
+            final String[] splitLines = currentLine.split(System.getProperty("line.separator"));
+
+            for (final String line : splitLines) {
+                processLine(line);
+            }
+        } else {
+            processLine(currentLine);
+        }
+    }
+
+    @Override
+    public void write(final byte[] byteArray, final int offset, final int length) throws IOException {
+        outputFileStream.write(byteArray, offset, length);
+
+        final String currentLine = new String(byteArray, offset, length, "UTF-8");
+        if (currentLine.contains(System.getProperty("line.separator"))) {
+            final String[] splitLines = currentLine.split(System.getProperty("line.separator"));
+
+            for (final String line : splitLines) {
+                processLine(line);
+            }
+        } else {
+            processLine(currentLine);
+        }
+    }
+
+    @Override
+    public void flush() throws IOException {
+        outputFileStream.flush();
+
+        // Print whatever is left in the buffer
+        writeToConsole(lineBuffer);
+        lineBuffer = "";
+        // Print whatever is left in the buffer
+        if (StringUtils.isNotBlank(currentLine)) {
+            writeToConsole(currentLine);
+            currentLine = "";
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        outputFileStream.close();
+
+        // Do not close the listener, will not be able to log to the UI anymore
+        // if you do
+    }
+
+    private void writeToConsole(final String line) {
+        if (StringUtils.containsIgnoreCase(line, DEBUG) || StringUtils.containsIgnoreCase(line, TRACE)) {
+            // We dont want to print Debug or Trace logs to the logger
+            return;
+        }
+        final StringBuilder outputBuilder = new StringBuilder();
+        outputBuilder.append(output);
+        if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
+            // looking for 'Exception in thread' type messages
+            outputBuilder.append(line);
+            outputBuilder.append(System.getProperty("line.separator"));
+            logger.error(line);
+        } else if (StringUtils.containsIgnoreCase(line, FINISHED)) {
+            outputBuilder.append(line);
+            outputBuilder.append(System.getProperty("line.separator"));
+            logger.info(line);
+        } else if (StringUtils.containsIgnoreCase(line, ERROR)) {
+            outputBuilder.append(line);
+            outputBuilder.append(System.getProperty("line.separator"));
+            logger.error(line);
+        } else if (StringUtils.containsIgnoreCase(line, WARN)) {
+            outputBuilder.append(line);
+            outputBuilder.append(System.getProperty("line.separator"));
+            logger.warn(line);
+        } else if (StringUtils.containsIgnoreCase(line, INFO)) {
+            outputBuilder.append(line);
+            outputBuilder.append(System.getProperty("line.separator"));
+            logger.info(line);
+        }
+
+        output = outputBuilder.toString();
+    }
 
 }

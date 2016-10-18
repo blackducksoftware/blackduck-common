@@ -42,41 +42,43 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
 public class PolicyStatusDataService extends AbstractDataService {
-	private final ProjectRestService projectRestService;
-	private final ProjectVersionRestService projectVersionRestService;
-	private final PolicyStatusRestService policyStatusRestService;
+    private final ProjectRestService projectRestService;
 
-	public PolicyStatusDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
-			final ProjectRestService projectRestService, final ProjectVersionRestService projectVersionRestService,
-			final PolicyStatusRestService policyStatusRestService) {
-		super(restConnection, gson, jsonParser);
-		this.projectRestService = projectRestService;
-		this.projectVersionRestService = projectVersionRestService;
-		this.policyStatusRestService = policyStatusRestService;
-	}
+    private final ProjectVersionRestService projectVersionRestService;
 
-	public PolicyStatusItem getPolicyStatusForProjectAndVersion(final String projectName,
-			final String projectVersionName)
-			throws IOException, URISyntaxException, BDRestException, ProjectDoesNotExistException,
-			HubIntegrationException, MissingUUIDException, UnexpectedHubResponseException {
-		final ProjectItem projectItem = projectRestService.getProjectByName(projectName);
-		final String versionsUrl = projectItem.getLink("versions");
+    private final PolicyStatusRestService policyStatusRestService;
 
-		final List<ProjectVersionItem> projectVersions = projectVersionRestService.getAllProjectVersions(versionsUrl);
-		final String policyStatusUrl = findPolicyStatusUrl(projectVersions, projectVersionName);
+    public PolicyStatusDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
+            final ProjectRestService projectRestService, final ProjectVersionRestService projectVersionRestService,
+            final PolicyStatusRestService policyStatusRestService) {
+        super(restConnection, gson, jsonParser);
+        this.projectRestService = projectRestService;
+        this.projectVersionRestService = projectVersionRestService;
+        this.policyStatusRestService = policyStatusRestService;
+    }
 
-		return policyStatusRestService.getItem(policyStatusUrl);
-	}
+    public PolicyStatusItem getPolicyStatusForProjectAndVersion(final String projectName,
+            final String projectVersionName)
+            throws IOException, URISyntaxException, BDRestException, ProjectDoesNotExistException,
+            HubIntegrationException, MissingUUIDException, UnexpectedHubResponseException {
+        final ProjectItem projectItem = projectRestService.getProjectByName(projectName);
+        final String versionsUrl = projectItem.getLink("versions");
 
-	private String findPolicyStatusUrl(final List<ProjectVersionItem> projectVersions, final String projectVersionName)
-			throws UnexpectedHubResponseException {
-		for (final ProjectVersionItem version : projectVersions) {
-			if (projectVersionName.equals(version.getVersionName())) {
-				return version.getLink("policy-status");
-			}
-		}
+        final List<ProjectVersionItem> projectVersions = projectVersionRestService.getAllProjectVersions(versionsUrl);
+        final String policyStatusUrl = findPolicyStatusUrl(projectVersions, projectVersionName);
 
-		return null;
-	}
+        return policyStatusRestService.getItem(policyStatusUrl);
+    }
+
+    private String findPolicyStatusUrl(final List<ProjectVersionItem> projectVersions, final String projectVersionName)
+            throws UnexpectedHubResponseException {
+        for (final ProjectVersionItem version : projectVersions) {
+            if (projectVersionName.equals(version.getVersionName())) {
+                return version.getLink("policy-status");
+            }
+        }
+
+        return null;
+    }
 
 }

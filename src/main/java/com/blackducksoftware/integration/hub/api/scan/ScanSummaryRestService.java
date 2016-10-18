@@ -38,25 +38,26 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ScanSummaryRestService extends HubItemRestService<ScanSummaryItem> {
-	private static final Type ITEM_TYPE = new TypeToken<ScanSummaryItem>() {
-	}.getType();
-	private static final Type ITEM_LIST_TYPE = new TypeToken<List<ScanSummaryItem>>() {
-	}.getType();
+    private static final Type ITEM_TYPE = new TypeToken<ScanSummaryItem>() {
+    }.getType();
 
-	public ScanSummaryRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    private static final Type ITEM_LIST_TYPE = new TypeToken<List<ScanSummaryItem>>() {
+    }.getType();
 
-	public List<ScanSummaryItem> getAllScanSummaryItems(final String scanSummaryUrl)
-			throws IOException, URISyntaxException, BDRestException {
-		final HubRequest scanSummaryItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		scanSummaryItemRequest.setMethod(Method.GET);
-		scanSummaryItemRequest.setLimit(100);
-		scanSummaryItemRequest.setUrl(scanSummaryUrl);
+    public ScanSummaryRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
-		final JsonObject jsonObject = scanSummaryItemRequest.executeForResponseJson();
-		final List<ScanSummaryItem> allScanSummaryItems = getAll(jsonObject, scanSummaryItemRequest);
-		return allScanSummaryItems;
-	}
+    public List<ScanSummaryItem> getAllScanSummaryItems(final String scanSummaryUrl)
+            throws IOException, URISyntaxException, BDRestException {
+        final HubRequest scanSummaryItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        scanSummaryItemRequest.setMethod(Method.GET);
+        scanSummaryItemRequest.setLimit(100);
+        scanSummaryItemRequest.setUrl(scanSummaryUrl);
+
+        final JsonObject jsonObject = scanSummaryItemRequest.executeForResponseJson();
+        final List<ScanSummaryItem> allScanSummaryItems = getAll(jsonObject, scanSummaryItemRequest);
+        return allScanSummaryItems;
+    }
 
 }

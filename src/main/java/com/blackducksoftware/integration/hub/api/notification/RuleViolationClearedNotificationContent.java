@@ -27,58 +27,61 @@ import com.blackducksoftware.integration.hub.api.component.ComponentVersionStatu
 import com.google.gson.annotations.SerializedName;
 
 public class RuleViolationClearedNotificationContent {
-	private String projectName;
-	private String projectVersionName;
-	private int componentVersionsInViolation;
-	private List<ComponentVersionStatus> componentVersionStatuses;
+    private String projectName;
 
-	@SerializedName("projectVersion")
-	private String projectVersionLink;
+    private String projectVersionName;
 
-	public String getProjectName() {
-		return projectName;
-	}
+    private int componentVersionsInViolation;
 
-	public String getProjectVersionName() {
-		return projectVersionName;
-	}
+    private List<ComponentVersionStatus> componentVersionStatuses;
 
-	public int getComponentVersionsInViolation() {
-		return componentVersionsInViolation;
-	}
+    @SerializedName("projectVersion")
+    private String projectVersionLink;
 
-	public List<ComponentVersionStatus> getComponentVersionStatuses() {
-		return componentVersionStatuses;
-	}
+    public String getProjectName() {
+        return projectName;
+    }
 
-	public String getProjectVersionLink() {
-		return projectVersionLink;
-	}
+    public String getProjectVersionName() {
+        return projectVersionName;
+    }
 
-	public void setProjectName(final String projectName) {
-		this.projectName = projectName;
-	}
+    public int getComponentVersionsInViolation() {
+        return componentVersionsInViolation;
+    }
 
-	public void setProjectVersionName(final String projectVersionName) {
-		this.projectVersionName = projectVersionName;
-	}
+    public List<ComponentVersionStatus> getComponentVersionStatuses() {
+        return componentVersionStatuses;
+    }
 
-	public void setComponentVersionsInViolation(final int componentVersionsInViolation) {
-		this.componentVersionsInViolation = componentVersionsInViolation;
-	}
+    public String getProjectVersionLink() {
+        return projectVersionLink;
+    }
 
-	public void setComponentVersionStatuses(final List<ComponentVersionStatus> componentVersionStatuses) {
-		this.componentVersionStatuses = componentVersionStatuses;
-	}
+    public void setProjectName(final String projectName) {
+        this.projectName = projectName;
+    }
 
-	public void setProjectVersionLink(final String projectVersionLink) {
-		this.projectVersionLink = projectVersionLink;
-	}
+    public void setProjectVersionName(final String projectVersionName) {
+        this.projectVersionName = projectVersionName;
+    }
 
-	@Override
-	public String toString() {
-		return "RuleViolationClearedContent [projectName=" + projectName + ", projectVersionName=" + projectVersionName
-				+ ", componentVersionsInViolation=" + componentVersionsInViolation + ", componentVersionStatuses="
-				+ componentVersionStatuses + ", projectVersionLink=" + projectVersionLink + "]";
-	}
+    public void setComponentVersionsInViolation(final int componentVersionsInViolation) {
+        this.componentVersionsInViolation = componentVersionsInViolation;
+    }
+
+    public void setComponentVersionStatuses(final List<ComponentVersionStatus> componentVersionStatuses) {
+        this.componentVersionStatuses = componentVersionStatuses;
+    }
+
+    public void setProjectVersionLink(final String projectVersionLink) {
+        this.projectVersionLink = projectVersionLink;
+    }
+
+    @Override
+    public String toString() {
+        return "RuleViolationClearedContent [projectName=" + projectName + ", projectVersionName=" + projectVersionName
+                + ", componentVersionsInViolation=" + componentVersionsInViolation + ", componentVersionStatuses="
+                + componentVersionStatuses + ", projectVersionLink=" + projectVersionLink + "]";
+    }
 }

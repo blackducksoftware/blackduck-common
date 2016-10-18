@@ -23,9 +23,9 @@ package com.blackducksoftware.integration.hub.report.api;
 
 @Deprecated
 public class LicenseDefinition extends com.blackducksoftware.integration.hub.api.report.LicenseDefinition {
-	// Need this package and the objects for backwards compatability
-	public LicenseDefinition(final String licenseId, final String discoveredAs, final String name, final String spdxId,
-			final String ownership, final String codeSharing, final String licenseDisplay) {
-		super(licenseId, discoveredAs, name, spdxId, ownership, codeSharing, licenseDisplay);
-	}
+    // Need this package and the objects for backwards compatability
+    public LicenseDefinition(final String licenseId, final String discoveredAs, final String name, final String spdxId,
+            final String ownership, final String codeSharing, final String licenseDisplay) {
+        super(licenseId, discoveredAs, name, spdxId, ownership, codeSharing, licenseDisplay);
+    }
 }

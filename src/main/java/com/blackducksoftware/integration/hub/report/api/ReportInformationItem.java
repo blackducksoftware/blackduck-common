@@ -25,11 +25,11 @@ import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 @Deprecated
 public class ReportInformationItem extends com.blackducksoftware.integration.hub.api.report.ReportInformationItem {
-	// Need this package and the objects for backwards compatability
-	public ReportInformationItem(final String reportFormat, final String locale, final String fileName,
-			final int fileSize, final String createdAt, final String updatedAt, final String finishedAt,
-			final String createdBy, final MetaInformation _meta) {
-		super(reportFormat, locale, fileName, fileSize, createdAt, updatedAt, finishedAt, createdBy, _meta);
-	}
+    // Need this package and the objects for backwards compatability
+    public ReportInformationItem(final String reportFormat, final String locale, final String fileName,
+            final int fileSize, final String createdAt, final String updatedAt, final String finishedAt,
+            final String createdBy, final MetaInformation _meta) {
+        super(reportFormat, locale, fileName, fileSize, createdAt, updatedAt, finishedAt, createdBy, _meta);
+    }
 
 }

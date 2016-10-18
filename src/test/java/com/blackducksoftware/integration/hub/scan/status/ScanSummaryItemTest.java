@@ -39,53 +39,53 @@ import com.blackducksoftware.integration.test.TestUtils;
 import com.google.gson.Gson;
 
 public class ScanSummaryItemTest {
-	@Test
-	public void testScanSummaryItem() {
-		final String href1 = "href1";
-		final MetaInformation meta1 = new MetaInformation(null, href1, null);
+    @Test
+    public void testScanSummaryItem() {
+        final String href1 = "href1";
+        final MetaInformation meta1 = new MetaInformation(null, href1, null);
 
-		final String href2 = "href2";
-		final MetaInformation meta2 = new MetaInformation(null, href2, null);
+        final String href2 = "href2";
+        final MetaInformation meta2 = new MetaInformation(null, href2, null);
 
-		final ScanSummaryItem item1 = new ScanSummaryItem(ScanStatus.UNKNOWN, null, null, null, meta1);
-		final ScanSummaryItem item2 = new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, meta2);
-		final ScanSummaryItem item3 = new ScanSummaryItem(ScanStatus.UNKNOWN, null, null, null, meta1);
+        final ScanSummaryItem item1 = new ScanSummaryItem(ScanStatus.UNKNOWN, null, null, null, meta1);
+        final ScanSummaryItem item2 = new ScanSummaryItem(ScanStatus.COMPLETE, null, null, null, meta2);
+        final ScanSummaryItem item3 = new ScanSummaryItem(ScanStatus.UNKNOWN, null, null, null, meta1);
 
-		assertEquals(ScanStatus.UNKNOWN, item1.getStatus());
-		assertEquals(meta1, item1.getMeta());
+        assertEquals(ScanStatus.UNKNOWN, item1.getStatus());
+        assertEquals(meta1, item1.getMeta());
 
-		assertEquals(ScanStatus.COMPLETE, item2.getStatus());
-		assertEquals(meta2, item2.getMeta());
+        assertEquals(ScanStatus.COMPLETE, item2.getStatus());
+        assertEquals(meta2, item2.getMeta());
 
-		assertTrue(!item1.equals(item2));
-		assertTrue(item1.equals(item3));
+        assertTrue(!item1.equals(item2));
+        assertTrue(item1.equals(item3));
 
-		assertTrue(item1.hashCode() != item2.hashCode());
-		assertEquals(item1.hashCode(), item3.hashCode());
-	}
+        assertTrue(item1.hashCode() != item2.hashCode());
+        assertEquals(item1.hashCode(), item3.hashCode());
+    }
 
-	@Test
-	public void testPopulatingScanSummaryItemFromJson() throws IOException {
-		final InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(
-				"com/blackducksoftware/integration/hub/scan/status/scanSummaryItemJson.txt");
-		final String json = IOUtils.toString(inputStream, "UTF-8");
+    @Test
+    public void testPopulatingScanSummaryItemFromJson() throws IOException {
+        final InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(
+                "com/blackducksoftware/integration/hub/scan/status/scanSummaryItemJson.txt");
+        final String json = IOUtils.toString(inputStream, "UTF-8");
 
-		final Gson gson = new Gson();
-		final ScanSummaryItem scanSummaryItem = gson.fromJson(json, ScanSummaryItem.class);
-		assertNotNull(scanSummaryItem.getCreatedAt());
-		assertNotNull(scanSummaryItem.getUpdatedAt());
+        final Gson gson = new Gson();
+        final ScanSummaryItem scanSummaryItem = gson.fromJson(json, ScanSummaryItem.class);
+        assertNotNull(scanSummaryItem.getCreatedAt());
+        assertNotNull(scanSummaryItem.getUpdatedAt());
 
-		final Calendar createdAt = Calendar.getInstance();
-		createdAt.setTime(scanSummaryItem.getCreatedAt());
-		assertEquals(4, createdAt.get(Calendar.DAY_OF_MONTH));
-		assertEquals(Calendar.OCTOBER, createdAt.get(Calendar.MONTH));
-		assertEquals(479, createdAt.get(Calendar.MILLISECOND));
+        final Calendar createdAt = Calendar.getInstance();
+        createdAt.setTime(scanSummaryItem.getCreatedAt());
+        assertEquals(4, createdAt.get(Calendar.DAY_OF_MONTH));
+        assertEquals(Calendar.OCTOBER, createdAt.get(Calendar.MONTH));
+        assertEquals(479, createdAt.get(Calendar.MILLISECOND));
 
-		final Calendar updatedAt = Calendar.getInstance();
-		updatedAt.setTime(scanSummaryItem.getUpdatedAt());
-		assertEquals(4, updatedAt.get(Calendar.DAY_OF_MONTH));
-		assertEquals(Calendar.OCTOBER, updatedAt.get(Calendar.MONTH));
-		assertEquals(982, updatedAt.get(Calendar.MILLISECOND));
-	}
+        final Calendar updatedAt = Calendar.getInstance();
+        updatedAt.setTime(scanSummaryItem.getUpdatedAt());
+        assertEquals(4, updatedAt.get(Calendar.DAY_OF_MONTH));
+        assertEquals(Calendar.OCTOBER, updatedAt.get(Calendar.MONTH));
+        assertEquals(982, updatedAt.get(Calendar.MILLISECOND));
+    }
 
 }

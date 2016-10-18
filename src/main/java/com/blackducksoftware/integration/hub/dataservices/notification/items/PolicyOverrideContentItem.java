@@ -30,36 +30,37 @@ import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 
 public class PolicyOverrideContentItem extends PolicyViolationContentItem {
 
-	private final String firstName;
-	private final String lastName;
+    private final String firstName;
 
-	public PolicyOverrideContentItem(final Date createdAt, final ProjectVersion projectVersion,
-			final String componentName,
-			final String componentVersion, final String componentUrl,
-			final String componentVersionUrl,
-			final List<PolicyRule> policyRuleList, final String firstName,
-			final String lastName)
-					throws URISyntaxException {
-		super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl,
-				policyRuleList);
-		this.firstName = firstName;
-		this.lastName = lastName;
-	}
+    private final String lastName;
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public PolicyOverrideContentItem(final Date createdAt, final ProjectVersion projectVersion,
+            final String componentName,
+            final String componentVersion, final String componentUrl,
+            final String componentVersionUrl,
+            final List<PolicyRule> policyRuleList, final String firstName,
+            final String lastName)
+            throws URISyntaxException {
+        super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl,
+                policyRuleList);
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 
-	public String getLastName() {
-		return lastName;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	@Override
-	public String toString() {
-		return "PolicyOverrideContentItem [firstName=" + firstName + ", lastName=" + lastName
-				+ ", getPolicyRuleList()=" + getPolicyRuleList() + ", getComponentUrl()=" + getComponentUrl()
-				+ ", getProjectVersion()=" + getProjectVersion() + ", getComponentName()=" + getComponentName()
-				+ ", getComponentVersion()=" + getComponentVersion() + ", getComponentVersionUrl()="
-				+ getComponentVersionUrl() + ", getCreatedAt()=" + getCreatedAt() + "]";
-	}
+    public String getLastName() {
+        return lastName;
+    }
+
+    @Override
+    public String toString() {
+        return "PolicyOverrideContentItem [firstName=" + firstName + ", lastName=" + lastName
+                + ", getPolicyRuleList()=" + getPolicyRuleList() + ", getComponentUrl()=" + getComponentUrl()
+                + ", getProjectVersion()=" + getProjectVersion() + ", getComponentName()=" + getComponentName()
+                + ", getComponentVersion()=" + getComponentVersion() + ", getComponentVersionUrl()="
+                + getComponentVersionUrl() + ", getCreatedAt()=" + getCreatedAt() + "]";
+    }
 }

@@ -23,8 +23,8 @@ package com.blackducksoftware.integration.hub.report.api;
 
 @Deprecated
 public class UserData extends com.blackducksoftware.integration.hub.api.report.UserData {
-	// Need this package and the objects for backwards compatability
-	public UserData(final String id, final String username) {
-		super(id, username);
-	}
+    // Need this package and the objects for backwards compatability
+    public UserData(final String id, final String username) {
+        super(id, username);
+    }
 }

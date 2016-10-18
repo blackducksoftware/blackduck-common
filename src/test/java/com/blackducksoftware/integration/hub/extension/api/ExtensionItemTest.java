@@ -30,18 +30,20 @@ import com.blackducksoftware.integration.hub.api.extension.ExtensionItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ExtensionItemTest {
-	private static final String INFO_URL = "infoUrl";
-	private static final String DESCRIPTION = "description";
-	private static final String NAME = "name";
+    private static final String INFO_URL = "infoUrl";
 
-	@Test
-	public void testConstructor() {
-		final MetaInformation meta = new MetaInformation(null, null, null);
-		final ExtensionItem item = new ExtensionItem(meta, NAME, DESCRIPTION, INFO_URL, true);
+    private static final String DESCRIPTION = "description";
 
-		assertEquals(NAME, item.getName());
-		assertEquals(DESCRIPTION, item.getDescription());
-		assertEquals(INFO_URL, item.getInfoUrl());
-		assertTrue(item.isAuthenticated());
-	}
+    private static final String NAME = "name";
+
+    @Test
+    public void testConstructor() {
+        final MetaInformation meta = new MetaInformation(null, null, null);
+        final ExtensionItem item = new ExtensionItem(meta, NAME, DESCRIPTION, INFO_URL, true);
+
+        assertEquals(NAME, item.getName());
+        assertEquals(DESCRIPTION, item.getDescription());
+        assertEquals(INFO_URL, item.getInfoUrl());
+        assertTrue(item.isAuthenticated());
+    }
 }

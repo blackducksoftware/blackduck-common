@@ -38,65 +38,65 @@ import com.blackducksoftware.integration.hub.meta.MetaLink;
  *
  */
 public class HubItem {
-	private final MetaInformation _meta;
+    private final MetaInformation _meta;
 
-	public HubItem(final MetaInformation meta) {
-		this._meta = meta;
-	}
+    public HubItem(final MetaInformation meta) {
+        this._meta = meta;
+    }
 
-	public MetaInformation getMeta() {
-		return _meta;
-	}
+    public MetaInformation getMeta() {
+        return _meta;
+    }
 
-	public String getLink(final String linkRel) throws UnexpectedHubResponseException {
-		final List<String> links = getLinks(linkRel);
-		if (links.size() != 1) {
-			final String combinedLinks = StringUtils.join(links, ", ");
-			throw new UnexpectedHubResponseException(
-					String.format("1 link was expected, but found %s: %s", links.size(), combinedLinks));
-		}
+    public String getLink(final String linkRel) throws UnexpectedHubResponseException {
+        final List<String> links = getLinks(linkRel);
+        if (links.size() != 1) {
+            final String combinedLinks = StringUtils.join(links, ", ");
+            throw new UnexpectedHubResponseException(
+                    String.format("1 link was expected, but found %s: %s", links.size(), combinedLinks));
+        }
 
-		return links.get(0);
-	}
+        return links.get(0);
+    }
 
-	public List<String> getLinks(final String linkRel) {
-		final List<String> links = new ArrayList<>();
-		if (linksExist()) {
-			for (final MetaLink link : getLinks()) {
-				if (isRequestedLink(linkRel, link)) {
-					links.add(link.getHref());
-				}
-			}
-		}
-		return links;
-	}
+    public List<String> getLinks(final String linkRel) {
+        final List<String> links = new ArrayList<>();
+        if (linksExist()) {
+            for (final MetaLink link : getLinks()) {
+                if (isRequestedLink(linkRel, link)) {
+                    links.add(link.getHref());
+                }
+            }
+        }
+        return links;
+    }
 
-	private List<MetaLink> getLinks() {
-		return getMeta().getLinks();
-	}
+    private List<MetaLink> getLinks() {
+        return getMeta().getLinks();
+    }
 
-	private boolean isRequestedLink(final String linkRel, final MetaLink link) {
-		return link.getRel().equalsIgnoreCase(linkRel);
-	}
+    private boolean isRequestedLink(final String linkRel, final MetaLink link) {
+        return link.getRel().equalsIgnoreCase(linkRel);
+    }
 
-	private boolean linksExist() {
-		return getMeta() != null && getLinks() != null && !getLinks().isEmpty();
-	}
+    private boolean linksExist() {
+        return getMeta() != null && getLinks() != null && !getLinks().isEmpty();
+    }
 
-	public DateTime getDateTime(final String time) {
-		if (StringUtils.isBlank(time)) {
-			return null;
-		}
-		try {
-			return new DateTime(time);
-		} catch (final IllegalArgumentException e) {
-			return null;
-		}
-	}
+    public DateTime getDateTime(final String time) {
+        if (StringUtils.isBlank(time)) {
+            return null;
+        }
+        try {
+            return new DateTime(time);
+        } catch (final IllegalArgumentException e) {
+            return null;
+        }
+    }
 
-	@Override
-	public String toString() {
-		return "Item [meta=" + _meta + "]";
-	}
+    @Override
+    public String toString() {
+        return "Item [meta=" + _meta + "]";
+    }
 
 }

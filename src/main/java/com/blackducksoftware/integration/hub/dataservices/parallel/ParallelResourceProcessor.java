@@ -37,80 +37,84 @@ import com.blackducksoftware.integration.hub.dataservices.ItemTransform;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ParallelResourceProcessor<R, S> {
-	private final Map<Class<?>, ItemTransform<List<R>, S>> transformerMap = new HashMap<>();;
-	private final ExecutorService executorService;
-	private final ExecutorCompletionService<List<R>> completionService;
-	private final IntLogger logger;
+    private final Map<Class<?>, ItemTransform<List<R>, S>> transformerMap = new HashMap<>();;
 
-	public ParallelResourceProcessor(final IntLogger logger) {
-		this.logger = logger;
-		final ThreadFactory threadFactory = Executors.defaultThreadFactory();
-		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
-		completionService = new ExecutorCompletionService<>(executorService);
-	}
+    private final ExecutorService executorService;
 
-	public ParallelResourceProcessor(final IntLogger logger, final ExecutorService executorService,
-			final ExecutorCompletionService<List<R>> completionService) {
-		this.logger = logger;
-		this.executorService = executorService;
-		this.completionService = completionService;
-	}
+    private final ExecutorCompletionService<List<R>> completionService;
 
-	public void addTransform(final Class<?> clazz, final ItemTransform<List<R>, S> transform) {
-		transformerMap.put(clazz, transform);
-	}
+    private final IntLogger logger;
 
-	public void removeTransform(final Class<?> clazz) {
-		transformerMap.remove(clazz);
-	}
+    public ParallelResourceProcessor(final IntLogger logger) {
+        this.logger = logger;
+        final ThreadFactory threadFactory = Executors.defaultThreadFactory();
+        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
+        completionService = new ExecutorCompletionService<>(executorService);
+    }
 
-	public List<R> process(final List<S> itemsToProcess) {
-		final int submitted = submitItems(itemsToProcess);
-		final List<R> results = processItems(submitted);
-		return results;
-	}
+    public ParallelResourceProcessor(final IntLogger logger, final ExecutorService executorService,
+            final ExecutorCompletionService<List<R>> completionService) {
+        this.logger = logger;
+        this.executorService = executorService;
+        this.completionService = completionService;
+    }
 
-	private int submitItems(final List<S> itemList) {
-		int submitted = 0;
-		for (final S item : itemList) {
-			final Class<?> key = item.getClass();
-			if (transformerMap.containsKey(key)) {
-				final ItemTransform<List<R>, S> converter = transformerMap.get(key);
-				final TransformCallable callable = new TransformCallable(item, converter);
-				completionService.submit(callable);
-				submitted++;
-			}
-		}
+    public void addTransform(final Class<?> clazz, final ItemTransform<List<R>, S> transform) {
+        transformerMap.put(clazz, transform);
+    }
 
-		return submitted;
-	}
+    public void removeTransform(final Class<?> clazz) {
+        transformerMap.remove(clazz);
+    }
 
-	private List<R> processItems(final int submitted) {
-		final List<R> results = new LinkedList<>();
-		for (int index = 0; index < submitted; index++) {
-			try {
-				final Future<List<R>> future = completionService.take();
-				final List<R> contentItems = future.get();
-				results.addAll(contentItems);
-			} catch (final ExecutionException | InterruptedException e) {
-				logger.error(e.getMessage(), e);
-			}
-		}
-		return results;
-	}
+    public List<R> process(final List<S> itemsToProcess) {
+        final int submitted = submitItems(itemsToProcess);
+        final List<R> results = processItems(submitted);
+        return results;
+    }
 
-	private class TransformCallable implements Callable<List<R>> {
-		private final S item;
-		private final ItemTransform<List<R>, S> converter;
+    private int submitItems(final List<S> itemList) {
+        int submitted = 0;
+        for (final S item : itemList) {
+            final Class<?> key = item.getClass();
+            if (transformerMap.containsKey(key)) {
+                final ItemTransform<List<R>, S> converter = transformerMap.get(key);
+                final TransformCallable callable = new TransformCallable(item, converter);
+                completionService.submit(callable);
+                submitted++;
+            }
+        }
 
-		public TransformCallable(final S item, final ItemTransform<List<R>, S> converter) {
-			this.item = item;
-			this.converter = converter;
-		}
+        return submitted;
+    }
 
-		@Override
-		public List<R> call() throws Exception {
-			return converter.transform(item);
-		}
-	}
+    private List<R> processItems(final int submitted) {
+        final List<R> results = new LinkedList<>();
+        for (int index = 0; index < submitted; index++) {
+            try {
+                final Future<List<R>> future = completionService.take();
+                final List<R> contentItems = future.get();
+                results.addAll(contentItems);
+            } catch (final ExecutionException | InterruptedException e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+        return results;
+    }
+
+    private class TransformCallable implements Callable<List<R>> {
+        private final S item;
+
+        private final ItemTransform<List<R>, S> converter;
+
+        public TransformCallable(final S item, final ItemTransform<List<R>, S> converter) {
+            this.item = item;
+            this.converter = converter;
+        }
+
+        @Override
+        public List<R> call() throws Exception {
+            return converter.transform(item);
+        }
+    }
 }

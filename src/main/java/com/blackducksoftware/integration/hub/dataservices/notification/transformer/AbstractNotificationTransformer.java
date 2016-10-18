@@ -34,45 +34,49 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Not
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
 public abstract class AbstractNotificationTransformer
-implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
-	private final NotificationRestService notificationService;
-	private final ReleaseItemRestService projectVersionService;
-	private final PolicyRestService policyService;
-	private final VersionBomPolicyRestService bomVersionPolicyService;
-	private final ComponentVersionRestService componentVersionService;
+        implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
+    private final NotificationRestService notificationService;
 
-	public AbstractNotificationTransformer(final NotificationRestService notificationService,
-			final ReleaseItemRestService projectVersionService, final PolicyRestService policyService,
-			final VersionBomPolicyRestService bomVersionPolicyService,
-			final ComponentVersionRestService componentVersionService) {
-		this.notificationService = notificationService;
-		this.projectVersionService = projectVersionService;
-		this.policyService = policyService;
-		this.bomVersionPolicyService = bomVersionPolicyService;
-		this.componentVersionService = componentVersionService;
-	}
+    private final ReleaseItemRestService projectVersionService;
 
-	public NotificationRestService getNotificationService() {
-		return notificationService;
-	}
+    private final PolicyRestService policyService;
 
-	public ReleaseItemRestService getProjectVersionService() {
-		return projectVersionService;
-	}
+    private final VersionBomPolicyRestService bomVersionPolicyService;
 
-	public PolicyRestService getPolicyService() {
-		return policyService;
-	}
+    private final ComponentVersionRestService componentVersionService;
 
-	public VersionBomPolicyRestService getBomVersionPolicyService() {
-		return bomVersionPolicyService;
-	}
+    public AbstractNotificationTransformer(final NotificationRestService notificationService,
+            final ReleaseItemRestService projectVersionService, final PolicyRestService policyService,
+            final VersionBomPolicyRestService bomVersionPolicyService,
+            final ComponentVersionRestService componentVersionService) {
+        this.notificationService = notificationService;
+        this.projectVersionService = projectVersionService;
+        this.policyService = policyService;
+        this.bomVersionPolicyService = bomVersionPolicyService;
+        this.componentVersionService = componentVersionService;
+    }
 
-	public ComponentVersionRestService getComponentVersionService() {
-		return componentVersionService;
-	}
+    public NotificationRestService getNotificationService() {
+        return notificationService;
+    }
 
-	@Override
-	public abstract List<NotificationContentItem> transform(NotificationItem item) throws HubItemTransformException;
+    public ReleaseItemRestService getProjectVersionService() {
+        return projectVersionService;
+    }
+
+    public PolicyRestService getPolicyService() {
+        return policyService;
+    }
+
+    public VersionBomPolicyRestService getBomVersionPolicyService() {
+        return bomVersionPolicyService;
+    }
+
+    public ComponentVersionRestService getComponentVersionService() {
+        return componentVersionService;
+    }
+
+    @Override
+    public abstract List<NotificationContentItem> transform(NotificationItem item) throws HubItemTransformException;
 
 }

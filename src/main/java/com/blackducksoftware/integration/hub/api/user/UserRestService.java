@@ -42,26 +42,27 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class UserRestService extends HubItemRestService<UserItem> {
-	private static final List<String> USERS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_USERS);
+    private static final List<String> USERS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_USERS);
 
-	private static final Type ITEM_TYPE = new TypeToken<UserItem>() {
-	}.getType();
-	private static final Type ITEM_LIST_TYPE = new TypeToken<List<UserItem>>() {
-	}.getType();
+    private static final Type ITEM_TYPE = new TypeToken<UserItem>() {
+    }.getType();
 
-	public UserRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    private static final Type ITEM_LIST_TYPE = new TypeToken<List<UserItem>>() {
+    }.getType();
 
-	public List<UserItem> getAllUsers() throws URISyntaxException, BDRestException, IOException {
-		final HubRequest userRequest = new HubRequest(getRestConnection(), getJsonParser());
-		userRequest.setMethod(Method.GET);
-		userRequest.addUrlSegments(USERS_SEGMENTS);
-		userRequest.setLimit(100);
+    public UserRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
-		final JsonObject jsonObject = userRequest.executeForResponseJson();
-		final List<UserItem> allUserItems = getAll(jsonObject, userRequest);
-		return allUserItems;
-	}
+    public List<UserItem> getAllUsers() throws URISyntaxException, BDRestException, IOException {
+        final HubRequest userRequest = new HubRequest(getRestConnection(), getJsonParser());
+        userRequest.setMethod(Method.GET);
+        userRequest.addUrlSegments(USERS_SEGMENTS);
+        userRequest.setLimit(100);
+
+        final JsonObject jsonObject = userRequest.executeForResponseJson();
+        final List<UserItem> allUserItems = getAll(jsonObject, userRequest);
+        return allUserItems;
+    }
 
 }

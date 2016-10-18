@@ -26,19 +26,20 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class BomComponentVersionPolicyStatus extends HubItem {
-	public static final String POLICY_RULE_URL = "policy-rule";
-	private PolicyStatusEnum approvalStatus;
+    public static final String POLICY_RULE_URL = "policy-rule";
 
-	public BomComponentVersionPolicyStatus(final MetaInformation meta) {
-		super(meta);
-	}
+    private PolicyStatusEnum approvalStatus;
 
-	public PolicyStatusEnum getApprovalStatus() {
-		return approvalStatus;
-	}
+    public BomComponentVersionPolicyStatus(final MetaInformation meta) {
+        super(meta);
+    }
 
-	public void setApprovalStatus(final PolicyStatusEnum approvalStatus) {
-		this.approvalStatus = approvalStatus;
-	}
+    public PolicyStatusEnum getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(final PolicyStatusEnum approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
 
 }

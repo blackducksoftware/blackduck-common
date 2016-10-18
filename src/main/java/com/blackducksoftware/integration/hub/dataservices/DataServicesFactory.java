@@ -49,151 +49,169 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
 public class DataServicesFactory {
-	private final RestConnection restConnection;
-	final Gson gson = new Gson();
-	final JsonParser jsonParser = new JsonParser();
+    private final RestConnection restConnection;
 
-	private final BomImportRestService bomImportRestService;
-	private final CodeLocationRestService codeLocationRestService;
-	private final ComponentVersionRestService componentVersionRestService;
-	private final NotificationRestService notificationRestService;
-	private final PolicyRestService policyRestService;
-	private final PolicyStatusRestService policyStatusRestService;
-	private final ProjectRestService projectRestService;
-	private final ProjectVersionRestService projectVersionRestService;
-	private final ReleaseItemRestService releaseItemRestService;
-	private final ScanSummaryRestService scanSummaryRestService;
-	private final UserRestService userRestService;
-	private final VersionBomPolicyRestService versionBomPolicyRestService;
-	private final VulnerabilityRestService vulnerabilityRestService;
-	private final ExtensionRestService extensionRestService;
-	private final ExtensionConfigRestService extensionConfigRestService;
-	private final ExtensionUserOptionRestService extensionUserOptionRestService;
-	private final VulnerableBomComponentRestService vulnerableBomComponentRestService;
+    final Gson gson = new Gson();
 
-	public DataServicesFactory(final RestConnection restConnection) {
-		this.restConnection = restConnection;
+    final JsonParser jsonParser = new JsonParser();
 
-		bomImportRestService = new BomImportRestService(restConnection);
-		codeLocationRestService = new CodeLocationRestService(restConnection, gson, jsonParser);
-		componentVersionRestService = new ComponentVersionRestService(restConnection, gson, jsonParser);
-		notificationRestService = new NotificationRestService(restConnection, gson, jsonParser);
-		policyRestService = new PolicyRestService(restConnection, gson, jsonParser);
-		policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
-		projectRestService = new ProjectRestService(restConnection, gson, jsonParser);
-		projectVersionRestService = new ProjectVersionRestService(restConnection, gson, jsonParser);
-		releaseItemRestService = new ReleaseItemRestService(restConnection, gson, jsonParser);
-		scanSummaryRestService = new ScanSummaryRestService(restConnection, gson, jsonParser);
-		userRestService = new UserRestService(restConnection, gson, jsonParser);
-		versionBomPolicyRestService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
-		vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
-		extensionRestService = new ExtensionRestService(restConnection, gson, jsonParser);
-		extensionConfigRestService = new ExtensionConfigRestService(restConnection, gson, jsonParser);
-		extensionUserOptionRestService = new ExtensionUserOptionRestService(restConnection, gson, jsonParser);
-		vulnerableBomComponentRestService = new VulnerableBomComponentRestService(restConnection, gson, jsonParser);
-	}
+    private final BomImportRestService bomImportRestService;
 
-	public PolicyStatusDataService createPolicyStatusDataService() {
-		return new PolicyStatusDataService(restConnection, gson, jsonParser, projectRestService,
-				projectVersionRestService, policyStatusRestService);
-	}
+    private final CodeLocationRestService codeLocationRestService;
 
-	public ScanStatusDataService createScanStatusDataService() {
-		return new ScanStatusDataService(restConnection, gson, jsonParser, projectRestService, releaseItemRestService,
-				codeLocationRestService, scanSummaryRestService);
-	}
+    private final ComponentVersionRestService componentVersionRestService;
 
-	public NotificationDataService createNotificationDataService(final IntLogger logger) {
-		return new NotificationDataService(logger, restConnection, gson, jsonParser);
-	}
+    private final NotificationRestService notificationRestService;
 
-	public NotificationDataService createNotificationDataService(final IntLogger logger,
-			final PolicyNotificationFilter policyNotificationFilter) {
-		return new NotificationDataService(logger, restConnection, gson, jsonParser, policyNotificationFilter);
-	}
+    private final PolicyRestService policyRestService;
 
-	public ExtensionConfigDataService createExtensionConfigDataService(final IntLogger logger) {
-		return new ExtensionConfigDataService(logger, restConnection, gson, jsonParser, userRestService,
-				extensionRestService, extensionConfigRestService, extensionUserOptionRestService);
-	}
+    private final PolicyStatusRestService policyStatusRestService;
 
-	public RestConnection getRestConnection() {
-		return restConnection;
-	}
+    private final ProjectRestService projectRestService;
 
-	public Gson getGson() {
-		return gson;
-	}
+    private final ProjectVersionRestService projectVersionRestService;
 
-	public JsonParser getJsonParser() {
-		return jsonParser;
-	}
+    private final ReleaseItemRestService releaseItemRestService;
 
-	public BomImportRestService getBomImportRestService() {
-		return bomImportRestService;
-	}
+    private final ScanSummaryRestService scanSummaryRestService;
 
-	public CodeLocationRestService getCodeLocationRestService() {
-		return codeLocationRestService;
-	}
+    private final UserRestService userRestService;
 
-	public ComponentVersionRestService getComponentVersionRestService() {
-		return componentVersionRestService;
-	}
+    private final VersionBomPolicyRestService versionBomPolicyRestService;
 
-	public NotificationRestService getNotificationRestService() {
-		return notificationRestService;
-	}
+    private final VulnerabilityRestService vulnerabilityRestService;
 
-	public PolicyRestService getPolicyRestService() {
-		return policyRestService;
-	}
+    private final ExtensionRestService extensionRestService;
 
-	public PolicyStatusRestService getPolicyStatusRestService() {
-		return policyStatusRestService;
-	}
+    private final ExtensionConfigRestService extensionConfigRestService;
 
-	public ProjectRestService getProjectRestService() {
-		return projectRestService;
-	}
+    private final ExtensionUserOptionRestService extensionUserOptionRestService;
 
-	public ProjectVersionRestService getProjectVersionRestService() {
-		return projectVersionRestService;
-	}
+    private final VulnerableBomComponentRestService vulnerableBomComponentRestService;
 
-	public ReleaseItemRestService getReleaseItemRestService() {
-		return releaseItemRestService;
-	}
+    public DataServicesFactory(final RestConnection restConnection) {
+        this.restConnection = restConnection;
 
-	public ScanSummaryRestService getScanSummaryRestService() {
-		return scanSummaryRestService;
-	}
+        bomImportRestService = new BomImportRestService(restConnection);
+        codeLocationRestService = new CodeLocationRestService(restConnection, gson, jsonParser);
+        componentVersionRestService = new ComponentVersionRestService(restConnection, gson, jsonParser);
+        notificationRestService = new NotificationRestService(restConnection, gson, jsonParser);
+        policyRestService = new PolicyRestService(restConnection, gson, jsonParser);
+        policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
+        projectRestService = new ProjectRestService(restConnection, gson, jsonParser);
+        projectVersionRestService = new ProjectVersionRestService(restConnection, gson, jsonParser);
+        releaseItemRestService = new ReleaseItemRestService(restConnection, gson, jsonParser);
+        scanSummaryRestService = new ScanSummaryRestService(restConnection, gson, jsonParser);
+        userRestService = new UserRestService(restConnection, gson, jsonParser);
+        versionBomPolicyRestService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
+        vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
+        extensionRestService = new ExtensionRestService(restConnection, gson, jsonParser);
+        extensionConfigRestService = new ExtensionConfigRestService(restConnection, gson, jsonParser);
+        extensionUserOptionRestService = new ExtensionUserOptionRestService(restConnection, gson, jsonParser);
+        vulnerableBomComponentRestService = new VulnerableBomComponentRestService(restConnection, gson, jsonParser);
+    }
 
-	public UserRestService getUserRestService() {
-		return userRestService;
-	}
+    public PolicyStatusDataService createPolicyStatusDataService() {
+        return new PolicyStatusDataService(restConnection, gson, jsonParser, projectRestService,
+                projectVersionRestService, policyStatusRestService);
+    }
 
-	public VersionBomPolicyRestService getVersionBomPolicyRestService() {
-		return versionBomPolicyRestService;
-	}
+    public ScanStatusDataService createScanStatusDataService() {
+        return new ScanStatusDataService(restConnection, gson, jsonParser, projectRestService, releaseItemRestService,
+                codeLocationRestService, scanSummaryRestService);
+    }
 
-	public VulnerabilityRestService getVulnerabilityRestService() {
-		return vulnerabilityRestService;
-	}
+    public NotificationDataService createNotificationDataService(final IntLogger logger) {
+        return new NotificationDataService(logger, restConnection, gson, jsonParser);
+    }
 
-	public ExtensionConfigRestService getExtensionConfigRestService() {
-		return extensionConfigRestService;
-	}
+    public NotificationDataService createNotificationDataService(final IntLogger logger,
+            final PolicyNotificationFilter policyNotificationFilter) {
+        return new NotificationDataService(logger, restConnection, gson, jsonParser, policyNotificationFilter);
+    }
 
-	public ExtensionRestService getExtensionRestService() {
-		return extensionRestService;
-	}
+    public ExtensionConfigDataService createExtensionConfigDataService(final IntLogger logger) {
+        return new ExtensionConfigDataService(logger, restConnection, gson, jsonParser, userRestService,
+                extensionRestService, extensionConfigRestService, extensionUserOptionRestService);
+    }
 
-	public ExtensionUserOptionRestService getExtensionUserOptionRestService() {
-		return extensionUserOptionRestService;
-	}
+    public RestConnection getRestConnection() {
+        return restConnection;
+    }
 
-	public VulnerableBomComponentRestService getVulnerableBomComponentRestService() {
-		return vulnerableBomComponentRestService;
-	}
+    public Gson getGson() {
+        return gson;
+    }
+
+    public JsonParser getJsonParser() {
+        return jsonParser;
+    }
+
+    public BomImportRestService getBomImportRestService() {
+        return bomImportRestService;
+    }
+
+    public CodeLocationRestService getCodeLocationRestService() {
+        return codeLocationRestService;
+    }
+
+    public ComponentVersionRestService getComponentVersionRestService() {
+        return componentVersionRestService;
+    }
+
+    public NotificationRestService getNotificationRestService() {
+        return notificationRestService;
+    }
+
+    public PolicyRestService getPolicyRestService() {
+        return policyRestService;
+    }
+
+    public PolicyStatusRestService getPolicyStatusRestService() {
+        return policyStatusRestService;
+    }
+
+    public ProjectRestService getProjectRestService() {
+        return projectRestService;
+    }
+
+    public ProjectVersionRestService getProjectVersionRestService() {
+        return projectVersionRestService;
+    }
+
+    public ReleaseItemRestService getReleaseItemRestService() {
+        return releaseItemRestService;
+    }
+
+    public ScanSummaryRestService getScanSummaryRestService() {
+        return scanSummaryRestService;
+    }
+
+    public UserRestService getUserRestService() {
+        return userRestService;
+    }
+
+    public VersionBomPolicyRestService getVersionBomPolicyRestService() {
+        return versionBomPolicyRestService;
+    }
+
+    public VulnerabilityRestService getVulnerabilityRestService() {
+        return vulnerabilityRestService;
+    }
+
+    public ExtensionConfigRestService getExtensionConfigRestService() {
+        return extensionConfigRestService;
+    }
+
+    public ExtensionRestService getExtensionRestService() {
+        return extensionRestService;
+    }
+
+    public ExtensionUserOptionRestService getExtensionUserOptionRestService() {
+        return extensionUserOptionRestService;
+    }
+
+    public VulnerableBomComponentRestService getVulnerableBomComponentRestService() {
+        return vulnerableBomComponentRestService;
+    }
 }

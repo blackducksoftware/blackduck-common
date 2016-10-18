@@ -32,15 +32,15 @@ import com.blackducksoftware.integration.hub.api.report.risk.RiskProfile;
 @Deprecated
 public class AggregateBomViewEntry extends com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry {
 
-	// Need this package and the objects for backwards compatability
-	public AggregateBomViewEntry(final List<String> bomEntryIds, final List<Long> bomViewEntryIds,
-			final List<String> matchTypes, final List<String> producerMatchTypes,
-			final List<String> componentMatchTypes, final List<String> usages, final List<Boolean> inUses,
-			final List<UserData> createdByUsers, final String since, final ProjectData producerProject,
-			final List<ReleaseData> producerReleases, final List<LicenseDefinition> licenses,
-			final RiskProfile riskProfile, final String policyApprovalStatus) {
-		super(bomEntryIds, bomViewEntryIds, matchTypes, producerMatchTypes, componentMatchTypes, usages, inUses,
-				createdByUsers, since, producerProject, producerReleases, licenses, riskProfile, policyApprovalStatus);
-	}
+    // Need this package and the objects for backwards compatability
+    public AggregateBomViewEntry(final List<String> bomEntryIds, final List<Long> bomViewEntryIds,
+            final List<String> matchTypes, final List<String> producerMatchTypes,
+            final List<String> componentMatchTypes, final List<String> usages, final List<Boolean> inUses,
+            final List<UserData> createdByUsers, final String since, final ProjectData producerProject,
+            final List<ReleaseData> producerReleases, final List<LicenseDefinition> licenses,
+            final RiskProfile riskProfile, final String policyApprovalStatus) {
+        super(bomEntryIds, bomViewEntryIds, matchTypes, producerMatchTypes, componentMatchTypes, usages, inUses,
+                createdByUsers, since, producerProject, producerReleases, licenses, riskProfile, policyApprovalStatus);
+    }
 
 }

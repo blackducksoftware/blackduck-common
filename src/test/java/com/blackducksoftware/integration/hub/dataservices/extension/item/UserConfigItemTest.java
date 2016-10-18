@@ -41,38 +41,38 @@ import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class UserConfigItemTest {
 
-	private UserItem createUserItem() {
-		final String id = UUID.randomUUID().toString();
-		final MetaInformation meta = new MetaInformation(null, "http://localhost/api/users/" + id, null);
-		return new UserItem(meta, "username", "firstName", "lastName", "user@blackducksoftware.com", UserType.INTERNAL,
-				true);
-	}
+    private UserItem createUserItem() {
+        final String id = UUID.randomUUID().toString();
+        final MetaInformation meta = new MetaInformation(null, "http://localhost/api/users/" + id, null);
+        return new UserItem(meta, "username", "firstName", "lastName", "user@blackducksoftware.com", UserType.INTERNAL,
+                true);
+    }
 
-	private Map<String, ConfigurationItem> createConfigItemMap() {
-		final MetaInformation meta = new MetaInformation(null, null, null);
-		List<String> valueList = new ArrayList<>();
-		valueList.add("a value");
-		final List<OptionItem> options = new ArrayList<>();
-		final ConfigurationItem item1 = new ConfigurationItem(meta, "item1", OptionTypeEnum.STRING, "itemTitle", true,
-				true, "a description", options, valueList);
-		valueList = new ArrayList<>();
-		valueList.add("another value");
-		final ConfigurationItem item2 = new ConfigurationItem(meta, "item2", OptionTypeEnum.STRING, "itemTitle", true,
-				true, "another description", options, valueList);
-		final Map<String, ConfigurationItem> configMap = new HashMap<>();
-		configMap.put(item1.getName(), item1);
-		configMap.put(item2.getName(), item2);
-		return configMap;
-	}
+    private Map<String, ConfigurationItem> createConfigItemMap() {
+        final MetaInformation meta = new MetaInformation(null, null, null);
+        List<String> valueList = new ArrayList<>();
+        valueList.add("a value");
+        final List<OptionItem> options = new ArrayList<>();
+        final ConfigurationItem item1 = new ConfigurationItem(meta, "item1", OptionTypeEnum.STRING, "itemTitle", true,
+                true, "a description", options, valueList);
+        valueList = new ArrayList<>();
+        valueList.add("another value");
+        final ConfigurationItem item2 = new ConfigurationItem(meta, "item2", OptionTypeEnum.STRING, "itemTitle", true,
+                true, "another description", options, valueList);
+        final Map<String, ConfigurationItem> configMap = new HashMap<>();
+        configMap.put(item1.getName(), item1);
+        configMap.put(item2.getName(), item2);
+        return configMap;
+    }
 
-	@Test
-	public void testConstructor() {
-		final UserItem user = createUserItem();
-		final Map<String, ConfigurationItem> configItemMap = createConfigItemMap();
-		final UserConfigItem item = new UserConfigItem(user, configItemMap);
+    @Test
+    public void testConstructor() {
+        final UserItem user = createUserItem();
+        final Map<String, ConfigurationItem> configItemMap = createConfigItemMap();
+        final UserConfigItem item = new UserConfigItem(user, configItemMap);
 
-		assertNotNull(item);
-		assertEquals(user, item.getUser());
-		assertEquals(configItemMap, item.getConfigMap());
-	}
+        assertNotNull(item);
+        assertEquals(user, item.getUser());
+        assertEquals(configItemMap, item.getConfigMap());
+    }
 }

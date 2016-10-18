@@ -30,20 +30,20 @@ import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 
 public class PolicyViolationClearedContentItem extends PolicyViolationContentItem {
 
-	public PolicyViolationClearedContentItem(final Date createdAt, final ProjectVersion projectVersion,
-			final String componentName,
-			final String componentVersion, final String componentUrl,
-			final String componentVersionUrl,
-			final List<PolicyRule> policyRuleList) throws URISyntaxException {
-		super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl,
-				policyRuleList);
-	}
+    public PolicyViolationClearedContentItem(final Date createdAt, final ProjectVersion projectVersion,
+            final String componentName,
+            final String componentVersion, final String componentUrl,
+            final String componentVersionUrl,
+            final List<PolicyRule> policyRuleList) throws URISyntaxException {
+        super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl,
+                policyRuleList);
+    }
 
-	@Override
-	public String toString() {
-		return "PolicyViolationClearedContentItem [getPolicyRuleList()=" + getPolicyRuleList() + ", getComponentUrl()="
-				+ getComponentUrl() + ", getProjectVersion()=" + getProjectVersion() + ", getComponentName()="
-				+ getComponentName() + ", getComponentVersion()=" + getComponentVersion()
-				+ ", getComponentVersionUrl()=" + getComponentVersionUrl() + ", getCreatedAt()=" + getCreatedAt() + "]";
-	}
+    @Override
+    public String toString() {
+        return "PolicyViolationClearedContentItem [getPolicyRuleList()=" + getPolicyRuleList() + ", getComponentUrl()="
+                + getComponentUrl() + ", getProjectVersion()=" + getProjectVersion() + ", getComponentName()="
+                + getComponentName() + ", getComponentVersion()=" + getComponentVersion()
+                + ", getComponentVersionUrl()=" + getComponentVersionUrl() + ", getCreatedAt()=" + getCreatedAt() + "]";
+    }
 }

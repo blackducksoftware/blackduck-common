@@ -25,55 +25,57 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public enum ScanStatus {
-	UNSTARTED,
-	SCANNING,
-	SAVING_SCAN_DATA,
-	SCAN_DATA_SAVE_COMPLETE,
-	REQUESTED_MATCH_JOB,
-	MATCHING,
-	BOM_VERSION_CHECK,
-	BUILDING_BOM,
-	CLONED,
-	COMPLETE,
-	CANCELLED,
-	ERROR_SCANNING,
-	ERROR_SAVING_SCAN_DATA,
-	ERROR_MATCHING,
-	ERROR_BUILDING_BOM,
-	ERROR,
-	UNKNOWN;
+    UNSTARTED,
+    SCANNING,
+    SAVING_SCAN_DATA,
+    SCAN_DATA_SAVE_COMPLETE,
+    REQUESTED_MATCH_JOB,
+    MATCHING,
+    BOM_VERSION_CHECK,
+    BUILDING_BOM,
+    CLONED,
+    COMPLETE,
+    CANCELLED,
+    ERROR_SCANNING,
+    ERROR_SAVING_SCAN_DATA,
+    ERROR_MATCHING,
+    ERROR_BUILDING_BOM,
+    ERROR,
+    UNKNOWN;
 
-	private static final Set<ScanStatus> PENDING_STATES = EnumSet.of(UNSTARTED, SCANNING, SAVING_SCAN_DATA,
-			SCAN_DATA_SAVE_COMPLETE, REQUESTED_MATCH_JOB, MATCHING, BOM_VERSION_CHECK, BUILDING_BOM);
-	private static final Set<ScanStatus> DONE_STATES = EnumSet.of(COMPLETE, CANCELLED, CLONED, ERROR_SCANNING,
-			ERROR_SAVING_SCAN_DATA, ERROR_MATCHING, ERROR_BUILDING_BOM, ERROR);
-	private static final Set<ScanStatus> ERROR_STATES = EnumSet.of(CANCELLED, ERROR_SCANNING, ERROR_SAVING_SCAN_DATA,
-			ERROR_MATCHING, ERROR_BUILDING_BOM, ERROR);
+    private static final Set<ScanStatus> PENDING_STATES = EnumSet.of(UNSTARTED, SCANNING, SAVING_SCAN_DATA,
+            SCAN_DATA_SAVE_COMPLETE, REQUESTED_MATCH_JOB, MATCHING, BOM_VERSION_CHECK, BUILDING_BOM);
 
-	public boolean isPending() {
-		return PENDING_STATES.contains(this);
-	}
+    private static final Set<ScanStatus> DONE_STATES = EnumSet.of(COMPLETE, CANCELLED, CLONED, ERROR_SCANNING,
+            ERROR_SAVING_SCAN_DATA, ERROR_MATCHING, ERROR_BUILDING_BOM, ERROR);
 
-	public boolean isDone() {
-		return DONE_STATES.contains(this);
-	}
+    private static final Set<ScanStatus> ERROR_STATES = EnumSet.of(CANCELLED, ERROR_SCANNING, ERROR_SAVING_SCAN_DATA,
+            ERROR_MATCHING, ERROR_BUILDING_BOM, ERROR);
 
-	public boolean isError() {
-		return ERROR_STATES.contains(this);
-	}
+    public boolean isPending() {
+        return PENDING_STATES.contains(this);
+    }
 
-	public static ScanStatus getScanStatus(final String scanStatus) {
-		if (scanStatus == null) {
-			return ScanStatus.UNKNOWN;
-		}
-		ScanStatus scanStatusEnum;
-		try {
-			scanStatusEnum = ScanStatus.valueOf(scanStatus.toUpperCase());
-		} catch (final IllegalArgumentException e) {
-			// ignore exception
-			scanStatusEnum = UNKNOWN;
-		}
-		return scanStatusEnum;
-	}
+    public boolean isDone() {
+        return DONE_STATES.contains(this);
+    }
+
+    public boolean isError() {
+        return ERROR_STATES.contains(this);
+    }
+
+    public static ScanStatus getScanStatus(final String scanStatus) {
+        if (scanStatus == null) {
+            return ScanStatus.UNKNOWN;
+        }
+        ScanStatus scanStatusEnum;
+        try {
+            scanStatusEnum = ScanStatus.valueOf(scanStatus.toUpperCase());
+        } catch (final IllegalArgumentException e) {
+            // ignore exception
+            scanStatusEnum = UNKNOWN;
+        }
+        return scanStatusEnum;
+    }
 
 }

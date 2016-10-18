@@ -44,33 +44,34 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class PolicyStatusRestService extends HubItemRestService<PolicyStatusItem> {
-	private static final Type ITEM_TYPE = new TypeToken<PolicyStatusItem>() {
-	}.getType();
-	private static final Type ITEM_LIST_TYPE = new TypeToken<List<PolicyStatusItem>>() {
-	}.getType();
+    private static final Type ITEM_TYPE = new TypeToken<PolicyStatusItem>() {
+    }.getType();
 
-	public PolicyStatusRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    private static final Type ITEM_LIST_TYPE = new TypeToken<List<PolicyStatusItem>>() {
+    }.getType();
 
-	public PolicyStatusItem getPolicyStatusItem(final String projectId, final String versionId)
-			throws IOException, URISyntaxException, BDRestException {
-		final List<String> urlSegments = new ArrayList<>();
-		urlSegments.add(SEGMENT_API);
-		urlSegments.add(SEGMENT_PROJECTS);
-		urlSegments.add(projectId);
-		urlSegments.add(SEGMENT_VERSIONS);
-		urlSegments.add(versionId);
-		urlSegments.add(SEGMENT_POLICY_STATUS);
+    public PolicyStatusRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
-		final HubRequest policyStatusItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		policyStatusItemRequest.setMethod(Method.GET);
-		policyStatusItemRequest.setLimit(1);
-		policyStatusItemRequest.addUrlSegments(urlSegments);
+    public PolicyStatusItem getPolicyStatusItem(final String projectId, final String versionId)
+            throws IOException, URISyntaxException, BDRestException {
+        final List<String> urlSegments = new ArrayList<>();
+        urlSegments.add(SEGMENT_API);
+        urlSegments.add(SEGMENT_PROJECTS);
+        urlSegments.add(projectId);
+        urlSegments.add(SEGMENT_VERSIONS);
+        urlSegments.add(versionId);
+        urlSegments.add(SEGMENT_POLICY_STATUS);
 
-		final JsonObject jsonObject = policyStatusItemRequest.executeForResponseJson();
-		final PolicyStatusItem policyStatusItem = getItem(jsonObject, PolicyStatusItem.class);
-		return policyStatusItem;
-	}
+        final HubRequest policyStatusItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        policyStatusItemRequest.setMethod(Method.GET);
+        policyStatusItemRequest.setLimit(1);
+        policyStatusItemRequest.addUrlSegments(urlSegments);
+
+        final JsonObject jsonObject = policyStatusItemRequest.executeForResponseJson();
+        final PolicyStatusItem policyStatusItem = getItem(jsonObject, PolicyStatusItem.class);
+        return policyStatusItem;
+    }
 
 }

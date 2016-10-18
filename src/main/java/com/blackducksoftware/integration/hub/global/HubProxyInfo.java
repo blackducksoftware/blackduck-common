@@ -39,215 +39,218 @@ import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.util.AuthenticatorUtil;
 
 public class HubProxyInfo implements Serializable {
-	private static final long serialVersionUID = -7476704373593358472L;
+    private static final long serialVersionUID = -7476704373593358472L;
 
-	private final String host;
-	private final int port;
-	private final HubCredentials proxyCredentials;
-	private final String ignoredProxyHosts;
+    private final String host;
 
-	public HubProxyInfo(final String host, final int port, final HubCredentials proxyCredentials,
-			final String ignoredProxyHosts) {
-		this.host = host;
-		this.port = port;
-		this.proxyCredentials = proxyCredentials;
-		this.ignoredProxyHosts = ignoredProxyHosts;
-	}
+    private final int port;
 
-	public URLConnection openConnection(final URL url) throws IOException {
-		if (shouldUseProxyForUrl(url)) {
-			final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
-			setDefaultAuthenticator();
+    private final HubCredentials proxyCredentials;
 
-			return url.openConnection(proxy);
-		}
+    private final String ignoredProxyHosts;
 
-		return url.openConnection();
-	}
+    public HubProxyInfo(final String host, final int port, final HubCredentials proxyCredentials,
+            final String ignoredProxyHosts) {
+        this.host = host;
+        this.port = port;
+        this.proxyCredentials = proxyCredentials;
+        this.ignoredProxyHosts = ignoredProxyHosts;
+    }
 
-	public boolean shouldUseProxyForUrl(final URL url) {
-		final List<Pattern> ignoredProxyHostPatterns = getIgnoredProxyHostPatterns();
-		boolean shouldUseProxy = !shouldIgnoreHost(url.getHost(), ignoredProxyHostPatterns);
-		if (StringUtils.isBlank(host) || port <= 0) {
-			shouldUseProxy = false;
-		}
-		return shouldUseProxy;
-	}
+    public URLConnection openConnection(final URL url) throws IOException {
+        if (shouldUseProxyForUrl(url)) {
+            final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
+            setDefaultAuthenticator();
 
-	public void setDefaultAuthenticator() {
-		if (getUsername() != null && getEncryptedPassword() != null) {
-			try {
-				AuthenticatorUtil.setAuthenticator(getProxyCredentials().getUsername(),
-						PasswordDecrypter.decrypt(getProxyCredentials().getEncryptedPassword()));
-			} catch (final Exception e) {
-			}
-		} else {
-			AuthenticatorUtil.resetAuthenticator();
-		}
-	}
+            return url.openConnection(proxy);
+        }
 
-	/**
-	 * Checks the list of user defined host names that should be connected to
-	 * directly and not go through the proxy. If the hostToMatch matches any of
-	 * these hose names then this method returns true.
-	 *
-	 */
-	private boolean shouldIgnoreHost(final String hostToMatch, final List<Pattern> ignoredProxyHostPatterns) {
-		if (StringUtils.isBlank(hostToMatch) || ignoredProxyHostPatterns == null
-				|| ignoredProxyHostPatterns.isEmpty()) {
-			return false;
-		}
+        return url.openConnection();
+    }
 
-		for (final Pattern ignoredProxyHostPattern : ignoredProxyHostPatterns) {
-			final Matcher m = ignoredProxyHostPattern.matcher(hostToMatch);
-			return m.find();
-		}
-		return false;
-	}
+    public boolean shouldUseProxyForUrl(final URL url) {
+        final List<Pattern> ignoredProxyHostPatterns = getIgnoredProxyHostPatterns();
+        boolean shouldUseProxy = !shouldIgnoreHost(url.getHost(), ignoredProxyHostPatterns);
+        if (StringUtils.isBlank(host) || port <= 0) {
+            shouldUseProxy = false;
+        }
+        return shouldUseProxy;
+    }
 
-	private List<Pattern> getIgnoredProxyHostPatterns() {
-		final List<Pattern> ignoredProxyHostPatterns = new ArrayList<>();
-		if (StringUtils.isNotBlank(ignoredProxyHosts)) {
-			String[] ignoreHosts = null;
-			if (ignoredProxyHosts.contains(",")) {
-				ignoreHosts = ignoredProxyHosts.split(",");
-				for (final String ignoreHost : ignoreHosts) {
-					final Pattern pattern = Pattern.compile(ignoreHost.trim());
-					ignoredProxyHostPatterns.add(pattern);
-				}
-			} else {
-				final Pattern pattern = Pattern.compile(ignoredProxyHosts);
-				ignoredProxyHostPatterns.add(pattern);
-			}
-		}
-		return ignoredProxyHostPatterns;
-	}
+    public void setDefaultAuthenticator() {
+        if (getUsername() != null && getEncryptedPassword() != null) {
+            try {
+                AuthenticatorUtil.setAuthenticator(getProxyCredentials().getUsername(),
+                        PasswordDecrypter.decrypt(getProxyCredentials().getEncryptedPassword()));
+            } catch (final Exception e) {
+            }
+        } else {
+            AuthenticatorUtil.resetAuthenticator();
+        }
+    }
 
-	@Override
-	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("HubProxyInfo [host=");
-		builder.append(host);
-		builder.append(", port=");
-		builder.append(port);
-		builder.append(", username=");
-		builder.append(getUsername());
-		builder.append(", encryptedPassword=");
-		builder.append(getEncryptedPassword());
-		builder.append(", actualPasswordLength=");
-		builder.append(getActualPasswordLength());
-		builder.append(", ignoredProxyHosts=");
-		builder.append(ignoredProxyHosts);
-		builder.append("]");
-		return builder.toString();
-	}
+    /**
+     * Checks the list of user defined host names that should be connected to
+     * directly and not go through the proxy. If the hostToMatch matches any of
+     * these hose names then this method returns true.
+     *
+     */
+    private boolean shouldIgnoreHost(final String hostToMatch, final List<Pattern> ignoredProxyHostPatterns) {
+        if (StringUtils.isBlank(hostToMatch) || ignoredProxyHostPatterns == null
+                || ignoredProxyHostPatterns.isEmpty()) {
+            return false;
+        }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((proxyCredentials == null) ? 0 : proxyCredentials.hashCode());
-		result = prime * result + ((host == null) ? 0 : host.hashCode());
-		result = prime * result + ((ignoredProxyHosts == null) ? 0 : ignoredProxyHosts.hashCode());
-		result = prime * result + port;
-		return result;
-	}
+        for (final Pattern ignoredProxyHostPattern : ignoredProxyHostPatterns) {
+            final Matcher m = ignoredProxyHostPattern.matcher(hostToMatch);
+            return m.find();
+        }
+        return false;
+    }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof HubProxyInfo)) {
-			return false;
-		}
-		final HubProxyInfo other = (HubProxyInfo) obj;
-		if (getProxyCredentials() == null) {
-			if (other.getProxyCredentials() != null) {
-				return false;
-			}
-		} else if (!getProxyCredentials().equals(other.getProxyCredentials())) {
-			return false;
-		}
+    private List<Pattern> getIgnoredProxyHostPatterns() {
+        final List<Pattern> ignoredProxyHostPatterns = new ArrayList<>();
+        if (StringUtils.isNotBlank(ignoredProxyHosts)) {
+            String[] ignoreHosts = null;
+            if (ignoredProxyHosts.contains(",")) {
+                ignoreHosts = ignoredProxyHosts.split(",");
+                for (final String ignoreHost : ignoreHosts) {
+                    final Pattern pattern = Pattern.compile(ignoreHost.trim());
+                    ignoredProxyHostPatterns.add(pattern);
+                }
+            } else {
+                final Pattern pattern = Pattern.compile(ignoredProxyHosts);
+                ignoredProxyHostPatterns.add(pattern);
+            }
+        }
+        return ignoredProxyHostPatterns;
+    }
 
-		if (host == null) {
-			if (other.host != null) {
-				return false;
-			}
-		} else if (!host.equals(other.host)) {
-			return false;
-		}
-		if (ignoredProxyHosts == null) {
-			if (other.ignoredProxyHosts != null) {
-				return false;
-			}
-		} else if (!ignoredProxyHosts.equals(other.ignoredProxyHosts)) {
-			return false;
-		}
-		if (port != other.port) {
-			return false;
-		}
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("HubProxyInfo [host=");
+        builder.append(host);
+        builder.append(", port=");
+        builder.append(port);
+        builder.append(", username=");
+        builder.append(getUsername());
+        builder.append(", encryptedPassword=");
+        builder.append(getEncryptedPassword());
+        builder.append(", actualPasswordLength=");
+        builder.append(getActualPasswordLength());
+        builder.append(", ignoredProxyHosts=");
+        builder.append(ignoredProxyHosts);
+        builder.append("]");
+        return builder.toString();
+    }
 
-		return true;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((proxyCredentials == null) ? 0 : proxyCredentials.hashCode());
+        result = prime * result + ((host == null) ? 0 : host.hashCode());
+        result = prime * result + ((ignoredProxyHosts == null) ? 0 : ignoredProxyHosts.hashCode());
+        result = prime * result + port;
+        return result;
+    }
 
-	public String getHost() {
-		return host;
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof HubProxyInfo)) {
+            return false;
+        }
+        final HubProxyInfo other = (HubProxyInfo) obj;
+        if (getProxyCredentials() == null) {
+            if (other.getProxyCredentials() != null) {
+                return false;
+            }
+        } else if (!getProxyCredentials().equals(other.getProxyCredentials())) {
+            return false;
+        }
 
-	public int getPort() {
-		return port;
-	}
+        if (host == null) {
+            if (other.host != null) {
+                return false;
+            }
+        } else if (!host.equals(other.host)) {
+            return false;
+        }
+        if (ignoredProxyHosts == null) {
+            if (other.ignoredProxyHosts != null) {
+                return false;
+            }
+        } else if (!ignoredProxyHosts.equals(other.ignoredProxyHosts)) {
+            return false;
+        }
+        if (port != other.port) {
+            return false;
+        }
 
-	public String getUsername() {
-		if (getProxyCredentials() == null) {
-			return null;
-		} else {
-			return getProxyCredentials().getUsername();
-		}
-	}
+        return true;
+    }
 
-	public String getEncryptedPassword() {
-		if (getProxyCredentials() == null) {
-			return null;
-		} else {
-			return getProxyCredentials().getEncryptedPassword();
-		}
-	}
+    public String getHost() {
+        return host;
+    }
 
-	public String getDecryptedPassword() throws IllegalArgumentException, EncryptionException {
-		if (getProxyCredentials() == null) {
-			return null;
-		} else {
-			return getProxyCredentials().getDecryptedPassword();
-		}
-	}
+    public int getPort() {
+        return port;
+    }
 
-	public String getMaskedPassword() {
-		if (getProxyCredentials() == null) {
-			return null;
-		} else {
-			return getProxyCredentials().getMaskedPassword();
-		}
-	}
+    public String getUsername() {
+        if (getProxyCredentials() == null) {
+            return null;
+        } else {
+            return getProxyCredentials().getUsername();
+        }
+    }
 
-	public int getActualPasswordLength() {
-		if (getProxyCredentials() == null) {
-			return 0;
-		} else {
-			return getProxyCredentials().getActualPasswordLength();
-		}
-	}
+    public String getEncryptedPassword() {
+        if (getProxyCredentials() == null) {
+            return null;
+        } else {
+            return getProxyCredentials().getEncryptedPassword();
+        }
+    }
 
-	public String getIgnoredProxyHosts() {
-		return ignoredProxyHosts;
-	}
+    public String getDecryptedPassword() throws IllegalArgumentException, EncryptionException {
+        if (getProxyCredentials() == null) {
+            return null;
+        } else {
+            return getProxyCredentials().getDecryptedPassword();
+        }
+    }
 
-	private HubCredentials getProxyCredentials() {
-		return proxyCredentials;
-	}
+    public String getMaskedPassword() {
+        if (getProxyCredentials() == null) {
+            return null;
+        } else {
+            return getProxyCredentials().getMaskedPassword();
+        }
+    }
+
+    public int getActualPasswordLength() {
+        if (getProxyCredentials() == null) {
+            return 0;
+        } else {
+            return getProxyCredentials().getActualPasswordLength();
+        }
+    }
+
+    public String getIgnoredProxyHosts() {
+        return ignoredProxyHosts;
+    }
+
+    private HubCredentials getProxyCredentials() {
+        return proxyCredentials;
+    }
 
 }

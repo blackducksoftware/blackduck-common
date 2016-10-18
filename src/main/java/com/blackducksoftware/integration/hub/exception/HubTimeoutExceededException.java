@@ -22,21 +22,21 @@
 package com.blackducksoftware.integration.hub.exception;
 
 public class HubTimeoutExceededException extends HubIntegrationException {
-	private static final long serialVersionUID = -7752926384289205234L;
+    private static final long serialVersionUID = -7752926384289205234L;
 
-	public HubTimeoutExceededException() {
-	}
+    public HubTimeoutExceededException() {
+    }
 
-	public HubTimeoutExceededException(final String message) {
-		super(message);
-	}
+    public HubTimeoutExceededException(final String message) {
+        super(message);
+    }
 
-	public HubTimeoutExceededException(final Throwable cause) {
-		super(cause);
-	}
+    public HubTimeoutExceededException(final Throwable cause) {
+        super(cause);
+    }
 
-	public HubTimeoutExceededException(final String message, final Throwable cause) {
-		super(message, cause);
-	}
+    public HubTimeoutExceededException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
 }

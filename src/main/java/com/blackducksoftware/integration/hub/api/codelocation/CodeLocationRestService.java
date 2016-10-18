@@ -42,39 +42,40 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class CodeLocationRestService extends HubItemRestService<CodeLocationItem> {
-	private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
+    private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
 
-	private static Type ITEM_TYPE = new TypeToken<CodeLocationItem>() {
-	}.getType();
-	private static Type ITEM_LIST_TYPE = new TypeToken<List<CodeLocationItem>>() {
-	}.getType();
+    private static Type ITEM_TYPE = new TypeToken<CodeLocationItem>() {
+    }.getType();
 
-	public CodeLocationRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    private static Type ITEM_LIST_TYPE = new TypeToken<List<CodeLocationItem>>() {
+    }.getType();
 
-	public List<CodeLocationItem> getAllCodeLocations() throws IOException, BDRestException, URISyntaxException {
-		final HubRequest codeLocationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		codeLocationItemRequest.setMethod(Method.GET);
-		codeLocationItemRequest.setLimit(100);
-		codeLocationItemRequest.addUrlSegments(CODE_LOCATION_SEGMENTS);
+    public CodeLocationRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
-		final JsonObject jsonObject = codeLocationItemRequest.executeForResponseJson();
-		final List<CodeLocationItem> allCodeLocations = getAll(jsonObject, codeLocationItemRequest);
-		return allCodeLocations;
-	}
+    public List<CodeLocationItem> getAllCodeLocations() throws IOException, BDRestException, URISyntaxException {
+        final HubRequest codeLocationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        codeLocationItemRequest.setMethod(Method.GET);
+        codeLocationItemRequest.setLimit(100);
+        codeLocationItemRequest.addUrlSegments(CODE_LOCATION_SEGMENTS);
 
-	public List<CodeLocationItem> getAllCodeLocationsForCodeLocationType(final CodeLocationTypeEnum codeLocationType)
-			throws IOException, BDRestException, URISyntaxException {
-		final HubRequest codeLocationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		codeLocationItemRequest.setMethod(Method.GET);
-		codeLocationItemRequest.setLimit(100);
-		codeLocationItemRequest.addQueryParameter("codeLocationType", codeLocationType.toString());
-		codeLocationItemRequest.addUrlSegments(CODE_LOCATION_SEGMENTS);
+        final JsonObject jsonObject = codeLocationItemRequest.executeForResponseJson();
+        final List<CodeLocationItem> allCodeLocations = getAll(jsonObject, codeLocationItemRequest);
+        return allCodeLocations;
+    }
 
-		final JsonObject jsonObject = codeLocationItemRequest.executeForResponseJson();
-		final List<CodeLocationItem> allCodeLocations = getAll(jsonObject, codeLocationItemRequest);
-		return allCodeLocations;
-	}
+    public List<CodeLocationItem> getAllCodeLocationsForCodeLocationType(final CodeLocationTypeEnum codeLocationType)
+            throws IOException, BDRestException, URISyntaxException {
+        final HubRequest codeLocationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        codeLocationItemRequest.setMethod(Method.GET);
+        codeLocationItemRequest.setLimit(100);
+        codeLocationItemRequest.addQueryParameter("codeLocationType", codeLocationType.toString());
+        codeLocationItemRequest.addUrlSegments(CODE_LOCATION_SEGMENTS);
+
+        final JsonObject jsonObject = codeLocationItemRequest.executeForResponseJson();
+        final List<CodeLocationItem> allCodeLocations = getAll(jsonObject, codeLocationItemRequest);
+        return allCodeLocations;
+    }
 
 }

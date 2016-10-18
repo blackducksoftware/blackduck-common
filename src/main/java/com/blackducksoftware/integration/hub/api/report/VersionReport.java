@@ -30,139 +30,139 @@ import org.apache.commons.lang3.StringUtils;
  *
  */
 public class VersionReport {
-	private final DetailedReleaseSummary detailedReleaseSummary;
+    private final DetailedReleaseSummary detailedReleaseSummary;
 
-	private final List<AggregateBomViewEntry> aggregateBomViewEntries;
+    private final List<AggregateBomViewEntry> aggregateBomViewEntries;
 
-	public VersionReport(final DetailedReleaseSummary detailedReleaseSummary,
-			final List<AggregateBomViewEntry> aggregateBomViewEntries) {
-		this.detailedReleaseSummary = detailedReleaseSummary;
-		this.aggregateBomViewEntries = aggregateBomViewEntries;
-	}
+    public VersionReport(final DetailedReleaseSummary detailedReleaseSummary,
+            final List<AggregateBomViewEntry> aggregateBomViewEntries) {
+        this.detailedReleaseSummary = detailedReleaseSummary;
+        this.aggregateBomViewEntries = aggregateBomViewEntries;
+    }
 
-	public DetailedReleaseSummary getDetailedReleaseSummary() {
-		return detailedReleaseSummary;
-	}
+    public DetailedReleaseSummary getDetailedReleaseSummary() {
+        return detailedReleaseSummary;
+    }
 
-	public String getBaseUrl() {
-		if (detailedReleaseSummary == null || detailedReleaseSummary.getUiUrlGenerator() == null) {
-			return null;
-		}
-		return detailedReleaseSummary.getUiUrlGenerator().getBaseUrl();
-	}
+    public String getBaseUrl() {
+        if (detailedReleaseSummary == null || detailedReleaseSummary.getUiUrlGenerator() == null) {
+            return null;
+        }
+        return detailedReleaseSummary.getUiUrlGenerator().getBaseUrl();
+    }
 
-	public String getReportProjectUrl() {
-		if (detailedReleaseSummary == null || StringUtils.isBlank(getBaseUrl())
-				|| StringUtils.isBlank(detailedReleaseSummary.getProjectId())) {
-			return null;
-		}
+    public String getReportProjectUrl() {
+        if (detailedReleaseSummary == null || StringUtils.isBlank(getBaseUrl())
+                || StringUtils.isBlank(detailedReleaseSummary.getProjectId())) {
+            return null;
+        }
 
-		final StringBuilder urlBuilder = new StringBuilder();
-		urlBuilder.append(getBaseUrl());
-		urlBuilder.append("#");
-		urlBuilder.append("projects/id:");
-		urlBuilder.append(detailedReleaseSummary.getProjectId());
+        final StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("#");
+        urlBuilder.append("projects/id:");
+        urlBuilder.append(detailedReleaseSummary.getProjectId());
 
-		return urlBuilder.toString();
-	}
+        return urlBuilder.toString();
+    }
 
-	public String getReportVersionUrl() {
-		if (detailedReleaseSummary == null || StringUtils.isBlank(getBaseUrl())
-				|| StringUtils.isBlank(detailedReleaseSummary.getVersionId())) {
-			return null;
-		}
+    public String getReportVersionUrl() {
+        if (detailedReleaseSummary == null || StringUtils.isBlank(getBaseUrl())
+                || StringUtils.isBlank(detailedReleaseSummary.getVersionId())) {
+            return null;
+        }
 
-		final StringBuilder urlBuilder = new StringBuilder();
-		urlBuilder.append(getBaseUrl());
-		urlBuilder.append("#");
-		urlBuilder.append("versions/id:");
-		urlBuilder.append(detailedReleaseSummary.getVersionId());
-		urlBuilder.append("/view:bom");
+        final StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("#");
+        urlBuilder.append("versions/id:");
+        urlBuilder.append(detailedReleaseSummary.getVersionId());
+        urlBuilder.append("/view:bom");
 
-		return urlBuilder.toString();
-	}
+        return urlBuilder.toString();
+    }
 
-	public String getComponentUrl(final AggregateBomViewEntry entry) {
-		if (StringUtils.isBlank(getBaseUrl()) || entry == null || entry.getProducerProject() == null
-				|| StringUtils.isBlank(entry.getProducerProject().getId())) {
-			return null;
-		}
+    public String getComponentUrl(final AggregateBomViewEntry entry) {
+        if (StringUtils.isBlank(getBaseUrl()) || entry == null || entry.getProducerProject() == null
+                || StringUtils.isBlank(entry.getProducerProject().getId())) {
+            return null;
+        }
 
-		final StringBuilder urlBuilder = new StringBuilder();
-		urlBuilder.append(getBaseUrl());
-		urlBuilder.append("#");
-		urlBuilder.append("projects/id:");
-		urlBuilder.append(entry.getProducerProject().getId());
+        final StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("#");
+        urlBuilder.append("projects/id:");
+        urlBuilder.append(entry.getProducerProject().getId());
 
-		return urlBuilder.toString();
-	}
+        return urlBuilder.toString();
+    }
 
-	public String getVersionUrl(final AggregateBomViewEntry entry) {
-		if (StringUtils.isBlank(getBaseUrl()) || entry == null || entry.getProducerReleases() == null
-				|| StringUtils.isBlank(entry.getProducerReleasesId())) {
-			return null;
-		}
+    public String getVersionUrl(final AggregateBomViewEntry entry) {
+        if (StringUtils.isBlank(getBaseUrl()) || entry == null || entry.getProducerReleases() == null
+                || StringUtils.isBlank(entry.getProducerReleasesId())) {
+            return null;
+        }
 
-		final StringBuilder urlBuilder = new StringBuilder();
-		urlBuilder.append(getBaseUrl());
-		urlBuilder.append("#");
-		urlBuilder.append("versions/id:");
-		urlBuilder.append(entry.getProducerReleasesId());
+        final StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("#");
+        urlBuilder.append("versions/id:");
+        urlBuilder.append(entry.getProducerReleasesId());
 
-		return urlBuilder.toString();
-	}
+        return urlBuilder.toString();
+    }
 
-	public List<AggregateBomViewEntry> getAggregateBomViewEntries() {
-		return aggregateBomViewEntries;
-	}
+    public List<AggregateBomViewEntry> getAggregateBomViewEntries() {
+        return aggregateBomViewEntries;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((aggregateBomViewEntries == null) ? 0 : aggregateBomViewEntries.hashCode());
-		result = prime * result + ((detailedReleaseSummary == null) ? 0 : detailedReleaseSummary.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((aggregateBomViewEntries == null) ? 0 : aggregateBomViewEntries.hashCode());
+        result = prime * result + ((detailedReleaseSummary == null) ? 0 : detailedReleaseSummary.hashCode());
+        return result;
+    }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof VersionReport)) {
-			return false;
-		}
-		final VersionReport other = (VersionReport) obj;
-		if (aggregateBomViewEntries == null) {
-			if (other.aggregateBomViewEntries != null) {
-				return false;
-			}
-		} else if (!aggregateBomViewEntries.equals(other.aggregateBomViewEntries)) {
-			return false;
-		}
-		if (detailedReleaseSummary == null) {
-			if (other.detailedReleaseSummary != null) {
-				return false;
-			}
-		} else if (!detailedReleaseSummary.equals(other.detailedReleaseSummary)) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof VersionReport)) {
+            return false;
+        }
+        final VersionReport other = (VersionReport) obj;
+        if (aggregateBomViewEntries == null) {
+            if (other.aggregateBomViewEntries != null) {
+                return false;
+            }
+        } else if (!aggregateBomViewEntries.equals(other.aggregateBomViewEntries)) {
+            return false;
+        }
+        if (detailedReleaseSummary == null) {
+            if (other.detailedReleaseSummary != null) {
+                return false;
+            }
+        } else if (!detailedReleaseSummary.equals(other.detailedReleaseSummary)) {
+            return false;
+        }
+        return true;
+    }
 
-	@Override
-	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("VersionReport [detailedReleaseSummary=");
-		builder.append(detailedReleaseSummary);
-		builder.append(", aggregateBomViewEntries=");
-		builder.append(aggregateBomViewEntries);
-		builder.append("]");
-		return builder.toString();
-	}
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("VersionReport [detailedReleaseSummary=");
+        builder.append(detailedReleaseSummary);
+        builder.append(", aggregateBomViewEntries=");
+        builder.append(aggregateBomViewEntries);
+        builder.append("]");
+        return builder.toString();
+    }
 
 }

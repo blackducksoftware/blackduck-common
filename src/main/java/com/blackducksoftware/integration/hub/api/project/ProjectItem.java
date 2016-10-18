@@ -29,92 +29,95 @@ import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class ProjectItem extends HubItem {
-	public static final String PROJECT_URL_IDENTIFIER = "projects";
-	public static final String VERSION_LINK = "versions";
-	public static final String CANONICAL_VERSION_LINK = "canonicalVersion";
+    public static final String PROJECT_URL_IDENTIFIER = "projects";
 
-	private final String name;
-	private final String source;
+    public static final String VERSION_LINK = "versions";
 
-	public ProjectItem(final String name, final String source, final MetaInformation _meta) {
-		super(_meta);
-		this.name = name;
-		this.source = source;
-	}
+    public static final String CANONICAL_VERSION_LINK = "canonicalVersion";
 
-	public String getName() {
-		return name;
-	}
+    private final String name;
 
-	public String getSource() {
-		return source;
-	}
+    private final String source;
 
-	@Deprecated
-	public UUID getProjectId() throws MissingUUIDException {
-		if (getMeta() == null || getMeta().getHref() == null) {
-			return null;
-		}
-		return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getMeta().getHref());
-	}
+    public ProjectItem(final String name, final String source, final MetaInformation _meta) {
+        super(_meta);
+        this.name = name;
+        this.source = source;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((source == null) ? 0 : source.hashCode());
-		result = prime * result + ((getMeta() == null) ? 0 : getMeta().hashCode());
-		return result;
-	}
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof ProjectItem)) {
-			return false;
-		}
-		final ProjectItem other = (ProjectItem) obj;
-		if (getMeta() == null) {
-			if (other.getMeta() != null) {
-				return false;
-			}
-		} else if (!getMeta().equals(other.getMeta())) {
-			return false;
-		}
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
-		}
-		if (source == null) {
-			if (other.source != null) {
-				return false;
-			}
-		} else if (!source.equals(other.source)) {
-			return false;
-		}
-		return true;
-	}
+    public String getSource() {
+        return source;
+    }
 
-	@Override
-	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("ProjectItem [name=");
-		builder.append(name);
-		builder.append(", source=");
-		builder.append(source);
-		builder.append(", _meta=");
-		builder.append(getMeta());
-		builder.append("]");
-		return builder.toString();
-	}
+    @Deprecated
+    public UUID getProjectId() throws MissingUUIDException {
+        if (getMeta() == null || getMeta().getHref() == null) {
+            return null;
+        }
+        return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getMeta().getHref());
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((source == null) ? 0 : source.hashCode());
+        result = prime * result + ((getMeta() == null) ? 0 : getMeta().hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof ProjectItem)) {
+            return false;
+        }
+        final ProjectItem other = (ProjectItem) obj;
+        if (getMeta() == null) {
+            if (other.getMeta() != null) {
+                return false;
+            }
+        } else if (!getMeta().equals(other.getMeta())) {
+            return false;
+        }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (source == null) {
+            if (other.source != null) {
+                return false;
+            }
+        } else if (!source.equals(other.source)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("ProjectItem [name=");
+        builder.append(name);
+        builder.append(", source=");
+        builder.append(source);
+        builder.append(", _meta=");
+        builder.append(getMeta());
+        builder.append("]");
+        return builder.toString();
+    }
 
 }
