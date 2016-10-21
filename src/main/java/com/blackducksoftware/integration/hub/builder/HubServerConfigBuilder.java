@@ -55,11 +55,11 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 
 	public static final String ERROR_MSG_AUTHENTICATED_PROXY_WITH_HTTPS = "Using an authenticated proxy to connect to an http Hub server is not supported.";
 
-	public static int DEFAULT_TIMEOUT = 120;
+	public static int DEFAULT_TIMEOUT_SECONDS = 120;
 
 	private String hubUrl;
 
-	private String timeout;
+	private String timeoutSeconds;
 
 	private String username;
 
@@ -126,7 +126,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 			hubURL = new URL(hubUrl);
 		} catch (final MalformedURLException e) {
 		}
-		final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeout), credentials, proxyInfo);
+		final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo);
 		result.setConstructedObject(config);
 		return result;
 	}
@@ -140,7 +140,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		result.addAllResults(credentialResult.getResultMap());
 		validateHubUrl(result);
 		if (shouldUseDefaultValues()) {
-			validateTimeout(result, DEFAULT_TIMEOUT);
+			validateTimeout(result, DEFAULT_TIMEOUT_SECONDS);
 		} else {
 			validateTimeout(result, null);
 		}
@@ -213,9 +213,9 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 			} else {
 				connection = hubURL.openConnection();
 			}
-			final int timeoutInt = stringToNonNegativeInteger(timeout);
-			connection.setConnectTimeout(timeoutInt);
-			connection.setReadTimeout(timeoutInt);
+			final int timeoutIntMillisec = 1000 * stringToNonNegativeInteger(timeoutSeconds);
+			connection.setConnectTimeout(timeoutIntMillisec);
+			connection.setReadTimeout(timeoutIntMillisec);
 			connection.getContent();
 		} catch (final IOException ioe) {
 			result.addResult(HubServerConfigFieldEnum.HUBURL,
@@ -247,27 +247,27 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 	}
 
 	private void validateTimeout(final ValidationResults<GlobalFieldKey, HubServerConfig> result,
-			final Integer defaultTimeout) {
-		if (shouldUseDefaultValues() && defaultTimeout != null) {
+			final Integer defaultTimeoutSeconds) {
+		if (shouldUseDefaultValues() && defaultTimeoutSeconds != null) {
 			int timeoutToValidate = 0;
 			try {
-				timeoutToValidate = stringToInteger(timeout);
+				timeoutToValidate = stringToInteger(timeoutSeconds);
 			} catch (final IllegalArgumentException e) {
-				timeout = String.valueOf(defaultTimeout);
+				timeoutSeconds = String.valueOf(defaultTimeoutSeconds);
 			}
 			if (timeoutToValidate <= 0) {
-				timeout = String.valueOf(defaultTimeout);
+				timeoutSeconds = String.valueOf(defaultTimeoutSeconds);
 			}
 			return;
 		}
-		if (StringUtils.isBlank(timeout)) {
+		if (StringUtils.isBlank(timeoutSeconds)) {
 			result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
 					new ValidationResult(ValidationResultEnum.ERROR, "No Hub Timeout was found."));
 			return;
 		}
 		int timeoutToValidate = 0;
 		try {
-			timeoutToValidate = stringToInteger(timeout);
+			timeoutToValidate = stringToInteger(timeoutSeconds);
 		} catch (final IllegalArgumentException e) {
 			result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
 					new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
@@ -285,16 +285,16 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 		this.hubUrl = StringUtils.trimToNull(hubUrl);
 	}
 
-	public void setTimeout(final String timeout) {
-		this.timeout = timeout;
+	public void setTimeout(final String timeoutSeconds) {
+		this.timeoutSeconds = timeoutSeconds;
 	}
 
 	public String getTimeout() {
-		return timeout;
+		return timeoutSeconds;
 	}
 
-	public void setTimeout(final int timeout) {
-		setTimeout(String.valueOf(timeout));
+	public void setTimeout(final int timeoutSeconds) {
+		setTimeout(String.valueOf(timeoutSeconds));
 	}
 
 	public String getHubUrl() {
