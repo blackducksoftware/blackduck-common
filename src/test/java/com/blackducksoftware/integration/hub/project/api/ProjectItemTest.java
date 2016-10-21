@@ -23,31 +23,33 @@ package com.blackducksoftware.integration.hub.project.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class ProjectItemTest {
 
     @Test
     public void testProjectItem() {
         final String name1 = "Name1";
-        final String source1 = "Source1";
+        final SourceEnum source1 = SourceEnum.CUSTOM;
         final String href1 = "href1";
         final MetaInformation metaInfo1 = new MetaInformation(null, href1, null);
 
         final String name2 = "Name2";
-        final String source2 = "Source2";
+        final SourceEnum source2 = SourceEnum.KB;
         final String href2 = "href2";
         final MetaInformation metaInfo2 = new MetaInformation(null, href2, null);
 
-        final ProjectItem item1 = new ProjectItem(name1, source1, metaInfo1);
-        final ProjectItem item2 = new ProjectItem(name2, source2, metaInfo2);
-        final ProjectItem item3 = new ProjectItem(name1, source1, metaInfo1);
+        final ProjectItem item1 = new ProjectItem(metaInfo1, name1, null, false, 1, source1);
+        final ProjectItem item2 = new ProjectItem(metaInfo2, name2, null, false, 1, source2);
+        final ProjectItem item3 = new ProjectItem(metaInfo1, name1, null, false, 1, source1);
 
         assertEquals(name1, item1.getName());
         assertEquals(source1, item1.getSource());

@@ -45,6 +45,7 @@ import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
 import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
 import com.blackducksoftware.integration.hub.api.report.HubRiskReportData;
@@ -111,7 +112,7 @@ public class RiskReportGeneratorTest {
 
         final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
         generatorInfo.setMaximumWaitTime(20000);
-        generatorInfo.setProject(new ProjectItem(null, null, null));
+        generatorInfo.setProject(new ProjectItem(null, null, null, false, 1, SourceEnum.CUSTOM));
         generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
         final List<String> scanTargets = new ArrayList<>();
         scanTargets.add("test");
@@ -182,7 +183,7 @@ public class RiskReportGeneratorTest {
 
         final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
         generatorInfo.setMaximumWaitTime(20000);
-        generatorInfo.setProject(new ProjectItem(null, null, null));
+        generatorInfo.setProject(new ProjectItem(null, null, null, false, 1, SourceEnum.CUSTOM));
         generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
         final List<String> scanTargets = new ArrayList<>();
         scanTargets.add("test");
@@ -241,7 +242,7 @@ public class RiskReportGeneratorTest {
 
         final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
         generatorInfo.setMaximumWaitTime(5000);
-        generatorInfo.setProject(new ProjectItem(null, null, null));
+        generatorInfo.setProject(new ProjectItem(null, null, null, false, 1, SourceEnum.CUSTOM));
         generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
         final List<String> scanTargets = new ArrayList<>();
         scanTargets.add("test");
@@ -296,7 +297,7 @@ public class RiskReportGeneratorTest {
 
         final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
         generatorInfo.setMaximumWaitTime(5000);
-        generatorInfo.setProject(new ProjectItem(null, null, null));
+        generatorInfo.setProject(new ProjectItem(null, null, null, false, 1, SourceEnum.CUSTOM));
         generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
         final List<String> scanTargets = new ArrayList<>();
         scanTargets.add("test");
@@ -394,7 +395,7 @@ public class RiskReportGeneratorTest {
 
         final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
         generatorInfo.setMaximumWaitTime(20000);
-        generatorInfo.setProject(new ProjectItem(null, null, null));
+        generatorInfo.setProject(new ProjectItem(null, null, null, false, 1, SourceEnum.CUSTOM));
         generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
         generatorInfo.setScanTargets(scanTargets);
         generatorInfo.setHostname(hostName);
@@ -507,7 +508,7 @@ public class RiskReportGeneratorTest {
 
         final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
         generatorInfo.setMaximumWaitTime(20000);
-        generatorInfo.setProject(new ProjectItem(null, null, null));
+        generatorInfo.setProject(new ProjectItem(null, null, null, false, 1, SourceEnum.CUSTOM));
         generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
         generatorInfo.setScanTargets(scanTargets);
         generatorInfo.setHostname(hostName);
@@ -610,7 +611,7 @@ public class RiskReportGeneratorTest {
 
         final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
         generatorInfo.setMaximumWaitTime(5000);
-        generatorInfo.setProject(new ProjectItem(null, null, null));
+        generatorInfo.setProject(new ProjectItem(null, null, null, false, 1, SourceEnum.CUSTOM));
         generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
         generatorInfo.setScanTargets(scanTargets);
         generatorInfo.setHostname(hostName);
@@ -710,7 +711,7 @@ public class RiskReportGeneratorTest {
 
         final HubReportGenerationInfo generatorInfo = new HubReportGenerationInfo();
         generatorInfo.setMaximumWaitTime(5000);
-        generatorInfo.setProject(new ProjectItem(null, null, null));
+        generatorInfo.setProject(new ProjectItem(null, null, null, false, 1, SourceEnum.CUSTOM));
         generatorInfo.setVersion(new ProjectVersionItem(null, null, null, null, null, null, null, null, null));
         generatorInfo.setScanTargets(scanTargets);
         generatorInfo.setHostname(hostName);

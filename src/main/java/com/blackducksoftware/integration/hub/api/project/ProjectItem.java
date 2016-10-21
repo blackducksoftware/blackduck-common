@@ -24,6 +24,7 @@ package com.blackducksoftware.integration.hub.api.project;
 import java.util.UUID;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.util.HubUrlParser;
@@ -35,22 +36,27 @@ public class ProjectItem extends HubItem {
 
     public static final String CANONICAL_VERSION_LINK = "canonicalVersion";
 
+    // description from Hub API: "The general identifier of the project"
     private final String name;
 
-    private final String source;
+    // description from Hub API: "Summary of what the project represents in terms of functionality and use"
+    private final String description;
 
-    public ProjectItem(final String name, final String source, final MetaInformation _meta) {
-        super(_meta);
+    // description from Hub API: "Whether BOM level adjustments are applied at the project level (to all releases)"
+    private final boolean projectLevelAdjustments;
+
+    // description from Hub API: "Allowed values : [1,2,3,4,5]"
+    private final int projectTier;
+
+    private final SourceEnum source;
+
+    public ProjectItem(MetaInformation meta, String name, String description, boolean projectLevelAdjustments, int projectTier, SourceEnum source) {
+        super(meta);
         this.name = name;
+        this.description = description;
+        this.projectLevelAdjustments = projectLevelAdjustments;
+        this.projectTier = projectTier;
         this.source = source;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getSource() {
-        return source;
     }
 
     @Deprecated
@@ -61,63 +67,24 @@ public class ProjectItem extends HubItem {
         return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getMeta().getHref());
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((source == null) ? 0 : source.hashCode());
-        result = prime * result + ((getMeta() == null) ? 0 : getMeta().hashCode());
-        return result;
+    public String getName() {
+        return name;
     }
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof ProjectItem)) {
-            return false;
-        }
-        final ProjectItem other = (ProjectItem) obj;
-        if (getMeta() == null) {
-            if (other.getMeta() != null) {
-                return false;
-            }
-        } else if (!getMeta().equals(other.getMeta())) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (source == null) {
-            if (other.source != null) {
-                return false;
-            }
-        } else if (!source.equals(other.source)) {
-            return false;
-        }
-        return true;
+    public String getDescription() {
+        return description;
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("ProjectItem [name=");
-        builder.append(name);
-        builder.append(", source=");
-        builder.append(source);
-        builder.append(", _meta=");
-        builder.append(getMeta());
-        builder.append("]");
-        return builder.toString();
+    public boolean isProjectLevelAdjustments() {
+        return projectLevelAdjustments;
+    }
+
+    public int getProjectTier() {
+        return projectTier;
+    }
+
+    public SourceEnum getSource() {
+        return source;
     }
 
 }
