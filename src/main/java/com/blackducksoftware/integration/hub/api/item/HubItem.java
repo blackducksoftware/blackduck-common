@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
@@ -96,7 +98,7 @@ public class HubItem {
 
     @Override
     public String toString() {
-        return "Item [meta=" + _meta + "]";
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }
