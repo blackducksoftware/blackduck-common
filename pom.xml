@@ -5,13 +5,13 @@
   <parent>
     <groupId>com.blackducksoftware.integration</groupId>
     <artifactId>common-maven-parent</artifactId>
-    <version>1.1.5</version>
+    <version>1.2.0</version>
   </parent>
 
   <artifactId>hub-common</artifactId>
-  <version>1.5.1-SNAPSHOT</version>
+  <version>1.5.1</version>
 
-  <name>HUB Common</name>
+  <name>Hub Common</name>
   <description>General Code for Hub Integration with CI systems</description>
   <url>https://www.github.com/blackducksoftware/hub-common</url>
   <inceptionYear>2015</inceptionYear>
