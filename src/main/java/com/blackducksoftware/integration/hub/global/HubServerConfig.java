@@ -29,16 +29,16 @@ public class HubServerConfig implements Serializable {
 
     private final URL hubUrl;
 
-    private final int timeout;
+    private final int timeoutSeconds;
 
     private final HubCredentials credentials;
 
     private final HubProxyInfo proxyInfo;
 
-    public HubServerConfig(final URL url, final int timeout, final HubCredentials credentials,
+    public HubServerConfig(final URL url, final int timeoutSeconds, final HubCredentials credentials,
             final HubProxyInfo proxyInfo) {
         this.hubUrl = url;
-        this.timeout = timeout;
+        this.timeoutSeconds = timeoutSeconds;
         this.credentials = credentials;
         this.proxyInfo = proxyInfo;
     }
@@ -49,7 +49,7 @@ public class HubServerConfig implements Serializable {
         builder.append("HubServerConfig [hubUrl=");
         builder.append(hubUrl);
         builder.append(", timeout=");
-        builder.append(timeout);
+        builder.append(timeoutSeconds);
         builder.append(", hubCredentials=");
         builder.append(credentials);
         builder.append(", proxyInfo=");
@@ -65,7 +65,7 @@ public class HubServerConfig implements Serializable {
         result = prime * result + ((credentials == null) ? 0 : credentials.hashCode());
         result = prime * result + ((hubUrl == null) ? 0 : hubUrl.hashCode());
         result = prime * result + ((proxyInfo == null) ? 0 : proxyInfo.hashCode());
-        result = prime * result + timeout;
+        result = prime * result + timeoutSeconds;
         return result;
     }
 
@@ -102,7 +102,7 @@ public class HubServerConfig implements Serializable {
         } else if (!proxyInfo.equals(other.proxyInfo)) {
             return false;
         }
-        if (timeout != other.timeout) {
+        if (timeoutSeconds != other.timeoutSeconds) {
             return false;
         }
         return true;
@@ -121,7 +121,7 @@ public class HubServerConfig implements Serializable {
     }
 
     public int getTimeout() {
-        return timeout;
+        return timeoutSeconds;
     }
 
 }

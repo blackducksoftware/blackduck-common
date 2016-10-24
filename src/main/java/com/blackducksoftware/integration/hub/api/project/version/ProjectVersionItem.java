@@ -20,6 +20,7 @@ public class ProjectVersionItem extends HubItem {
 
     private final DateTime releasedOn;
 
+    // description from Hub API: "Read-Only; No matter the value it will always default to 'CUSTOM'",
     private final SourceEnum source;
 
     private final String versionName;

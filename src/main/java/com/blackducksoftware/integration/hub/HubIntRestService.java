@@ -50,6 +50,7 @@ import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
 import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
@@ -310,7 +311,7 @@ public class HubIntRestService {
         urlSegments.add("api");
         urlSegments.add("projects");
 
-        final ProjectItem newProject = new ProjectItem(projectName, null, null);
+        final ProjectItem newProject = new ProjectItem(null, projectName, null, false, 1, SourceEnum.CUSTOM);
         final StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
         stringRep.setMediaType(MediaType.APPLICATION_JSON);
         stringRep.setCharacterSet(CharacterSet.UTF_8);
@@ -801,7 +802,7 @@ public class HubIntRestService {
     }
 
     public ScanStatusDataService getScanStatusDataService() {
-        return new ScanStatusDataService(restConnection, gson, jsonParser, projectRestService, releaseItemRestService,
+        return new ScanStatusDataService(restConnection, gson, jsonParser, projectRestService, projectVersionRestService,
                 codeLocationRestService, scanSummaryRestService);
     }
 

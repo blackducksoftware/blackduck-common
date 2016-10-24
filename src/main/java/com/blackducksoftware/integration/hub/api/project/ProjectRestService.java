@@ -57,10 +57,7 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
     }
 
     public List<ProjectItem> getAllProjects() throws IOException, BDRestException, URISyntaxException {
-        final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-        projectItemRequest.setMethod(Method.GET);
-        projectItemRequest.setLimit(100);
-        projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
+        final HubRequest projectItemRequest = createDefaultHubRequest();
 
         final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
         final List<ProjectItem> allProjectItems = getAll(jsonObject, projectItemRequest);
@@ -69,13 +66,8 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
 
     public List<ProjectItem> getAllProjectMatches(final String projectName)
             throws IOException, BDRestException, URISyntaxException {
-        final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-        projectItemRequest.setMethod(Method.GET);
-        projectItemRequest.setLimit(100);
-        projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
-        if (StringUtils.isNotBlank(projectName)) {
-            projectItemRequest.setQ("name:" + projectName);
-        }
+        final HubRequest projectItemRequest = createDefaultHubRequest();
+        addProjectNameQuery(projectItemRequest, projectName);
 
         final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
         final List<ProjectItem> allProjectItems = getAll(jsonObject, projectItemRequest);
@@ -84,13 +76,9 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
 
     public List<ProjectItem> getProjectMatches(final String projectName, final int limit)
             throws IOException, BDRestException, URISyntaxException {
-        final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-        projectItemRequest.setMethod(Method.GET);
+        HubRequest projectItemRequest = createDefaultHubRequest();
+        addProjectNameQuery(projectItemRequest, projectName);
         projectItemRequest.setLimit(limit);
-        projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
-        if (StringUtils.isNotBlank(projectName)) {
-            projectItemRequest.setQ("name:" + projectName);
-        }
 
         final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
         final List<ProjectItem> allProjectItems = getItems(jsonObject);
@@ -99,7 +87,6 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
 
     public ProjectItem getProjectByName(String projectName)
             throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
-        projectName = StringUtils.trimToEmpty(projectName);
         final List<ProjectItem> allProjectItems = getAllProjectMatches(projectName);
         for (final ProjectItem project : allProjectItems) {
             if (projectName.equals(project.getName())) {
@@ -107,6 +94,22 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
             }
         }
         throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName);
+    }
+
+    private HubRequest createDefaultHubRequest() {
+        final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+
+        projectItemRequest.setMethod(Method.GET);
+        projectItemRequest.setLimit(100);
+        projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
+
+        return projectItemRequest;
+    }
+
+    private void addProjectNameQuery(HubRequest projectItemRequest, String projectName) {
+        if (StringUtils.isNotBlank(projectName)) {
+            projectItemRequest.setQ("name:" + projectName);
+        }
     }
 
 }

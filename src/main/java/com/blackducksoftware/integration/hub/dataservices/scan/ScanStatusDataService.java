@@ -27,17 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationItem;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationTypeEnum;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
-import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
-import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -54,14 +52,14 @@ public class ScanStatusDataService extends AbstractDataService {
 
     private final ProjectRestService projectRestService;
 
-    private final ReleaseItemRestService projectVersionRestService;
+    private final ProjectVersionRestService projectVersionRestService;
 
     private final CodeLocationRestService codeLocationRestService;
 
     private final ScanSummaryRestService scanSummaryRestService;
 
     public ScanStatusDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
-            final ProjectRestService projectRestService, final ReleaseItemRestService projectVersionRestService,
+            final ProjectRestService projectRestService, final ProjectVersionRestService projectVersionRestService,
             final CodeLocationRestService codeLocationRestService,
             final ScanSummaryRestService scanSummaryRestService) {
         super(restConnection, gson, jsonParser);
@@ -192,21 +190,17 @@ public class ScanStatusDataService extends AbstractDataService {
         List<ScanSummaryItem> pendingScans = new ArrayList<>();
         try {
             final ProjectItem projectItem = projectRestService.getProjectByName(projectName);
-            final String projectId = projectItem.getProjectId().toString();
-
-            final ReleaseItem releaseItem = projectVersionRestService
-                    .getProjectVersionByName(projectItem.getProjectId().toString(), projectVersion);
-            final String versionId = releaseItem.getVersionId().toString();
+            ProjectVersionItem projectVersionItem = projectVersionRestService.getProjectVersion(projectItem, projectVersion);
+            String projectVersionUrl = projectVersionItem.getMeta().getHref();
 
             final List<CodeLocationItem> allCodeLocations = codeLocationRestService
                     .getAllCodeLocationsForCodeLocationType(CodeLocationTypeEnum.BOM_IMPORT);
 
             final List<String> allScanSummariesLinks = new ArrayList<>();
             for (final CodeLocationItem codeLocationItem : allCodeLocations) {
-                final String projectVersionLink = codeLocationItem.getMappedProjectVersion();
-                final String scanSummariesLink = codeLocationItem.getLink("scans");
-                if (StringUtils.isNotBlank(projectVersionLink) && projectVersionLink.contains(projectId)
-                        && projectVersionLink.contains(versionId)) {
+                final String mappedProjectVersionUrl = codeLocationItem.getMappedProjectVersion();
+                if (projectVersionUrl.equals(mappedProjectVersionUrl)) {
+                    final String scanSummariesLink = codeLocationItem.getLink("scans");
                     allScanSummariesLinks.add(scanSummariesLink);
                 }
             }

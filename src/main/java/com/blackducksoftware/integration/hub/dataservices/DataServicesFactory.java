@@ -117,7 +117,7 @@ public class DataServicesFactory {
     }
 
     public ScanStatusDataService createScanStatusDataService() {
-        return new ScanStatusDataService(restConnection, gson, jsonParser, projectRestService, releaseItemRestService,
+        return new ScanStatusDataService(restConnection, gson, jsonParser, projectRestService, projectVersionRestService,
                 codeLocationRestService, scanSummaryRestService);
     }
 
