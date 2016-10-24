@@ -25,12 +25,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
@@ -40,7 +42,7 @@ import com.blackducksoftware.integration.hub.api.report.risk.RiskCategories;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskCounts;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskProfile;
 import com.blackducksoftware.integration.hub.util.XStreamHelperTest;
-import com.blackducksoftware.integration.test.TestUtils;
+import com.blackducksoftware.integration.util.ResourceUtil;
 
 public class HubRiskReportDataTest {
     @Test
@@ -198,22 +200,22 @@ public class HubRiskReportDataTest {
     }
 
     @Test
-    public void testReadingFromInputStream() {
+    public void testReadingFromInputStream() throws IOException, IllegalAccessException {
         final HubRiskReportData hubRiskReportData = new HubRiskReportData();
-        TestUtils.setField(hubRiskReportData, "vulnerabilityRiskHighCount", 1000);
-        TestUtils.setField(hubRiskReportData, "vulnerabilityRiskMediumCount", 2000);
-        TestUtils.setField(hubRiskReportData, "vulnerabilityRiskLowCount", 3000);
-        TestUtils.setField(hubRiskReportData, "vulnerabilityRiskNoneCount", 4000);
+        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskHighCount", 1000, true);
+        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskMediumCount", 2000, true);
+        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskLowCount", 3000, true);
+        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskNoneCount", 4000, true);
 
-        TestUtils.setField(hubRiskReportData, "licenseRiskHighCount", 5000);
-        TestUtils.setField(hubRiskReportData, "licenseRiskMediumCount", 6000);
-        TestUtils.setField(hubRiskReportData, "licenseRiskLowCount", 7000);
-        TestUtils.setField(hubRiskReportData, "licenseRiskNoneCount", 8000);
+        FieldUtils.writeField(hubRiskReportData, "licenseRiskHighCount", 5000, true);
+        FieldUtils.writeField(hubRiskReportData, "licenseRiskMediumCount", 6000, true);
+        FieldUtils.writeField(hubRiskReportData, "licenseRiskLowCount", 7000, true);
+        FieldUtils.writeField(hubRiskReportData, "licenseRiskNoneCount", 8000, true);
 
-        TestUtils.setField(hubRiskReportData, "operationalRiskHighCount", 9000);
-        TestUtils.setField(hubRiskReportData, "operationalRiskMediumCount", 10000);
-        TestUtils.setField(hubRiskReportData, "operationalRiskLowCount", 11000);
-        TestUtils.setField(hubRiskReportData, "operationalRiskNoneCount", 12000);
+        FieldUtils.writeField(hubRiskReportData, "operationalRiskHighCount", 9000, true);
+        FieldUtils.writeField(hubRiskReportData, "operationalRiskMediumCount", 10000, true);
+        FieldUtils.writeField(hubRiskReportData, "operationalRiskLowCount", 11000, true);
+        FieldUtils.writeField(hubRiskReportData, "operationalRiskNoneCount", 12000, true);
 
         assertEquals(1000, hubRiskReportData.getVulnerabilityRiskHighCount());
         assertEquals(2000, hubRiskReportData.getVulnerabilityRiskMediumCount());
@@ -230,8 +232,7 @@ public class HubRiskReportDataTest {
         assertEquals(11000, hubRiskReportData.getOperationalRiskLowCount());
         assertEquals(12000, hubRiskReportData.getOperationalRiskNoneCount());
 
-        final InputStream inputStream = TestUtils
-                .getInputStreamFromClasspathFile(XStreamHelperTest.toReadClasspathEntry);
+        final InputStream inputStream = ResourceUtil.getResourceAsStream(XStreamHelperTest.toReadClasspathEntry);
         hubRiskReportData.readFromInputStream(inputStream);
         IOUtils.closeQuietly(inputStream);
 
@@ -252,22 +253,22 @@ public class HubRiskReportDataTest {
     }
 
     @Test
-    public void testWritingToOutputStream() {
+    public void testWritingToOutputStream() throws IllegalAccessException {
         final HubRiskReportData hubRiskReportData = new HubRiskReportData();
-        TestUtils.setField(hubRiskReportData, "vulnerabilityRiskHighCount", 1000);
-        TestUtils.setField(hubRiskReportData, "vulnerabilityRiskMediumCount", 2000);
-        TestUtils.setField(hubRiskReportData, "vulnerabilityRiskLowCount", 3000);
-        TestUtils.setField(hubRiskReportData, "vulnerabilityRiskNoneCount", 4000);
+        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskHighCount", 1000, true);
+        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskMediumCount", 2000, true);
+        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskLowCount", 3000, true);
+        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskNoneCount", 4000, true);
 
-        TestUtils.setField(hubRiskReportData, "licenseRiskHighCount", 5000);
-        TestUtils.setField(hubRiskReportData, "licenseRiskMediumCount", 6000);
-        TestUtils.setField(hubRiskReportData, "licenseRiskLowCount", 7000);
-        TestUtils.setField(hubRiskReportData, "licenseRiskNoneCount", 8000);
+        FieldUtils.writeField(hubRiskReportData, "licenseRiskHighCount", 5000, true);
+        FieldUtils.writeField(hubRiskReportData, "licenseRiskMediumCount", 6000, true);
+        FieldUtils.writeField(hubRiskReportData, "licenseRiskLowCount", 7000, true);
+        FieldUtils.writeField(hubRiskReportData, "licenseRiskNoneCount", 8000, true);
 
-        TestUtils.setField(hubRiskReportData, "operationalRiskHighCount", 9000);
-        TestUtils.setField(hubRiskReportData, "operationalRiskMediumCount", 10000);
-        TestUtils.setField(hubRiskReportData, "operationalRiskLowCount", 11000);
-        TestUtils.setField(hubRiskReportData, "operationalRiskNoneCount", 12000);
+        FieldUtils.writeField(hubRiskReportData, "operationalRiskHighCount", 9000, true);
+        FieldUtils.writeField(hubRiskReportData, "operationalRiskMediumCount", 10000, true);
+        FieldUtils.writeField(hubRiskReportData, "operationalRiskLowCount", 11000, true);
+        FieldUtils.writeField(hubRiskReportData, "operationalRiskNoneCount", 12000, true);
 
         final OutputStream outputStream = new ByteArrayOutputStream();
         hubRiskReportData.writeToOutputStream(outputStream);

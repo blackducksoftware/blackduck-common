@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.blackducksoftware.integration</groupId>
     <artifactId>common-maven-parent</artifactId>
-    <version>1.2.0</version>
+    <version>2.0.0</version>
   </parent>
 
   <artifactId>hub-common</artifactId>
@@ -26,7 +26,7 @@
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>integration-common</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.7</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
@@ -63,6 +63,10 @@
       <artifactId>org.restlet</artifactId>
       <version>2.3.7</version>
     </dependency>
+    <!--
+    We include the httpclient dependency since the default implementation that restlet will use is not recommended for production use.
+    https://restlet.com/technical-resources/restlet-framework/guide/2.3/core/base/connectors
+    -->
     <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.httpclient</artifactId>
@@ -72,11 +76,6 @@
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
       <version>1.4.9</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>1.10</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
