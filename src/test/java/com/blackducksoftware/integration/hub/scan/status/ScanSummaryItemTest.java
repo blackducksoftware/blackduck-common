@@ -35,7 +35,7 @@ import org.junit.Test;
 import com.blackducksoftware.integration.hub.api.scan.ScanStatus;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
-import com.blackducksoftware.integration.test.TestUtils;
+import com.blackducksoftware.integration.util.ResourceUtil;
 import com.google.gson.Gson;
 
 public class ScanSummaryItemTest {
@@ -66,7 +66,7 @@ public class ScanSummaryItemTest {
 
     @Test
     public void testPopulatingScanSummaryItemFromJson() throws IOException {
-        final InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(
+        final InputStream inputStream = ResourceUtil.getResourceAsStream(
                 "com/blackducksoftware/integration/hub/scan/status/scanSummaryItemJson.txt");
         final String json = IOUtils.toString(inputStream, "UTF-8");
 

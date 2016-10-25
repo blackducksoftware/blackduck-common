@@ -26,17 +26,22 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.report.HubRiskReportData;
-import com.blackducksoftware.integration.test.TestUtils;
+import com.blackducksoftware.integration.util.ResourceUtil;
 
 public class XStreamHelperTest {
     public static final String toWriteClasspathEntry = "com/blackducksoftware/integration/hub/util/XStreamHelperTestToWriteTo.xml";
@@ -46,7 +51,7 @@ public class XStreamHelperTest {
     @BeforeClass
     public static void beforeAllTests() throws Exception {
         // test that output file is initially empty
-        final InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(toWriteClasspathEntry);
+        final InputStream inputStream = ResourceUtil.getResourceAsStream(toWriteClasspathEntry);
         final String contents = IOUtils.toString(inputStream);
         IOUtils.closeQuietly(inputStream);
         assertTrue(contents.isEmpty());
@@ -55,38 +60,42 @@ public class XStreamHelperTest {
     @AfterClass
     public static void afterAllTests() throws Exception {
         // clear contents of output file
-        final OutputStream outputStream = TestUtils.getOutputStreamFromClasspathFile(toWriteClasspathEntry);
+        final URL url = Thread.currentThread().getContextClassLoader().getResource(toWriteClasspathEntry);
+        final File file = new File(url.toURI().getPath());
+        final OutputStream outputStream = new FileOutputStream(file);
         IOUtils.write((String) null, outputStream);
         IOUtils.closeQuietly(outputStream);
     }
 
     @Test
-    public void testWritingXmlToOutputStream() throws IOException {
+    public void testWritingXmlToOutputStream() throws IOException, URISyntaxException, IllegalAccessException {
         final HubRiskReportData hubRiskReportData = new HubRiskReportData();
-        TestUtils.setField(hubRiskReportData, "vulnerabilityRiskHighCount", 1);
-        TestUtils.setField(hubRiskReportData, "vulnerabilityRiskMediumCount", 2);
-        TestUtils.setField(hubRiskReportData, "vulnerabilityRiskLowCount", 3);
-        TestUtils.setField(hubRiskReportData, "vulnerabilityRiskNoneCount", 4);
-        TestUtils.setField(hubRiskReportData, "licenseRiskHighCount", 5);
-        TestUtils.setField(hubRiskReportData, "licenseRiskMediumCount", 6);
-        TestUtils.setField(hubRiskReportData, "licenseRiskLowCount", 7);
-        TestUtils.setField(hubRiskReportData, "licenseRiskNoneCount", 8);
-        TestUtils.setField(hubRiskReportData, "operationalRiskHighCount", 9);
-        TestUtils.setField(hubRiskReportData, "operationalRiskMediumCount", 10);
-        TestUtils.setField(hubRiskReportData, "operationalRiskLowCount", 11);
-        TestUtils.setField(hubRiskReportData, "operationalRiskNoneCount", 12);
+        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskHighCount", 1, true);
+        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskMediumCount", 2, true);
+        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskLowCount", 3, true);
+        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskNoneCount", 4, true);
+        FieldUtils.writeField(hubRiskReportData, "licenseRiskHighCount", 5, true);
+        FieldUtils.writeField(hubRiskReportData, "licenseRiskMediumCount", 6, true);
+        FieldUtils.writeField(hubRiskReportData, "licenseRiskLowCount", 7, true);
+        FieldUtils.writeField(hubRiskReportData, "licenseRiskNoneCount", 8, true);
+        FieldUtils.writeField(hubRiskReportData, "operationalRiskHighCount", 9, true);
+        FieldUtils.writeField(hubRiskReportData, "operationalRiskMediumCount", 10, true);
+        FieldUtils.writeField(hubRiskReportData, "operationalRiskLowCount", 11, true);
+        FieldUtils.writeField(hubRiskReportData, "operationalRiskNoneCount", 12, true);
 
         final XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<>();
         final String xml = xStreamHelper.toXML(hubRiskReportData);
         assertFalse(xml.isEmpty());
 
         // write to output file
-        final OutputStream outputStream = TestUtils.getOutputStreamFromClasspathFile(toWriteClasspathEntry);
+        final URL url = Thread.currentThread().getContextClassLoader().getResource(toWriteClasspathEntry);
+        final File file = new File(url.toURI().getPath());
+        final OutputStream outputStream = new FileOutputStream(file);
         xStreamHelper.toXML(hubRiskReportData, outputStream);
         IOUtils.closeQuietly(outputStream);
 
         // test that output file is no longer empty
-        final InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(toWriteClasspathEntry);
+        final InputStream inputStream = ResourceUtil.getResourceAsStream(toWriteClasspathEntry);
         final String contents = IOUtils.toString(inputStream);
         IOUtils.closeQuietly(inputStream);
         assertFalse(contents.isEmpty());
@@ -97,9 +106,9 @@ public class XStreamHelperTest {
     }
 
     @Test
-    public void testReadingXmlFromInputStream() {
+    public void testReadingXmlFromInputStream() throws IOException {
         final XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<>();
-        final InputStream inputStream = TestUtils.getInputStreamFromClasspathFile(toReadClasspathEntry);
+        final InputStream inputStream = ResourceUtil.getResourceAsStream(toReadClasspathEntry);
         final HubRiskReportData hubRiskReportData = xStreamHelper.fromXML(inputStream);
         IOUtils.closeQuietly(inputStream);
 
