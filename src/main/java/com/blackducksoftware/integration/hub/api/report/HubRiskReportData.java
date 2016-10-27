@@ -28,7 +28,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.util.XStreamHelper;
+import com.blackducksoftware.integration.util.XStreamHelper;
 
 public class HubRiskReportData {
     private VersionReport report;
@@ -117,7 +117,7 @@ public class HubRiskReportData {
     }
 
     public void readFromInputStream(final InputStream inputStream) {
-        final XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<HubRiskReportData>();
+        final XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<>();
         final HubRiskReportData that = xStreamHelper.fromXML(inputStream);
 
         licenseRiskHighCount = that.licenseRiskHighCount;
@@ -136,7 +136,7 @@ public class HubRiskReportData {
     }
 
     public void writeToOutputStream(final OutputStream outputStream) {
-        final XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<HubRiskReportData>();
+        final XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<>();
         xStreamHelper.toXML(this, outputStream);
     }
 

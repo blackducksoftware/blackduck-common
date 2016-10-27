@@ -25,8 +25,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +39,6 @@ import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskCategories;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskCounts;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskProfile;
-import com.blackducksoftware.integration.hub.util.XStreamHelperTest;
-import com.blackducksoftware.integration.util.ResourceUtil;
 
 public class HubRiskReportDataTest {
     @Test
@@ -197,59 +193,6 @@ public class HubRiskReportDataTest {
         assertEquals(0, hubRiskReportData.getOperationalRiskMediumCount());
         assertEquals(0, hubRiskReportData.getOperationalRiskLowCount());
         assertEquals(1, hubRiskReportData.getOperationalRiskNoneCount());
-    }
-
-    @Test
-    public void testReadingFromInputStream() throws IOException, IllegalAccessException {
-        final HubRiskReportData hubRiskReportData = new HubRiskReportData();
-        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskHighCount", 1000, true);
-        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskMediumCount", 2000, true);
-        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskLowCount", 3000, true);
-        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskNoneCount", 4000, true);
-
-        FieldUtils.writeField(hubRiskReportData, "licenseRiskHighCount", 5000, true);
-        FieldUtils.writeField(hubRiskReportData, "licenseRiskMediumCount", 6000, true);
-        FieldUtils.writeField(hubRiskReportData, "licenseRiskLowCount", 7000, true);
-        FieldUtils.writeField(hubRiskReportData, "licenseRiskNoneCount", 8000, true);
-
-        FieldUtils.writeField(hubRiskReportData, "operationalRiskHighCount", 9000, true);
-        FieldUtils.writeField(hubRiskReportData, "operationalRiskMediumCount", 10000, true);
-        FieldUtils.writeField(hubRiskReportData, "operationalRiskLowCount", 11000, true);
-        FieldUtils.writeField(hubRiskReportData, "operationalRiskNoneCount", 12000, true);
-
-        assertEquals(1000, hubRiskReportData.getVulnerabilityRiskHighCount());
-        assertEquals(2000, hubRiskReportData.getVulnerabilityRiskMediumCount());
-        assertEquals(3000, hubRiskReportData.getVulnerabilityRiskLowCount());
-        assertEquals(4000, hubRiskReportData.getVulnerabilityRiskNoneCount());
-
-        assertEquals(5000, hubRiskReportData.getLicenseRiskHighCount());
-        assertEquals(6000, hubRiskReportData.getLicenseRiskMediumCount());
-        assertEquals(7000, hubRiskReportData.getLicenseRiskLowCount());
-        assertEquals(8000, hubRiskReportData.getLicenseRiskNoneCount());
-
-        assertEquals(9000, hubRiskReportData.getOperationalRiskHighCount());
-        assertEquals(10000, hubRiskReportData.getOperationalRiskMediumCount());
-        assertEquals(11000, hubRiskReportData.getOperationalRiskLowCount());
-        assertEquals(12000, hubRiskReportData.getOperationalRiskNoneCount());
-
-        final InputStream inputStream = ResourceUtil.getResourceAsStream(XStreamHelperTest.toReadClasspathEntry);
-        hubRiskReportData.readFromInputStream(inputStream);
-        IOUtils.closeQuietly(inputStream);
-
-        assertEquals(13, hubRiskReportData.getVulnerabilityRiskHighCount());
-        assertEquals(14, hubRiskReportData.getVulnerabilityRiskMediumCount());
-        assertEquals(15, hubRiskReportData.getVulnerabilityRiskLowCount());
-        assertEquals(16, hubRiskReportData.getVulnerabilityRiskNoneCount());
-
-        assertEquals(17, hubRiskReportData.getLicenseRiskHighCount());
-        assertEquals(18, hubRiskReportData.getLicenseRiskMediumCount());
-        assertEquals(19, hubRiskReportData.getLicenseRiskLowCount());
-        assertEquals(20, hubRiskReportData.getLicenseRiskNoneCount());
-
-        assertEquals(21, hubRiskReportData.getOperationalRiskHighCount());
-        assertEquals(22, hubRiskReportData.getOperationalRiskMediumCount());
-        assertEquals(23, hubRiskReportData.getOperationalRiskLowCount());
-        assertEquals(24, hubRiskReportData.getOperationalRiskNoneCount());
     }
 
     @Test
