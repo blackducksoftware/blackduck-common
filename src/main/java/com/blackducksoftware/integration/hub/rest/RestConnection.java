@@ -105,10 +105,19 @@ public abstract class RestConnection {
     }
 
     public RestConnection() {
+        this(null);
+    }
+
+    public RestConnection(final IntLogger logger) {
+        if (logger != null) {
+            setLogger(logger);
+        }
         client = createClient();
+        setTimeout(timeout); // just in case setTimeout() is never called
     }
 
     private Client createClient() {
+        logMessage(LogLevel.DEBUG, "createClient()");
         final Context context = new Context();
         final List<Protocol> protocolList = new ArrayList<>();
         protocolList.add(Protocol.HTTP);
@@ -119,8 +128,10 @@ public abstract class RestConnection {
         // be equal to the maxTotalConnections. If this rest connection object
         // connects to more than one hub instance then the maxConnectionsPerHost
         // would need to be divided by the number of hub instances.
-        client.getContext().getParameters().add("maxConnectionsPerHost", "100");
-        client.getContext().getParameters().add("maxTotalConnections", "100");
+
+        logMessage(LogLevel.DEBUG, "Setting maxConnectionsPerHost and maxTotalConnections on client context");
+        client.getContext().getParameters().set("maxConnectionsPerHost", "100");
+        client.getContext().getParameters().set("maxTotalConnections", "100");
 
         return client;
     }
@@ -138,20 +149,16 @@ public abstract class RestConnection {
     }
 
     public void setTimeout(final int timeout) {
-        if (timeout == 0) {
-            throw new IllegalArgumentException("Can not set the timeout to zero.");
+        if (timeout < 0) {
+            throw new IllegalArgumentException("Timeout must be non-negative.");
         }
         this.timeout = timeout;
-        setClientTimeout(this.timeout);
-    }
-
-    private void setClientTimeout(final int timeout) {
         // the User sets the timeout in seconds, so we translate to ms
         final String stringTimeout = String.valueOf(timeout * 1000);
-
-        client.getContext().getParameters().add("socketTimeout", stringTimeout);
-        client.getContext().getParameters().add("socketConnectTimeoutMs", stringTimeout);
-        client.getContext().getParameters().add("readTimeout", stringTimeout);
+        logMessage(LogLevel.DEBUG, "Setting socketTimeout, socketConnectTimeoutMs, and readTimeout to: " + stringTimeout + " on client context");
+        client.getContext().getParameters().set("socketTimeout", stringTimeout);
+        client.getContext().getParameters().set("socketConnectTimeoutMs", stringTimeout);
+        client.getContext().getParameters().set("readTimeout", stringTimeout);
     }
 
     public String getBaseUrl() {
@@ -420,7 +427,7 @@ public abstract class RestConnection {
     }
 
     public void handleRequest(final ClientResource resource) throws BDRestException {
-        final boolean debugLogging = logger != null && logger.getLogLevel() == LogLevel.TRACE;
+        final boolean debugLogging = isDebugLogging();
         if (debugLogging) {
             logMessage(LogLevel.TRACE, "Resource : " + resource.toString());
             logRestletRequestOrResponse(resource.getRequest());
@@ -452,12 +459,16 @@ public abstract class RestConnection {
         }
     }
 
+    private boolean isDebugLogging() {
+        return logger != null && logger.getLogLevel() == LogLevel.TRACE;
+    }
+
     public String readResponseAsString(final Response response) throws IOException {
         return response.getEntityAsText();
     }
 
     private void logRestletRequestOrResponse(final Message requestOrResponse) {
-        if (logger != null && logger.getLogLevel() == LogLevel.TRACE) {
+        if (isDebugLogging()) {
             final String requestOrResponseName = requestOrResponse.getClass().getSimpleName();
             logMessage(LogLevel.TRACE, requestOrResponseName + " : " + requestOrResponse.toString());
 
