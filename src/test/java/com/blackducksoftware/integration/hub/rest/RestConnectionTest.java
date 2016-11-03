@@ -29,7 +29,14 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.exception.EncryptionException;
+import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
+import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.util.HubUrlParser;
+import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.log.LogLevel;
+import com.blackducksoftware.integration.test.TestLogger;
 
 public class RestConnectionTest {
 
@@ -75,5 +82,19 @@ public class RestConnectionTest {
         final String projectVersionUrl = urlPrefix + projectVersionRelativeUrl;
 
         assertEquals(projectVersionRelativeUrl, HubUrlParser.getRelativeUrl(projectVersionUrl));
+    }
+    
+    // TODO this is an integration test
+    @Test
+    public void testConnectionParameters() throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException {
+        IntLogger logger = new TestLogger();
+        logger.setLogLevel(LogLevel.TRACE);
+        HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setHubUrl("https://integration-hub.blackducksoftware.com:8443");
+        builder.setUsername("sysadmin");
+        builder.setPassword("blackduck");
+        builder.setTimeout(33);
+        HubServerConfig config = builder.build();
+        RestConnection conn = new CredentialsRestConnection(logger , config);
     }
 }
