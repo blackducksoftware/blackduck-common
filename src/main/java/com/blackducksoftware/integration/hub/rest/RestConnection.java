@@ -49,7 +49,6 @@ import org.restlet.data.Cookie;
 import org.restlet.data.CookieSetting;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Parameter;
 import org.restlet.data.Protocol;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.representation.Representation;
@@ -131,26 +130,8 @@ public abstract class RestConnection {
         // would need to be divided by the number of hub instances.
 
         logMessage(LogLevel.DEBUG, "Setting maxConnectionsPerHost and maxTotalConnections on client context");
-        // TODO TEMP
-        if (isDebugLogging()) {
-            Series<Parameter> parameters = client.getContext().getParameters();
-            logMessage(LogLevel.DEBUG, "createClient() Parameters: Before:");
-            for (Parameter param : parameters) {
-                logMessage(LogLevel.DEBUG, "\tcreateClient() before setting connections: Parameter: " + param.getName() + " = " + param.getValue());
-            }
-        }
-
         client.getContext().getParameters().set("maxConnectionsPerHost", "100");
         client.getContext().getParameters().set("maxTotalConnections", "100");
-
-        // TODO TEMP
-        if (isDebugLogging()) {
-            Series<Parameter> parameters = client.getContext().getParameters();
-            logMessage(LogLevel.DEBUG, "createClient() Parameters: After:");
-            for (Parameter param : parameters) {
-                logMessage(LogLevel.DEBUG, "\tcreateClient() after setting connections: Parameter: " + param.getName() + " = " + param.getValue());
-            }
-        }
 
         return client;
     }
@@ -180,28 +161,9 @@ public abstract class RestConnection {
         // the User sets the timeout in seconds, so we translate to ms
         final String stringTimeout = String.valueOf(timeout * 1000);
         logMessage(LogLevel.DEBUG, "Setting socketTimeout, socketConnectTimeoutMs, and readTimeout to: " + stringTimeout + " on client context");
-
-        // TODO TEMP
-        if (isDebugLogging()) {
-            Series<Parameter> parameters = client.getContext().getParameters();
-            logMessage(LogLevel.DEBUG, "Parameters: Before:");
-            for (Parameter param : parameters) {
-                logMessage(LogLevel.DEBUG, "\tsetClientTimeout() before setting timeouts: Parameter: " + param.getName() + " = " + param.getValue());
-            }
-        }
-
         client.getContext().getParameters().set("socketTimeout", stringTimeout);
         client.getContext().getParameters().set("socketConnectTimeoutMs", stringTimeout);
         client.getContext().getParameters().set("readTimeout", stringTimeout);
-
-        // TODO TEMP
-        if (isDebugLogging()) {
-            Series<Parameter> parameters = client.getContext().getParameters();
-            logMessage(LogLevel.DEBUG, "Parameters: After:");
-            for (Parameter param : parameters) {
-                logMessage(LogLevel.DEBUG, "\tsetClientTimeout() after setting timeouts: Parameter: " + param.getName() + " = " + param.getValue());
-            }
-        }
     }
 
     public String getBaseUrl() {
