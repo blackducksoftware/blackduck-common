@@ -149,8 +149,8 @@ public abstract class RestConnection {
     }
 
     public void setTimeout(final int timeout) {
-        if (timeout < 0) {
-            throw new IllegalArgumentException("Timeout must be non-negative.");
+        if (timeout <= 0) {
+            throw new IllegalArgumentException("Timeout must be greater than zero.");
         }
         this.timeout = timeout;
         // the User sets the timeout in seconds, so we translate to ms
