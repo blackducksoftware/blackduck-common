@@ -113,7 +113,7 @@ public abstract class RestConnection {
             setLogger(logger);
         }
         client = createClient();
-        setClientTimeout(timeout); // just in case setTimeout() is never called
+        setTimeout(timeout); // just in case setTimeout() is never called
     }
 
     private Client createClient() {
@@ -152,11 +152,6 @@ public abstract class RestConnection {
         if (timeout < 0) {
             throw new IllegalArgumentException("Timeout must be non-negative.");
         }
-        this.timeout = timeout;
-        setClientTimeout(this.timeout);
-    }
-
-    private void setClientTimeout(final int timeout) {
         this.timeout = timeout;
         // the User sets the timeout in seconds, so we translate to ms
         final String stringTimeout = String.valueOf(timeout * 1000);
