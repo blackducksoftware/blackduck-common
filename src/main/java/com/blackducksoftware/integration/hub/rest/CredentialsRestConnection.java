@@ -32,12 +32,18 @@ import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class CredentialsRestConnection extends RestConnection {
 
     public CredentialsRestConnection(final HubServerConfig hubServerConfig)
             throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException {
-        super();
+        this(null, hubServerConfig);
+    }
+    
+    public CredentialsRestConnection(final IntLogger logger, final HubServerConfig hubServerConfig)
+            throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException {
+        super(logger);
         setBaseUrl(hubServerConfig.getHubUrl().toString());
         final HubProxyInfo proxyInfo = hubServerConfig.getProxyInfo();
         if (proxyInfo.shouldUseProxyForUrl(hubServerConfig.getHubUrl())) {
