@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeComparator;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
@@ -120,9 +121,9 @@ public class ReportInformationItemTest {
         assertNull(item1.getTimeUpdatedAt());
         assertNull(item1.getTimeFinishedAt());
 
-        assertEquals(date, item2.getTimeCreatedAt());
-        assertEquals(date, item2.getTimeUpdatedAt());
-        assertEquals(date, item2.getTimeFinishedAt());
+        assertEquals(0, DateTimeComparator.getInstance().compare(date, item2.getTimeCreatedAt()));
+        assertEquals(0, DateTimeComparator.getInstance().compare(date, item2.getTimeUpdatedAt()));
+        assertEquals(0, DateTimeComparator.getInstance().compare(date, item2.getTimeFinishedAt()));
 
         assertEquals(href1, _meta1.getHref());
         assertEquals(links1, _meta1.getLinks());
