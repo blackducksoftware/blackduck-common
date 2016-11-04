@@ -119,8 +119,8 @@ public class PolicyRuleTest {
         assertEquals(createdBy2, item2.getCreatedBy());
         assertEquals(updatedAt2.toString(), item2.getUpdatedAt());
         assertEquals(updatedBy2, item2.getUpdatedBy());
-        assertEquals(createdAt2, item2.getCreatedAtTime());
-        assertEquals(updatedAt2, item2.getUpdatedAtTime());
+        assertEquals(createdAt2.toString(), item2.getCreatedAtTime().toString());
+        assertEquals(updatedAt2.toString(), item2.getUpdatedAtTime().toString());
 
         assertTrue(!item1.equals(item2));
         assertTrue(item1.equals(item3));

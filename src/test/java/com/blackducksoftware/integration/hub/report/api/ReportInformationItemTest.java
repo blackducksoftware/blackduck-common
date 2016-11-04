@@ -120,9 +120,9 @@ public class ReportInformationItemTest {
         assertNull(item1.getTimeUpdatedAt());
         assertNull(item1.getTimeFinishedAt());
 
-        assertEquals(date, item2.getTimeCreatedAt());
-        assertEquals(date, item2.getTimeUpdatedAt());
-        assertEquals(date, item2.getTimeFinishedAt());
+        assertEquals(date.toString(), item2.getTimeCreatedAt().toString());
+        assertEquals(date.toString(), item2.getTimeUpdatedAt().toString());
+        assertEquals(date.toString(), item2.getTimeFinishedAt().toString());
 
         assertEquals(href1, _meta1.getHref());
         assertEquals(links1, _meta1.getLinks());
