@@ -567,7 +567,7 @@ public abstract class RestConnection {
         }
     }
 
-    private String handleHttpPost(final ClientResource resource)
+    public String handleHttpPost(final ClientResource resource)
             throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
         handleRequest(resource);
 

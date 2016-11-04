@@ -38,6 +38,7 @@ import org.restlet.data.Method;
 import org.restlet.resource.ClientResource;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -103,6 +104,24 @@ public class HubRequest {
                         clientResource.toString());
                 throw new BDRestException(message, clientResource);
             }
+        } finally {
+            releaseResource(clientResource);
+        }
+    }
+
+    public String executePost() throws URISyntaxException, IOException, ResourceDoesNotExistException, BDRestException {
+        final ClientResource clientResource = buildClientResource(restConnection);
+        try {
+            return restConnection.handleHttpPost(clientResource);
+        } finally {
+            releaseResource(clientResource);
+        }
+    }
+
+    public void executeDelete() throws BDRestException, URISyntaxException {
+        final ClientResource clientResource = buildClientResource(restConnection);
+        try {
+            restConnection.handleRequest(clientResource);
         } finally {
             releaseResource(clientResource);
         }

@@ -104,6 +104,16 @@ public class HubItemRestService<T extends HubItem> extends HubRestService {
         return gson.fromJson(response, itemType);
     }
 
+    public void deleteItem(final String url) throws IOException, BDRestException, URISyntaxException {
+        final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
+        itemRequest.setMethod(Method.DELETE);
+        itemRequest.setUrl(url);
+        itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
+        itemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
+
+        itemRequest.executeDelete();
+    }
+
     public T getItem(final List<String> urlSegments) throws IOException, BDRestException, URISyntaxException {
         final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
         itemRequest.setMethod(Method.GET);

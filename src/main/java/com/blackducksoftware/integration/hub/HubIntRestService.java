@@ -50,7 +50,6 @@ import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
 import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
@@ -307,22 +306,7 @@ public class HubIntRestService {
      * @return the project URL.
      */
     public String createHubProject(final String projectName) throws IOException, BDRestException, URISyntaxException {
-        final List<String> urlSegments = new ArrayList<>();
-        urlSegments.add("api");
-        urlSegments.add("projects");
-
-        final ProjectItem newProject = new ProjectItem(null, projectName, null, false, 1, SourceEnum.CUSTOM);
-        final StringRepresentation stringRep = new StringRepresentation(gson.toJson(newProject));
-        stringRep.setMediaType(MediaType.APPLICATION_JSON);
-        stringRep.setCharacterSet(CharacterSet.UTF_8);
-        String location = null;
-        try {
-            location = getRestConnection().httpPostFromRelativeUrl(urlSegments, stringRep);
-        } catch (final ResourceDoesNotExistException ex) {
-            throw new BDRestException("There was a problem creating this Project for the specified Hub server.", ex,
-                    ex.getResource());
-        }
-        return location;
+        return getProjectRestService().createHubProject(projectName);
     }
 
     /**
@@ -334,20 +318,8 @@ public class HubIntRestService {
      */
     public String createHubVersion(final ProjectItem project, final String versionName, final String phase,
             final String dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
-        final ReleaseItem newRelease = new ReleaseItem(versionName, phase, dist, null, null);
 
-        final StringRepresentation stringRep = new StringRepresentation(gson.toJson(newRelease));
-        stringRep.setMediaType(MediaType.APPLICATION_JSON);
-        stringRep.setCharacterSet(CharacterSet.UTF_8);
-        String location = null;
-        try {
-            location = getRestConnection().httpPostFromAbsoluteUrl(getVersionsUrl(project), stringRep);
-        } catch (final ResourceDoesNotExistException ex) {
-            throw new BDRestException("There was a problem creating this Version for the specified Hub Project. ", ex,
-                    ex.getResource());
-        }
-
-        return location;
+        return getReleaseItemRestService().createHubVersion(project, versionName, phase, dist);
     }
 
     /**
