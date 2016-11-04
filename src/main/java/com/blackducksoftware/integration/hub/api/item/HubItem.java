@@ -90,7 +90,7 @@ public class HubItem {
             return null;
         }
         try {
-            return new DateTime(time);
+            return DateTime.parse(time);
         } catch (final IllegalArgumentException e) {
             return null;
         }

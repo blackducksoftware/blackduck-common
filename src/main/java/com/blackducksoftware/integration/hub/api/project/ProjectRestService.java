@@ -31,12 +31,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.restlet.data.CharacterSet;
+import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.representation.StringRepresentation;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
+import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -96,11 +101,39 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
         throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName);
     }
 
+    public String createHubProject(final String projectName) throws IOException, BDRestException, URISyntaxException {
+        final ProjectItem newProject = new ProjectItem(null, projectName, null, false, 1, SourceEnum.CUSTOM);
+        final StringRepresentation stringRep = new StringRepresentation(getGson().toJson(newProject));
+        stringRep.setMediaType(MediaType.APPLICATION_JSON);
+        stringRep.setCharacterSet(CharacterSet.UTF_8);
+
+        HubRequest projectItemRequest = createPostHubRequest(stringRep);
+        String location = null;
+        try {
+            location = projectItemRequest.executePost();
+        } catch (final ResourceDoesNotExistException ex) {
+            throw new BDRestException("There was a problem creating this Project for the specified Hub server.", ex,
+                    ex.getResource());
+        }
+        return location;
+    }
+
     private HubRequest createDefaultHubRequest() {
         final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
 
         projectItemRequest.setMethod(Method.GET);
         projectItemRequest.setLimit(100);
+        projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
+
+        return projectItemRequest;
+    }
+
+    private HubRequest createPostHubRequest(StringRepresentation representation) {
+        final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+
+        projectItemRequest.setMethod(Method.POST);
+        projectItemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
+        projectItemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
         projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
 
         return projectItemRequest;

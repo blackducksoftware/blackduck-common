@@ -23,8 +23,6 @@ package com.blackducksoftware.integration.hub.version.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
@@ -32,6 +30,9 @@ import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
 import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class ReleaseItemTest {
 

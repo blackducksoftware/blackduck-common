@@ -59,10 +59,7 @@ public class ComponentVersion extends HubItem {
     }
 
     public DateTime getReleasedOnDate() {
-        if (StringUtils.isNotBlank(releasedOn)) {
-            return DateTime.parse(releasedOn);
-        }
-        return null;
+        return getDateTime(releasedOn);
     }
 
     public void setReleasedOn(final String releasedOn) {

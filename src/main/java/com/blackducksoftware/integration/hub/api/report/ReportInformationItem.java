@@ -21,7 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.report;
 
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
@@ -95,27 +94,16 @@ public class ReportInformationItem extends HubItem {
         return createdBy;
     }
 
-    private DateTime stringToDateTime(final String dateString) {
-        if (StringUtils.isBlank(dateString)) {
-            return null;
-        }
-        try {
-            return new DateTime(dateString);
-        } catch (final IllegalArgumentException e) {
-            return null;
-        }
-    }
-
     public DateTime getTimeCreatedAt() {
-        return stringToDateTime(createdAt);
+        return getDateTime(createdAt);
     }
 
     public DateTime getTimeUpdatedAt() {
-        return stringToDateTime(updatedAt);
+        return getDateTime(updatedAt);
     }
 
     public DateTime getTimeFinishedAt() {
-        return stringToDateTime(finishedAt);
+        return getDateTime(finishedAt);
     }
 
     @Override
