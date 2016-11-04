@@ -21,7 +21,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.project.version;
 
-import org.joda.time.DateTime;
+import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
@@ -39,7 +39,7 @@ public class ProjectVersionItem extends HubItem {
 
     private final String releaseComments;
 
-    private final DateTime releasedOn;
+    private final Date releasedOn;
 
     // description from Hub API: "Read-Only; No matter the value it will always default to 'CUSTOM'",
     private final SourceEnum source;
@@ -48,7 +48,7 @@ public class ProjectVersionItem extends HubItem {
 
     public ProjectVersionItem(final MetaInformation meta, final DistributionEnum distribution,
             final ComplexLicense license, final String nickname, final PhaseEnum phase, final String releaseComments,
-            final DateTime releasedOn, final SourceEnum source, final String versionName) {
+            final Date releasedOn, final SourceEnum source, final String versionName) {
         super(meta);
         this.distribution = distribution;
         this.license = license;
@@ -80,7 +80,7 @@ public class ProjectVersionItem extends HubItem {
         return releaseComments;
     }
 
-    public DateTime getReleasedOn() {
+    public Date getReleasedOn() {
         return releasedOn;
     }
 
