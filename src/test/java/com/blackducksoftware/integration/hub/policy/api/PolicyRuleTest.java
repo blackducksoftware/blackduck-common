@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeComparator;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyExpressions;
@@ -119,8 +120,8 @@ public class PolicyRuleTest {
         assertEquals(createdBy2, item2.getCreatedBy());
         assertEquals(updatedAt2.toString(), item2.getUpdatedAt());
         assertEquals(updatedBy2, item2.getUpdatedBy());
-        assertEquals(createdAt2.toString(), item2.getCreatedAtTime().toString());
-        assertEquals(updatedAt2.toString(), item2.getUpdatedAtTime().toString());
+        assertEquals(0, DateTimeComparator.getInstance().compare(createdAt2, item2.getCreatedAtTime()));
+        assertEquals(0, DateTimeComparator.getInstance().compare(updatedAt2, item2.getUpdatedAtTime()));
 
         assertTrue(!item1.equals(item2));
         assertTrue(item1.equals(item3));
