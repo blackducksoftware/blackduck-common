@@ -110,7 +110,7 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
         HubRequest projectItemRequest = createPostHubRequest(stringRep);
         String location = null;
         try {
-            location = projectItemRequest.executePost();
+            location = projectItemRequest.executePost(stringRep);
         } catch (final ResourceDoesNotExistException ex) {
             throw new BDRestException("There was a problem creating this Project for the specified Hub server.", ex,
                     ex.getResource());

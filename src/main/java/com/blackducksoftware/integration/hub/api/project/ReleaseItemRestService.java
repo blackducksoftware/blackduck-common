@@ -103,7 +103,7 @@ public class ReleaseItemRestService extends HubItemRestService<ReleaseItem> {
 
         String location = null;
         try {
-            location = projectVersionItemRequest.executePost();
+            location = projectVersionItemRequest.executePost(stringRep);
         } catch (final ResourceDoesNotExistException ex) {
             throw new BDRestException("There was a problem creating this Version for the specified Hub Project. ", ex,
                     ex.getResource());

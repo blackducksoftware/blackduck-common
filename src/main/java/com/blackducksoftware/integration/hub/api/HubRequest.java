@@ -35,6 +35,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.Response;
 import org.restlet.data.Method;
+import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -109,9 +110,10 @@ public class HubRequest {
         }
     }
 
-    public String executePost() throws URISyntaxException, IOException, ResourceDoesNotExistException, BDRestException {
+    public String executePost(Representation representation) throws URISyntaxException, IOException, ResourceDoesNotExistException, BDRestException {
         final ClientResource clientResource = buildClientResource(restConnection);
         try {
+            clientResource.getRequest().setEntity(representation);
             return restConnection.handleHttpPost(clientResource);
         } finally {
             releaseResource(clientResource);
