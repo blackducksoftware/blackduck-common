@@ -14,6 +14,7 @@ package com.blackducksoftware.integration.hub.api;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_VERSION;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CURRENT_VERSION;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CURRENT_VERSION_COMPARISON;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 
 import java.io.IOException;
@@ -34,7 +35,7 @@ import com.google.gson.JsonParser;
 public class HubVersionRestService extends HubRestService {
     private static final List<String> CURRENT_VERSION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION);
 
-    private static final List<String> CURRENT_VERSION_COMPARISON_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION);
+    private static final List<String> CURRENT_VERSION_COMPARISON_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON);
 
     private Gson gson;
 
