@@ -98,7 +98,7 @@ public class DataServicesFactory {
         bomImportRestService = new BomImportRestService(restConnection);
         codeLocationRestService = new CodeLocationRestService(restConnection, gson, jsonParser);
         componentVersionRestService = new ComponentVersionRestService(restConnection, gson, jsonParser);
-        hubVersionRestService = new HubVersionRestService(restConnection);
+        hubVersionRestService = new HubVersionRestService(restConnection, gson, jsonParser);
         notificationRestService = new NotificationRestService(restConnection, gson, jsonParser);
         policyRestService = new PolicyRestService(restConnection, gson, jsonParser);
         policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);

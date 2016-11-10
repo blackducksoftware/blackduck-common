@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.restlet.Response;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.Cookie;
 import org.restlet.data.Header;
@@ -61,7 +60,6 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.user.UserRestService;
 import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
-import com.blackducksoftware.integration.hub.api.version.VersionComparison;
 import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.dataservices.policystatus.PolicyStatusDataService;
 import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusDataService;
@@ -320,69 +318,6 @@ public class HubIntRestService {
             final String dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
 
         return getReleaseItemRestService().createHubVersion(project, versionName, phase, dist);
-    }
-
-    /**
-     * Retrieves the version of the Hub server
-     */
-    public String getHubVersion() throws IOException, BDRestException, URISyntaxException {
-        final ClientResource resource = getRestConnection().createClientResource();
-        try {
-            resource.addSegment("api");
-            resource.addSegment("v1");
-            resource.addSegment("current-version");
-
-            int responseCode = 0;
-
-            resource.setMethod(Method.GET);
-            getRestConnection().handleRequest(resource);
-            responseCode = resource.getResponse().getStatus().getCode();
-
-            if (getRestConnection().isSuccess(responseCode)) {
-                final Response resp = resource.getResponse();
-                return resp.getEntityAsText();
-            } else {
-                throw new BDRestException(
-                        "There was a problem getting the version of the Hub server. Error Code: " + responseCode,
-                        resource);
-            }
-        } finally {
-            releaseResource(resource);
-        }
-    }
-
-    /**
-     * Compares the specified version with the actual version of the Hub server.
-     *
-     */
-    public VersionComparison compareWithHubVersion(final String version)
-            throws IOException, BDRestException, URISyntaxException {
-        final ClientResource resource = getRestConnection().createClientResource();
-        try {
-            resource.addSegment("api");
-            resource.addSegment("v1");
-            resource.addSegment("current-version-comparison");
-            resource.addQueryParameter("version", version);
-
-            int responseCode = 0;
-
-            resource.setMethod(Method.GET);
-            getRestConnection().handleRequest(resource);
-            responseCode = resource.getResponse().getStatus().getCode();
-
-            if (getRestConnection().isSuccess(responseCode)) {
-                final String response = getRestConnection().readResponseAsString(resource.getResponse());
-                final VersionComparison comparison = gson.fromJson(response, VersionComparison.class);
-                return comparison;
-            } else {
-                throw new BDRestException(
-                        "There was a problem comparing the specified version to the version of the Hub server. Error Code: "
-                                + responseCode,
-                        resource);
-            }
-        } finally {
-            releaseResource(resource);
-        }
     }
 
     /**

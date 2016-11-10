@@ -11,6 +11,7 @@
  */
 package com.blackducksoftware.integration.hub.api;
 
+import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_VERSION;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CURRENT_VERSION;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
@@ -22,20 +23,31 @@ import java.util.List;
 
 import org.restlet.data.Method;
 
+import com.blackducksoftware.integration.hub.api.version.VersionComparison;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class HubVersionRestService extends HubRestService {
     private static final List<String> CURRENT_VERSION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION);
 
-    public HubVersionRestService(RestConnection restConnection) {
+    private static final List<String> CURRENT_VERSION_COMPARISON_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION);
+
+    private Gson gson;
+
+    private JsonParser jsonParser;
+
+    public HubVersionRestService(RestConnection restConnection, Gson gson, JsonParser jsonParser) {
         super(restConnection);
+        this.gson = gson;
+        this.jsonParser = jsonParser;
     }
 
     public String getHubVersion() throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
-        HubRequest hubVersionRequest = new HubRequest(getRestConnection(), new JsonParser());
+        HubRequest hubVersionRequest = new HubRequest(getRestConnection(), jsonParser);
         hubVersionRequest.setMethod(Method.GET);
         hubVersionRequest.addUrlSegments(CURRENT_VERSION_SEGMENTS);
 
@@ -43,6 +55,26 @@ public class HubVersionRestService extends HubRestService {
         String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
 
         return hubVersion;
+    }
+
+    public VersionComparison getHubVersionComparison(String consumerVersion) throws IOException, URISyntaxException, BDRestException {
+        HubRequest hubVersionRequest = new HubRequest(getRestConnection(), new JsonParser());
+        hubVersionRequest.setMethod(Method.GET);
+        hubVersionRequest.addUrlSegments(CURRENT_VERSION_COMPARISON_SEGMENTS);
+        hubVersionRequest.addQueryParameter(QUERY_VERSION, consumerVersion);
+
+        JsonObject jsonObject = hubVersionRequest.executeForResponseJson();
+        VersionComparison versionComparison = gson.fromJson(jsonObject, VersionComparison.class);
+        return versionComparison;
+    }
+
+    public boolean isConsumerVersionLessThanOrEqualToServerVersion(String consumerVersion) throws IOException, URISyntaxException, BDRestException {
+        VersionComparison versionComparison = getHubVersionComparison(consumerVersion);
+        if (versionComparison.getNumericResult() <= 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

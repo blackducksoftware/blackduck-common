@@ -29,34 +29,35 @@ import org.mockito.Mockito;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
+import com.blackducksoftware.integration.hub.api.HubVersionRestService;
 import com.blackducksoftware.integration.hub.api.version.VersionComparison;
 import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.test.TestLogger;
 
 public class HubSupportHelperTest {
-    private HubIntRestService getMockedService(final String returnVersion) throws Exception {
-        final HubIntRestService service = Mockito.mock(HubIntRestService.class);
+    private HubVersionRestService getMockedService(final String returnVersion) throws Exception {
+        final HubVersionRestService service = Mockito.mock(HubVersionRestService.class);
         Mockito.when(service.getHubVersion()).thenReturn(returnVersion);
         return service;
     }
 
-    private HubIntRestService getMockedServiceWithFallBack(final String returnVersion, final boolean compareSupported)
+    private HubVersionRestService getMockedServiceWithFallBack(final String returnVersion, final boolean compareSupported)
             throws Exception {
-        final HubIntRestService service = getMockedService(returnVersion);
+        final HubVersionRestService service = getMockedService(returnVersion);
         VersionComparison compare;
         if (compareSupported) {
             compare = new VersionComparison("", "", -1, "");
         } else {
             compare = new VersionComparison("", "", 1, "");
         }
-        Mockito.when(service.compareWithHubVersion(Mockito.anyString())).thenReturn(compare);
+        Mockito.when(service.getHubVersionComparison(Mockito.anyString())).thenReturn(compare);
         return service;
     }
 
     @Test
     public void testJreProvided() throws Exception {
-        HubIntRestService service = getMockedService("3.0.0");
+        HubVersionRestService service = getMockedService("3.0.0");
         HubSupportHelper supportHelper = new HubSupportHelper();
         TestLogger logger = new TestLogger();
         supportHelper.checkHubSupport(service, logger);
@@ -133,7 +134,7 @@ public class HubSupportHelperTest {
 
     @Test
     public void testCheckHubSupportFallback() throws Exception {
-        HubIntRestService service = getMockedServiceWithFallBack("Two.one.zero", true);
+        HubVersionRestService service = getMockedServiceWithFallBack("Two.one.zero", true);
         HubSupportHelper supportHelper = new HubSupportHelper();
         TestLogger logger = new TestLogger();
         supportHelper.checkHubSupport(service, logger);
@@ -152,7 +153,7 @@ public class HubSupportHelperTest {
 
     @Test
     public void testHubVersionApiMissing() throws Exception {
-        final HubIntRestService service = getMockedService("2.0.1");
+        final HubVersionRestService service = getMockedService("2.0.1");
         final ResourceException cause = new ResourceException(Status.CLIENT_ERROR_NOT_FOUND);
         final BDRestException exception = new BDRestException("", cause, null);
         Mockito.when(service.getHubVersion()).thenThrow(exception);
@@ -168,7 +169,7 @@ public class HubSupportHelperTest {
 
     @Test
     public void testHubVersionApiRestFailure() throws Exception {
-        final HubIntRestService service = getMockedService("2.0.1");
+        final HubVersionRestService service = getMockedService("2.0.1");
         final ResourceException cause = new ResourceException(Status.CLIENT_ERROR_PAYMENT_REQUIRED);
         final String errorMessage = "error";
         final BDRestException exception = new BDRestException(errorMessage, cause, null);
@@ -188,7 +189,7 @@ public class HubSupportHelperTest {
 
     @Test
     public void testHubVersionApiRestFailureDifferentEror() throws Exception {
-        final HubIntRestService service = getMockedService("2.0.1");
+        final HubVersionRestService service = getMockedService("2.0.1");
         final Exception cause = new Exception();
         final String errorMessage = "error";
         final BDRestException exception = new BDRestException(errorMessage, cause, null);

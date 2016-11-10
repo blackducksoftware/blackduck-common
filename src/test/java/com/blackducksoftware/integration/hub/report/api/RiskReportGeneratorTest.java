@@ -43,6 +43,7 @@ import org.mockito.stubbing.Answer;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
+import com.blackducksoftware.integration.hub.api.HubVersionRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
@@ -152,8 +153,9 @@ public class RiskReportGeneratorTest {
         final TestLogger logger = new TestLogger();
         final HubSupportHelper supportHelper = new HubSupportHelper();
 
-        Mockito.doReturn("3.0.0").when(service).getHubVersion();
-        supportHelper.checkHubSupport(service, logger);
+        HubVersionRestService hubVersionRestService = Mockito.mock(HubVersionRestService.class);
+        Mockito.doReturn("3.0.0").when(hubVersionRestService).getHubVersion();
+        supportHelper.checkHubSupport(hubVersionRestService, logger);
 
         final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         final HubRiskReportData hubRiskReportData = generator.generateHubReport(logger, ReportCategoriesEnum.values());
@@ -216,8 +218,9 @@ public class RiskReportGeneratorTest {
         final TestLogger logger = new TestLogger();
         final HubSupportHelper supportHelper = new HubSupportHelper();
 
-        Mockito.doReturn("3.0.0").when(service).getHubVersion();
-        supportHelper.checkHubSupport(service, logger);
+        HubVersionRestService hubVersionRestService = Mockito.mock(HubVersionRestService.class);
+        Mockito.doReturn("3.0.0").when(hubVersionRestService).getHubVersion();
+        supportHelper.checkHubSupport(hubVersionRestService, logger);
 
         final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         generator.generateHubReport(logger, ReportCategoriesEnum.values()).getReport();
@@ -272,8 +275,9 @@ public class RiskReportGeneratorTest {
         final TestLogger logger = new TestLogger();
         final HubSupportHelper supportHelper = new HubSupportHelper();
 
-        Mockito.doReturn("3.0.0").when(service).getHubVersion();
-        supportHelper.checkHubSupport(service, logger);
+        HubVersionRestService hubVersionRestService = Mockito.mock(HubVersionRestService.class);
+        Mockito.doReturn("3.0.0").when(hubVersionRestService).getHubVersion();
+        supportHelper.checkHubSupport(hubVersionRestService, logger);
 
         final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         generator.generateHubReport(logger, ReportCategoriesEnum.values()).getReport();
@@ -319,8 +323,9 @@ public class RiskReportGeneratorTest {
         final TestLogger logger = new TestLogger();
         final HubSupportHelper supportHelper = new HubSupportHelper();
 
-        Mockito.doReturn("3.0.0").when(service).getHubVersion();
-        supportHelper.checkHubSupport(service, logger);
+        HubVersionRestService hubVersionRestService = Mockito.mock(HubVersionRestService.class);
+        Mockito.doReturn("3.0.0").when(hubVersionRestService).getHubVersion();
+        supportHelper.checkHubSupport(hubVersionRestService, logger);
 
         final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         generator.generateHubReport(logger, ReportCategoriesEnum.values()).getReport();
@@ -425,8 +430,9 @@ public class RiskReportGeneratorTest {
         final TestLogger logger = new TestLogger();
         final HubSupportHelper supportHelper = new HubSupportHelper();
 
-        Mockito.doReturn("2.0.0").when(service).getHubVersion();
-        supportHelper.checkHubSupport(service, logger);
+        HubVersionRestService hubVersionRestService = Mockito.mock(HubVersionRestService.class);
+        Mockito.doReturn("2.0.0").when(hubVersionRestService).getHubVersion();
+        supportHelper.checkHubSupport(hubVersionRestService, logger);
 
         final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         assertEquals(report, generator.generateHubReport(logger, null).getReport());
@@ -532,8 +538,9 @@ public class RiskReportGeneratorTest {
         final TestLogger logger = new TestLogger();
         final HubSupportHelper supportHelper = new HubSupportHelper();
 
-        Mockito.doReturn("2.0.0").when(service).getHubVersion();
-        supportHelper.checkHubSupport(service, logger);
+        HubVersionRestService hubVersionRestService = Mockito.mock(HubVersionRestService.class);
+        Mockito.doReturn("2.0.0").when(hubVersionRestService).getHubVersion();
+        supportHelper.checkHubSupport(hubVersionRestService, logger);
 
         final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         generator.generateHubReport(logger, ReportCategoriesEnum.values()).getReport();
@@ -631,8 +638,9 @@ public class RiskReportGeneratorTest {
         final TestLogger logger = new TestLogger();
         final HubSupportHelper supportHelper = new HubSupportHelper();
 
-        Mockito.doReturn("2.0.0").when(service).getHubVersion();
-        supportHelper.checkHubSupport(service, logger);
+        HubVersionRestService hubVersionRestService = Mockito.mock(HubVersionRestService.class);
+        Mockito.doReturn("2.0.0").when(hubVersionRestService).getHubVersion();
+        supportHelper.checkHubSupport(hubVersionRestService, logger);
 
         final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         generator.generateHubReport(logger, null).getReport();
@@ -723,8 +731,9 @@ public class RiskReportGeneratorTest {
         final TestLogger logger = new TestLogger();
         final HubSupportHelper supportHelper = new HubSupportHelper();
 
-        Mockito.doReturn("2.0.0").when(service).getHubVersion();
-        supportHelper.checkHubSupport(service, logger);
+        HubVersionRestService hubVersionRestService = Mockito.mock(HubVersionRestService.class);
+        Mockito.doReturn("2.0.0").when(hubVersionRestService).getHubVersion();
+        supportHelper.checkHubSupport(hubVersionRestService, logger);
 
         final RiskReportGenerator generator = new RiskReportGenerator(generatorInfo, supportHelper);
         generator.generateHubReport(logger, null).getReport();
