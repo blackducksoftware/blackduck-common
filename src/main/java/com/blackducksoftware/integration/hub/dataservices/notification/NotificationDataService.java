@@ -37,6 +37,7 @@ import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotif
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
+import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
@@ -47,6 +48,7 @@ import com.blackducksoftware.integration.hub.dataservices.notification.transform
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.dataservices.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.Gson;
@@ -105,6 +107,14 @@ public class NotificationDataService extends AbstractDataService {
             throws IOException, URISyntaxException, BDRestException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
         final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
+        contentList.addAll(parallelProcessor.process(itemList));
+        return contentList;
+    }
+
+    public SortedSet<NotificationContentItem> getUserNotifications(final Date startDate, final Date endDate, UserItem user)
+            throws IOException, URISyntaxException, BDRestException, UnexpectedHubResponseException {
+        final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
+        final List<NotificationItem> itemList = notificationService.getUserNotifications(startDate, endDate, user);
         contentList.addAll(parallelProcessor.process(itemList));
         return contentList;
     }

@@ -40,7 +40,9 @@ import org.restlet.data.Method;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -80,6 +82,25 @@ public class NotificationRestService extends HubItemRestService<NotificationItem
         notificationItemRequest.setMethod(Method.GET);
         notificationItemRequest.setLimit(100);
         notificationItemRequest.addUrlSegments(NOTIFICATIONS_SEGMENTS);
+        notificationItemRequest.addQueryParameter("startDate", startDateString);
+        notificationItemRequest.addQueryParameter("endDate", endDateString);
+
+        final JsonObject jsonObject = notificationItemRequest.executeForResponseJson();
+        final List<NotificationItem> allNotificationItems = getAll(jsonObject, notificationItemRequest);
+        return allNotificationItems;
+    }
+
+    public List<NotificationItem> getUserNotifications(final Date startDate, final Date endDate, final UserItem user)
+            throws UnexpectedHubResponseException, IOException, URISyntaxException, BDRestException {
+        final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        final String startDateString = sdf.format(startDate);
+        final String endDateString = sdf.format(endDate);
+
+        final HubRequest notificationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        notificationItemRequest.setMethod(Method.GET);
+        notificationItemRequest.setLimit(100);
+        notificationItemRequest.setUrl(user.getLink("notifications"));
         notificationItemRequest.addQueryParameter("startDate", startDateString);
         notificationItemRequest.addQueryParameter("endDate", endDateString);
 
