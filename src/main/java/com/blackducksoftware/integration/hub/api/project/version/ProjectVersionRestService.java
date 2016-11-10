@@ -27,12 +27,17 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.restlet.data.CharacterSet;
+import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.representation.StringRepresentation;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
@@ -86,6 +91,31 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
     public String getVersionsUrl(ProjectItem project) throws UnexpectedHubResponseException {
         String versionsUrl = project.getLink(ProjectItem.VERSION_LINK);
         return versionsUrl;
+    }
+
+    public String createHubVersion(final ProjectItem project, final String versionName, final String phase,
+            final String dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
+        final ReleaseItem newRelease = new ReleaseItem(versionName, phase, dist, null, null);
+
+        final StringRepresentation stringRep = new StringRepresentation(getGson().toJson(newRelease));
+        stringRep.setMediaType(MediaType.APPLICATION_JSON);
+        stringRep.setCharacterSet(CharacterSet.UTF_8);
+
+        final HubRequest projectVersionItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        projectVersionItemRequest.setMethod(Method.POST);
+        projectVersionItemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
+        projectVersionItemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
+        projectVersionItemRequest.setUrl(project.getLink(ProjectItem.VERSION_LINK));
+
+        String location = null;
+        try {
+            location = projectVersionItemRequest.executePost(stringRep);
+        } catch (final ResourceDoesNotExistException ex) {
+            throw new BDRestException("There was a problem creating this Version for the specified Hub Project. ", ex,
+                    ex.getResource());
+        }
+
+        return location;
     }
 
     private HubRequest createDefaultHubRequest(ProjectItem project) throws UnexpectedHubResponseException {
