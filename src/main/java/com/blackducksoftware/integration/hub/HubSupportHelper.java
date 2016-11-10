@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.restlet.resource.ResourceException;
 
 import com.blackducksoftware.integration.hub.api.version.VersionComparison;
@@ -37,12 +36,6 @@ import com.blackducksoftware.integration.log.IntLogger;
 
 public class HubSupportHelper implements Serializable {
     private static final long serialVersionUID = 6440466357358359056L;
-
-    public static final String DEFAULT_CLI_DOWNLOAD = "scan.cli.zip";
-
-    public static final String WINDOWS_CLI_DOWNLOAD = "scan.cli-windows.zip";
-
-    public static final String MAC_CLI_DOWNLOAD = "scan.cli-macosx.zip";
 
     private boolean hasBeenChecked = false;
 
@@ -194,44 +187,6 @@ public class HubSupportHelper implements Serializable {
         } else {
             return false;
         }
-    }
-
-    private static String getCLIWrapperLink(final String hubUrl) throws IllegalArgumentException {
-        if (StringUtils.isBlank(hubUrl)) {
-            throw new IllegalArgumentException("You must provide a valid Hub URL in order to get the correct link.");
-        }
-        final StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(hubUrl);
-        if (!hubUrl.endsWith("/")) {
-            urlBuilder.append("/");
-        }
-        urlBuilder.append("download");
-        urlBuilder.append("/");
-        return urlBuilder.toString();
-    }
-
-    public static String getLinuxCLIWrapperLink(final String hubUrl) throws IllegalArgumentException {
-        final String baseUrl = getCLIWrapperLink(hubUrl);
-        final StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(baseUrl);
-        urlBuilder.append(DEFAULT_CLI_DOWNLOAD);
-        return urlBuilder.toString();
-    }
-
-    public static String getWindowsCLIWrapperLink(final String hubUrl) throws IllegalArgumentException {
-        final String baseUrl = getCLIWrapperLink(hubUrl);
-        final StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(baseUrl);
-        urlBuilder.append(WINDOWS_CLI_DOWNLOAD);
-        return urlBuilder.toString();
-    }
-
-    public static String getOSXCLIWrapperLink(final String hubUrl) throws IllegalArgumentException {
-        final String baseUrl = getCLIWrapperLink(hubUrl);
-        final StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(baseUrl);
-        urlBuilder.append(MAC_CLI_DOWNLOAD);
-        return urlBuilder.toString();
     }
 
     public boolean hasCapability(final HubCapabilitiesEnum capability) {

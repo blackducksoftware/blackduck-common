@@ -21,7 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -203,78 +202,6 @@ public class HubSupportHelperTest {
             assertFalse(supportHelper.hasCapability(value));
         }
         assertTrue(logger.getOutputString().contains(errorMessage));
-    }
-
-    @Test
-    public void testGetLinuxCLIWrapperLink() throws Exception {
-        assertEquals("testUrl/download/scan.cli.zip", HubSupportHelper.getLinuxCLIWrapperLink("testUrl"));
-        assertEquals("testUrl/download/scan.cli.zip", HubSupportHelper.getLinuxCLIWrapperLink("testUrl/"));
-        assertEquals("http://testSite/download/scan.cli.zip",
-                HubSupportHelper.getLinuxCLIWrapperLink("http://testSite/"));
-        assertEquals("http://testSite/download/scan.cli.zip",
-                HubSupportHelper.getLinuxCLIWrapperLink("http://testSite"));
-
-        try {
-            HubSupportHelper.getLinuxCLIWrapperLink(" ");
-        } catch (final Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-            assertEquals("You must provide a valid Hub URL in order to get the correct link.", e.getMessage());
-        }
-
-        try {
-            HubSupportHelper.getLinuxCLIWrapperLink(null);
-        } catch (final Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-            assertEquals("You must provide a valid Hub URL in order to get the correct link.", e.getMessage());
-        }
-    }
-
-    @Test
-    public void testGetWindowsCLIWrapperLink() throws Exception {
-        assertEquals("testUrl/download/scan.cli-windows.zip", HubSupportHelper.getWindowsCLIWrapperLink("testUrl"));
-        assertEquals("testUrl/download/scan.cli-windows.zip", HubSupportHelper.getWindowsCLIWrapperLink("testUrl/"));
-        assertEquals("http://testSite/download/scan.cli-windows.zip",
-                HubSupportHelper.getWindowsCLIWrapperLink("http://testSite/"));
-        assertEquals("http://testSite/download/scan.cli-windows.zip",
-                HubSupportHelper.getWindowsCLIWrapperLink("http://testSite"));
-
-        try {
-            HubSupportHelper.getWindowsCLIWrapperLink(" ");
-        } catch (final Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-            assertEquals("You must provide a valid Hub URL in order to get the correct link.", e.getMessage());
-        }
-
-        try {
-            HubSupportHelper.getWindowsCLIWrapperLink(null);
-        } catch (final Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-            assertEquals("You must provide a valid Hub URL in order to get the correct link.", e.getMessage());
-        }
-    }
-
-    @Test
-    public void testGetOSXCLIWrapperLink() throws Exception {
-        assertEquals("testUrl/download/scan.cli-macosx.zip", HubSupportHelper.getOSXCLIWrapperLink("testUrl"));
-        assertEquals("testUrl/download/scan.cli-macosx.zip", HubSupportHelper.getOSXCLIWrapperLink("testUrl/"));
-        assertEquals("http://testSite/download/scan.cli-macosx.zip",
-                HubSupportHelper.getOSXCLIWrapperLink("http://testSite/"));
-        assertEquals("http://testSite/download/scan.cli-macosx.zip",
-                HubSupportHelper.getOSXCLIWrapperLink("http://testSite"));
-
-        try {
-            HubSupportHelper.getOSXCLIWrapperLink(" ");
-        } catch (final Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-            assertEquals("You must provide a valid Hub URL in order to get the correct link.", e.getMessage());
-        }
-
-        try {
-            HubSupportHelper.getOSXCLIWrapperLink(null);
-        } catch (final Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-            assertEquals("You must provide a valid Hub URL in order to get the correct link.", e.getMessage());
-        }
     }
 
 }

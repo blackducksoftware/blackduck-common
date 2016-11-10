@@ -21,6 +21,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservices;
 
+import com.blackducksoftware.integration.hub.api.HubVersionRestService;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
@@ -61,6 +62,8 @@ public class DataServicesFactory {
 
     private final ComponentVersionRestService componentVersionRestService;
 
+    private final HubVersionRestService hubVersionRestService;
+
     private final NotificationRestService notificationRestService;
 
     private final PolicyRestService policyRestService;
@@ -95,6 +98,7 @@ public class DataServicesFactory {
         bomImportRestService = new BomImportRestService(restConnection);
         codeLocationRestService = new CodeLocationRestService(restConnection, gson, jsonParser);
         componentVersionRestService = new ComponentVersionRestService(restConnection, gson, jsonParser);
+        hubVersionRestService = new HubVersionRestService(restConnection);
         notificationRestService = new NotificationRestService(restConnection, gson, jsonParser);
         policyRestService = new PolicyRestService(restConnection, gson, jsonParser);
         policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
@@ -159,6 +163,10 @@ public class DataServicesFactory {
         return componentVersionRestService;
     }
 
+    public HubVersionRestService getHubVersionRestService() {
+        return hubVersionRestService;
+    }
+
     public NotificationRestService getNotificationRestService() {
         return notificationRestService;
     }
@@ -214,4 +222,5 @@ public class DataServicesFactory {
     public VulnerableBomComponentRestService getVulnerableBomComponentRestService() {
         return vulnerableBomComponentRestService;
     }
+
 }

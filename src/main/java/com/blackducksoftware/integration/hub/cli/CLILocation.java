@@ -23,15 +23,12 @@ package com.blackducksoftware.integration.hub.cli;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
-import com.blackducksoftware.integration.hub.HubIntRestService;
-import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.log.IntLogger;
 
@@ -39,6 +36,12 @@ public class CLILocation {
     public static final String CLI_UNZIP_DIR = "Hub_Scan_Installation";
 
     public static final String VERSION_FILE_NAME = "hubVersion.txt";
+
+    public static final String DEFAULT_CLI_DOWNLOAD = "scan.cli.zip";
+
+    public static final String WINDOWS_CLI_DOWNLOAD = "scan.cli-windows.zip";
+
+    public static final String MAC_CLI_DOWNLOAD = "scan.cli-macosx.zip";
 
     private final File directoryToInstallTo;
 
@@ -68,25 +71,14 @@ public class CLILocation {
         return jreContents;
     }
 
-    public String getCLIDownloadUrl(final IntLogger logger, final HubIntRestService restService)
-            throws IOException, InterruptedException {
-        try {
-            final HubSupportHelper hubSupport = new HubSupportHelper();
-            hubSupport.checkHubSupport(restService, logger);
-
-            if (SystemUtils.IS_OS_MAC_OSX && hubSupport.hasCapability(HubCapabilitiesEnum.JRE_PROVIDED)) {
-                return HubSupportHelper.getOSXCLIWrapperLink(restService.getBaseUrl());
-            } else if (SystemUtils.IS_OS_WINDOWS && hubSupport.hasCapability(HubCapabilitiesEnum.JRE_PROVIDED)) {
-                return HubSupportHelper.getWindowsCLIWrapperLink(restService.getBaseUrl());
-            } else {
-                return HubSupportHelper.getLinuxCLIWrapperLink(restService.getBaseUrl());
-            }
-        } catch (final URISyntaxException e) {
-            if (logger != null) {
-                logger.error(e.getMessage(), e);
-            }
+    public String getCLIDownloadUrl(final IntLogger logger, String hubUrl) {
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            return getCLIWrapperLink(hubUrl, MAC_CLI_DOWNLOAD);
+        } else if (SystemUtils.IS_OS_WINDOWS) {
+            return getCLIWrapperLink(hubUrl, WINDOWS_CLI_DOWNLOAD);
+        } else {
+            return getCLIWrapperLink(hubUrl, DEFAULT_CLI_DOWNLOAD);
         }
-        return null;
     }
 
     public File getOneJarFile() {
@@ -230,6 +222,21 @@ public class CLILocation {
             }
         }
         return null;
+    }
+
+    private String getCLIWrapperLink(final String hubUrl, String downloadFilename) throws IllegalArgumentException {
+        if (StringUtils.isBlank(hubUrl)) {
+            throw new IllegalArgumentException("You must provide a valid Hub URL in order to get the correct link.");
+        }
+        final StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(hubUrl);
+        if (!hubUrl.endsWith("/")) {
+            urlBuilder.append("/");
+        }
+        urlBuilder.append("download");
+        urlBuilder.append("/");
+        urlBuilder.append(downloadFilename);
+        return urlBuilder.toString();
     }
 
 }
