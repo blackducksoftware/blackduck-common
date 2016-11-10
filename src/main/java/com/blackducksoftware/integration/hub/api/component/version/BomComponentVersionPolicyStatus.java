@@ -19,7 +19,7 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api.component;
+package com.blackducksoftware.integration.hub.api.component.version;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;

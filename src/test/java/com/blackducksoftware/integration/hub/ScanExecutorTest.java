@@ -36,6 +36,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
 import com.blackducksoftware.integration.hub.ScanExecutor.Result;
+import com.blackducksoftware.integration.hub.api.HubVersionRestService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.test.TestLogger;
 
@@ -58,7 +59,7 @@ public class ScanExecutorTest {
     private static final String FAKE_PROXY_PASSWORD_BASIC = "euler";
 
     private HubSupportHelper getCheckedHubSupportHelper(final String hubVersion) throws Exception {
-        final HubIntRestService service = Mockito.mock(HubIntRestService.class);
+        final HubVersionRestService service = Mockito.mock(HubVersionRestService.class);
         Mockito.when(service.getHubVersion()).thenReturn(hubVersion);
         final HubSupportHelper supportHelper = new HubSupportHelper();
         supportHelper.checkHubSupport(service, new TestLogger());

@@ -37,12 +37,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 
-import com.blackducksoftware.integration.hub.HubIntRestService;
-import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
-import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 
 public class CLILocationTest {
     @Rule
@@ -98,43 +95,22 @@ public class CLILocationTest {
 
         final File directoryToInstallTo = folder.newFolder();
         final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
-        HubIntRestService restService = new HubIntRestService(new CredentialsRestConnection(hubServerConfig));
-        restService = Mockito.spy(restService);
-        Mockito.doReturn("3.0.1").when(restService).getHubVersion();
 
-        final String downloadUrl = cliLocation.getCLIDownloadUrl(null, restService);
+        final String downloadUrl = cliLocation.getCLIDownloadUrl(null, baseUrl);
 
         final StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(baseUrl + "/download/");
 
         if (SystemUtils.IS_OS_MAC_OSX) {
-            urlBuilder.append(HubSupportHelper.MAC_CLI_DOWNLOAD);
+            urlBuilder.append(CLILocation.MAC_CLI_DOWNLOAD);
             assertEquals(urlBuilder.toString(), downloadUrl);
         } else if (SystemUtils.IS_OS_WINDOWS) {
-            urlBuilder.append(HubSupportHelper.WINDOWS_CLI_DOWNLOAD);
+            urlBuilder.append(CLILocation.WINDOWS_CLI_DOWNLOAD);
             assertEquals(urlBuilder.toString(), downloadUrl);
         } else {
-            urlBuilder.append(HubSupportHelper.DEFAULT_CLI_DOWNLOAD);
+            urlBuilder.append(CLILocation.DEFAULT_CLI_DOWNLOAD);
             assertEquals(urlBuilder.toString(), downloadUrl);
         }
-    }
-
-    @Test
-    public void testGetCLIDownloadUrlJreNotSupported() throws Exception {
-        final String baseUrl = "http://test-hub-server";
-
-        final File directoryToInstallTo = folder.newFolder();
-        final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
-        HubIntRestService restService = new HubIntRestService(new CredentialsRestConnection(hubServerConfig));
-        restService = Mockito.spy(restService);
-        Mockito.doReturn("2.4.0").when(restService).getHubVersion();
-
-        final String downloadUrl = cliLocation.getCLIDownloadUrl(null, restService);
-
-        final StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(baseUrl + "/download/");
-        urlBuilder.append(HubSupportHelper.DEFAULT_CLI_DOWNLOAD);
-        assertEquals(urlBuilder.toString(), downloadUrl);
     }
 
 }

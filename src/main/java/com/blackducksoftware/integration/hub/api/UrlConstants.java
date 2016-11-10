@@ -33,6 +33,10 @@ public class UrlConstants {
 
     public static final String SEGMENT_CURRENT_USER = "currentuser";
 
+    public static final String SEGMENT_CURRENT_VERSION = "current-version";
+
+    public static final String SEGMENT_CURRENT_VERSION_COMPARISON = "current-version-comparison";
+
     public static final String SEGMENT_EXTERNAL_EXTENSIONS = "externalextensions";
 
     public static final String SEGMENT_GLOBAL = "global";
@@ -63,5 +67,7 @@ public class UrlConstants {
     public static final String QUERY_LIMIT = "limit";
 
     public static final String QUERY_Q = "q";
+
+    public static final String QUERY_VERSION = "version";
 
 }
