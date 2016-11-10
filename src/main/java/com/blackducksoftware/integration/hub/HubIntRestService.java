@@ -23,13 +23,10 @@ package com.blackducksoftware.integration.hub;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.data.CharacterSet;
-import org.restlet.data.Cookie;
 import org.restlet.data.Header;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -53,8 +50,6 @@ import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
-import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
-import com.blackducksoftware.integration.hub.api.scan.ScanLocationResults;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.user.UserRestService;
@@ -64,14 +59,11 @@ import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRe
 import com.blackducksoftware.integration.hub.dataservices.policystatus.PolicyStatusDataService;
 import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.exception.VersionDoesNotExistException;
-import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -132,89 +124,6 @@ public class HubIntRestService {
         this.userRestService = new UserRestService(restConnection, gson, jsonParser);
         this.versionBomPolicyRestService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
         this.vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
-    }
-
-    /**
-     * @deprecated moved to RestConnection.
-     */
-    @Deprecated
-    public void setTimeout(final int timeout) {
-        getRestConnection().setTimeout(timeout);
-    }
-
-    /**
-     * @deprecated moved to RestConnection.
-     */
-    @Deprecated
-    public void setLogger(final IntLogger logger) {
-        getRestConnection().setLogger(logger);
-    }
-
-    /**
-     * @deprecated moved to RestConnection.
-     */
-    @Deprecated
-    public String getBaseUrl() {
-        return getRestConnection().getBaseUrl();
-    }
-
-    /**
-     * The proxy settings get set as System properties. I.E. https.proxyHost,
-     * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
-     *
-     * @deprecated moved to RestConnection.
-     */
-    @Deprecated
-    public void setProxyProperties(final HubProxyInfo proxyInfo) {
-        getRestConnection().setProxyProperties(proxyInfo);
-    }
-
-    /**
-     * The proxy settings get set as System properties. I.E. https.proxyHost,
-     * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
-     *
-     * @deprecated moved to RestConnection.
-     */
-    @Deprecated
-    public void setProxyProperties(final String proxyHost, final int proxyPort, final List<Pattern> noProxyHosts,
-            final String proxyUsername, final String proxyPassword) {
-        getRestConnection().setProxyProperties(proxyHost, proxyPort, noProxyHosts, proxyUsername, proxyPassword);
-    }
-
-    /**
-     * @deprecated moved to RestConnection.
-     */
-    @Deprecated
-    public ClientResource createClientResource() throws URISyntaxException {
-        return getRestConnection().createClientResource();
-    }
-
-    /**
-     * @deprecated moved to RestConnection.
-     */
-    @Deprecated
-    public ClientResource createClientResource(final String providedUrl) throws URISyntaxException {
-        return getRestConnection().createClientResource(providedUrl);
-    }
-
-    /**
-     * Gets the cookie for the Authorized connection to the Hub server. Returns
-     * the response code from the connection.
-     *
-     * @deprecated moved to RestConnection.
-     */
-    @Deprecated
-    public int setCookies(final String hubUserName, final String hubPassword)
-            throws URISyntaxException, BDRestException {
-        return getRestConnection().setCookies(hubUserName, hubPassword);
-    }
-
-    /**
-     * @deprecated moved to RestConnection.
-     */
-    @Deprecated
-    public Series<Cookie> getCookies() {
-        return getRestConnection().getCookies();
     }
 
     /**
@@ -307,6 +216,23 @@ public class HubIntRestService {
         return getProjectRestService().createHubProject(projectName);
     }
 
+    public void deleteHubProject(final ProjectItem project) throws IOException, BDRestException, URISyntaxException {
+        String projectUrl = project.getMeta().getHref();
+        deleteHubProject(projectUrl);
+    }
+
+    /**
+     * Delete HubProject. For test purposes only!
+     * 
+     * @throws URISyntaxException
+     * @throws BDRestException
+     * @throws IOException
+     *
+     */
+    public void deleteHubProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
+        getProjectRestService().deleteItem(projectUrl);
+    }
+
     /**
      * Creates a new Version in the Project specified, using the phase and
      * distribution provided.
@@ -317,91 +243,7 @@ public class HubIntRestService {
     public String createHubVersion(final ProjectItem project, final String versionName, final String phase,
             final String dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
 
-        return getReleaseItemRestService().createHubVersion(project, versionName, phase, dist);
-    }
-
-    /**
-     * Gets the code locations that match the host and paths provided
-     *
-     * @deprecated with Hub 3.0 should use the status files from the CLI
-     *             instead. The CLI option is --statusWriteDir
-     */
-    @Deprecated
-    public List<ScanLocationItem> getScanLocations(final String hostname, final List<String> scanTargets)
-            throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
-        final List<ScanLocationItem> codeLocations = new ArrayList<>();
-        ClientResource resource = null;
-        for (final String targetPath : scanTargets) {
-            String correctedTargetPath = targetPath;
-
-            // Scan paths in the Hub only use '/' not '\'
-            if (correctedTargetPath.contains("\\")) {
-                correctedTargetPath = correctedTargetPath.replace("\\", "/");
-            }
-            // and it always starts with a '/'
-            if (!correctedTargetPath.startsWith("/")) {
-                correctedTargetPath = "/" + correctedTargetPath;
-            }
-
-            resource = getRestConnection().createClientResource();
-            try {
-                resource.addSegment("api");
-                resource.addSegment("v1");
-                resource.addSegment("scanlocations");
-                resource.addQueryParameter("host", hostname);
-                resource.addQueryParameter("path", correctedTargetPath);
-
-                resource.setMethod(Method.GET);
-
-                getRestConnection().handleRequest(resource);
-
-                final int responseCode = resource.getResponse().getStatus().getCode();
-
-                if (getRestConnection().isSuccess(responseCode)) {
-                    final String response = getRestConnection().readResponseAsString(resource.getResponse());
-                    final ScanLocationResults results = gson.fromJson(response, ScanLocationResults.class);
-                    final ScanLocationItem currentCodeLocation = getScanLocationMatch(hostname, correctedTargetPath,
-                            results);
-                    if (currentCodeLocation == null) {
-                        throw new HubIntegrationException("Could not determine the code location for the Host : "
-                                + hostname + " and Path : " + correctedTargetPath);
-                    }
-
-                    codeLocations.add(currentCodeLocation);
-                } else {
-                    throw new BDRestException(
-                            "There was a problem getting the code locations for the host and paths provided. Error Code: "
-                                    + responseCode,
-                            resource);
-                }
-            } finally {
-                releaseResource(resource);
-            }
-        }
-        return codeLocations;
-    }
-
-    private ScanLocationItem getScanLocationMatch(final String hostname, final String scanTarget,
-            final ScanLocationResults results) {
-        String targetPath = scanTarget;
-
-        if (targetPath.endsWith("/")) {
-            targetPath = targetPath.substring(0, targetPath.length() - 1);
-        }
-
-        for (final ScanLocationItem scanMatch : results.getItems()) {
-            String path = scanMatch.getPath().trim();
-
-            // Remove trailing slash from both strings
-            if (path.endsWith("/")) {
-                path = path.substring(0, path.length() - 1);
-            }
-            if (targetPath.equals(path)) {
-                return scanMatch;
-            }
-        }
-
-        return null;
+        return getProjectVersionRestService().createHubVersion(project, versionName, phase, dist);
     }
 
     /**

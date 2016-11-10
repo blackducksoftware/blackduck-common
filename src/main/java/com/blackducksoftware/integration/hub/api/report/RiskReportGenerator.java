@@ -27,7 +27,6 @@ import java.util.List;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
@@ -39,8 +38,6 @@ import com.blackducksoftware.integration.log.IntLogger;
 public class RiskReportGenerator {
     private final HubReportGenerationInfo hubReportGenerationInfo;
 
-    private final HubSupportHelper supportHelper;
-
     /**
      * Make sure supportHelper.checkHubSupport() has already been run before
      * passing in the supportHelper.
@@ -49,7 +46,6 @@ public class RiskReportGenerator {
     public RiskReportGenerator(final HubReportGenerationInfo hubReportGenerationInfo,
             final HubSupportHelper supportHelper) {
         this.hubReportGenerationInfo = hubReportGenerationInfo;
-        this.supportHelper = supportHelper;
     }
 
     public HubRiskReportData generateHubReport(final IntLogger logger, final ReportCategoriesEnum[] categories)
@@ -58,11 +54,7 @@ public class RiskReportGenerator {
         logger.debug("Waiting for the bom to be updated with the scan results.");
         final HubEventPolling hubEventPolling = getHubEventPolling(hubReportGenerationInfo.getService());
 
-        if (supportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
-            hubEventPolling.assertBomUpToDate(hubReportGenerationInfo, logger);
-        } else {
-            hubEventPolling.assertBomUpToDate(hubReportGenerationInfo);
-        }
+        hubEventPolling.assertBomUpToDate(hubReportGenerationInfo, logger);
 
         logger.debug("The bom has been updated, generating the report.");
         final String reportUrl = hubReportGenerationInfo.getService()
