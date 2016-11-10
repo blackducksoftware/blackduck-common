@@ -36,7 +36,7 @@ import org.restlet.resource.ClientResource;
 import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
-import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
