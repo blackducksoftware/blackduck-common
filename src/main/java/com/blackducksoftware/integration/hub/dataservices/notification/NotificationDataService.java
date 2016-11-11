@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;

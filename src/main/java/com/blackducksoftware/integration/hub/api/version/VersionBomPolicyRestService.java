@@ -25,7 +25,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
-import com.blackducksoftware.integration.hub.api.component.BomComponentVersionPolicyStatus;
+import com.blackducksoftware.integration.hub.api.component.version.BomComponentVersionPolicyStatus;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;

@@ -34,10 +34,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.blackducksoftware.integration.hub.api.component.BomComponentVersionPolicyStatus;
-import com.blackducksoftware.integration.hub.api.component.ComponentVersion;
-import com.blackducksoftware.integration.hub.api.component.ComponentVersionRestService;
-import com.blackducksoftware.integration.hub.api.component.ComponentVersionStatus;
+import com.blackducksoftware.integration.hub.api.component.version.BomComponentVersionPolicyStatus;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRestService;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationContent;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;

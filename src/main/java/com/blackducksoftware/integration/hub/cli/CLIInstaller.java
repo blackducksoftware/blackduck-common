@@ -22,8 +22,8 @@
 package com.blackducksoftware.integration.hub.cli;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +42,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
-import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -67,16 +66,15 @@ public class CLIInstaller {
         this.ciEnvironmentVariables = ciEnvironmentVariables;
     }
 
-    public void performInstallation(final IntLogger logger, final HubIntRestService restService,
-            final String localHostName)
+    public void performInstallation(final IntLogger logger, String hubUrl, String hubVersion, final String localHostName)
             throws IOException, InterruptedException, BDRestException, URISyntaxException, HubIntegrationException {
         if (StringUtils.isBlank(localHostName)) {
             throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
         }
 
-        final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(logger, restService);
+        final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(logger, hubUrl);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
-            customInstall(new URL(cliDownloadUrl), restService.getHubVersion(), localHostName, logger);
+            customInstall(new URL(cliDownloadUrl), hubVersion, localHostName, logger);
         } else {
             logger.error("Could not find the correct Hub CLI download URL.");
         }
@@ -85,13 +83,10 @@ public class CLIInstaller {
     public void customInstall(final URL archive, String hubVersion, final String localHostName, final IntLogger logger)
             throws IOException, InterruptedException, HubIntegrationException {
         boolean cliMismatch = true;
-        // For some reason the Hub returns the Version inside quotes
-        hubVersion = hubVersion.replace("\"", "");
-
         try {
             final File hubVersionFile = cliLocation.createHubVersionFile();
             if (hubVersionFile.exists()) {
-                final String storedHubVersion = IOUtils.toString(new FileInputStream(hubVersionFile));
+                final String storedHubVersion = IOUtils.toString(new FileReader(hubVersionFile));
                 if (hubVersion.equals(storedHubVersion)) {
                     cliMismatch = false;
                 } else {

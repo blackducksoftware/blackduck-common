@@ -87,6 +87,7 @@ public class ReleaseItemRestService extends HubItemRestService<ReleaseItem> {
                 String.format("The version %s does not exist for projecId %s.", projectVersionName, projectId));
     }
 
+    @Deprecated
     public String createHubVersion(final ProjectItem project, final String versionName, final String phase,
             final String dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
         final ReleaseItem newRelease = new ReleaseItem(versionName, phase, dist, null, null);

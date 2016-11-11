@@ -23,7 +23,7 @@ package com.blackducksoftware.integration.hub.api.notification;
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.component.ComponentVersionStatus;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.google.gson.annotations.SerializedName;
 
 public class RuleViolationClearedNotificationContent {

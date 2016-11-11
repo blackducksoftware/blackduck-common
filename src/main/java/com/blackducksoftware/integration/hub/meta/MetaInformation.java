@@ -24,6 +24,9 @@ package com.blackducksoftware.integration.hub.meta;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class MetaInformation {
@@ -111,15 +114,7 @@ public class MetaInformation {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("MetaInformation [allow=");
-        builder.append(allow);
-        builder.append(", href=");
-        builder.append(href);
-        builder.append(", links=");
-        builder.append(links);
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

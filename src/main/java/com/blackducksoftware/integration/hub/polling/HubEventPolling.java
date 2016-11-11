@@ -30,13 +30,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.api.report.HubReportGenerationInfo;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
-import com.blackducksoftware.integration.hub.api.scan.ScanHistoryItem;
-import com.blackducksoftware.integration.hub.api.scan.ScanLocationItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -57,74 +54,6 @@ public class HubEventPolling {
 
     public HubIntRestService getService() {
         return service;
-    }
-
-    /**
-     * Check the code locations with the host specified and the paths provided.
-     * Check the history for the scan history that falls between the times
-     * provided, if the status of that scan history for all code locations is
-     * complete then the bom is up to date with these scan results. Otherwise we
-     * try again after 10 sec, and we keep trying until it is up to date or
-     * until we hit the maximum wait time. If we find a scan history object that
-     * has status cancelled or an error type then we throw an exception.
-     */
-    public void assertBomUpToDate(final HubReportGenerationInfo hubReportGenerationInfo)
-            throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException {
-        final long maximumWait = hubReportGenerationInfo.getMaximumWaitTime();
-        final DateTime timeBeforeScan = hubReportGenerationInfo.getBeforeScanTime();
-        final DateTime timeAfterScan = hubReportGenerationInfo.getAfterScanTime();
-        final String hostname = hubReportGenerationInfo.getHostname();
-        final List<String> scanTargets = hubReportGenerationInfo.getScanTargets();
-
-        final long startTime = System.currentTimeMillis();
-        long elapsedTime = 0;
-        while (elapsedTime < maximumWait) {
-            // logger.trace("CHECKING CODE LOCATIONS");
-            final List<ScanLocationItem> scanLocationsToCheck = getService().getScanLocations(hostname, scanTargets);
-            boolean upToDate = true;
-            for (final ScanLocationItem currentCodeLocation : scanLocationsToCheck) {
-                if (!upToDate) {
-                    break;
-                }
-                for (final ScanHistoryItem currentScanHistory : currentCodeLocation.getScanList()) {
-                    final DateTime scanHistoryCreationTime = currentScanHistory.getCreatedOnTime();
-                    if (scanHistoryItemWithinOurScanBoundaries(scanHistoryCreationTime, timeBeforeScan,
-                            timeAfterScan)) {
-                        if (currentScanHistory.getStatus().isDone()) {
-                            if (currentScanHistory.getStatus().isError()) {
-                                throw new HubIntegrationException(
-                                        "There was a problem with one of the code locations. Error Status : "
-                                                + currentScanHistory.getStatus().name());
-                            }
-                        } else {
-                            // The code location is still updating or matching,
-                            // etc.
-                            upToDate = false;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (upToDate) {
-                // The code locations are all finished, so we know the bom has
-                // been updated with our scan results
-                // So we break out of this loop
-                return;
-            }
-            // wait 10 seconds before checking the status's again
-            Thread.sleep(10000);
-            elapsedTime = System.currentTimeMillis() - startTime;
-        }
-
-        final String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(maximumWait));
-        throw new HubIntegrationException(
-                "The Bom has not finished updating from the scan within the specified wait time : " + formattedTime);
-    }
-
-    private boolean scanHistoryItemWithinOurScanBoundaries(final DateTime scanHistoryCreationTime,
-            final DateTime timeBeforeScan, final DateTime timeAfterScan) {
-        return (scanHistoryCreationTime != null && scanHistoryCreationTime.isAfter(timeBeforeScan)
-                && scanHistoryCreationTime.isBefore(timeAfterScan));
     }
 
     /**
