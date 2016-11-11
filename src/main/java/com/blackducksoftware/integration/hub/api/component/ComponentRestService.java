@@ -22,7 +22,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class ComponentRestService extends HubItemRestService<ComponentItem> {
 
-	private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_COMPONENTS);
+	private static final List<String> COMPONENT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_COMPONENTS);
 
 	private static Type ITEM_TYPE = new TypeToken<ComponentItem>() {
 	}.getType();
@@ -34,11 +34,15 @@ public class ComponentRestService extends HubItemRestService<ComponentItem> {
 		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
 	}
 
-	public List<ComponentItem> getAllComponents() throws IOException, BDRestException, URISyntaxException {
+	public List<ComponentItem> getAllComponents(final String id, final String groupId, final String artifactId,
+			final String version) throws IOException, BDRestException, URISyntaxException {
 		final HubRequest componentItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+		final ComponentQuery q = new ComponentQuery(id, groupId, artifactId, version);
+
 		componentItemRequest.setMethod(Method.GET);
 		componentItemRequest.setLimit(5);
-		componentItemRequest.addUrlSegments(CODE_LOCATION_SEGMENTS);
+		componentItemRequest.addUrlSegments(COMPONENT_SEGMENTS);
+		componentItemRequest.setQ(q.getQuery());
 
 		final JsonObject jsonObject = componentItemRequest.executeForResponseJson();
 		final List<ComponentItem> allComponents = getAll(jsonObject, componentItemRequest);
