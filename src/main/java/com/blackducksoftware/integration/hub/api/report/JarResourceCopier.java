@@ -20,40 +20,28 @@ import java.nio.file.StandardCopyOption;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ArtifactPublisher {
+public class JarResourceCopier {
 
-    private final static String REPORT_RESOURCES_DIR = "riskreport/web";
-
-    private File destinationDirectory;
-
-    public ArtifactPublisher(String destinationDirectory) {
-        this(new File(destinationDirectory));
+    public List<File> copy(String resourceDir, String destinationDir) throws IOException, URISyntaxException {
+        List<File> fileList = findFileList(resourceDir);
+        return writeFiles(fileList, resourceDir, destinationDir);
     }
 
-    public ArtifactPublisher(File destinationDirectory) {
-        this.destinationDirectory = destinationDirectory;
-    }
-
-    public List<File> publish() throws IOException, URISyntaxException {
-        List<File> fileList = findFileList();
-        return writeFiles(fileList);
-    }
-
-    private List<File> findFileList() throws IOException, URISyntaxException {
+    private List<File> findFileList(String resourceDir) throws IOException, URISyntaxException {
         List<File> fileList = new LinkedList<>();
-        URL rootDirectory = Thread.currentThread().getContextClassLoader().getResource(REPORT_RESOURCES_DIR);
+        URL rootDirectory = Thread.currentThread().getContextClassLoader().getResource(resourceDir);
         File riskReportDir = new File(rootDirectory.toURI());
         fileList = listFiles(riskReportDir);
         return fileList;
     }
 
-    private List<File> writeFiles(List<File> fileList) throws IOException {
+    private List<File> writeFiles(List<File> fileList, String resourceDir, String destinationDir) throws IOException {
         List<File> writtenList = new LinkedList<>();
         for (File file : fileList) {
             String destFilePath = file.getCanonicalPath();
-            int indexExcludingRootDir = destFilePath.lastIndexOf(REPORT_RESOURCES_DIR) + REPORT_RESOURCES_DIR.length();
+            int indexExcludingRootDir = destFilePath.lastIndexOf(resourceDir) + resourceDir.length();
             destFilePath = destFilePath.substring(indexExcludingRootDir);
-            File destFile = new File(destinationDirectory, destFilePath);
+            File destFile = new File(destinationDir, destFilePath);
             destFile.mkdirs();
             Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             writtenList.add(destFile);

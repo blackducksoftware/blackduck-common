@@ -20,9 +20,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.blackducksoftware.integration.hub.api.report.ArtifactPublisher;
+import com.blackducksoftware.integration.hub.api.report.JarResourceCopier;
+import com.blackducksoftware.integration.hub.api.report.RiskReportResourceCopier;
 
-public class ArtifactPublisherTest {
+public class RiskReportCopierTest {
 
     private static final String RISK_REPORT_DIR = "risk_report_dir";
 
@@ -30,12 +31,26 @@ public class ArtifactPublisherTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void testPublish() throws Exception {
+    public void testResourceCopier() throws Exception {
         folder.create();
         final File dirToWriteTo = folder.newFolder();
         final File riskReportDir = new File(dirToWriteTo, RISK_REPORT_DIR);
-        ArtifactPublisher artifactPublisher = new ArtifactPublisher(riskReportDir);
-        List<File> writtenFiles = artifactPublisher.publish();
+        JarResourceCopier artifactPublisher = new JarResourceCopier();
+        List<File> writtenFiles = artifactPublisher.copy("riskreport/web", riskReportDir.getCanonicalPath());
+        for (File file : writtenFiles) {
+            System.out.println(file.getCanonicalPath());
+        }
+
+        assertFalse(writtenFiles.isEmpty());
+    }
+
+    @Test
+    public void testRiskReportCopier() throws Exception {
+        folder.create();
+        final File dirToWriteTo = folder.newFolder();
+        final File riskReportDir = new File(dirToWriteTo, RISK_REPORT_DIR);
+        RiskReportResourceCopier publisher = new RiskReportResourceCopier(riskReportDir.getCanonicalPath());
+        List<File> writtenFiles = publisher.copy();
         for (File file : writtenFiles) {
             System.out.println(file.getCanonicalPath());
         }
