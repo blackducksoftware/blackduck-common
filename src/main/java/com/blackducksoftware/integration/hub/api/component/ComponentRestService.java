@@ -21,32 +21,31 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ComponentRestService extends HubItemRestService<ComponentItem> {
+    private static final List<String> COMPONENT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_COMPONENTS);
 
-	private static final List<String> COMPONENT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_COMPONENTS);
+    private static Type ITEM_TYPE = new TypeToken<ComponentItem>() {
+    }.getType();
 
-	private static Type ITEM_TYPE = new TypeToken<ComponentItem>() {
-	}.getType();
+    private static Type ITEM_LIST_TYPE = new TypeToken<List<ComponentItem>>() {
+    }.getType();
 
-	private static Type ITEM_LIST_TYPE = new TypeToken<List<ComponentItem>>() {
-	}.getType();
+    public ComponentRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
-	public ComponentRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    public List<ComponentItem> getAllComponents(final String id, final String groupId, final String artifactId,
+            final String version) throws IOException, BDRestException, URISyntaxException {
+        final HubRequest componentItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final ComponentQuery componentQuery = new ComponentQuery(id, groupId, artifactId, version);
 
-	public List<ComponentItem> getAllComponents(final String id, final String groupId, final String artifactId,
-			final String version) throws IOException, BDRestException, URISyntaxException {
-		final HubRequest componentItemRequest = new HubRequest(getRestConnection(), getJsonParser());
-		final ComponentQuery q = new ComponentQuery(id, groupId, artifactId, version);
+        componentItemRequest.setMethod(Method.GET);
+        componentItemRequest.setLimit(5);
+        componentItemRequest.addUrlSegments(COMPONENT_SEGMENTS);
+        componentItemRequest.setQ(componentQuery.getQuery());
 
-		componentItemRequest.setMethod(Method.GET);
-		componentItemRequest.setLimit(5);
-		componentItemRequest.addUrlSegments(COMPONENT_SEGMENTS);
-		componentItemRequest.setQ(q.getQuery());
-
-		final JsonObject jsonObject = componentItemRequest.executeForResponseJson();
-		final List<ComponentItem> allComponents = getAll(jsonObject, componentItemRequest);
-		return allComponents;
-	}
+        final JsonObject jsonObject = componentItemRequest.executeForResponseJson();
+        final List<ComponentItem> allComponents = getAll(jsonObject, componentItemRequest);
+        return allComponents;
+    }
 
 }
