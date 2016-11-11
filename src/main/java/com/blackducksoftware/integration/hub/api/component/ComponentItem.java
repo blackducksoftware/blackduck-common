@@ -5,10 +5,10 @@ import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ComponentItem extends HubItem {
 
-	private final String component;
+	private final String component; // *****URL*****//
 	private final String componentName;
 	private final String originId;
-	private final String version;
+	private final String version; // *****URL*****//
 	private final String versionName;
 
 	public ComponentItem(final MetaInformation meta, final String component, final String componentName,
