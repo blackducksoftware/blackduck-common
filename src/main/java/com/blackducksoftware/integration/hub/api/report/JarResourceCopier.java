@@ -13,54 +13,36 @@ package com.blackducksoftware.integration.hub.api.report;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.LinkedList;
 import java.util.List;
 
-public class JarResourceCopier {
+public abstract class JarResourceCopier {
 
     public List<File> copy(String resourceDir, String destinationDir) throws IOException, URISyntaxException {
-        List<File> fileList = findFileList(resourceDir);
+        List<File> fileList = findRelativePathFileList();
         return writeFiles(fileList, resourceDir, destinationDir);
     }
 
-    private List<File> findFileList(String resourceDir) throws IOException, URISyntaxException {
-        List<File> fileList = new LinkedList<>();
-        URL rootDirectory = Thread.currentThread().getContextClassLoader().getResource(resourceDir);
-        File riskReportDir = new File(rootDirectory.toURI());
-        fileList = listFiles(riskReportDir);
-        return fileList;
-    }
+    public abstract List<File> findRelativePathFileList();
 
     private List<File> writeFiles(List<File> fileList, String resourceDir, String destinationDir) throws IOException {
         List<File> writtenList = new LinkedList<>();
+        ClassLoader classLoader = this.getClass().getClassLoader();
         for (File file : fileList) {
-            String destFilePath = file.getCanonicalPath();
-            int indexExcludingRootDir = destFilePath.lastIndexOf(resourceDir) + resourceDir.length();
-            destFilePath = destFilePath.substring(indexExcludingRootDir);
-            File destFile = new File(destinationDir, destFilePath);
-            destFile.mkdirs();
-            Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            writtenList.add(destFile);
-        }
-        return writtenList;
-    }
-
-    private List<File> listFiles(final File rootDirectory) {
-        List<File> resultList = new LinkedList<>();
-        File[] children = rootDirectory.listFiles();
-
-        for (File file : children) {
-            if (file.isFile()) {
-                resultList.add(file);
-            } else {
-                resultList.addAll(listFiles(file));
+            String relativePath = file.getPath();
+            File resourceFile = new File(resourceDir, relativePath);
+            File destFile = new File(destinationDir, relativePath);
+            String resourcePath = resourceFile.getPath();
+            try (InputStream resourceStream = classLoader.getResourceAsStream(resourcePath)) {
+                destFile.mkdirs();
+                Files.copy(resourceStream, destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                writtenList.add(destFile);
             }
         }
-
-        return resultList;
+        return writtenList;
     }
 }

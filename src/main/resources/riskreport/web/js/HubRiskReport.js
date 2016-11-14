@@ -112,7 +112,7 @@ var RiskReport = function (myJQuery, jsonData) {
 	RiskReport.prototype.createVersionSummary = function () {
 		var detailedReleaseSummary = this.rawdata.report.detailedReleaseSummary;
 		var table = document.createElement("div");
-		this.mythis.myJQuery(table).addClass("versionSummaryTable");
+		this.myJQuery(table).addClass("versionSummaryTable");
 		var versionInfo = document.createElement("div");
 		var projectName = document.createElement("div");
 		var projectVersion = document.createElement("div");

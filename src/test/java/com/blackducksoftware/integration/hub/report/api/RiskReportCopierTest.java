@@ -20,7 +20,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.blackducksoftware.integration.hub.api.report.JarResourceCopier;
 import com.blackducksoftware.integration.hub.api.report.RiskReportResourceCopier;
 
 public class RiskReportCopierTest {
@@ -29,20 +28,6 @@ public class RiskReportCopierTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-
-    @Test
-    public void testResourceCopier() throws Exception {
-        folder.create();
-        final File dirToWriteTo = folder.newFolder();
-        final File riskReportDir = new File(dirToWriteTo, RISK_REPORT_DIR);
-        JarResourceCopier artifactPublisher = new JarResourceCopier();
-        List<File> writtenFiles = artifactPublisher.copy("riskreport/web", riskReportDir.getCanonicalPath());
-        for (File file : writtenFiles) {
-            System.out.println(file.getCanonicalPath());
-        }
-
-        assertFalse(writtenFiles.isEmpty());
-    }
 
     @Test
     public void testRiskReportCopier() throws Exception {
