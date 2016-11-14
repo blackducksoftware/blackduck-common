@@ -38,6 +38,8 @@ import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class SimpleScanExecutor {
+    private IntLogger logger;
+
     private HubServerConfig hubServerConfig;
 
     private HubSupportHelper hubSupportHelper;
@@ -60,15 +62,24 @@ public class SimpleScanExecutor {
 
     private String workingDirectoryPath;
 
-    private IntLogger logger;
-
+    /**
+     * The workingDirectoryPath is the parent folder of the scan logs and other scan artifacts.
+     */
     public SimpleScanExecutor(IntLogger logger, HubServerConfig hubServerConfig, HubSupportHelper hubSupportHelper,
-            CIEnvironmentVariables ciEnvironmentVariables, CLILocation cliLocation) {
+            CIEnvironmentVariables ciEnvironmentVariables, CLILocation cliLocation, int scanMemory, boolean verboseRun, boolean dryRun, String project,
+            String version, List<String> scanTargetPaths, String workingDirectoryPath) {
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
         this.hubSupportHelper = hubSupportHelper;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
         this.cliLocation = cliLocation;
+        this.scanMemory = scanMemory;
+        this.verboseRun = verboseRun;
+        this.dryRun = dryRun;
+        this.project = project;
+        this.version = version;
+        this.scanTargetPaths = scanTargetPaths;
+        this.workingDirectoryPath = workingDirectoryPath;
     }
 
     public Result setupAndRunScan()
