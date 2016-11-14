@@ -279,4 +279,52 @@ public class SimpleScanExecutor {
         }
     }
 
+    public IntLogger getLogger() {
+        return logger;
+    }
+
+    public HubServerConfig getHubServerConfig() {
+        return hubServerConfig;
+    }
+
+    public HubSupportHelper getHubSupportHelper() {
+        return hubSupportHelper;
+    }
+
+    public CIEnvironmentVariables getCiEnvironmentVariables() {
+        return ciEnvironmentVariables;
+    }
+
+    public CLILocation getCliLocation() {
+        return cliLocation;
+    }
+
+    public int getScanMemory() {
+        return scanMemory;
+    }
+
+    public boolean isVerboseRun() {
+        return verboseRun;
+    }
+
+    public boolean isDryRun() {
+        return dryRun;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public List<String> getScanTargetPaths() {
+        return scanTargetPaths;
+    }
+
+    public String getWorkingDirectoryPath() {
+        return workingDirectoryPath;
+    }
+
 }
