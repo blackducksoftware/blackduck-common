@@ -230,9 +230,9 @@ public class SimpleScanExecutor {
 
     private File getLogDirectory() throws IOException {
         final File logsDirectory = new File(workingDirectoryPath, "HubScanLogs");
-        String directoryForThisSpecificScanExecution = getSpecificScanExecutionLogDirectory();
+        String specificScanExecutionLogDirectory = getSpecificScanExecutionLogDirectory();
 
-        File logDirectory = new File(logsDirectory, directoryForThisSpecificScanExecution);
+        File logDirectory = new File(logsDirectory, specificScanExecutionLogDirectory);
         if (!logDirectory.exists() && !logDirectory.mkdirs()) {
             throw new IOException("Could not create the HubScanLogs directory!");
         }
