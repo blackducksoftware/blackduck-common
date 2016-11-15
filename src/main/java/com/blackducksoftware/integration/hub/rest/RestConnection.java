@@ -50,6 +50,7 @@ import org.restlet.data.CookieSetting;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
+import org.restlet.data.Status;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -293,7 +294,10 @@ public abstract class RestConnection {
                 }
                 cookies = requestCookies;
             } else {
-                throw new BDRestException(resource.getResponse().getStatus().toString(), resource);
+                logger.trace("Response entity : " + resource.getResponse().getEntityAsText());
+                Status status = resource.getResponse().getStatus();
+                logger.trace("Status : " + status.toString(), status.getThrowable());
+                throw new BDRestException(resource.getResponse().getStatus().toString(), status.getThrowable(), resource);
             }
             return statusCode;
         } finally {
