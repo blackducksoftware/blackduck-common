@@ -29,6 +29,16 @@ import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ProjectVersionItem extends HubItem {
+    public static final String VERSION_REPORT_LINK = "project";
+
+    public static final String RISK_PROFILE_LINK = "project";
+
+    public static final String VULNERABLE_COMPONENTS_LINK = "project";
+
+    public static final String PROJECT_LINK = "project";
+
+    public static final String POLICY_STATUS_LINK = "project";
+
     private final DistributionEnum distribution;
 
     private final ComplexLicense license;
