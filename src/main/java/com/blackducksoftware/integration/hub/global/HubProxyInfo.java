@@ -83,6 +83,7 @@ public class HubProxyInfo implements Serializable {
                 AuthenticatorUtil.setAuthenticator(getProxyCredentials().getUsername(),
                         PasswordDecrypter.decrypt(getProxyCredentials().getEncryptedPassword()));
             } catch (final Exception e) {
+                e.printStackTrace();
             }
         } else {
             AuthenticatorUtil.resetAuthenticator();
