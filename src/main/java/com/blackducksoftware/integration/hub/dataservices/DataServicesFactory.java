@@ -24,6 +24,8 @@ package com.blackducksoftware.integration.hub.dataservices;
 import com.blackducksoftware.integration.hub.api.HubVersionRestService;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
+import com.blackducksoftware.integration.hub.api.component.ComponentRestService;
+import com.blackducksoftware.integration.hub.api.component.id.ComponentIdRestService;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionRestService;
@@ -44,6 +46,7 @@ import com.blackducksoftware.integration.hub.dataservices.notification.Notificat
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.policystatus.PolicyStatusDataService;
 import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusDataService;
+import com.blackducksoftware.integration.hub.dataservices.vulnerability.VulnerabilityDataService;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.Gson;
@@ -59,6 +62,10 @@ public class DataServicesFactory {
     private final BomImportRestService bomImportRestService;
 
     private final CodeLocationRestService codeLocationRestService;
+
+    private final ComponentIdRestService componentIdRestService;
+
+    private final ComponentRestService componentRestService;
 
     private final ComponentVersionRestService componentVersionRestService;
 
@@ -97,6 +104,8 @@ public class DataServicesFactory {
 
         bomImportRestService = new BomImportRestService(restConnection);
         codeLocationRestService = new CodeLocationRestService(restConnection, gson, jsonParser);
+        componentIdRestService = new ComponentIdRestService(restConnection, gson, jsonParser);
+        componentRestService = new ComponentRestService(restConnection, gson, jsonParser);
         componentVersionRestService = new ComponentVersionRestService(restConnection, gson, jsonParser);
         hubVersionRestService = new HubVersionRestService(restConnection, gson, jsonParser);
         notificationRestService = new NotificationRestService(restConnection, gson, jsonParser);
@@ -139,6 +148,10 @@ public class DataServicesFactory {
                 extensionRestService, extensionConfigRestService, extensionUserOptionRestService);
     }
 
+    public VulnerabilityDataService createVulnerabilityDataService() {
+        return new VulnerabilityDataService(restConnection, gson, jsonParser);
+    }
+
     public RestConnection getRestConnection() {
         return restConnection;
     }
@@ -157,6 +170,14 @@ public class DataServicesFactory {
 
     public CodeLocationRestService getCodeLocationRestService() {
         return codeLocationRestService;
+    }
+
+    public ComponentIdRestService getComponentIdRestService() {
+        return componentIdRestService;
+    }
+
+    public ComponentRestService getComponentRestService() {
+        return componentRestService;
     }
 
     public ComponentVersionRestService getComponentVersionRestService() {
