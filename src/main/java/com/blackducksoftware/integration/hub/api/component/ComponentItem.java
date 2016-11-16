@@ -2,32 +2,29 @@ package com.blackducksoftware.integration.hub.api.component;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
-import com.google.gson.annotations.SerializedName;
 
 public class ComponentItem extends HubItem {
-    @SerializedName("component")
-    private final String componentUrl;
+    private final String component;
 
     private final String componentName;
 
     private final String originId;
 
-    @SerializedName("version")
-    private final String versionUrl;
+    private final String version;
 
     private final String versionName;
 
     public ComponentItem(MetaInformation meta, String componentUrl, String componentName, String originId, String versionUrl, String versionName) {
         super(meta);
-        this.componentUrl = componentUrl;
+        this.component = componentUrl;
         this.componentName = componentName;
         this.originId = originId;
-        this.versionUrl = versionUrl;
+        this.version = versionUrl;
         this.versionName = versionName;
     }
 
-    public String getComponentUrl() {
-        return componentUrl;
+    public String getComponent() {
+        return component;
     }
 
     public String getComponentName() {
@@ -38,8 +35,8 @@ public class ComponentItem extends HubItem {
         return originId;
     }
 
-    public String getVersionUrl() {
-        return versionUrl;
+    public String getVersion() {
+        return version;
     }
 
     public String getVersionName() {
