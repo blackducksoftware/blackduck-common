@@ -27,13 +27,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.data.CharacterSet;
-import org.restlet.data.Header;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.engine.header.HeaderConstants;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
-import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRestService;
@@ -223,7 +220,7 @@ public class HubIntRestService {
 
     /**
      * Delete HubProject. For test purposes only!
-     * 
+     *
      * @throws URISyntaxException
      * @throws BDRestException
      * @throws IOException
@@ -306,17 +303,18 @@ public class HubIntRestService {
             throws IOException, BDRestException, URISyntaxException {
         final ClientResource resource = getRestConnection().createClientResource(reportUrl);
         try {
-            @SuppressWarnings("unchecked")
-            Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
-                    .get(HeaderConstants.ATTRIBUTE_HEADERS);
-            if (requestHeaders == null) {
-                requestHeaders = new Series<>(Header.class);
-                resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
-            }
-            requestHeaders.add(new Header("Accept", MediaType.APPLICATION_JSON.toString()));
+            // Restlet 2.3.3 and lower use
+            // @SuppressWarnings("unchecked")
+            // Series<Header> requestHeaders = (Series<Header>) resource.getRequestAttributes()
+            // .get(HeaderConstants.ATTRIBUTE_HEADERS);
+            // if (requestHeaders == null) {
+            // requestHeaders = new Series<>(Header.class);
+            // resource.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, requestHeaders);
+            // }
+            // requestHeaders.add(new Header("Accept", MediaType.APPLICATION_JSON.toString()));
 
             // Restlet 2.3.4 and higher
-            // resource.accept(MediaType.APPLICATION_JSON);
+            resource.accept(MediaType.APPLICATION_JSON);
 
             resource.setMethod(Method.GET);
 
