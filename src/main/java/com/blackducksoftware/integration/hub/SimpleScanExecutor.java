@@ -18,8 +18,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -29,6 +31,7 @@ import org.restlet.engine.io.IoUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.ScanExecutor.Result;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -36,9 +39,12 @@ import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import com.google.gson.Gson;
 
 public class SimpleScanExecutor {
     private IntLogger logger;
+
+    private Gson gson;
 
     private HubServerConfig hubServerConfig;
 
@@ -60,15 +66,18 @@ public class SimpleScanExecutor {
 
     private List<String> scanTargetPaths;
 
+    private File logDirectory;
+
     private String workingDirectoryPath;
 
     /**
      * The workingDirectoryPath is the parent folder of the scan logs and other scan artifacts.
      */
-    public SimpleScanExecutor(IntLogger logger, HubServerConfig hubServerConfig, HubSupportHelper hubSupportHelper,
+    public SimpleScanExecutor(IntLogger logger, Gson gson, HubServerConfig hubServerConfig, HubSupportHelper hubSupportHelper,
             CIEnvironmentVariables ciEnvironmentVariables, CLILocation cliLocation, int scanMemory, boolean verboseRun, boolean dryRun, String project,
             String version, List<String> scanTargetPaths, String workingDirectoryPath) {
         this.logger = logger;
+        this.gson = gson;
         this.hubServerConfig = hubServerConfig;
         this.hubSupportHelper = hubSupportHelper;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
@@ -141,7 +150,7 @@ public class SimpleScanExecutor {
             cmd.add("-v");
         }
 
-        final File logDirectory = getLogDirectory();
+        populateLogDirectory();
         final String logDirectoryPath = logDirectory.getCanonicalPath();
         cmd.add("--logDir");
         cmd.add(logDirectoryPath);
@@ -222,22 +231,53 @@ public class SimpleScanExecutor {
         }
     }
 
+    /**
+     * For all error cases, return an empty list. If all goes well, return a list of scan summary urls.
+     */
+    public List<String> getScanSummaryUrls() {
+        if (null == logDirectory || !hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
+            return Collections.emptyList();
+        }
+
+        File scanStatusDirectory = new File(logDirectory, "status");
+        final File[] statusFiles = scanStatusDirectory.listFiles();
+
+        if (statusFiles.length != scanTargetPaths.size()) {
+            logger.error(String.format("There were %d scans target paths and %d status files.", scanTargetPaths.size(), statusFiles.length));
+            return Collections.emptyList();
+        }
+
+        List<String> scanSummaryUrls = new ArrayList<>();
+        for (final File currentStatusFile : statusFiles) {
+            String fileContent;
+            try {
+                fileContent = FileUtils.readFileToString(currentStatusFile, "UTF8");
+            } catch (IOException e) {
+                logger.error(String.format("There was an exception reading the status file: %s", e.getMessage(), e));
+                return Collections.emptyList();
+            }
+            final ScanSummaryItem scanSummaryItem = gson.fromJson(fileContent, ScanSummaryItem.class);
+            String scanSummaryUrl = scanSummaryItem.getMeta().getHref();
+            scanSummaryUrls.add(scanSummaryUrl);
+        }
+
+        return scanSummaryUrls;
+    }
+
     public String getSpecificScanExecutionLogDirectory() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMddHHmmssSSSz");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZoneUTC();
         String timeString = DateTime.now().withZone(DateTimeZone.UTC).toString(dateTimeFormatter);
         return timeString;
     }
 
-    private File getLogDirectory() throws IOException {
+    private void populateLogDirectory() throws IOException {
         final File logsDirectory = new File(workingDirectoryPath, "HubScanLogs");
         String specificScanExecutionLogDirectory = getSpecificScanExecutionLogDirectory();
 
-        File logDirectory = new File(logsDirectory, specificScanExecutionLogDirectory);
+        logDirectory = new File(logsDirectory, specificScanExecutionLogDirectory);
         if (!logDirectory.exists() && !logDirectory.mkdirs()) {
             throw new IOException("Could not create the HubScanLogs directory!");
         }
-
-        return logDirectory;
     }
 
     /**
