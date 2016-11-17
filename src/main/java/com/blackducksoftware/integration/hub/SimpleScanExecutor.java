@@ -234,7 +234,7 @@ public class SimpleScanExecutor {
     /**
      * For all error cases, return an empty list. If all goes well, return a list of scan summary urls.
      */
-    public List<String> getScanSummaryUrls() {
+    public List<ScanSummaryItem> getScanSummaryItems() {
         if (null == logDirectory || !hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
             return Collections.emptyList();
         }
@@ -247,7 +247,7 @@ public class SimpleScanExecutor {
             return Collections.emptyList();
         }
 
-        List<String> scanSummaryUrls = new ArrayList<>();
+        List<ScanSummaryItem> scanSummaryItems = new ArrayList<>();
         for (final File currentStatusFile : statusFiles) {
             String fileContent;
             try {
@@ -257,11 +257,10 @@ public class SimpleScanExecutor {
                 return Collections.emptyList();
             }
             final ScanSummaryItem scanSummaryItem = gson.fromJson(fileContent, ScanSummaryItem.class);
-            String scanSummaryUrl = scanSummaryItem.getMeta().getHref();
-            scanSummaryUrls.add(scanSummaryUrl);
+            scanSummaryItems.add(scanSummaryItem);
         }
 
-        return scanSummaryUrls;
+        return scanSummaryItems;
     }
 
     public String getSpecificScanExecutionLogDirectory() {
