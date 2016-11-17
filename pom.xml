@@ -64,12 +64,12 @@
       <version>2.3.7</version>
     </dependency>
     <!--
-    We include the httpclient dependency since the default implementation that restlet will use is not recommended for production use.
+    We include the nio restlet dependency since the default implementation that restlet will use is not recommended for production use.
     https://restlet.com/technical-resources/restlet-framework/guide/2.3/core/base/connectors
     -->
     <dependency>
       <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet.ext.httpclient</artifactId>
+      <artifactId>org.restlet.ext.nio</artifactId>
       <version>2.3.7</version>
     </dependency>
     <dependency>
