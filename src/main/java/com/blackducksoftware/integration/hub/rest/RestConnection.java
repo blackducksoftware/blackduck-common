@@ -129,7 +129,6 @@ public abstract class RestConnection {
         // be equal to the maxTotalConnections. If this rest connection object
         // connects to more than one hub instance then the maxConnectionsPerHost
         // would need to be divided by the number of hub instances.
-
         logMessage(LogLevel.DEBUG, "Setting maxConnectionsPerHost and maxTotalConnections on client context");
         client.getContext().getParameters().set("maxConnectionsPerHost", "100");
         client.getContext().getParameters().set("maxTotalConnections", "100");
