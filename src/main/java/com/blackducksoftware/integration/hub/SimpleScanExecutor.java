@@ -181,10 +181,10 @@ public class SimpleScanExecutor {
             cmd.add(target);
         }
 
-        return executeScan(cmd, logDirectory);
+        return executeScan(cmd);
     }
 
-    public Result executeScan(List<String> cmd, File logDirectory) throws IOException, InterruptedException, IllegalArgumentException, EncryptionException {
+    public Result executeScan(List<String> cmd) throws IOException, InterruptedException, IllegalArgumentException, EncryptionException {
         printCommand(cmd);
 
         final File standardOutFile = new File(logDirectory, "CLI_Output.txt");
@@ -215,15 +215,10 @@ public class SimpleScanExecutor {
             splitOutputStream.flush();
             logger.info(IoUtils.toString((hubCliProcess.getInputStream())));
 
-            String outputString = "";
-            if (splitOutputStream.hasOutput()) {
-                outputString = splitOutputStream.getOutput();
-            }
-
             logger.info("Hub CLI return code : " + returnCode);
             logger.info("You can view the BlackDuck Scan CLI logs at : '" + logDirectory.getAbsolutePath() + "'");
 
-            if (outputString.contains("Finished in") && outputString.contains("with status SUCCESS")) {
+            if (returnCode == 0) {
                 return Result.SUCCESS;
             } else {
                 return Result.FAILURE;
@@ -234,7 +229,7 @@ public class SimpleScanExecutor {
     /**
      * For all error cases, return an empty list. If all goes well, return a list of scan summary urls.
      */
-    public List<String> getScanSummaryUrls() {
+    public List<ScanSummaryItem> getScanSummaryItems() {
         if (null == logDirectory || !hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
             return Collections.emptyList();
         }
@@ -247,7 +242,7 @@ public class SimpleScanExecutor {
             return Collections.emptyList();
         }
 
-        List<String> scanSummaryUrls = new ArrayList<>();
+        List<ScanSummaryItem> scanSummaryItems = new ArrayList<>();
         for (final File currentStatusFile : statusFiles) {
             String fileContent;
             try {
@@ -257,11 +252,10 @@ public class SimpleScanExecutor {
                 return Collections.emptyList();
             }
             final ScanSummaryItem scanSummaryItem = gson.fromJson(fileContent, ScanSummaryItem.class);
-            String scanSummaryUrl = scanSummaryItem.getMeta().getHref();
-            scanSummaryUrls.add(scanSummaryUrl);
+            scanSummaryItems.add(scanSummaryItem);
         }
 
-        return scanSummaryUrls;
+        return scanSummaryItems;
     }
 
     public String getSpecificScanExecutionLogDirectory() {

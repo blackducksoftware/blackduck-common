@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>hub-common</artifactId>
-  <version>2.0.1-SNAPSHOT</version>
+  <version>2.1.1-SNAPSHOT</version>
 
   <name>Hub Common</name>
   <description>General Code for Hub Integration with CI systems</description>
@@ -26,7 +26,7 @@
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>integration-common</artifactId>
-      <version>1.0.8</version>
+      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
@@ -41,7 +41,7 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>2.9.5</version>
+      <version>2.9.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

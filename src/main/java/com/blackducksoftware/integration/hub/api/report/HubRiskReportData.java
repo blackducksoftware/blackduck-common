@@ -21,14 +21,10 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.report;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import com.blackducksoftware.integration.util.XStreamHelper;
 
 public class HubRiskReportData {
     private VersionReport report;
@@ -114,30 +110,6 @@ public class HubRiskReportData {
         licenseRiskNoneCount = totalBomEntries - licenseRiskHighCount - licenseRiskMediumCount - licenseRiskLowCount;
         operationalRiskNoneCount = totalBomEntries - operationalRiskHighCount - operationalRiskMediumCount
                 - operationalRiskLowCount;
-    }
-
-    public void readFromInputStream(final InputStream inputStream) {
-        final XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<>();
-        final HubRiskReportData that = xStreamHelper.fromXML(inputStream);
-
-        licenseRiskHighCount = that.licenseRiskHighCount;
-        licenseRiskMediumCount = that.licenseRiskMediumCount;
-        licenseRiskLowCount = that.licenseRiskLowCount;
-        licenseRiskNoneCount = that.licenseRiskNoneCount;
-        vulnerabilityRiskHighCount = that.vulnerabilityRiskHighCount;
-        vulnerabilityRiskMediumCount = that.vulnerabilityRiskMediumCount;
-        vulnerabilityRiskLowCount = that.vulnerabilityRiskLowCount;
-        vulnerabilityRiskNoneCount = that.vulnerabilityRiskNoneCount;
-        operationalRiskHighCount = that.operationalRiskHighCount;
-        operationalRiskMediumCount = that.operationalRiskMediumCount;
-        operationalRiskLowCount = that.operationalRiskLowCount;
-        operationalRiskNoneCount = that.operationalRiskNoneCount;
-        report = that.report;
-    }
-
-    public void writeToOutputStream(final OutputStream outputStream) {
-        final XStreamHelper<HubRiskReportData> xStreamHelper = new XStreamHelper<>();
-        xStreamHelper.toXML(this, outputStream);
     }
 
     public double getPercentage(final double count) {

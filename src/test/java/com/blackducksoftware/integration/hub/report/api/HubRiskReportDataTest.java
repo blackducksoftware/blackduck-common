@@ -22,15 +22,10 @@
 package com.blackducksoftware.integration.hub.report.api;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
@@ -193,35 +188,6 @@ public class HubRiskReportDataTest {
         assertEquals(0, hubRiskReportData.getOperationalRiskMediumCount());
         assertEquals(0, hubRiskReportData.getOperationalRiskLowCount());
         assertEquals(1, hubRiskReportData.getOperationalRiskNoneCount());
-    }
-
-    @Test
-    public void testWritingToOutputStream() throws IllegalAccessException {
-        final HubRiskReportData hubRiskReportData = new HubRiskReportData();
-        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskHighCount", 1000, true);
-        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskMediumCount", 2000, true);
-        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskLowCount", 3000, true);
-        FieldUtils.writeField(hubRiskReportData, "vulnerabilityRiskNoneCount", 4000, true);
-
-        FieldUtils.writeField(hubRiskReportData, "licenseRiskHighCount", 5000, true);
-        FieldUtils.writeField(hubRiskReportData, "licenseRiskMediumCount", 6000, true);
-        FieldUtils.writeField(hubRiskReportData, "licenseRiskLowCount", 7000, true);
-        FieldUtils.writeField(hubRiskReportData, "licenseRiskNoneCount", 8000, true);
-
-        FieldUtils.writeField(hubRiskReportData, "operationalRiskHighCount", 9000, true);
-        FieldUtils.writeField(hubRiskReportData, "operationalRiskMediumCount", 10000, true);
-        FieldUtils.writeField(hubRiskReportData, "operationalRiskLowCount", 11000, true);
-        FieldUtils.writeField(hubRiskReportData, "operationalRiskNoneCount", 12000, true);
-
-        final OutputStream outputStream = new ByteArrayOutputStream();
-        hubRiskReportData.writeToOutputStream(outputStream);
-        final String xml = outputStream.toString();
-        IOUtils.closeQuietly(outputStream);
-
-        assertTrue(xml.contains("vulnerabilityRiskHighCount"));
-        assertTrue(xml.contains("1000"));
-        assertTrue(xml.contains("operationalRiskNoneCount"));
-        assertTrue(xml.contains("12000"));
     }
 
 }
