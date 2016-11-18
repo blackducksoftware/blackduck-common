@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.restlet.data.Method;
@@ -14,6 +15,7 @@ import org.restlet.data.Method;
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -39,13 +41,29 @@ public class ComponentRestService extends HubItemRestService<ComponentItem> {
         final ComponentQuery componentQuery = new ComponentQuery(id, groupId, artifactId, version);
 
         componentItemRequest.setMethod(Method.GET);
-        componentItemRequest.setLimit(5);
+        componentItemRequest.setLimit(1);
         componentItemRequest.addUrlSegments(COMPONENT_SEGMENTS);
         componentItemRequest.setQ(componentQuery.getQuery());
 
         final JsonObject jsonObject = componentItemRequest.executeForResponseJson();
         final List<ComponentItem> allComponents = getAll(jsonObject, componentItemRequest);
         return allComponents;
+    }
+
+    public ComponentItem getExactComponentMatch(String id, String groupId, String artifactId, String version)
+            throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
+        List<ComponentItem> allComponents = getAllComponents(id, groupId, artifactId, version);
+        Iterator<ComponentItem> it = allComponents.iterator();
+        while (it.hasNext()) {
+            ComponentItem item = it.next();
+            if (item.getOriginId() != null) {
+                String[] segments = item.getOriginId().split(":");
+                if (segments.length == 3 && segments[0].equals(groupId) && segments[1].equals(artifactId) && segments[2].equals(version)) {
+                    return item;
+                }
+            }
+        }
+        throw new UnexpectedHubResponseException();
     }
 
 }

@@ -18,25 +18,25 @@ import com.google.gson.reflect.TypeToken;
 
 public class ComponentIdRestService extends HubItemRestService<ComponentIdItem> {
 
-	private static Type ITEM_TYPE = new TypeToken<ComponentIdItem>() {
-	}.getType();
+    private static Type ITEM_TYPE = new TypeToken<ComponentIdItem>() {
+    }.getType();
 
-	private static Type ITEM_LIST_TYPE = new TypeToken<List<ComponentIdItem>>() {
-	}.getType();
+    private static Type ITEM_LIST_TYPE = new TypeToken<List<ComponentIdItem>>() {
+    }.getType();
 
-	public ComponentIdRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-	}
+    public ComponentIdRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    }
 
-	public ComponentIdItem getComponent(final String componentURL)
-			throws IOException, URISyntaxException, BDRestException {
-		final HubRequest componentRequest = new HubRequest(getRestConnection(), getJsonParser());
-		componentRequest.setMethod(Method.GET);
-		componentRequest.setLimit(1);
-		componentRequest.setUrl(componentURL);
-		final JsonObject jsonObject = componentRequest.executeForResponseJson();
-		final ComponentIdItem component = getItem(jsonObject, ComponentIdItem.class);
-		return component;
-	}
+    public ComponentIdItem getComponent(final String componentURL)
+            throws IOException, URISyntaxException, BDRestException {
+        final HubRequest componentRequest = new HubRequest(getRestConnection(), getJsonParser());
+        componentRequest.setMethod(Method.GET);
+        componentRequest.setLimit(1);
+        componentRequest.setUrl(componentURL);
+        final JsonObject jsonObject = componentRequest.executeForResponseJson();
+        final ComponentIdItem component = getItem(jsonObject, ComponentIdItem.class);
+        return component;
+    }
 
 }
