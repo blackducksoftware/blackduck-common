@@ -181,10 +181,10 @@ public class SimpleScanExecutor {
             cmd.add(target);
         }
 
-        return executeScan(cmd, logDirectory);
+        return executeScan(cmd);
     }
 
-    public Result executeScan(List<String> cmd, File logDirectory) throws IOException, InterruptedException, IllegalArgumentException, EncryptionException {
+    public Result executeScan(List<String> cmd) throws IOException, InterruptedException, IllegalArgumentException, EncryptionException {
         printCommand(cmd);
 
         final File standardOutFile = new File(logDirectory, "CLI_Output.txt");
@@ -215,15 +215,10 @@ public class SimpleScanExecutor {
             splitOutputStream.flush();
             logger.info(IoUtils.toString((hubCliProcess.getInputStream())));
 
-            String outputString = "";
-            if (splitOutputStream.hasOutput()) {
-                outputString = splitOutputStream.getOutput();
-            }
-
             logger.info("Hub CLI return code : " + returnCode);
             logger.info("You can view the BlackDuck Scan CLI logs at : '" + logDirectory.getAbsolutePath() + "'");
 
-            if (outputString.contains("Finished in") && outputString.contains("with status SUCCESS")) {
+            if (returnCode == 0) {
                 return Result.SUCCESS;
             } else {
                 return Result.FAILURE;

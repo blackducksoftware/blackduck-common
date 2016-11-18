@@ -55,7 +55,7 @@ import com.google.gson.JsonParser;
 public class DataServicesFactory {
     private final RestConnection restConnection;
 
-    final Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
     final JsonParser jsonParser = new JsonParser();
 
