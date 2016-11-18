@@ -104,17 +104,6 @@ public class HubEventPolling {
             scanSummaryItems.add(scanSummaryItem);
         }
 
-        logger.debug("Cleaning up the scan status files at : " + statusDirectory.getCanonicalPath());
-        // We delete the files in a second loop to ensure we have all the scan
-        // status's in memory before we start
-        // deleting the files. This way, if there is an exception thrown, the
-        // User can go look at the files to see what
-        // went wrong.
-        for (final File currentStatusFile : statusFiles) {
-            currentStatusFile.delete();
-        }
-        statusDirectory.delete();
-
         final long timeoutInMilliseconds = hubReportGenerationInfo.getMaximumWaitTime();
         final ScanStatusDataService scanStatusDataService = service.getScanStatusDataService();
         scanStatusDataService.assertBomImportScansFinished(scanSummaryItems, timeoutInMilliseconds);

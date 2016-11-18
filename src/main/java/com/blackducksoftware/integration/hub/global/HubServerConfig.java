@@ -43,6 +43,10 @@ public class HubServerConfig implements Serializable {
         this.proxyInfo = proxyInfo;
     }
 
+    public boolean shouldUseProxyForHub() {
+        return proxyInfo != null && proxyInfo.shouldUseProxyForUrl(hubUrl);
+    }
+
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();

@@ -27,6 +27,8 @@ import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ScanSummaryItem extends HubItem {
+    public static final String CODE_LOCATION_LINK = "codelocation";
+
     private final ScanStatus status;
 
     private final String statusMessage;

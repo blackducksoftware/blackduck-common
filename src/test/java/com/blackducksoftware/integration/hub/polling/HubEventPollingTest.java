@@ -137,12 +137,8 @@ public class HubEventPollingTest {
 
         assertTrue(logger.getOutputString(), logger.getOutputString()
                 .contains("Checking the directory : " + scanStatusDir.getCanonicalPath() + " for the scan status's."));
-        assertTrue(logger.getOutputString(), logger.getOutputString()
-                .contains("Cleaning up the scan status files at : " + scanStatusDir.getCanonicalPath()));
-        assertTrue(!statusFile1.exists());
-        assertTrue(!statusFile2.exists());
-        assertTrue(!statusFile3.exists());
-        assertTrue(!scanStatusDir.exists());
+        assertTrue(statusFile1.exists());
+        assertTrue(scanStatusDir.exists());
     }
 
     @Test

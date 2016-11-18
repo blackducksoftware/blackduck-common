@@ -21,25 +21,43 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.component.version;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.util.List;
 
+import org.restlet.data.Method;
+
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
+import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ComponentVersionRestService extends HubItemRestService<ComponentVersion> {
-    private static Type ITEM_TYPE = new TypeToken<ComponentVersion>() {
-    }.getType();
+	private static Type ITEM_TYPE = new TypeToken<ComponentVersion>() {
+	}.getType();
 
-    private static Type ITEM_LIST_TYPE = new TypeToken<List<ComponentVersion>>() {
-    }.getType();
+	private static Type ITEM_LIST_TYPE = new TypeToken<List<ComponentVersion>>() {
+	}.getType();
 
-    public ComponentVersionRestService(final RestConnection restConnection, final Gson gson,
-            final JsonParser jsonParser) {
-        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
-    }
+	public ComponentVersionRestService(final RestConnection restConnection, final Gson gson,
+			final JsonParser jsonParser) {
+		super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+	}
+
+	public ComponentVersion getComponentVersion(final String componentVersionURL)
+			throws IOException, URISyntaxException, BDRestException {
+		final HubRequest componentVersionRequest = new HubRequest(getRestConnection(), getJsonParser());
+		componentVersionRequest.setMethod(Method.GET);
+		componentVersionRequest.setLimit(1);
+		componentVersionRequest.setUrl(componentVersionURL);
+		final JsonObject json = componentVersionRequest.executeForResponseJson();
+		final ComponentVersion version = getItem(json, ComponentVersion.class);
+		return version;
+	}
 
 }

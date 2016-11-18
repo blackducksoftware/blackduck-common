@@ -40,7 +40,7 @@ public class CredentialsRestConnection extends RestConnection {
             throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException {
         this(null, hubServerConfig);
     }
-    
+
     public CredentialsRestConnection(final IntLogger logger, final HubServerConfig hubServerConfig)
             throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException {
         super(logger);
