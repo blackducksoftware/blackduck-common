@@ -36,6 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.test.TestLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
@@ -55,7 +56,7 @@ public class CLIInstallerTest {
         final URL cliZip = classLoader.getResource("scan.cli-2.4.2.zip");
         final TestLogger logger = new TestLogger();
 
-        final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
+        final CLIInstaller installer = new CLIInstaller(null, cliLocation, ciEnvironmentVariables);
         installer.customInstall(cliZip, "2.4.2", "localHost", logger);
 
         assertNotNull(cliLocation.getCLIHome());
@@ -77,7 +78,7 @@ public class CLIInstallerTest {
         URL cliZip = classLoader.getResource("scan.cli-2.4.2.zip");
         TestLogger logger = new TestLogger();
 
-        final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
+        final CLIInstaller installer = new CLIInstaller(null, cliLocation, ciEnvironmentVariables);
         installer.customInstall(cliZip, "2.4.2", "localHost", logger);
 
         assertNotNull(cliLocation.getCLIHome());
@@ -113,7 +114,7 @@ public class CLIInstallerTest {
         final URL cliZip = classLoader.getResource("scan.cli-3.1.0.zip");
         final TestLogger logger = new TestLogger();
 
-        final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
+        final CLIInstaller installer = new CLIInstaller(null, cliLocation, ciEnvironmentVariables);
         installer.customInstall(cliZip, "3.1.0", "localHost", logger);
 
         assertNotNull(cliLocation.getCLIHome());
@@ -134,7 +135,7 @@ public class CLIInstallerTest {
         final URL cliZip = classLoader.getResource("scan.cli-3.1.0.zip");
         TestLogger logger = new TestLogger();
 
-        final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
+        final CLIInstaller installer = new CLIInstaller(null, cliLocation, ciEnvironmentVariables);
         installer.customInstall(cliZip, "3.1.0", "localHost", logger);
 
         assertNotNull(cliLocation.getCLIHome());
@@ -171,7 +172,7 @@ public class CLIInstallerTest {
         final URL cliZip = classLoader.getResource("scan.cli-3.1.0.zip");
         TestLogger logger = new TestLogger();
 
-        final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
+        final CLIInstaller installer = new CLIInstaller(null, cliLocation, ciEnvironmentVariables);
         installer.customInstall(cliZip, "3.1.0", "localHost", logger);
 
         assertNotNull(cliLocation.getCLIHome());
@@ -198,7 +199,7 @@ public class CLIInstallerTest {
 
     @Test
     public void testCustomInstallWithCacertsOverride()
-            throws IOException, InterruptedException, HubIntegrationException {
+            throws IOException, InterruptedException, HubIntegrationException, IllegalArgumentException, EncryptionException {
         final File directoryToInstallTo = folder.newFolder();
         final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
@@ -209,37 +210,37 @@ public class CLIInstallerTest {
         final File cacertsFolder = folder.newFolder();
         final File customCacerts = new File(cacertsFolder, "custom_cacerts");
         customCacerts.createNewFile();
-        FileUtils.write(customCacerts, "a test cacerts file for testing");
+        FileUtils.write(customCacerts, "a test cacerts file for testing", "UTF8");
 
         final String customCacertsPath = customCacerts.getAbsolutePath();
         ciEnvironmentVariables.put(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE, customCacertsPath);
 
-        final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
+        final CLIInstaller installer = new CLIInstaller(null, cliLocation, ciEnvironmentVariables);
         installer.customInstall(cliZip, "3.0.3", "localHost", logger);
 
         final File securityDirectory = cliLocation.getJreSecurityDirectory();
         final File cacerts = new File(securityDirectory, "cacerts");
-        final String cacertsContents = FileUtils.readFileToString(cacerts);
+        final String cacertsContents = FileUtils.readFileToString(cacerts, "UTF8");
         assertEquals("a test cacerts file for testing", cacertsContents);
     }
 
     @Test
     public void testCustomInstallWithoutCacertsOverride()
-            throws IOException, InterruptedException, HubIntegrationException {
+            throws IOException, InterruptedException, HubIntegrationException, IllegalArgumentException, EncryptionException {
         final File directoryToInstallTo = folder.newFolder();
         final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
 
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         final URL cliZip = classLoader.getResource("scan.cli-3.0.3.zip");
-        final String expectedCacertsContents = IOUtils.toString(classLoader.getResourceAsStream("cacerts"));
+        final String expectedCacertsContents = IOUtils.toString(classLoader.getResourceAsStream("cacerts"), "UTF8");
         final TestLogger logger = new TestLogger();
 
-        final CLIInstaller installer = new CLIInstaller(cliLocation, ciEnvironmentVariables);
+        final CLIInstaller installer = new CLIInstaller(null, cliLocation, ciEnvironmentVariables);
         installer.customInstall(cliZip, "3.0.3", "localHost", logger);
 
         final File securityDirectory = cliLocation.getJreSecurityDirectory();
         final File cacerts = new File(securityDirectory, "cacerts");
-        final String cacertsContents = FileUtils.readFileToString(cacerts);
+        final String cacertsContents = FileUtils.readFileToString(cacerts, "UTF8");
         assertEquals(expectedCacertsContents, cacertsContents);
     }
 

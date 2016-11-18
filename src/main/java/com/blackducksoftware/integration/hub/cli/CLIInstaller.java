@@ -42,32 +42,30 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
+import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.AuthenticatorUtil;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class CLIInstaller {
-    private String proxyHost;
-
-    private Integer proxyPort;
-
-    private String proxyUserName;
-
-    private String proxyPassword;
+    private HubProxyInfo hubProxyInfo;
 
     private final CLILocation cliLocation;
 
     private final CIEnvironmentVariables ciEnvironmentVariables;
 
-    public CLIInstaller(final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables) {
+    public CLIInstaller(HubProxyInfo hubProxyInfo, final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables) {
+        this.hubProxyInfo = hubProxyInfo;
         this.cliLocation = cliLocation;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
     }
 
     public void performInstallation(final IntLogger logger, String hubUrl, String hubVersion, final String localHostName)
-            throws IOException, InterruptedException, BDRestException, URISyntaxException, HubIntegrationException {
+            throws IOException, InterruptedException, BDRestException, URISyntaxException, HubIntegrationException, IllegalArgumentException,
+            EncryptionException {
         if (StringUtils.isBlank(localHostName)) {
             throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
         }
@@ -81,7 +79,7 @@ public class CLIInstaller {
     }
 
     public void customInstall(final URL archive, String hubVersion, final String localHostName, final IntLogger logger)
-            throws IOException, InterruptedException, HubIntegrationException {
+            throws IOException, InterruptedException, HubIntegrationException, IllegalArgumentException, EncryptionException {
         boolean cliMismatch = true;
         try {
             final File hubVersionFile = cliLocation.createHubVersionFile();
@@ -111,15 +109,21 @@ public class CLIInstaller {
             URLConnection connection = null;
             try {
                 Proxy proxy = null;
+                if (hubProxyInfo != null) {
+                    String proxyHost = hubProxyInfo.getHost();
+                    int proxyPort = hubProxyInfo.getPort();
+                    String proxyUsername = hubProxyInfo.getUsername();
+                    String proxyPassword = hubProxyInfo.getDecryptedPassword();
 
-                if (StringUtils.isNotBlank(proxyHost)) {
-                    proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
-                }
-                if (proxy != null) {
-                    if (StringUtils.isNotBlank(proxyUserName) && StringUtils.isNotBlank(proxyPassword)) {
-                        AuthenticatorUtil.setAuthenticator(proxyUserName, proxyPassword);
-                    } else {
-                        AuthenticatorUtil.resetAuthenticator();
+                    if (StringUtils.isNotBlank(proxyHost) && proxyPort > 0) {
+                        proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
+                    }
+                    if (proxy != null) {
+                        if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+                            AuthenticatorUtil.setAuthenticator(proxyUsername, proxyPassword);
+                        } else {
+                            AuthenticatorUtil.resetAuthenticator();
+                        }
                     }
                 }
                 if (proxy != null) {
@@ -248,38 +252,6 @@ public class CLIInstaller {
         } finally {
             org.apache.commons.io.IOUtils.closeQuietly(fos);
         }
-    }
-
-    public String getProxyHost() {
-        return proxyHost;
-    }
-
-    public void setProxyHost(final String proxyHost) {
-        this.proxyHost = proxyHost;
-    }
-
-    public Integer getProxyPort() {
-        return proxyPort;
-    }
-
-    public void setProxyPort(final Integer proxyPort) {
-        this.proxyPort = proxyPort;
-    }
-
-    public String getProxyUserName() {
-        return proxyUserName;
-    }
-
-    public void setProxyUserName(final String proxyUserName) {
-        this.proxyUserName = proxyUserName;
-    }
-
-    public String getProxyPassword() {
-        return proxyPassword;
-    }
-
-    public void setProxyPassword(final String proxyPassword) {
-        this.proxyPassword = proxyPassword;
     }
 
 }
