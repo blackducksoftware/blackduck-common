@@ -43,7 +43,6 @@ import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistExcept
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 public class HubEventPolling {
     private final HubIntRestService service;
@@ -95,7 +94,7 @@ public class HubEventPolling {
         final List<ScanSummaryItem> scanSummaryItems = new ArrayList<>();
         for (final File currentStatusFile : statusFiles) {
             final String fileContent = FileUtils.readFileToString(currentStatusFile, "UTF8");
-            final Gson gson = new GsonBuilder().create();
+            final Gson gson = service.getGson();
             final ScanSummaryItem scanSummaryItem = gson.fromJson(fileContent, ScanSummaryItem.class);
             if (scanSummaryItem.getMeta() == null || scanSummaryItem.getStatus() == null) {
                 throw new HubIntegrationException("The scan status file : " + currentStatusFile.getCanonicalPath()

@@ -62,7 +62,6 @@ import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseExce
 import com.blackducksoftware.integration.hub.exception.VersionDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -103,11 +102,8 @@ public class HubIntRestService {
     public HubIntRestService(final RestConnection restConnection) throws URISyntaxException {
         this.restConnection = restConnection;
 
-        final GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setDateFormat(RestConnection.JSON_DATE_FORMAT);
-        this.gson = gsonBuilder.create();
-
-        this.jsonParser = new JsonParser();
+        this.gson = restConnection.getGson();
+        this.jsonParser = restConnection.getJsonParser();
 
         this.codeLocationRestService = new CodeLocationRestService(restConnection, gson, jsonParser);
         this.componentVersionRestService = new ComponentVersionRestService(restConnection, gson, jsonParser);

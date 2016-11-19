@@ -55,9 +55,9 @@ import com.google.gson.JsonParser;
 public class DataServicesFactory {
     private final RestConnection restConnection;
 
-    private final Gson gson = new Gson();
+    private final Gson gson;
 
-    final JsonParser jsonParser = new JsonParser();
+    private final JsonParser jsonParser;
 
     private final BomImportRestService bomImportRestService;
 
@@ -101,6 +101,8 @@ public class DataServicesFactory {
 
     public DataServicesFactory(final RestConnection restConnection) {
         this.restConnection = restConnection;
+        this.gson = restConnection.getGson();
+        this.jsonParser = restConnection.getJsonParser();
 
         bomImportRestService = new BomImportRestService(restConnection);
         codeLocationRestService = new CodeLocationRestService(restConnection, gson, jsonParser);

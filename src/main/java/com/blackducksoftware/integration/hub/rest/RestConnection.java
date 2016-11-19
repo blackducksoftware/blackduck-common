@@ -91,6 +91,8 @@ public abstract class RestConnection {
 
     private final Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
 
+    private final JsonParser jsonParser = new JsonParser();
+
     private final Client client;
 
     public static Date parseDateString(final String dateString) throws ParseException {
@@ -613,6 +615,14 @@ public abstract class RestConnection {
             throw new ResourceDoesNotExistException(
                     "There was a problem creating the resource. Error Code: " + responseCode, resource);
         }
+    }
+
+    public Gson getGson() {
+        return gson;
+    }
+
+    public JsonParser getJsonParser() {
+        return jsonParser;
     }
 
 }
