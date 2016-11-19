@@ -27,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -34,7 +35,7 @@ public class MetaInformationTest {
     @Test
     public void conversionTest() {
         final String metaJson = "{'allow': ['GET'],'href': 'https://test/api/projects/aacfcbd6-3625-4f3b-ba93-d1da3047d186','links': [{'rel': 'versions','href': 'https://test/api/projects/aacfcbd6-3625-4f3b-ba93-d1da3047d186/versions'},{'rel': 'canonicalVersion','href': 'https://test/api/projects/aacfcbd6-3625-4f3b-ba93-d1da3047d186/versions/bdd15fe4-3728-4b1a-af5e-b8972b2699a5'}]}";
-        final Gson gson = new GsonBuilder().create();
+        final Gson gson = new GsonBuilder().setDateFormat(RestConnection.JSON_DATE_FORMAT).create();
 
         final MetaInformation meta = gson.fromJson(metaJson, MetaInformation.class);
         assertNotNull(meta);

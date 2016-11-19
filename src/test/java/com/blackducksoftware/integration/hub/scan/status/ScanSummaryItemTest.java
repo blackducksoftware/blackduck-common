@@ -35,8 +35,10 @@ import org.junit.Test;
 import com.blackducksoftware.integration.hub.api.scan.ScanStatus;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.util.ResourceUtil;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class ScanSummaryItemTest {
     @Test
@@ -70,7 +72,7 @@ public class ScanSummaryItemTest {
                 "com/blackducksoftware/integration/hub/scan/status/scanSummaryItemJson.txt");
         final String json = IOUtils.toString(inputStream, "UTF-8");
 
-        final Gson gson = new Gson();
+        final Gson gson = new GsonBuilder().setDateFormat(RestConnection.JSON_DATE_FORMAT).create();
         final ScanSummaryItem scanSummaryItem = gson.fromJson(json, ScanSummaryItem.class);
         assertNotNull(scanSummaryItem.getCreatedAt());
         assertNotNull(scanSummaryItem.getUpdatedAt());

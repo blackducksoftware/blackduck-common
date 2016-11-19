@@ -21,8 +21,10 @@ import java.util.Calendar;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.util.ResourceUtil;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class ProjectVersionTest {
 
@@ -32,7 +34,8 @@ public class ProjectVersionTest {
                 "com/blackducksoftware/integration/hub/api/project/version/ProjectVersionItemJson.txt");
         final String json = IOUtils.toString(inputStream, "UTF-8");
 
-        final Gson gson = new Gson();
+        final Gson gson = new GsonBuilder().setDateFormat(RestConnection.JSON_DATE_FORMAT).create();
+
         final ProjectVersionItem releaseItem = gson.fromJson(json, ProjectVersionItem.class);
         assertNotNull(releaseItem.getReleasedOn());
 

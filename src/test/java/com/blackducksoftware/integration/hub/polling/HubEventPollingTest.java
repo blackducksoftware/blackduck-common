@@ -86,7 +86,7 @@ public class HubEventPollingTest {
     }
 
     private void writeScanStatusToFile(final ScanSummaryItem status, final File file) throws IOException {
-        final Gson gson = new GsonBuilder().create();
+        final Gson gson = new GsonBuilder().setDateFormat(RestConnection.JSON_DATE_FORMAT).create();
 
         final String stringStatus = gson.toJson(status);
 
@@ -235,7 +235,7 @@ public class HubEventPollingTest {
         final File scanStatusDir = folder.newFolder();
         final File statusFile1 = new File(scanStatusDir, "status1.txt");
         statusFile1.createNewFile();
-        final Gson gson = new GsonBuilder().create();
+        final Gson gson = new GsonBuilder().setDateFormat(RestConnection.JSON_DATE_FORMAT).create();
 
         final String stringStatus = gson.toJson(meta);
 
@@ -244,6 +244,7 @@ public class HubEventPollingTest {
         writer.close();
 
         final HubIntRestService restService = Mockito.mock(HubIntRestService.class);
+        Mockito.when(restService.getGson()).thenReturn(new GsonBuilder().setDateFormat(RestConnection.JSON_DATE_FORMAT).create());
         final HubEventPolling eventPoller = new HubEventPolling(restService);
         final TestLogger logger = new TestLogger();
         try {
