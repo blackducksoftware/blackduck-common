@@ -120,6 +120,11 @@ public class HubRequest {
         final ClientResource clientResource = buildClientResource(restConnection);
         try {
             restConnection.handleRequest(clientResource);
+            final int responseCode = clientResource.getResponse().getStatus().getCode();
+            if (!restConnection.isSuccess(responseCode)) {
+                throw new BDRestException("There was a problem deleting this item : " + url + ". Error Code: " + responseCode,
+                        clientResource);
+            }
         } finally {
             releaseResource(clientResource);
         }
