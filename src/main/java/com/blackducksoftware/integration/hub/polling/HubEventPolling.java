@@ -42,19 +42,8 @@ import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededExcepti
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.google.gson.Gson;
 
 public class HubEventPolling {
-    private final HubIntRestService service;
-
-    public HubEventPolling(final HubIntRestService service) {
-        this.service = service;
-    }
-
-    public HubIntRestService getService() {
-        return service;
-    }
-
     /**
      * Checks the status's in the scan files and polls their URL's, every 10
      * seconds, until they have all have status COMPLETE. We keep trying until
@@ -65,7 +54,7 @@ public class HubEventPolling {
      * @throws UnexpectedHubResponseException
      * @throws ProjectDoesNotExistException
      */
-    public void assertBomUpToDate(final HubReportGenerationInfo hubReportGenerationInfo, final IntLogger logger)
+    public void assertBomUpToDate(ScanStatusDataService scanStatusDataService, final HubReportGenerationInfo hubReportGenerationInfo, final IntLogger logger)
             throws InterruptedException, BDRestException, HubIntegrationException, URISyntaxException, IOException,
             ProjectDoesNotExistException, UnexpectedHubResponseException {
         if (StringUtils.isBlank(hubReportGenerationInfo.getScanStatusDirectory())) {
@@ -94,8 +83,7 @@ public class HubEventPolling {
         final List<ScanSummaryItem> scanSummaryItems = new ArrayList<>();
         for (final File currentStatusFile : statusFiles) {
             final String fileContent = FileUtils.readFileToString(currentStatusFile, "UTF8");
-            final Gson gson = service.getGson();
-            final ScanSummaryItem scanSummaryItem = gson.fromJson(fileContent, ScanSummaryItem.class);
+            final ScanSummaryItem scanSummaryItem = scanStatusDataService.getRestConnection().getGson().fromJson(fileContent, ScanSummaryItem.class);
             if (scanSummaryItem.getMeta() == null || scanSummaryItem.getStatus() == null) {
                 throw new HubIntegrationException("The scan status file : " + currentStatusFile.getCanonicalPath()
                         + " does not contain valid scan status json.");
@@ -104,7 +92,6 @@ public class HubEventPolling {
         }
 
         final long timeoutInMilliseconds = hubReportGenerationInfo.getMaximumWaitTime();
-        final ScanStatusDataService scanStatusDataService = service.getScanStatusDataService();
         scanStatusDataService.assertBomImportScansFinished(scanSummaryItems, timeoutInMilliseconds);
     }
 
@@ -115,11 +102,11 @@ public class HubEventPolling {
      * generated yet.
      *
      */
-    public ReportInformationItem isReportFinishedGenerating(final String reportUrl)
+    public ReportInformationItem isReportFinishedGenerating(HubIntRestService service, final String reportUrl)
             throws IOException, BDRestException, URISyntaxException, InterruptedException, HubIntegrationException {
         // maximum wait time of 30 minutes
         final long maximumWait = 1000 * 60 * 30;
-        return isReportFinishedGenerating(reportUrl, maximumWait);
+        return isReportFinishedGenerating(service, reportUrl, maximumWait);
     }
 
     /**
@@ -129,7 +116,7 @@ public class HubEventPolling {
      * generated yet.
      *
      */
-    public ReportInformationItem isReportFinishedGenerating(final String reportUrl, final long maximumWait)
+    public ReportInformationItem isReportFinishedGenerating(HubIntRestService service, final String reportUrl, final long maximumWait)
             throws IOException, BDRestException, URISyntaxException, InterruptedException, HubIntegrationException {
         final long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
@@ -137,7 +124,7 @@ public class HubEventPolling {
         ReportInformationItem reportInfo = null;
 
         while (timeFinished == null) {
-            reportInfo = getService().getReportInformation(reportUrl);
+            reportInfo = service.getReportInformation(reportUrl);
             timeFinished = reportInfo.getFinishedAt();
             if (timeFinished != null) {
                 break;

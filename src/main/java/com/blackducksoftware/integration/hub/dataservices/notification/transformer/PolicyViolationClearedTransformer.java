@@ -34,8 +34,8 @@ import com.blackducksoftware.integration.hub.api.notification.RuleViolationClear
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
-import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
-import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
@@ -45,7 +45,7 @@ import com.blackducksoftware.integration.hub.exception.HubItemTransformException
 
 public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer {
     public PolicyViolationClearedTransformer(final NotificationRestService notificationService,
-            final ReleaseItemRestService projectVersionService, final PolicyRestService policyService,
+            final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
             final VersionBomPolicyRestService bomVersionPolicyService,
             final ComponentVersionRestService componentVersionService, final PolicyNotificationFilter policyFilter) {
         super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
@@ -61,7 +61,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent()
                 .getComponentVersionStatuses();
         final String projectVersionLink = policyViolation.getContent().getProjectVersionLink();
-        ReleaseItem releaseItem;
+        ProjectVersionItem releaseItem;
         try {
             releaseItem = getReleaseItem(projectVersionLink);
         } catch (IOException | BDRestException | URISyntaxException e1) {
@@ -114,10 +114,9 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         }
     }
 
-    private ReleaseItem getReleaseItem(final String projectVersionLink)
+    private ProjectVersionItem getReleaseItem(final String projectVersionLink)
             throws IOException, BDRestException, URISyntaxException {
-        ReleaseItem releaseItem;
-        releaseItem = getProjectVersionService().getItem(projectVersionLink);
+        ProjectVersionItem releaseItem = getProjectVersionService().getItem(projectVersionLink);
         return releaseItem;
     }
 

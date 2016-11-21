@@ -43,11 +43,9 @@ import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseExce
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ReportRestService extends HubItemRestService<ReportInformationItem> {
@@ -59,9 +57,8 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
     private static final Type ITEM_LIST_TYPE = new TypeToken<List<ReportInformationItem>>() {
     }.getType();
 
-    public ReportRestService(final RestConnection restConnection, final Gson gson,
-            final JsonParser jsonParser) {
-        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    public ReportRestService(final RestConnection restConnection) {
+        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
     }
 
     /**
@@ -88,13 +85,13 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
             json.add("categories", categoriesJson);
         }
 
-        final HubRequest hubRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest hubRequest = new HubRequest(getRestConnection());
 
         hubRequest.setMethod(Method.POST);
         hubRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
         hubRequest.setUrl(getVersionReportLink(version));
 
-        final StringRepresentation stringRep = new StringRepresentation(getGson().toJson(json));
+        final StringRepresentation stringRep = new StringRepresentation(getRestConnection().getGson().toJson(json));
         stringRep.setMediaType(MediaType.APPLICATION_JSON);
         stringRep.setCharacterSet(CharacterSet.UTF_8);
         String location = null;
@@ -109,7 +106,7 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
     }
 
     public void deleteHubReport(final String reportUrl) throws IOException, BDRestException, URISyntaxException {
-        final HubRequest hubRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest hubRequest = new HubRequest(getRestConnection());
         hubRequest.setMethod(Method.DELETE);
         hubRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
         hubRequest.setUrl(reportUrl);
@@ -123,7 +120,7 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
      */
     public VersionReport getReportContent(final String reportContentUrl)
             throws IOException, BDRestException, URISyntaxException {
-        final HubRequest hubRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest hubRequest = new HubRequest(getRestConnection());
         hubRequest.setMethod(Method.GET);
         hubRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
         hubRequest.setUrl(reportContentUrl);
@@ -133,7 +130,7 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
         final JsonArray reportConentArray = content.getAsJsonArray();
         final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
 
-        final VersionReport report = getGson().fromJson(reportFile.get("fileContent"), VersionReport.class);
+        final VersionReport report = getRestConnection().getGson().fromJson(reportFile.get("fileContent"), VersionReport.class);
 
         return report;
 

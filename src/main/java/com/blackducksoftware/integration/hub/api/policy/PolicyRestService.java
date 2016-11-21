@@ -37,9 +37,7 @@ import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class PolicyRestService extends HubItemRestService<PolicyRule> {
@@ -51,8 +49,8 @@ public class PolicyRestService extends HubItemRestService<PolicyRule> {
     private static final Type ITEM_LIST_TYPE = new TypeToken<List<PolicyRule>>() {
     }.getType();
 
-    public PolicyRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    public PolicyRestService(final RestConnection restConnection) {
+        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
     }
 
     public PolicyRule getPolicyRuleById(final String policyRuleId)
@@ -66,7 +64,7 @@ public class PolicyRestService extends HubItemRestService<PolicyRule> {
     }
 
     public List<PolicyRule> getAllPolicyRules() throws IOException, BDRestException, URISyntaxException {
-        final HubRequest policyRuleItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest policyRuleItemRequest = new HubRequest(getRestConnection());
         policyRuleItemRequest.setMethod(Method.GET);
         policyRuleItemRequest.setLimit(100);
         policyRuleItemRequest.addUrlSegments(POLICY_RULE_SEGMENTS);

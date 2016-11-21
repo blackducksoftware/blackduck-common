@@ -37,7 +37,7 @@ import com.blackducksoftware.integration.hub.api.notification.NotificationRestSe
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
-import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
@@ -49,7 +49,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     private final PolicyNotificationFilter policyFilter;
 
     public AbstractPolicyTransformer(final NotificationRestService notificationService,
-            final ReleaseItemRestService projectVersionService, final PolicyRestService policyService,
+            final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
             final VersionBomPolicyRestService bomVersionPolicyService,
             final ComponentVersionRestService componentVersionService, final PolicyNotificationFilter policyFilter) {
         super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
