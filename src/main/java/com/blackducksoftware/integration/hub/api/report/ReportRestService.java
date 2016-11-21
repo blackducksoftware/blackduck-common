@@ -40,7 +40,9 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
+import com.blackducksoftware.integration.hub.meta.MetaLink;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -49,6 +51,8 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ReportRestService extends HubItemRestService<ReportInformationItem> {
+    private final static long MAXIMUM_WAIT = 1000 * 60 * 30;
+
     private static final Type ITEM_TYPE = new TypeToken<ReportInformationItem>() {
     }.getType();
 
@@ -66,7 +70,7 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
      * @return the Report URL
      *
      */
-    public String generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
+    public String startGeneratingHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
             final ReportCategoriesEnum[] categories)
             throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
         if (ReportFormatEnum.UNKNOWN == reportFormat) {
@@ -144,9 +148,7 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
      */
     public ReportInformationItem isReportFinishedGenerating(final String reportUrl)
             throws IOException, BDRestException, URISyntaxException, InterruptedException, HubIntegrationException {
-        // maximum wait time of 30 minutes
-        final long maximumWait = 1000 * 60 * 30;
-        return isReportFinishedGenerating(reportUrl, maximumWait);
+        return isReportFinishedGenerating(reportUrl, MAXIMUM_WAIT);
     }
 
     /**
@@ -178,6 +180,52 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
             elapsedTime = System.currentTimeMillis() - startTime;
         }
         return reportInfo;
+    }
+
+    /**
+     * Assumes the Bom has already been updated
+     *
+     */
+    public HubRiskReportData generateHubReport(final IntLogger logger, final ProjectVersionItem version, final ReportFormatEnum reportFormat,
+            final ReportCategoriesEnum[] categories)
+            throws IOException, BDRestException, URISyntaxException, HubIntegrationException, InterruptedException, UnexpectedHubResponseException {
+        return generateHubReport(logger, version, reportFormat, categories, MAXIMUM_WAIT);
+    }
+
+    /**
+     * Assumes the Bom has already been updated
+     *
+     */
+    public HubRiskReportData generateHubReport(final IntLogger logger, final ProjectVersionItem version, final ReportFormatEnum reportFormat,
+            final ReportCategoriesEnum[] categories, long maxWaitTime)
+            throws IOException, BDRestException, URISyntaxException, HubIntegrationException, InterruptedException, UnexpectedHubResponseException {
+
+        final String reportUrl = startGeneratingHubReport(version, reportFormat, categories);
+
+        final ReportInformationItem reportInfo = isReportFinishedGenerating(reportUrl,
+                maxWaitTime);
+
+        final List<MetaLink> links = reportInfo.getMeta().getLinks();
+
+        MetaLink contentLink = null;
+        for (final MetaLink link : links) {
+            if (link.getRel().equalsIgnoreCase("content")) {
+                contentLink = link;
+                break;
+            }
+        }
+        if (contentLink == null) {
+            throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
+        }
+
+        final HubRiskReportData hubRiskReportData = new HubRiskReportData();
+        final VersionReport report = getReportContent(contentLink.getHref());
+        hubRiskReportData.setReport(report);
+        logger.debug("Finished retrieving the report.");
+
+        deleteHubReport(reportUrl);
+
+        return hubRiskReportData;
     }
 
     private String getVersionReportLink(final ProjectVersionItem version) throws UnexpectedHubResponseException {
