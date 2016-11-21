@@ -22,34 +22,50 @@ var RiskReport = function (myJQuery, jsonData) {
 	};
 	
 	RiskReport.prototype.createProjectUrl = function () {
-		var detailedReleaseSummary = this.rawdata.report.detailedReleaseSummary; 
-		var url = this.createBaseUrl();
-		url = url +"#projects/id:";
-        url = url +detailedReleaseSummary.projectId;
-		return url;
+		var detailedReleaseSummary = this.rawdata.report.detailedReleaseSummary;
+		if(detailedReleaseSummary) {
+			var url = this.createBaseUrl();
+			url = url +"#projects/id:";
+	        url = url +detailedReleaseSummary.projectId;
+	        return url;
+		} else {
+			return "";
+		}
 	};
 	
 	RiskReport.prototype.createComponentUrl = function (entry) { 
-		var url = this.createBaseUrl();
-		url = url+"#projects/id:";
-		url = url + entry.producerProject.id;
-		return url;
+		if(entry.producerProject) {
+			var url = this.createBaseUrl();
+			url = url+"#projects/id:";
+			url = url + entry.producerProject.id;
+			return url;
+		} else {
+			return "";
+		}
 	};
 	
 	RiskReport.prototype.createComponentVersionUrl = function (entry) {
-		var url = this.createBaseUrl();
-        url = url + "#versions/id:";
-        url = url + entry.producerReleases[0].id;
-        return url;
+		if(entry.producerReleases && entry.producerReleases.length > 0) {
+			var url = this.createBaseUrl();
+	        url = url + "#versions/id:";
+	        url = url + entry.producerReleases[0].id;
+	        return url;
+		} else {
+			return "";
+		}
 	};
 	
 	RiskReport.prototype.createVersionUrl = function () {
 		var detailedReleaseSummary = this.rawdata.report.detailedReleaseSummary; 
+		if (detailedReleaseSummary) {
 		var url = this.createBaseUrl();
 		url = url + "#versions/id:";
 		url = url + detailedReleaseSummary.versionId;
 		url = url + "/view:bom";
 		return url;
+		} else {
+			return "";
+		}
 	};
 	
 	RiskReport.prototype.createRiskString = function (riskCategory) {
@@ -117,18 +133,28 @@ var RiskReport = function (myJQuery, jsonData) {
 		var projectName = document.createElement("div");
 		var projectVersion = document.createElement("div");
 		var moreDetail = document.createElement("div");
+		var projectUrl = this.createProjectUrl();
+		var versionUrl = this.createVersionUrl();
 		
 		this.myJQuery(projectName).addClass("clickable linkText versionSummaryLargeLabel");
-		this.myJQuery(projectName).attr("onclick" ,"window.open('"+this.createProjectUrl()+"', '_blank');");
+		
+		
+		if(projectUrl) {
+			this.myJQuery(projectName).attr("onclick" ,"window.open('"+projectUrl+"', '_blank');");
+		}
 		this.myJQuery(projectName).text(detailedReleaseSummary.projectName);
 		
 		this.myJQuery(projectVersion).addClass("clickable linkText versionSummaryLargeLabel");
-		this.myJQuery(projectVersion).attr("onclick" ,"window.open('"+this.createVersionUrl()+"', '_blank');");
+		if(versionUrl) {
+			this.myJQuery(projectVersion).attr("onclick" ,"window.open('"+versionUrl+"', '_blank');");
+		}
 		this.myJQuery(projectVersion).text(detailedReleaseSummary.version);
 		
 		this.myJQuery(moreDetail).addClass("linkText riskReportText clickable evenPadding");
 		this.myJQuery(moreDetail).css({"float": "right"});
-		this.myJQuery(moreDetail).attr("onclick" ,"window.open('"+this.createVersionUrl()+"', '_blank');");
+		if(versionUrl) {
+			this.myJQuery(moreDetail).attr("onclick" ,"window.open('"+versionUrl+"', '_blank');");
+		}
 		this.myJQuery(moreDetail).text("See more detail...");
 		
 		this.myJQuery(versionInfo).append(projectName);
@@ -310,12 +336,18 @@ var RiskReport = function (myJQuery, jsonData) {
 	
 		var columnComponent = document.createElement("td");
 		this.myJQuery(columnComponent).addClass("clickable componentColumn evenPadding");
-		this.myJQuery(columnComponent).attr("onclick" ,"window.open('"+this.createComponentUrl(entry)+"', '_blank');");
+		var componentUrl = this.createComponentUrl(entry);
+		if(componentUrl) {
+			this.myJQuery(columnComponent).attr("onclick" ,"window.open('"+componentUrl+"', '_blank');");
+		}
 		this.myJQuery(columnComponent).text(entry.producerProject.name);
 
         var columnVersion = document.createElement("td");
         this.myJQuery(columnVersion).addClass("clickable componentColumn evenPadding");
-		this.myJQuery(columnVersion).attr("onclick" ,"window.open('"+this.createComponentVersionUrl(entry)+"', '_blank');");
+        var componentVersionUrl = this.createComponentVersionUrl(entry);
+        if (componentVersionUrl) {
+        	this.myJQuery(columnVersion).attr("onclick" ,"window.open('"+componentVersionUrl+"', '_blank');");
+        }
 		this.myJQuery(columnVersion).text(entry.producerReleases[0].version);
         
         var columnLicense = document.createElement("td");
@@ -388,13 +420,17 @@ var RiskReport = function (myJQuery, jsonData) {
 		var index;
 		var odd = true;
 		for (index in entryArray) {
-			var tableRow = this.createComponentTableRow(entryArray[index]);
-			adjustTableRow(tableRow, odd);
-			adjustSecurityRisks(tableRow);
-			adjustOtherRisks(tableRow, licenseRiskColumnNum);
-			adjustOtherRisks(tableRow, operationRiskColumnNum);
-			odd = !odd;
-			this.myJQuery(tableBody).append(tableRow);
+			try {
+				var tableRow = this.createComponentTableRow(entryArray[index]);
+				adjustTableRow(tableRow, odd);
+				adjustSecurityRisks(tableRow);
+				adjustOtherRisks(tableRow, licenseRiskColumnNum);
+				adjustOtherRisks(tableRow, operationRiskColumnNum);
+				odd = !odd;
+				this.myJQuery(tableBody).append(tableRow);
+			} catch (ex) {
+				console.log("Exception creating table row in Component Table" + ex);
+			}
 		}
 		this.myJQuery(table).append(tableBody);
 		return table;
