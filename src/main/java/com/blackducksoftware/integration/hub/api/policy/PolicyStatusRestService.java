@@ -38,9 +38,7 @@ import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class PolicyStatusRestService extends HubItemRestService<PolicyStatusItem> {
@@ -50,8 +48,8 @@ public class PolicyStatusRestService extends HubItemRestService<PolicyStatusItem
     private static final Type ITEM_LIST_TYPE = new TypeToken<List<PolicyStatusItem>>() {
     }.getType();
 
-    public PolicyStatusRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    public PolicyStatusRestService(final RestConnection restConnection) {
+        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
     }
 
     public PolicyStatusItem getPolicyStatusItem(final String projectId, final String versionId)
@@ -64,7 +62,7 @@ public class PolicyStatusRestService extends HubItemRestService<PolicyStatusItem
         urlSegments.add(versionId);
         urlSegments.add(SEGMENT_POLICY_STATUS);
 
-        final HubRequest policyStatusItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest policyStatusItemRequest = new HubRequest(getRestConnection());
         policyStatusItemRequest.setMethod(Method.GET);
         policyStatusItemRequest.setLimit(1);
         policyStatusItemRequest.addUrlSegments(urlSegments);

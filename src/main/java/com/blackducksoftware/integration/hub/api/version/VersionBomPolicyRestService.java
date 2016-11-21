@@ -27,8 +27,6 @@ import java.util.List;
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.component.version.BomComponentVersionPolicyStatus;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class VersionBomPolicyRestService extends HubItemRestService<BomComponentVersionPolicyStatus> {
@@ -38,9 +36,8 @@ public class VersionBomPolicyRestService extends HubItemRestService<BomComponent
     private static final Type ITEM_LIST_TYPE = new TypeToken<List<BomComponentVersionPolicyStatus>>() {
     }.getType();
 
-    public VersionBomPolicyRestService(final RestConnection restConnection, final Gson gson,
-            final JsonParser jsonParser) {
-        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    public VersionBomPolicyRestService(final RestConnection restConnection) {
+        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
     }
 
 }

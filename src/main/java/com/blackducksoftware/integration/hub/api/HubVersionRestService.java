@@ -28,27 +28,19 @@ import com.blackducksoftware.integration.hub.api.version.VersionComparison;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class HubVersionRestService extends HubRestService {
     private static final List<String> CURRENT_VERSION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION);
 
     private static final List<String> CURRENT_VERSION_COMPARISON_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON);
 
-    private Gson gson;
-
-    private JsonParser jsonParser;
-
-    public HubVersionRestService(RestConnection restConnection, Gson gson, JsonParser jsonParser) {
+    public HubVersionRestService(RestConnection restConnection) {
         super(restConnection);
-        this.gson = gson;
-        this.jsonParser = jsonParser;
     }
 
     public String getHubVersion() throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
-        HubRequest hubVersionRequest = new HubRequest(getRestConnection(), jsonParser);
+        HubRequest hubVersionRequest = new HubRequest(getRestConnection());
         hubVersionRequest.setMethod(Method.GET);
         hubVersionRequest.addUrlSegments(CURRENT_VERSION_SEGMENTS);
 
@@ -59,13 +51,13 @@ public class HubVersionRestService extends HubRestService {
     }
 
     public VersionComparison getHubVersionComparison(String consumerVersion) throws IOException, URISyntaxException, BDRestException {
-        HubRequest hubVersionRequest = new HubRequest(getRestConnection(), new JsonParser());
+        HubRequest hubVersionRequest = new HubRequest(getRestConnection());
         hubVersionRequest.setMethod(Method.GET);
         hubVersionRequest.addUrlSegments(CURRENT_VERSION_COMPARISON_SEGMENTS);
         hubVersionRequest.addQueryParameter(QUERY_VERSION, consumerVersion);
 
         JsonObject jsonObject = hubVersionRequest.executeForResponseJson();
-        VersionComparison versionComparison = gson.fromJson(jsonObject, VersionComparison.class);
+        VersionComparison versionComparison = getRestConnection().getGson().fromJson(jsonObject, VersionComparison.class);
         return versionComparison;
     }
 

@@ -36,9 +36,7 @@ import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class UserRestService extends HubItemRestService<UserItem> {
@@ -50,12 +48,12 @@ public class UserRestService extends HubItemRestService<UserItem> {
     private static final Type ITEM_LIST_TYPE = new TypeToken<List<UserItem>>() {
     }.getType();
 
-    public UserRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    public UserRestService(final RestConnection restConnection) {
+        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
     }
 
     public List<UserItem> getAllUsers() throws URISyntaxException, BDRestException, IOException {
-        final HubRequest userRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest userRequest = new HubRequest(getRestConnection());
         userRequest.setMethod(Method.GET);
         userRequest.addUrlSegments(USERS_SEGMENTS);
         userRequest.setLimit(100);

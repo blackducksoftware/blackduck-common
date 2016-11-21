@@ -25,8 +25,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.HubIntRestService;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
+import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
@@ -52,15 +52,16 @@ public class RiskReportGenerator {
             throws IOException, BDRestException, URISyntaxException, InterruptedException, HubIntegrationException,
             UnexpectedHubResponseException, ProjectDoesNotExistException {
         logger.debug("Waiting for the bom to be updated with the scan results.");
-        final HubEventPolling hubEventPolling = getHubEventPolling(hubReportGenerationInfo.getService());
+        final HubEventPolling hubEventPolling = new HubEventPolling();
 
-        hubEventPolling.assertBomUpToDate(hubReportGenerationInfo, logger);
+        ScanStatusDataService scanStatusDataService = hubReportGenerationInfo.getService().getHubServicesFactory().createScanStatusDataService();
+        hubEventPolling.assertBomUpToDate(scanStatusDataService, hubReportGenerationInfo, logger);
 
         logger.debug("The bom has been updated, generating the report.");
         final String reportUrl = hubReportGenerationInfo.getService()
                 .generateHubReport(hubReportGenerationInfo.getVersion(), ReportFormatEnum.JSON, categories);
 
-        final ReportInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(reportUrl,
+        final ReportInformationItem reportInfo = hubEventPolling.isReportFinishedGenerating(hubReportGenerationInfo.getService(), reportUrl,
                 hubReportGenerationInfo.getMaximumWaitTime());
 
         final List<MetaLink> links = reportInfo.getMeta().getLinks();
@@ -84,10 +85,6 @@ public class RiskReportGenerator {
         hubReportGenerationInfo.getService().deleteHubReport(reportUrl);
 
         return hubRiskReportData;
-    }
-
-    public HubEventPolling getHubEventPolling(final HubIntRestService service) {
-        return new HubEventPolling(service);
     }
 
 }

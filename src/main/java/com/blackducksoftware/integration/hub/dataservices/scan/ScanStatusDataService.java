@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationItem;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationTypeEnum;
@@ -36,7 +37,6 @@ import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionI
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
-import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
@@ -44,10 +44,8 @@ import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistExcept
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 
-public class ScanStatusDataService extends AbstractDataService {
+public class ScanStatusDataService extends HubRestService {
     private static final long FIVE_SECONDS = 5 * 1000;
 
     private final ProjectRestService projectRestService;
@@ -58,11 +56,11 @@ public class ScanStatusDataService extends AbstractDataService {
 
     private final ScanSummaryRestService scanSummaryRestService;
 
-    public ScanStatusDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
+    public ScanStatusDataService(final RestConnection restConnection,
             final ProjectRestService projectRestService, final ProjectVersionRestService projectVersionRestService,
             final CodeLocationRestService codeLocationRestService,
             final ScanSummaryRestService scanSummaryRestService) {
-        super(restConnection, gson, jsonParser);
+        super(restConnection);
         this.projectRestService = projectRestService;
         this.projectVersionRestService = projectVersionRestService;
         this.codeLocationRestService = codeLocationRestService;

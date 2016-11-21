@@ -43,9 +43,7 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ProjectRestService extends HubItemRestService<ProjectItem> {
@@ -57,8 +55,8 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
     private static final Type ITEM_LIST_TYPE = new TypeToken<List<ProjectItem>>() {
     }.getType();
 
-    public ProjectRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    public ProjectRestService(final RestConnection restConnection) {
+        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
     }
 
     public List<ProjectItem> getAllProjects() throws IOException, BDRestException, URISyntaxException {
@@ -103,7 +101,7 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
 
     public String createHubProject(final String projectName) throws IOException, BDRestException, URISyntaxException {
         final ProjectItem newProject = new ProjectItem(null, projectName, null, false, 1, SourceEnum.CUSTOM);
-        final StringRepresentation stringRep = new StringRepresentation(getGson().toJson(newProject));
+        final StringRepresentation stringRep = new StringRepresentation(getRestConnection().getGson().toJson(newProject));
         stringRep.setMediaType(MediaType.APPLICATION_JSON);
         stringRep.setCharacterSet(CharacterSet.UTF_8);
 
@@ -119,7 +117,7 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
     }
 
     private HubRequest createDefaultHubRequest() {
-        final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest projectItemRequest = new HubRequest(getRestConnection());
 
         projectItemRequest.setMethod(Method.GET);
         projectItemRequest.setLimit(100);
@@ -129,7 +127,7 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
     }
 
     private HubRequest createPostHubRequest(StringRepresentation representation) {
-        final HubRequest projectItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest projectItemRequest = new HubRequest(getRestConnection());
 
         projectItemRequest.setMethod(Method.POST);
         projectItemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);

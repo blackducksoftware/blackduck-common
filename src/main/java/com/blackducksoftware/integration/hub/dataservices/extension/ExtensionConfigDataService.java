@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionItem;
@@ -35,7 +36,6 @@ import com.blackducksoftware.integration.hub.api.extension.ExtensionRestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRestService;
 import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkItem;
 import com.blackducksoftware.integration.hub.api.user.UserRestService;
-import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.dataservices.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.dataservices.extension.transformer.UserConfigTransform;
 import com.blackducksoftware.integration.hub.dataservices.parallel.ParallelResourceProcessor;
@@ -43,10 +43,8 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 
-public class ExtensionConfigDataService extends AbstractDataService {
+public class ExtensionConfigDataService extends HubRestService {
     private final IntLogger logger;
 
     private final ExtensionRestService extensionRestService;
@@ -59,12 +57,11 @@ public class ExtensionConfigDataService extends AbstractDataService {
 
     private final ParallelResourceProcessor<UserConfigItem, UserOptionLinkItem> parallelProcessor;
 
-    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
-            final JsonParser jsonParser, final UserRestService userRestService,
+    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserRestService userRestService,
             final ExtensionRestService extensionRestService,
             final ExtensionConfigRestService extensionConfigRestService,
             final ExtensionUserOptionRestService extensionUserOptionRestService) {
-        super(restConnection, gson, jsonParser);
+        super(restConnection);
         this.logger = logger;
         this.extensionRestService = extensionRestService;
         this.extensionConfigRestService = extensionConfigRestService;
@@ -72,7 +69,6 @@ public class ExtensionConfigDataService extends AbstractDataService {
         userConfigTransform = new UserConfigTransform(userRestService, extensionConfigRestService);
         parallelProcessor = new ParallelResourceProcessor<>(logger);
         parallelProcessor.addTransform(UserOptionLinkItem.class, userConfigTransform);
-
     }
 
     public Map<String, ConfigurationItem> getGlobalConfigMap(final String extensionUrl)

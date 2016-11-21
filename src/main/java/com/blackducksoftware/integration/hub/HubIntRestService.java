@@ -32,91 +32,32 @@ import org.restlet.data.Method;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRestService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
+import com.blackducksoftware.integration.hub.api.HubServicesFactory;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
-import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
-import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportInformationItem;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
-import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
-import com.blackducksoftware.integration.hub.api.user.UserRestService;
-import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
-import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
-import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRestService;
-import com.blackducksoftware.integration.hub.dataservices.policystatus.PolicyStatusDataService;
-import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusDataService;
+import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
+import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
-import com.blackducksoftware.integration.hub.exception.VersionDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 public class HubIntRestService {
-    private RestConnection restConnection;
-
-    private final Gson gson;
-
-    private final JsonParser jsonParser;
-
-    private CodeLocationRestService codeLocationRestService;
-
-    private ComponentVersionRestService componentVersionRestService;
-
-    private NotificationRestService notificationRestService;
-
-    private PolicyRestService policyRestService;
-
-    private PolicyStatusRestService policyStatusRestService;
-
-    private ProjectRestService projectRestService;
-
-    private ProjectVersionRestService projectVersionRestService;
-
-    private ReleaseItemRestService releaseItemRestService;
-
-    private ScanSummaryRestService scanSummaryRestService;
-
-    private UserRestService userRestService;
-
-    private VersionBomPolicyRestService versionBomPolicyRestService;
-
-    private VulnerabilityRestService vulnerabilityRestService;
+    private HubServicesFactory hubServicesFactory;
 
     public HubIntRestService(final RestConnection restConnection) throws URISyntaxException {
-        this.restConnection = restConnection;
-
-        this.gson = restConnection.getGson();
-        this.jsonParser = restConnection.getJsonParser();
-
-        this.codeLocationRestService = new CodeLocationRestService(restConnection, gson, jsonParser);
-        this.componentVersionRestService = new ComponentVersionRestService(restConnection, gson, jsonParser);
-        this.notificationRestService = new NotificationRestService(restConnection, gson, jsonParser);
-        this.policyRestService = new PolicyRestService(restConnection, gson, jsonParser);
-        this.policyStatusRestService = new PolicyStatusRestService(restConnection, gson, jsonParser);
-        this.projectRestService = new ProjectRestService(restConnection, gson, jsonParser);
-        this.projectVersionRestService = new ProjectVersionRestService(restConnection, gson, jsonParser);
-        this.releaseItemRestService = new ReleaseItemRestService(restConnection, gson, jsonParser);
-        this.scanSummaryRestService = new ScanSummaryRestService(restConnection, gson, jsonParser);
-        this.userRestService = new UserRestService(restConnection, gson, jsonParser);
-        this.versionBomPolicyRestService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
-        this.vulnerabilityRestService = new VulnerabilityRestService(restConnection, gson, jsonParser);
+        this.hubServicesFactory = new HubServicesFactory(restConnection);
     }
 
     /**
@@ -125,7 +66,7 @@ public class HubIntRestService {
      */
     public List<ProjectItem> getProjectMatches(final String projectName)
             throws IOException, BDRestException, URISyntaxException {
-        return getProjectRestService().getAllProjectMatches(projectName);
+        return hubServicesFactory.createProjectRestService().getAllProjectMatches(projectName);
     }
 
     /**
@@ -135,7 +76,7 @@ public class HubIntRestService {
      */
     public List<ProjectItem> getProjectMatches(final String projectName, final int limit)
             throws IOException, BDRestException, URISyntaxException {
-        return getProjectRestService().getProjectMatches(projectName, limit);
+        return hubServicesFactory.createProjectRestService().getProjectMatches(projectName, limit);
     }
 
     /**
@@ -144,16 +85,16 @@ public class HubIntRestService {
      */
     public ProjectItem getProjectByName(final String projectName)
             throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
-        return getProjectRestService().getProjectByName(projectName);
+        return hubServicesFactory.createProjectRestService().getProjectByName(projectName);
     }
 
     public ProjectItem getProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
-        return getProjectRestService().getItem(projectUrl);
+        return hubServicesFactory.createProjectRestService().getItem(projectUrl);
     }
 
     public ProjectVersionItem getProjectVersion(final String versionUrl)
             throws IOException, BDRestException, URISyntaxException {
-        return projectVersionRestService.getItem(versionUrl);
+        return hubServicesFactory.createProjectVersionRestService().getItem(versionUrl);
     }
 
     /**
@@ -161,37 +102,17 @@ public class HubIntRestService {
      *
      */
     public ProjectVersionItem getVersion(final ProjectItem project, final String versionName) throws IOException,
-            BDRestException, URISyntaxException, VersionDoesNotExistException, UnexpectedHubResponseException {
-        final List<ProjectVersionItem> versions = getProjectVersionsForProject(project);
-        for (final ProjectVersionItem version : versions) {
-            if (version.getVersionName().equals(versionName)) {
-                return version;
-            }
-        }
-        throw new VersionDoesNotExistException(
-                "This Version does not exist. Project : " + project.getName() + " Version : " + versionName);
+            BDRestException, URISyntaxException, UnexpectedHubResponseException {
+        return hubServicesFactory.createProjectVersionRestService().getProjectVersion(project, versionName);
     }
 
     public List<ProjectVersionItem> getProjectVersionsForProject(final ProjectItem project)
             throws UnexpectedHubResponseException, IOException, URISyntaxException, BDRestException {
-        final String versionsUrl = getVersionsUrl(project);
-        final List<ProjectVersionItem> allProjectVersions = projectVersionRestService
-                .getAllProjectVersions(versionsUrl);
-        return allProjectVersions;
-    }
-
-    private String getVersionsUrl(final ProjectItem project) throws UnexpectedHubResponseException {
-        final List<String> versionLinks = project.getLinks(ProjectItem.VERSION_LINK);
-        if (versionLinks.size() != 1) {
-            throw new UnexpectedHubResponseException("The project " + project.getName() + " has " + versionLinks.size()
-                    + " " + ProjectItem.VERSION_LINK + " links; expected one");
-        }
-        final String versionLink = versionLinks.get(0);
-        return versionLink;
+        return hubServicesFactory.createProjectVersionRestService().getAllProjectVersions(project);
     }
 
     private String getVersionReportLink(final ProjectVersionItem version) throws UnexpectedHubResponseException {
-        final List<String> versionLinks = version.getLinks(ReleaseItem.VERSION_REPORT_LINK);
+        final List<String> versionLinks = version.getLinks("versionReport");
         if (versionLinks.size() != 1) {
             throw new UnexpectedHubResponseException("The release " + version.getVersionName() + " has "
                     + versionLinks.size() + " " + ProjectItem.VERSION_LINK + " links; expected one");
@@ -206,7 +127,7 @@ public class HubIntRestService {
      * @return the project URL.
      */
     public String createHubProject(final String projectName) throws IOException, BDRestException, URISyntaxException {
-        return getProjectRestService().createHubProject(projectName);
+        return hubServicesFactory.createProjectRestService().createHubProject(projectName);
     }
 
     public void deleteHubProject(final ProjectItem project) throws IOException, BDRestException, URISyntaxException {
@@ -223,7 +144,7 @@ public class HubIntRestService {
      *
      */
     public void deleteHubProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
-        getProjectRestService().deleteItem(projectUrl);
+        hubServicesFactory.createProjectRestService().deleteItem(projectUrl);
     }
 
     /**
@@ -233,10 +154,10 @@ public class HubIntRestService {
      * @return the version URL
      *
      */
-    public String createHubVersion(final ProjectItem project, final String versionName, final String phase,
-            final String dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
+    public String createHubVersion(final ProjectItem project, final String versionName, final PhaseEnum phase,
+            final DistributionEnum dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
 
-        return getProjectVersionRestService().createHubVersion(project, versionName, phase, dist);
+        return hubServicesFactory.createProjectVersionRestService().createHubVersion(project, versionName, phase, dist);
     }
 
     /**
@@ -263,12 +184,12 @@ public class HubIntRestService {
             json.add("categories", categoriesJson);
         }
 
-        final StringRepresentation stringRep = new StringRepresentation(gson.toJson(json));
+        final StringRepresentation stringRep = new StringRepresentation(hubServicesFactory.getRestConnection().getGson().toJson(json));
         stringRep.setMediaType(MediaType.APPLICATION_JSON);
         stringRep.setCharacterSet(CharacterSet.UTF_8);
         String location = null;
         try {
-            location = getRestConnection().httpPostFromAbsoluteUrl(getVersionReportLink(version), stringRep);
+            location = hubServicesFactory.getRestConnection().httpPostFromAbsoluteUrl(getVersionReportLink(version), stringRep);
         } catch (final ResourceDoesNotExistException ex) {
             throw new BDRestException("There was a problem generating a report for this Version.", ex,
                     ex.getResource());
@@ -278,14 +199,13 @@ public class HubIntRestService {
     }
 
     public int deleteHubReport(final String reportUrl) throws IOException, BDRestException, URISyntaxException {
-
-        final ClientResource resource = getRestConnection().createClientResource(reportUrl);
+        final ClientResource resource = hubServicesFactory.getRestConnection().createClientResource(reportUrl);
         try {
             resource.setMethod(Method.DELETE);
-            getRestConnection().handleRequest(resource);
+            hubServicesFactory.getRestConnection().handleRequest(resource);
 
             final int responseCode = resource.getResponse().getStatus().getCode();
-            if (!getRestConnection().isSuccess(responseCode)) {
+            if (!hubServicesFactory.getRestConnection().isSuccess(responseCode)) {
                 throw new BDRestException("There was a problem deleting this report. Error Code: " + responseCode,
                         resource);
             }
@@ -297,7 +217,7 @@ public class HubIntRestService {
 
     public ReportInformationItem getReportInformation(final String reportUrl)
             throws IOException, BDRestException, URISyntaxException {
-        final ClientResource resource = getRestConnection().createClientResource(reportUrl);
+        final ClientResource resource = hubServicesFactory.getRestConnection().createClientResource(reportUrl);
         try {
             // Restlet 2.3.3 and lower use
             // @SuppressWarnings("unchecked")
@@ -314,12 +234,12 @@ public class HubIntRestService {
 
             resource.setMethod(Method.GET);
 
-            getRestConnection().handleRequest(resource);
+            hubServicesFactory.getRestConnection().handleRequest(resource);
             final int responseCode = resource.getResponse().getStatus().getCode();
 
-            if (getRestConnection().isSuccess(responseCode)) {
-                final String response = getRestConnection().readResponseAsString(resource.getResponse());
-                return gson.fromJson(response, ReportInformationItem.class);
+            if (hubServicesFactory.getRestConnection().isSuccess(responseCode)) {
+                final String response = hubServicesFactory.getRestConnection().readResponseAsString(resource.getResponse());
+                return hubServicesFactory.getRestConnection().getGson().fromJson(response, ReportInformationItem.class);
             } else {
                 throw new BDRestException(
                         "There was a problem getting the links for the specified report. Error Code: " + responseCode,
@@ -336,27 +256,27 @@ public class HubIntRestService {
      */
     public VersionReport getReportContent(final String reportContentUrl)
             throws IOException, BDRestException, URISyntaxException {
-        final ClientResource resource = getRestConnection().createClientResource(reportContentUrl);
+        final ClientResource resource = hubServicesFactory.getRestConnection().createClientResource(reportContentUrl);
         try {
             resource.setMethod(Method.GET);
 
-            getRestConnection().handleRequest(resource);
+            hubServicesFactory.getRestConnection().handleRequest(resource);
             final int responseCode = resource.getResponse().getStatus().getCode();
 
-            if (getRestConnection().isSuccess(responseCode)) {
-                final String response = getRestConnection().readResponseAsString(resource.getResponse());
+            if (hubServicesFactory.getRestConnection().isSuccess(responseCode)) {
+                final String response = hubServicesFactory.getRestConnection().readResponseAsString(resource.getResponse());
 
-                final JsonObject json = jsonParser.parse(response).getAsJsonObject();
+                final JsonObject json = hubServicesFactory.getRestConnection().getJsonParser().parse(response).getAsJsonObject();
                 final JsonElement content = json.get("reportContent");
                 final JsonArray reportConentArray = content.getAsJsonArray();
                 final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
 
-                final VersionReport report = gson.fromJson(reportFile.get("fileContent"), VersionReport.class);
+                final VersionReport report = hubServicesFactory.getRestConnection().getGson().fromJson(reportFile.get("fileContent"), VersionReport.class);
 
                 return report;
             } else if (responseCode == 412) {
-                final String response = getRestConnection().readResponseAsString(resource.getResponse());
-                final JsonObject json = jsonParser.parse(response).getAsJsonObject();
+                final String response = hubServicesFactory.getRestConnection().readResponseAsString(resource.getResponse());
+                final JsonObject json = hubServicesFactory.getRestConnection().getJsonParser().parse(response).getAsJsonObject();
                 final String errorMessage = json.get("errorMessage").getAsString();
                 throw new BDRestException(errorMessage + " Error Code: " + responseCode, resource);
             } else {
@@ -374,7 +294,7 @@ public class HubIntRestService {
         if (StringUtils.isBlank(policyStatusUrl)) {
             throw new IllegalArgumentException("Missing the policy status URL.");
         }
-        return getPolicyStatusRestService().getItem(policyStatusUrl);
+        return hubServicesFactory.createPolicyStatusRestService().getItem(policyStatusUrl);
     }
 
     /**
@@ -382,7 +302,7 @@ public class HubIntRestService {
      */
     public ScanSummaryItem checkScanStatus(final String scanStatusUrl)
             throws IOException, BDRestException, URISyntaxException {
-        return getScanSummaryRestService().getItem(scanStatusUrl);
+        return hubServicesFactory.createScanSummaryRestService().getItem(scanStatusUrl);
     }
 
     /**
@@ -395,29 +315,7 @@ public class HubIntRestService {
      *             Returns the registration ID of the hub instance
      */
     public String getRegistrationId() throws URISyntaxException, BDRestException, IOException, JsonSyntaxException {
-        final ClientResource resource = getRestConnection().createClientResource();
-        try {
-            resource.addSegment("api");
-            resource.addSegment("v1");
-            resource.addSegment("registrations");
-            resource.setMethod(Method.GET);
-
-            getRestConnection().handleRequest(resource);
-            final int responseCode = resource.getResponse().getStatus().getCode();
-            if (responseCode == 200) {
-                final String response = getRestConnection().readResponseAsString(resource.getResponse());
-                final JsonElement je = jsonParser.parse(response);
-                final JsonObject jo = je.getAsJsonObject();
-                final JsonElement je2 = jo.get("registrationId");
-                final String regId = je2.getAsString();
-                return regId;
-            } else {
-                throw new BDRestException(
-                        "There was a problem getting the registration ID. Error Code: " + responseCode, resource);
-            }
-        } finally {
-            releaseResource(resource);
-        }
+        return hubServicesFactory.createHubRegistrationRestService().getRegistrationId();
     }
 
     private void releaseResource(final ClientResource resource) {
@@ -427,126 +325,8 @@ public class HubIntRestService {
         resource.release();
     }
 
-    public RestConnection getRestConnection() {
-        return restConnection;
-    }
-
-    public void setRestConnection(final RestConnection restConnection) {
-        this.restConnection = restConnection;
-    }
-
-    public Gson getGson() {
-        return gson;
-    }
-
-    public JsonParser getJsonParser() {
-        return jsonParser;
-    }
-
-    public CodeLocationRestService getCodeLocationRestService() {
-        return codeLocationRestService;
-    }
-
-    public void setCodeLocationRestService(final CodeLocationRestService codeLocationRestService) {
-        this.codeLocationRestService = codeLocationRestService;
-    }
-
-    public ComponentVersionRestService getComponentVersionRestService() {
-        return componentVersionRestService;
-    }
-
-    public void setComponentVersionRestService(final ComponentVersionRestService componentVersionRestService) {
-        this.componentVersionRestService = componentVersionRestService;
-    }
-
-    public NotificationRestService getNotificationRestService() {
-        return notificationRestService;
-    }
-
-    public void setNotificationRestService(final NotificationRestService notificationRestService) {
-        this.notificationRestService = notificationRestService;
-    }
-
-    public PolicyRestService getPolicyRestService() {
-        return policyRestService;
-    }
-
-    public void setPolicyRestService(final PolicyRestService policyRestService) {
-        this.policyRestService = policyRestService;
-    }
-
-    public PolicyStatusRestService getPolicyStatusRestService() {
-        return policyStatusRestService;
-    }
-
-    public void setPolicyStatusRestService(final PolicyStatusRestService policyStatusRestService) {
-        this.policyStatusRestService = policyStatusRestService;
-    }
-
-    public ProjectRestService getProjectRestService() {
-        return projectRestService;
-    }
-
-    public void setProjectRestService(final ProjectRestService projectRestService) {
-        this.projectRestService = projectRestService;
-    }
-
-    public ProjectVersionRestService getProjectVersionRestService() {
-        return projectVersionRestService;
-    }
-
-    public void setProjectVersionRestService(final ProjectVersionRestService projectVersionRestService) {
-        this.projectVersionRestService = projectVersionRestService;
-    }
-
-    public ReleaseItemRestService getReleaseItemRestService() {
-        return releaseItemRestService;
-    }
-
-    public void setReleaseItemRestService(final ReleaseItemRestService releaseItemRestService) {
-        this.releaseItemRestService = releaseItemRestService;
-    }
-
-    public ScanSummaryRestService getScanSummaryRestService() {
-        return scanSummaryRestService;
-    }
-
-    public void setScanSummaryRestService(final ScanSummaryRestService scanSummaryRestService) {
-        this.scanSummaryRestService = scanSummaryRestService;
-    }
-
-    public UserRestService getUserRestService() {
-        return userRestService;
-    }
-
-    public void setUserRestService(final UserRestService userRestService) {
-        this.userRestService = userRestService;
-    }
-
-    public VersionBomPolicyRestService getVersionBomPolicyRestService() {
-        return versionBomPolicyRestService;
-    }
-
-    public void setVersionBomPolicyRestService(final VersionBomPolicyRestService versionBomPolicyRestService) {
-        this.versionBomPolicyRestService = versionBomPolicyRestService;
-    }
-
-    public VulnerabilityRestService getVulnerabilityRestService() {
-        return vulnerabilityRestService;
-    }
-
-    public void setVulnerabilityRestService(final VulnerabilityRestService vulnerabilityRestService) {
-        this.vulnerabilityRestService = vulnerabilityRestService;
-    }
-
-    public PolicyStatusDataService getPolicyStatusDataService() {
-        return new PolicyStatusDataService(restConnection, gson, jsonParser, projectRestService,
-                projectVersionRestService, policyStatusRestService);
-    }
-
-    public ScanStatusDataService getScanStatusDataService() {
-        return new ScanStatusDataService(restConnection, gson, jsonParser, projectRestService, projectVersionRestService,
-                codeLocationRestService, scanSummaryRestService);
+    public HubServicesFactory getHubServicesFactory() {
+        return hubServicesFactory;
     }
 
 }

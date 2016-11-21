@@ -31,13 +31,13 @@ public class ComponentRestService extends HubItemRestService<ComponentItem> {
     private static Type ITEM_LIST_TYPE = new TypeToken<List<ComponentItem>>() {
     }.getType();
 
-    public ComponentRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    public ComponentRestService(final RestConnection restConnection) {
+        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
     }
 
     public List<ComponentItem> getAllComponents(final String id, final String groupId, final String artifactId,
             final String version) throws IOException, BDRestException, URISyntaxException {
-        final HubRequest componentItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest componentItemRequest = new HubRequest(getRestConnection());
         final ComponentQuery componentQuery = new ComponentQuery(id, groupId, artifactId, version);
 
         componentItemRequest.setMethod(Method.GET);

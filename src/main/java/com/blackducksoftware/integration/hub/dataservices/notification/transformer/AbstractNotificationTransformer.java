@@ -27,7 +27,7 @@ import com.blackducksoftware.integration.hub.api.component.version.ComponentVers
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
-import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
 import com.blackducksoftware.integration.hub.dataservices.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
@@ -37,7 +37,7 @@ public abstract class AbstractNotificationTransformer
         implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
     private final NotificationRestService notificationService;
 
-    private final ReleaseItemRestService projectVersionService;
+    private final ProjectVersionRestService projectVersionService;
 
     private final PolicyRestService policyService;
 
@@ -46,7 +46,7 @@ public abstract class AbstractNotificationTransformer
     private final ComponentVersionRestService componentVersionService;
 
     public AbstractNotificationTransformer(final NotificationRestService notificationService,
-            final ReleaseItemRestService projectVersionService, final PolicyRestService policyService,
+            final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
             final VersionBomPolicyRestService bomVersionPolicyService,
             final ComponentVersionRestService componentVersionService) {
         this.notificationService = notificationService;
@@ -60,7 +60,7 @@ public abstract class AbstractNotificationTransformer
         return notificationService;
     }
 
-    public ReleaseItemRestService getProjectVersionService() {
+    public ProjectVersionRestService getProjectVersionService() {
         return projectVersionService;
     }
 

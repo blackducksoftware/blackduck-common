@@ -36,9 +36,7 @@ import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class CodeLocationRestService extends HubItemRestService<CodeLocationItem> {
@@ -50,12 +48,12 @@ public class CodeLocationRestService extends HubItemRestService<CodeLocationItem
     private static Type ITEM_LIST_TYPE = new TypeToken<List<CodeLocationItem>>() {
     }.getType();
 
-    public CodeLocationRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    public CodeLocationRestService(final RestConnection restConnection) {
+        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
     }
 
     public List<CodeLocationItem> getAllCodeLocations() throws IOException, BDRestException, URISyntaxException {
-        final HubRequest codeLocationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest codeLocationItemRequest = new HubRequest(getRestConnection());
         codeLocationItemRequest.setMethod(Method.GET);
         codeLocationItemRequest.setLimit(100);
         codeLocationItemRequest.addUrlSegments(CODE_LOCATION_SEGMENTS);
@@ -67,7 +65,7 @@ public class CodeLocationRestService extends HubItemRestService<CodeLocationItem
 
     public List<CodeLocationItem> getAllCodeLocationsForCodeLocationType(final CodeLocationTypeEnum codeLocationType)
             throws IOException, BDRestException, URISyntaxException {
-        final HubRequest codeLocationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest codeLocationItemRequest = new HubRequest(getRestConnection());
         codeLocationItemRequest.setMethod(Method.GET);
         codeLocationItemRequest.setLimit(100);
         codeLocationItemRequest.addQueryParameter("codeLocationType", codeLocationType.toString());

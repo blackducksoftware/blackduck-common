@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
@@ -36,10 +37,9 @@ import com.blackducksoftware.integration.hub.api.notification.RuleViolationClear
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
-import com.blackducksoftware.integration.hub.api.project.ReleaseItemRestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
-import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationClearedTransformer;
@@ -51,62 +51,63 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 
-public class NotificationDataService extends AbstractDataService {
-    private final NotificationRestService notificationService;
+public class NotificationDataService extends HubRestService {
+    private final NotificationRestService notificationRestService;
 
-    private final ReleaseItemRestService releaseItemService;
+    private final ProjectVersionRestService projectVersionRestService;
 
-    private final PolicyRestService policyService;
+    private final PolicyRestService policyRestService;
 
-    private final VersionBomPolicyRestService bomVersionPolicyService;
+    private final VersionBomPolicyRestService versionBomPolicyRestService;
 
-    private final ComponentVersionRestService componentVersionService;
+    private final ComponentVersionRestService componentVersionRestService;
 
-    private PolicyNotificationFilter policyFilter = null;
+    private final PolicyNotificationFilter policyNotificationFilter;
 
     private final ParallelResourceProcessor<NotificationContentItem, NotificationItem> parallelProcessor;
 
-    public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
-            final JsonParser jsonParser) {
-        this(logger, restConnection, gson, jsonParser, null);
+    public NotificationDataService(IntLogger logger, RestConnection restConnection, NotificationRestService notificationRestService,
+            ProjectVersionRestService projectVersionRestService, PolicyRestService policyRestService, VersionBomPolicyRestService versionBomPolicyRestService,
+            ComponentVersionRestService componentVersionRestService) {
+        this(logger, restConnection, notificationRestService, projectVersionRestService, policyRestService, versionBomPolicyRestService,
+                componentVersionRestService, null);
     }
 
-    public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final Gson gson,
-            final JsonParser jsonParser, final PolicyNotificationFilter policyFilter) {
-        super(restConnection, gson, jsonParser);
-        this.policyFilter = policyFilter;
+    public NotificationDataService(IntLogger logger, RestConnection restConnection, NotificationRestService notificationRestService,
+            ProjectVersionRestService projectVersionRestService, PolicyRestService policyRestService, VersionBomPolicyRestService versionBomPolicyRestService,
+            ComponentVersionRestService componentVersionRestService, PolicyNotificationFilter policyNotificationFilter) {
+        super(restConnection);
+        this.notificationRestService = notificationRestService;
+        this.projectVersionRestService = projectVersionRestService;
+        this.policyRestService = policyRestService;
+        this.versionBomPolicyRestService = versionBomPolicyRestService;
+        this.componentVersionRestService = componentVersionRestService;
+        this.policyNotificationFilter = policyNotificationFilter;
+        this.parallelProcessor = new ParallelResourceProcessor<>(logger);
 
-        notificationService = new NotificationRestService(restConnection, gson, jsonParser);
-        releaseItemService = new ReleaseItemRestService(restConnection, gson, jsonParser);
-        policyService = new PolicyRestService(restConnection, gson, jsonParser);
-        bomVersionPolicyService = new VersionBomPolicyRestService(restConnection, gson, jsonParser);
-        componentVersionService = new ComponentVersionRestService(restConnection, gson, jsonParser);
-        parallelProcessor = new ParallelResourceProcessor<>(logger);
         populateTransformerMap();
     }
 
     private void populateTransformerMap() {
         parallelProcessor.addTransform(RuleViolationNotificationItem.class,
-                new PolicyViolationTransformer(notificationService, releaseItemService, policyService,
-                        bomVersionPolicyService, componentVersionService, policyFilter));
+                new PolicyViolationTransformer(notificationRestService, projectVersionRestService, policyRestService,
+                        versionBomPolicyRestService, componentVersionRestService, policyNotificationFilter));
         parallelProcessor.addTransform(PolicyOverrideNotificationItem.class,
-                new PolicyViolationOverrideTransformer(notificationService, releaseItemService, policyService,
-                        bomVersionPolicyService, componentVersionService, policyFilter));
+                new PolicyViolationOverrideTransformer(notificationRestService, projectVersionRestService, policyRestService,
+                        versionBomPolicyRestService, componentVersionRestService, policyNotificationFilter));
         parallelProcessor.addTransform(VulnerabilityNotificationItem.class,
-                new VulnerabilityTransformer(notificationService, releaseItemService, policyService,
-                        bomVersionPolicyService, componentVersionService));
+                new VulnerabilityTransformer(notificationRestService, projectVersionRestService, policyRestService,
+                        versionBomPolicyRestService, componentVersionRestService));
         parallelProcessor.addTransform(RuleViolationClearedNotificationItem.class,
-                new PolicyViolationClearedTransformer(notificationService, releaseItemService, policyService,
-                        bomVersionPolicyService, componentVersionService, policyFilter));
+                new PolicyViolationClearedTransformer(notificationRestService, projectVersionRestService, policyRestService,
+                        versionBomPolicyRestService, componentVersionRestService, policyNotificationFilter));
     }
 
     public SortedSet<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
             throws IOException, URISyntaxException, BDRestException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
-        final List<NotificationItem> itemList = notificationService.getAllNotifications(startDate, endDate);
+        final List<NotificationItem> itemList = notificationRestService.getAllNotifications(startDate, endDate);
         contentList.addAll(parallelProcessor.process(itemList));
         return contentList;
     }
@@ -114,8 +115,9 @@ public class NotificationDataService extends AbstractDataService {
     public SortedSet<NotificationContentItem> getUserNotifications(final Date startDate, final Date endDate, UserItem user)
             throws IOException, URISyntaxException, BDRestException, UnexpectedHubResponseException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
-        final List<NotificationItem> itemList = notificationService.getUserNotifications(startDate, endDate, user);
+        final List<NotificationItem> itemList = notificationRestService.getUserNotifications(startDate, endDate, user);
         contentList.addAll(parallelProcessor.process(itemList));
         return contentList;
     }
+
 }

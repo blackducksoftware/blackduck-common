@@ -32,25 +32,16 @@ import org.restlet.data.Method;
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class HubItemRestService<T extends HubItem> extends HubRestService {
-    private final Gson gson;
-
-    private final JsonParser jsonParser;
-
     private final Type itemType;
 
     private final Type itemListType;
 
-    public HubItemRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
-            final Type itemType, final Type itemListType) {
+    public HubItemRestService(final RestConnection restConnection, final Type itemType, final Type itemListType) {
         super(restConnection);
 
-        this.gson = gson;
-        this.jsonParser = jsonParser;
         this.itemType = itemType;
         this.itemListType = itemListType;
     }
@@ -76,36 +67,36 @@ public class HubItemRestService<T extends HubItem> extends HubRestService {
     }
 
     public List<T> getItems(final JsonObject jsonObject) {
-        final List<T> items = gson.fromJson(jsonObject.get("items"), itemListType);
+        final List<T> items = getRestConnection().getGson().fromJson(jsonObject.get("items"), itemListType);
         return items;
     }
 
     public List<T> getItems(final String url) throws IOException, URISyntaxException, BDRestException {
-        final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
+        final HubRequest itemRequest = new HubRequest(getRestConnection());
         itemRequest.setMethod(Method.GET);
         itemRequest.setUrl(url);
 
         final String response = itemRequest.executeForResponseString();
-        return gson.fromJson(response, itemListType);
+        return getRestConnection().getGson().fromJson(response, itemListType);
     }
 
     public T getItem(final JsonObject jsonObject, final Class<T> clazz) {
-        return gson.fromJson(jsonObject, clazz);
+        return getRestConnection().getGson().fromJson(jsonObject, clazz);
     }
 
     public T getItem(final String url) throws IOException, BDRestException, URISyntaxException {
-        final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
+        final HubRequest itemRequest = new HubRequest(getRestConnection());
         itemRequest.setMethod(Method.GET);
         itemRequest.setUrl(url);
         itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
         itemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
 
         final String response = itemRequest.executeForResponseString();
-        return gson.fromJson(response, itemType);
+        return getRestConnection().getGson().fromJson(response, itemType);
     }
 
     public void deleteItem(final String url) throws IOException, BDRestException, URISyntaxException {
-        final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
+        final HubRequest itemRequest = new HubRequest(getRestConnection());
         itemRequest.setMethod(Method.DELETE);
         itemRequest.setUrl(url);
         itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
@@ -115,22 +106,14 @@ public class HubItemRestService<T extends HubItem> extends HubRestService {
     }
 
     public T getItem(final List<String> urlSegments) throws IOException, BDRestException, URISyntaxException {
-        final HubRequest itemRequest = new HubRequest(getRestConnection(), jsonParser);
+        final HubRequest itemRequest = new HubRequest(getRestConnection());
         itemRequest.setMethod(Method.GET);
         itemRequest.addUrlSegments(urlSegments);
         itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
         itemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
 
         final String response = itemRequest.executeForResponseString();
-        return gson.fromJson(response, itemType);
-    }
-
-    public Gson getGson() {
-        return gson;
-    }
-
-    public JsonParser getJsonParser() {
-        return jsonParser;
+        return getRestConnection().getGson().fromJson(response, itemType);
     }
 
     public Type getItemType() {
