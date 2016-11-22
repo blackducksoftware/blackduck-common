@@ -23,7 +23,6 @@ package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;

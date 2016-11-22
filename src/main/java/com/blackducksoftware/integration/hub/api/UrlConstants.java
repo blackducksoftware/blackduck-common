@@ -61,6 +61,8 @@ public class UrlConstants {
 
     public static final String SEGMENT_VULNERABILITIES = "vulnerabilities";
 
+    public static final String SEGMENT_REGISTRATIONS = "registrations";
+
     // query parameters
     public static final String QUERY_OFFSET = "offset";
 

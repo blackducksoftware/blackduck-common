@@ -32,9 +32,7 @@ import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class VulnerableBomComponentRestService extends HubItemRestService<VulnerableBomComponentItem> {
@@ -44,15 +42,14 @@ public class VulnerableBomComponentRestService extends HubItemRestService<Vulner
     private static final Type ITEM_LIST_TYPE = new TypeToken<List<VulnerableBomComponentItem>>() {
     }.getType();
 
-    public VulnerableBomComponentRestService(final RestConnection restConnection, final Gson gson,
-            final JsonParser jsonParser) {
-        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    public VulnerableBomComponentRestService(final RestConnection restConnection) {
+        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
     }
 
     public List<VulnerableBomComponentItem> getVulnerableComponentsMatchingComponentName(
             final String vulnerableBomComponentsUrl, final String componentName)
             throws IOException, URISyntaxException, BDRestException {
-        final HubRequest itemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest itemRequest = new HubRequest(getRestConnection());
         itemRequest.setMethod(Method.GET);
         itemRequest.setUrl(vulnerableBomComponentsUrl);
         itemRequest.setQ(componentName);

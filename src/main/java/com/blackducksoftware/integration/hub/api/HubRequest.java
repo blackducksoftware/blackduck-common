@@ -42,14 +42,11 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class HubRequest {
     public static final int EXCLUDE_INTEGER_QUERY_PARAMETER = -999;
 
     private final RestConnection restConnection;
-
-    private final JsonParser jsonParser;
 
     private Method method;
 
@@ -65,9 +62,8 @@ public class HubRequest {
 
     private String q;
 
-    public HubRequest(final RestConnection restConnection, final JsonParser jsonParser) {
+    public HubRequest(final RestConnection restConnection) {
         this.restConnection = restConnection;
-        this.jsonParser = jsonParser;
     }
 
     public JsonObject executeForResponseJson() throws IOException, URISyntaxException, BDRestException {
@@ -79,7 +75,7 @@ public class HubRequest {
             final int responseCode = response.getStatus().getCode();
             if (restConnection.isSuccess(responseCode)) {
                 final String responseString = restConnection.readResponseAsString(response);
-                final JsonObject jsonObject = jsonParser.parse(responseString).getAsJsonObject();
+                final JsonObject jsonObject = restConnection.getJsonParser().parse(responseString).getAsJsonObject();
                 return jsonObject;
             } else {
                 final String message = String.format("Request was not successful. (responseCode: %s)", responseCode);
@@ -124,6 +120,11 @@ public class HubRequest {
         final ClientResource clientResource = buildClientResource(restConnection);
         try {
             restConnection.handleRequest(clientResource);
+            final int responseCode = clientResource.getResponse().getStatus().getCode();
+            if (!restConnection.isSuccess(responseCode)) {
+                throw new BDRestException("There was a problem deleting this item : " + url + ". Error Code: " + responseCode,
+                        clientResource);
+            }
         } finally {
             releaseResource(clientResource);
         }

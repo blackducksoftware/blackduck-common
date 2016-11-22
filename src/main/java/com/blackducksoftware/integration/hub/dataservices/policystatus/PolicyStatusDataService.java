@@ -25,33 +25,30 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.dataservices.AbstractDataService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 
-public class PolicyStatusDataService extends AbstractDataService {
+public class PolicyStatusDataService extends HubRestService {
     private final ProjectRestService projectRestService;
 
     private final ProjectVersionRestService projectVersionRestService;
 
     private final PolicyStatusRestService policyStatusRestService;
 
-    public PolicyStatusDataService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser,
-            final ProjectRestService projectRestService, final ProjectVersionRestService projectVersionRestService,
-            final PolicyStatusRestService policyStatusRestService) {
-        super(restConnection, gson, jsonParser);
+    public PolicyStatusDataService(final RestConnection restConnection, final ProjectRestService projectRestService,
+            final ProjectVersionRestService projectVersionRestService, final PolicyStatusRestService policyStatusRestService) {
+        super(restConnection);
         this.projectRestService = projectRestService;
         this.projectVersionRestService = projectVersionRestService;
         this.policyStatusRestService = policyStatusRestService;

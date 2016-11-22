@@ -239,4 +239,8 @@ public class CLILocation {
         return urlBuilder.toString();
     }
 
+    public File getDirectoryToInstallTo() {
+        return directoryToInstallTo;
+    }
+
 }

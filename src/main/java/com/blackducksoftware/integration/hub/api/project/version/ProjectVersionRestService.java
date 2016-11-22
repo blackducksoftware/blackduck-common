@@ -35,14 +35,13 @@ import org.restlet.representation.StringRepresentation;
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
-import com.blackducksoftware.integration.hub.api.version.ReleaseItem;
+import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
+import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ProjectVersionRestService extends HubItemRestService<ProjectVersionItem> {
@@ -52,9 +51,8 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
     private static final Type ITEM_LIST_TYPE = new TypeToken<List<ProjectVersionItem>>() {
     }.getType();
 
-    public ProjectVersionRestService(final RestConnection restConnection, final Gson gson,
-            final JsonParser jsonParser) {
-        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    public ProjectVersionRestService(final RestConnection restConnection) {
+        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
     }
 
     public ProjectVersionItem getProjectVersion(ProjectItem project, String projectVersionName)
@@ -93,15 +91,15 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
         return versionsUrl;
     }
 
-    public String createHubVersion(final ProjectItem project, final String versionName, final String phase,
-            final String dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
-        final ReleaseItem newRelease = new ReleaseItem(versionName, phase, dist, null, null);
+    public String createHubVersion(final ProjectItem project, final String versionName, final PhaseEnum phase,
+            final DistributionEnum dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
+        final ProjectVersionItem newRelease = new ProjectVersionItem(null, dist, null, null, phase, null, null, null, versionName);
 
-        final StringRepresentation stringRep = new StringRepresentation(getGson().toJson(newRelease));
+        final StringRepresentation stringRep = new StringRepresentation(getRestConnection().getGson().toJson(newRelease));
         stringRep.setMediaType(MediaType.APPLICATION_JSON);
         stringRep.setCharacterSet(CharacterSet.UTF_8);
 
-        final HubRequest projectVersionItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest projectVersionItemRequest = new HubRequest(getRestConnection());
         projectVersionItemRequest.setMethod(Method.POST);
         projectVersionItemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
         projectVersionItemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
@@ -123,7 +121,7 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
     }
 
     private HubRequest createDefaultHubRequest(String versionsUrl) {
-        final HubRequest projectVersionItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest projectVersionItemRequest = new HubRequest(getRestConnection());
 
         projectVersionItemRequest.setMethod(Method.GET);
         projectVersionItemRequest.setLimit(100);

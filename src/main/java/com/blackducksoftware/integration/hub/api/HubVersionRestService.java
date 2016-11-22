@@ -1,14 +1,24 @@
-/*
- * Copyright (C) 2016 Black Duck Software Inc.
+/*******************************************************************************
+ * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- * All rights reserved.
  *
- * This software is the confidential and proprietary information of
- * Black Duck Software ("Confidential Information"). You shall not
- * disclose such Confidential Information and shall use it only in
- * accordance with the terms of the license agreement you entered into
- * with Black Duck Software.
- */
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *******************************************************************************/
 package com.blackducksoftware.integration.hub.api;
 
 import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_VERSION;
@@ -28,27 +38,19 @@ import com.blackducksoftware.integration.hub.api.version.VersionComparison;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class HubVersionRestService extends HubRestService {
     private static final List<String> CURRENT_VERSION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION);
 
     private static final List<String> CURRENT_VERSION_COMPARISON_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON);
 
-    private Gson gson;
-
-    private JsonParser jsonParser;
-
-    public HubVersionRestService(RestConnection restConnection, Gson gson, JsonParser jsonParser) {
+    public HubVersionRestService(RestConnection restConnection) {
         super(restConnection);
-        this.gson = gson;
-        this.jsonParser = jsonParser;
     }
 
     public String getHubVersion() throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
-        HubRequest hubVersionRequest = new HubRequest(getRestConnection(), jsonParser);
+        HubRequest hubVersionRequest = new HubRequest(getRestConnection());
         hubVersionRequest.setMethod(Method.GET);
         hubVersionRequest.addUrlSegments(CURRENT_VERSION_SEGMENTS);
 
@@ -59,13 +61,13 @@ public class HubVersionRestService extends HubRestService {
     }
 
     public VersionComparison getHubVersionComparison(String consumerVersion) throws IOException, URISyntaxException, BDRestException {
-        HubRequest hubVersionRequest = new HubRequest(getRestConnection(), new JsonParser());
+        HubRequest hubVersionRequest = new HubRequest(getRestConnection());
         hubVersionRequest.setMethod(Method.GET);
         hubVersionRequest.addUrlSegments(CURRENT_VERSION_COMPARISON_SEGMENTS);
         hubVersionRequest.addQueryParameter(QUERY_VERSION, consumerVersion);
 
         JsonObject jsonObject = hubVersionRequest.executeForResponseJson();
-        VersionComparison versionComparison = gson.fromJson(jsonObject, VersionComparison.class);
+        VersionComparison versionComparison = getRestConnection().getGson().fromJson(jsonObject, VersionComparison.class);
         return versionComparison;
     }
 

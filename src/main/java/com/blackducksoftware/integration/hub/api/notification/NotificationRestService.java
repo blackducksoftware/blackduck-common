@@ -44,11 +44,9 @@ import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class NotificationRestService extends HubItemRestService<NotificationItem> {
@@ -62,8 +60,8 @@ public class NotificationRestService extends HubItemRestService<NotificationItem
 
     private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();
 
-    public NotificationRestService(final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
-        super(restConnection, gson, jsonParser, ITEM_TYPE, ITEM_LIST_TYPE);
+    public NotificationRestService(final RestConnection restConnection) {
+        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
 
         typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);
         typeMap.put("RULE_VIOLATION", RuleViolationNotificationItem.class);
@@ -78,7 +76,7 @@ public class NotificationRestService extends HubItemRestService<NotificationItem
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final HubRequest notificationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest notificationItemRequest = new HubRequest(getRestConnection());
         notificationItemRequest.setMethod(Method.GET);
         notificationItemRequest.setLimit(100);
         notificationItemRequest.addUrlSegments(NOTIFICATIONS_SEGMENTS);
@@ -97,7 +95,7 @@ public class NotificationRestService extends HubItemRestService<NotificationItem
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final HubRequest notificationItemRequest = new HubRequest(getRestConnection(), getJsonParser());
+        final HubRequest notificationItemRequest = new HubRequest(getRestConnection());
         notificationItemRequest.setMethod(Method.GET);
         notificationItemRequest.setLimit(100);
         notificationItemRequest.setUrl(user.getLink("notifications"));
@@ -119,7 +117,7 @@ public class NotificationRestService extends HubItemRestService<NotificationItem
             if (typeMap.containsKey(type)) {
                 clazz = typeMap.get(type);
             }
-            allNotificationItems.add(getGson().fromJson(jsonElement, clazz));
+            allNotificationItems.add(getRestConnection().getGson().fromJson(jsonElement, clazz));
         }
 
         return allNotificationItems;
