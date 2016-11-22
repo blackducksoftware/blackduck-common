@@ -54,7 +54,7 @@ public class CLIInstaller {
             throws IOException, InterruptedException, BDRestException, URISyntaxException, HubIntegrationException, IllegalArgumentException,
             EncryptionException {
         CLIDownloadService cliDownloadService = new CLIDownloadService(logger);
-        cliDownloadService.performInstallation(hubProxyInfo, cliLocation, ciEnvironmentVariables, hubUrl, hubVersion, localHostName);
+        cliDownloadService.performInstallation(hubProxyInfo, cliLocation.getDirectoryToInstallTo(), ciEnvironmentVariables, hubUrl, hubVersion, localHostName);
     }
 
     public void customInstall(final URL archive, String hubVersion, final String localHostName, final IntLogger logger)

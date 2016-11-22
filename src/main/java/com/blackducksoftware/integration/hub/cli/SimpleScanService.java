@@ -71,9 +71,10 @@ public class SimpleScanService extends HubRestService {
      * the scan logs and other scan artifacts.
      */
     public Result setupAndExecuteScan(HubServerConfig hubServerConfig, HubSupportHelper hubSupportHelper,
-            CIEnvironmentVariables ciEnvironmentVariables, CLILocation cliLocation, int scanMemory, boolean verboseRun, boolean dryRun, String project,
+            CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, int scanMemory, boolean verboseRun, boolean dryRun, String project,
             String version, List<String> scanTargetPaths, String workingDirectoryPath)
             throws HubIntegrationException, IOException, IllegalArgumentException, InterruptedException, EncryptionException {
+        CLILocation cliLocation = new CLILocation(directoryToInstallTo);
         String pathToJavaExecutable = cliLocation.getProvidedJavaExec().getCanonicalPath();
         String pathToOneJar = cliLocation.getOneJarFile().getCanonicalPath();
         String pathToScanExecutable = cliLocation.getCLI(logger).getCanonicalPath();

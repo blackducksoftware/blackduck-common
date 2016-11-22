@@ -57,7 +57,7 @@ public class CLIDownloadService {
         this.logger = logger;
     }
 
-    public void performInstallation(HubProxyInfo hubProxyInfo, final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables,
+    public void performInstallation(HubProxyInfo hubProxyInfo, final File directoryToInstallTo, final CIEnvironmentVariables ciEnvironmentVariables,
             String hubUrl, String hubVersion, final String localHostName)
             throws IOException, InterruptedException, BDRestException, URISyntaxException, HubIntegrationException, IllegalArgumentException,
             EncryptionException {
@@ -65,6 +65,7 @@ public class CLIDownloadService {
             throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
         }
 
+        CLILocation cliLocation = new CLILocation(directoryToInstallTo);
         final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(logger, hubUrl);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
             customInstall(hubProxyInfo, cliLocation, ciEnvironmentVariables, new URL(cliDownloadUrl), hubVersion, localHostName);
