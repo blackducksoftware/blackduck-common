@@ -34,6 +34,7 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.report.ReportRestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
 import com.blackducksoftware.integration.hub.api.user.UserRestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
@@ -174,6 +175,10 @@ public class HubServicesFactory {
 
     public HubRegistrationRestService createHubRegistrationRestService() {
         return new HubRegistrationRestService(restConnection);
+    }
+
+    public ReportRestService createReportRestService(IntLogger logger) {
+        return new ReportRestService(restConnection, logger);
     }
 
     public RestConnection getRestConnection() {
