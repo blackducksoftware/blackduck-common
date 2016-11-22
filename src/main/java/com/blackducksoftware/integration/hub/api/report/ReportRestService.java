@@ -49,6 +49,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class ReportRestService extends HubItemRestService<ReportInformationItem> {
+
     private final static long MAXIMUM_WAIT = 1000 * 60 * 30;
 
     private static final Type ITEM_TYPE = new TypeToken<ReportInformationItem>() {
@@ -57,8 +58,11 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
     private static final Type ITEM_LIST_TYPE = new TypeToken<List<ReportInformationItem>>() {
     }.getType();
 
-    public ReportRestService(final RestConnection restConnection) {
+    private final IntLogger logger;
+
+    public ReportRestService(final RestConnection restConnection, IntLogger logger) {
         super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        this.logger = logger;
     }
 
     /**
@@ -182,21 +186,23 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
     /**
      * Assumes the BOM has already been updated
      */
-    public HubRiskReportData generateHubReport(final IntLogger logger, final ProjectVersionItem version, final ReportFormatEnum reportFormat,
+    public HubRiskReportData generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
             final ReportCategoriesEnum[] categories)
             throws IOException, BDRestException, URISyntaxException, HubIntegrationException, InterruptedException, UnexpectedHubResponseException {
-        return generateHubReport(logger, version, reportFormat, categories, MAXIMUM_WAIT);
+        return generateHubReport(version, reportFormat, categories, MAXIMUM_WAIT);
     }
 
     /**
      * Assumes the BOM has already been updated
      */
-    public HubRiskReportData generateHubReport(final IntLogger logger, final ProjectVersionItem version, final ReportFormatEnum reportFormat,
+    public HubRiskReportData generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
             final ReportCategoriesEnum[] categories, long maxWaitTime)
             throws IOException, BDRestException, URISyntaxException, HubIntegrationException, InterruptedException, UnexpectedHubResponseException {
 
+        logger.debug("Starting the Report generation.");
         final String reportUrl = startGeneratingHubReport(version, reportFormat, categories);
 
+        logger.debug("Waiting for the Report to complete.");
         final ReportInformationItem reportInfo = isReportFinishedGenerating(reportUrl,
                 maxWaitTime);
 
@@ -214,10 +220,12 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
         }
 
         final HubRiskReportData hubRiskReportData = new HubRiskReportData();
+        logger.debug("Getting the Report content.");
         final VersionReport report = getReportContent(contentLink.getHref());
         hubRiskReportData.setReport(report);
-        logger.debug("Finished retrieving the report.");
+        logger.debug("Finished retrieving the Report.");
 
+        logger.debug("Cleaning up the Report on the server.");
         deleteHubReport(reportUrl);
 
         return hubRiskReportData;
