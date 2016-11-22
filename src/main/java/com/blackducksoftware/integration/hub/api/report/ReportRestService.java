@@ -180,8 +180,7 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
     }
 
     /**
-     * Assumes the Bom has already been updated
-     *
+     * Assumes the BOM has already been updated
      */
     public HubRiskReportData generateHubReport(final IntLogger logger, final ProjectVersionItem version, final ReportFormatEnum reportFormat,
             final ReportCategoriesEnum[] categories)
@@ -190,8 +189,7 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
     }
 
     /**
-     * Assumes the Bom has already been updated
-     *
+     * Assumes the BOM has already been updated
      */
     public HubRiskReportData generateHubReport(final IntLogger logger, final ProjectVersionItem version, final ReportFormatEnum reportFormat,
             final ReportCategoriesEnum[] categories, long maxWaitTime)
