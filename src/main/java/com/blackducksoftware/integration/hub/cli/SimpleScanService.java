@@ -57,23 +57,55 @@ import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 public class SimpleScanService extends HubRestService {
     private final IntLogger logger;
 
+    private final HubServerConfig hubServerConfig;
+
+    private final HubSupportHelper hubSupportHelper;
+
+    private final CIEnvironmentVariables ciEnvironmentVariables;
+
+    private File directoryToInstallTo;
+
+    private int scanMemory;
+
+    private boolean verboseRun;
+
+    private boolean dryRun;
+
+    private String project;
+
+    private String version;
+
+    private List<String> scanTargetPaths;
+
+    private String workingDirectoryPath;
+
     private final List<String> cmd = new ArrayList<>();
 
     private File logDirectory;
 
-    public SimpleScanService(IntLogger logger, RestConnection restConnection) {
+    public SimpleScanService(IntLogger logger, RestConnection restConnection, HubServerConfig hubServerConfig, HubSupportHelper hubSupportHelper,
+            CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, int scanMemory, boolean verboseRun, boolean dryRun, String project,
+            String version, List<String> scanTargetPaths, String workingDirectoryPath) {
         super(restConnection);
         this.logger = logger;
+        this.hubServerConfig = hubServerConfig;
+        this.hubSupportHelper = hubSupportHelper;
+        this.ciEnvironmentVariables = ciEnvironmentVariables;
+        this.directoryToInstallTo = directoryToInstallTo;
+        this.scanMemory = scanMemory;
+        this.verboseRun = verboseRun;
+        this.dryRun = dryRun;
+        this.project = project;
+        this.version = version;
+        this.scanTargetPaths = scanTargetPaths;
+        this.workingDirectoryPath = workingDirectoryPath;
     }
 
     /**
      * This will setup the command-line invocation of the Hub scanner. The workingDirectoryPath is the parent folder of
      * the scan logs and other scan artifacts.
      */
-    public Result setupAndExecuteScan(HubServerConfig hubServerConfig, HubSupportHelper hubSupportHelper,
-            CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, int scanMemory, boolean verboseRun, boolean dryRun, String project,
-            String version, List<String> scanTargetPaths, String workingDirectoryPath)
-            throws HubIntegrationException, IOException, IllegalArgumentException, InterruptedException, EncryptionException {
+    public Result setupAndExecuteScan() throws HubIntegrationException, IOException, IllegalArgumentException, InterruptedException, EncryptionException {
         CLILocation cliLocation = new CLILocation(directoryToInstallTo);
         String pathToJavaExecutable = cliLocation.getProvidedJavaExec().getCanonicalPath();
         String pathToOneJar = cliLocation.getOneJarFile().getCanonicalPath();
@@ -131,7 +163,7 @@ public class SimpleScanService extends HubRestService {
             cmd.add("-v");
         }
 
-        populateLogDirectory(workingDirectoryPath);
+        populateLogDirectory();
         final String logDirectoryPath = logDirectory.getCanonicalPath();
         cmd.add("--logDir");
         cmd.add(logDirectoryPath);
@@ -162,19 +194,16 @@ public class SimpleScanService extends HubRestService {
             cmd.add(target);
         }
 
-        return executeScan(hubServerConfig, hubSupportHelper, ciEnvironmentVariables, cliLocation, scanMemory, verboseRun, dryRun, project, version,
-                scanTargetPaths, workingDirectoryPath, cmd);
+        return executeScan();
     }
 
     /**
      * If running in an environment that handles process creation, this method should be overridden to construct a
      * process to execute the scan in the environment-specific way.
      */
-    public Result executeScan(HubServerConfig hubServerConfig, HubSupportHelper hubSupportHelper,
-            CIEnvironmentVariables ciEnvironmentVariables, CLILocation cliLocation, int scanMemory, boolean verboseRun, boolean dryRun, String project,
-            String version, List<String> scanTargetPaths, String workingDirectoryPath, List<String> cmd)
+    public Result executeScan()
             throws IOException, InterruptedException, IllegalArgumentException, EncryptionException {
-        printCommand(cmd);
+        printCommand();
 
         final File standardOutFile = new File(logDirectory, "CLI_Output.txt");
         standardOutFile.createNewFile();
@@ -218,8 +247,8 @@ public class SimpleScanService extends HubRestService {
     /**
      * For all error cases, return an empty list. If all goes well, return a list of scan summary urls.
      */
-    public List<ScanSummaryItem> getScanSummaryItems(HubSupportHelper hubSupportHelper, List<String> scanTargetPaths) {
-        if (null == logDirectory || !hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
+    public List<ScanSummaryItem> getScanSummaryItems() {
+        if (null == logDirectory) {
             return Collections.emptyList();
         }
 
@@ -257,7 +286,7 @@ public class SimpleScanService extends HubRestService {
         return timeString;
     }
 
-    private void populateLogDirectory(String workingDirectoryPath) throws IOException {
+    private void populateLogDirectory() throws IOException {
         final File logsDirectory = new File(workingDirectoryPath, "HubScanLogs");
         String specificScanExecutionLogDirectory = getSpecificScanExecutionLogDirectory();
 
@@ -270,7 +299,7 @@ public class SimpleScanService extends HubRestService {
     /**
      * Code to mask passwords in the logs
      */
-    private void printCommand(final List<String> cmd) {
+    private void printCommand() {
         final List<String> cmdToOutput = new ArrayList<>();
         cmdToOutput.addAll(cmd);
 

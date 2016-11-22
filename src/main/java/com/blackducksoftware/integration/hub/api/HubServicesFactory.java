@@ -21,6 +21,10 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api;
 
+import java.io.File;
+import java.util.List;
+
+import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentRestService;
@@ -48,8 +52,10 @@ import com.blackducksoftware.integration.hub.dataservices.notification.items.Pol
 import com.blackducksoftware.integration.hub.dataservices.policystatus.PolicyStatusDataService;
 import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.dataservices.vulnerability.VulnerabilityDataService;
+import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class HubServicesFactory {
     private final RestConnection restConnection;
@@ -169,8 +175,12 @@ public class HubServicesFactory {
         return new CLIDownloadService(logger);
     }
 
-    public SimpleScanService createSimpleScanService(IntLogger logger) {
-        return new SimpleScanService(logger, restConnection);
+    public SimpleScanService createSimpleScanService(IntLogger logger, RestConnection restConnection, HubServerConfig hubServerConfig,
+            HubSupportHelper hubSupportHelper,
+            CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, int scanMemory, boolean verboseRun, boolean dryRun, String project,
+            String version, List<String> scanTargetPaths, String workingDirectoryPath) {
+        return new SimpleScanService(logger, restConnection, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo, scanMemory,
+                verboseRun, dryRun, project, version, scanTargetPaths, workingDirectoryPath);
     }
 
     public HubRegistrationRestService createHubRegistrationRestService() {
