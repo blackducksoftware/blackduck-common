@@ -91,7 +91,7 @@ public class HubServicesFactory {
     }
 
     public VulnerabilityDataService createVulnerabilityDataService() {
-        return new VulnerabilityDataService(restConnection, createComponentRestService(), createComponentVersionRestService(), createComponentIdRestService(),
+        return new VulnerabilityDataService(restConnection, createComponentRestService(), createComponentVersionRestService(),
                 createVulnerabilityRestService());
     }
 
