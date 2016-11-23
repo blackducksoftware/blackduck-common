@@ -33,6 +33,7 @@ import org.restlet.data.Method;
 import org.restlet.representation.StringRepresentation;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
+import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
@@ -57,7 +58,7 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
 
     public ProjectVersionItem getProjectVersion(ProjectItem project, String projectVersionName)
             throws UnexpectedHubResponseException, IOException, URISyntaxException, BDRestException {
-        final HubRequest projectVersionItemRequest = createDefaultHubRequest(project);
+        final HubPagedRequest projectVersionItemRequest = createDefaultHubRequest(project);
         addProjectVersionNameQuery(projectVersionItemRequest, projectVersionName);
 
         final JsonObject jsonObject = projectVersionItemRequest.executeForResponseJson();
@@ -79,7 +80,7 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
 
     public List<ProjectVersionItem> getAllProjectVersions(final String versionsUrl)
             throws IOException, URISyntaxException, BDRestException {
-        HubRequest projectVersionItemRequest = createDefaultHubRequest(versionsUrl);
+        HubPagedRequest projectVersionItemRequest = createDefaultHubRequest(versionsUrl);
 
         final JsonObject jsonObject = projectVersionItemRequest.executeForResponseJson();
         final List<ProjectVersionItem> allProjectVersionItems = getAll(jsonObject, projectVersionItemRequest);
@@ -101,8 +102,6 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
 
         final HubRequest projectVersionItemRequest = new HubRequest(getRestConnection());
         projectVersionItemRequest.setMethod(Method.POST);
-        projectVersionItemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
-        projectVersionItemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
         projectVersionItemRequest.setUrl(project.getLink(ProjectItem.VERSION_LINK));
 
         String location = null;
@@ -116,12 +115,12 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
         return location;
     }
 
-    private HubRequest createDefaultHubRequest(ProjectItem project) throws UnexpectedHubResponseException {
+    private HubPagedRequest createDefaultHubRequest(ProjectItem project) throws UnexpectedHubResponseException {
         return createDefaultHubRequest(getVersionsUrl(project));
     }
 
-    private HubRequest createDefaultHubRequest(String versionsUrl) {
-        final HubRequest projectVersionItemRequest = new HubRequest(getRestConnection());
+    private HubPagedRequest createDefaultHubRequest(String versionsUrl) {
+        final HubPagedRequest projectVersionItemRequest = new HubPagedRequest(getRestConnection());
 
         projectVersionItemRequest.setMethod(Method.GET);
         projectVersionItemRequest.setLimit(100);
@@ -130,7 +129,7 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
         return projectVersionItemRequest;
     }
 
-    private void addProjectVersionNameQuery(HubRequest projectVersionItemRequest, String projectVersionName) {
+    private void addProjectVersionNameQuery(HubPagedRequest projectVersionItemRequest, String projectVersionName) {
         if (StringUtils.isNotBlank(projectVersionName)) {
             projectVersionItemRequest.setQ(String.format("versionName:%s", projectVersionName));
         }

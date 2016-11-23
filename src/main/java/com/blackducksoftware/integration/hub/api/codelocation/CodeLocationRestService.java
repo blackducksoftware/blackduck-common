@@ -33,7 +33,7 @@ import java.util.List;
 import org.restlet.data.Method;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
-import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
@@ -53,7 +53,7 @@ public class CodeLocationRestService extends HubItemRestService<CodeLocationItem
     }
 
     public List<CodeLocationItem> getAllCodeLocations() throws IOException, BDRestException, URISyntaxException {
-        final HubRequest codeLocationItemRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest codeLocationItemRequest = new HubPagedRequest(getRestConnection());
         codeLocationItemRequest.setMethod(Method.GET);
         codeLocationItemRequest.setLimit(100);
         codeLocationItemRequest.addUrlSegments(CODE_LOCATION_SEGMENTS);
@@ -65,7 +65,7 @@ public class CodeLocationRestService extends HubItemRestService<CodeLocationItem
 
     public List<CodeLocationItem> getAllCodeLocationsForCodeLocationType(final CodeLocationTypeEnum codeLocationType)
             throws IOException, BDRestException, URISyntaxException {
-        final HubRequest codeLocationItemRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest codeLocationItemRequest = new HubPagedRequest(getRestConnection());
         codeLocationItemRequest.setMethod(Method.GET);
         codeLocationItemRequest.setLimit(100);
         codeLocationItemRequest.addQueryParameter("codeLocationType", codeLocationType.toString());

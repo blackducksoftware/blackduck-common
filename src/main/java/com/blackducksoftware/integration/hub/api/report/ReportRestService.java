@@ -49,7 +49,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class ReportRestService extends HubItemRestService<ReportInformationItem> {
-
     private final static long MAXIMUM_WAIT = 1000 * 60 * 30;
 
     private static final Type ITEM_TYPE = new TypeToken<ReportInformationItem>() {
@@ -69,7 +68,6 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
      * Generates a new Hub report for the specified version.
      *
      * @return the Report URL
-     *
      */
     public String startGeneratingHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
             final ReportCategoriesEnum[] categories)
@@ -92,7 +90,6 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
         final HubRequest hubRequest = new HubRequest(getRestConnection());
 
         hubRequest.setMethod(Method.POST);
-        hubRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
         hubRequest.setUrl(getVersionReportLink(version));
 
         final StringRepresentation stringRep = new StringRepresentation(getRestConnection().getGson().toJson(json));
@@ -112,7 +109,6 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
     public void deleteHubReport(final String reportUrl) throws IOException, BDRestException, URISyntaxException {
         final HubRequest hubRequest = new HubRequest(getRestConnection());
         hubRequest.setMethod(Method.DELETE);
-        hubRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
         hubRequest.setUrl(reportUrl);
 
         hubRequest.executeDelete();
@@ -120,13 +116,11 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
 
     /**
      * Gets the content of the report
-     *
      */
     public VersionReport getReportContent(final String reportContentUrl)
             throws IOException, BDRestException, URISyntaxException {
         final HubRequest hubRequest = new HubRequest(getRestConnection());
         hubRequest.setMethod(Method.GET);
-        hubRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
         hubRequest.setUrl(reportContentUrl);
 
         final JsonObject json = hubRequest.executeForResponseJson();
@@ -137,7 +131,6 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
         final VersionReport report = getRestConnection().getGson().fromJson(reportFile.get("fileContent"), VersionReport.class);
 
         return report;
-
     }
 
     /**
@@ -145,7 +138,6 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
      * time available, then we know it is done being generated. Throws
      * HubIntegrationException after 30 minutes if the report has not been
      * generated yet.
-     *
      */
     public ReportInformationItem isReportFinishedGenerating(final String reportUrl)
             throws IOException, BDRestException, URISyntaxException, InterruptedException, HubIntegrationException {
@@ -157,7 +149,6 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
      * time available, then we know it is done being generated. Throws
      * HubIntegrationException after the maximum wait if the report has not been
      * generated yet.
-     *
      */
     public ReportInformationItem isReportFinishedGenerating(final String reportUrl, final long maximumWait)
             throws IOException, BDRestException, URISyntaxException, InterruptedException, HubIntegrationException {
@@ -240,4 +231,5 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
         final String versionLink = versionLinks.get(0);
         return versionLink;
     }
+
 }

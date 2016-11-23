@@ -34,7 +34,7 @@ import java.util.List;
 import org.restlet.data.Method;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
-import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
@@ -64,7 +64,7 @@ public class PolicyRestService extends HubItemRestService<PolicyRule> {
     }
 
     public List<PolicyRule> getAllPolicyRules() throws IOException, BDRestException, URISyntaxException {
-        final HubRequest policyRuleItemRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest policyRuleItemRequest = new HubPagedRequest(getRestConnection());
         policyRuleItemRequest.setMethod(Method.GET);
         policyRuleItemRequest.setLimit(100);
         policyRuleItemRequest.addUrlSegments(POLICY_RULE_SEGMENTS);

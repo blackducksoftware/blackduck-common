@@ -44,7 +44,7 @@ public class HubRegistrationRestService extends HubRestService {
     }
 
     public String getRegistrationId() throws IOException, URISyntaxException, BDRestException {
-        final HubRequest registrationRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest registrationRequest = new HubPagedRequest(getRestConnection());
         registrationRequest.setMethod(Method.GET);
         registrationRequest.addUrlSegments(REGISTRATION_SEGMENTS);
 

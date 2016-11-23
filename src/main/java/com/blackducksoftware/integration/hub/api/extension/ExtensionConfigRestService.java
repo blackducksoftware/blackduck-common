@@ -29,7 +29,7 @@ import java.util.List;
 import org.restlet.data.Method;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
-import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
@@ -48,7 +48,7 @@ public class ExtensionConfigRestService extends HubItemRestService<Configuration
 
     public List<ConfigurationItem> getGlobalOptions(final String globalConfigUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubRequest itemRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest itemRequest = new HubPagedRequest(getRestConnection());
         itemRequest.setUrl(globalConfigUrl);
         itemRequest.setMethod(Method.GET);
         itemRequest.setLimit(100);
@@ -60,7 +60,7 @@ public class ExtensionConfigRestService extends HubItemRestService<Configuration
 
     public List<ConfigurationItem> getCurrentUserOptions(final String currentUserConfigUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubRequest itemRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest itemRequest = new HubPagedRequest(getRestConnection());
         itemRequest.setUrl(currentUserConfigUrl);
         itemRequest.setMethod(Method.GET);
         itemRequest.setLimit(100);
@@ -72,7 +72,7 @@ public class ExtensionConfigRestService extends HubItemRestService<Configuration
 
     public List<ConfigurationItem> getUserConfiguration(final String userConfigUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubRequest itemRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest itemRequest = new HubPagedRequest(getRestConnection());
         itemRequest.setUrl(userConfigUrl);
         itemRequest.setMethod(Method.GET);
         itemRequest.setLimit(100);

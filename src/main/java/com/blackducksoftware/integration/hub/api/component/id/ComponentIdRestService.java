@@ -29,7 +29,7 @@ import java.util.List;
 import org.restlet.data.Method;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
-import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
@@ -48,7 +48,7 @@ public class ComponentIdRestService extends HubItemRestService<ComponentIdItem> 
 
     public ComponentIdItem getComponent(final String componentURL)
             throws IOException, URISyntaxException, BDRestException {
-        final HubRequest componentRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest componentRequest = new HubPagedRequest(getRestConnection());
         componentRequest.setMethod(Method.GET);
         componentRequest.setLimit(1);
         componentRequest.setUrl(componentURL);

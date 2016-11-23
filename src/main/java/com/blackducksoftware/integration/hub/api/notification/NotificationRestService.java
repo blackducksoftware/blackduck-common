@@ -39,7 +39,7 @@ import java.util.TimeZone;
 import org.restlet.data.Method;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
-import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
@@ -76,7 +76,7 @@ public class NotificationRestService extends HubItemRestService<NotificationItem
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final HubRequest notificationItemRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest notificationItemRequest = new HubPagedRequest(getRestConnection());
         notificationItemRequest.setMethod(Method.GET);
         notificationItemRequest.setLimit(100);
         notificationItemRequest.addUrlSegments(NOTIFICATIONS_SEGMENTS);
@@ -95,7 +95,7 @@ public class NotificationRestService extends HubItemRestService<NotificationItem
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final HubRequest notificationItemRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest notificationItemRequest = new HubPagedRequest(getRestConnection());
         notificationItemRequest.setMethod(Method.GET);
         notificationItemRequest.setLimit(100);
         notificationItemRequest.setUrl(user.getLink("notifications"));

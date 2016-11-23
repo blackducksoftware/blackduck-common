@@ -34,7 +34,7 @@ import java.util.List;
 import org.restlet.data.Method;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
-import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -58,7 +58,7 @@ public class ComponentRestService extends HubItemRestService<ComponentItem> {
 
     public List<ComponentItem> getAllComponents(final String id, final String groupId, final String artifactId,
             final String version) throws IOException, BDRestException, URISyntaxException {
-        final HubRequest componentItemRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest componentItemRequest = new HubPagedRequest(getRestConnection());
         final ComponentQuery componentQuery = new ComponentQuery(id, groupId, artifactId, version);
 
         componentItemRequest.setMethod(Method.GET);

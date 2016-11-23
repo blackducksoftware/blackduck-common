@@ -37,6 +37,7 @@ import org.restlet.data.Method;
 import org.restlet.representation.StringRepresentation;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
+import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -60,7 +61,7 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
     }
 
     public List<ProjectItem> getAllProjects() throws IOException, BDRestException, URISyntaxException {
-        final HubRequest projectItemRequest = createDefaultHubRequest();
+        final HubPagedRequest projectItemRequest = createDefaultHubRequest();
 
         final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
         final List<ProjectItem> allProjectItems = getAll(jsonObject, projectItemRequest);
@@ -69,7 +70,7 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
 
     public List<ProjectItem> getAllProjectMatches(final String projectName)
             throws IOException, BDRestException, URISyntaxException {
-        final HubRequest projectItemRequest = createDefaultHubRequest();
+        final HubPagedRequest projectItemRequest = createDefaultHubRequest();
         addProjectNameQuery(projectItemRequest, projectName);
 
         final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
@@ -79,7 +80,7 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
 
     public List<ProjectItem> getProjectMatches(final String projectName, final int limit)
             throws IOException, BDRestException, URISyntaxException {
-        HubRequest projectItemRequest = createDefaultHubRequest();
+        HubPagedRequest projectItemRequest = createDefaultHubRequest();
         addProjectNameQuery(projectItemRequest, projectName);
         projectItemRequest.setLimit(limit);
 
@@ -116,8 +117,8 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
         return location;
     }
 
-    private HubRequest createDefaultHubRequest() {
-        final HubRequest projectItemRequest = new HubRequest(getRestConnection());
+    private HubPagedRequest createDefaultHubRequest() {
+        final HubPagedRequest projectItemRequest = new HubPagedRequest(getRestConnection());
 
         projectItemRequest.setMethod(Method.GET);
         projectItemRequest.setLimit(100);
@@ -130,14 +131,12 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
         final HubRequest projectItemRequest = new HubRequest(getRestConnection());
 
         projectItemRequest.setMethod(Method.POST);
-        projectItemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
-        projectItemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
         projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
 
         return projectItemRequest;
     }
 
-    private void addProjectNameQuery(HubRequest projectItemRequest, String projectName) {
+    private void addProjectNameQuery(HubPagedRequest projectItemRequest, String projectName) {
         if (StringUtils.isNotBlank(projectName)) {
             projectItemRequest.setQ("name:" + projectName);
         }

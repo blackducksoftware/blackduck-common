@@ -50,7 +50,7 @@ public class HubVersionRestService extends HubRestService {
     }
 
     public String getHubVersion() throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
-        HubRequest hubVersionRequest = new HubRequest(getRestConnection());
+        HubPagedRequest hubVersionRequest = new HubPagedRequest(getRestConnection());
         hubVersionRequest.setMethod(Method.GET);
         hubVersionRequest.addUrlSegments(CURRENT_VERSION_SEGMENTS);
 
@@ -61,7 +61,7 @@ public class HubVersionRestService extends HubRestService {
     }
 
     public VersionComparison getHubVersionComparison(String consumerVersion) throws IOException, URISyntaxException, BDRestException {
-        HubRequest hubVersionRequest = new HubRequest(getRestConnection());
+        HubPagedRequest hubVersionRequest = new HubPagedRequest(getRestConnection());
         hubVersionRequest.setMethod(Method.GET);
         hubVersionRequest.addUrlSegments(CURRENT_VERSION_COMPARISON_SEGMENTS);
         hubVersionRequest.addQueryParameter(QUERY_VERSION, consumerVersion);

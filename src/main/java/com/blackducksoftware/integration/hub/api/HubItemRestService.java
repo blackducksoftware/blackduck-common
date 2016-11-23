@@ -46,7 +46,7 @@ public class HubItemRestService<T extends HubItem> extends HubRestService {
         this.itemListType = itemListType;
     }
 
-    public List<T> getAll(final JsonObject jsonObject, final HubRequest hubRequest)
+    public List<T> getAll(final JsonObject jsonObject, final HubPagedRequest hubRequest)
             throws BDRestException, IOException, URISyntaxException {
         final List<T> allItems = new ArrayList<>();
         final int totalCount = jsonObject.get("totalCount").getAsInt();
@@ -72,7 +72,7 @@ public class HubItemRestService<T extends HubItem> extends HubRestService {
     }
 
     public List<T> getItems(final String url) throws IOException, URISyntaxException, BDRestException {
-        final HubRequest itemRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest itemRequest = new HubPagedRequest(getRestConnection());
         itemRequest.setMethod(Method.GET);
         itemRequest.setUrl(url);
 
@@ -88,8 +88,6 @@ public class HubItemRestService<T extends HubItem> extends HubRestService {
         final HubRequest itemRequest = new HubRequest(getRestConnection());
         itemRequest.setMethod(Method.GET);
         itemRequest.setUrl(url);
-        itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
-        itemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
 
         final String response = itemRequest.executeForResponseString();
         return getRestConnection().getGson().fromJson(response, itemType);
@@ -99,8 +97,6 @@ public class HubItemRestService<T extends HubItem> extends HubRestService {
         final HubRequest itemRequest = new HubRequest(getRestConnection());
         itemRequest.setMethod(Method.DELETE);
         itemRequest.setUrl(url);
-        itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
-        itemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
 
         itemRequest.executeDelete();
     }
@@ -109,8 +105,6 @@ public class HubItemRestService<T extends HubItem> extends HubRestService {
         final HubRequest itemRequest = new HubRequest(getRestConnection());
         itemRequest.setMethod(Method.GET);
         itemRequest.addUrlSegments(urlSegments);
-        itemRequest.setOffset(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
-        itemRequest.setLimit(HubRequest.EXCLUDE_INTEGER_QUERY_PARAMETER);
 
         final String response = itemRequest.executeForResponseString();
         return getRestConnection().getGson().fromJson(response, itemType);

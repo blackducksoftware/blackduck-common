@@ -1,28 +1,16 @@
-/*******************************************************************************
- * Copyright (C) 2016 Black Duck Software, Inc.
+/*
+ * Copyright (C) 2016 Black Duck Software Inc.
  * http://www.blackducksoftware.com/
+ * All rights reserved.
  *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- *******************************************************************************/
+ * This software is the confidential and proprietary information of
+ * Black Duck Software ("Confidential Information"). You shall not
+ * disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Black Duck Software.
+ */
 package com.blackducksoftware.integration.hub.api;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_LIMIT;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_OFFSET;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_Q;
 
 import java.io.IOException;
@@ -33,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.restlet.Response;
 import org.restlet.data.Method;
 import org.restlet.representation.Representation;
@@ -43,9 +33,12 @@ import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistExcep
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 
+/**
+ * Most usages of the Hub endpoints as of 2016-11-23 (Hub 3.3.1) should use the HubPagedRequest, but there are several
+ * REST endpoints
+ * that do not consume limit or offset, and those should use this implementation.
+ */
 public class HubRequest {
-    public static final int EXCLUDE_INTEGER_QUERY_PARAMETER = -999;
-
     private final RestConnection restConnection;
 
     private Method method;
@@ -54,15 +47,11 @@ public class HubRequest {
 
     private final List<String> urlSegments = new ArrayList<>();
 
-    private int limit = 10;
-
     private final Map<String, String> queryParameters = new HashMap<>();
-
-    private int offset = 0;
 
     private String q;
 
-    public HubRequest(final RestConnection restConnection) {
+    public HubRequest(RestConnection restConnection) {
         this.restConnection = restConnection;
     }
 
@@ -130,6 +119,12 @@ public class HubRequest {
         }
     }
 
+    public void populateQueryParamters() {
+        if (StringUtils.isNotBlank(q)) {
+            queryParameters.put(QUERY_Q, q);
+        }
+    }
+
     private void releaseResource(final ClientResource resource) {
         if (resource.getResponse() != null) {
             resource.getResponse().release();
@@ -148,26 +143,8 @@ public class HubRequest {
         for (final String segment : urlSegments) {
             resource.addSegment(segment);
         }
-        // TODO this will need to be refactored out with the new version of hub
-        // common.
-        if (limit != EXCLUDE_INTEGER_QUERY_PARAMETER) {
-            // if limit is not provided, the default is 10
-            if (limit <= 0) {
-                limit = 10;
-            }
-            queryParameters.put(QUERY_LIMIT, String.valueOf(limit));
-        }
 
-        if (offset != EXCLUDE_INTEGER_QUERY_PARAMETER) {
-            // if offset is not provided, the default is 0
-            if (offset != EXCLUDE_INTEGER_QUERY_PARAMETER && offset < 0) {
-                offset = 0;
-            }
-            queryParameters.put(QUERY_OFFSET, String.valueOf(offset));
-        }
-        if (StringUtils.isNotBlank(q)) {
-            queryParameters.put(QUERY_Q, q);
-        }
+        populateQueryParamters();
 
         for (final Map.Entry<String, String> entry : queryParameters.entrySet()) {
             resource.addQueryParameter(entry.getKey(), entry.getValue());
@@ -205,14 +182,6 @@ public class HubRequest {
         urlSegments.addAll(urlSegment);
     }
 
-    public int getLimit() {
-        return limit;
-    }
-
-    public void setLimit(final int limit) {
-        this.limit = limit;
-    }
-
     public Map<String, String> getQueryParameters() {
         return queryParameters;
     }
@@ -225,14 +194,6 @@ public class HubRequest {
         queryParameters.putAll(queryParameters);
     }
 
-    public int getOffset() {
-        return offset;
-    }
-
-    public void setOffset(final int offset) {
-        this.offset = offset;
-    }
-
     public String getQ() {
         return q;
     }
@@ -243,8 +204,7 @@ public class HubRequest {
 
     @Override
     public String toString() {
-        return "HubRequest [url=" + url + ", urlSegments=" + urlSegments + ", limit=" + limit + ", queryParameters="
-                + queryParameters + ", offset=" + offset + ", q=" + q + "]";
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

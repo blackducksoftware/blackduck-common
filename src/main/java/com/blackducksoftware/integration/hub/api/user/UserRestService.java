@@ -33,7 +33,7 @@ import java.util.List;
 import org.restlet.data.Method;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
-import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
@@ -53,7 +53,7 @@ public class UserRestService extends HubItemRestService<UserItem> {
     }
 
     public List<UserItem> getAllUsers() throws URISyntaxException, BDRestException, IOException {
-        final HubRequest userRequest = new HubRequest(getRestConnection());
+        final HubPagedRequest userRequest = new HubPagedRequest(getRestConnection());
         userRequest.setMethod(Method.GET);
         userRequest.addUrlSegments(USERS_SEGMENTS);
         userRequest.setLimit(100);
