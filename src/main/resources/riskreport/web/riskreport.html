@@ -12,12 +12,10 @@
 	   <script type="text/javascript">
 	   var myJQuery = jQuery.noConflict();
 	   myJQuery(document).ready(function () {
-		   console.log("Risk Report Document ready.");
-		   myJQuery.getJSON('hub_risk_report.json',function (data) {
-			   console.log("Risk Report JSON loaded creating report.");
-               var riskReport = new RiskReport(myJQuery,data);
-               riskReport.createReport();
-            }); 
+           console.log("Risk Report Document ready.");
+           var data = TOKEN_RISK_REPORT_JSON_TOKEN;
+           var riskReport = new RiskReport(myJQuery,data);
+           riskReport.createReport();
 	   });
 	   </script>
 	</head>
