@@ -29,7 +29,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
 import org.restlet.representation.StringRepresentation;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
@@ -42,7 +41,6 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class ProjectVersionRestService extends HubItemRestService<ProjectVersionItem> {
@@ -58,11 +56,13 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
 
     public ProjectVersionItem getProjectVersion(ProjectItem project, String projectVersionName)
             throws UnexpectedHubResponseException, IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest projectVersionItemRequest = createDefaultHubRequest(project);
-        addProjectVersionNameQuery(projectVersionItemRequest, projectVersionName);
+        String versionsUrl = project.getLink("versions");
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, versionsUrl);
+        if (StringUtils.isNotBlank(projectVersionName)) {
+            hubPagedRequest.setQ(String.format("versionName:%s", projectVersionName));
+        }
 
-        final JsonObject jsonObject = projectVersionItemRequest.executeForResponseJson();
-        final List<ProjectVersionItem> allProjectVersionMatchingItems = getAll(jsonObject, projectVersionItemRequest);
+        final List<ProjectVersionItem> allProjectVersionMatchingItems = getAllHubItems(hubPagedRequest);
         for (ProjectVersionItem projectVersion : allProjectVersionMatchingItems) {
             if (projectVersionName.equals(projectVersion.getVersionName())) {
                 return projectVersion;
@@ -74,65 +74,39 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
 
     public List<ProjectVersionItem> getAllProjectVersions(final ProjectItem project)
             throws UnexpectedHubResponseException, IOException, URISyntaxException, BDRestException {
-        String versionsUrl = getVersionsUrl(project);
+        String versionsUrl = project.getLink("versions");
         return getAllProjectVersions(versionsUrl);
     }
 
     public List<ProjectVersionItem> getAllProjectVersions(final String versionsUrl)
             throws IOException, URISyntaxException, BDRestException {
-        HubPagedRequest projectVersionItemRequest = createDefaultHubRequest(versionsUrl);
+        HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, versionsUrl);
 
-        final JsonObject jsonObject = projectVersionItemRequest.executeForResponseJson();
-        final List<ProjectVersionItem> allProjectVersionItems = getAll(jsonObject, projectVersionItemRequest);
+        final List<ProjectVersionItem> allProjectVersionItems = getAllHubItems(hubPagedRequest);
         return allProjectVersionItems;
-    }
-
-    public String getVersionsUrl(ProjectItem project) throws UnexpectedHubResponseException {
-        String versionsUrl = project.getLink(ProjectItem.VERSION_LINK);
-        return versionsUrl;
     }
 
     public String createHubVersion(final ProjectItem project, final String versionName, final PhaseEnum phase,
             final DistributionEnum dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
         final ProjectVersionItem newRelease = new ProjectVersionItem(null, dist, null, null, phase, null, null, null, versionName);
 
-        final StringRepresentation stringRep = new StringRepresentation(getRestConnection().getGson().toJson(newRelease));
-        stringRep.setMediaType(MediaType.APPLICATION_JSON);
-        stringRep.setCharacterSet(CharacterSet.UTF_8);
+        String versionsUrl = project.getLink("versions");
 
-        final HubRequest projectVersionItemRequest = new HubRequest(getRestConnection());
-        projectVersionItemRequest.setMethod(Method.POST);
-        projectVersionItemRequest.setUrl(project.getLink(ProjectItem.VERSION_LINK));
+        final HubRequest hubRequest = getHubRequestFactory().createPostRequest(versionsUrl);
+
+        final StringRepresentation stringRepresentation = new StringRepresentation(getRestConnection().getGson().toJson(newRelease));
+        stringRepresentation.setMediaType(MediaType.APPLICATION_JSON);
+        stringRepresentation.setCharacterSet(CharacterSet.UTF_8);
 
         String location = null;
         try {
-            location = projectVersionItemRequest.executePost(stringRep);
+            location = hubRequest.executePost(stringRepresentation);
         } catch (final ResourceDoesNotExistException ex) {
             throw new BDRestException("There was a problem creating this Version for the specified Hub Project. ", ex,
                     ex.getResource());
         }
 
         return location;
-    }
-
-    private HubPagedRequest createDefaultHubRequest(ProjectItem project) throws UnexpectedHubResponseException {
-        return createDefaultHubRequest(getVersionsUrl(project));
-    }
-
-    private HubPagedRequest createDefaultHubRequest(String versionsUrl) {
-        final HubPagedRequest projectVersionItemRequest = new HubPagedRequest(getRestConnection());
-
-        projectVersionItemRequest.setMethod(Method.GET);
-        projectVersionItemRequest.setLimit(100);
-        projectVersionItemRequest.setUrl(versionsUrl);
-
-        return projectVersionItemRequest;
-    }
-
-    private void addProjectVersionNameQuery(HubPagedRequest projectVersionItemRequest, String projectVersionName) {
-        if (StringUtils.isNotBlank(projectVersionName)) {
-            projectVersionItemRequest.setQ(String.format("versionName:%s", projectVersionName));
-        }
     }
 
 }

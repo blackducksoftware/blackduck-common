@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HubItemFilterUtil<T extends HubItem> {
-
     public List<T> getAccessibleItems(final List<T> hubItems) {
         final List<T> accessibleItems = new ArrayList<>();
         for (final T hubItem : hubItems) {
@@ -33,6 +32,8 @@ public class HubItemFilterUtil<T extends HubItem> {
                 accessibleItems.add(hubItem);
             }
         }
+
         return accessibleItems;
     }
+
 }

@@ -32,8 +32,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.restlet.data.Method;
-
 import com.blackducksoftware.integration.hub.api.version.VersionComparison;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
@@ -50,24 +48,17 @@ public class HubVersionRestService extends HubRestService {
     }
 
     public String getHubVersion() throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
-        HubPagedRequest hubVersionRequest = new HubPagedRequest(getRestConnection());
-        hubVersionRequest.setMethod(Method.GET);
-        hubVersionRequest.addUrlSegments(CURRENT_VERSION_SEGMENTS);
-
-        String hubVersionWithPossibleSurroundingQuotes = hubVersionRequest.executeForResponseString();
+        String hubVersionWithPossibleSurroundingQuotes = getString(CURRENT_VERSION_SEGMENTS);
         String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
 
         return hubVersion;
     }
 
     public VersionComparison getHubVersionComparison(String consumerVersion) throws IOException, URISyntaxException, BDRestException {
-        HubPagedRequest hubVersionRequest = new HubPagedRequest(getRestConnection());
-        hubVersionRequest.setMethod(Method.GET);
-        hubVersionRequest.addUrlSegments(CURRENT_VERSION_COMPARISON_SEGMENTS);
-        hubVersionRequest.addQueryParameter(QUERY_VERSION, consumerVersion);
-
+        HubRequest hubVersionRequest = getHubRequestFactory().createGetRequest(CURRENT_VERSION_COMPARISON_SEGMENTS).addQueryParameter(QUERY_VERSION,
+                consumerVersion);
         JsonObject jsonObject = hubVersionRequest.executeForResponseJson();
-        VersionComparison versionComparison = getRestConnection().getGson().fromJson(jsonObject, VersionComparison.class);
+        VersionComparison versionComparison = getItem(jsonObject, VersionComparison.class);
         return versionComparison;
     }
 

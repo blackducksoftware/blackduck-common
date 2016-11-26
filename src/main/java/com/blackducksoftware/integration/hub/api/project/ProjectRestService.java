@@ -33,7 +33,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
 import org.restlet.representation.StringRepresentation;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
@@ -44,7 +43,6 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class ProjectRestService extends HubItemRestService<ProjectItem> {
@@ -61,31 +59,31 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
     }
 
     public List<ProjectItem> getAllProjects() throws IOException, BDRestException, URISyntaxException {
-        final HubPagedRequest projectItemRequest = createDefaultHubRequest();
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, PROJECTS_SEGMENTS);
 
-        final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
-        final List<ProjectItem> allProjectItems = getAll(jsonObject, projectItemRequest);
+        final List<ProjectItem> allProjectItems = getAllHubItems(hubPagedRequest);
         return allProjectItems;
     }
 
     public List<ProjectItem> getAllProjectMatches(final String projectName)
             throws IOException, BDRestException, URISyntaxException {
-        final HubPagedRequest projectItemRequest = createDefaultHubRequest();
-        addProjectNameQuery(projectItemRequest, projectName);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, PROJECTS_SEGMENTS);
+        if (StringUtils.isNotBlank(projectName)) {
+            hubPagedRequest.setQ("name:" + projectName);
+        }
 
-        final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
-        final List<ProjectItem> allProjectItems = getAll(jsonObject, projectItemRequest);
+        final List<ProjectItem> allProjectItems = getAllHubItems(hubPagedRequest);
         return allProjectItems;
     }
 
     public List<ProjectItem> getProjectMatches(final String projectName, final int limit)
             throws IOException, BDRestException, URISyntaxException {
-        HubPagedRequest projectItemRequest = createDefaultHubRequest();
-        addProjectNameQuery(projectItemRequest, projectName);
-        projectItemRequest.setLimit(limit);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(limit, PROJECTS_SEGMENTS);
+        if (StringUtils.isNotBlank(projectName)) {
+            hubPagedRequest.setQ("name:" + projectName);
+        }
 
-        final JsonObject jsonObject = projectItemRequest.executeForResponseJson();
-        final List<ProjectItem> allProjectItems = getItems(jsonObject);
+        final List<ProjectItem> allProjectItems = getHubItems(hubPagedRequest).getItems();
         return allProjectItems;
     }
 
@@ -102,44 +100,19 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
 
     public String createHubProject(final String projectName) throws IOException, BDRestException, URISyntaxException {
         final ProjectItem newProject = new ProjectItem(null, projectName, null, false, 1, SourceEnum.CUSTOM);
-        final StringRepresentation stringRep = new StringRepresentation(getRestConnection().getGson().toJson(newProject));
-        stringRep.setMediaType(MediaType.APPLICATION_JSON);
-        stringRep.setCharacterSet(CharacterSet.UTF_8);
+        final StringRepresentation stringRepresentation = new StringRepresentation(getRestConnection().getGson().toJson(newProject));
+        stringRepresentation.setMediaType(MediaType.APPLICATION_JSON);
+        stringRepresentation.setCharacterSet(CharacterSet.UTF_8);
 
-        HubRequest projectItemRequest = createPostHubRequest(stringRep);
+        HubRequest projectItemRequest = getHubRequestFactory().createPostRequest(PROJECTS_SEGMENTS);
         String location = null;
         try {
-            location = projectItemRequest.executePost(stringRep);
+            location = projectItemRequest.executePost(stringRepresentation);
         } catch (final ResourceDoesNotExistException ex) {
             throw new BDRestException("There was a problem creating this Project for the specified Hub server.", ex,
                     ex.getResource());
         }
         return location;
-    }
-
-    private HubPagedRequest createDefaultHubRequest() {
-        final HubPagedRequest projectItemRequest = new HubPagedRequest(getRestConnection());
-
-        projectItemRequest.setMethod(Method.GET);
-        projectItemRequest.setLimit(100);
-        projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
-
-        return projectItemRequest;
-    }
-
-    private HubRequest createPostHubRequest(StringRepresentation representation) {
-        final HubRequest projectItemRequest = new HubRequest(getRestConnection());
-
-        projectItemRequest.setMethod(Method.POST);
-        projectItemRequest.addUrlSegments(PROJECTS_SEGMENTS);
-
-        return projectItemRequest;
-    }
-
-    private void addProjectNameQuery(HubPagedRequest projectItemRequest, String projectName) {
-        if (StringUtils.isNotBlank(projectName)) {
-            projectItemRequest.setQ("name:" + projectName);
-        }
     }
 
 }

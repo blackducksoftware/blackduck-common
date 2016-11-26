@@ -30,8 +30,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.restlet.data.Method;
-
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
@@ -44,11 +42,8 @@ public class HubRegistrationRestService extends HubRestService {
     }
 
     public String getRegistrationId() throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest registrationRequest = new HubPagedRequest(getRestConnection());
-        registrationRequest.setMethod(Method.GET);
-        registrationRequest.addUrlSegments(REGISTRATION_SEGMENTS);
+        JsonObject jsonObject = getJsonObject(REGISTRATION_SEGMENTS);
 
-        final JsonObject jsonObject = registrationRequest.executeForResponseJson();
         String registrationId = jsonObject.get("registrationId").getAsString();
         return registrationId;
     }

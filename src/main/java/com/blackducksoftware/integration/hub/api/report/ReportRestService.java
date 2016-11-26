@@ -158,7 +158,8 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
         ReportInformationItem reportInfo = null;
 
         while (timeFinished == null) {
-            reportInfo = getItem(reportUrl);
+            HubRequest hubRequest = getHubRequestFactory().createGetRequest(reportUrl);
+            reportInfo = getItem(hubRequest);
             timeFinished = reportInfo.getFinishedAt();
             if (timeFinished != null) {
                 break;

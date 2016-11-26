@@ -21,13 +21,10 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.extension;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.reflect.TypeToken;
 
@@ -42,8 +39,4 @@ public class ExtensionRestService extends HubItemRestService<ExtensionItem> {
         super(restConnection, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
     }
 
-    public ExtensionItem getExtensionItem(final String extensionUrl)
-            throws IOException, BDRestException, URISyntaxException {
-        return getItem(extensionUrl);
-    }
 }

@@ -27,17 +27,13 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_POL
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.restlet.data.Method;
 
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class PolicyRestService extends HubItemRestService<PolicyRule> {
@@ -53,24 +49,10 @@ public class PolicyRestService extends HubItemRestService<PolicyRule> {
         super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
     }
 
-    public PolicyRule getPolicyRuleById(final String policyRuleId)
-            throws IOException, BDRestException, URISyntaxException {
-        final List<String> urlSegments = new ArrayList<>();
-        urlSegments.addAll(POLICY_RULE_SEGMENTS);
-        urlSegments.add(policyRuleId);
-
-        final PolicyRule rule = getItem(urlSegments);
-        return rule;
-    }
-
     public List<PolicyRule> getAllPolicyRules() throws IOException, BDRestException, URISyntaxException {
-        final HubPagedRequest policyRuleItemRequest = new HubPagedRequest(getRestConnection());
-        policyRuleItemRequest.setMethod(Method.GET);
-        policyRuleItemRequest.setLimit(100);
-        policyRuleItemRequest.addUrlSegments(POLICY_RULE_SEGMENTS);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, POLICY_RULE_SEGMENTS);
 
-        final JsonObject jsonObject = policyRuleItemRequest.executeForResponseJson();
-        final List<PolicyRule> allPolicyRuleItems = getAll(jsonObject, policyRuleItemRequest);
+        final List<PolicyRule> allPolicyRuleItems = getAllHubItems(hubPagedRequest);
         return allPolicyRuleItems;
     }
 

@@ -24,6 +24,8 @@ package com.blackducksoftware.integration.hub.api;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_LIMIT;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_OFFSET;
 
+import java.util.Map;
+
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
 /**
@@ -48,6 +50,18 @@ public class HubPagedRequest extends HubRequest {
 
         // if offset is not provided, the default is 0
         addQueryParameter(QUERY_OFFSET, String.valueOf(offset));
+    }
+
+    @Override
+    public HubPagedRequest addQueryParameter(final String queryParameterName, final String queryParameterValue) {
+        super.addQueryParameter(queryParameterName, queryParameterValue);
+        return this;
+    }
+
+    @Override
+    public HubPagedRequest addQueryParameters(final Map<String, String> queryParameters) {
+        super.addQueryParameters(queryParameters);
+        return this;
     }
 
     public int getLimit() {

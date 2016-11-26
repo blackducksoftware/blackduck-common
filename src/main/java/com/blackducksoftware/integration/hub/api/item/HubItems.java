@@ -23,30 +23,30 @@ package com.blackducksoftware.integration.hub.api.item;
 
 import java.util.List;
 
-public class HubItems {
-    private int totalCount;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-    private List<HubItem> items;
+public class HubItems<T extends HubItem> {
+    private final int totalCount;
+
+    private final List<T> items;
+
+    public HubItems(int totalCount, List<T> items) {
+        this.totalCount = totalCount;
+        this.items = items;
+    }
 
     public int getTotalCount() {
         return totalCount;
     }
 
-    public List<HubItem> getItems() {
+    public List<T> getItems() {
         return items;
-    }
-
-    public void setTotalCount(final int totalCount) {
-        this.totalCount = totalCount;
-    }
-
-    public void setItems(final List<HubItem> items) {
-        this.items = items;
     }
 
     @Override
     public String toString() {
-        return "HubItemList [totalCount=" + totalCount + ", items=" + items + "]";
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

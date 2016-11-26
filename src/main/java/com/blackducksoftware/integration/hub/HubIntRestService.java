@@ -32,9 +32,11 @@ import org.restlet.data.Method;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 
+import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.HubServicesFactory;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
@@ -144,7 +146,9 @@ public class HubIntRestService {
      *
      */
     public void deleteHubProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
-        hubServicesFactory.createProjectRestService().deleteItem(projectUrl);
+        ProjectRestService projectRestService = hubServicesFactory.createProjectRestService();
+        HubRequest hubRequest = projectRestService.getHubRequestFactory().createDeleteRequest(projectUrl);
+        projectRestService.deleteItem(hubRequest);
     }
 
     /**

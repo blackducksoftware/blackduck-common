@@ -21,24 +21,11 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.policy;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_POLICY_STATUS;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_PROJECTS;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_VERSIONS;
-
-import java.io.IOException;
 import java.lang.reflect.Type;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.restlet.data.Method;
-
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
-import com.blackducksoftware.integration.hub.api.HubPagedRequest;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class PolicyStatusRestService extends HubItemRestService<PolicyStatusItem> {
@@ -50,26 +37,6 @@ public class PolicyStatusRestService extends HubItemRestService<PolicyStatusItem
 
     public PolicyStatusRestService(final RestConnection restConnection) {
         super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
-    }
-
-    public PolicyStatusItem getPolicyStatusItem(final String projectId, final String versionId)
-            throws IOException, URISyntaxException, BDRestException {
-        final List<String> urlSegments = new ArrayList<>();
-        urlSegments.add(SEGMENT_API);
-        urlSegments.add(SEGMENT_PROJECTS);
-        urlSegments.add(projectId);
-        urlSegments.add(SEGMENT_VERSIONS);
-        urlSegments.add(versionId);
-        urlSegments.add(SEGMENT_POLICY_STATUS);
-
-        final HubPagedRequest policyStatusItemRequest = new HubPagedRequest(getRestConnection());
-        policyStatusItemRequest.setMethod(Method.GET);
-        policyStatusItemRequest.setLimit(1);
-        policyStatusItemRequest.addUrlSegments(urlSegments);
-
-        final JsonObject jsonObject = policyStatusItemRequest.executeForResponseJson();
-        final PolicyStatusItem policyStatusItem = getItem(jsonObject, PolicyStatusItem.class);
-        return policyStatusItem;
     }
 
 }

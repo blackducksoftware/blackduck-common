@@ -27,9 +27,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.restlet.data.Method;
-
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.api.item.HubItems;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
@@ -46,11 +45,28 @@ public class HubItemRestService<T extends HubItem> extends HubRestService {
         this.itemListType = itemListType;
     }
 
-    public List<T> getAll(final JsonObject jsonObject, final HubPagedRequest hubRequest)
+    public HubItems<T> getHubItems(HubRequest hubRequest) throws IOException, URISyntaxException, BDRestException {
+        JsonObject jsonObject = hubRequest.executeForResponseJson();
+        final int totalCount = jsonObject.get("totalCount").getAsInt();
+        final List<T> items = getItems(jsonObject);
+        return new HubItems<>(totalCount, items);
+    }
+
+    /**
+     * This method can be overridden by subclasses to provide special treatment for extracting the items from the
+     * jsonObject.
+     */
+    public List<T> getItems(JsonObject jsonObject) {
+        return getRestConnection().getGson().fromJson(jsonObject.get("items"), itemListType);
+    }
+
+    public List<T> getAllHubItems(final HubPagedRequest hubRequest)
             throws BDRestException, IOException, URISyntaxException {
         final List<T> allItems = new ArrayList<>();
-        final int totalCount = jsonObject.get("totalCount").getAsInt();
-        List<T> items = getItems(jsonObject);
+
+        HubItems<T> firstPage = getHubItems(hubRequest);
+        final int totalCount = firstPage.getTotalCount();
+        List<T> items = firstPage.getItems();
         allItems.addAll(items);
 
         while (allItems.size() < totalCount) {
@@ -58,56 +74,25 @@ public class HubItemRestService<T extends HubItem> extends HubRestService {
             final int increasedOffset = currentOffset + items.size();
 
             hubRequest.setOffset(increasedOffset);
-            final JsonObject nextResponse = hubRequest.executeForResponseJson();
-            items = getItems(nextResponse);
-            allItems.addAll(items);
+            HubItems<T> nextPage = getHubItems(hubRequest);
+            allItems.addAll(nextPage.getItems());
         }
 
         return allItems;
     }
 
-    public List<T> getItems(final JsonObject jsonObject) {
-        final List<T> items = getRestConnection().getGson().fromJson(jsonObject.get("items"), itemListType);
-        return items;
-    }
-
-    public List<T> getItems(final String url) throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest itemRequest = new HubPagedRequest(getRestConnection());
-        itemRequest.setMethod(Method.GET);
-        itemRequest.setUrl(url);
-
-        final String response = itemRequest.executeForResponseString();
-        return getRestConnection().getGson().fromJson(response, itemListType);
-    }
-
-    public T getItem(final JsonObject jsonObject, final Class<T> clazz) {
-        return getRestConnection().getGson().fromJson(jsonObject, clazz);
-    }
-
-    public T getItem(final String url) throws IOException, BDRestException, URISyntaxException {
-        final HubRequest itemRequest = new HubRequest(getRestConnection());
-        itemRequest.setMethod(Method.GET);
-        itemRequest.setUrl(url);
-
-        final String response = itemRequest.executeForResponseString();
+    public T getItem(final HubRequest hubRequest) throws IOException, BDRestException, URISyntaxException {
+        final String response = hubRequest.executeForResponseString();
         return getRestConnection().getGson().fromJson(response, itemType);
     }
 
-    public void deleteItem(final String url) throws IOException, BDRestException, URISyntaxException {
-        final HubRequest itemRequest = new HubRequest(getRestConnection());
-        itemRequest.setMethod(Method.DELETE);
-        itemRequest.setUrl(url);
-
-        itemRequest.executeDelete();
+    public T getItem(String url) throws IOException, BDRestException, URISyntaxException {
+        HubRequest hubRequest = getHubRequestFactory().createGetRequest(url);
+        return getItem(hubRequest);
     }
 
-    public T getItem(final List<String> urlSegments) throws IOException, BDRestException, URISyntaxException {
-        final HubRequest itemRequest = new HubRequest(getRestConnection());
-        itemRequest.setMethod(Method.GET);
-        itemRequest.addUrlSegments(urlSegments);
-
-        final String response = itemRequest.executeForResponseString();
-        return getRestConnection().getGson().fromJson(response, itemType);
+    public void deleteItem(HubRequest hubRequest) throws IOException, BDRestException, URISyntaxException {
+        hubRequest.executeDelete();
     }
 
     public Type getItemType() {

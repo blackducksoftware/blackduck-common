@@ -186,12 +186,14 @@ public class HubRequest {
         return queryParameters;
     }
 
-    public void addQueryParameter(final String queryParameterName, final String queryParameterValue) {
+    public HubRequest addQueryParameter(final String queryParameterName, final String queryParameterValue) {
         queryParameters.put(queryParameterName, queryParameterValue);
+        return this;
     }
 
-    public void addQueryParameters(final Map<String, String> queryParameters) {
+    public HubRequest addQueryParameters(final Map<String, String> queryParameters) {
         queryParameters.putAll(queryParameters);
+        return this;
     }
 
     public String getQ() {

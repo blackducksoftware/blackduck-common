@@ -26,13 +26,10 @@ import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.restlet.data.Method;
-
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class VulnerableBomComponentRestService extends HubItemRestService<VulnerableBomComponentItem> {
@@ -49,13 +46,11 @@ public class VulnerableBomComponentRestService extends HubItemRestService<Vulner
     public List<VulnerableBomComponentItem> getVulnerableComponentsMatchingComponentName(
             final String vulnerableBomComponentsUrl, final String componentName)
             throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest itemRequest = new HubPagedRequest(getRestConnection());
-        itemRequest.setMethod(Method.GET);
-        itemRequest.setUrl(vulnerableBomComponentsUrl);
-        itemRequest.setQ(componentName);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, vulnerableBomComponentsUrl);
+        hubPagedRequest.setQ(componentName);
 
-        final JsonObject jsonObject = itemRequest.executeForResponseJson();
-        final List<VulnerableBomComponentItem> allItems = getAll(jsonObject, itemRequest);
+        final List<VulnerableBomComponentItem> allItems = getAllHubItems(hubPagedRequest);
         return allItems;
     }
+
 }

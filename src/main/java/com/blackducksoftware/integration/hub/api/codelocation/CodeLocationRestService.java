@@ -30,13 +30,10 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.restlet.data.Method;
-
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class CodeLocationRestService extends HubItemRestService<CodeLocationItem> {
@@ -53,26 +50,18 @@ public class CodeLocationRestService extends HubItemRestService<CodeLocationItem
     }
 
     public List<CodeLocationItem> getAllCodeLocations() throws IOException, BDRestException, URISyntaxException {
-        final HubPagedRequest codeLocationItemRequest = new HubPagedRequest(getRestConnection());
-        codeLocationItemRequest.setMethod(Method.GET);
-        codeLocationItemRequest.setLimit(100);
-        codeLocationItemRequest.addUrlSegments(CODE_LOCATION_SEGMENTS);
+        HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, CODE_LOCATION_SEGMENTS);
 
-        final JsonObject jsonObject = codeLocationItemRequest.executeForResponseJson();
-        final List<CodeLocationItem> allCodeLocations = getAll(jsonObject, codeLocationItemRequest);
+        final List<CodeLocationItem> allCodeLocations = getAllHubItems(hubPagedRequest);
         return allCodeLocations;
     }
 
     public List<CodeLocationItem> getAllCodeLocationsForCodeLocationType(final CodeLocationTypeEnum codeLocationType)
             throws IOException, BDRestException, URISyntaxException {
-        final HubPagedRequest codeLocationItemRequest = new HubPagedRequest(getRestConnection());
-        codeLocationItemRequest.setMethod(Method.GET);
-        codeLocationItemRequest.setLimit(100);
-        codeLocationItemRequest.addQueryParameter("codeLocationType", codeLocationType.toString());
-        codeLocationItemRequest.addUrlSegments(CODE_LOCATION_SEGMENTS);
+        HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType",
+                codeLocationType.toString());
 
-        final JsonObject jsonObject = codeLocationItemRequest.executeForResponseJson();
-        final List<CodeLocationItem> allCodeLocations = getAll(jsonObject, codeLocationItemRequest);
+        final List<CodeLocationItem> allCodeLocations = getAllHubItems(hubPagedRequest);
         return allCodeLocations;
     }
 

@@ -21,18 +21,11 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.component.id;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
-import java.net.URISyntaxException;
 import java.util.List;
 
-import org.restlet.data.Method;
-
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
-import com.blackducksoftware.integration.hub.api.HubPagedRequest;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class ComponentIdRestService extends HubItemRestService<ComponentIdItem> {
@@ -44,17 +37,6 @@ public class ComponentIdRestService extends HubItemRestService<ComponentIdItem> 
 
     public ComponentIdRestService(final RestConnection restConnection) {
         super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
-    }
-
-    public ComponentIdItem getComponent(final String componentURL)
-            throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest componentRequest = new HubPagedRequest(getRestConnection());
-        componentRequest.setMethod(Method.GET);
-        componentRequest.setLimit(1);
-        componentRequest.setUrl(componentURL);
-        final JsonObject jsonObject = componentRequest.executeForResponseJson();
-        final ComponentIdItem component = getItem(jsonObject, ComponentIdItem.class);
-        return component;
     }
 
 }

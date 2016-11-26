@@ -36,8 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.restlet.data.Method;
-
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
@@ -76,15 +74,11 @@ public class NotificationRestService extends HubItemRestService<NotificationItem
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final HubPagedRequest notificationItemRequest = new HubPagedRequest(getRestConnection());
-        notificationItemRequest.setMethod(Method.GET);
-        notificationItemRequest.setLimit(100);
-        notificationItemRequest.addUrlSegments(NOTIFICATIONS_SEGMENTS);
-        notificationItemRequest.addQueryParameter("startDate", startDateString);
-        notificationItemRequest.addQueryParameter("endDate", endDateString);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, NOTIFICATIONS_SEGMENTS);
+        hubPagedRequest.addQueryParameter("startDate", startDateString);
+        hubPagedRequest.addQueryParameter("endDate", endDateString);
 
-        final JsonObject jsonObject = notificationItemRequest.executeForResponseJson();
-        final List<NotificationItem> allNotificationItems = getAll(jsonObject, notificationItemRequest);
+        final List<NotificationItem> allNotificationItems = getAllHubItems(hubPagedRequest);
         return allNotificationItems;
     }
 
@@ -94,16 +88,13 @@ public class NotificationRestService extends HubItemRestService<NotificationItem
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
+        String url = user.getLink("notifications");
 
-        final HubPagedRequest notificationItemRequest = new HubPagedRequest(getRestConnection());
-        notificationItemRequest.setMethod(Method.GET);
-        notificationItemRequest.setLimit(100);
-        notificationItemRequest.setUrl(user.getLink("notifications"));
-        notificationItemRequest.addQueryParameter("startDate", startDateString);
-        notificationItemRequest.addQueryParameter("endDate", endDateString);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, url);
+        hubPagedRequest.addQueryParameter("startDate", startDateString);
+        hubPagedRequest.addQueryParameter("endDate", endDateString);
 
-        final JsonObject jsonObject = notificationItemRequest.executeForResponseJson();
-        final List<NotificationItem> allNotificationItems = getAll(jsonObject, notificationItemRequest);
+        final List<NotificationItem> allNotificationItems = getAllHubItems(hubPagedRequest);
         return allNotificationItems;
     }
 

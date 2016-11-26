@@ -26,13 +26,10 @@ import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.restlet.data.Method;
-
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class ExtensionConfigRestService extends HubItemRestService<ConfigurationItem> {
@@ -48,37 +45,25 @@ public class ExtensionConfigRestService extends HubItemRestService<Configuration
 
     public List<ConfigurationItem> getGlobalOptions(final String globalConfigUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest itemRequest = new HubPagedRequest(getRestConnection());
-        itemRequest.setUrl(globalConfigUrl);
-        itemRequest.setMethod(Method.GET);
-        itemRequest.setLimit(100);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, globalConfigUrl);
 
-        final JsonObject jsonObject = itemRequest.executeForResponseJson();
-        final List<ConfigurationItem> allItems = getAll(jsonObject, itemRequest);
+        final List<ConfigurationItem> allItems = getAllHubItems(hubPagedRequest);
         return allItems;
     }
 
     public List<ConfigurationItem> getCurrentUserOptions(final String currentUserConfigUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest itemRequest = new HubPagedRequest(getRestConnection());
-        itemRequest.setUrl(currentUserConfigUrl);
-        itemRequest.setMethod(Method.GET);
-        itemRequest.setLimit(100);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, currentUserConfigUrl);
 
-        final JsonObject jsonObject = itemRequest.executeForResponseJson();
-        final List<ConfigurationItem> allItems = getAll(jsonObject, itemRequest);
+        final List<ConfigurationItem> allItems = getAllHubItems(hubPagedRequest);
         return allItems;
     }
 
     public List<ConfigurationItem> getUserConfiguration(final String userConfigUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest itemRequest = new HubPagedRequest(getRestConnection());
-        itemRequest.setUrl(userConfigUrl);
-        itemRequest.setMethod(Method.GET);
-        itemRequest.setLimit(100);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, userConfigUrl);
 
-        final JsonObject jsonObject = itemRequest.executeForResponseJson();
-        final List<ConfigurationItem> allItems = getAll(jsonObject, itemRequest);
+        final List<ConfigurationItem> allItems = getAllHubItems(hubPagedRequest);
         return allItems;
     }
 

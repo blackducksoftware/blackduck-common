@@ -26,13 +26,10 @@ import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.restlet.data.Method;
-
 import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class ScanSummaryRestService extends HubItemRestService<ScanSummaryItem> {
@@ -48,13 +45,9 @@ public class ScanSummaryRestService extends HubItemRestService<ScanSummaryItem> 
 
     public List<ScanSummaryItem> getAllScanSummaryItems(final String scanSummaryUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest scanSummaryItemRequest = new HubPagedRequest(getRestConnection());
-        scanSummaryItemRequest.setMethod(Method.GET);
-        scanSummaryItemRequest.setLimit(100);
-        scanSummaryItemRequest.setUrl(scanSummaryUrl);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, scanSummaryUrl);
 
-        final JsonObject jsonObject = scanSummaryItemRequest.executeForResponseJson();
-        final List<ScanSummaryItem> allScanSummaryItems = getAll(jsonObject, scanSummaryItemRequest);
+        final List<ScanSummaryItem> allScanSummaryItems = getAllHubItems(hubPagedRequest);
         return allScanSummaryItems;
     }
 

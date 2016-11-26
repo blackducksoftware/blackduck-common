@@ -75,7 +75,7 @@ public class ExtensionConfigDataService extends HubRestService {
             throws UnexpectedHubResponseException {
         Map<String, ConfigurationItem> globalConfigMap = new HashMap<>();
         try {
-            final ExtensionItem extension = extensionRestService.getExtensionItem(extensionUrl);
+            final ExtensionItem extension = extensionRestService.getItem(extensionUrl);
             globalConfigMap = createGlobalConfigMap(extension.getLink("global-options"));
         } catch (IOException | URISyntaxException | BDRestException e) {
             logger.error("Error creating global configurationMap", e);
@@ -86,7 +86,7 @@ public class ExtensionConfigDataService extends HubRestService {
     public List<UserConfigItem> getUserConfigList(final String extensionUrl) throws UnexpectedHubResponseException {
         List<UserConfigItem> itemList = new LinkedList<>();
         try {
-            final ExtensionItem extension = extensionRestService.getExtensionItem(extensionUrl);
+            final ExtensionItem extension = extensionRestService.getItem(extensionUrl);
             final List<UserOptionLinkItem> userOptionList = extensionUserOptionRestService
                     .getUserOptions(extension.getLink("user-options"));
             itemList = parallelProcessor.process(userOptionList);
