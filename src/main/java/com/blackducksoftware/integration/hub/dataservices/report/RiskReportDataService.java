@@ -12,6 +12,7 @@
 package com.blackducksoftware.integration.hub.dataservices.report;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -58,7 +59,8 @@ public class RiskReportDataService extends HubRestService {
     }
 
     public void createRiskReport(final File outputDirectory, String projectName, String projectVersionName, ReportCategoriesEnum[] categories)
-            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, HubIntegrationException, InterruptedException,
+            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, HubIntegrationException,
+            InterruptedException,
             UnexpectedHubResponseException {
         ProjectItem project = projectRestService.getProjectByName(projectName);
         ProjectVersionItem version = projectVersionRestService.getProjectVersion(project, projectVersionName);
@@ -71,6 +73,10 @@ public class RiskReportDataService extends HubRestService {
                 htmlFile = file;
                 break;
             }
+        }
+        if (htmlFile == null) {
+            throw new FileNotFoundException("Could not find the file : " + RiskReportResourceCopier.RISK_REPORT_HTML_FILE_NAME
+                    + ", the report files must not have been copied into the report directory.");
         }
         String htmlFileString = FileUtils.readFileToString(htmlFile, "UTF-8");
         String reportString = getRestConnection().getGson().toJson(riskreportData);
