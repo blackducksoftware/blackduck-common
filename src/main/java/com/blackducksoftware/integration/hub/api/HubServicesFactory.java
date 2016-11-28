@@ -50,6 +50,7 @@ import com.blackducksoftware.integration.hub.dataservices.extension.ExtensionCon
 import com.blackducksoftware.integration.hub.dataservices.notification.NotificationDataService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.policystatus.PolicyStatusDataService;
+import com.blackducksoftware.integration.hub.dataservices.report.RiskReportDataService;
 import com.blackducksoftware.integration.hub.dataservices.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.dataservices.vulnerability.VulnerabilityDataService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
@@ -62,6 +63,11 @@ public class HubServicesFactory {
 
     public HubServicesFactory(final RestConnection restConnection) {
         this.restConnection = restConnection;
+    }
+
+    public RiskReportDataService createRiskReportDataService(final IntLogger logger) {
+        return new RiskReportDataService(restConnection, createProjectRestService(),
+                createProjectVersionRestService(), createReportRestService(logger));
     }
 
     public PolicyStatusDataService createPolicyStatusDataService() {
