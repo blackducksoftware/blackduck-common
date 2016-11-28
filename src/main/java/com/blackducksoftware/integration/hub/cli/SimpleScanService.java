@@ -41,10 +41,9 @@ import org.restlet.engine.io.IoUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.ScanExecutor.Result;
 import com.blackducksoftware.integration.hub.ScannerSplitStream;
 import com.blackducksoftware.integration.hub.StreamRedirectThread;
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubRequestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -54,7 +53,13 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
-public class SimpleScanService extends HubRestService<String> {
+public class SimpleScanService extends HubRequestService {
+    public static final int DEFAULT_MEMORY = 4096;
+
+    public static enum Result {
+        SUCCESS, FAILURE;
+    }
+
     private final IntLogger logger;
 
     private final HubServerConfig hubServerConfig;
@@ -86,7 +91,7 @@ public class SimpleScanService extends HubRestService<String> {
     public SimpleScanService(IntLogger logger, RestConnection restConnection, HubServerConfig hubServerConfig, HubSupportHelper hubSupportHelper,
             CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, int scanMemory, boolean verboseRun, boolean dryRun, String project,
             String version, List<String> scanTargetPaths, String workingDirectoryPath) {
-        super(restConnection, String.class);
+        super(restConnection);
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
         this.hubSupportHelper = hubSupportHelper;

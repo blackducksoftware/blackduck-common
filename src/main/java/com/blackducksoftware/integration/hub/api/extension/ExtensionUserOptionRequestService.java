@@ -19,14 +19,28 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api.component.version;
+package com.blackducksoftware.integration.hub.api.extension;
 
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.List;
+
+import com.blackducksoftware.integration.hub.api.HubPagedRequest;
+import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class ComponentVersionRestService extends HubRestService<ComponentVersion> {
-    public ComponentVersionRestService(final RestConnection restConnection) {
-        super(restConnection, ComponentVersion.class);
+public class ExtensionUserOptionRequestService extends HubParameterizedRequestService<UserOptionLinkItem> {
+    public ExtensionUserOptionRequestService(final RestConnection restConnection) {
+        super(restConnection, UserOptionLinkItem.class);
+    }
+
+    public List<UserOptionLinkItem> getUserOptions(final String userOptionsUrl)
+            throws IOException, URISyntaxException, BDRestException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, userOptionsUrl);
+
+        final List<UserOptionLinkItem> allItems = getAllItems(hubPagedRequest);
+        return allItems;
     }
 
 }

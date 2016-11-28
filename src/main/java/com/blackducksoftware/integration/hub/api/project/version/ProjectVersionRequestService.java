@@ -32,7 +32,7 @@ import org.restlet.representation.StringRepresentation;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.HubRequest;
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
 import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
@@ -41,8 +41,8 @@ import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistExcep
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class ProjectVersionRestService extends HubRestService<ProjectVersionItem> {
-    public ProjectVersionRestService(final RestConnection restConnection) {
+public class ProjectVersionRequestService extends HubParameterizedRequestService<ProjectVersionItem> {
+    public ProjectVersionRequestService(final RestConnection restConnection) {
         super(restConnection, ProjectVersionItem.class);
     }
 

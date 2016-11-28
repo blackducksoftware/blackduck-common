@@ -36,7 +36,7 @@ import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.HubServicesFactory;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
-import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
@@ -68,7 +68,7 @@ public class HubIntRestService {
      */
     public List<ProjectItem> getProjectMatches(final String projectName)
             throws IOException, BDRestException, URISyntaxException {
-        return hubServicesFactory.createProjectRestService().getAllProjectMatches(projectName);
+        return hubServicesFactory.createProjectRequestService().getAllProjectMatches(projectName);
     }
 
     /**
@@ -78,7 +78,7 @@ public class HubIntRestService {
      */
     public List<ProjectItem> getProjectMatches(final String projectName, final int limit)
             throws IOException, BDRestException, URISyntaxException {
-        return hubServicesFactory.createProjectRestService().getProjectMatches(projectName, limit);
+        return hubServicesFactory.createProjectRequestService().getProjectMatches(projectName, limit);
     }
 
     /**
@@ -87,16 +87,16 @@ public class HubIntRestService {
      */
     public ProjectItem getProjectByName(final String projectName)
             throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
-        return hubServicesFactory.createProjectRestService().getProjectByName(projectName);
+        return hubServicesFactory.createProjectRequestService().getProjectByName(projectName);
     }
 
     public ProjectItem getProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
-        return hubServicesFactory.createProjectRestService().getItem(projectUrl);
+        return hubServicesFactory.createProjectRequestService().getItem(projectUrl);
     }
 
     public ProjectVersionItem getProjectVersion(final String versionUrl)
             throws IOException, BDRestException, URISyntaxException {
-        return hubServicesFactory.createProjectVersionRestService().getItem(versionUrl);
+        return hubServicesFactory.createProjectVersionRequestService().getItem(versionUrl);
     }
 
     /**
@@ -105,12 +105,12 @@ public class HubIntRestService {
      */
     public ProjectVersionItem getVersion(final ProjectItem project, final String versionName) throws IOException,
             BDRestException, URISyntaxException, UnexpectedHubResponseException {
-        return hubServicesFactory.createProjectVersionRestService().getProjectVersion(project, versionName);
+        return hubServicesFactory.createProjectVersionRequestService().getProjectVersion(project, versionName);
     }
 
     public List<ProjectVersionItem> getProjectVersionsForProject(final ProjectItem project)
             throws UnexpectedHubResponseException, IOException, URISyntaxException, BDRestException {
-        return hubServicesFactory.createProjectVersionRestService().getAllProjectVersions(project);
+        return hubServicesFactory.createProjectVersionRequestService().getAllProjectVersions(project);
     }
 
     private String getVersionReportLink(final ProjectVersionItem version) throws UnexpectedHubResponseException {
@@ -129,7 +129,7 @@ public class HubIntRestService {
      * @return the project URL.
      */
     public String createHubProject(final String projectName) throws IOException, BDRestException, URISyntaxException {
-        return hubServicesFactory.createProjectRestService().createHubProject(projectName);
+        return hubServicesFactory.createProjectRequestService().createHubProject(projectName);
     }
 
     public void deleteHubProject(final ProjectItem project) throws IOException, BDRestException, URISyntaxException {
@@ -146,8 +146,8 @@ public class HubIntRestService {
      *
      */
     public void deleteHubProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
-        final ProjectRestService projectRestService = hubServicesFactory.createProjectRestService();
-        final HubRequest hubRequest = projectRestService.getHubRequestFactory().createDeleteRequest(projectUrl);
+        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService();
+        final HubRequest hubRequest = projectRequestService.getHubRequestFactory().createDeleteRequest(projectUrl);
         hubRequest.executeDelete();
     }
 
@@ -161,7 +161,7 @@ public class HubIntRestService {
     public String createHubVersion(final ProjectItem project, final String versionName, final PhaseEnum phase,
             final DistributionEnum dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
 
-        return hubServicesFactory.createProjectVersionRestService().createHubVersion(project, versionName, phase, dist);
+        return hubServicesFactory.createProjectVersionRequestService().createHubVersion(project, versionName, phase, dist);
     }
 
     /**
@@ -298,7 +298,7 @@ public class HubIntRestService {
         if (StringUtils.isBlank(policyStatusUrl)) {
             throw new IllegalArgumentException("Missing the policy status URL.");
         }
-        return hubServicesFactory.createPolicyStatusRestService().getItem(policyStatusUrl);
+        return hubServicesFactory.createPolicyStatusRequestService().getItem(policyStatusUrl);
     }
 
     /**
@@ -306,7 +306,7 @@ public class HubIntRestService {
      */
     public ScanSummaryItem checkScanStatus(final String scanStatusUrl)
             throws IOException, BDRestException, URISyntaxException {
-        return hubServicesFactory.createScanSummaryRestService().getItem(scanStatusUrl);
+        return hubServicesFactory.createScanSummaryRequestService().getItem(scanStatusUrl);
     }
 
     /**
@@ -319,7 +319,7 @@ public class HubIntRestService {
      *             Returns the registration ID of the hub instance
      */
     public String getRegistrationId() throws URISyntaxException, BDRestException, IOException, JsonSyntaxException {
-        return hubServicesFactory.createHubRegistrationRestService().getRegistrationId();
+        return hubServicesFactory.createHubRegistrationRequestService().getRegistrationId();
     }
 
     private void releaseResource(final ClientResource resource) {

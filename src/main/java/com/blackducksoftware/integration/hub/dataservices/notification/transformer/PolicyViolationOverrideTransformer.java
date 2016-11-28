@@ -29,17 +29,17 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.api.component.version.BomComponentVersionPolicyStatus;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRestService;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRequestService;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
+import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyOverrideContentItem;
@@ -47,10 +47,10 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
 public class PolicyViolationOverrideTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationOverrideTransformer(final NotificationRestService notificationService,
-            final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
-            final VersionBomPolicyRestService bomVersionPolicyService,
-            final ComponentVersionRestService componentVersionService, final PolicyNotificationFilter policyFilter) {
+    public PolicyViolationOverrideTransformer(final NotificationRequestService notificationService,
+            final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
+            final VersionBomPolicyRequestService bomVersionPolicyService,
+            final ComponentVersionRequestService componentVersionService, final PolicyNotificationFilter policyFilter) {
         super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
                 componentVersionService, policyFilter);
     }

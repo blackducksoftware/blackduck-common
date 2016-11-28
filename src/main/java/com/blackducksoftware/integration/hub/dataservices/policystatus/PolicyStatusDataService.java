@@ -25,13 +25,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRestService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
-import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
@@ -39,32 +39,32 @@ import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistExcept
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class PolicyStatusDataService extends HubRestService<String> {
-    private final ProjectRestService projectRestService;
+public class PolicyStatusDataService extends HubRequestService {
+    private final ProjectRequestService projectRequestService;
 
-    private final ProjectVersionRestService projectVersionRestService;
+    private final ProjectVersionRequestService projectVersionRequestService;
 
-    private final PolicyStatusRestService policyStatusRestService;
+    private final PolicyStatusRequestService policyStatusRequestService;
 
-    public PolicyStatusDataService(final RestConnection restConnection, final ProjectRestService projectRestService,
-            final ProjectVersionRestService projectVersionRestService, final PolicyStatusRestService policyStatusRestService) {
-        super(restConnection, String.class);
-        this.projectRestService = projectRestService;
-        this.projectVersionRestService = projectVersionRestService;
-        this.policyStatusRestService = policyStatusRestService;
+    public PolicyStatusDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService,
+            final ProjectVersionRequestService projectVersionRequestService, final PolicyStatusRequestService policyStatusRequestService) {
+        super(restConnection);
+        this.projectRequestService = projectRequestService;
+        this.projectVersionRequestService = projectVersionRequestService;
+        this.policyStatusRequestService = policyStatusRequestService;
     }
 
     public PolicyStatusItem getPolicyStatusForProjectAndVersion(final String projectName,
             final String projectVersionName)
             throws IOException, URISyntaxException, BDRestException, ProjectDoesNotExistException,
             HubIntegrationException, MissingUUIDException, UnexpectedHubResponseException {
-        final ProjectItem projectItem = projectRestService.getProjectByName(projectName);
+        final ProjectItem projectItem = projectRequestService.getProjectByName(projectName);
         final String versionsUrl = projectItem.getLink("versions");
 
-        final List<ProjectVersionItem> projectVersions = projectVersionRestService.getAllProjectVersions(versionsUrl);
+        final List<ProjectVersionItem> projectVersions = projectVersionRequestService.getAllProjectVersions(versionsUrl);
         final String policyStatusUrl = findPolicyStatusUrl(projectVersions, projectVersionName);
 
-        return policyStatusRestService.getItem(policyStatusUrl);
+        return policyStatusRequestService.getItem(policyStatusUrl);
     }
 
     private String findPolicyStatusUrl(final List<ProjectVersionItem> projectVersions, final String projectVersionName)

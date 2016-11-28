@@ -25,25 +25,25 @@ import java.io.File;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.bom.BomImportRestService;
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
-import com.blackducksoftware.integration.hub.api.component.ComponentRestService;
-import com.blackducksoftware.integration.hub.api.component.id.ComponentIdRestService;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRestService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRestService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionRestService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRestService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.report.ReportRestService;
-import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
-import com.blackducksoftware.integration.hub.api.user.UserRestService;
-import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
-import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRestService;
-import com.blackducksoftware.integration.hub.api.vulnerableBomComponent.VulnerableBomComponentRestService;
+import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
+import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
+import com.blackducksoftware.integration.hub.api.component.id.ComponentIdRequestService;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRequestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionRequestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
+import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRequestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
+import com.blackducksoftware.integration.hub.api.user.UserRequestService;
+import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
+import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRequestService;
+import com.blackducksoftware.integration.hub.api.vulnerableBomComponent.VulnerableBomComponentRequestService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservices.extension.ExtensionConfigDataService;
@@ -66,115 +66,115 @@ public class HubServicesFactory {
     }
 
     public RiskReportDataService createRiskReportDataService(final IntLogger logger) {
-        return new RiskReportDataService(restConnection, createProjectRestService(),
-                createProjectVersionRestService(), createReportRestService(logger));
+        return new RiskReportDataService(restConnection, createProjectRequestService(),
+                createProjectVersionRequestService(), createReportRequestService(logger));
     }
 
     public PolicyStatusDataService createPolicyStatusDataService() {
-        return new PolicyStatusDataService(restConnection, createProjectRestService(),
-                createProjectVersionRestService(), createPolicyStatusRestService());
+        return new PolicyStatusDataService(restConnection, createProjectRequestService(),
+                createProjectVersionRequestService(), createPolicyStatusRequestService());
     }
 
     public ScanStatusDataService createScanStatusDataService() {
-        return new ScanStatusDataService(restConnection, createProjectRestService(), createProjectVersionRestService(),
-                createCodeLocationRestService(), createScanSummaryRestService());
+        return new ScanStatusDataService(restConnection, createProjectRequestService(), createProjectVersionRequestService(),
+                createCodeLocationRequestService(), createScanSummaryRequestService());
     }
 
     public NotificationDataService createNotificationDataService(final IntLogger logger) {
-        return new NotificationDataService(logger, restConnection, createNotificationRestService(), createProjectVersionRestService(),
-                createPolicyRestService(), createVersionBomPolicyRestService(), createComponentVersionRestService());
+        return new NotificationDataService(logger, restConnection, createNotificationRequestService(), createProjectVersionRequestService(),
+                createPolicyRequestService(), createVersionBomPolicyRequestService(), createComponentVersionRequestService());
     }
 
     public NotificationDataService createNotificationDataService(final IntLogger logger,
             final PolicyNotificationFilter policyNotificationFilter) {
-        return new NotificationDataService(logger, restConnection, createNotificationRestService(), createProjectVersionRestService(),
-                createPolicyRestService(), createVersionBomPolicyRestService(), createComponentVersionRestService(), policyNotificationFilter);
+        return new NotificationDataService(logger, restConnection, createNotificationRequestService(), createProjectVersionRequestService(),
+                createPolicyRequestService(), createVersionBomPolicyRequestService(), createComponentVersionRequestService(), policyNotificationFilter);
     }
 
     public ExtensionConfigDataService createExtensionConfigDataService(final IntLogger logger) {
-        return new ExtensionConfigDataService(logger, restConnection, createUserRestService(),
-                createExtensionRestService(), createExtensionConfigRestService(), createExtensionUserOptionRestService());
+        return new ExtensionConfigDataService(logger, restConnection, createUserRequestService(),
+                createExtensionRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService());
     }
 
     public VulnerabilityDataService createVulnerabilityDataService() {
-        return new VulnerabilityDataService(restConnection, createComponentRestService(), createComponentVersionRestService(),
-                createVulnerabilityRestService());
+        return new VulnerabilityDataService(restConnection, createComponentRequestService(), createComponentVersionRequestService(),
+                createVulnerabilityRequestService());
     }
 
-    public BomImportRestService createBomImportRestService() {
-        return new BomImportRestService(restConnection);
+    public BomImportRequestService createBomImportRequestService() {
+        return new BomImportRequestService(restConnection);
     }
 
-    public CodeLocationRestService createCodeLocationRestService() {
-        return new CodeLocationRestService(restConnection);
+    public CodeLocationRequestService createCodeLocationRequestService() {
+        return new CodeLocationRequestService(restConnection);
     }
 
-    public ComponentIdRestService createComponentIdRestService() {
-        return new ComponentIdRestService(restConnection);
+    public ComponentIdRequestService createComponentIdRequestService() {
+        return new ComponentIdRequestService(restConnection);
     }
 
-    public ComponentRestService createComponentRestService() {
-        return new ComponentRestService(restConnection);
+    public ComponentRequestService createComponentRequestService() {
+        return new ComponentRequestService(restConnection);
     }
 
-    public ComponentVersionRestService createComponentVersionRestService() {
-        return new ComponentVersionRestService(restConnection);
+    public ComponentVersionRequestService createComponentVersionRequestService() {
+        return new ComponentVersionRequestService(restConnection);
     }
 
-    public HubVersionRestService createHubVersionRestService() {
-        return new HubVersionRestService(restConnection);
+    public HubVersionRequestService createHubVersionRequestService() {
+        return new HubVersionRequestService(restConnection);
     }
 
-    public NotificationRestService createNotificationRestService() {
-        return new NotificationRestService(restConnection);
+    public NotificationRequestService createNotificationRequestService() {
+        return new NotificationRequestService(restConnection);
     }
 
-    public PolicyRestService createPolicyRestService() {
-        return new PolicyRestService(restConnection);
+    public PolicyRequestService createPolicyRequestService() {
+        return new PolicyRequestService(restConnection);
     }
 
-    public PolicyStatusRestService createPolicyStatusRestService() {
-        return new PolicyStatusRestService(restConnection);
+    public PolicyStatusRequestService createPolicyStatusRequestService() {
+        return new PolicyStatusRequestService(restConnection);
     }
 
-    public ProjectRestService createProjectRestService() {
-        return new ProjectRestService(restConnection);
+    public ProjectRequestService createProjectRequestService() {
+        return new ProjectRequestService(restConnection);
     }
 
-    public ProjectVersionRestService createProjectVersionRestService() {
-        return new ProjectVersionRestService(restConnection);
+    public ProjectVersionRequestService createProjectVersionRequestService() {
+        return new ProjectVersionRequestService(restConnection);
     }
 
-    public ScanSummaryRestService createScanSummaryRestService() {
-        return new ScanSummaryRestService(restConnection);
+    public ScanSummaryRequestService createScanSummaryRequestService() {
+        return new ScanSummaryRequestService(restConnection);
     }
 
-    public UserRestService createUserRestService() {
-        return new UserRestService(restConnection);
+    public UserRequestService createUserRequestService() {
+        return new UserRequestService(restConnection);
     }
 
-    public VersionBomPolicyRestService createVersionBomPolicyRestService() {
-        return new VersionBomPolicyRestService(restConnection);
+    public VersionBomPolicyRequestService createVersionBomPolicyRequestService() {
+        return new VersionBomPolicyRequestService(restConnection);
     }
 
-    public VulnerabilityRestService createVulnerabilityRestService() {
-        return new VulnerabilityRestService(restConnection);
+    public VulnerabilityRequestService createVulnerabilityRequestService() {
+        return new VulnerabilityRequestService(restConnection);
     }
 
-    public ExtensionRestService createExtensionRestService() {
-        return new ExtensionRestService(restConnection);
+    public ExtensionRequestService createExtensionRequestService() {
+        return new ExtensionRequestService(restConnection);
     }
 
-    public ExtensionConfigRestService createExtensionConfigRestService() {
-        return new ExtensionConfigRestService(restConnection);
+    public ExtensionConfigRequestService createExtensionConfigRequestService() {
+        return new ExtensionConfigRequestService(restConnection);
     }
 
-    public ExtensionUserOptionRestService createExtensionUserOptionRestService() {
-        return new ExtensionUserOptionRestService(restConnection);
+    public ExtensionUserOptionRequestService createExtensionUserOptionRequestService() {
+        return new ExtensionUserOptionRequestService(restConnection);
     }
 
-    public VulnerableBomComponentRestService createVulnerableBomComponentRestService() {
-        return new VulnerableBomComponentRestService(restConnection);
+    public VulnerableBomComponentRequestService createVulnerableBomComponentRequestService() {
+        return new VulnerableBomComponentRequestService(restConnection);
     }
 
     public CLIDownloadService createCliDownloadService(IntLogger logger) {
@@ -189,12 +189,12 @@ public class HubServicesFactory {
                 verboseRun, dryRun, project, version, scanTargetPaths, workingDirectoryPath);
     }
 
-    public HubRegistrationRestService createHubRegistrationRestService() {
-        return new HubRegistrationRestService(restConnection);
+    public HubRegistrationRequestService createHubRegistrationRequestService() {
+        return new HubRegistrationRequestService(restConnection);
     }
 
-    public ReportRestService createReportRestService(IntLogger logger) {
-        return new ReportRestService(restConnection, logger);
+    public ReportRequestService createReportRequestService(IntLogger logger) {
+        return new ReportRequestService(restConnection, logger);
     }
 
     public RestConnection getRestConnection() {

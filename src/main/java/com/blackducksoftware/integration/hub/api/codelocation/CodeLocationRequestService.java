@@ -19,10 +19,10 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api.policy;
+package com.blackducksoftware.integration.hub.api.codelocation;
 
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_POLICY_RULES;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CODE_LOCATIONS;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -30,22 +30,31 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class PolicyRestService extends HubRestService<PolicyRule> {
-    private static final List<String> POLICY_RULE_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_POLICY_RULES);
+public class CodeLocationRequestService extends HubParameterizedRequestService<CodeLocationItem> {
+    private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
 
-    public PolicyRestService(final RestConnection restConnection) {
-        super(restConnection, PolicyRule.class);
+    public CodeLocationRequestService(final RestConnection restConnection) {
+        super(restConnection, CodeLocationItem.class);
     }
 
-    public List<PolicyRule> getAllPolicyRules() throws IOException, BDRestException, URISyntaxException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, POLICY_RULE_SEGMENTS);
+    public List<CodeLocationItem> getAllCodeLocations() throws IOException, BDRestException, URISyntaxException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, CODE_LOCATION_SEGMENTS);
 
-        final List<PolicyRule> allPolicyRuleItems = getAllItems(hubPagedRequest);
-        return allPolicyRuleItems;
+        final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest);
+        return allCodeLocations;
+    }
+
+    public List<CodeLocationItem> getAllCodeLocationsForCodeLocationType(final CodeLocationTypeEnum codeLocationType)
+            throws IOException, BDRestException, URISyntaxException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType",
+                codeLocationType.toString());
+
+        final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest);
+        return allCodeLocations;
     }
 
 }

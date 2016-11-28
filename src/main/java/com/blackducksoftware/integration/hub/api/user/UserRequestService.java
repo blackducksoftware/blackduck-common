@@ -19,28 +19,33 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api.scan;
+package com.blackducksoftware.integration.hub.api.user;
+
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_USERS;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class ScanSummaryRestService extends HubRestService<ScanSummaryItem> {
-    public ScanSummaryRestService(final RestConnection restConnection) {
-        super(restConnection, ScanSummaryItem.class);
+public class UserRequestService extends HubParameterizedRequestService<UserItem> {
+    private static final List<String> USERS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_USERS);
+
+    public UserRequestService(final RestConnection restConnection) {
+        super(restConnection, UserItem.class);
     }
 
-    public List<ScanSummaryItem> getAllScanSummaryItems(final String scanSummaryUrl)
-            throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, scanSummaryUrl);
+    public List<UserItem> getAllUsers() throws URISyntaxException, BDRestException, IOException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, USERS_SEGMENTS);
 
-        final List<ScanSummaryItem> allScanSummaryItems = getAllItems(hubPagedRequest);
-        return allScanSummaryItems;
+        final List<UserItem> allUserItems = getAllItems(hubPagedRequest);
+        return allUserItems;
     }
 
 }

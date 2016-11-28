@@ -30,15 +30,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class ComponentRestService extends HubRestService<ComponentItem> {
+public class ComponentRequestService extends HubParameterizedRequestService<ComponentItem> {
     private static final List<String> COMPONENT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_COMPONENTS);
 
-    public ComponentRestService(final RestConnection restConnection) {
+    public ComponentRequestService(final RestConnection restConnection) {
         super(restConnection, ComponentItem.class);
     }
 

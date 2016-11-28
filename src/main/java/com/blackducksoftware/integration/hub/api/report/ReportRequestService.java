@@ -32,7 +32,7 @@ import org.restlet.data.Method;
 import org.restlet.representation.StringRepresentation;
 
 import com.blackducksoftware.integration.hub.api.HubRequest;
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -46,12 +46,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class ReportRestService extends HubRestService<ReportInformationItem> {
+public class ReportRequestService extends HubParameterizedRequestService<ReportInformationItem> {
     private final static long MAXIMUM_WAIT = 1000 * 60 * 30;
 
     private final IntLogger logger;
 
-    public ReportRestService(final RestConnection restConnection, IntLogger logger) {
+    public ReportRequestService(final RestConnection restConnection, IntLogger logger) {
         super(restConnection, ReportInformationItem.class);
         this.logger = logger;
     }

@@ -19,33 +19,42 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api.user;
+package com.blackducksoftware.integration.hub.api.bom;
 
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_USERS;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_BOM_IMPORT;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import com.blackducksoftware.integration.hub.api.HubPagedRequest;
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import org.restlet.data.MediaType;
+import org.restlet.representation.FileRepresentation;
+
+import com.blackducksoftware.integration.hub.api.HubRequestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class UserRestService extends HubRestService<UserItem> {
-    private static final List<String> USERS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_USERS);
+public class BomImportRequestService extends HubRequestService {
+    private static final List<String> BOM_IMPORT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_BOM_IMPORT);
 
-    public UserRestService(final RestConnection restConnection) {
-        super(restConnection, UserItem.class);
+    public BomImportRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
-    public List<UserItem> getAllUsers() throws URISyntaxException, BDRestException, IOException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, USERS_SEGMENTS);
+    public void importBomFile(final File file, final String mediaType)
+            throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+        final Set<SimpleEntry<String, String>> queryParameters = new HashSet<>();
+        final FileRepresentation content = new FileRepresentation(file, new MediaType(mediaType));
 
-        final List<UserItem> allUserItems = getAllItems(hubPagedRequest);
-        return allUserItems;
+        getRestConnection().httpPostFromRelativeUrl(BOM_IMPORT_SEGMENTS, queryParameters, content);
     }
 
 }

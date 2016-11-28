@@ -19,15 +19,15 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
-import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.report.HubRiskReportData;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
-import com.blackducksoftware.integration.hub.api.report.ReportRestService;
+import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
 import com.blackducksoftware.integration.hub.api.report.RiskReportResourceCopier;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -35,20 +35,19 @@ import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistExcept
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class RiskReportDataService extends HubRestService {
+public class RiskReportDataService extends HubRequestService {
+    private final ProjectRequestService projectRequestService;
 
-    private final ProjectRestService projectRestService;
+    private final ProjectVersionRequestService projectVersionRequestService;
 
-    private final ProjectVersionRestService projectVersionRestService;
+    private final ReportRequestService reportRequestService;
 
-    private final ReportRestService reportRestService;
-
-    public RiskReportDataService(final RestConnection restConnection, final ProjectRestService projectRestService,
-            final ProjectVersionRestService projectVersionRestService, final ReportRestService reportRestService) {
+    public RiskReportDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService,
+            final ProjectVersionRequestService projectVersionRequestService, final ReportRequestService reportRequestService) {
         super(restConnection);
-        this.projectRestService = projectRestService;
-        this.projectVersionRestService = projectVersionRestService;
-        this.reportRestService = reportRestService;
+        this.projectRequestService = projectRequestService;
+        this.projectVersionRequestService = projectVersionRequestService;
+        this.reportRequestService = reportRequestService;
     }
 
     public void createRiskReport(final File outputDirectory, String projectName, String projectVersionName)
@@ -62,13 +61,13 @@ public class RiskReportDataService extends HubRestService {
             throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, HubIntegrationException,
             InterruptedException,
             UnexpectedHubResponseException {
-        ProjectItem project = projectRestService.getProjectByName(projectName);
-        ProjectVersionItem version = projectVersionRestService.getProjectVersion(project, projectVersionName);
-        HubRiskReportData riskreportData = reportRestService.generateHubReport(version, ReportFormatEnum.JSON, categories);
-        RiskReportResourceCopier copier = new RiskReportResourceCopier(outputDirectory.getCanonicalPath());
-        List<File> writtenFiles = copier.copy();
+        final ProjectItem project = projectRequestService.getProjectByName(projectName);
+        final ProjectVersionItem version = projectVersionRequestService.getProjectVersion(project, projectVersionName);
+        final HubRiskReportData riskreportData = reportRequestService.generateHubReport(version, ReportFormatEnum.JSON, categories);
+        final RiskReportResourceCopier copier = new RiskReportResourceCopier(outputDirectory.getCanonicalPath());
+        final List<File> writtenFiles = copier.copy();
         File htmlFile = null;
-        for (File file : writtenFiles) {
+        for (final File file : writtenFiles) {
             if (file.getName().equals(RiskReportResourceCopier.RISK_REPORT_HTML_FILE_NAME)) {
                 htmlFile = file;
                 break;
@@ -79,7 +78,7 @@ public class RiskReportDataService extends HubRestService {
                     + ", the report files must not have been copied into the report directory.");
         }
         String htmlFileString = FileUtils.readFileToString(htmlFile, "UTF-8");
-        String reportString = getRestConnection().getGson().toJson(riskreportData);
+        final String reportString = getRestConnection().getGson().toJson(riskreportData);
         htmlFileString = htmlFileString.replace(RiskReportResourceCopier.JSON_TOKEN_TO_REPLACE, reportString);
         FileUtils.writeStringToFile(htmlFile, htmlFileString, "UTF-8");
     }

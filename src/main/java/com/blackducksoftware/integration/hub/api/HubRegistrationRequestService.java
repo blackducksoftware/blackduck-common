@@ -34,11 +34,11 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 
-public class HubRegistrationRestService extends HubRestService<String> {
+public class HubRegistrationRequestService extends HubRequestService {
     private static final List<String> REGISTRATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_REGISTRATIONS);
 
-    public HubRegistrationRestService(RestConnection restConnection) {
-        super(restConnection, String.class);
+    public HubRegistrationRequestService(RestConnection restConnection) {
+        super(restConnection);
     }
 
     public String getRegistrationId() throws IOException, URISyntaxException, BDRestException {

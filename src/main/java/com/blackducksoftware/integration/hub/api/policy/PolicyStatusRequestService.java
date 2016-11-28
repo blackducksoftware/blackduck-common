@@ -19,27 +19,14 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.job;
+package com.blackducksoftware.integration.hub.api.policy;
 
-public enum HubScanJobFieldEnum {
-    PROJECT("hubProject"),
-    VERSION("hubVersion"),
-    PHASE("hubPhase"),
-    DISTRIBUTION("hubDistribution"),
-    GENERATE_RISK_REPORT("shouldGenerateRiskReport"),
-    MAX_WAIT_TIME_FOR_BOM_UPDATE("maxWaitTimeForBomUpdate"),
-    SCANMEMORY("hubScanMemory"),
-    TARGETS("hubTargets"),
-    FAIL_ON_POLICY_VIOLATION("failOnPolicyViolation");
+import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-    private String key;
-
-    private HubScanJobFieldEnum(final String key) {
-        this.key = key;
-    }
-
-    public String getKey() {
-        return key;
+public class PolicyStatusRequestService extends HubParameterizedRequestService<PolicyStatusItem> {
+    public PolicyStatusRequestService(final RestConnection restConnection) {
+        super(restConnection, PolicyStatusItem.class);
     }
 
 }

@@ -33,18 +33,13 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 
-public class HubRestService<T> {
-    private final RestConnection restConnection;
-
-    private final HubRequestFactory hubRequestFactory;
-
+public class HubParameterizedRequestService<T> extends HubRequestService {
     private final Class<T> clazz;
 
     private final Type listType;
 
-    public HubRestService(final RestConnection restConnection, Class<T> clazz) {
-        this.restConnection = restConnection;
-        this.hubRequestFactory = new HubRequestFactory(restConnection);
+    public HubParameterizedRequestService(final RestConnection restConnection, Class<T> clazz) {
+        super(restConnection);
         this.clazz = clazz;
         this.listType = new ParameterizedListType(clazz);
     }
@@ -103,26 +98,6 @@ public class HubRestService<T> {
 
     public T getItem(final JsonObject jsonObject, final Class<T> clazz) {
         return getRestConnection().getGson().fromJson(jsonObject, clazz);
-    }
-
-    public String getString(List<String> urlSegments) throws IOException, URISyntaxException, BDRestException {
-        final HubRequest hubRequest = getHubRequestFactory().createGetRequest(urlSegments);
-        final String s = hubRequest.executeForResponseString();
-        return s;
-    }
-
-    public JsonObject getJsonObject(List<String> urlSegments) throws IOException, URISyntaxException, BDRestException {
-        final HubRequest hubRequest = getHubRequestFactory().createGetRequest(urlSegments);
-        final JsonObject jsonObject = hubRequest.executeForResponseJson();
-        return jsonObject;
-    }
-
-    public RestConnection getRestConnection() {
-        return restConnection;
-    }
-
-    public HubRequestFactory getHubRequestFactory() {
-        return hubRequestFactory;
     }
 
 }

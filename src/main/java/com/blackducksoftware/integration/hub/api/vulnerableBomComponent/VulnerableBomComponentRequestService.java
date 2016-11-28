@@ -26,12 +26,12 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class VulnerableBomComponentRestService extends HubRestService<VulnerableBomComponentItem> {
-    public VulnerableBomComponentRestService(final RestConnection restConnection) {
+public class VulnerableBomComponentRequestService extends HubParameterizedRequestService<VulnerableBomComponentItem> {
+    public VulnerableBomComponentRequestService(final RestConnection restConnection) {
         super(restConnection, VulnerableBomComponentItem.class);
     }
 

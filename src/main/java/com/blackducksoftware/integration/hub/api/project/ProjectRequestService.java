@@ -36,17 +36,17 @@ import org.restlet.representation.StringRepresentation;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.HubRequest;
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class ProjectRestService extends HubRestService<ProjectItem> {
+public class ProjectRequestService extends HubParameterizedRequestService<ProjectItem> {
     private static final List<String> PROJECTS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS);
 
-    public ProjectRestService(final RestConnection restConnection) {
+    public ProjectRequestService(final RestConnection restConnection) {
         super(restConnection, ProjectItem.class);
     }
 

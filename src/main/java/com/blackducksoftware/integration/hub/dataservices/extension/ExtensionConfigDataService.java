@@ -28,14 +28,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionItem;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionRestService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionRequestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
 import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkItem;
-import com.blackducksoftware.integration.hub.api.user.UserRestService;
+import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.dataservices.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.dataservices.extension.transformer.UserConfigTransform;
 import com.blackducksoftware.integration.hub.dataservices.parallel.ParallelResourceProcessor;
@@ -44,29 +44,29 @@ import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseExce
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ExtensionConfigDataService extends HubRestService<String> {
+public class ExtensionConfigDataService extends HubRequestService {
     private final IntLogger logger;
 
-    private final ExtensionRestService extensionRestService;
+    private final ExtensionRequestService extensionRequestService;
 
-    private final ExtensionConfigRestService extensionConfigRestService;
+    private final ExtensionConfigRequestService extensionConfigRequestService;
 
     private final UserConfigTransform userConfigTransform;
 
-    private final ExtensionUserOptionRestService extensionUserOptionRestService;
+    private final ExtensionUserOptionRequestService extensionUserOptionRequestService;
 
     private final ParallelResourceProcessor<UserConfigItem, UserOptionLinkItem> parallelProcessor;
 
-    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserRestService userRestService,
-            final ExtensionRestService extensionRestService,
-            final ExtensionConfigRestService extensionConfigRestService,
-            final ExtensionUserOptionRestService extensionUserOptionRestService) {
-        super(restConnection, String.class);
+    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserRequestService userRequestService,
+            final ExtensionRequestService extensionRequestService,
+            final ExtensionConfigRequestService extensionConfigRequestService,
+            final ExtensionUserOptionRequestService extensionUserOptionRequestService) {
+        super(restConnection);
         this.logger = logger;
-        this.extensionRestService = extensionRestService;
-        this.extensionConfigRestService = extensionConfigRestService;
-        this.extensionUserOptionRestService = extensionUserOptionRestService;
-        userConfigTransform = new UserConfigTransform(userRestService, extensionConfigRestService);
+        this.extensionRequestService = extensionRequestService;
+        this.extensionConfigRequestService = extensionConfigRequestService;
+        this.extensionUserOptionRequestService = extensionUserOptionRequestService;
+        userConfigTransform = new UserConfigTransform(userRequestService, extensionConfigRequestService);
         parallelProcessor = new ParallelResourceProcessor<>(logger);
         parallelProcessor.addTransform(UserOptionLinkItem.class, userConfigTransform);
     }
@@ -75,7 +75,7 @@ public class ExtensionConfigDataService extends HubRestService<String> {
             throws UnexpectedHubResponseException {
         Map<String, ConfigurationItem> globalConfigMap = new HashMap<>();
         try {
-            final ExtensionItem extension = extensionRestService.getItem(extensionUrl);
+            final ExtensionItem extension = extensionRequestService.getItem(extensionUrl);
             globalConfigMap = createGlobalConfigMap(extension.getLink("global-options"));
         } catch (IOException | URISyntaxException | BDRestException e) {
             logger.error("Error creating global configurationMap", e);
@@ -86,8 +86,8 @@ public class ExtensionConfigDataService extends HubRestService<String> {
     public List<UserConfigItem> getUserConfigList(final String extensionUrl) throws UnexpectedHubResponseException {
         List<UserConfigItem> itemList = new LinkedList<>();
         try {
-            final ExtensionItem extension = extensionRestService.getItem(extensionUrl);
-            final List<UserOptionLinkItem> userOptionList = extensionUserOptionRestService
+            final ExtensionItem extension = extensionRequestService.getItem(extensionUrl);
+            final List<UserOptionLinkItem> userOptionList = extensionUserOptionRequestService
                     .getUserOptions(extension.getLink("user-options"));
             itemList = parallelProcessor.process(userOptionList);
         } catch (URISyntaxException | BDRestException | IOException e) {
@@ -99,7 +99,7 @@ public class ExtensionConfigDataService extends HubRestService<String> {
 
     private Map<String, ConfigurationItem> createGlobalConfigMap(final String globalConfigUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final List<ConfigurationItem> itemList = extensionConfigRestService.getGlobalOptions(globalConfigUrl);
+        final List<ConfigurationItem> itemList = extensionConfigRequestService.getGlobalOptions(globalConfigUrl);
         final Map<String, ConfigurationItem> itemMap = createConfigMap(itemList);
         return itemMap;
     }

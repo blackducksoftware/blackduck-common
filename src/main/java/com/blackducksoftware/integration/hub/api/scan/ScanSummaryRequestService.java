@@ -19,44 +19,28 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api.extension;
+package com.blackducksoftware.integration.hub.api.scan;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class ExtensionConfigRestService extends HubRestService<ConfigurationItem> {
-    public ExtensionConfigRestService(final RestConnection restConnection) {
-        super(restConnection, ConfigurationItem.class);
+public class ScanSummaryRequestService extends HubParameterizedRequestService<ScanSummaryItem> {
+    public ScanSummaryRequestService(final RestConnection restConnection) {
+        super(restConnection, ScanSummaryItem.class);
     }
 
-    public List<ConfigurationItem> getGlobalOptions(final String globalConfigUrl)
+    public List<ScanSummaryItem> getAllScanSummaryItems(final String scanSummaryUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, globalConfigUrl);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, scanSummaryUrl);
 
-        final List<ConfigurationItem> allItems = getAllItems(hubPagedRequest);
-        return allItems;
-    }
-
-    public List<ConfigurationItem> getCurrentUserOptions(final String currentUserConfigUrl)
-            throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, currentUserConfigUrl);
-
-        final List<ConfigurationItem> allItems = getAllItems(hubPagedRequest);
-        return allItems;
-    }
-
-    public List<ConfigurationItem> getUserConfiguration(final String userConfigUrl)
-            throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, userConfigUrl);
-
-        final List<ConfigurationItem> allItems = getAllItems(hubPagedRequest);
-        return allItems;
+        final List<ScanSummaryItem> allScanSummaryItems = getAllItems(hubPagedRequest);
+        return allScanSummaryItems;
     }
 
 }

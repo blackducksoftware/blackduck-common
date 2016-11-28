@@ -27,16 +27,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationItem;
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRestService;
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationTypeEnum;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
-import com.blackducksoftware.integration.hub.api.project.ProjectRestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
-import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRestService;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
@@ -45,26 +45,26 @@ import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseExce
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ScanStatusDataService extends HubRestService<String> {
+public class ScanStatusDataService extends HubRequestService {
     private static final long FIVE_SECONDS = 5 * 1000;
 
-    private final ProjectRestService projectRestService;
+    private final ProjectRequestService projectRequestService;
 
-    private final ProjectVersionRestService projectVersionRestService;
+    private final ProjectVersionRequestService projectVersionRequestService;
 
-    private final CodeLocationRestService codeLocationRestService;
+    private final CodeLocationRequestService codeLocationRequestService;
 
-    private final ScanSummaryRestService scanSummaryRestService;
+    private final ScanSummaryRequestService scanSummaryRequestService;
 
     public ScanStatusDataService(final RestConnection restConnection,
-            final ProjectRestService projectRestService, final ProjectVersionRestService projectVersionRestService,
-            final CodeLocationRestService codeLocationRestService,
-            final ScanSummaryRestService scanSummaryRestService) {
-        super(restConnection, String.class);
-        this.projectRestService = projectRestService;
-        this.projectVersionRestService = projectVersionRestService;
-        this.codeLocationRestService = codeLocationRestService;
-        this.scanSummaryRestService = scanSummaryRestService;
+            final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
+            final CodeLocationRequestService codeLocationRequestService,
+            final ScanSummaryRequestService scanSummaryRequestService) {
+        super(restConnection);
+        this.projectRequestService = projectRequestService;
+        this.projectVersionRequestService = projectVersionRequestService;
+        this.codeLocationRequestService = codeLocationRequestService;
+        this.scanSummaryRequestService = scanSummaryRequestService;
     }
 
     /**
@@ -77,10 +77,10 @@ public class ScanStatusDataService extends HubRestService<String> {
      * If the timeouts are exceeded, a HubTimeoutExceededException will be
      * thrown.
      *
-     * @param projectRestService
-     * @param projectVersionRestService
-     * @param codeLocationRestService
-     * @param scanSummaryRestService
+     * @param projectRequestService
+     * @param projectVersionRequestService
+     * @param codeLocationRequestService
+     * @param scanSummaryRequestService
      * @param projectName
      * @param projectVersion
      * @param scanStartedTimeoutInMilliseconds
@@ -112,7 +112,7 @@ public class ScanStatusDataService extends HubRestService<String> {
      *
      * If the timeout is exceeded, a HubTimeoutExceededException will be thrown.
      *
-     * @param scanSummaryRestService
+     * @param scanSummaryRequestService
      * @param pendingScans
      * @param scanFinishedTimeoutInMilliseconds
      * @throws InterruptedException
@@ -187,11 +187,11 @@ public class ScanStatusDataService extends HubRestService<String> {
             UnexpectedHubResponseException, HubIntegrationException {
         List<ScanSummaryItem> pendingScans = new ArrayList<>();
         try {
-            final ProjectItem projectItem = projectRestService.getProjectByName(projectName);
-            final ProjectVersionItem projectVersionItem = projectVersionRestService.getProjectVersion(projectItem, projectVersion);
+            final ProjectItem projectItem = projectRequestService.getProjectByName(projectName);
+            final ProjectVersionItem projectVersionItem = projectVersionRequestService.getProjectVersion(projectItem, projectVersion);
             final String projectVersionUrl = projectVersionItem.getMeta().getHref();
 
-            final List<CodeLocationItem> allCodeLocations = codeLocationRestService
+            final List<CodeLocationItem> allCodeLocations = codeLocationRequestService
                     .getAllCodeLocationsForCodeLocationType(CodeLocationTypeEnum.BOM_IMPORT);
 
             final List<String> allScanSummariesLinks = new ArrayList<>();
@@ -205,7 +205,7 @@ public class ScanStatusDataService extends HubRestService<String> {
 
             final List<ScanSummaryItem> allScanSummaries = new ArrayList<>();
             for (final String scanSummaryLink : allScanSummariesLinks) {
-                allScanSummaries.addAll(scanSummaryRestService.getAllScanSummaryItems(scanSummaryLink));
+                allScanSummaries.addAll(scanSummaryRequestService.getAllScanSummaryItems(scanSummaryLink));
             }
 
             pendingScans = new ArrayList<>();
@@ -228,7 +228,7 @@ public class ScanStatusDataService extends HubRestService<String> {
         final List<ScanSummaryItem> pendingScans = new ArrayList<>();
         for (final ScanSummaryItem scanSummaryItem : scanSummaries) {
             final String scanSummaryLink = scanSummaryItem.getMeta().getHref();
-            final ScanSummaryItem currentScanSummaryItem = scanSummaryRestService.getItem(scanSummaryLink);
+            final ScanSummaryItem currentScanSummaryItem = scanSummaryRequestService.getItem(scanSummaryLink);
             if (currentScanSummaryItem.getStatus().isPending()) {
                 pendingScans.add(currentScanSummaryItem);
             } else if (currentScanSummaryItem.getStatus().isError()) {

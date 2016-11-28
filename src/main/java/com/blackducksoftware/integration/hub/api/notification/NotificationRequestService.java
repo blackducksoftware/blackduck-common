@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
-import com.blackducksoftware.integration.hub.api.HubRestService;
+import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
@@ -45,12 +45,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class NotificationRestService extends HubRestService<NotificationItem> {
+public class NotificationRequestService extends HubParameterizedRequestService<NotificationItem> {
     private static final List<String> NOTIFICATIONS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_NOTIFICATIONS);
 
     private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();
 
-    public NotificationRestService(final RestConnection restConnection) {
+    public NotificationRequestService(final RestConnection restConnection) {
         super(restConnection, NotificationItem.class);
 
         typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);

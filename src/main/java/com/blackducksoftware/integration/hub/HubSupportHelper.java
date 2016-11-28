@@ -29,7 +29,7 @@ import java.util.Set;
 
 import org.restlet.resource.ResourceException;
 
-import com.blackducksoftware.integration.hub.api.HubVersionRestService;
+import com.blackducksoftware.integration.hub.api.HubVersionRequestService;
 import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -54,18 +54,18 @@ public class HubSupportHelper implements Serializable {
      * Hub supports. You can use the get methods in this class after this method
      * has run to get the supported options.
      */
-    public void checkHubSupport(HubVersionRestService hubVersionRestService, final IntLogger logger)
+    public void checkHubSupport(HubVersionRequestService hubVersionRequestService, final IntLogger logger)
             throws IOException, URISyntaxException {
         try {
-            if (hubVersionRestService.isConsumerVersionLessThanOrEqualToServerVersion("3.3.1")) {
+            if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.3.1")) {
                 setHub3_3_1Support();
                 setHub3_1Support();
                 setHub3_0Support();
-            } else if (hubVersionRestService.isConsumerVersionLessThanOrEqualToServerVersion("3.1.0")) {
+            } else if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.1.0")) {
                 setHub3_1Support();
                 setHub3_0Support();
             } else {
-                if (hubVersionRestService.isConsumerVersionLessThanOrEqualToServerVersion("3.0.0")) {
+                if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.0.0")) {
                     setHub3_0Support();
                 }
             }

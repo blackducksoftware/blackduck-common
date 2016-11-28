@@ -38,12 +38,12 @@ import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistExcep
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 
-public class HubVersionRestService extends HubRestService<VersionComparison> {
+public class HubVersionRequestService extends HubParameterizedRequestService<VersionComparison> {
     private static final List<String> CURRENT_VERSION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION);
 
     private static final List<String> CURRENT_VERSION_COMPARISON_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON);
 
-    public HubVersionRestService(RestConnection restConnection) {
+    public HubVersionRequestService(RestConnection restConnection) {
         super(restConnection, VersionComparison.class);
     }
 

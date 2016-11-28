@@ -23,32 +23,32 @@ package com.blackducksoftware.integration.hub.dataservices.notification.transfor
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRestService;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRequestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
-import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
+import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.dataservices.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 
 public abstract class AbstractNotificationTransformer
         implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
-    private final NotificationRestService notificationService;
+    private final NotificationRequestService notificationService;
 
-    private final ProjectVersionRestService projectVersionService;
+    private final ProjectVersionRequestService projectVersionService;
 
-    private final PolicyRestService policyService;
+    private final PolicyRequestService policyService;
 
-    private final VersionBomPolicyRestService bomVersionPolicyService;
+    private final VersionBomPolicyRequestService bomVersionPolicyService;
 
-    private final ComponentVersionRestService componentVersionService;
+    private final ComponentVersionRequestService componentVersionService;
 
-    public AbstractNotificationTransformer(final NotificationRestService notificationService,
-            final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
-            final VersionBomPolicyRestService bomVersionPolicyService,
-            final ComponentVersionRestService componentVersionService) {
+    public AbstractNotificationTransformer(final NotificationRequestService notificationService,
+            final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
+            final VersionBomPolicyRequestService bomVersionPolicyService,
+            final ComponentVersionRequestService componentVersionService) {
         this.notificationService = notificationService;
         this.projectVersionService = projectVersionService;
         this.policyService = policyService;
@@ -56,23 +56,23 @@ public abstract class AbstractNotificationTransformer
         this.componentVersionService = componentVersionService;
     }
 
-    public NotificationRestService getNotificationService() {
+    public NotificationRequestService getNotificationService() {
         return notificationService;
     }
 
-    public ProjectVersionRestService getProjectVersionService() {
+    public ProjectVersionRequestService getProjectVersionService() {
         return projectVersionService;
     }
 
-    public PolicyRestService getPolicyService() {
+    public PolicyRequestService getPolicyService() {
         return policyService;
     }
 
-    public VersionBomPolicyRestService getBomVersionPolicyService() {
+    public VersionBomPolicyRequestService getBomVersionPolicyService() {
         return bomVersionPolicyService;
     }
 
-    public ComponentVersionRestService getComponentVersionService() {
+    public ComponentVersionRequestService getComponentVersionService() {
         return componentVersionService;
     }
 

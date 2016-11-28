@@ -19,15 +19,14 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api.version;
+package com.blackducksoftware.integration.hub.api.component.id;
 
-import com.blackducksoftware.integration.hub.api.HubRestService;
-import com.blackducksoftware.integration.hub.api.component.version.BomComponentVersionPolicyStatus;
+import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class VersionBomPolicyRestService extends HubRestService<BomComponentVersionPolicyStatus> {
-    public VersionBomPolicyRestService(final RestConnection restConnection) {
-        super(restConnection, BomComponentVersionPolicyStatus.class);
+public class ComponentIdRequestService extends HubParameterizedRequestService<ComponentIdItem> {
+    public ComponentIdRequestService(final RestConnection restConnection) {
+        super(restConnection, ComponentIdItem.class);
     }
 
 }

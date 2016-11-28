@@ -28,18 +28,18 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.blackducksoftware.integration.hub.api.HubRestService;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRestService;
+import com.blackducksoftware.integration.hub.api.HubRequestService;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRequestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.NotificationRestService;
+import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationClearedNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRestService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
-import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRestService;
+import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservices.notification.items.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservices.notification.transformer.PolicyViolationClearedTransformer;
@@ -52,37 +52,39 @@ import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseExce
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class NotificationDataService extends HubRestService<String> {
-    private final NotificationRestService notificationRestService;
+public class NotificationDataService extends HubRequestService {
+    private final NotificationRequestService notificationRequestService;
 
-    private final ProjectVersionRestService projectVersionRestService;
+    private final ProjectVersionRequestService projectVersionRequestService;
 
-    private final PolicyRestService policyRestService;
+    private final PolicyRequestService policyRequestService;
 
-    private final VersionBomPolicyRestService versionBomPolicyRestService;
+    private final VersionBomPolicyRequestService versionBomPolicyRequestService;
 
-    private final ComponentVersionRestService componentVersionRestService;
+    private final ComponentVersionRequestService componentVersionRequestService;
 
     private final PolicyNotificationFilter policyNotificationFilter;
 
     private final ParallelResourceProcessor<NotificationContentItem, NotificationItem> parallelProcessor;
 
-    public NotificationDataService(IntLogger logger, RestConnection restConnection, NotificationRestService notificationRestService,
-            ProjectVersionRestService projectVersionRestService, PolicyRestService policyRestService, VersionBomPolicyRestService versionBomPolicyRestService,
-            ComponentVersionRestService componentVersionRestService) {
-        this(logger, restConnection, notificationRestService, projectVersionRestService, policyRestService, versionBomPolicyRestService,
-                componentVersionRestService, null);
+    public NotificationDataService(IntLogger logger, RestConnection restConnection, NotificationRequestService notificationRequestService,
+            ProjectVersionRequestService projectVersionRequestService, PolicyRequestService policyRequestService,
+            VersionBomPolicyRequestService versionBomPolicyRequestService,
+            ComponentVersionRequestService componentVersionRequestService) {
+        this(logger, restConnection, notificationRequestService, projectVersionRequestService, policyRequestService, versionBomPolicyRequestService,
+                componentVersionRequestService, null);
     }
 
-    public NotificationDataService(IntLogger logger, RestConnection restConnection, NotificationRestService notificationRestService,
-            ProjectVersionRestService projectVersionRestService, PolicyRestService policyRestService, VersionBomPolicyRestService versionBomPolicyRestService,
-            ComponentVersionRestService componentVersionRestService, PolicyNotificationFilter policyNotificationFilter) {
-        super(restConnection, String.class);
-        this.notificationRestService = notificationRestService;
-        this.projectVersionRestService = projectVersionRestService;
-        this.policyRestService = policyRestService;
-        this.versionBomPolicyRestService = versionBomPolicyRestService;
-        this.componentVersionRestService = componentVersionRestService;
+    public NotificationDataService(IntLogger logger, RestConnection restConnection, NotificationRequestService notificationRequestService,
+            ProjectVersionRequestService projectVersionRequestService, PolicyRequestService policyRequestService,
+            VersionBomPolicyRequestService versionBomPolicyRequestService,
+            ComponentVersionRequestService componentVersionRequestService, PolicyNotificationFilter policyNotificationFilter) {
+        super(restConnection);
+        this.notificationRequestService = notificationRequestService;
+        this.projectVersionRequestService = projectVersionRequestService;
+        this.policyRequestService = policyRequestService;
+        this.versionBomPolicyRequestService = versionBomPolicyRequestService;
+        this.componentVersionRequestService = componentVersionRequestService;
         this.policyNotificationFilter = policyNotificationFilter;
         this.parallelProcessor = new ParallelResourceProcessor<>(logger);
 
@@ -91,23 +93,23 @@ public class NotificationDataService extends HubRestService<String> {
 
     private void populateTransformerMap() {
         parallelProcessor.addTransform(RuleViolationNotificationItem.class,
-                new PolicyViolationTransformer(notificationRestService, projectVersionRestService, policyRestService,
-                        versionBomPolicyRestService, componentVersionRestService, policyNotificationFilter));
+                new PolicyViolationTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
+                        versionBomPolicyRequestService, componentVersionRequestService, policyNotificationFilter));
         parallelProcessor.addTransform(PolicyOverrideNotificationItem.class,
-                new PolicyViolationOverrideTransformer(notificationRestService, projectVersionRestService, policyRestService,
-                        versionBomPolicyRestService, componentVersionRestService, policyNotificationFilter));
+                new PolicyViolationOverrideTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
+                        versionBomPolicyRequestService, componentVersionRequestService, policyNotificationFilter));
         parallelProcessor.addTransform(VulnerabilityNotificationItem.class,
-                new VulnerabilityTransformer(notificationRestService, projectVersionRestService, policyRestService,
-                        versionBomPolicyRestService, componentVersionRestService));
+                new VulnerabilityTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
+                        versionBomPolicyRequestService, componentVersionRequestService));
         parallelProcessor.addTransform(RuleViolationClearedNotificationItem.class,
-                new PolicyViolationClearedTransformer(notificationRestService, projectVersionRestService, policyRestService,
-                        versionBomPolicyRestService, componentVersionRestService, policyNotificationFilter));
+                new PolicyViolationClearedTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
+                        versionBomPolicyRequestService, componentVersionRequestService, policyNotificationFilter));
     }
 
     public SortedSet<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate)
             throws IOException, URISyntaxException, BDRestException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
-        final List<NotificationItem> itemList = notificationRestService.getAllNotifications(startDate, endDate);
+        final List<NotificationItem> itemList = notificationRequestService.getAllNotifications(startDate, endDate);
         contentList.addAll(parallelProcessor.process(itemList));
         return contentList;
     }
@@ -115,7 +117,7 @@ public class NotificationDataService extends HubRestService<String> {
     public SortedSet<NotificationContentItem> getUserNotifications(final Date startDate, final Date endDate, UserItem user)
             throws IOException, URISyntaxException, BDRestException, UnexpectedHubResponseException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
-        final List<NotificationItem> itemList = notificationRestService.getUserNotifications(startDate, endDate, user);
+        final List<NotificationItem> itemList = notificationRequestService.getUserNotifications(startDate, endDate, user);
         contentList.addAll(parallelProcessor.process(itemList));
         return contentList;
     }
