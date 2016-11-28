@@ -52,7 +52,7 @@ import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseExce
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class NotificationDataService extends HubRestService {
+public class NotificationDataService extends HubRestService<String> {
     private final NotificationRestService notificationRestService;
 
     private final ProjectVersionRestService projectVersionRestService;
@@ -77,7 +77,7 @@ public class NotificationDataService extends HubRestService {
     public NotificationDataService(IntLogger logger, RestConnection restConnection, NotificationRestService notificationRestService,
             ProjectVersionRestService projectVersionRestService, PolicyRestService policyRestService, VersionBomPolicyRestService versionBomPolicyRestService,
             ComponentVersionRestService componentVersionRestService, PolicyNotificationFilter policyNotificationFilter) {
-        super(restConnection);
+        super(restConnection, String.class);
         this.notificationRestService = notificationRestService;
         this.projectVersionRestService = projectVersionRestService;
         this.policyRestService = policyRestService;

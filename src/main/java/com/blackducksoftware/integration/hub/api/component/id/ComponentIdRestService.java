@@ -21,22 +21,12 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.component.id;
 
-import java.lang.reflect.Type;
-import java.util.List;
-
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class ComponentIdRestService extends HubItemRestService<ComponentIdItem> {
-    private static Type ITEM_TYPE = new TypeToken<ComponentIdItem>() {
-    }.getType();
-
-    private static Type ITEM_LIST_TYPE = new TypeToken<List<ComponentIdItem>>() {
-    }.getType();
-
+public class ComponentIdRestService extends HubRestService<ComponentIdItem> {
     public ComponentIdRestService(final RestConnection restConnection) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, ComponentIdItem.class);
     }
 
 }

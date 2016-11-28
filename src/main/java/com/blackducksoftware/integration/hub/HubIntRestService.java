@@ -56,7 +56,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 public class HubIntRestService {
-    private HubServicesFactory hubServicesFactory;
+    private final HubServicesFactory hubServicesFactory;
 
     public HubIntRestService(final RestConnection restConnection) throws URISyntaxException {
         this.hubServicesFactory = new HubServicesFactory(restConnection);
@@ -133,7 +133,7 @@ public class HubIntRestService {
     }
 
     public void deleteHubProject(final ProjectItem project) throws IOException, BDRestException, URISyntaxException {
-        String projectUrl = project.getMeta().getHref();
+        final String projectUrl = project.getMeta().getHref();
         deleteHubProject(projectUrl);
     }
 
@@ -146,9 +146,9 @@ public class HubIntRestService {
      *
      */
     public void deleteHubProject(final String projectUrl) throws IOException, BDRestException, URISyntaxException {
-        ProjectRestService projectRestService = hubServicesFactory.createProjectRestService();
-        HubRequest hubRequest = projectRestService.getHubRequestFactory().createDeleteRequest(projectUrl);
-        projectRestService.deleteItem(hubRequest);
+        final ProjectRestService projectRestService = hubServicesFactory.createProjectRestService();
+        final HubRequest hubRequest = projectRestService.getHubRequestFactory().createDeleteRequest(projectUrl);
+        hubRequest.executeDelete();
     }
 
     /**

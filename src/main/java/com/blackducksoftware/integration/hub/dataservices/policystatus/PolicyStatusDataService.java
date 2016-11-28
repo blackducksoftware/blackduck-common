@@ -39,7 +39,7 @@ import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistExcept
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class PolicyStatusDataService extends HubRestService {
+public class PolicyStatusDataService extends HubRestService<String> {
     private final ProjectRestService projectRestService;
 
     private final ProjectVersionRestService projectVersionRestService;
@@ -48,7 +48,7 @@ public class PolicyStatusDataService extends HubRestService {
 
     public PolicyStatusDataService(final RestConnection restConnection, final ProjectRestService projectRestService,
             final ProjectVersionRestService projectVersionRestService, final PolicyStatusRestService policyStatusRestService) {
-        super(restConnection);
+        super(restConnection, String.class);
         this.projectRestService = projectRestService;
         this.projectVersionRestService = projectVersionRestService;
         this.policyStatusRestService = policyStatusRestService;

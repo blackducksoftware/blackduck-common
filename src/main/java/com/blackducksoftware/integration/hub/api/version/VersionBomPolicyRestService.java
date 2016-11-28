@@ -21,23 +21,13 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.version;
 
-import java.lang.reflect.Type;
-import java.util.List;
-
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.api.component.version.BomComponentVersionPolicyStatus;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class VersionBomPolicyRestService extends HubItemRestService<BomComponentVersionPolicyStatus> {
-    private static final Type ITEM_TYPE = new TypeToken<BomComponentVersionPolicyStatus>() {
-    }.getType();
-
-    private static final Type ITEM_LIST_TYPE = new TypeToken<List<BomComponentVersionPolicyStatus>>() {
-    }.getType();
-
+public class VersionBomPolicyRestService extends HubRestService<BomComponentVersionPolicyStatus> {
     public VersionBomPolicyRestService(final RestConnection restConnection) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, BomComponentVersionPolicyStatus.class);
     }
 
 }

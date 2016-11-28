@@ -22,32 +22,24 @@
 package com.blackducksoftware.integration.hub.api.extension;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class ExtensionUserOptionRestService extends HubItemRestService<UserOptionLinkItem> {
-    private static final Type TYPE_TOKEN_ITEM = new TypeToken<UserOptionLinkItem>() {
-    }.getType();
-
-    private static final Type TYPE_TOKEN_LIST = new TypeToken<List<UserOptionLinkItem>>() {
-    }.getType();
-
+public class ExtensionUserOptionRestService extends HubRestService<UserOptionLinkItem> {
     public ExtensionUserOptionRestService(final RestConnection restConnection) {
-        super(restConnection, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
+        super(restConnection, UserOptionLinkItem.class);
     }
 
     public List<UserOptionLinkItem> getUserOptions(final String userOptionsUrl)
             throws IOException, URISyntaxException, BDRestException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, userOptionsUrl);
 
-        final List<UserOptionLinkItem> allItems = getAllHubItems(hubPagedRequest);
+        final List<UserOptionLinkItem> allItems = getAllItems(hubPagedRequest);
         return allItems;
     }
 

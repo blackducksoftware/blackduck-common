@@ -22,7 +22,6 @@
 package com.blackducksoftware.integration.hub.api.project.version;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -31,9 +30,9 @@ import org.restlet.data.CharacterSet;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
 import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
@@ -41,29 +40,22 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class ProjectVersionRestService extends HubItemRestService<ProjectVersionItem> {
-    private static final Type ITEM_TYPE = new TypeToken<ProjectVersionItem>() {
-    }.getType();
-
-    private static final Type ITEM_LIST_TYPE = new TypeToken<List<ProjectVersionItem>>() {
-    }.getType();
-
+public class ProjectVersionRestService extends HubRestService<ProjectVersionItem> {
     public ProjectVersionRestService(final RestConnection restConnection) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, ProjectVersionItem.class);
     }
 
     public ProjectVersionItem getProjectVersion(ProjectItem project, String projectVersionName)
             throws UnexpectedHubResponseException, IOException, URISyntaxException, BDRestException {
-        String versionsUrl = project.getLink("versions");
+        final String versionsUrl = project.getLink("versions");
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, versionsUrl);
         if (StringUtils.isNotBlank(projectVersionName)) {
             hubPagedRequest.setQ(String.format("versionName:%s", projectVersionName));
         }
 
-        final List<ProjectVersionItem> allProjectVersionMatchingItems = getAllHubItems(hubPagedRequest);
-        for (ProjectVersionItem projectVersion : allProjectVersionMatchingItems) {
+        final List<ProjectVersionItem> allProjectVersionMatchingItems = getAllItems(hubPagedRequest);
+        for (final ProjectVersionItem projectVersion : allProjectVersionMatchingItems) {
             if (projectVersionName.equals(projectVersion.getVersionName())) {
                 return projectVersion;
             }
@@ -74,15 +66,15 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
 
     public List<ProjectVersionItem> getAllProjectVersions(final ProjectItem project)
             throws UnexpectedHubResponseException, IOException, URISyntaxException, BDRestException {
-        String versionsUrl = project.getLink("versions");
+        final String versionsUrl = project.getLink("versions");
         return getAllProjectVersions(versionsUrl);
     }
 
     public List<ProjectVersionItem> getAllProjectVersions(final String versionsUrl)
             throws IOException, URISyntaxException, BDRestException {
-        HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, versionsUrl);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, versionsUrl);
 
-        final List<ProjectVersionItem> allProjectVersionItems = getAllHubItems(hubPagedRequest);
+        final List<ProjectVersionItem> allProjectVersionItems = getAllItems(hubPagedRequest);
         return allProjectVersionItems;
     }
 
@@ -90,7 +82,7 @@ public class ProjectVersionRestService extends HubItemRestService<ProjectVersion
             final DistributionEnum dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
         final ProjectVersionItem newRelease = new ProjectVersionItem(null, dist, null, null, phase, null, null, null, versionName);
 
-        String versionsUrl = project.getLink("versions");
+        final String versionsUrl = project.getLink("versions");
 
         final HubRequest hubRequest = getHubRequestFactory().createPostRequest(versionsUrl);
 

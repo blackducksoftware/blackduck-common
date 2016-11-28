@@ -25,29 +25,21 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_COMPONENTS;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class ComponentRestService extends HubItemRestService<ComponentItem> {
+public class ComponentRestService extends HubRestService<ComponentItem> {
     private static final List<String> COMPONENT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_COMPONENTS);
 
-    private static Type ITEM_TYPE = new TypeToken<ComponentItem>() {
-    }.getType();
-
-    private static Type ITEM_LIST_TYPE = new TypeToken<List<ComponentItem>>() {
-    }.getType();
-
     public ComponentRestService(final RestConnection restConnection) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, ComponentItem.class);
     }
 
     public List<ComponentItem> getAllComponents(final String forge, final String groupId, final String artifactId,
@@ -55,16 +47,16 @@ public class ComponentRestService extends HubItemRestService<ComponentItem> {
         final String componentQuery = String.format("id:%s|%s|%s|%s", forge, groupId, artifactId, version);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, COMPONENT_SEGMENTS, componentQuery);
 
-        final List<ComponentItem> allComponents = getAllHubItems(hubPagedRequest);
+        final List<ComponentItem> allComponents = getAllItems(hubPagedRequest);
         return allComponents;
     }
 
     public ComponentItem getExactComponentMatch(String forge, String groupId, String artifactId, String version)
             throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
-        List<ComponentItem> allComponents = getAllComponents(forge, groupId, artifactId, version);
-        for (ComponentItem componentItem : allComponents) {
+        final List<ComponentItem> allComponents = getAllComponents(forge, groupId, artifactId, version);
+        for (final ComponentItem componentItem : allComponents) {
             if (componentItem.getOriginId() != null) {
-                String exactMatch = String.format("%s:%s:%s", groupId, artifactId, version);
+                final String exactMatch = String.format("%s:%s:%s", groupId, artifactId, version);
                 if (componentItem.getOriginId().equals(exactMatch)) {
                     return componentItem;
                 }

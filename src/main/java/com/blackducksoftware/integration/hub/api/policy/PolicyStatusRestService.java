@@ -21,22 +21,12 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.policy;
 
-import java.lang.reflect.Type;
-import java.util.List;
-
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class PolicyStatusRestService extends HubItemRestService<PolicyStatusItem> {
-    private static final Type ITEM_TYPE = new TypeToken<PolicyStatusItem>() {
-    }.getType();
-
-    private static final Type ITEM_LIST_TYPE = new TypeToken<List<PolicyStatusItem>>() {
-    }.getType();
-
+public class PolicyStatusRestService extends HubRestService<PolicyStatusItem> {
     public PolicyStatusRestService(final RestConnection restConnection) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, PolicyStatusItem.class);
     }
 
 }

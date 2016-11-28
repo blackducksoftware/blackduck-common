@@ -25,34 +25,26 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_POLICY_RULES;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class PolicyRestService extends HubItemRestService<PolicyRule> {
+public class PolicyRestService extends HubRestService<PolicyRule> {
     private static final List<String> POLICY_RULE_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_POLICY_RULES);
 
-    private static final Type ITEM_TYPE = new TypeToken<PolicyRule>() {
-    }.getType();
-
-    private static final Type ITEM_LIST_TYPE = new TypeToken<List<PolicyRule>>() {
-    }.getType();
-
     public PolicyRestService(final RestConnection restConnection) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, PolicyRule.class);
     }
 
     public List<PolicyRule> getAllPolicyRules() throws IOException, BDRestException, URISyntaxException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, POLICY_RULE_SEGMENTS);
 
-        final List<PolicyRule> allPolicyRuleItems = getAllHubItems(hubPagedRequest);
+        final List<PolicyRule> allPolicyRuleItems = getAllItems(hubPagedRequest);
         return allPolicyRuleItems;
     }
 

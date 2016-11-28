@@ -38,32 +38,32 @@ import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistExcep
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 
-public class HubVersionRestService extends HubRestService {
+public class HubVersionRestService extends HubRestService<VersionComparison> {
     private static final List<String> CURRENT_VERSION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION);
 
     private static final List<String> CURRENT_VERSION_COMPARISON_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON);
 
     public HubVersionRestService(RestConnection restConnection) {
-        super(restConnection);
+        super(restConnection, VersionComparison.class);
     }
 
     public String getHubVersion() throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
-        String hubVersionWithPossibleSurroundingQuotes = getString(CURRENT_VERSION_SEGMENTS);
-        String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
+        final String hubVersionWithPossibleSurroundingQuotes = getString(CURRENT_VERSION_SEGMENTS);
+        final String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
 
         return hubVersion;
     }
 
     public VersionComparison getHubVersionComparison(String consumerVersion) throws IOException, URISyntaxException, BDRestException {
-        HubRequest hubVersionRequest = getHubRequestFactory().createGetRequest(CURRENT_VERSION_COMPARISON_SEGMENTS).addQueryParameter(QUERY_VERSION,
+        final HubRequest hubVersionRequest = getHubRequestFactory().createGetRequest(CURRENT_VERSION_COMPARISON_SEGMENTS).addQueryParameter(QUERY_VERSION,
                 consumerVersion);
-        JsonObject jsonObject = hubVersionRequest.executeForResponseJson();
-        VersionComparison versionComparison = getItem(jsonObject, VersionComparison.class);
+        final JsonObject jsonObject = hubVersionRequest.executeForResponseJson();
+        final VersionComparison versionComparison = getItem(jsonObject, VersionComparison.class);
         return versionComparison;
     }
 
     public boolean isConsumerVersionLessThanOrEqualToServerVersion(String consumerVersion) throws IOException, URISyntaxException, BDRestException {
-        VersionComparison versionComparison = getHubVersionComparison(consumerVersion);
+        final VersionComparison versionComparison = getHubVersionComparison(consumerVersion);
         if (versionComparison.getNumericResult() <= 0) {
             return true;
         } else {

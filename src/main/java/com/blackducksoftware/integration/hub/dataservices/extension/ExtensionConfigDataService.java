@@ -44,7 +44,7 @@ import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseExce
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ExtensionConfigDataService extends HubRestService {
+public class ExtensionConfigDataService extends HubRestService<String> {
     private final IntLogger logger;
 
     private final ExtensionRestService extensionRestService;
@@ -61,7 +61,7 @@ public class ExtensionConfigDataService extends HubRestService {
             final ExtensionRestService extensionRestService,
             final ExtensionConfigRestService extensionConfigRestService,
             final ExtensionUserOptionRestService extensionUserOptionRestService) {
-        super(restConnection);
+        super(restConnection, String.class);
         this.logger = logger;
         this.extensionRestService = extensionRestService;
         this.extensionConfigRestService = extensionConfigRestService;

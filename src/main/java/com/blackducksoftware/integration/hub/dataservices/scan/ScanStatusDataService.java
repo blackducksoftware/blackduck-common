@@ -45,7 +45,7 @@ import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseExce
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ScanStatusDataService extends HubRestService {
+public class ScanStatusDataService extends HubRestService<String> {
     private static final long FIVE_SECONDS = 5 * 1000;
 
     private final ProjectRestService projectRestService;
@@ -60,7 +60,7 @@ public class ScanStatusDataService extends HubRestService {
             final ProjectRestService projectRestService, final ProjectVersionRestService projectVersionRestService,
             final CodeLocationRestService codeLocationRestService,
             final ScanSummaryRestService scanSummaryRestService) {
-        super(restConnection);
+        super(restConnection, String.class);
         this.projectRestService = projectRestService;
         this.projectVersionRestService = projectVersionRestService;
         this.codeLocationRestService = codeLocationRestService;
@@ -188,8 +188,8 @@ public class ScanStatusDataService extends HubRestService {
         List<ScanSummaryItem> pendingScans = new ArrayList<>();
         try {
             final ProjectItem projectItem = projectRestService.getProjectByName(projectName);
-            ProjectVersionItem projectVersionItem = projectVersionRestService.getProjectVersion(projectItem, projectVersion);
-            String projectVersionUrl = projectVersionItem.getMeta().getHref();
+            final ProjectVersionItem projectVersionItem = projectVersionRestService.getProjectVersion(projectItem, projectVersion);
+            final String projectVersionUrl = projectVersionItem.getMeta().getHref();
 
             final List<CodeLocationItem> allCodeLocations = codeLocationRestService
                     .getAllCodeLocationsForCodeLocationType(CodeLocationTypeEnum.BOM_IMPORT);

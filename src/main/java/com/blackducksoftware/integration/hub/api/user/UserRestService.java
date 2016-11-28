@@ -25,34 +25,26 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_USERS;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class UserRestService extends HubItemRestService<UserItem> {
+public class UserRestService extends HubRestService<UserItem> {
     private static final List<String> USERS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_USERS);
 
-    private static final Type ITEM_TYPE = new TypeToken<UserItem>() {
-    }.getType();
-
-    private static final Type ITEM_LIST_TYPE = new TypeToken<List<UserItem>>() {
-    }.getType();
-
     public UserRestService(final RestConnection restConnection) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, UserItem.class);
     }
 
     public List<UserItem> getAllUsers() throws URISyntaxException, BDRestException, IOException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, USERS_SEGMENTS);
 
-        final List<UserItem> allUserItems = getAllHubItems(hubPagedRequest);
+        final List<UserItem> allUserItems = getAllItems(hubPagedRequest);
         return allUserItems;
     }
 

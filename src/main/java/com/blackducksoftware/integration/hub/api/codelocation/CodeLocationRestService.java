@@ -25,43 +25,35 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CODE_LOCATIONS;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class CodeLocationRestService extends HubItemRestService<CodeLocationItem> {
+public class CodeLocationRestService extends HubRestService<CodeLocationItem> {
     private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
 
-    private static Type ITEM_TYPE = new TypeToken<CodeLocationItem>() {
-    }.getType();
-
-    private static Type ITEM_LIST_TYPE = new TypeToken<List<CodeLocationItem>>() {
-    }.getType();
-
     public CodeLocationRestService(final RestConnection restConnection) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, CodeLocationItem.class);
     }
 
     public List<CodeLocationItem> getAllCodeLocations() throws IOException, BDRestException, URISyntaxException {
-        HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, CODE_LOCATION_SEGMENTS);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, CODE_LOCATION_SEGMENTS);
 
-        final List<CodeLocationItem> allCodeLocations = getAllHubItems(hubPagedRequest);
+        final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest);
         return allCodeLocations;
     }
 
     public List<CodeLocationItem> getAllCodeLocationsForCodeLocationType(final CodeLocationTypeEnum codeLocationType)
             throws IOException, BDRestException, URISyntaxException {
-        HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType",
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType",
                 codeLocationType.toString());
 
-        final List<CodeLocationItem> allCodeLocations = getAllHubItems(hubPagedRequest);
+        final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest);
         return allCodeLocations;
     }
 

@@ -22,7 +22,6 @@
 package com.blackducksoftware.integration.hub.api.report;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -32,8 +31,8 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.representation.StringRepresentation;
 
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -46,21 +45,14 @@ import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 
-public class ReportRestService extends HubItemRestService<ReportInformationItem> {
+public class ReportRestService extends HubRestService<ReportInformationItem> {
     private final static long MAXIMUM_WAIT = 1000 * 60 * 30;
-
-    private static final Type ITEM_TYPE = new TypeToken<ReportInformationItem>() {
-    }.getType();
-
-    private static final Type ITEM_LIST_TYPE = new TypeToken<List<ReportInformationItem>>() {
-    }.getType();
 
     private final IntLogger logger;
 
     public ReportRestService(final RestConnection restConnection, IntLogger logger) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, ReportInformationItem.class);
         this.logger = logger;
     }
 
@@ -158,7 +150,7 @@ public class ReportRestService extends HubItemRestService<ReportInformationItem>
         ReportInformationItem reportInfo = null;
 
         while (timeFinished == null) {
-            HubRequest hubRequest = getHubRequestFactory().createGetRequest(reportUrl);
+            final HubRequest hubRequest = getHubRequestFactory().createGetRequest(reportUrl);
             reportInfo = getItem(hubRequest);
             timeFinished = reportInfo.getFinishedAt();
             if (timeFinished != null) {

@@ -22,32 +22,24 @@
 package com.blackducksoftware.integration.hub.api.scan;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class ScanSummaryRestService extends HubItemRestService<ScanSummaryItem> {
-    private static final Type ITEM_TYPE = new TypeToken<ScanSummaryItem>() {
-    }.getType();
-
-    private static final Type ITEM_LIST_TYPE = new TypeToken<List<ScanSummaryItem>>() {
-    }.getType();
-
+public class ScanSummaryRestService extends HubRestService<ScanSummaryItem> {
     public ScanSummaryRestService(final RestConnection restConnection) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, ScanSummaryItem.class);
     }
 
     public List<ScanSummaryItem> getAllScanSummaryItems(final String scanSummaryUrl)
             throws IOException, URISyntaxException, BDRestException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, scanSummaryUrl);
 
-        final List<ScanSummaryItem> allScanSummaryItems = getAllHubItems(hubPagedRequest);
+        final List<ScanSummaryItem> allScanSummaryItems = getAllItems(hubPagedRequest);
         return allScanSummaryItems;
     }
 

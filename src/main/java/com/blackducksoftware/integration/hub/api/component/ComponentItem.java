@@ -21,26 +21,27 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.component;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-public class ComponentItem extends HubItem {
-    private final String component; // ****URL**** //
+public class ComponentItem {
+    // ****URL**** //
+    private final String component;
 
     private final String componentName;
 
     private final String originId;
 
-    private final String version; // ****URL**** //
+    // ****URL**** //
+    private final String version;
 
     private final String versionName;
 
-    public ComponentItem(MetaInformation meta, String componentUrl, String componentName, String originId, String versionUrl, String versionName) {
-        super(meta);
-        this.component = componentUrl;
+    public ComponentItem(String component, String componentName, String originId, String version, String versionName) {
+        this.component = component;
         this.componentName = componentName;
         this.originId = originId;
-        this.version = versionUrl;
+        this.version = version;
         this.versionName = versionName;
     }
 
@@ -62,6 +63,11 @@ public class ComponentItem extends HubItem {
 
     public String getVersionName() {
         return versionName;
+    }
+
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

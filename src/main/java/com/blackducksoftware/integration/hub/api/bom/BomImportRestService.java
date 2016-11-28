@@ -42,11 +42,11 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class BomImportRestService extends HubRestService {
+public class BomImportRestService extends HubRestService<String> {
     private static final List<String> BOM_IMPORT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_BOM_IMPORT);
 
     public BomImportRestService(final RestConnection restConnection) {
-        super(restConnection);
+        super(restConnection, String.class);
     }
 
     public void importBomFile(final File file, final String mediaType)

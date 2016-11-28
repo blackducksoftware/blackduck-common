@@ -25,7 +25,6 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_NOTIFICATIONS;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,8 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
@@ -45,21 +44,14 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 
-public class NotificationRestService extends HubItemRestService<NotificationItem> {
+public class NotificationRestService extends HubRestService<NotificationItem> {
     private static final List<String> NOTIFICATIONS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_NOTIFICATIONS);
-
-    private static final Type ITEM_TYPE = new TypeToken<NotificationItem>() {
-    }.getType();
-
-    private static final Type ITEM_LIST_TYPE = new TypeToken<List<NotificationItem>>() {
-    }.getType();
 
     private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();
 
     public NotificationRestService(final RestConnection restConnection) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, NotificationItem.class);
 
         typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);
         typeMap.put("RULE_VIOLATION", RuleViolationNotificationItem.class);
@@ -78,7 +70,7 @@ public class NotificationRestService extends HubItemRestService<NotificationItem
         hubPagedRequest.addQueryParameter("startDate", startDateString);
         hubPagedRequest.addQueryParameter("endDate", endDateString);
 
-        final List<NotificationItem> allNotificationItems = getAllHubItems(hubPagedRequest);
+        final List<NotificationItem> allNotificationItems = getAllItems(hubPagedRequest);
         return allNotificationItems;
     }
 
@@ -88,13 +80,13 @@ public class NotificationRestService extends HubItemRestService<NotificationItem
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
-        String url = user.getLink("notifications");
+        final String url = user.getLink("notifications");
 
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, url);
         hubPagedRequest.addQueryParameter("startDate", startDateString);
         hubPagedRequest.addQueryParameter("endDate", endDateString);
 
-        final List<NotificationItem> allNotificationItems = getAllHubItems(hubPagedRequest);
+        final List<NotificationItem> allNotificationItems = getAllItems(hubPagedRequest);
         return allNotificationItems;
     }
 

@@ -22,32 +22,24 @@
 package com.blackducksoftware.integration.hub.api.extension;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class ExtensionConfigRestService extends HubItemRestService<ConfigurationItem> {
-    private static final Type TYPE_TOKEN_ITEM = new TypeToken<ConfigurationItem>() {
-    }.getType();
-
-    private static final Type TYPE_TOKEN_LIST = new TypeToken<List<ConfigurationItem>>() {
-    }.getType();
-
+public class ExtensionConfigRestService extends HubRestService<ConfigurationItem> {
     public ExtensionConfigRestService(final RestConnection restConnection) {
-        super(restConnection, TYPE_TOKEN_ITEM, TYPE_TOKEN_LIST);
+        super(restConnection, ConfigurationItem.class);
     }
 
     public List<ConfigurationItem> getGlobalOptions(final String globalConfigUrl)
             throws IOException, URISyntaxException, BDRestException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, globalConfigUrl);
 
-        final List<ConfigurationItem> allItems = getAllHubItems(hubPagedRequest);
+        final List<ConfigurationItem> allItems = getAllItems(hubPagedRequest);
         return allItems;
     }
 
@@ -55,7 +47,7 @@ public class ExtensionConfigRestService extends HubItemRestService<Configuration
             throws IOException, URISyntaxException, BDRestException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, currentUserConfigUrl);
 
-        final List<ConfigurationItem> allItems = getAllHubItems(hubPagedRequest);
+        final List<ConfigurationItem> allItems = getAllItems(hubPagedRequest);
         return allItems;
     }
 
@@ -63,7 +55,7 @@ public class ExtensionConfigRestService extends HubItemRestService<Configuration
             throws IOException, URISyntaxException, BDRestException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, userConfigUrl);
 
-        final List<ConfigurationItem> allItems = getAllHubItems(hubPagedRequest);
+        final List<ConfigurationItem> allItems = getAllItems(hubPagedRequest);
         return allItems;
     }
 

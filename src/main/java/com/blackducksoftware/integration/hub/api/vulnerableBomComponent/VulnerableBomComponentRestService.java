@@ -22,25 +22,17 @@
 package com.blackducksoftware.integration.hub.api.vulnerableBomComponent;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class VulnerableBomComponentRestService extends HubItemRestService<VulnerableBomComponentItem> {
-    private static final Type ITEM_TYPE = new TypeToken<VulnerableBomComponentItem>() {
-    }.getType();
-
-    private static final Type ITEM_LIST_TYPE = new TypeToken<List<VulnerableBomComponentItem>>() {
-    }.getType();
-
+public class VulnerableBomComponentRestService extends HubRestService<VulnerableBomComponentItem> {
     public VulnerableBomComponentRestService(final RestConnection restConnection) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, VulnerableBomComponentItem.class);
     }
 
     public List<VulnerableBomComponentItem> getVulnerableComponentsMatchingComponentName(
@@ -49,7 +41,7 @@ public class VulnerableBomComponentRestService extends HubItemRestService<Vulner
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, vulnerableBomComponentsUrl);
         hubPagedRequest.setQ(componentName);
 
-        final List<VulnerableBomComponentItem> allItems = getAllHubItems(hubPagedRequest);
+        final List<VulnerableBomComponentItem> allItems = getAllItems(hubPagedRequest);
         return allItems;
     }
 

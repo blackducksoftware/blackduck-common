@@ -25,7 +25,6 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_PROJECTS;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
@@ -35,33 +34,26 @@ import org.restlet.data.CharacterSet;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;
 
-import com.blackducksoftware.integration.hub.api.HubItemRestService;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.HubRequest;
+import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.reflect.TypeToken;
 
-public class ProjectRestService extends HubItemRestService<ProjectItem> {
+public class ProjectRestService extends HubRestService<ProjectItem> {
     private static final List<String> PROJECTS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS);
 
-    private static final Type ITEM_TYPE = new TypeToken<ProjectItem>() {
-    }.getType();
-
-    private static final Type ITEM_LIST_TYPE = new TypeToken<List<ProjectItem>>() {
-    }.getType();
-
     public ProjectRestService(final RestConnection restConnection) {
-        super(restConnection, ITEM_TYPE, ITEM_LIST_TYPE);
+        super(restConnection, ProjectItem.class);
     }
 
     public List<ProjectItem> getAllProjects() throws IOException, BDRestException, URISyntaxException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, PROJECTS_SEGMENTS);
 
-        final List<ProjectItem> allProjectItems = getAllHubItems(hubPagedRequest);
+        final List<ProjectItem> allProjectItems = getAllItems(hubPagedRequest);
         return allProjectItems;
     }
 
@@ -72,7 +64,7 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
             hubPagedRequest.setQ("name:" + projectName);
         }
 
-        final List<ProjectItem> allProjectItems = getAllHubItems(hubPagedRequest);
+        final List<ProjectItem> allProjectItems = getAllItems(hubPagedRequest);
         return allProjectItems;
     }
 
@@ -83,7 +75,7 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
             hubPagedRequest.setQ("name:" + projectName);
         }
 
-        final List<ProjectItem> allProjectItems = getHubItems(hubPagedRequest).getItems();
+        final List<ProjectItem> allProjectItems = getItems(hubPagedRequest);
         return allProjectItems;
     }
 
@@ -104,7 +96,7 @@ public class ProjectRestService extends HubItemRestService<ProjectItem> {
         stringRepresentation.setMediaType(MediaType.APPLICATION_JSON);
         stringRepresentation.setCharacterSet(CharacterSet.UTF_8);
 
-        HubRequest projectItemRequest = getHubRequestFactory().createPostRequest(PROJECTS_SEGMENTS);
+        final HubRequest projectItemRequest = getHubRequestFactory().createPostRequest(PROJECTS_SEGMENTS);
         String location = null;
         try {
             location = projectItemRequest.executePost(stringRepresentation);
