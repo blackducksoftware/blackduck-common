@@ -19,6 +19,8 @@ import java.util.List;
 
 public class RiskReportResourceCopier extends JarResourceCopier {
 
+    public final static String JSON_TOKEN_TO_REPLACE = "TOKEN_RISK_REPORT_JSON_TOKEN";
+
     public final static String RESOURCE_DIRECTORY = "riskreport/web";
 
     private String destinationDirectory;
