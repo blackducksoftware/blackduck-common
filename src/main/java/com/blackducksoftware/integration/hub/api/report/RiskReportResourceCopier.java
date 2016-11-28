@@ -23,6 +23,8 @@ public class RiskReportResourceCopier extends JarResourceCopier {
 
     public final static String RESOURCE_DIRECTORY = "riskreport/web";
 
+    public final static String RISK_REPORT_HTML_FILE_NAME = "riskreport.html";
+
     private String destinationDirectory;
 
     public RiskReportResourceCopier(String destinationDirectory) {
@@ -38,7 +40,7 @@ public class RiskReportResourceCopier extends JarResourceCopier {
         List<File> relativePathList = new LinkedList<>();
         relativePathList.add(new File("css/HubBomReport.css"));
         relativePathList.add(new File("images/Hub_BD_logo.png"));
-        relativePathList.add(new File("riskreport.html"));
+        relativePathList.add(new File(RISK_REPORT_HTML_FILE_NAME));
         relativePathList.addAll(findJavascriptFileList());
         relativePathList.addAll(findFontAwesomeFileList());
         return relativePathList;
