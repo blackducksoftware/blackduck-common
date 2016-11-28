@@ -38,9 +38,7 @@ import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ComponentRestService extends HubItemRestService<ComponentItem> {
@@ -62,7 +60,7 @@ public class ComponentRestService extends HubItemRestService<ComponentItem> {
         final ComponentQuery componentQuery = new ComponentQuery(id, groupId, artifactId, version);
 
         componentItemRequest.setMethod(Method.GET);
-        componentItemRequest.setLimit(1);
+        componentItemRequest.setLimit(10);
         componentItemRequest.addUrlSegments(COMPONENT_SEGMENTS);
         componentItemRequest.setQ(componentQuery.getQuery());
 
@@ -73,12 +71,12 @@ public class ComponentRestService extends HubItemRestService<ComponentItem> {
 
     public ComponentItem getExactComponentMatch(String id, String groupId, String artifactId, String version)
             throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
-        List<ComponentItem> allComponents = getAllComponents(id, groupId, artifactId, version);
-        Iterator<ComponentItem> it = allComponents.iterator();
+        final List<ComponentItem> allComponents = getAllComponents(id, groupId, artifactId, version);
+        final Iterator<ComponentItem> it = allComponents.iterator();
         while (it.hasNext()) {
-            ComponentItem item = it.next();
+            final ComponentItem item = it.next();
             if (item.getOriginId() != null) {
-                String[] segments = item.getOriginId().split(":");
+                final String[] segments = item.getOriginId().split(":");
                 if (segments.length == 3 && segments[0].equals(groupId) && segments[1].equals(artifactId) && segments[2].equals(version)) {
                     return item;
                 }

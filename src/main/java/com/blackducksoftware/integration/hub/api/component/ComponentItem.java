@@ -35,12 +35,12 @@ public class ComponentItem extends HubItem {
 
     private final String versionName;
 
-    public ComponentItem(MetaInformation meta, String componentUrl, String componentName, String originId, String versionUrl, String versionName) {
+    public ComponentItem(MetaInformation meta, String component, String componentName, String originId, String version, String versionName) {
         super(meta);
-        this.component = componentUrl;
+        this.component = component;
         this.componentName = componentName;
         this.originId = originId;
-        this.version = versionUrl;
+        this.version = version;
         this.versionName = versionName;
     }
 
