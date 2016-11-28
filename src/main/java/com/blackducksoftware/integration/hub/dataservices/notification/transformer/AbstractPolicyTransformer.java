@@ -48,6 +48,10 @@ import com.blackducksoftware.integration.hub.exception.NotificationServiceExcept
 public abstract class AbstractPolicyTransformer extends AbstractNotificationTransformer {
     private final PolicyNotificationFilter policyFilter;
 
+    /**
+     * policyFilter.size() == 0: match no rules
+     * policyFilter == null: match all rules
+     */
     public AbstractPolicyTransformer(final NotificationRestService notificationService,
             final ProjectVersionRestService projectVersionService, final PolicyRestService policyService,
             final VersionBomPolicyRestService bomVersionPolicyService,
@@ -150,8 +154,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
 
     protected List<String> getMatchingRuleUrls(final List<String> rulesViolated) {
         final List<String> filteredRules = new ArrayList<>();
-        if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null
-                && !policyFilter.getRuleLinksToInclude().isEmpty()) {
+        if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null) {
             for (final String ruleViolated : rulesViolated) {
                 if (policyFilter.getRuleLinksToInclude().contains(ruleViolated)) {
                     filteredRules.add(ruleViolated);
