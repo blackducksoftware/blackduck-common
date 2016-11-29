@@ -81,9 +81,4 @@ public class ComponentVersion extends HubItem {
         return HubUrlParser.getUUIDFromURLString(VERSION_URL_IDENTIFIER, getMeta().getHref());
     }
 
-    @Override
-    public String toString() {
-        return "ComponentVersion [versionName=" + versionName + ", releasedOn=" + releasedOn + "]";
-    }
-
 }

@@ -19,52 +19,27 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api.codelocation;
-
-import java.util.Date;
+package com.blackducksoftware.integration.hub.api.version;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
-public class CodeLocationItem extends HubItem {
-    private final CodeLocationTypeEnum type;
+public class BomComponentVersionPolicyStatus extends HubItem {
+    public static final String POLICY_RULE_URL = "policy-rule";
 
-    private final String url;
+    private PolicyStatusEnum approvalStatus;
 
-    private final String mappedProjectVersion;
-
-    private final Date createdAt;
-
-    private final Date updatedAt;
-
-    public CodeLocationItem(final MetaInformation meta, final CodeLocationTypeEnum type, final String url,
-            final String mappedProjectVersion, final Date createdAt, final Date updatedAt) {
+    public BomComponentVersionPolicyStatus(final MetaInformation meta) {
         super(meta);
-        this.type = type;
-        this.url = url;
-        this.mappedProjectVersion = mappedProjectVersion;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
-    public CodeLocationTypeEnum getType() {
-        return type;
+    public PolicyStatusEnum getApprovalStatus() {
+        return approvalStatus;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public String getMappedProjectVersion() {
-        return mappedProjectVersion;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
+    public void setApprovalStatus(final PolicyStatusEnum approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 
 }

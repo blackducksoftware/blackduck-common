@@ -41,20 +41,25 @@ import org.restlet.engine.io.IoUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.ScanExecutor.Result;
 import com.blackducksoftware.integration.hub.ScannerSplitStream;
 import com.blackducksoftware.integration.hub.StreamRedirectThread;
-import com.blackducksoftware.integration.hub.api.HubRestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
-import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
+import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
-public class SimpleScanService extends HubRestService {
+public class SimpleScanService extends HubRequestService {
+    public static final int DEFAULT_MEMORY = 4096;
+
+    public static enum Result {
+        SUCCESS, FAILURE;
+    }
+
     private final IntLogger logger;
 
     private final HubServerConfig hubServerConfig;
@@ -63,21 +68,21 @@ public class SimpleScanService extends HubRestService {
 
     private final CIEnvironmentVariables ciEnvironmentVariables;
 
-    private File directoryToInstallTo;
+    private final File directoryToInstallTo;
 
-    private int scanMemory;
+    private final int scanMemory;
 
-    private boolean verboseRun;
+    private final boolean verboseRun;
 
-    private boolean dryRun;
+    private final boolean dryRun;
 
-    private String project;
+    private final String project;
 
-    private String version;
+    private final String version;
 
-    private List<String> scanTargetPaths;
+    private final List<String> scanTargetPaths;
 
-    private String workingDirectoryPath;
+    private final String workingDirectoryPath;
 
     private final List<String> cmd = new ArrayList<>();
 
@@ -106,10 +111,10 @@ public class SimpleScanService extends HubRestService {
      * the scan logs and other scan artifacts.
      */
     public Result setupAndExecuteScan() throws HubIntegrationException, IOException, IllegalArgumentException, InterruptedException, EncryptionException {
-        CLILocation cliLocation = new CLILocation(directoryToInstallTo);
-        String pathToJavaExecutable = cliLocation.getProvidedJavaExec().getCanonicalPath();
-        String pathToOneJar = cliLocation.getOneJarFile().getCanonicalPath();
-        String pathToScanExecutable = cliLocation.getCLI(logger).getCanonicalPath();
+        final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
+        final String pathToJavaExecutable = cliLocation.getProvidedJavaExec().getCanonicalPath();
+        final String pathToOneJar = cliLocation.getOneJarFile().getCanonicalPath();
+        final String pathToScanExecutable = cliLocation.getCLI(logger).getCanonicalPath();
         logger.debug("Using this java installation : " + pathToJavaExecutable);
 
         cmd.add(pathToJavaExecutable);
@@ -117,11 +122,11 @@ public class SimpleScanService extends HubRestService {
         cmd.add("-Done-jar.jar.path=" + pathToOneJar);
 
         if (hubServerConfig.shouldUseProxyForHub()) {
-            HubProxyInfo hubProxyInfo = hubServerConfig.getProxyInfo();
-            String proxyHost = hubProxyInfo.getHost();
-            int proxyPort = hubProxyInfo.getPort();
-            String proxyUsername = hubProxyInfo.getUsername();
-            String proxyPassword = hubProxyInfo.getDecryptedPassword();
+            final HubProxyInfo hubProxyInfo = hubServerConfig.getProxyInfo();
+            final String proxyHost = hubProxyInfo.getHost();
+            final int proxyPort = hubProxyInfo.getPort();
+            final String proxyUsername = hubProxyInfo.getUsername();
+            final String proxyPassword = hubProxyInfo.getDecryptedPassword();
             cmd.add("-Dhttp.proxyHost=" + proxyHost);
             cmd.add("-Dhttp.proxyPort=" + Integer.toString(proxyPort));
             if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
@@ -145,12 +150,12 @@ public class SimpleScanService extends HubRestService {
             cmd.add(hubServerConfig.getGlobalCredentials().getDecryptedPassword());
         }
 
-        int hubPort = hubServerConfig.getHubUrl().getPort();
+        final int hubPort = hubServerConfig.getHubUrl().getPort();
         if (hubPort > 0) {
             cmd.add("--port");
             cmd.add(Integer.toString(hubPort));
         } else {
-            int defaultPort = hubServerConfig.getHubUrl().getDefaultPort();
+            final int defaultPort = hubServerConfig.getHubUrl().getDefaultPort();
             if (defaultPort > 0) {
                 cmd.add("--port");
                 cmd.add(Integer.toString(defaultPort));
@@ -208,7 +213,7 @@ public class SimpleScanService extends HubRestService {
         final File standardOutFile = new File(logDirectory, "CLI_Output.txt");
         standardOutFile.createNewFile();
         try (FileOutputStream outputFileStream = new FileOutputStream(standardOutFile)) {
-            ScannerSplitStream splitOutputStream = new ScannerSplitStream(logger, outputFileStream);
+            final ScannerSplitStream splitOutputStream = new ScannerSplitStream(logger, outputFileStream);
             final ProcessBuilder processBuilder = new ProcessBuilder(cmd).redirectError(PIPE).redirectOutput(PIPE);
 
             processBuilder.environment().put("BD_HUB_PASSWORD", hubServerConfig.getGlobalCredentials().getDecryptedPassword());
@@ -218,13 +223,13 @@ public class SimpleScanService extends HubRestService {
                 processBuilder.environment().put("BD_HUB_DECLARED_COMPONENTS", bdioEnvVar);
             }
 
-            Process hubCliProcess = processBuilder.start();
+            final Process hubCliProcess = processBuilder.start();
 
             // The cli logs go the error stream for some reason
-            StreamRedirectThread redirectThread = new StreamRedirectThread(hubCliProcess.getErrorStream(), splitOutputStream);
+            final StreamRedirectThread redirectThread = new StreamRedirectThread(hubCliProcess.getErrorStream(), splitOutputStream);
             redirectThread.start();
 
-            int returnCode = hubCliProcess.waitFor();
+            final int returnCode = hubCliProcess.waitFor();
 
             // the join method on the redirect thread will wait until the thread is dead
             // the thread will die when it reaches the end of stream and the run method is finished
@@ -252,7 +257,7 @@ public class SimpleScanService extends HubRestService {
             return Collections.emptyList();
         }
 
-        File scanStatusDirectory = new File(logDirectory, "status");
+        final File scanStatusDirectory = new File(logDirectory, "status");
         final File[] statusFiles = scanStatusDirectory.listFiles();
 
         if (statusFiles.length != scanTargetPaths.size()) {
@@ -260,12 +265,12 @@ public class SimpleScanService extends HubRestService {
             return Collections.emptyList();
         }
 
-        List<ScanSummaryItem> scanSummaryItems = new ArrayList<>();
+        final List<ScanSummaryItem> scanSummaryItems = new ArrayList<>();
         for (final File currentStatusFile : statusFiles) {
             String fileContent;
             try {
                 fileContent = FileUtils.readFileToString(currentStatusFile, "UTF8");
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 logger.error(String.format("There was an exception reading the status file: %s", e.getMessage(), e));
                 return Collections.emptyList();
             }
@@ -281,14 +286,14 @@ public class SimpleScanService extends HubRestService {
      * execution.
      */
     public String getSpecificScanExecutionLogDirectory() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZoneUTC();
-        String timeString = DateTime.now().withZone(DateTimeZone.UTC).toString(dateTimeFormatter);
+        final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZoneUTC();
+        final String timeString = DateTime.now().withZone(DateTimeZone.UTC).toString(dateTimeFormatter);
         return timeString;
     }
 
     private void populateLogDirectory() throws IOException {
         final File logsDirectory = new File(workingDirectoryPath, "HubScanLogs");
-        String specificScanExecutionLogDirectory = getSpecificScanExecutionLogDirectory();
+        final String specificScanExecutionLogDirectory = getSpecificScanExecutionLogDirectory();
 
         logDirectory = new File(logsDirectory, specificScanExecutionLogDirectory);
         if (!logDirectory.exists() && !logDirectory.mkdirs()) {
@@ -311,7 +316,7 @@ public class SimpleScanService extends HubRestService {
 
         int proxyPasswordIndex = -1;
         for (int commandIndex = 0; commandIndex < cmdToOutput.size(); commandIndex++) {
-            String commandParameter = cmdToOutput.get(commandIndex);
+            final String commandParameter = cmdToOutput.get(commandIndex);
             if (commandParameter.contains("-Dhttp.proxyPassword=")) {
                 proxyPasswordIndex = commandIndex;
             }
