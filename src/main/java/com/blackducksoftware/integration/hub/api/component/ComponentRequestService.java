@@ -42,18 +42,18 @@ public class ComponentRequestService extends HubParameterizedRequestService<Comp
         super(restConnection, Component.class);
     }
 
-    public List<Component> getAllComponents(final String forge, final String groupId, final String artifactId,
+    public List<Component> getAllComponents(final String namespace, final String groupId, final String artifactId,
             final String version) throws IOException, BDRestException, URISyntaxException {
-        final String componentQuery = String.format("id:%s|%s|%s|%s", forge, groupId, artifactId, version);
+        final String componentQuery = String.format("id:%s|%s|%s|%s", namespace, groupId, artifactId, version);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(COMPONENT_SEGMENTS, componentQuery);
 
         final List<Component> allComponents = getAllItems(hubPagedRequest);
         return allComponents;
     }
 
-    public Component getExactComponentMatch(String forge, String groupId, String artifactId, String version)
+    public Component getExactComponentMatch(String namespace, String groupId, String artifactId, String version)
             throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
-        final List<Component> allComponents = getAllComponents(forge, groupId, artifactId, version);
+        final List<Component> allComponents = getAllComponents(namespace, groupId, artifactId, version);
         for (final Component componentItem : allComponents) {
             if (componentItem.getOriginId() != null) {
                 final String exactMatch = String.format("%s:%s:%s", groupId, artifactId, version);
