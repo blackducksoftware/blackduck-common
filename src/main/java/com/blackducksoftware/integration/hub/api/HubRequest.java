@@ -119,7 +119,7 @@ public class HubRequest {
         }
     }
 
-    public void populateQueryParamters() {
+    public void populateQueryParameters() {
         if (StringUtils.isNotBlank(q)) {
             queryParameters.put(QUERY_Q, q);
         }
@@ -144,7 +144,7 @@ public class HubRequest {
             resource.addSegment(segment);
         }
 
-        populateQueryParamters();
+        populateQueryParameters();
 
         for (final Map.Entry<String, String> entry : queryParameters.entrySet()) {
             resource.addQueryParameter(entry.getKey(), entry.getValue());
