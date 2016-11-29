@@ -24,6 +24,10 @@ package com.blackducksoftware.integration.hub.global;
 import java.io.Serializable;
 import java.net.URL;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.blackducksoftware.integration.log.IntLogger;
+
 public class HubServerConfig implements Serializable {
     private static final long serialVersionUID = -1581638027683631935L;
 
@@ -45,6 +49,30 @@ public class HubServerConfig implements Serializable {
 
     public boolean shouldUseProxyForHub() {
         return proxyInfo != null && proxyInfo.shouldUseProxyForUrl(hubUrl);
+    }
+
+    public void print(final IntLogger logger) {
+        if (getHubUrl() != null) {
+            logger.alwaysLog("--> Hub Server Url : " + getHubUrl());
+        }
+        if (StringUtils.isNotBlank(getGlobalCredentials().getUsername())) {
+            logger.alwaysLog("--> Hub User : " + getGlobalCredentials().getUsername());
+        }
+
+        if (proxyInfo != null) {
+            if (StringUtils.isNotBlank(proxyInfo.getHost())) {
+                logger.alwaysLog("--> Proxy Host : " + proxyInfo.getHost());
+            }
+            if (proxyInfo.getPort() > 0) {
+                logger.alwaysLog("--> Proxy Port : " + proxyInfo.getPort());
+            }
+            if (StringUtils.isNotBlank(proxyInfo.getIgnoredProxyHosts())) {
+                logger.alwaysLog("--> No Proxy Hosts : " + proxyInfo.getIgnoredProxyHosts());
+            }
+            if (StringUtils.isNotBlank(proxyInfo.getUsername())) {
+                logger.alwaysLog("--> Proxy Username : " + proxyInfo.getUsername());
+            }
+        }
     }
 
     @Override
