@@ -21,8 +21,8 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.policy;
 
-import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
 public class PolicyStatusRequestService extends HubParameterizedRequestService<PolicyStatusItem> {
     public PolicyStatusRequestService(final RestConnection restConnection) {

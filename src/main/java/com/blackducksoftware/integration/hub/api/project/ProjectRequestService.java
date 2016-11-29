@@ -36,12 +36,12 @@ import org.restlet.representation.StringRepresentation;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.HubRequest;
-import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
 public class ProjectRequestService extends HubParameterizedRequestService<ProjectItem> {
     private static final List<String> PROJECTS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS);
@@ -51,7 +51,7 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
     }
 
     public List<ProjectItem> getAllProjects() throws IOException, BDRestException, URISyntaxException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, PROJECTS_SEGMENTS);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(PROJECTS_SEGMENTS);
 
         final List<ProjectItem> allProjectItems = getAllItems(hubPagedRequest);
         return allProjectItems;
@@ -59,7 +59,7 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
 
     public List<ProjectItem> getAllProjectMatches(final String projectName)
             throws IOException, BDRestException, URISyntaxException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, PROJECTS_SEGMENTS);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(PROJECTS_SEGMENTS);
         if (StringUtils.isNotBlank(projectName)) {
             hubPagedRequest.setQ("name:" + projectName);
         }

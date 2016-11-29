@@ -29,8 +29,8 @@ import java.util.Set;
 
 import org.restlet.resource.ResourceException;
 
-import com.blackducksoftware.integration.hub.api.HubVersionRequestService;
-import com.blackducksoftware.integration.hub.capabilities.HubCapabilitiesEnum;
+import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
+import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.log.IntLogger;
 

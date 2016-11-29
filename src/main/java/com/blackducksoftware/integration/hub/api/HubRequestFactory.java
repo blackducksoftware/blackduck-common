@@ -25,17 +25,25 @@ public class HubRequestFactory {
     }
 
     public HubRequest createGetRequest(List<String> urlSegments) {
-        HubRequest hubRequest = new HubRequest(restConnection);
+        final HubRequest hubRequest = new HubRequest(restConnection);
         hubRequest.setMethod(Method.GET);
         hubRequest.addUrlSegments(urlSegments);
         return hubRequest;
     }
 
     public HubRequest createGetRequest(String url) {
-        HubRequest hubRequest = new HubRequest(restConnection);
+        final HubRequest hubRequest = new HubRequest(restConnection);
         hubRequest.setMethod(Method.GET);
         hubRequest.setUrl(url);
         return hubRequest;
+    }
+
+    public HubPagedRequest createGetPagedRequest(List<String> urlSegments) {
+        final HubPagedRequest hubPagedRequest = new HubPagedRequest(restConnection);
+        hubPagedRequest.setMethod(Method.GET);
+        hubPagedRequest.setLimit(100);
+        hubPagedRequest.addUrlSegments(urlSegments);
+        return hubPagedRequest;
     }
 
     public HubPagedRequest createGetPagedRequest(int itemsPerPage, List<String> urlSegments) {
@@ -43,6 +51,15 @@ public class HubRequestFactory {
         hubPagedRequest.setMethod(Method.GET);
         hubPagedRequest.setLimit(itemsPerPage);
         hubPagedRequest.addUrlSegments(urlSegments);
+        return hubPagedRequest;
+    }
+
+    public HubPagedRequest createGetPagedRequest(List<String> urlSegments, String q) {
+        final HubPagedRequest hubPagedRequest = new HubPagedRequest(restConnection);
+        hubPagedRequest.setMethod(Method.GET);
+        hubPagedRequest.setLimit(100);
+        hubPagedRequest.addUrlSegments(urlSegments);
+        hubPagedRequest.setQ(q);
         return hubPagedRequest;
     }
 
@@ -55,11 +72,37 @@ public class HubRequestFactory {
         return hubPagedRequest;
     }
 
+    public HubPagedRequest createGetPagedRequest(String url) {
+        final HubPagedRequest hubPagedRequest = new HubPagedRequest(restConnection);
+        hubPagedRequest.setMethod(Method.GET);
+        hubPagedRequest.setLimit(100);
+        hubPagedRequest.setUrl(url);
+        return hubPagedRequest;
+    }
+
     public HubPagedRequest createGetPagedRequest(int itemsPerPage, String url) {
         final HubPagedRequest hubPagedRequest = new HubPagedRequest(restConnection);
         hubPagedRequest.setMethod(Method.GET);
         hubPagedRequest.setLimit(itemsPerPage);
         hubPagedRequest.setUrl(url);
+        return hubPagedRequest;
+    }
+
+    public HubPagedRequest createGetPagedRequest(String url, String q) {
+        final HubPagedRequest hubPagedRequest = new HubPagedRequest(restConnection);
+        hubPagedRequest.setMethod(Method.GET);
+        hubPagedRequest.setLimit(100);
+        hubPagedRequest.setUrl(url);
+        hubPagedRequest.setQ(q);
+        return hubPagedRequest;
+    }
+
+    public HubPagedRequest createGetPagedRequest(int itemsPerPage, String url, String q) {
+        final HubPagedRequest hubPagedRequest = new HubPagedRequest(restConnection);
+        hubPagedRequest.setMethod(Method.GET);
+        hubPagedRequest.setLimit(itemsPerPage);
+        hubPagedRequest.setUrl(url);
+        hubPagedRequest.setQ(q);
         return hubPagedRequest;
     }
 

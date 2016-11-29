@@ -41,7 +41,10 @@ public class HubPagedRequest extends HubRequest {
         super(restConnection);
     }
 
+    @Override
     public void populateQueryParameters() {
+        super.populateQueryParameters();
+
         // if limit is not provided, the default is 10
         if (limit <= 0) {
             limit = 10;

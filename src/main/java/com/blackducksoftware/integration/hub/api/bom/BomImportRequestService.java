@@ -23,7 +23,6 @@ package com.blackducksoftware.integration.hub.api.bom;
 
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_BOM_IMPORT;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,13 +36,13 @@ import java.util.Set;
 import org.restlet.data.MediaType;
 import org.restlet.representation.FileRepresentation;
 
-import com.blackducksoftware.integration.hub.api.HubRequestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubRequestService;
 
 public class BomImportRequestService extends HubRequestService {
-    private static final List<String> BOM_IMPORT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_BOM_IMPORT);
+    private static final List<String> BOM_IMPORT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_BOM_IMPORT);
 
     public BomImportRequestService(final RestConnection restConnection) {
         super(restConnection);

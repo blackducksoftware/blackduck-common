@@ -30,9 +30,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
-import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
 public class CodeLocationRequestService extends HubParameterizedRequestService<CodeLocationItem> {
     private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
@@ -42,7 +42,7 @@ public class CodeLocationRequestService extends HubParameterizedRequestService<C
     }
 
     public List<CodeLocationItem> getAllCodeLocations() throws IOException, BDRestException, URISyntaxException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, CODE_LOCATION_SEGMENTS);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(CODE_LOCATION_SEGMENTS);
 
         final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest);
         return allCodeLocations;
@@ -50,7 +50,7 @@ public class CodeLocationRequestService extends HubParameterizedRequestService<C
 
     public List<CodeLocationItem> getAllCodeLocationsForCodeLocationType(final CodeLocationTypeEnum codeLocationType)
             throws IOException, BDRestException, URISyntaxException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType",
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType",
                 codeLocationType.toString());
 
         final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest);

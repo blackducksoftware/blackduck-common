@@ -21,8 +21,8 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.extension;
 
-import com.blackducksoftware.integration.hub.api.HubParameterizedRequestService;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
 public class ExtensionRequestService extends HubParameterizedRequestService<ExtensionItem> {
     public ExtensionRequestService(final RestConnection restConnection) {
