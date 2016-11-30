@@ -72,9 +72,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
 
     public List<ProjectVersionItem> getAllProjectVersions(final String versionsUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, versionsUrl);
-
-        final List<ProjectVersionItem> allProjectVersionItems = getAllItems(hubPagedRequest);
+        final List<ProjectVersionItem> allProjectVersionItems = getAllItems(versionsUrl);
         return allProjectVersionItems;
     }
 

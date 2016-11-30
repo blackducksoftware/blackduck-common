@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
@@ -37,25 +36,19 @@ public class ExtensionConfigRequestService extends HubParameterizedRequestServic
 
     public List<ConfigurationItem> getGlobalOptions(final String globalConfigUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, globalConfigUrl);
-
-        final List<ConfigurationItem> allItems = getAllItems(hubPagedRequest);
+        final List<ConfigurationItem> allItems = getAllItems(globalConfigUrl);
         return allItems;
     }
 
     public List<ConfigurationItem> getCurrentUserOptions(final String currentUserConfigUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, currentUserConfigUrl);
-
-        final List<ConfigurationItem> allItems = getAllItems(hubPagedRequest);
+        final List<ConfigurationItem> allItems = getAllItems(currentUserConfigUrl);
         return allItems;
     }
 
     public List<ConfigurationItem> getUserConfiguration(final String userConfigUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, userConfigUrl);
-
-        final List<ConfigurationItem> allItems = getAllItems(hubPagedRequest);
+        final List<ConfigurationItem> allItems = getAllItems(userConfigUrl);
         return allItems;
     }
 

@@ -29,14 +29,11 @@ import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
-import com.blackducksoftware.integration.hub.api.item.HubItemFilter;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
@@ -62,11 +59,8 @@ import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 public class HubServicesFactory {
     private final RestConnection restConnection;
 
-    private final HubItemFilter hubItemFilter;
-
     public HubServicesFactory(final RestConnection restConnection) {
         this.restConnection = restConnection;
-        this.hubItemFilter = new HubItemFilter();
     }
 
     public HubRequestService createHubRequestService() {
@@ -80,7 +74,7 @@ public class HubServicesFactory {
 
     public PolicyStatusDataService createPolicyStatusDataService() {
         return new PolicyStatusDataService(restConnection, createProjectRequestService(),
-                createProjectVersionRequestService(), createPolicyStatusRequestService());
+                createProjectVersionRequestService(), createHubRequestService());
     }
 
     public ScanStatusDataService createScanStatusDataService() {
@@ -101,7 +95,7 @@ public class HubServicesFactory {
 
     public ExtensionConfigDataService createExtensionConfigDataService(final IntLogger logger) {
         return new ExtensionConfigDataService(logger, restConnection, createUserRequestService(),
-                createExtensionRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService());
+                createHubRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService());
     }
 
     public VulnerabilityDataService createVulnerabilityDataService() {
@@ -133,10 +127,6 @@ public class HubServicesFactory {
         return new PolicyRequestService(restConnection);
     }
 
-    public PolicyStatusRequestService createPolicyStatusRequestService() {
-        return new PolicyStatusRequestService(restConnection);
-    }
-
     public ProjectRequestService createProjectRequestService() {
         return new ProjectRequestService(restConnection);
     }
@@ -159,10 +149,6 @@ public class HubServicesFactory {
 
     public VulnerabilityRequestService createVulnerabilityRequestService() {
         return new VulnerabilityRequestService(restConnection);
-    }
-
-    public ExtensionRequestService createExtensionRequestService() {
-        return new ExtensionRequestService(restConnection);
     }
 
     public ExtensionConfigRequestService createExtensionConfigRequestService() {

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
@@ -37,9 +36,7 @@ public class ExtensionUserOptionRequestService extends HubParameterizedRequestSe
 
     public List<UserOptionLinkItem> getUserOptions(final String userOptionsUrl)
             throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, userOptionsUrl);
-
-        final List<UserOptionLinkItem> allItems = getAllItems(hubPagedRequest);
+        final List<UserOptionLinkItem> allItems = getAllItems(userOptionsUrl);
         return allItems;
     }
 

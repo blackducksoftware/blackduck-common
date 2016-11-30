@@ -88,6 +88,16 @@ public class HubParameterizedRequestService<T> extends HubRequestService {
         return allItems;
     }
 
+    public List<T> getAllItems(List<String> urlSegments) throws BDRestException, IOException, URISyntaxException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(urlSegments);
+        return getAllItems(hubPagedRequest);
+    }
+
+    public List<T> getAllItems(String url) throws BDRestException, IOException, URISyntaxException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(url);
+        return getAllItems(hubPagedRequest);
+    }
+
     public T getItem(final HubRequest hubRequest) throws IOException, BDRestException, URISyntaxException {
         return getItem(hubRequest, clazz);
     }

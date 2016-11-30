@@ -42,9 +42,7 @@ public class CodeLocationRequestService extends HubParameterizedRequestService<C
     }
 
     public List<CodeLocationItem> getAllCodeLocations() throws IOException, BDRestException, URISyntaxException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(CODE_LOCATION_SEGMENTS);
-
-        final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest);
+        final List<CodeLocationItem> allCodeLocations = getAllItems(CODE_LOCATION_SEGMENTS);
         return allCodeLocations;
     }
 
