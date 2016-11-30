@@ -23,26 +23,64 @@ import java.util.List;
 public abstract class JarResourceCopier {
 
     public List<File> copy(String resourceDir, String destinationDir) throws IOException, URISyntaxException {
-        List<File> fileList = findRelativePathFileList();
+        List<String> fileList = findRelativePathFileList();
         return writeFiles(fileList, resourceDir, destinationDir);
     }
 
-    public abstract List<File> findRelativePathFileList();
+    public abstract List<String> findRelativePathFileList();
 
-    private List<File> writeFiles(List<File> fileList, String resourceDir, String destinationDir) throws IOException {
+    private List<File> writeFiles(List<String> fileList, String resourceDir, String destinationDir) throws IOException {
         List<File> writtenList = new LinkedList<>();
-        ClassLoader classLoader = this.getClass().getClassLoader();
-        for (File file : fileList) {
-            String relativePath = file.getPath();
-            File resourceFile = new File(resourceDir, relativePath);
-            File destFile = new File(destinationDir, relativePath);
-            String resourcePath = resourceFile.getPath();
-            try (InputStream resourceStream = classLoader.getResourceAsStream(resourcePath)) {
-                destFile.mkdirs();
-                Files.copy(resourceStream, destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                writtenList.add(destFile);
+        for (String relativePath : fileList) {
+            String resourceFile = resourceDir + relativePath;
+            String destFile = destinationDir + File.separator + relativePath;
+            if (!copyFileViaClass(resourceFile, destFile, writtenList)) {
+                copyFileViaClassLoader(resourceFile, destFile, writtenList);
             }
         }
         return writtenList;
+    }
+
+    private boolean copyFileViaClass(String resourcePath, String destFile, List<File> writtenFileList) throws IOException {
+        try (InputStream resourceStream = getClassInputStream(resourcePath)) {
+            if (resourceStream == null) {
+                return false;
+            } else {
+                copyFile(resourceStream, destFile, writtenFileList);
+                return true;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean copyFileViaClassLoader(String resourcePath, String destFile, List<File> writtenFileList) throws IOException {
+        try (InputStream resourceStream = getClassLoaderInputStream(resourcePath)) {
+            if (resourceStream == null) {
+                return false;
+            } else {
+                copyFile(resourceStream, destFile, writtenFileList);
+                return true;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    private void copyFile(final InputStream resourceStream, final String destFile, List<File> writtenFileList) throws IOException {
+        File filePath = new File(destFile);
+        filePath.getParentFile().mkdirs();
+        Files.copy(resourceStream, filePath.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        writtenFileList.add(filePath);
+    }
+
+    private InputStream getClassLoaderInputStream(String resourcePath) {
+        return this.getClass().getClassLoader().getResourceAsStream(resourcePath);
+    }
+
+    private InputStream getClassInputStream(String resourcePath) {
+        return this.getClass().getResourceAsStream(resourcePath);
     }
 }
