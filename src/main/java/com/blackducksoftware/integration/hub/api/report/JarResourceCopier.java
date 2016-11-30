@@ -23,28 +23,25 @@ import java.util.List;
 public abstract class JarResourceCopier {
 
     public List<File> copy(String resourceDir, String destinationDir) throws IOException, URISyntaxException {
-        List<File> fileList = findRelativePathFileList();
+        List<String> fileList = findRelativePathFileList();
         return writeFiles(fileList, resourceDir, destinationDir);
     }
 
-    public abstract List<File> findRelativePathFileList();
+    public abstract List<String> findRelativePathFileList();
 
-    private List<File> writeFiles(List<File> fileList, String resourceDir, String destinationDir) throws IOException {
+    private List<File> writeFiles(List<String> fileList, String resourceDir, String destinationDir) throws IOException {
         List<File> writtenList = new LinkedList<>();
-        for (File file : fileList) {
-            String relativePath = file.getPath();
-            File resourceFile = new File(resourceDir, relativePath);
-            File destFile = new File(destinationDir, relativePath);
-            String resourcePath = resourceFile.getPath();
-            System.out.println("Resource path: " + resourcePath);
-            if (!copyFileViaClass(resourcePath, destFile, writtenList)) {
-                copyFileViaClassLoader(resourcePath, destFile, writtenList);
+        for (String relativePath : fileList) {
+            String resourceFile = resourceDir + relativePath;
+            String destFile = destinationDir + File.separator + relativePath;
+            if (!copyFileViaClass(resourceFile, destFile, writtenList)) {
+                copyFileViaClassLoader(resourceFile, destFile, writtenList);
             }
         }
         return writtenList;
     }
 
-    public boolean copyFileViaClass(String resourcePath, File destFile, List<File> writtenFileList) throws IOException {
+    public boolean copyFileViaClass(String resourcePath, String destFile, List<File> writtenFileList) throws IOException {
         try (InputStream resourceStream = getClassInputStream(resourcePath)) {
             if (resourceStream == null) {
                 return false;
@@ -52,10 +49,13 @@ public abstract class JarResourceCopier {
                 copyFile(resourceStream, destFile, writtenFileList);
                 return true;
             }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
         }
     }
 
-    public boolean copyFileViaClassLoader(String resourcePath, File destFile, List<File> writtenFileList) throws IOException {
+    public boolean copyFileViaClassLoader(String resourcePath, String destFile, List<File> writtenFileList) throws IOException {
         try (InputStream resourceStream = getClassLoaderInputStream(resourcePath)) {
             if (resourceStream == null) {
                 return false;
@@ -63,15 +63,17 @@ public abstract class JarResourceCopier {
                 copyFile(resourceStream, destFile, writtenFileList);
                 return true;
             }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
         }
     }
 
-    public void copyFile(final InputStream resourceStream, final File destFile, List<File> writtenFileList) throws IOException {
-        destFile.mkdirs();
-        System.out.println("Resource Stream: " + resourceStream);
-        System.out.println("destFile: " + destFile);
-        Files.copy(resourceStream, destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        writtenFileList.add(destFile);
+    public void copyFile(final InputStream resourceStream, final String destFile, List<File> writtenFileList) throws IOException {
+        File filePath = new File(destFile);
+        filePath.getParentFile().mkdirs();
+        Files.copy(resourceStream, filePath.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        writtenFileList.add(filePath);
     }
 
     public InputStream getClassLoaderInputStream(String resourcePath) {
