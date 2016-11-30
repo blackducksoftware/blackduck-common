@@ -21,7 +21,7 @@ public class RiskReportResourceCopier extends JarResourceCopier {
 
     public final static String JSON_TOKEN_TO_REPLACE = "TOKEN_RISK_REPORT_JSON_TOKEN";
 
-    public final static String RESOURCE_DIRECTORY = "riskreport/web";
+    public final static String RESOURCE_DIRECTORY = "riskreport" + File.separator + "web";
 
     public final static String RISK_REPORT_HTML_FILE_NAME = "riskreport.html";
 
@@ -38,8 +38,10 @@ public class RiskReportResourceCopier extends JarResourceCopier {
     @Override
     public List<File> findRelativePathFileList() {
         List<File> relativePathList = new LinkedList<>();
-        relativePathList.add(new File("css/HubBomReport.css"));
-        relativePathList.add(new File("images/Hub_BD_logo.png"));
+        File cssDir = new File("css");
+        File imagesDir = new File("images");
+        relativePathList.add(new File(cssDir, "HubBomReport.css"));
+        relativePathList.add(new File(imagesDir, "Hub_BD_logo.png"));
         relativePathList.add(new File(RISK_REPORT_HTML_FILE_NAME));
         relativePathList.addAll(findJavascriptFileList());
         relativePathList.addAll(findFontAwesomeFileList());
