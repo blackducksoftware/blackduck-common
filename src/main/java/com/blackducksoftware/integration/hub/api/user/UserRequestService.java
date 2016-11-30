@@ -29,7 +29,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
@@ -42,9 +41,7 @@ public class UserRequestService extends HubParameterizedRequestService<UserItem>
     }
 
     public List<UserItem> getAllUsers() throws URISyntaxException, BDRestException, IOException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, USERS_SEGMENTS);
-
-        final List<UserItem> allUserItems = getAllItems(hubPagedRequest);
+        final List<UserItem> allUserItems = getAllItems(USERS_SEGMENTS);
         return allUserItems;
     }
 

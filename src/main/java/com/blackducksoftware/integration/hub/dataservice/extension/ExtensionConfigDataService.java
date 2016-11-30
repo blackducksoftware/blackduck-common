@@ -31,7 +31,6 @@ import java.util.Map;
 import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionItem;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
 import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkItem;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
@@ -47,7 +46,7 @@ import com.blackducksoftware.integration.log.IntLogger;
 public class ExtensionConfigDataService extends HubRequestService {
     private final IntLogger logger;
 
-    private final ExtensionRequestService extensionRequestService;
+    private final HubRequestService hubRequestService;
 
     private final ExtensionConfigRequestService extensionConfigRequestService;
 
@@ -58,12 +57,12 @@ public class ExtensionConfigDataService extends HubRequestService {
     private final ParallelResourceProcessor<UserConfigItem, UserOptionLinkItem> parallelProcessor;
 
     public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserRequestService userRequestService,
-            final ExtensionRequestService extensionRequestService,
+            final HubRequestService hubRequestService,
             final ExtensionConfigRequestService extensionConfigRequestService,
             final ExtensionUserOptionRequestService extensionUserOptionRequestService) {
         super(restConnection);
         this.logger = logger;
-        this.extensionRequestService = extensionRequestService;
+        this.hubRequestService = hubRequestService;
         this.extensionConfigRequestService = extensionConfigRequestService;
         this.extensionUserOptionRequestService = extensionUserOptionRequestService;
         userConfigTransform = new UserConfigTransform(userRequestService, extensionConfigRequestService);
@@ -75,7 +74,7 @@ public class ExtensionConfigDataService extends HubRequestService {
             throws UnexpectedHubResponseException {
         Map<String, ConfigurationItem> globalConfigMap = new HashMap<>();
         try {
-            final ExtensionItem extension = extensionRequestService.getItem(extensionUrl);
+            final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
             globalConfigMap = createGlobalConfigMap(extension.getLink("global-options"));
         } catch (IOException | URISyntaxException | BDRestException e) {
             logger.error("Error creating global configurationMap", e);
@@ -86,7 +85,7 @@ public class ExtensionConfigDataService extends HubRequestService {
     public List<UserConfigItem> getUserConfigList(final String extensionUrl) throws UnexpectedHubResponseException {
         List<UserConfigItem> itemList = new LinkedList<>();
         try {
-            final ExtensionItem extension = extensionRequestService.getItem(extensionUrl);
+            final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
             final List<UserOptionLinkItem> userOptionList = extensionUserOptionRequestService
                     .getUserOptions(extension.getLink("user-options"));
             itemList = parallelProcessor.process(userOptionList);

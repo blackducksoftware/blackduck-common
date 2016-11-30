@@ -26,7 +26,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatusRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
@@ -44,14 +43,14 @@ public class PolicyStatusDataService extends HubRequestService {
 
     private final ProjectVersionRequestService projectVersionRequestService;
 
-    private final PolicyStatusRequestService policyStatusRequestService;
+    private final HubRequestService hubRequestService;
 
     public PolicyStatusDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService,
-            final ProjectVersionRequestService projectVersionRequestService, final PolicyStatusRequestService policyStatusRequestService) {
+            final ProjectVersionRequestService projectVersionRequestService, final HubRequestService hubRequestService) {
         super(restConnection);
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
-        this.policyStatusRequestService = policyStatusRequestService;
+        this.hubRequestService = hubRequestService;
     }
 
     public PolicyStatusItem getPolicyStatusForProjectAndVersion(final String projectName,
@@ -64,7 +63,7 @@ public class PolicyStatusDataService extends HubRequestService {
         final List<ProjectVersionItem> projectVersions = projectVersionRequestService.getAllProjectVersions(versionsUrl);
         final String policyStatusUrl = findPolicyStatusUrl(projectVersions, projectVersionName);
 
-        return policyStatusRequestService.getItem(policyStatusUrl);
+        return hubRequestService.getItem(policyStatusUrl, PolicyStatusItem.class);
     }
 
     private String findPolicyStatusUrl(final List<ProjectVersionItem> projectVersions, final String projectVersionName)

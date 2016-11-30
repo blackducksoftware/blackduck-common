@@ -111,9 +111,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      */
     public VersionReport getReportContent(final String reportContentUrl)
             throws IOException, BDRestException, URISyntaxException {
-        final HubRequest hubRequest = new HubRequest(getRestConnection());
-        hubRequest.setMethod(Method.GET);
-        hubRequest.setUrl(reportContentUrl);
+        final HubRequest hubRequest = getHubRequestFactory().createGetRequest(reportContentUrl);
 
         final JsonObject json = hubRequest.executeForResponseJson();
         final JsonElement content = json.get("reportContent");
