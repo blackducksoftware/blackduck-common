@@ -46,6 +46,7 @@ import com.blackducksoftware.integration.hub.StreamRedirectThread;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.exception.ScanFailedException;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -55,10 +56,6 @@ import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class SimpleScanService extends HubRequestService {
     public static final int DEFAULT_MEMORY = 4096;
-
-    public static enum Result {
-        SUCCESS, FAILURE;
-    }
 
     private final IntLogger logger;
 
@@ -82,7 +79,7 @@ public class SimpleScanService extends HubRequestService {
 
     private final List<String> scanTargetPaths;
 
-    private final String workingDirectoryPath;
+    private final File workingDirectory;
 
     private final List<String> cmd = new ArrayList<>();
 
@@ -90,7 +87,7 @@ public class SimpleScanService extends HubRequestService {
 
     public SimpleScanService(IntLogger logger, RestConnection restConnection, HubServerConfig hubServerConfig, HubSupportHelper hubSupportHelper,
             CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, int scanMemory, boolean verboseRun, boolean dryRun, String project,
-            String version, List<String> scanTargetPaths, String workingDirectoryPath) {
+            String version, List<String> scanTargetPaths, File workingDirectory) {
         super(restConnection);
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
@@ -103,14 +100,17 @@ public class SimpleScanService extends HubRequestService {
         this.project = project;
         this.version = version;
         this.scanTargetPaths = scanTargetPaths;
-        this.workingDirectoryPath = workingDirectoryPath;
+        this.workingDirectory = workingDirectory;
     }
 
     /**
      * This will setup the command-line invocation of the Hub scanner. The workingDirectoryPath is the parent folder of
      * the scan logs and other scan artifacts.
+     *
+     * @throws ScanFailedException
      */
-    public Result setupAndExecuteScan() throws HubIntegrationException, IOException, IllegalArgumentException, InterruptedException, EncryptionException {
+    public void setupAndExecuteScan()
+            throws HubIntegrationException, IOException, IllegalArgumentException, InterruptedException, EncryptionException, ScanFailedException {
         final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
         final String pathToJavaExecutable = cliLocation.getProvidedJavaExec().getCanonicalPath();
         final String pathToOneJar = cliLocation.getOneJarFile().getCanonicalPath();
@@ -199,15 +199,17 @@ public class SimpleScanService extends HubRequestService {
             cmd.add(target);
         }
 
-        return executeScan();
+        executeScan();
     }
 
     /**
      * If running in an environment that handles process creation, this method should be overridden to construct a
      * process to execute the scan in the environment-specific way.
+     *
+     * @throws ScanFailedException
      */
-    public Result executeScan()
-            throws IOException, InterruptedException, IllegalArgumentException, EncryptionException {
+    private void executeScan()
+            throws IOException, InterruptedException, IllegalArgumentException, EncryptionException, ScanFailedException {
         printCommand();
 
         final File standardOutFile = new File(logDirectory, "CLI_Output.txt");
@@ -241,10 +243,8 @@ public class SimpleScanService extends HubRequestService {
             logger.info("Hub CLI return code : " + returnCode);
             logger.info("You can view the BlackDuck Scan CLI logs at : '" + logDirectory.getCanonicalPath() + "'");
 
-            if (returnCode == 0) {
-                return Result.SUCCESS;
-            } else {
-                return Result.FAILURE;
+            if (returnCode != 0) {
+                throw new ScanFailedException("The scan failed with return code : " + returnCode);
             }
         }
     }
@@ -292,7 +292,7 @@ public class SimpleScanService extends HubRequestService {
     }
 
     private void populateLogDirectory() throws IOException {
-        final File logsDirectory = new File(workingDirectoryPath, "HubScanLogs");
+        final File logsDirectory = new File(workingDirectory, "HubScanLogs");
         final String specificScanExecutionLogDirectory = getSpecificScanExecutionLogDirectory();
 
         logDirectory = new File(logsDirectory, specificScanExecutionLogDirectory);

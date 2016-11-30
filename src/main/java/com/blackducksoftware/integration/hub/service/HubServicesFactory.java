@@ -47,6 +47,7 @@ import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequ
 import com.blackducksoftware.integration.hub.api.vulnerableBomComponent.VulnerableBomComponentRequestService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
+import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
 import com.blackducksoftware.integration.hub.dataservice.extension.ExtensionConfigDataService;
 import com.blackducksoftware.integration.hub.dataservice.notification.NotificationDataService;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyNotificationFilter;
@@ -71,6 +72,11 @@ public class HubServicesFactory {
 
     public HubRequestService createHubRequestService() {
         return new HubRequestService(restConnection);
+    }
+
+    public CLIDataService createCLIDataService(final IntLogger logger) {
+        return new CLIDataService(logger, restConnection, createHubVersionRequestService(), createCliDownloadService(logger),
+                createHubRegistrationRequestService());
     }
 
     public RiskReportDataService createRiskReportDataService(final IntLogger logger) {
@@ -184,9 +190,9 @@ public class HubServicesFactory {
     public SimpleScanService createSimpleScanService(IntLogger logger, RestConnection restConnection, HubServerConfig hubServerConfig,
             HubSupportHelper hubSupportHelper,
             CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, int scanMemory, boolean verboseRun, boolean dryRun, String project,
-            String version, List<String> scanTargetPaths, String workingDirectoryPath) {
+            String version, List<String> scanTargetPaths, File workingDirectory) {
         return new SimpleScanService(logger, restConnection, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo, scanMemory,
-                verboseRun, dryRun, project, version, scanTargetPaths, workingDirectoryPath);
+                verboseRun, dryRun, project, version, scanTargetPaths, workingDirectory);
     }
 
     public HubRegistrationRequestService createHubRegistrationRequestService() {
