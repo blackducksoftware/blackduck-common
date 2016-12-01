@@ -73,8 +73,8 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
             hubPagedRequest.setQ("name:" + projectName);
         }
 
-        final List<ProjectItem> allProjectItems = getItems(hubPagedRequest);
-        return allProjectItems;
+        final List<ProjectItem> projectItems = getItems(hubPagedRequest);
+        return projectItems;
     }
 
     public ProjectItem getProjectByName(String projectName)
