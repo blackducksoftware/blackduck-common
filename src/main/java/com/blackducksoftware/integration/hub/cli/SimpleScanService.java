@@ -253,11 +253,13 @@ public class SimpleScanService extends HubRequestService {
      * For all error cases, return an empty list. If all goes well, return a list of scan summary urls.
      */
     public List<ScanSummaryItem> getScanSummaryItems() {
-        if (null == logDirectory) {
+        if (logDirectory == null || !logDirectory.exists()) {
             return Collections.emptyList();
         }
-
         final File scanStatusDirectory = new File(logDirectory, "status");
+        if (!scanStatusDirectory.exists()) {
+            return Collections.emptyList();
+        }
         final File[] statusFiles = scanStatusDirectory.listFiles();
 
         if (statusFiles.length != scanTargetPaths.size()) {
