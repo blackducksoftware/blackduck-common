@@ -51,9 +51,7 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
     }
 
     public List<ProjectItem> getAllProjects() throws IOException, BDRestException, URISyntaxException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(PROJECTS_SEGMENTS);
-
-        final List<ProjectItem> allProjectItems = getAllItems(hubPagedRequest);
+        final List<ProjectItem> allProjectItems = getAllItems(PROJECTS_SEGMENTS);
         return allProjectItems;
     }
 
@@ -75,8 +73,8 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
             hubPagedRequest.setQ("name:" + projectName);
         }
 
-        final List<ProjectItem> allProjectItems = getItems(hubPagedRequest);
-        return allProjectItems;
+        final List<ProjectItem> projectItems = getItems(hubPagedRequest);
+        return projectItems;
     }
 
     public ProjectItem getProjectByName(String projectName)

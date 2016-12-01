@@ -38,8 +38,7 @@ public class VulnerableBomComponentRequestService extends HubParameterizedReques
     public List<VulnerableBomComponentItem> getVulnerableComponentsMatchingComponentName(
             final String vulnerableBomComponentsUrl, final String componentName)
             throws IOException, URISyntaxException, BDRestException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, vulnerableBomComponentsUrl);
-        hubPagedRequest.setQ(componentName);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, vulnerableBomComponentsUrl, componentName);
 
         final List<VulnerableBomComponentItem> allItems = getAllItems(hubPagedRequest);
         return allItems;

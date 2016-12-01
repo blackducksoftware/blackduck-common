@@ -43,4 +43,5 @@ public class PolicyContentItem extends NotificationContentItem {
     public String getComponentRelativeUrl() throws URISyntaxException {
         return HubUrlParser.getRelativeUrl(componentUrl);
     }
+
 }

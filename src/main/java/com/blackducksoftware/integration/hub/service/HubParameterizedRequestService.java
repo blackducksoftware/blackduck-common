@@ -30,10 +30,10 @@ import java.util.List;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.item.HubPagedResponse;
+import com.blackducksoftware.integration.hub.api.item.ParameterizedListType;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 
 public class HubParameterizedRequestService<T> extends HubRequestService {
     private final Class<T> clazz;
@@ -43,7 +43,9 @@ public class HubParameterizedRequestService<T> extends HubRequestService {
     public HubParameterizedRequestService(final RestConnection restConnection, Class<T> clazz) {
         super(restConnection);
         this.clazz = clazz;
-        listType = TypeToken.getParameterized(List.class, new Type[] { clazz }).getType();
+        // we can use this once we don't need to support older versions (2.3.0 for hub-artifactory) anymore
+        // listType = TypeToken.getParameterized(List.class, new Type[] { clazz }).getType();
+        listType = new ParameterizedListType(clazz);
     }
 
     public HubPagedResponse<T> getPagedResponse(HubPagedRequest hubPagedRequest) throws IOException, URISyntaxException, BDRestException {
@@ -86,6 +88,16 @@ public class HubParameterizedRequestService<T> extends HubRequestService {
         }
 
         return allItems;
+    }
+
+    public List<T> getAllItems(List<String> urlSegments) throws BDRestException, IOException, URISyntaxException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(urlSegments);
+        return getAllItems(hubPagedRequest);
+    }
+
+    public List<T> getAllItems(String url) throws BDRestException, IOException, URISyntaxException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(url);
+        return getAllItems(hubPagedRequest);
     }
 
     public T getItem(final HubRequest hubRequest) throws IOException, BDRestException, URISyntaxException {

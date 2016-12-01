@@ -38,7 +38,6 @@ import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
-import com.google.gson.JsonObject;
 
 public class HubVersionRequestService extends HubParameterizedRequestService<VersionComparison> {
     private static final List<String> CURRENT_VERSION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION);
@@ -59,8 +58,7 @@ public class HubVersionRequestService extends HubParameterizedRequestService<Ver
     public VersionComparison getHubVersionComparison(String consumerVersion) throws IOException, URISyntaxException, BDRestException {
         final HubRequest hubVersionRequest = getHubRequestFactory().createGetRequest(CURRENT_VERSION_COMPARISON_SEGMENTS).addQueryParameter(QUERY_VERSION,
                 consumerVersion);
-        final JsonObject jsonObject = hubVersionRequest.executeForResponseJson();
-        final VersionComparison versionComparison = getItem(jsonObject, VersionComparison.class);
+        final VersionComparison versionComparison = getItem(hubVersionRequest);
         return versionComparison;
     }
 
