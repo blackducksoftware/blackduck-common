@@ -21,19 +21,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class JarResourceCopier {
-
     public List<File> copy(String resourceDir, String destinationDir) throws IOException, URISyntaxException {
-        List<String> fileList = findRelativePathFileList();
+        final List<String> fileList = findRelativePathFileList();
         return writeFiles(fileList, resourceDir, destinationDir);
     }
 
     public abstract List<String> findRelativePathFileList();
 
     private List<File> writeFiles(List<String> fileList, String resourceDir, String destinationDir) throws IOException {
-        List<File> writtenList = new LinkedList<>();
-        for (String relativePath : fileList) {
-            String resourceFile = resourceDir + relativePath;
-            String destFile = destinationDir + File.separator + relativePath;
+        final List<File> writtenList = new LinkedList<>();
+        for (final String relativePath : fileList) {
+            final String resourceFile = resourceDir + relativePath;
+            final String destFile = destinationDir + File.separator + relativePath;
             if (!copyFileViaClass(resourceFile, destFile, writtenList)) {
                 copyFileViaClassLoader(resourceFile, destFile, writtenList);
             }
@@ -49,7 +48,7 @@ public abstract class JarResourceCopier {
                 copyFile(resourceStream, destFile, writtenFileList);
                 return true;
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             ex.printStackTrace();
             return false;
         }
@@ -63,14 +62,14 @@ public abstract class JarResourceCopier {
                 copyFile(resourceStream, destFile, writtenFileList);
                 return true;
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             ex.printStackTrace();
             return false;
         }
     }
 
     private void copyFile(final InputStream resourceStream, final String destFile, List<File> writtenFileList) throws IOException {
-        File filePath = new File(destFile);
+        final File filePath = new File(destFile);
         filePath.getParentFile().mkdirs();
         Files.copy(resourceStream, filePath.toPath(), StandardCopyOption.REPLACE_EXISTING);
         writtenFileList.add(filePath);
@@ -83,4 +82,5 @@ public abstract class JarResourceCopier {
     private InputStream getClassInputStream(String resourcePath) {
         return this.getClass().getResourceAsStream(resourcePath);
     }
+
 }

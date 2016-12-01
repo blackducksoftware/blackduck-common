@@ -18,14 +18,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class RiskReportResourceCopier extends JarResourceCopier {
-
     public final static String JSON_TOKEN_TO_REPLACE = "TOKEN_RISK_REPORT_JSON_TOKEN";
 
     public final static String RESOURCE_DIRECTORY = "riskreport/web/";
 
     public final static String RISK_REPORT_HTML_FILE_NAME = "riskreport.html";
 
-    private String destinationDirectory;
+    private final String destinationDirectory;
 
     public RiskReportResourceCopier(String destinationDirectory) {
         this.destinationDirectory = destinationDirectory;
@@ -37,7 +36,7 @@ public class RiskReportResourceCopier extends JarResourceCopier {
 
     @Override
     public List<String> findRelativePathFileList() {
-        List<String> relativePathList = new LinkedList<>();
+        final List<String> relativePathList = new LinkedList<>();
         relativePathList.add("css/HubBomReport.css");
         relativePathList.add("images/Hub_BD_logo.png");
         relativePathList.add(RISK_REPORT_HTML_FILE_NAME);
@@ -47,8 +46,8 @@ public class RiskReportResourceCopier extends JarResourceCopier {
     }
 
     private List<String> findJavascriptFileList() {
-        List<String> fileList = new LinkedList<>();
-        String parentDir = "js/";
+        final List<String> fileList = new LinkedList<>();
+        final String parentDir = "js/";
         fileList.add(parentDir + "HubBomReportFunctions.js");
         fileList.add(parentDir + "HubRiskReport.js");
         fileList.add(parentDir + "jquery-3.1.1.min.js");
@@ -57,12 +56,12 @@ public class RiskReportResourceCopier extends JarResourceCopier {
     }
 
     private List<String> findFontAwesomeFileList() {
-        List<String> fileList = new LinkedList<>();
-        String parentDir = "font-awesome-4.5.0/";
-        String cssDir = parentDir + "css/";
-        String fontsDir = parentDir + "fonts/";
-        String lessDir = parentDir + "less/";
-        String scssDir = parentDir + "scss/";
+        final List<String> fileList = new LinkedList<>();
+        final String parentDir = "font-awesome-4.5.0/";
+        final String cssDir = parentDir + "css/";
+        final String fontsDir = parentDir + "fonts/";
+        final String lessDir = parentDir + "less/";
+        final String scssDir = parentDir + "scss/";
         // css
         fileList.add(cssDir + "font-awesome.css");
         fileList.add(cssDir + "font-awesome.min.css");
@@ -103,4 +102,5 @@ public class RiskReportResourceCopier extends JarResourceCopier {
         fileList.add(scssDir + "font-awesome.scss");
         return fileList;
     }
+
 }
