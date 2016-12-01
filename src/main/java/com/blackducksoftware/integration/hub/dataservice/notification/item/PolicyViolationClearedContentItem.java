@@ -29,7 +29,6 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 
 public class PolicyViolationClearedContentItem extends PolicyViolationContentItem {
-
     public PolicyViolationClearedContentItem(final Date createdAt, final ProjectVersion projectVersion,
             final String componentName,
             final String componentVersion, final String componentUrl,
@@ -39,11 +38,4 @@ public class PolicyViolationClearedContentItem extends PolicyViolationContentIte
                 policyRuleList);
     }
 
-    @Override
-    public String toString() {
-        return "PolicyViolationClearedContentItem [getPolicyRuleList()=" + getPolicyRuleList() + ", getComponentUrl()="
-                + getComponentUrl() + ", getProjectVersion()=" + getProjectVersion() + ", getComponentName()="
-                + getComponentName() + ", getComponentVersion()=" + getComponentVersion()
-                + ", getComponentVersionUrl()=" + getComponentVersionUrl() + ", getCreatedAt()=" + getCreatedAt() + "]";
-    }
 }
