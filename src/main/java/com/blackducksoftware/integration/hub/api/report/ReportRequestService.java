@@ -47,7 +47,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class ReportRequestService extends HubParameterizedRequestService<ReportInformationItem> {
-    private final static long MAXIMUM_WAIT = 1000 * 60 * 30;
+    public final static long MAXIMUM_WAIT = 1000 * 60 * 30;
 
     private final IntLogger logger;
 

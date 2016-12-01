@@ -50,20 +50,48 @@ public class RiskReportDataService extends HubRequestService {
         this.reportRequestService = reportRequestService;
     }
 
-    public void createRiskReport(final File outputDirectory, String projectName, String projectVersionName)
+    public HubRiskReportData createRiskReport(String projectName, String projectVersionName)
+            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, UnexpectedHubResponseException, HubIntegrationException,
+            InterruptedException {
+        final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
+        return createRiskReport(projectName, projectVersionName, ReportRequestService.MAXIMUM_WAIT, categories);
+    }
+
+    public HubRiskReportData createRiskReport(String projectName, String projectVersionName, long maximumWaitInMilliSeconds)
+            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, UnexpectedHubResponseException, HubIntegrationException,
+            InterruptedException {
+        final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
+        return createRiskReport(projectName, projectVersionName, maximumWaitInMilliSeconds, categories);
+    }
+
+    public HubRiskReportData createRiskReport(String projectName, String projectVersionName, long maximumWaitInMilliSeconds, ReportCategoriesEnum[] categories)
+            throws IOException,
+            BDRestException, URISyntaxException, ProjectDoesNotExistException, UnexpectedHubResponseException, HubIntegrationException, InterruptedException {
+        final ProjectItem project = projectRequestService.getProjectByName(projectName);
+        final ProjectVersionItem version = projectVersionRequestService.getProjectVersion(project, projectVersionName);
+        return reportRequestService.generateHubReport(version, ReportFormatEnum.JSON, categories, maximumWaitInMilliSeconds);
+    }
+
+    public void createRiskReportFiles(final File outputDirectory, String projectName, String projectVersionName)
             throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, HubIntegrationException, InterruptedException,
             UnexpectedHubResponseException {
         final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
-        createRiskReport(outputDirectory, projectName, projectVersionName, categories);
+        createRiskReportFiles(outputDirectory, projectName, projectVersionName, ReportRequestService.MAXIMUM_WAIT, categories);
     }
 
-    public void createRiskReport(final File outputDirectory, String projectName, String projectVersionName, ReportCategoriesEnum[] categories)
+    public void createRiskReportFiles(final File outputDirectory, String projectName, String projectVersionName, long maximumWait)
+            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, HubIntegrationException, InterruptedException,
+            UnexpectedHubResponseException {
+        final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
+        createRiskReportFiles(outputDirectory, projectName, projectVersionName, maximumWait, categories);
+    }
+
+    public void createRiskReportFiles(final File outputDirectory, String projectName, String projectVersionName, long maximumWaitInMilliSeconds,
+            ReportCategoriesEnum[] categories)
             throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, HubIntegrationException,
             InterruptedException,
             UnexpectedHubResponseException {
-        final ProjectItem project = projectRequestService.getProjectByName(projectName);
-        final ProjectVersionItem version = projectVersionRequestService.getProjectVersion(project, projectVersionName);
-        final HubRiskReportData riskreportData = reportRequestService.generateHubReport(version, ReportFormatEnum.JSON, categories);
+        final HubRiskReportData riskreportData = createRiskReport(projectName, projectVersionName, maximumWaitInMilliSeconds, categories);
         final RiskReportResourceCopier copier = new RiskReportResourceCopier(outputDirectory.getCanonicalPath());
         final List<File> writtenFiles = copier.copy();
         File htmlFile = null;
