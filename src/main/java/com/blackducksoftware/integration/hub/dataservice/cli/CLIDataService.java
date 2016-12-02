@@ -109,4 +109,5 @@ public class CLIDataService extends HubRequestService {
         logger.alwaysLog("--> Log Level : " + logger.getLogLevel().name());
         hubScanConfig.print(logger);
     }
+
 }

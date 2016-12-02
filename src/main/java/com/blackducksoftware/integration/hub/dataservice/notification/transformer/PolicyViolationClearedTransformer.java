@@ -21,7 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservice.notification.transformer;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,7 @@ import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequest
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationClearedContentItem;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 
@@ -64,7 +63,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         ProjectVersionItem releaseItem;
         try {
             releaseItem = getReleaseItem(projectVersionLink);
-        } catch (IOException | BDRestException | URISyntaxException e1) {
+        } catch (final HubIntegrationException e1) {
             throw new HubItemTransformException("Error getting release item while transforming notification " + item
                     + "; projectVersionLink: " + projectVersionLink + ": " + e1.getMessage(), e1);
         }
@@ -114,8 +113,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         }
     }
 
-    private ProjectVersionItem getReleaseItem(final String projectVersionLink)
-            throws IOException, BDRestException, URISyntaxException {
+    private ProjectVersionItem getReleaseItem(final String projectVersionLink) throws HubIntegrationException {
         final ProjectVersionItem releaseItem = getProjectVersionService().getItem(projectVersionLink);
         return releaseItem;
     }

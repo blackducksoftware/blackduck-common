@@ -21,7 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservice.notification.transformer;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequest
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyOverrideContentItem;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 
@@ -58,31 +57,31 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
     @Override
     public List<NotificationContentItem> transform(final NotificationItem item) throws HubItemTransformException {
         final List<NotificationContentItem> templateData = new ArrayList<>();
+        final ProjectVersionItem releaseItem;
+        final PolicyOverrideNotificationItem policyOverride = (PolicyOverrideNotificationItem) item;
+        final String projectName = policyOverride.getContent().getProjectName();
+        final List<ComponentVersionStatus> componentVersionList = new ArrayList<>();
+        final ComponentVersionStatus componentStatus = new ComponentVersionStatus();
+        componentStatus.setBomComponentVersionPolicyStatusLink(
+                policyOverride.getContent()
+                        .getBomComponentVersionPolicyStatusLink());
+        componentStatus.setComponentName(policyOverride.getContent().getComponentName());
+        componentStatus.setComponentVersionLink(policyOverride.getContent().getComponentVersionLink());
+
+        componentVersionList.add(componentStatus);
+
         try {
-            final ProjectVersionItem releaseItem;
-            final PolicyOverrideNotificationItem policyOverride = (PolicyOverrideNotificationItem) item;
-            final String projectName = policyOverride.getContent().getProjectName();
-            final List<ComponentVersionStatus> componentVersionList = new ArrayList<>();
-            final ComponentVersionStatus componentStatus = new ComponentVersionStatus();
-            componentStatus.setBomComponentVersionPolicyStatusLink(
-                    policyOverride.getContent()
-                            .getBomComponentVersionPolicyStatusLink());
-            componentStatus.setComponentName(policyOverride.getContent().getComponentName());
-            componentStatus.setComponentVersionLink(policyOverride.getContent().getComponentVersionLink());
-
-            componentVersionList.add(componentStatus);
-
             releaseItem = getProjectVersionService().getItem(policyOverride.getContent().getProjectVersionLink());
-
-            final ProjectVersion projectVersion = new ProjectVersion();
-            projectVersion.setProjectName(projectName);
-            projectVersion.setProjectVersionName(releaseItem.getVersionName());
-            projectVersion.setUrl(policyOverride.getContent().getProjectVersionLink());
-
-            handleNotification(componentVersionList, projectVersion, item, templateData);
-        } catch (IOException | BDRestException | URISyntaxException e) {
+        } catch (final HubIntegrationException e) {
             throw new HubItemTransformException(e);
         }
+
+        final ProjectVersion projectVersion = new ProjectVersion();
+        projectVersion.setProjectName(projectName);
+        projectVersion.setProjectVersionName(releaseItem.getVersionName());
+        projectVersion.setUrl(policyOverride.getContent().getProjectVersionLink());
+
+        handleNotification(componentVersionList, projectVersion, item, templateData);
         return templateData;
     }
 

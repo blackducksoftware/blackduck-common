@@ -29,20 +29,18 @@ import org.restlet.Context;
 import org.restlet.resource.ClientResource;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class CredentialsRestConnection extends RestConnection {
-
-    public CredentialsRestConnection(final HubServerConfig hubServerConfig)
-            throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException {
+    public CredentialsRestConnection(final HubServerConfig hubServerConfig) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         this(null, hubServerConfig);
     }
 
     public CredentialsRestConnection(final IntLogger logger, final HubServerConfig hubServerConfig)
-            throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException {
+            throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         super(logger);
         setBaseUrl(hubServerConfig.getHubUrl().toString());
         final HubProxyInfo proxyInfo = hubServerConfig.getProxyInfo();
@@ -59,8 +57,11 @@ public class CredentialsRestConnection extends RestConnection {
     }
 
     @Override
-    public ClientResource createClientResource(final Context context, final String providedUrl)
-            throws URISyntaxException {
-        return new ClientResource(context, new URI(providedUrl));
+    public ClientResource createClientResource(final Context context, final String providedUrl) throws HubIntegrationException {
+        try {
+            return new ClientResource(context, new URI(providedUrl));
+        } catch (final URISyntaxException e) {
+            throw new HubIntegrationException(String.format("The providedUrl (%s) was invalid.", providedUrl), e);
+        }
     }
 }

@@ -19,53 +19,55 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.meta;
-
-import java.util.List;
+package com.blackducksoftware.integration.hub.api.project;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-public class MetaInformation {
-    private final List<MetaAllowEnum> allow;
+import com.google.gson.annotations.SerializedName;
 
-    private final String href;
+public class ProjectVersion {
+    public static final String PROJECT_URL_IDENTIFIER = "projects";
 
-    private final List<MetaLink> links;
+    public static final String VERSION_URL_IDENTIFIER = "versions";
 
-    public MetaInformation(final List<MetaAllowEnum> allow, final String href, final List<MetaLink> links) {
-        this.allow = allow;
-        this.href = href;
-        this.links = links;
+    private String projectName;
+
+    private String projectVersionName;
+
+    @SerializedName("projectVersion")
+    private String url;
+
+    public String getProjectName() {
+        return projectName;
     }
 
-    public List<MetaAllowEnum> getAllow() {
-        return allow;
+    public String getProjectVersionName() {
+        return projectVersionName;
     }
 
-    public boolean isAccessible() {
-        if (allow != null && !allow.isEmpty() && allow.contains(MetaAllowEnum.GET)
-                && allow.contains(MetaAllowEnum.PUT)) {
-            return true;
-        }
-        return false;
+    public String getUrl() {
+        return url;
     }
 
-    public String getHref() {
-        return href;
+    public void setProjectName(final String projectName) {
+        this.projectName = projectName;
     }
 
-    public List<MetaLink> getLinks() {
-        return links;
+    public void setProjectVersionName(final String projectVersionName) {
+        this.projectVersionName = projectVersionName;
+    }
+
+    public void setUrl(final String url) {
+        this.url = url;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((allow == null) ? 0 : allow.hashCode());
-        result = prime * result + ((href == null) ? 0 : href.hashCode());
-        result = prime * result + ((links == null) ? 0 : links.hashCode());
+        result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
+        result = prime * result + ((projectVersionName == null) ? 0 : projectVersionName.hashCode());
         return result;
     }
 
@@ -77,29 +79,22 @@ public class MetaInformation {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MetaInformation)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        final MetaInformation other = (MetaInformation) obj;
-        if (allow == null) {
-            if (other.allow != null) {
+        final ProjectVersion other = (ProjectVersion) obj;
+        if (projectName == null) {
+            if (other.projectName != null) {
                 return false;
             }
-        } else if (!allow.equals(other.allow)) {
+        } else if (!projectName.equals(other.projectName)) {
             return false;
         }
-        if (href == null) {
-            if (other.href != null) {
+        if (projectVersionName == null) {
+            if (other.projectVersionName != null) {
                 return false;
             }
-        } else if (!href.equals(other.href)) {
-            return false;
-        }
-        if (links == null) {
-            if (other.links != null) {
-                return false;
-            }
-        } else if (!links.equals(other.links)) {
+        } else if (!projectVersionName.equals(other.projectVersionName)) {
             return false;
         }
         return true;

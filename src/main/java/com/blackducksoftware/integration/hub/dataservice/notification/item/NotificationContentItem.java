@@ -26,11 +26,11 @@ import java.util.Date;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.google.common.base.Joiner;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {
-    private final ProjectVersionItem projectVersionItem;
+    private final ProjectVersion projectVersion;
 
     private final String componentName;
 
@@ -43,19 +43,19 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
     // they are collected multi-threaded
     public final Date createdAt;
 
-    public NotificationContentItem(final Date createdAt, final ProjectVersionItem projectVersionItem,
+    public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
             final String componentName,
             final String componentVersion,
             final String componentVersionUrl) {
         this.createdAt = createdAt;
-        this.projectVersionItem = projectVersionItem;
+        this.projectVersion = projectVersion;
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.componentVersionUrl = componentVersionUrl;
     }
 
-    public ProjectVersionItem getProjectVersionItem() {
-        return projectVersionItem;
+    public ProjectVersion getProjectVersion() {
+        return projectVersion;
     }
 
     public String getComponentName() {
@@ -93,10 +93,10 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
         // Identify same-time non-equal items as non-equal
         final Joiner joiner = Joiner.on(":").skipNulls();
-        final String thisProjectVersionString = joiner.join(getProjectVersionItem().get, getProjectVersionItem()
+        final String thisProjectVersionString = joiner.join(getProjectVersion().getProjectName(), getProjectVersion()
                 .getProjectVersionName(), getComponentVersionUrl());
-        final String otherProjectVersionString = joiner.join(o.getProjectVersionItem().getProjectName(), o
-                .getProjectVersionItem().getProjectVersionItemName(), o.getComponentVersionUrl().toString());
+        final String otherProjectVersionString = joiner.join(o.getProjectVersion().getProjectName(), o
+                .getProjectVersion().getProjectVersionName(), o.getComponentVersionUrl().toString());
 
         return thisProjectVersionString.compareTo(otherProjectVersionString);
     }

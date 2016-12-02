@@ -383,11 +383,11 @@ public abstract class RestConnection {
         resource.release();
     }
 
-    public ClientResource createClientResource() {
+    public ClientResource createClientResource() throws HubIntegrationException {
         return createClientResource(getBaseUrl());
     }
 
-    public ClientResource createClientResource(final String providedUrl) {
+    public ClientResource createClientResource(final String providedUrl) throws HubIntegrationException {
         // Should throw timeout exception after the specified timeout, default
         // is 2 minutes
         final ClientResource resource = createClientResource(client.getContext(), providedUrl);
@@ -396,10 +396,10 @@ public abstract class RestConnection {
         return resource;
     }
 
-    public abstract ClientResource createClientResource(final Context context, final String providedUrl);
+    public abstract ClientResource createClientResource(final Context context, final String providedUrl) throws HubIntegrationException;
 
     public ClientResource createClientResource(final List<String> urlSegments,
-            final Set<AbstractMap.SimpleEntry<String, String>> queryParameters) {
+            final Set<AbstractMap.SimpleEntry<String, String>> queryParameters) throws HubIntegrationException {
         final ClientResource resource = createClientResource();
 
         for (final String urlSegment : urlSegments) {

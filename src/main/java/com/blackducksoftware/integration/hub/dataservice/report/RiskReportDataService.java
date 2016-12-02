@@ -12,7 +12,6 @@
 package com.blackducksoftware.integration.hub.dataservice.report;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -28,10 +27,7 @@ import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
 import com.blackducksoftware.integration.hub.api.report.RiskReportResourceCopier;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
-import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 
@@ -50,64 +46,61 @@ public class RiskReportDataService extends HubRequestService {
         this.reportRequestService = reportRequestService;
     }
 
-    public HubRiskReportData createRiskReport(String projectName, String projectVersionName)
-            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, UnexpectedHubResponseException, HubIntegrationException,
-            InterruptedException {
+    public HubRiskReportData createRiskReport(String projectName, String projectVersionName) throws HubIntegrationException {
         final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
         return createRiskReport(projectName, projectVersionName, ReportRequestService.MAXIMUM_WAIT, categories);
     }
 
-    public HubRiskReportData createRiskReport(String projectName, String projectVersionName, long maximumWaitInMilliSeconds)
-            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, UnexpectedHubResponseException, HubIntegrationException,
-            InterruptedException {
+    public HubRiskReportData createRiskReport(String projectName, String projectVersionName, long maximumWaitInMilliSeconds) throws HubIntegrationException {
         final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
         return createRiskReport(projectName, projectVersionName, maximumWaitInMilliSeconds, categories);
     }
 
-    public HubRiskReportData createRiskReport(String projectName, String projectVersionName, long maximumWaitInMilliSeconds, ReportCategoriesEnum[] categories)
-            throws IOException,
-            BDRestException, URISyntaxException, ProjectDoesNotExistException, UnexpectedHubResponseException, HubIntegrationException, InterruptedException {
+    public HubRiskReportData createRiskReport(String projectName, String projectVersionName, long maximumWaitInMilliSeconds,
+            ReportCategoriesEnum[] categories) throws HubIntegrationException {
         final ProjectItem project = projectRequestService.getProjectByName(projectName);
         final ProjectVersionItem version = projectVersionRequestService.getProjectVersion(project, projectVersionName);
         return reportRequestService.generateHubReport(version, ReportFormatEnum.JSON, categories, maximumWaitInMilliSeconds);
     }
 
-    public void createRiskReportFiles(final File outputDirectory, String projectName, String projectVersionName)
-            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, HubIntegrationException, InterruptedException,
-            UnexpectedHubResponseException {
+    public void createRiskReportFiles(final File outputDirectory, String projectName, String projectVersionName) throws HubIntegrationException {
         final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
         createRiskReportFiles(outputDirectory, projectName, projectVersionName, ReportRequestService.MAXIMUM_WAIT, categories);
     }
 
     public void createRiskReportFiles(final File outputDirectory, String projectName, String projectVersionName, long maximumWait)
-            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, HubIntegrationException, InterruptedException,
-            UnexpectedHubResponseException {
+            throws HubIntegrationException {
         final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
         createRiskReportFiles(outputDirectory, projectName, projectVersionName, maximumWait, categories);
     }
 
     public void createRiskReportFiles(final File outputDirectory, String projectName, String projectVersionName, long maximumWaitInMilliSeconds,
-            ReportCategoriesEnum[] categories)
-            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException, HubIntegrationException,
-            InterruptedException,
-            UnexpectedHubResponseException {
+            ReportCategoriesEnum[] categories) throws HubIntegrationException {
         final HubRiskReportData riskreportData = createRiskReport(projectName, projectVersionName, maximumWaitInMilliSeconds, categories);
-        final RiskReportResourceCopier copier = new RiskReportResourceCopier(outputDirectory.getCanonicalPath());
-        final List<File> writtenFiles = copier.copy();
-        File htmlFile = null;
-        for (final File file : writtenFiles) {
-            if (file.getName().equals(RiskReportResourceCopier.RISK_REPORT_HTML_FILE_NAME)) {
-                htmlFile = file;
-                break;
+        try {
+            final RiskReportResourceCopier copier = new RiskReportResourceCopier(outputDirectory.getCanonicalPath());
+            File htmlFile = null;
+            try {
+                final List<File> writtenFiles = copier.copy();
+                for (final File file : writtenFiles) {
+                    if (file.getName().equals(RiskReportResourceCopier.RISK_REPORT_HTML_FILE_NAME)) {
+                        htmlFile = file;
+                        break;
+                    }
+                }
+            } catch (final URISyntaxException e) {
+                throw new HubIntegrationException("Couldn't create the report: " + e.getMessage(), e);
             }
+            if (htmlFile == null) {
+                throw new HubIntegrationException("Could not find the file : " + RiskReportResourceCopier.RISK_REPORT_HTML_FILE_NAME
+                        + ", the report files must not have been copied into the report directory.");
+            }
+            String htmlFileString = FileUtils.readFileToString(htmlFile, "UTF-8");
+            final String reportString = getRestConnection().getGson().toJson(riskreportData);
+            htmlFileString = htmlFileString.replace(RiskReportResourceCopier.JSON_TOKEN_TO_REPLACE, reportString);
+            FileUtils.writeStringToFile(htmlFile, htmlFileString, "UTF-8");
+        } catch (final IOException e) {
+            throw new HubIntegrationException("Couldn't create the report: " + e.getMessage(), e);
         }
-        if (htmlFile == null) {
-            throw new FileNotFoundException("Could not find the file : " + RiskReportResourceCopier.RISK_REPORT_HTML_FILE_NAME
-                    + ", the report files must not have been copied into the report directory.");
-        }
-        String htmlFileString = FileUtils.readFileToString(htmlFile, "UTF-8");
-        final String reportString = getRestConnection().getGson().toJson(riskreportData);
-        htmlFileString = htmlFileString.replace(RiskReportResourceCopier.JSON_TOKEN_TO_REPLACE, reportString);
-        FileUtils.writeStringToFile(htmlFile, htmlFileString, "UTF-8");
     }
 }

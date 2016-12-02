@@ -127,7 +127,7 @@ public class HubRequest {
         resource.release();
     }
 
-    private ClientResource buildClientResource(final RestConnection restConnection) {
+    private ClientResource buildClientResource(final RestConnection restConnection) throws HubIntegrationException {
         final ClientResource resource;
         if (StringUtils.isNotBlank(url)) {
             resource = restConnection.createClientResource(url);
