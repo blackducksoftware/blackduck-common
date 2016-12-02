@@ -23,7 +23,6 @@ package com.blackducksoftware.integration.hub.builder;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -76,32 +75,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
 
     public HubScanConfigBuilder(final boolean shouldUseDefaultValues) {
         super(shouldUseDefaultValues);
-    }
-
-    @Override
-    public HubScanConfig build() throws IllegalStateException {
-        final ValidationResults<HubScanConfigFieldEnum, HubScanConfig> results = buildResults();
-        if (results.isSuccess()) {
-            return results.getConstructedObject();
-        } else {
-            final List<String> warningMessages = new ArrayList<>();
-            final List<String> errorMessages = new ArrayList<>();
-            final Set<HubScanConfigFieldEnum> keySet = results.getResultMap().keySet();
-            for (final HubScanConfigFieldEnum key : keySet) {
-                if (results.hasWarnings(key)) {
-                    warningMessages.add(results.getResultString(key, ValidationResultEnum.WARN));
-                }
-                if (results.hasErrors(key)) {
-                    errorMessages.add(results.getResultString(key, ValidationResultEnum.ERROR));
-                }
-            }
-
-            String exceptionMessage = "Invalid Hub Scan Configuration: ";
-            exceptionMessage += "[WARN: " + StringUtils.join(warningMessages, ", ") + "], ";
-            exceptionMessage += "[ERROR: " + StringUtils.join(errorMessages, ", ") + "]";
-
-            throw new IllegalStateException(exceptionMessage);
-        }
     }
 
     @Override
