@@ -135,10 +135,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
     }
 
     public void validateProjectAndVersion(final ValidationResults<HubScanConfigFieldEnum, HubScanConfig> result) {
-        if (dryRun) {
-            result.addResult(HubScanConfigFieldEnum.PROJECT, new ValidationResult(ValidationResultEnum.OK, ""));
-            result.addResult(HubScanConfigFieldEnum.VERSION, new ValidationResult(ValidationResultEnum.OK, ""));
-        } else if (projectName == null && version == null) {
+        if (!dryRun && projectName == null && version == null) {
             result.addResult(HubScanConfigFieldEnum.VERSION, new ValidationResult(ValidationResultEnum.WARN,
                     "No Project name or Version were found. Any scans run will not be mapped to a Version."));
         } else {
@@ -151,8 +148,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
         if (projectName == null) {
             result.addResult(HubScanConfigFieldEnum.PROJECT,
                     new ValidationResult(ValidationResultEnum.ERROR, "No Project name was found."));
-        } else {
-            result.addResult(HubScanConfigFieldEnum.PROJECT, new ValidationResult(ValidationResultEnum.OK, ""));
         }
     }
 
@@ -160,8 +155,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
         if (version == null) {
             result.addResult(HubScanConfigFieldEnum.VERSION,
                     new ValidationResult(ValidationResultEnum.ERROR, "No Version was found."));
-        } else {
-            result.addResult(HubScanConfigFieldEnum.VERSION, new ValidationResult(ValidationResultEnum.OK, ""));
         }
     }
 
@@ -194,22 +187,14 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
         if (scanMemoryInt < MINIMUM_MEMORY_IN_MEGABYTES) {
             result.addResult(HubScanConfigFieldEnum.SCANMEMORY, new ValidationResult(ValidationResultEnum.ERROR,
                     "The minimum amount of memory for the scan is " + MINIMUM_MEMORY_IN_MEGABYTES + " MB."));
-        } else {
-            result.addResult(HubScanConfigFieldEnum.SCANMEMORY, new ValidationResult(ValidationResultEnum.OK, ""));
         }
     }
 
     public void validateShouldGenerateRiskReport(
             final ValidationResults<HubScanConfigFieldEnum, HubScanConfig> result) {
-        if (dryRun) {
-            result.addResult(HubScanConfigFieldEnum.GENERATE_RISK_REPORT,
-                    new ValidationResult(ValidationResultEnum.OK, ""));
-        } else if ((projectName == null || version == null) && shouldGenerateRiskReport) {
+        if (!dryRun && (projectName == null || version == null) && shouldGenerateRiskReport) {
             result.addResult(HubScanConfigFieldEnum.GENERATE_RISK_REPORT, new ValidationResult(ValidationResultEnum.ERROR,
                     "To generate the Risk Report, you need to provide a Project name or version."));
-        } else {
-            result.addResult(HubScanConfigFieldEnum.GENERATE_RISK_REPORT,
-                    new ValidationResult(ValidationResultEnum.OK, ""));
         }
     }
 
@@ -219,10 +204,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
 
     private void validateMaxWaitTimeForBomUpdate(final ValidationResults<HubScanConfigFieldEnum, HubScanConfig> result,
             final Integer defaultMaxWaitTime) {
-        if (dryRun) {
-            result.addResult(HubScanConfigFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
-                    new ValidationResult(ValidationResultEnum.OK, ""));
-        } else {
+        if (!dryRun) {
             if (shouldUseDefaultValues() && defaultMaxWaitTime != null) {
                 final int maxWaitTime = NumberUtils.toInt(maxWaitTimeForBomUpdate);
                 if (maxWaitTime <= 0) {
@@ -250,9 +232,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
             } else if (maxWaitTime < 2) {
                 result.addResult(HubScanConfigFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
                         new ValidationResult(ValidationResultEnum.WARN, "This wait time may be too short."));
-            } else {
-                result.addResult(HubScanConfigFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
-                        new ValidationResult(ValidationResultEnum.OK, ""));
             }
         }
     }
@@ -273,7 +252,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
             scanTargetPaths.add(defaultTargetPath.getAbsolutePath());
         }
 
-        boolean valid = true;
         final Set<String> targetPaths = new HashSet<>();
         for (final String currentTargetPath : scanTargetPaths) {
             String targetPath;
@@ -294,7 +272,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
                     if (target == null || !target.exists()) {
                         result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
                                 "The scan target '" + target.getAbsolutePath() + "' does not exist."));
-                        valid = false;
                     }
 
                     String targetCanonicalPath;
@@ -303,22 +280,16 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
                         if (!targetCanonicalPath.startsWith(workingDirectory.getAbsolutePath())) {
                             result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(
                                     ValidationResultEnum.ERROR, "Can not scan targets outside the working directory."));
-                            valid = false;
                         }
                     } catch (final IOException e) {
                         result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
                                 "Could not get the canonical path for Target : " + targetPath));
-                        valid = false;
                     }
                 }
             }
         }
         scanTargetPaths.clear();
         scanTargetPaths.addAll(targetPaths);
-
-        if (valid) {
-            result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.OK, ""));
-        }
     }
 
     public void setToolsDir(File toolsDir) {
