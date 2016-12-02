@@ -21,11 +21,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.scan;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
@@ -34,8 +32,7 @@ public class ScanSummaryRequestService extends HubParameterizedRequestService<Sc
         super(restConnection, ScanSummaryItem.class);
     }
 
-    public List<ScanSummaryItem> getAllScanSummaryItems(final String scanSummaryUrl)
-            throws IOException, URISyntaxException, BDRestException {
+    public List<ScanSummaryItem> getAllScanSummaryItems(final String scanSummaryUrl) throws HubIntegrationException {
         final List<ScanSummaryItem> allScanSummaryItems = getAllItems(scanSummaryUrl);
         return allScanSummaryItems;
     }

@@ -135,7 +135,7 @@ public class CLILocation {
         }
     }
 
-    public File getProvidedJavaExec() throws IOException, InterruptedException {
+    public File getProvidedJavaExec() {
         final File cliHomeFile = getCLIHome();
         if (cliHomeFile == null) {
             return null;
@@ -162,12 +162,12 @@ public class CLILocation {
         return javaExec;
     }
 
-    public boolean getCLIExists(final IntLogger logger) throws IOException, InterruptedException {
+    public boolean getCLIExists(final IntLogger logger) throws IOException {
         final File cli = getCLI(logger);
         return cli != null && cli.exists();
     }
 
-    public File getCLI(final IntLogger logger) throws IOException, InterruptedException {
+    public File getCLI(final IntLogger logger) throws IOException {
         final File cliHomeFile = getCLIHome();
         if (cliHomeFile == null) {
             return null;
@@ -224,7 +224,7 @@ public class CLILocation {
         return null;
     }
 
-    private String getCLIWrapperLink(final String hubUrl, String downloadFilename) throws IllegalArgumentException {
+    private String getCLIWrapperLink(final String hubUrl, String downloadFilename) {
         if (StringUtils.isBlank(hubUrl)) {
             throw new IllegalArgumentException("You must provide a valid Hub URL in order to get the correct link.");
         }

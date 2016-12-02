@@ -21,8 +21,10 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.report;
 
-public class ReleaseData {
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+public class ReleaseData {
     private final String id;
 
     private final String version;
@@ -80,13 +82,7 @@ public class ReleaseData {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("ReleaseData [id=");
-        builder.append(id);
-        builder.append(", version=");
-        builder.append(version);
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

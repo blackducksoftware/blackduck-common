@@ -12,7 +12,6 @@
 package com.blackducksoftware.integration.hub.dataservice.cli;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -26,10 +25,7 @@ import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestServ
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
-import com.blackducksoftware.integration.hub.exception.ScanFailedException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
@@ -62,12 +58,11 @@ public class CLIDataService extends HubRequestService {
     }
 
     public List<ScanSummaryItem> installAndRunScan(final CIEnvironmentVariables commonEnvVars, final HubServerConfig hubConfig, HubScanConfig hubScanConfig)
-            throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException, IllegalArgumentException,
-            InterruptedException, HubIntegrationException, EncryptionException, ScanFailedException {
+            throws HubIntegrationException, EncryptionException {
         final String localHostName = HostnameHelper.getMyHostname();
         logger.info("Running on machine : " + localHostName);
         printConfiguration(hubScanConfig);
-        String hubVersion = hubVersionRequestService.getHubVersion();
+        final String hubVersion = hubVersionRequestService.getHubVersion();
         cliDownloadService.performInstallation(hubConfig.getProxyInfo(), hubScanConfig.getToolsDir(), commonEnvVars, hubConfig.getHubUrl().toString(),
                 hubVersion, localHostName);
 
@@ -91,7 +86,7 @@ public class CLIDataService extends HubRequestService {
             logger.debug("Unable to phone-home", e);
         }
 
-        HubSupportHelper hubSupportHelper = new HubSupportHelper();
+        final HubSupportHelper hubSupportHelper = new HubSupportHelper();
         hubSupportHelper.checkHubSupport(hubVersionRequestService, logger);
         final SimpleScanService simpleScanService = new SimpleScanService(logger, getRestConnection(), hubConfig, hubSupportHelper, commonEnvVars,
                 hubScanConfig.getToolsDir(),
@@ -110,8 +105,7 @@ public class CLIDataService extends HubRequestService {
                 thirdPartyVersion, pluginVersion);
     }
 
-    public void printConfiguration(HubScanConfig hubScanConfig)
-            throws IOException, InterruptedException {
+    public void printConfiguration(HubScanConfig hubScanConfig) {
         logger.alwaysLog("--> Log Level : " + logger.getLogLevel().name());
         hubScanConfig.print(logger);
     }

@@ -21,9 +21,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.net.URISyntaxException;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -31,7 +29,7 @@ import org.restlet.resource.ResourceException;
 
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class HubSupportHelper implements Serializable {
@@ -54,8 +52,7 @@ public class HubSupportHelper implements Serializable {
      * Hub supports. You can use the get methods in this class after this method
      * has run to get the supported options.
      */
-    public void checkHubSupport(HubVersionRequestService hubVersionRequestService, final IntLogger logger)
-            throws IOException, URISyntaxException {
+    public void checkHubSupport(HubVersionRequestService hubVersionRequestService, final IntLogger logger) {
         try {
             if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.3.1")) {
                 setHub3_3_1Support();
@@ -70,7 +67,7 @@ public class HubSupportHelper implements Serializable {
                 }
             }
             setHasBeenChecked(true);
-        } catch (final BDRestException e) {
+        } catch (final HubIntegrationException e) {
             ResourceException resEx = null;
             if (e.getCause() != null && e.getCause() instanceof ResourceException) {
                 resEx = (ResourceException) e.getCause();

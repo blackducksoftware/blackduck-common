@@ -61,10 +61,4 @@ public class NotificationItem extends HubItem {
         this.createdAt = createdAt;
     }
 
-    @Override
-    public String toString() {
-        return "NotificationItem [contentType=" + contentType + ", type=" + type + ", createdAt=" + createdAt
-                + ", Meta=" + getMeta() + "]";
-    }
-
 }

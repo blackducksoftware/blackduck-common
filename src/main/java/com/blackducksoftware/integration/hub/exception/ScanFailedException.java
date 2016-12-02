@@ -21,15 +21,25 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.exception;
 
-public class ScanFailedException extends Exception {
-    private static final long serialVersionUID = 6616918212644568568L;
+public class ScanFailedException extends HubIntegrationException {
+    public ScanFailedException() {
+        super();
+    }
 
-    public ScanFailedException(final String message) {
+    public ScanFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public ScanFailedException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ScanFailedException(String message) {
         super(message);
     }
 
-    public ScanFailedException(final String message, final Throwable cause) {
-        super(message, cause);
+    public ScanFailedException(Throwable cause) {
+        super(cause);
     }
 
 }

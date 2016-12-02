@@ -21,6 +21,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.policy;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 public class PolicyValue {
     private final String label;
 
@@ -79,13 +82,7 @@ public class PolicyValue {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("PolicyValue [label=");
-        builder.append(label);
-        builder.append(", value=");
-        builder.append(value);
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

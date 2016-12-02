@@ -21,22 +21,27 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.exception;
 
-public class HubIntegrationException extends Exception {
-    private static final long serialVersionUID = -7752926384289205234L;
+import com.blackducksoftware.integration.exception.IntegrationException;
 
+public class HubIntegrationException extends IntegrationException {
     public HubIntegrationException() {
+        super();
     }
 
-    public HubIntegrationException(final String message) {
+    public HubIntegrationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public HubIntegrationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public HubIntegrationException(String message) {
         super(message);
     }
 
-    public HubIntegrationException(final Throwable cause) {
+    public HubIntegrationException(Throwable cause) {
         super(cause);
-    }
-
-    public HubIntegrationException(final String message, final Throwable cause) {
-        super(message, cause);
     }
 
 }

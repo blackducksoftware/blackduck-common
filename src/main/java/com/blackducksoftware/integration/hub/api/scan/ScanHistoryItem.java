@@ -22,6 +22,8 @@
 package com.blackducksoftware.integration.hub.api.scan;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 
 public class ScanHistoryItem {
@@ -203,25 +205,7 @@ public class ScanHistoryItem {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("ScanHistoryItem [scannerVersion=");
-        builder.append(scannerVersion);
-        builder.append(", lastModifiedOn=");
-        builder.append(lastModifiedOn);
-        builder.append(", createdOn=");
-        builder.append(createdOn);
-        builder.append(", createdByUserName=");
-        builder.append(createdByUserName);
-        builder.append(", status=");
-        builder.append(status);
-        builder.append(", scanSourceType=");
-        builder.append(scanSourceType);
-        builder.append(", numDirs=");
-        builder.append(numDirs);
-        builder.append(", numNonDirFiles=");
-        builder.append(numNonDirFiles);
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

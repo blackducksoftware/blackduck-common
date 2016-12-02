@@ -21,13 +21,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.project;
 
-import java.util.UUID;
-
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
-import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
-import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class ProjectItem extends HubItem {
     public static final String PROJECT_URL_IDENTIFIER = "projects";
@@ -57,14 +53,6 @@ public class ProjectItem extends HubItem {
         this.projectLevelAdjustments = projectLevelAdjustments;
         this.projectTier = projectTier;
         this.source = source;
-    }
-
-    @Deprecated
-    public UUID getProjectId() throws MissingUUIDException {
-        if (getMeta() == null || getMeta().getHref() == null) {
-            return null;
-        }
-        return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getMeta().getHref());
     }
 
     public String getName() {

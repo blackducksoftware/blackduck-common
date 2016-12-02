@@ -22,12 +22,10 @@
 package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.List;
-import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
-import com.blackducksoftware.integration.hub.util.HubUrlParser;
 import com.google.gson.annotations.SerializedName;
 
 public class ComponentVersionStatus {
@@ -88,32 +86,9 @@ public class ComponentVersionStatus {
         this.policies = policies;
     }
 
-    @Deprecated
-    public UUID getComponentId() throws MissingUUIDException {
-        if (StringUtils.isBlank(getComponentVersionLink())
-                && StringUtils.isBlank(getBomComponentVersionPolicyStatusLink())) {
-            return null;
-        }
-        if (StringUtils.isNotBlank(getComponentVersionLink())) {
-            return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER, getComponentVersionLink());
-        } else {
-            return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER,
-                    getBomComponentVersionPolicyStatusLink());
-        }
-    }
-
-    @Deprecated
-    public UUID getComponentVersionId() throws MissingUUIDException {
-        if (StringUtils.isBlank(getComponentVersionLink())) {
-            return null;
-        }
-        return HubUrlParser.getUUIDFromURLString(COMPONENT_VERSION_URL_IDENTIFIER, getComponentVersionLink());
-    }
-
     @Override
     public String toString() {
-        return "ComponentVersionStatus [componentName=" + componentName + ", componentVersionLink="
-                + componentVersionLink + ", bomComponentVersionPolicyStatusLink=" + bomComponentVersionPolicyStatusLink
-                + ", policies=" + policies + "]";
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
+
 }

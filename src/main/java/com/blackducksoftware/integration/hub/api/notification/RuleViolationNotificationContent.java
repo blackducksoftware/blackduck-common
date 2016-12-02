@@ -23,6 +23,9 @@ package com.blackducksoftware.integration.hub.api.notification;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.google.gson.annotations.SerializedName;
 
@@ -80,10 +83,7 @@ public class RuleViolationNotificationContent {
 
     @Override
     public String toString() {
-        return "RuleViolationNotificationContent [projectName=" + projectName + ", projectVersionName="
-                + projectVersionName + ", componentVersionsInViolation=" + componentVersionsInViolation
-                + ", componentVersionStatuses=" + componentVersionStatuses + ", projectVersionLink="
-                + projectVersionLink + "]";
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

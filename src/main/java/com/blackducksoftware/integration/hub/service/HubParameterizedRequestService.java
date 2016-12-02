@@ -21,9 +21,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.service;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +29,7 @@ import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.item.HubPagedResponse;
 import com.blackducksoftware.integration.hub.api.item.ParameterizedListType;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 
@@ -48,14 +46,14 @@ public class HubParameterizedRequestService<T> extends HubRequestService {
         listType = new ParameterizedListType(clazz);
     }
 
-    public HubPagedResponse<T> getPagedResponse(HubPagedRequest hubPagedRequest) throws IOException, URISyntaxException, BDRestException {
+    public HubPagedResponse<T> getPagedResponse(HubPagedRequest hubPagedRequest) throws HubIntegrationException {
         final JsonObject jsonObject = hubPagedRequest.executeForResponseJson();
         final int totalCount = jsonObject.get("totalCount").getAsInt();
         final List<T> items = getItems(jsonObject);
         return new HubPagedResponse<>(totalCount, items);
     }
 
-    public List<T> getItems(HubPagedRequest hubPagedRequest) throws IOException, URISyntaxException, BDRestException {
+    public List<T> getItems(HubPagedRequest hubPagedRequest) throws HubIntegrationException {
         final JsonObject jsonObject = hubPagedRequest.executeForResponseJson();
         final List<T> items = getItems(jsonObject);
         return items;
@@ -69,8 +67,7 @@ public class HubParameterizedRequestService<T> extends HubRequestService {
         return getRestConnection().getGson().fromJson(jsonObject.get("items"), listType);
     }
 
-    public List<T> getAllItems(final HubPagedRequest hubPagedRequest)
-            throws BDRestException, IOException, URISyntaxException {
+    public List<T> getAllItems(final HubPagedRequest hubPagedRequest) throws HubIntegrationException {
         final List<T> allItems = new ArrayList<>();
 
         final HubPagedResponse<T> firstPage = getPagedResponse(hubPagedRequest);
@@ -90,21 +87,21 @@ public class HubParameterizedRequestService<T> extends HubRequestService {
         return allItems;
     }
 
-    public List<T> getAllItems(List<String> urlSegments) throws BDRestException, IOException, URISyntaxException {
+    public List<T> getAllItems(List<String> urlSegments) throws HubIntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(urlSegments);
         return getAllItems(hubPagedRequest);
     }
 
-    public List<T> getAllItems(String url) throws BDRestException, IOException, URISyntaxException {
+    public List<T> getAllItems(String url) throws HubIntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(url);
         return getAllItems(hubPagedRequest);
     }
 
-    public T getItem(final HubRequest hubRequest) throws IOException, BDRestException, URISyntaxException {
+    public T getItem(final HubRequest hubRequest) throws HubIntegrationException {
         return getItem(hubRequest, clazz);
     }
 
-    public T getItem(String url) throws IOException, BDRestException, URISyntaxException {
+    public T getItem(String url) throws HubIntegrationException {
         return getItem(url, clazz);
     }
 

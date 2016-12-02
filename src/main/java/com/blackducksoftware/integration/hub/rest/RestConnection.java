@@ -21,10 +21,8 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.rest;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.CookieHandler;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,8 +58,7 @@ import org.restlet.util.NamedValue;
 import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -246,7 +243,7 @@ public abstract class RestConnection {
      *
      */
     public int setCookies(final String hubUserName, final String hubPassword)
-            throws URISyntaxException, BDRestException {
+            throws HubIntegrationException {
         final ClientResource resource = createClientResource();
         try {
             resource.addSegment("j_spring_security_check");
@@ -258,7 +255,7 @@ public abstract class RestConnection {
                 encodedHubUser = URLEncoder.encode(hubUserName, "UTF-8");
                 encodedHubPassword = URLEncoder.encode(hubPassword, "UTF-8");
             } catch (final UnsupportedEncodingException e) {
-                throw new BDRestException("Could not encode the HubUsername and Password", e, resource);
+                throw new HubIntegrationException("Could not encode the HubUsername and Password", e);
             }
 
             final StringRepresentation stringRep = new StringRepresentation(
@@ -289,16 +286,15 @@ public abstract class RestConnection {
                 }
 
                 if (requestCookies == null || requestCookies.size() == 0) {
-                    throw new BDRestException(
-                            "Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies",
-                            resource);
+                    throw new HubIntegrationException(
+                            "Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
                 }
                 cookies = requestCookies;
             } else {
                 logger.trace("Response entity : " + resource.getResponse().getEntityAsText());
-                Status status = resource.getResponse().getStatus();
+                final Status status = resource.getResponse().getStatus();
                 logger.trace("Status : " + status.toString(), status.getThrowable());
-                throw new BDRestException(resource.getResponse().getStatus().toString(), status.getThrowable(), resource);
+                throw new HubIntegrationException(resource.getResponse().getStatus().toString(), status.getThrowable());
             }
             return statusCode;
         } finally {
@@ -319,12 +315,10 @@ public abstract class RestConnection {
      *            The absolute URL for the resource.
      * @return The resource gotten from the Hub.
      * @throws ResourceDoesNotExistException
-     * @throws URISyntaxException
-     * @throws IOException
-     * @throws BDRestException
+     * @throws HubIntegrationException
      */
     public <T> T httpGetFromAbsoluteUrl(final Class<T> modelClass, final String url)
-            throws ResourceDoesNotExistException, URISyntaxException, IOException, BDRestException {
+            throws HubIntegrationException {
         final ClientResource resource = createClientResource(url);
         try {
             resource.setMethod(Method.GET);
@@ -335,9 +329,8 @@ public abstract class RestConnection {
             if (isSuccess(responseCode)) {
                 return parseResponse(modelClass, resource);
             } else {
-                throw new ResourceDoesNotExistException(
-                        "Error getting resource from " + url + ": " + responseCode + "; " + resource.toString(),
-                        resource);
+                throw new HubIntegrationException(
+                        "Error getting resource from " + url + ": " + responseCode + "; " + resource.toString());
             }
         } finally {
             releaseResource(resource);
@@ -357,14 +350,11 @@ public abstract class RestConnection {
      * @param queryParameters
      *            Query parameters to add to the URL.
      * @return The resource gotten from the Hub.
-     * @throws IOException
-     * @throws ResourceDoesNotExistException
-     * @throws URISyntaxException
-     * @throws BDRestException
+     * @throws HubIntegrationException
      */
     public <T> T httpGetFromRelativeUrl(final Class<T> modelClass, final List<String> urlSegments,
             final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
-            throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+            throws HubIntegrationException {
 
         final ClientResource resource = createClientResource(urlSegments, queryParameters);
         try {
@@ -377,10 +367,9 @@ public abstract class RestConnection {
             if (isSuccess(responseCode)) {
                 return parseResponse(modelClass, resource);
             } else {
-                throw new ResourceDoesNotExistException(
+                throw new HubIntegrationException(
                         "Error getting resource from relative url segments " + urlSegments + " and query parameters "
-                                + queryParameters + "; errorCode: " + responseCode + "; " + resource.toString(),
-                        resource);
+                                + queryParameters + "; errorCode: " + responseCode + "; " + resource.toString());
             }
         } finally {
             releaseResource(resource);
@@ -394,11 +383,11 @@ public abstract class RestConnection {
         resource.release();
     }
 
-    public ClientResource createClientResource() throws URISyntaxException {
+    public ClientResource createClientResource() {
         return createClientResource(getBaseUrl());
     }
 
-    public ClientResource createClientResource(final String providedUrl) throws URISyntaxException {
+    public ClientResource createClientResource(final String providedUrl) {
         // Should throw timeout exception after the specified timeout, default
         // is 2 minutes
         final ClientResource resource = createClientResource(client.getContext(), providedUrl);
@@ -407,11 +396,10 @@ public abstract class RestConnection {
         return resource;
     }
 
-    public abstract ClientResource createClientResource(final Context context, final String providedUrl)
-            throws URISyntaxException;
+    public abstract ClientResource createClientResource(final Context context, final String providedUrl);
 
     public ClientResource createClientResource(final List<String> urlSegments,
-            final Set<AbstractMap.SimpleEntry<String, String>> queryParameters) throws URISyntaxException {
+            final Set<AbstractMap.SimpleEntry<String, String>> queryParameters) {
         final ClientResource resource = createClientResource();
 
         for (final String urlSegment : urlSegments) {
@@ -431,7 +419,7 @@ public abstract class RestConnection {
         return responseCode >= 200 && responseCode < 300;
     }
 
-    public void handleRequest(final ClientResource resource) throws BDRestException {
+    public void handleRequest(final ClientResource resource) throws HubIntegrationException {
         final boolean debugLogging = isDebugLogging();
         if (debugLogging) {
             logMessage(LogLevel.TRACE, "Resource : " + resource.toString());
@@ -448,7 +436,7 @@ public abstract class RestConnection {
             }
             resource.handle();
         } catch (final ResourceException e) {
-            throw new BDRestException("Problem connecting to the Hub server provided.", e, resource);
+            throw new HubIntegrationException("Problem connecting to the Hub server provided.", e);
         } finally {
             if (originalCookieHandler != null) {
                 if (debugLogging) {
@@ -468,7 +456,7 @@ public abstract class RestConnection {
         return logger != null && logger.getLogLevel() == LogLevel.TRACE;
     }
 
-    public String readResponseAsString(final Response response) throws IOException {
+    public String readResponseAsString(final Response response) {
         return response.getEntityAsText();
     }
 
@@ -520,7 +508,7 @@ public abstract class RestConnection {
         AuthenticatorUtil.resetAuthenticator();
     }
 
-    private <T> T parseResponse(final Class<T> modelClass, final ClientResource resource) throws IOException {
+    private <T> T parseResponse(final Class<T> modelClass, final ClientResource resource) {
         final String response = readResponseAsString(resource.getResponse());
         final JsonParser parser = new JsonParser();
         final JsonObject json = parser.parse(response).getAsJsonObject();
@@ -551,7 +539,7 @@ public abstract class RestConnection {
     }
 
     public String httpPostFromAbsoluteUrl(final String url, final Representation content)
-            throws ResourceDoesNotExistException, URISyntaxException, IOException, BDRestException {
+            throws HubIntegrationException {
 
         final ClientResource resource = createClientResource(url);
         try {
@@ -564,14 +552,14 @@ public abstract class RestConnection {
     }
 
     public String httpPostFromRelativeUrl(final List<String> urlSegments, final Representation content)
-            throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+            throws HubIntegrationException {
         final Set<SimpleEntry<String, String>> queryParameters = new HashSet<>();
         return httpPostFromRelativeUrl(urlSegments, queryParameters, content);
     }
 
     public String httpPostFromRelativeUrl(final List<String> urlSegments,
             final Set<AbstractMap.SimpleEntry<String, String>> queryParameters, final Representation content)
-            throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+            throws HubIntegrationException {
 
         final ClientResource resource = createClientResource(urlSegments, queryParameters);
         try {
@@ -584,7 +572,7 @@ public abstract class RestConnection {
     }
 
     public String handleHttpPost(final ClientResource resource)
-            throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+            throws HubIntegrationException {
         handleRequest(resource);
 
         logMessage(LogLevel.DEBUG, "Resource: " + resource);
@@ -593,8 +581,8 @@ public abstract class RestConnection {
         if (isSuccess(responseCode)) {
             if (resource.getResponse().getAttributes() == null
                     || resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
-                throw new ResourceDoesNotExistException(
-                        "Could not get the response headers after creating the resource.", resource);
+                throw new HubIntegrationException(
+                        "Could not get the response headers after creating the resource.");
             }
 
             if (responseCode != 201) {
@@ -605,15 +593,14 @@ public abstract class RestConnection {
                         .getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
                 final NamedValue resourceUrl = responseHeaders.getFirst("location", true);
                 if (resourceUrl == null) {
-                    throw new ResourceDoesNotExistException("Could not get the resource URL from the response headers.",
-                            resource);
+                    throw new HubIntegrationException("Could not get the resource URL from the response headers.");
                 }
                 final String value = (String) resourceUrl.getValue();
                 return value;
             }
         } else {
-            throw new ResourceDoesNotExistException(
-                    "There was a problem creating the resource. Error Code: " + responseCode, resource);
+            throw new HubIntegrationException(
+                    "There was a problem creating the resource. Error Code: " + responseCode);
         }
     }
 

@@ -13,8 +13,6 @@ package com.blackducksoftware.integration.hub.api;
 
 import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_Q;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +26,7 @@ import org.restlet.data.Method;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
-import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 
@@ -55,7 +52,7 @@ public class HubRequest {
         this.restConnection = restConnection;
     }
 
-    public JsonObject executeForResponseJson() throws IOException, URISyntaxException, BDRestException {
+    public JsonObject executeForResponseJson() throws HubIntegrationException {
         final ClientResource clientResource = buildClientResource(restConnection);
         try {
             restConnection.handleRequest(clientResource);
@@ -67,15 +64,14 @@ public class HubRequest {
                 final JsonObject jsonObject = restConnection.getJsonParser().parse(responseString).getAsJsonObject();
                 return jsonObject;
             } else {
-                final String message = String.format("Request was not successful. (responseCode: %s)", responseCode);
-                throw new BDRestException(message, clientResource);
+                throw new HubIntegrationException(String.format("Request was not successful. (responseCode: %s)", responseCode));
             }
         } finally {
             releaseResource(clientResource);
         }
     }
 
-    public String executeForResponseString() throws IOException, URISyntaxException, BDRestException {
+    public String executeForResponseString() throws HubIntegrationException {
         final ClientResource clientResource = buildClientResource(restConnection);
         try {
             restConnection.handleRequest(clientResource);
@@ -88,14 +84,14 @@ public class HubRequest {
             } else {
                 final String message = String.format("Request was not successful. (responseCode: %s): %s", responseCode,
                         clientResource.toString());
-                throw new BDRestException(message, clientResource);
+                throw new HubIntegrationException(message);
             }
         } finally {
             releaseResource(clientResource);
         }
     }
 
-    public String executePost(Representation representation) throws URISyntaxException, IOException, ResourceDoesNotExistException, BDRestException {
+    public String executePost(Representation representation) throws HubIntegrationException {
         final ClientResource clientResource = buildClientResource(restConnection);
         try {
             clientResource.getRequest().setEntity(representation);
@@ -105,14 +101,13 @@ public class HubRequest {
         }
     }
 
-    public void executeDelete() throws BDRestException, URISyntaxException {
+    public void executeDelete() throws HubIntegrationException {
         final ClientResource clientResource = buildClientResource(restConnection);
         try {
             restConnection.handleRequest(clientResource);
             final int responseCode = clientResource.getResponse().getStatus().getCode();
             if (!restConnection.isSuccess(responseCode)) {
-                throw new BDRestException("There was a problem deleting this item : " + url + ". Error Code: " + responseCode,
-                        clientResource);
+                throw new HubIntegrationException("There was a problem deleting this item : " + url + ". Error Code: " + responseCode);
             }
         } finally {
             releaseResource(clientResource);
@@ -132,7 +127,7 @@ public class HubRequest {
         resource.release();
     }
 
-    private ClientResource buildClientResource(final RestConnection restConnection) throws URISyntaxException {
+    private ClientResource buildClientResource(final RestConnection restConnection) {
         final ClientResource resource;
         if (StringUtils.isNotBlank(url)) {
             resource = restConnection.createClientResource(url);

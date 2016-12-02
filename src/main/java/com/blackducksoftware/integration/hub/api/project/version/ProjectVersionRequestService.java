@@ -21,8 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.project.version;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,9 +33,7 @@ import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
 import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
-import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
@@ -46,8 +42,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
         super(restConnection, ProjectVersionItem.class);
     }
 
-    public ProjectVersionItem getProjectVersion(ProjectItem project, String projectVersionName)
-            throws UnexpectedHubResponseException, IOException, URISyntaxException, BDRestException {
+    public ProjectVersionItem getProjectVersion(ProjectItem project, String projectVersionName) throws HubIntegrationException {
         final String versionsUrl = project.getLink("versions");
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, versionsUrl);
         if (StringUtils.isNotBlank(projectVersionName)) {
@@ -61,23 +56,21 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
             }
         }
 
-        throw new UnexpectedHubResponseException(String.format("Could not find the version: %s for project: %s", projectVersionName, project.getName()));
+        throw new HubIntegrationException(String.format("Could not find the version: %s for project: %s", projectVersionName, project.getName()));
     }
 
-    public List<ProjectVersionItem> getAllProjectVersions(final ProjectItem project)
-            throws UnexpectedHubResponseException, IOException, URISyntaxException, BDRestException {
+    public List<ProjectVersionItem> getAllProjectVersions(final ProjectItem project) throws HubIntegrationException {
         final String versionsUrl = project.getLink("versions");
         return getAllProjectVersions(versionsUrl);
     }
 
-    public List<ProjectVersionItem> getAllProjectVersions(final String versionsUrl)
-            throws IOException, URISyntaxException, BDRestException {
+    public List<ProjectVersionItem> getAllProjectVersions(final String versionsUrl) throws HubIntegrationException {
         final List<ProjectVersionItem> allProjectVersionItems = getAllItems(versionsUrl);
         return allProjectVersionItems;
     }
 
-    public String createHubVersion(final ProjectItem project, final String versionName, final PhaseEnum phase,
-            final DistributionEnum dist) throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
+    public String createHubVersion(final ProjectItem project, final String versionName, final PhaseEnum phase, final DistributionEnum dist)
+            throws HubIntegrationException {
         final ProjectVersionItem newRelease = new ProjectVersionItem(null, dist, null, null, phase, null, null, null, versionName);
 
         final String versionsUrl = project.getLink("versions");
@@ -88,13 +81,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
         stringRepresentation.setMediaType(MediaType.APPLICATION_JSON);
         stringRepresentation.setCharacterSet(CharacterSet.UTF_8);
 
-        String location = null;
-        try {
-            location = hubRequest.executePost(stringRepresentation);
-        } catch (final ResourceDoesNotExistException ex) {
-            throw new BDRestException("There was a problem creating this Version for the specified Hub Project. ", ex,
-                    ex.getResource());
-        }
+        final String location = hubRequest.executePost(stringRepresentation);
 
         return location;
     }

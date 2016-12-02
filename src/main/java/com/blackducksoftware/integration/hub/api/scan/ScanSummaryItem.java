@@ -112,10 +112,4 @@ public class ScanSummaryItem extends HubItem {
         return true;
     }
 
-    @Override
-    public String toString() {
-        return "ScanSummaryItem [status=" + status + ", statusMessage=" + statusMessage + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt + "]";
-    }
-
 }

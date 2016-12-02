@@ -21,6 +21,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.notification;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import com.google.gson.annotations.SerializedName;
 
 public class PolicyOverrideNotificationContent {
@@ -134,11 +137,7 @@ public class PolicyOverrideNotificationContent {
 
     @Override
     public String toString() {
-        return "PolicyOverrideNotificationContent [projectName=" + projectName + ", projectVersionName="
-                + projectVersionName + ", componentName=" + componentName + ", componentVersionName="
-                + componentVersionName + ", firstName=" + firstName + ", lastName=" + lastName + ", projectVersionLink="
-                + projectVersionLink + ", componentVersionLink=" + componentVersionLink
-                + ", bomComponentVersionPolicyStatusLink=" + bomComponentVersionPolicyStatusLink + "]";
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

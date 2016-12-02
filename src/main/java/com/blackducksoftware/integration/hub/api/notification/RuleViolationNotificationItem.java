@@ -38,10 +38,4 @@ public class RuleViolationNotificationItem extends NotificationItem {
         this.content = content;
     }
 
-    @Override
-    public String toString() {
-        return "RuleViolationNotificationItem [content=" + content + ", contentType=" + contentType + ", type=" + type
-                + ", createdAt=" + createdAt + ", Meta=" + getMeta() + "]";
-    }
-
 }

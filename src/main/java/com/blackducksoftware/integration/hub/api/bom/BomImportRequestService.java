@@ -25,8 +25,6 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_BOM_IMPORT;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -36,8 +34,7 @@ import java.util.Set;
 import org.restlet.data.MediaType;
 import org.restlet.representation.FileRepresentation;
 
-import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 
@@ -48,8 +45,7 @@ public class BomImportRequestService extends HubRequestService {
         super(restConnection);
     }
 
-    public void importBomFile(final File file, final String mediaType)
-            throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+    public void importBomFile(final File file, final String mediaType) throws HubIntegrationException {
         final Set<SimpleEntry<String, String>> queryParameters = new HashSet<>();
         final FileRepresentation content = new FileRepresentation(file, new MediaType(mediaType));
 

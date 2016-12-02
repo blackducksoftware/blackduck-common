@@ -23,6 +23,9 @@ package com.blackducksoftware.integration.hub.api.policy;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 public class PolicyExpression {
     private final String name;
 
@@ -100,15 +103,7 @@ public class PolicyExpression {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("PolicyExpression [name=");
-        builder.append(name);
-        builder.append(", operation=");
-        builder.append(operation);
-        builder.append(", values=");
-        builder.append(values);
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

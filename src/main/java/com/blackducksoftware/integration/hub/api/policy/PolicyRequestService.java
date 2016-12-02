@@ -24,12 +24,10 @@ package com.blackducksoftware.integration.hub.api.policy;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_POLICY_RULES;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
@@ -40,7 +38,7 @@ public class PolicyRequestService extends HubParameterizedRequestService<PolicyR
         super(restConnection, PolicyRule.class);
     }
 
-    public List<PolicyRule> getAllPolicyRules() throws IOException, BDRestException, URISyntaxException {
+    public List<PolicyRule> getAllPolicyRules() throws HubIntegrationException {
         final List<PolicyRule> allPolicyRuleItems = getAllItems(POLICY_RULE_SEGMENTS);
         return allPolicyRuleItems;
     }

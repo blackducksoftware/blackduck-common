@@ -21,8 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.report;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -34,10 +32,7 @@ import org.restlet.representation.StringRepresentation;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
-import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
@@ -60,10 +55,10 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      * Generates a new Hub report for the specified version.
      *
      * @return the Report URL
+     * @throws HubIntegrationException
      */
-    public String startGeneratingHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
-            final ReportCategoriesEnum[] categories)
-            throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
+    public String startGeneratingHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories)
+            throws HubIntegrationException {
         if (ReportFormatEnum.UNKNOWN == reportFormat) {
             throw new IllegalArgumentException("Can not generate a report of format : " + reportFormat);
         }
@@ -87,18 +82,12 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
         final StringRepresentation stringRep = new StringRepresentation(getRestConnection().getGson().toJson(json));
         stringRep.setMediaType(MediaType.APPLICATION_JSON);
         stringRep.setCharacterSet(CharacterSet.UTF_8);
-        String location = null;
-        try {
-            location = hubRequest.executePost(stringRep);
-        } catch (final ResourceDoesNotExistException ex) {
-            throw new BDRestException("There was a problem generating a report for this Version.", ex,
-                    ex.getResource());
-        }
+        final String location = hubRequest.executePost(stringRep);
 
         return location;
     }
 
-    public void deleteHubReport(final String reportUrl) throws IOException, BDRestException, URISyntaxException {
+    public void deleteHubReport(final String reportUrl) throws HubIntegrationException {
         final HubRequest hubRequest = new HubRequest(getRestConnection());
         hubRequest.setMethod(Method.DELETE);
         hubRequest.setUrl(reportUrl);
@@ -108,9 +97,10 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
 
     /**
      * Gets the content of the report
+     *
+     * @throws HubIntegrationException
      */
-    public VersionReport getReportContent(final String reportContentUrl)
-            throws IOException, BDRestException, URISyntaxException {
+    public VersionReport getReportContent(final String reportContentUrl) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(reportContentUrl);
 
         final JsonObject json = hubRequest.executeForResponseJson();
@@ -130,7 +120,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      * generated yet.
      */
     public ReportInformationItem isReportFinishedGenerating(final String reportUrl)
-            throws IOException, BDRestException, URISyntaxException, InterruptedException, HubIntegrationException {
+            throws HubIntegrationException {
         return isReportFinishedGenerating(reportUrl, MAXIMUM_WAIT);
     }
 
@@ -141,7 +131,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      * generated yet.
      */
     public ReportInformationItem isReportFinishedGenerating(final String reportUrl, final long maximumWait)
-            throws IOException, BDRestException, URISyntaxException, InterruptedException, HubIntegrationException {
+            throws HubIntegrationException {
         final long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         String timeFinished = null;
@@ -159,7 +149,11 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
                 throw new HubIntegrationException("The Report has not finished generating in : " + formattedTime);
             }
             // Retry every 5 seconds
-            Thread.sleep(5000);
+            try {
+                Thread.sleep(5000);
+            } catch (final InterruptedException e) {
+                throw new HubIntegrationException("The thread waiting for the report generation was interrupted", e);
+            }
             elapsedTime = System.currentTimeMillis() - startTime;
         }
         return reportInfo;
@@ -167,20 +161,21 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
 
     /**
      * Assumes the BOM has already been updated
+     * 
+     * @throws HubIntegrationException
      */
     public HubRiskReportData generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
-            final ReportCategoriesEnum[] categories)
-            throws IOException, BDRestException, URISyntaxException, HubIntegrationException, InterruptedException, UnexpectedHubResponseException {
+            final ReportCategoriesEnum[] categories) throws HubIntegrationException {
         return generateHubReport(version, reportFormat, categories, MAXIMUM_WAIT);
     }
 
     /**
      * Assumes the BOM has already been updated
+     *
+     * @throws HubIntegrationException
      */
     public HubRiskReportData generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
-            final ReportCategoriesEnum[] categories, long maxWaitTime)
-            throws IOException, BDRestException, URISyntaxException, HubIntegrationException, InterruptedException, UnexpectedHubResponseException {
-
+            final ReportCategoriesEnum[] categories, long maxWaitTime) throws HubIntegrationException {
         logger.debug("Starting the Report generation.");
         final String reportUrl = startGeneratingHubReport(version, reportFormat, categories);
 
@@ -213,10 +208,10 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
         return hubRiskReportData;
     }
 
-    private String getVersionReportLink(final ProjectVersionItem version) throws UnexpectedHubResponseException {
+    private String getVersionReportLink(final ProjectVersionItem version) throws HubIntegrationException {
         final List<String> versionLinks = version.getLinks(ProjectVersionItem.VERSION_REPORT_LINK);
         if (versionLinks.size() != 1) {
-            throw new UnexpectedHubResponseException("The release " + version.getVersionName() + " has "
+            throw new HubIntegrationException("The release " + version.getVersionName() + " has "
                     + versionLinks.size() + " " + ProjectItem.VERSION_LINK + " links; expected one");
         }
         final String versionLink = versionLinks.get(0);

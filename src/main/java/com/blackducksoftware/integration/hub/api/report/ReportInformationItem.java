@@ -21,13 +21,14 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.report;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ReportInformationItem extends HubItem {
-
     public static final String REPORT_CONTENT_LINK = "content";
 
     public static final String REPORT_DOWNLOAD_LINK = "download";
@@ -198,27 +199,7 @@ public class ReportInformationItem extends HubItem {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("ReportInformationItem [reportFormat=");
-        builder.append(reportFormat);
-        builder.append(", locale=");
-        builder.append(locale);
-        builder.append(", fileName=");
-        builder.append(fileName);
-        builder.append(", fileSize=");
-        builder.append(fileSize);
-        builder.append(", createdAt=");
-        builder.append(createdAt);
-        builder.append(", updatedAt=");
-        builder.append(updatedAt);
-        builder.append(", finishedAt=");
-        builder.append(finishedAt);
-        builder.append(", createdBy=");
-        builder.append(createdBy);
-        builder.append(", _meta=");
-        builder.append(getMeta());
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

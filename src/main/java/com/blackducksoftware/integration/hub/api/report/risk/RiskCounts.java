@@ -21,8 +21,10 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.report.risk;
 
-public class RiskCounts {
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+public class RiskCounts {
     private final int HIGH;
 
     private final int MEDIUM;
@@ -105,19 +107,7 @@ public class RiskCounts {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("RiskCounts [HIGH=");
-        builder.append(HIGH);
-        builder.append(", MEDIUM=");
-        builder.append(MEDIUM);
-        builder.append(", LOW=");
-        builder.append(LOW);
-        builder.append(", OK=");
-        builder.append(OK);
-        builder.append(", UNKNOWN=");
-        builder.append(UNKNOWN);
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

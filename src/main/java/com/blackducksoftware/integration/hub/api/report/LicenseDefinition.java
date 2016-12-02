@@ -24,9 +24,10 @@ package com.blackducksoftware.integration.hub.api.report;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 public class LicenseDefinition {
-
     private final String licenseId;
 
     private final String discoveredAs;
@@ -50,7 +51,6 @@ public class LicenseDefinition {
         this.ownership = ownership;
         this.codeSharing = codeSharing;
         this.licenseDisplay = licenseDisplay;
-
     }
 
     public String getLicenseId() {
@@ -175,23 +175,7 @@ public class LicenseDefinition {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("LicenseDefinition [licenseId=");
-        builder.append(licenseId);
-        builder.append(", discoveredAs=");
-        builder.append(discoveredAs);
-        builder.append(", name=");
-        builder.append(name);
-        builder.append(", spdxId=");
-        builder.append(spdxId);
-        builder.append(", ownership=");
-        builder.append(ownership);
-        builder.append(", codeSharing=");
-        builder.append(codeSharing);
-        builder.append(", licenseDisplay=");
-        builder.append(licenseDisplay);
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

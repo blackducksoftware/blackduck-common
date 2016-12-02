@@ -21,18 +21,16 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservice.notification.item;
 
-import java.net.URISyntaxException;
 import java.util.Date;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
-import com.blackducksoftware.integration.hub.util.HubUrlParser;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.google.common.base.Joiner;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {
-    private final ProjectVersion projectVersion;
+    private final ProjectVersionItem projectVersionItem;
 
     private final String componentName;
 
@@ -45,19 +43,19 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
     // they are collected multi-threaded
     public final Date createdAt;
 
-    public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
+    public NotificationContentItem(final Date createdAt, final ProjectVersionItem projectVersionItem,
             final String componentName,
             final String componentVersion,
             final String componentVersionUrl) {
         this.createdAt = createdAt;
-        this.projectVersion = projectVersion;
+        this.projectVersionItem = projectVersionItem;
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.componentVersionUrl = componentVersionUrl;
     }
 
-    public ProjectVersion getProjectVersion() {
-        return projectVersion;
+    public ProjectVersionItem getProjectVersionItem() {
+        return projectVersionItem;
     }
 
     public String getComponentName() {
@@ -70,10 +68,6 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
     public String getComponentVersionUrl() {
         return componentVersionUrl;
-    }
-
-    public String getComponentVersionRelativeUrl() throws URISyntaxException {
-        return HubUrlParser.getRelativeUrl(componentVersionUrl);
     }
 
     public Date getCreatedAt() {
@@ -99,10 +93,10 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
         // Identify same-time non-equal items as non-equal
         final Joiner joiner = Joiner.on(":").skipNulls();
-        final String thisProjectVersionString = joiner.join(getProjectVersion().getProjectName(), getProjectVersion()
+        final String thisProjectVersionString = joiner.join(getProjectVersionItem().get, getProjectVersionItem()
                 .getProjectVersionName(), getComponentVersionUrl());
-        final String otherProjectVersionString = joiner.join(o.getProjectVersion().getProjectName(), o
-                .getProjectVersion().getProjectVersionName(), o.getComponentVersionUrl().toString());
+        final String otherProjectVersionString = joiner.join(o.getProjectVersionItem().getProjectName(), o
+                .getProjectVersionItem().getProjectVersionItemName(), o.getComponentVersionUrl().toString());
 
         return thisProjectVersionString.compareTo(otherProjectVersionString);
     }

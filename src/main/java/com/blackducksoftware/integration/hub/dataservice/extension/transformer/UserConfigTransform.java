@@ -21,8 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservice.extension.transformer;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,9 +34,7 @@ import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 
 public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, UserOptionLinkItem> {
     private final UserRequestService userRequestService;
@@ -52,24 +48,19 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
     }
 
     @Override
-    public List<UserConfigItem> transform(final UserOptionLinkItem item) throws HubItemTransformException {
-        try {
-            final UserItem user = userRequestService.getItem(item.getUser());
-            if (!user.isActive()) {
-                return Collections.emptyList();
-            } else {
-                final Map<String, ConfigurationItem> configItems = getUserConfigOptions(item.getExtensionOptions());
-                final List<UserConfigItem> itemList = new ArrayList<>(configItems.size());
-                itemList.add(new UserConfigItem(user, configItems));
-                return itemList;
-            }
-        } catch (final IOException | URISyntaxException | BDRestException | MissingUUIDException e) {
-            throw new HubItemTransformException("Error processing user config for extension", e);
+    public List<UserConfigItem> transform(final UserOptionLinkItem item) throws HubIntegrationException {
+        final UserItem user = userRequestService.getItem(item.getUser());
+        if (!user.isActive()) {
+            return Collections.emptyList();
+        } else {
+            final Map<String, ConfigurationItem> configItems = getUserConfigOptions(item.getExtensionOptions());
+            final List<UserConfigItem> itemList = new ArrayList<>(configItems.size());
+            itemList.add(new UserConfigItem(user, configItems));
+            return itemList;
         }
     }
 
-    private Map<String, ConfigurationItem> getUserConfigOptions(final String userConfigUrl)
-            throws IOException, URISyntaxException, BDRestException, MissingUUIDException {
+    private Map<String, ConfigurationItem> getUserConfigOptions(final String userConfigUrl) throws HubIntegrationException {
         final List<ConfigurationItem> userItemList = extensionConfigRequestService.getUserConfiguration(userConfigUrl);
         final Map<String, ConfigurationItem> itemMap = createConfigMap(userItemList);
         return itemMap;
@@ -82,4 +73,5 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
         }
         return itemMap;
     }
+
 }

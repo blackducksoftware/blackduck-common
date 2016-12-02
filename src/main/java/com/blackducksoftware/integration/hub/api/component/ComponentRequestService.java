@@ -24,14 +24,11 @@ package com.blackducksoftware.integration.hub.api.component;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_COMPONENTS;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
@@ -42,8 +39,8 @@ public class ComponentRequestService extends HubParameterizedRequestService<Comp
         super(restConnection, Component.class);
     }
 
-    public List<Component> getAllComponents(final String namespace, final String groupId, final String artifactId,
-            final String version) throws IOException, BDRestException, URISyntaxException {
+    public List<Component> getAllComponents(final String namespace, final String groupId, final String artifactId, final String version)
+            throws HubIntegrationException {
         final String componentQuery = String.format("id:%s|%s|%s|%s", namespace, groupId, artifactId, version);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(COMPONENT_SEGMENTS, componentQuery);
 
@@ -51,8 +48,7 @@ public class ComponentRequestService extends HubParameterizedRequestService<Comp
         return allComponents;
     }
 
-    public Component getExactComponentMatch(String namespace, String groupId, String artifactId, String version)
-            throws IOException, BDRestException, URISyntaxException, UnexpectedHubResponseException {
+    public Component getExactComponentMatch(String namespace, String groupId, String artifactId, String version) throws HubIntegrationException {
         final List<Component> allComponents = getAllComponents(namespace, groupId, artifactId, version);
         for (final Component componentItem : allComponents) {
             if (componentItem.getOriginId() != null) {
@@ -63,7 +59,7 @@ public class ComponentRequestService extends HubParameterizedRequestService<Comp
             }
         }
 
-        throw new UnexpectedHubResponseException("Couldn't find an exact component match.");
+        throw new HubIntegrationException("Couldn't find an exact component match.");
     }
 
 }
