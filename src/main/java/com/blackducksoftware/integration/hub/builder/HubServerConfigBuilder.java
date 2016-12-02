@@ -26,10 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -98,22 +95,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
         if (results.isSuccess()) {
             return results.getConstructedObject();
         } else {
-            final List<String> warningMessages = new ArrayList<>();
-            final List<String> errorMessages = new ArrayList<>();
-            final Set<GlobalFieldKey> keySet = results.getResultMap().keySet();
-            for (final GlobalFieldKey key : keySet) {
-                if (results.hasWarnings(key)) {
-                    warningMessages.add(results.getResultString(key, ValidationResultEnum.WARN));
-                }
-                if (results.hasErrors(key)) {
-                    errorMessages.add(results.getResultString(key, ValidationResultEnum.ERROR));
-                }
-            }
-
-            String exceptionMessage = "Invalid Hub Server Configuration: ";
-            exceptionMessage += "[WARN: " + StringUtils.join(warningMessages, ", ") + "], ";
-            exceptionMessage += "[ERROR: " + StringUtils.join(errorMessages, ", ") + "]";
-
+            String exceptionMessage = "Invalid Configuration: ";
+            exceptionMessage += results.getAllResultString();
             throw new IllegalStateException(exceptionMessage);
         }
     }
@@ -137,8 +120,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
         final ValidationResults<GlobalFieldKey, HubProxyInfo> proxyResult = assertProxyValid();
         final ValidationResults<GlobalFieldKey, HubCredentials> credentialResult = assertCredentialsValid();
         final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
-        result.addAllResults(proxyResult.getResultMap());
-        result.addAllResults(credentialResult.getResultMap());
+        result.addAllResultsStrings(proxyResult.getResultMap(), proxyResult.getValidationStatus());
+        result.addAllResultsStrings(credentialResult.getResultMap(), credentialResult.getValidationStatus());
         validateHubUrl(result);
         if (shouldUseDefaultValues()) {
             validateTimeout(result, DEFAULT_TIMEOUT_SECONDS);
@@ -227,8 +210,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
                     new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl, e));
             return;
         }
-
-        result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.OK, ""));
     }
 
     private int stringToNonNegativeInteger(final String intString) {
@@ -277,8 +258,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
         if (timeoutToValidate <= 0) {
             result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
                     new ValidationResult(ValidationResultEnum.ERROR, "The Timeout must be greater than 0."));
-        } else {
-            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT, new ValidationResult(ValidationResultEnum.OK, ""));
         }
     }
 

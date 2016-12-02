@@ -104,20 +104,12 @@ public class HubProxyInfoBuilder extends AbstractBuilder<GlobalFieldKey, HubProx
             validatePort(result);
             validateCredentials(result);
             validateIgnoreHosts(result);
-        } else {
-            result.addResult(HubProxyInfoFieldEnum.PROXYHOST, new ValidationResult(ValidationResultEnum.OK, ""));
-            result.addResult(HubProxyInfoFieldEnum.PROXYPORT, new ValidationResult(ValidationResultEnum.OK, ""));
-            result.addResult(HubProxyInfoFieldEnum.NOPROXYHOSTS, new ValidationResult(ValidationResultEnum.OK, ""));
-            result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.OK, ""));
-            result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD, new ValidationResult(ValidationResultEnum.OK, ""));
         }
         return result;
     }
 
     public void validatePort(final ValidationResults<GlobalFieldKey, HubProxyInfo> result) {
         if (StringUtils.isBlank(host) && StringUtils.isBlank(port)) {
-            result.addResult(HubProxyInfoFieldEnum.PROXYHOST, new ValidationResult(ValidationResultEnum.OK, ""));
-            result.addResult(HubProxyInfoFieldEnum.PROXYPORT, new ValidationResult(ValidationResultEnum.OK, ""));
             return;
         } else if (StringUtils.isBlank(host) && StringUtils.isNotBlank(port)) {
             result.addResult(HubProxyInfoFieldEnum.PROXYHOST,
@@ -138,32 +130,20 @@ public class HubProxyInfoBuilder extends AbstractBuilder<GlobalFieldKey, HubProx
         if (StringUtils.isNotBlank(host) && portToValidate < 0) {
             result.addResult(HubProxyInfoFieldEnum.PROXYPORT,
                     new ValidationResult(ValidationResultEnum.ERROR, MSG_PROXY_PORT_INVALID));
-        } else {
-            result.addResult(HubProxyInfoFieldEnum.PROXYPORT, new ValidationResult(ValidationResultEnum.OK, ""));
         }
 
     }
 
     public void validateCredentials(final ValidationResults<GlobalFieldKey, HubProxyInfo> result) {
-        if (StringUtils.isBlank(username) && StringUtils.isBlank(password)) {
-            result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.OK, ""));
-            result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD, new ValidationResult(ValidationResultEnum.OK, ""));
-        } else {
-            if (StringUtils.isBlank(host)) {
-                result.addResult(HubProxyInfoFieldEnum.PROXYHOST,
-                        new ValidationResult(ValidationResultEnum.ERROR, MSG_PROXY_HOST_NOT_SPECIFIED));
-            }
-            if (StringUtils.isNotBlank(getUsername()) && StringUtils.isNotBlank(getPassword())) {
-                result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
-                        new ValidationResult(ValidationResultEnum.OK, ""));
-                result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD,
-                        new ValidationResult(ValidationResultEnum.OK, ""));
-            } else {
-                result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
-                        new ValidationResult(ValidationResultEnum.ERROR, MSG_CREDENTIALS_INVALID));
-                result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD,
-                        new ValidationResult(ValidationResultEnum.ERROR, MSG_CREDENTIALS_INVALID));
-            }
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password) && StringUtils.isBlank(host)) {
+            result.addResult(HubProxyInfoFieldEnum.PROXYHOST,
+                    new ValidationResult(ValidationResultEnum.ERROR, MSG_PROXY_HOST_NOT_SPECIFIED));
+        }
+        if (StringUtils.isNotBlank(username) && StringUtils.isBlank(password) || StringUtils.isBlank(username) && StringUtils.isNotBlank(password)) {
+            result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
+                    new ValidationResult(ValidationResultEnum.ERROR, MSG_CREDENTIALS_INVALID));
+            result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD,
+                    new ValidationResult(ValidationResultEnum.ERROR, MSG_CREDENTIALS_INVALID));
         }
     }
 
@@ -183,7 +163,6 @@ public class HubProxyInfoBuilder extends AbstractBuilder<GlobalFieldKey, HubProx
                 } else {
                     Pattern.compile(ignoredProxyHosts);
                 }
-                result.addResult(HubProxyInfoFieldEnum.NOPROXYHOSTS, new ValidationResult(ValidationResultEnum.OK, ""));
             } catch (final PatternSyntaxException ex) {
                 result.addResult(HubProxyInfoFieldEnum.NOPROXYHOSTS,
                         new ValidationResult(ValidationResultEnum.ERROR, MSG_IGNORE_HOSTS_INVALID));

@@ -30,13 +30,13 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.builder.ValidationResult;
 import com.blackducksoftware.integration.builder.ValidationResults;
 import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
 
@@ -65,23 +65,27 @@ public class HubCredentialsBuilderTest {
                 actualMessages.size());
 
         for (final String expectedMessage : expectedMessages) {
+            boolean foundExpectedMessage = false;
+            for (final String actualMessage : actualMessages) {
+                if (actualMessage.contains(expectedMessage)) {
+                    foundExpectedMessage = true;
+                    break;
+                }
+            }
             assertTrue("Did not find the expected message : " + expectedMessage,
-                    actualMessages.contains(expectedMessage));
+                    foundExpectedMessage);
         }
     }
 
     private List<String> getMessages(final ValidationResults<GlobalFieldKey, HubCredentials> result) {
-
         final List<String> messageList = new ArrayList<>();
-        final Map<GlobalFieldKey, List<ValidationResult>> resultMap = result.getResultMap();
+        final Map<GlobalFieldKey, Set<String>> resultMap = result.getResultMap();
         for (final GlobalFieldKey key : resultMap.keySet()) {
-            final List<ValidationResult> resultList = resultMap.get(key);
+            final Set<String> resultList = resultMap.get(key);
 
-            for (final ValidationResult item : resultList) {
-                final String message = item.getMessage();
-
-                if (StringUtils.isNotBlank(message)) {
-                    messageList.add(item.getMessage());
+            for (final String item : resultList) {
+                if (StringUtils.isNotBlank(item)) {
+                    messageList.add(item);
                 }
             }
         }

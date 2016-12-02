@@ -92,8 +92,6 @@ public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCr
         if (StringUtils.isBlank(username)) {
             result.addResult(HubCredentialsFieldEnum.USERNAME,
                     new ValidationResult(ValidationResultEnum.ERROR, "No Hub Username was found."));
-        } else {
-            result.addResult(HubCredentialsFieldEnum.USERNAME, new ValidationResult(ValidationResultEnum.OK, ""));
         }
     }
 
@@ -101,8 +99,6 @@ public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCr
         if (StringUtils.isBlank(password)) {
             result.addResult(HubCredentialsFieldEnum.PASSWORD,
                     new ValidationResult(ValidationResultEnum.ERROR, "No Hub Password was found."));
-        } else {
-            result.addResult(HubCredentialsFieldEnum.PASSWORD, new ValidationResult(ValidationResultEnum.OK, ""));
         }
     }
 
