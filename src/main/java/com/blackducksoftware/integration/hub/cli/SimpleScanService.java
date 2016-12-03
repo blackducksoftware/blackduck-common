@@ -107,14 +107,24 @@ public class SimpleScanService extends HubRequestService {
      * This will setup the command-line invocation of the Hub scanner. The workingDirectoryPath is the parent folder of
      * the scan logs and other scan artifacts.
      *
+     * @throws EncryptionException
+     * @throws IllegalArgumentException
+     * @throws HubIntegrationException
+     *
      * @throws ScanFailedException
      */
-    public void setupAndExecuteScan()
-            throws HubIntegrationException, IOException, IllegalArgumentException, InterruptedException, EncryptionException, ScanFailedException {
+    public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
-        final String pathToJavaExecutable = cliLocation.getProvidedJavaExec().getCanonicalPath();
-        final String pathToOneJar = cliLocation.getOneJarFile().getCanonicalPath();
-        final String pathToScanExecutable = cliLocation.getCLI(logger).getCanonicalPath();
+        String pathToJavaExecutable;
+        String pathToOneJar;
+        String pathToScanExecutable;
+        try {
+            pathToJavaExecutable = cliLocation.getProvidedJavaExec().getCanonicalPath();
+            pathToOneJar = cliLocation.getOneJarFile().getCanonicalPath();
+            pathToScanExecutable = cliLocation.getCLI(logger).getCanonicalPath();
+        } catch (final IOException e) {
+            throw new HubIntegrationException(String.format("The provided directory %s did not have a Hub CLI.", directoryToInstallTo.getAbsolutePath()), e);
+        }
         logger.debug("Using this java installation : " + pathToJavaExecutable);
 
         cmd.add(pathToJavaExecutable);
@@ -168,8 +178,13 @@ public class SimpleScanService extends HubRequestService {
             cmd.add("-v");
         }
 
-        populateLogDirectory();
-        final String logDirectoryPath = logDirectory.getCanonicalPath();
+        final String logDirectoryPath;
+        try {
+            populateLogDirectory();
+            logDirectoryPath = logDirectory.getCanonicalPath();
+        } catch (final IOException e) {
+            throw new HubIntegrationException("Exception creating the log directory for the cli scan: " + e.getMessage(), e);
+        }
         cmd.add("--logDir");
         cmd.add(logDirectoryPath);
 
@@ -199,17 +214,22 @@ public class SimpleScanService extends HubRequestService {
             cmd.add(target);
         }
 
-        executeScan();
+        try {
+            executeScan();
+        } catch (final IOException e) {
+            throw new HubIntegrationException("Exception executing the cli scan: " + e.getMessage(), e);
+        }
     }
 
     /**
      * If running in an environment that handles process creation, this method should be overridden to construct a
      * process to execute the scan in the environment-specific way.
      *
-     * @throws ScanFailedException
+     * @throws IOException
+     * @throws HubIntegrationException
      */
     private void executeScan()
-            throws IOException, InterruptedException, IllegalArgumentException, EncryptionException, ScanFailedException {
+            throws IllegalArgumentException, EncryptionException, IOException, HubIntegrationException {
         printCommand();
 
         final File standardOutFile = new File(logDirectory, "CLI_Output.txt");
@@ -231,11 +251,16 @@ public class SimpleScanService extends HubRequestService {
             final StreamRedirectThread redirectThread = new StreamRedirectThread(hubCliProcess.getErrorStream(), splitOutputStream);
             redirectThread.start();
 
-            final int returnCode = hubCliProcess.waitFor();
+            int returnCode = -1;
+            try {
+                returnCode = hubCliProcess.waitFor();
 
-            // the join method on the redirect thread will wait until the thread is dead
-            // the thread will die when it reaches the end of stream and the run method is finished
-            redirectThread.join();
+                // the join method on the redirect thread will wait until the thread is dead
+                // the thread will die when it reaches the end of stream and the run method is finished
+                redirectThread.join();
+            } catch (final InterruptedException e) {
+                throw new HubIntegrationException("The thread waiting for the cli to complete was interrupted: " + e.getMessage(), e);
+            }
 
             splitOutputStream.flush();
             logger.info(IoUtils.toString((hubCliProcess.getInputStream())));

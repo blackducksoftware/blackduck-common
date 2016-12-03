@@ -24,6 +24,8 @@ package com.blackducksoftware.integration.hub.api.report;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 public class UserData {
 
@@ -95,13 +97,7 @@ public class UserData {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("UserData [id=");
-        builder.append(id);
-        builder.append(", username=");
-        builder.append(username);
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

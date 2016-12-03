@@ -29,8 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.Proxy;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
@@ -43,7 +43,6 @@ import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -58,27 +57,35 @@ public class CLIDownloadService {
     }
 
     public void performInstallation(HubProxyInfo hubProxyInfo, final File directoryToInstallTo, final CIEnvironmentVariables ciEnvironmentVariables,
-            String hubUrl, String hubVersion, final String localHostName)
-            throws IOException, InterruptedException, BDRestException, URISyntaxException, HubIntegrationException, IllegalArgumentException,
-            EncryptionException {
+            String hubUrl, String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
         if (StringUtils.isBlank(localHostName)) {
             throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
         }
 
-        CLILocation cliLocation = new CLILocation(directoryToInstallTo);
+        final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
         final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(logger, hubUrl);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
-            customInstall(hubProxyInfo, cliLocation, ciEnvironmentVariables, new URL(cliDownloadUrl), hubVersion, localHostName);
+            try {
+                customInstall(hubProxyInfo, cliLocation, ciEnvironmentVariables, new URL(cliDownloadUrl), hubVersion, localHostName);
+            } catch (final MalformedURLException e) {
+                throw new HubIntegrationException(String.format("The cli could not be downloaded from %s: %s", cliDownloadUrl, e.getMessage()), e);
+            }
         } else {
             logger.error("Could not find the correct Hub CLI download URL.");
         }
     }
 
     public void customInstall(HubProxyInfo hubProxyInfo, CLILocation cliLocation, CIEnvironmentVariables ciEnvironmentVariables, final URL archive,
-            String hubVersion, final String localHostName)
-            throws IOException, InterruptedException, HubIntegrationException, IllegalArgumentException, EncryptionException {
-        boolean cliMismatch = true;
+            String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
+        String directoryToInstallTo;
         try {
+            directoryToInstallTo = cliLocation.getCanonicalPath();
+        } catch (final IOException e) {
+            throw new HubIntegrationException("Could not get the path for the install directory for the cli - does it exist?", e);
+        }
+
+        try {
+            boolean cliMismatch = true;
             final File hubVersionFile = cliLocation.createHubVersionFile();
             if (hubVersionFile.exists()) {
                 final String storedHubVersion = IOUtils.toString(new FileReader(hubVersionFile));
@@ -107,10 +114,10 @@ public class CLIDownloadService {
             try {
                 Proxy proxy = null;
                 if (hubProxyInfo != null) {
-                    String proxyHost = hubProxyInfo.getHost();
-                    int proxyPort = hubProxyInfo.getPort();
-                    String proxyUsername = hubProxyInfo.getUsername();
-                    String proxyPassword = hubProxyInfo.getDecryptedPassword();
+                    final String proxyHost = hubProxyInfo.getHost();
+                    final int proxyPort = hubProxyInfo.getPort();
+                    final String proxyUsername = hubProxyInfo.getUsername();
+                    final String proxyPassword = hubProxyInfo.getDecryptedPassword();
 
                     if (StringUtils.isNotBlank(proxyHost) && proxyPort > 0) {
                         proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
@@ -131,7 +138,7 @@ public class CLIDownloadService {
                 connection.setIfModifiedSince(cliTimestamp);
                 connection.connect();
             } catch (final IOException ioe) {
-                logger.error("Skipping installation of " + archive + " to " + cliLocation.getCanonicalPath() + ": "
+                logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo + ": "
                         + ioe.toString());
                 return;
             }
@@ -158,7 +165,7 @@ public class CLIDownloadService {
             logger.debug("Updating the Hub CLI.");
             hubVersionFile.setLastModified(sourceTimestamp);
 
-            logger.info("Unpacking " + archive.toString() + " to " + cliInstallDirectory.getCanonicalPath() + " on "
+            logger.info("Unpacking " + archive.toString() + " to " + directoryToInstallTo + " on "
                     + localHostName);
 
             final CountingInputStream cis = new CountingInputStream(connection.getInputStream());
@@ -166,11 +173,11 @@ public class CLIDownloadService {
                 unzip(cliInstallDirectory, cis, logger);
                 updateJreSecurity(logger, cliLocation, ciEnvironmentVariables);
             } catch (final IOException e) {
-                throw new IOException(String.format("Failed to unpack %s (%d bytes read of total %d)", archive,
+                throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", archive,
                         cis.getByteCount(), connection.getContentLength()), e);
             }
         } catch (final IOException e) {
-            throw new IOException("Failed to install " + archive + " to " + cliLocation.getCanonicalPath(), e);
+            throw new HubIntegrationException("Failed to install " + archive + " to " + directoryToInstallTo, e);
         }
     }
 

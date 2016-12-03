@@ -23,6 +23,9 @@ package com.blackducksoftware.integration.hub.api.scan;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 public class ScanLocationResults {
     private Integer totalCount; // Number of results
 
@@ -46,13 +49,7 @@ public class ScanLocationResults {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("ScanLocationResults [totalCount=");
-        builder.append(totalCount);
-        builder.append(", items=");
-        builder.append(items);
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
     @Override

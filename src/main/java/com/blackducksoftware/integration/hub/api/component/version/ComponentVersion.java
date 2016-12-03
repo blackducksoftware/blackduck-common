@@ -21,14 +21,10 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.component.version;
 
-import java.util.UUID;
-
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
-import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
-import com.blackducksoftware.integration.hub.util.HubUrlParser;
 
 public class ComponentVersion extends HubItem {
     public static final String COMPONENT_URL_IDENTIFIER = "components";
@@ -63,22 +59,6 @@ public class ComponentVersion extends HubItem {
 
     public void setReleasedOn(final String releasedOn) {
         this.releasedOn = releasedOn;
-    }
-
-    @Deprecated
-    public UUID getComponentId() throws MissingUUIDException {
-        if (getMeta() == null || getMeta().getHref() == null) {
-            return null;
-        }
-        return HubUrlParser.getUUIDFromURLString(COMPONENT_URL_IDENTIFIER, getMeta().getHref());
-    }
-
-    @Deprecated
-    public UUID getVersionId() throws MissingUUIDException {
-        if (getMeta() == null || getMeta().getHref() == null) {
-            return null;
-        }
-        return HubUrlParser.getUUIDFromURLString(VERSION_URL_IDENTIFIER, getMeta().getHref());
     }
 
 }

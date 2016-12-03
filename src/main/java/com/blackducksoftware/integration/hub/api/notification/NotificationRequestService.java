@@ -24,8 +24,6 @@ package com.blackducksoftware.integration.hub.api.notification;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_NOTIFICATIONS;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,8 +35,7 @@ import java.util.TimeZone;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 import com.google.gson.JsonArray;
@@ -59,8 +56,7 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
         typeMap.put("RULE_VIOLATION_CLEARED", RuleViolationClearedNotificationItem.class);
     }
 
-    public List<NotificationItem> getAllNotifications(final Date startDate, final Date endDate)
-            throws IOException, URISyntaxException, BDRestException {
+    public List<NotificationItem> getAllNotifications(final Date startDate, final Date endDate) throws HubIntegrationException {
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
@@ -74,8 +70,7 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
         return allNotificationItems;
     }
 
-    public List<NotificationItem> getUserNotifications(final Date startDate, final Date endDate, final UserItem user)
-            throws UnexpectedHubResponseException, IOException, URISyntaxException, BDRestException {
+    public List<NotificationItem> getUserNotifications(final Date startDate, final Date endDate, final UserItem user) throws HubIntegrationException {
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);

@@ -21,9 +21,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservice;
 
-import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 
 public interface ItemTransform<R, S> {
-    public R transform(S item) throws HubItemTransformException;;
+    public R transform(S item) throws HubIntegrationException;;
 
 }

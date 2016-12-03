@@ -90,18 +90,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
     }
 
     @Override
-    public HubServerConfig build() throws IllegalStateException {
-        final ValidationResults<GlobalFieldKey, HubServerConfig> results = buildResults();
-        if (results.isSuccess()) {
-            return results.getConstructedObject();
-        } else {
-            String exceptionMessage = "Invalid Configuration: ";
-            exceptionMessage += results.getAllResultString();
-            throw new IllegalStateException(exceptionMessage);
-        }
-    }
-
-    @Override
     public ValidationResults<GlobalFieldKey, HubServerConfig> buildResults() {
         final ValidationResults<GlobalFieldKey, HubServerConfig> result = assertValid();
 
@@ -262,15 +250,15 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
     }
 
     public void setFromProperties(Properties properties) {
-        String hubUrl = properties.getProperty("hub.url");
-        String hubUsername = properties.getProperty("hub.username");
-        String hubPassword = properties.getProperty("hub.password");
-        String hubTimeout = properties.getProperty("hub.timeout");
-        String hubProxyHost = properties.getProperty("hub.proxy.host");
-        String hubProxyPort = properties.getProperty("hub.proxy.port");
-        String hubIgnoredProxyHosts = properties.getProperty("hub.ignored.proxy.hosts");
-        String hubProxyUsername = properties.getProperty("hub.proxy.username");
-        String hubProxyPassword = properties.getProperty("hub.proxy.password");
+        final String hubUrl = properties.getProperty("hub.url");
+        final String hubUsername = properties.getProperty("hub.username");
+        final String hubPassword = properties.getProperty("hub.password");
+        final String hubTimeout = properties.getProperty("hub.timeout");
+        final String hubProxyHost = properties.getProperty("hub.proxy.host");
+        final String hubProxyPort = properties.getProperty("hub.proxy.port");
+        final String hubIgnoredProxyHosts = properties.getProperty("hub.ignored.proxy.hosts");
+        final String hubProxyUsername = properties.getProperty("hub.proxy.username");
+        final String hubProxyPassword = properties.getProperty("hub.proxy.password");
 
         setHubUrl(hubUrl);
         setUsername(hubUsername);

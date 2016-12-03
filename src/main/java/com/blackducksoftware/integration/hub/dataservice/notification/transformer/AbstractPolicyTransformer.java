@@ -21,7 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservice.notification.transformer;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +39,8 @@ import com.blackducksoftware.integration.hub.api.version.BomComponentVersionPoli
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.exception.NotificationServiceException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 
 public abstract class AbstractPolicyTransformer extends AbstractNotificationTransformer {
@@ -98,8 +96,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         }
     }
 
-    protected String getComponentVersionName(final String componentVersionLink)
-            throws NotificationServiceException, IOException, BDRestException, URISyntaxException {
+    protected String getComponentVersionName(final String componentVersionLink) throws HubIntegrationException {
         String componentVersionName;
         if (StringUtils.isBlank(componentVersionLink)) {
             componentVersionName = "";
@@ -111,8 +108,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         return componentVersionName;
     }
 
-    protected List<PolicyRule> getRulesFromUrls(final List<String> ruleUrlsViolated)
-            throws NotificationServiceException, IOException, BDRestException, URISyntaxException {
+    protected List<PolicyRule> getRulesFromUrls(final List<String> ruleUrlsViolated) throws HubIntegrationException {
         if (ruleUrlsViolated == null || ruleUrlsViolated.isEmpty()) {
             return null;
         }
@@ -143,7 +139,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         return policyFilter;
     }
 
-    protected PolicyRule getPolicyRule(final String ruleUrl) throws IOException, BDRestException, URISyntaxException {
+    protected PolicyRule getPolicyRule(final String ruleUrl) throws HubIntegrationException {
         PolicyRule rule;
         rule = getPolicyService().getItem(ruleUrl);
         return rule;
@@ -163,7 +159,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         return filteredRules;
     }
 
-    protected List<String> getRuleUrls(final List<String> rulesViolated) throws NotificationServiceException {
+    protected List<String> getRuleUrls(final List<String> rulesViolated) {
         if (rulesViolated == null || rulesViolated.isEmpty()) {
             return null;
         }
@@ -193,8 +189,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         return fixedRuleUrl;
     }
 
-    protected BomComponentVersionPolicyStatus getBomComponentVersionPolicyStatus(final String policyStatusUrl)
-            throws IOException, BDRestException, URISyntaxException {
+    protected BomComponentVersionPolicyStatus getBomComponentVersionPolicyStatus(final String policyStatusUrl) throws HubIntegrationException {
         BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus;
         bomComponentVersionPolicyStatus = getBomVersionPolicyService().getItem(policyStatusUrl);
 

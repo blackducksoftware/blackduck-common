@@ -11,13 +11,11 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.HubRequestFactory;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 
@@ -31,24 +29,24 @@ public class HubRequestService {
         this.hubRequestFactory = new HubRequestFactory(restConnection);
     }
 
-    public String getString(List<String> urlSegments) throws IOException, URISyntaxException, BDRestException {
+    public String getString(List<String> urlSegments) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(urlSegments);
         final String s = hubRequest.executeForResponseString();
         return s;
     }
 
-    public JsonObject getJsonObject(List<String> urlSegments) throws IOException, URISyntaxException, BDRestException {
+    public JsonObject getJsonObject(List<String> urlSegments) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(urlSegments);
         final JsonObject jsonObject = hubRequest.executeForResponseJson();
         return jsonObject;
     }
 
-    public <T> T getItem(final HubRequest hubRequest, Class<T> clazz) throws IOException, BDRestException, URISyntaxException {
+    public <T> T getItem(final HubRequest hubRequest, Class<T> clazz) throws HubIntegrationException {
         final String response = hubRequest.executeForResponseString();
         return getRestConnection().getGson().fromJson(response, clazz);
     }
 
-    public <T> T getItem(String url, Class<T> clazz) throws IOException, BDRestException, URISyntaxException {
+    public <T> T getItem(String url, Class<T> clazz) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(url);
         return getItem(hubRequest, clazz);
     }

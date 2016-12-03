@@ -21,8 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservice.policystatus;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
@@ -30,11 +28,7 @@ import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
-import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
-import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 
@@ -54,9 +48,7 @@ public class PolicyStatusDataService extends HubRequestService {
     }
 
     public PolicyStatusItem getPolicyStatusForProjectAndVersion(final String projectName,
-            final String projectVersionName)
-            throws IOException, URISyntaxException, BDRestException, ProjectDoesNotExistException,
-            HubIntegrationException, MissingUUIDException, UnexpectedHubResponseException {
+            final String projectVersionName) throws HubIntegrationException {
         final ProjectItem projectItem = projectRequestService.getProjectByName(projectName);
         final String versionsUrl = projectItem.getLink("versions");
 
@@ -66,8 +58,7 @@ public class PolicyStatusDataService extends HubRequestService {
         return hubRequestService.getItem(policyStatusUrl, PolicyStatusItem.class);
     }
 
-    private String findPolicyStatusUrl(final List<ProjectVersionItem> projectVersions, final String projectVersionName)
-            throws UnexpectedHubResponseException {
+    private String findPolicyStatusUrl(final List<ProjectVersionItem> projectVersions, final String projectVersionName) throws HubIntegrationException {
         for (final ProjectVersionItem version : projectVersions) {
             if (projectVersionName.equals(version.getVersionName())) {
                 return version.getLink("policy-status");

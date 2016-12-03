@@ -27,7 +27,6 @@ import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ConfigurationItem extends HubItem {
-
     private final String name;
 
     private final OptionTypeEnum optionType;
@@ -90,10 +89,4 @@ public class ConfigurationItem extends HubItem {
         return value;
     }
 
-    @Override
-    public String toString() {
-        return "ConfigurationItem [name=" + name + ", optionType=" + optionType + ", title=" + title + ", required="
-                + required + ", singleValue=" + singleValue + ", description=" + description + ", options=" + options
-                + ", value=" + value + "]";
-    }
 }

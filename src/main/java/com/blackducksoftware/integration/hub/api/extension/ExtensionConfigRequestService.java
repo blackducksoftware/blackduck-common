@@ -21,11 +21,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.extension;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
@@ -34,20 +32,17 @@ public class ExtensionConfigRequestService extends HubParameterizedRequestServic
         super(restConnection, ConfigurationItem.class);
     }
 
-    public List<ConfigurationItem> getGlobalOptions(final String globalConfigUrl)
-            throws IOException, URISyntaxException, BDRestException {
+    public List<ConfigurationItem> getGlobalOptions(final String globalConfigUrl) throws HubIntegrationException {
         final List<ConfigurationItem> allItems = getAllItems(globalConfigUrl);
         return allItems;
     }
 
-    public List<ConfigurationItem> getCurrentUserOptions(final String currentUserConfigUrl)
-            throws IOException, URISyntaxException, BDRestException {
+    public List<ConfigurationItem> getCurrentUserOptions(final String currentUserConfigUrl) throws HubIntegrationException {
         final List<ConfigurationItem> allItems = getAllItems(currentUserConfigUrl);
         return allItems;
     }
 
-    public List<ConfigurationItem> getUserConfiguration(final String userConfigUrl)
-            throws IOException, URISyntaxException, BDRestException {
+    public List<ConfigurationItem> getUserConfiguration(final String userConfigUrl) throws HubIntegrationException {
         final List<ConfigurationItem> allItems = getAllItems(userConfigUrl);
         return allItems;
     }

@@ -24,8 +24,6 @@ package com.blackducksoftware.integration.hub.api.project;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_PROJECTS;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,9 +35,7 @@ import org.restlet.representation.StringRepresentation;
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
-import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
@@ -50,13 +46,12 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
         super(restConnection, ProjectItem.class);
     }
 
-    public List<ProjectItem> getAllProjects() throws IOException, BDRestException, URISyntaxException {
+    public List<ProjectItem> getAllProjects() throws HubIntegrationException {
         final List<ProjectItem> allProjectItems = getAllItems(PROJECTS_SEGMENTS);
         return allProjectItems;
     }
 
-    public List<ProjectItem> getAllProjectMatches(final String projectName)
-            throws IOException, BDRestException, URISyntaxException {
+    public List<ProjectItem> getAllProjectMatches(final String projectName) throws HubIntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(PROJECTS_SEGMENTS);
         if (StringUtils.isNotBlank(projectName)) {
             hubPagedRequest.setQ("name:" + projectName);
@@ -66,8 +61,7 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
         return allProjectItems;
     }
 
-    public List<ProjectItem> getProjectMatches(final String projectName, final int limit)
-            throws IOException, BDRestException, URISyntaxException {
+    public List<ProjectItem> getProjectMatches(final String projectName, final int limit) throws HubIntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(limit, PROJECTS_SEGMENTS);
         if (StringUtils.isNotBlank(projectName)) {
             hubPagedRequest.setQ("name:" + projectName);
@@ -77,18 +71,17 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
         return projectItems;
     }
 
-    public ProjectItem getProjectByName(String projectName)
-            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException {
+    public ProjectItem getProjectByName(String projectName) throws HubIntegrationException {
         final List<ProjectItem> allProjectItems = getAllProjectMatches(projectName);
         for (final ProjectItem project : allProjectItems) {
             if (projectName.equals(project.getName())) {
                 return project;
             }
         }
-        throw new ProjectDoesNotExistException("This Project does not exist. Project : " + projectName);
+        throw new HubIntegrationException("This Project does not exist. Project : " + projectName);
     }
 
-    public String createHubProject(final String projectName) throws IOException, BDRestException, URISyntaxException {
+    public String createHubProject(final String projectName) throws HubIntegrationException {
         final ProjectItem newProject = new ProjectItem(null, projectName, null, false, 1, SourceEnum.CUSTOM);
         final StringRepresentation stringRepresentation = new StringRepresentation(getRestConnection().getGson().toJson(newProject));
         stringRepresentation.setMediaType(MediaType.APPLICATION_JSON);
@@ -96,12 +89,7 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
 
         final HubRequest projectItemRequest = getHubRequestFactory().createPostRequest(PROJECTS_SEGMENTS);
         String location = null;
-        try {
-            location = projectItemRequest.executePost(stringRepresentation);
-        } catch (final ResourceDoesNotExistException ex) {
-            throw new BDRestException("There was a problem creating this Project for the specified Hub server.", ex,
-                    ex.getResource());
-        }
+        location = projectItemRequest.executePost(stringRepresentation);
         return location;
     }
 

@@ -21,14 +21,12 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservice.notification.item;
 
-import java.net.URISyntaxException;
 import java.util.Date;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
-import com.blackducksoftware.integration.hub.util.HubUrlParser;
 import com.google.common.base.Joiner;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {
@@ -70,10 +68,6 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
     public String getComponentVersionUrl() {
         return componentVersionUrl;
-    }
-
-    public String getComponentVersionRelativeUrl() throws URISyntaxException {
-        return HubUrlParser.getRelativeUrl(componentVersionUrl);
     }
 
     public Date getCreatedAt() {

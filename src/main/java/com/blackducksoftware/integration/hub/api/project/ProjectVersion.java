@@ -21,11 +21,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.project;
 
-import java.net.URISyntaxException;
-import java.util.UUID;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.exception.MissingUUIDException;
-import com.blackducksoftware.integration.hub.util.HubUrlParser;
 import com.google.gson.annotations.SerializedName;
 
 public class ProjectVersion {
@@ -48,22 +46,8 @@ public class ProjectVersion {
         return projectVersionName;
     }
 
-    /**
-     * Use getUrl() instead.
-     *
-     * @return
-     */
-    @Deprecated
-    public String getProjectVersionLink() {
-        return getUrl();
-    }
-
     public String getUrl() {
         return url;
-    }
-
-    public String getRelativeUrl() throws URISyntaxException {
-        return HubUrlParser.getRelativeUrl(url);
     }
 
     public void setProjectName(final String projectName) {
@@ -74,40 +58,8 @@ public class ProjectVersion {
         this.projectVersionName = projectVersionName;
     }
 
-    /**
-     * Use setUrl() instead.
-     *
-     * @param url
-     */
-    @Deprecated
-    public void setProjectVersionLink(final String url) {
-        setUrl(url);
-    }
-
     public void setUrl(final String url) {
         this.url = url;
-    }
-
-    @Deprecated
-    public UUID getProjectId() throws MissingUUIDException {
-        if (getUrl() == null) {
-            return null;
-        }
-        return HubUrlParser.getUUIDFromURLString(PROJECT_URL_IDENTIFIER, getUrl());
-    }
-
-    @Deprecated
-    public UUID getVersionId() throws MissingUUIDException {
-        if (getUrl() == null) {
-            return null;
-        }
-        return HubUrlParser.getUUIDFromURLString(VERSION_URL_IDENTIFIER, getUrl());
-    }
-
-    @Override
-    public String toString() {
-        return "ProjectVersion [projectName=" + projectName + ", projectVersionName=" + projectVersionName
-                + ", projectVersionLink=" + getUrl() + "]";
     }
 
     @Override
@@ -146,6 +98,11 @@ public class ProjectVersion {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

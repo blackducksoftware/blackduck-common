@@ -24,6 +24,8 @@ package com.blackducksoftware.integration.hub.api.report;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
@@ -260,29 +262,7 @@ public class DetailedReleaseSummary {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("DetailedReleaseSummary [projectId=");
-        builder.append(projectId);
-        builder.append(", versionId=");
-        builder.append(versionId);
-        builder.append(", projectName=");
-        builder.append(projectName);
-        builder.append(", version=");
-        builder.append(version);
-        builder.append(", versionComments=");
-        builder.append(versionComments);
-        builder.append(", nickname=");
-        builder.append(nickname);
-        builder.append(", releasedOn=");
-        builder.append(releasedOn);
-        builder.append(", phase=");
-        builder.append(phase);
-        builder.append(", distribution=");
-        builder.append(distribution);
-        builder.append(", uiUrlGenerator=");
-        builder.append(uiUrlGenerator);
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
     static public class URLProvider {
@@ -328,13 +308,8 @@ public class DetailedReleaseSummary {
 
         @Override
         public String toString() {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("URLProvider [baseUrl=");
-            builder.append(baseUrl);
-            builder.append("]");
-            return builder.toString();
+            return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
         }
-
     }
 
 }

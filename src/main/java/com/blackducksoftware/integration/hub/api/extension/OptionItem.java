@@ -21,6 +21,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.extension;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 public class OptionItem {
     private final String name;
 
@@ -41,6 +44,7 @@ public class OptionItem {
 
     @Override
     public String toString() {
-        return "OptionItem [name=" + name + ", title=" + title + "]";
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
+
 }

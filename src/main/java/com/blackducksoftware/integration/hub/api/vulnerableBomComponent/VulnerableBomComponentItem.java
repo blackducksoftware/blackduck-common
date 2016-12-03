@@ -26,7 +26,6 @@ import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.google.gson.annotations.SerializedName;
 
 public class VulnerableBomComponentItem extends HubItem {
-
     private String componentName;
 
     private String componentVersionName;
@@ -81,10 +80,4 @@ public class VulnerableBomComponentItem extends HubItem {
         this.vulnerabilityWithRemediation = vulnerabilityWithRemediation;
     }
 
-    @Override
-    public String toString() {
-        return "VulnerableBomComponentItem [componentName=" + componentName + ", componentVersionName="
-                + componentVersionName + ", componentVersionLink=" + componentVersionLink
-                + ", vulnerabilityWithRemediation=" + vulnerabilityWithRemediation + "]";
-    }
 }

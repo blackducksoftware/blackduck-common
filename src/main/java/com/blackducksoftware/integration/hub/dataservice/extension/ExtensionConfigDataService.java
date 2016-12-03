@@ -21,8 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservice.extension;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,8 +35,7 @@ import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.dataservice.extension.transformer.UserConfigTransform;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -70,34 +67,24 @@ public class ExtensionConfigDataService extends HubRequestService {
         parallelProcessor.addTransform(UserOptionLinkItem.class, userConfigTransform);
     }
 
-    public Map<String, ConfigurationItem> getGlobalConfigMap(final String extensionUrl)
-            throws UnexpectedHubResponseException {
+    public Map<String, ConfigurationItem> getGlobalConfigMap(final String extensionUrl) throws HubIntegrationException {
         Map<String, ConfigurationItem> globalConfigMap = new HashMap<>();
-        try {
-            final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
-            globalConfigMap = createGlobalConfigMap(extension.getLink("global-options"));
-        } catch (IOException | URISyntaxException | BDRestException e) {
-            logger.error("Error creating global configurationMap", e);
-        }
+        final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
+        globalConfigMap = createGlobalConfigMap(extension.getLink("global-options"));
         return globalConfigMap;
     }
 
-    public List<UserConfigItem> getUserConfigList(final String extensionUrl) throws UnexpectedHubResponseException {
+    public List<UserConfigItem> getUserConfigList(final String extensionUrl) throws HubIntegrationException {
         List<UserConfigItem> itemList = new LinkedList<>();
-        try {
-            final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
-            final List<UserOptionLinkItem> userOptionList = extensionUserOptionRequestService
-                    .getUserOptions(extension.getLink("user-options"));
-            itemList = parallelProcessor.process(userOptionList);
-        } catch (URISyntaxException | BDRestException | IOException e) {
-            logger.error("Error creating user configuration", e);
-        }
+        final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
+        final List<UserOptionLinkItem> userOptionList = extensionUserOptionRequestService
+                .getUserOptions(extension.getLink("user-options"));
+        itemList = parallelProcessor.process(userOptionList);
 
         return itemList;
     }
 
-    private Map<String, ConfigurationItem> createGlobalConfigMap(final String globalConfigUrl)
-            throws IOException, URISyntaxException, BDRestException {
+    private Map<String, ConfigurationItem> createGlobalConfigMap(final String globalConfigUrl) throws HubIntegrationException {
         final List<ConfigurationItem> itemList = extensionConfigRequestService.getGlobalOptions(globalConfigUrl);
         final Map<String, ConfigurationItem> itemMap = createConfigMap(itemList);
         return itemMap;

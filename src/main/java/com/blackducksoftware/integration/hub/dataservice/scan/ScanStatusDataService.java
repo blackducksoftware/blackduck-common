@@ -36,11 +36,8 @@ import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionI
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
-import com.blackducksoftware.integration.hub.exception.ProjectDoesNotExistException;
-import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -97,10 +94,7 @@ public class ScanStatusDataService extends HubRequestService {
      */
     public void assertBomImportScanStartedThenFinished(final String projectName, final String projectVersion,
             final long scanStartedTimeoutInMilliseconds, final long scanFinishedTimeoutInMilliseconds,
-            final IntLogger logger)
-            throws IOException, BDRestException, URISyntaxException,
-            ProjectDoesNotExistException,
-            UnexpectedHubResponseException, HubIntegrationException, HubTimeoutExceededException, InterruptedException {
+            final IntLogger logger) throws HubTimeoutExceededException, HubIntegrationException {
         final List<ScanSummaryItem> pendingScans = waitForPendingScansToStart(projectName, projectVersion,
                 scanStartedTimeoutInMilliseconds);
         waitForScansToComplete(pendingScans, scanFinishedTimeoutInMilliseconds);
@@ -125,23 +119,22 @@ public class ScanStatusDataService extends HubRequestService {
      * @throws HubTimeoutExceededException
      */
     public void assertBomImportScansFinished(final List<ScanSummaryItem> pendingScans,
-            final long scanFinishedTimeoutInMilliseconds) throws InterruptedException, IOException, BDRestException,
-            URISyntaxException, HubIntegrationException, ProjectDoesNotExistException,
-            UnexpectedHubResponseException, HubTimeoutExceededException {
+            final long scanFinishedTimeoutInMilliseconds) throws HubTimeoutExceededException, HubIntegrationException {
         waitForScansToComplete(pendingScans, scanFinishedTimeoutInMilliseconds);
     }
 
     private List<ScanSummaryItem> waitForPendingScansToStart(final String projectName, final String projectVersion,
-            final long scanStartedTimeoutInMilliseconds)
-            throws IOException, BDRestException, URISyntaxException,
-            ProjectDoesNotExistException,
-            UnexpectedHubResponseException, HubIntegrationException, HubTimeoutExceededException, InterruptedException {
+            final long scanStartedTimeoutInMilliseconds) throws HubIntegrationException {
         List<ScanSummaryItem> pendingScans = getPendingScans(projectName, projectVersion);
         final long startedTime = System.currentTimeMillis();
         boolean pendingScansOk = pendingScans.size() > 0;
         while (!done(pendingScansOk, scanStartedTimeoutInMilliseconds, startedTime,
                 "No scan has started within the specified wait time: %d minutes")) {
-            Thread.sleep(FIVE_SECONDS);
+            try {
+                Thread.sleep(FIVE_SECONDS);
+            } catch (final InterruptedException e) {
+                throw new HubIntegrationException("The thread waiting for the scan to start was interrupted: " + e.getMessage(), e);
+            }
             pendingScans = getPendingScans(projectName, projectVersion);
             pendingScansOk = pendingScans.size() > 0;
         }
@@ -150,14 +143,17 @@ public class ScanStatusDataService extends HubRequestService {
     }
 
     private void waitForScansToComplete(List<ScanSummaryItem> pendingScans, final long scanStartedTimeoutInMilliseconds)
-            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException,
-            UnexpectedHubResponseException, HubIntegrationException, HubTimeoutExceededException, InterruptedException {
+            throws HubTimeoutExceededException, HubIntegrationException {
         pendingScans = getPendingScans(pendingScans);
         final long startedTime = System.currentTimeMillis();
         boolean pendingScansOk = pendingScans.isEmpty();
         while (!done(pendingScansOk, scanStartedTimeoutInMilliseconds, startedTime,
                 "The pending scans have not completed within the specified wait time: %d minutes")) {
-            Thread.sleep(FIVE_SECONDS);
+            try {
+                Thread.sleep(FIVE_SECONDS);
+            } catch (final InterruptedException e) {
+                throw new HubIntegrationException("The thread waiting for the scan to complete was interrupted: " + e.getMessage(), e);
+            }
             pendingScans = getPendingScans(pendingScans);
             pendingScansOk = pendingScans.isEmpty();
         }
@@ -182,9 +178,7 @@ public class ScanStatusDataService extends HubRequestService {
         return elapsed > timeoutInMilliseconds;
     }
 
-    private List<ScanSummaryItem> getPendingScans(final String projectName, final String projectVersion)
-            throws IOException, BDRestException, URISyntaxException, ProjectDoesNotExistException,
-            UnexpectedHubResponseException, HubIntegrationException {
+    private List<ScanSummaryItem> getPendingScans(final String projectName, final String projectVersion) {
         List<ScanSummaryItem> pendingScans = new ArrayList<>();
         try {
             final ProjectItem projectItem = projectRequestService.getProjectByName(projectName);
@@ -223,8 +217,7 @@ public class ScanStatusDataService extends HubRequestService {
         return pendingScans;
     }
 
-    private List<ScanSummaryItem> getPendingScans(final List<ScanSummaryItem> scanSummaries)
-            throws InterruptedException, IOException, BDRestException, URISyntaxException, HubIntegrationException {
+    private List<ScanSummaryItem> getPendingScans(final List<ScanSummaryItem> scanSummaries) throws HubIntegrationException {
         final List<ScanSummaryItem> pendingScans = new ArrayList<>();
         for (final ScanSummaryItem scanSummaryItem : scanSummaries) {
             final String scanSummaryLink = scanSummaryItem.getMeta().getHref();

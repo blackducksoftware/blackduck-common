@@ -21,6 +21,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.policy;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 public class ComponentVersionStatusCount {
     private final PolicyStatusEnum name;
 
@@ -71,7 +74,7 @@ public class ComponentVersionStatusCount {
 
     @Override
     public String toString() {
-        return "ComponentVersionStatusCount [name=" + name + ", value=" + value + "]";
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

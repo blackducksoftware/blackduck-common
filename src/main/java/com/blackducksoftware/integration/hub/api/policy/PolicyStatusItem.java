@@ -146,10 +146,4 @@ public class PolicyStatusItem extends HubItem {
         return true;
     }
 
-    @Override
-    public String toString() {
-        return "PolicyStatusItem [overallStatus=" + overallStatus + ", updatedAt=" + updatedAt
-                + ", componentVersionStatusCounts=" + componentVersionStatusCounts + "]";
-    }
-
 }

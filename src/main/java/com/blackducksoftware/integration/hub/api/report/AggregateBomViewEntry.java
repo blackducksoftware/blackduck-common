@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
@@ -103,7 +105,7 @@ public class AggregateBomViewEntry {
     }
 
     public List<UUID> getBomEntryUUIds() {
-        final List<UUID> bomEntryUUIds = new ArrayList<UUID>();
+        final List<UUID> bomEntryUUIds = new ArrayList<>();
         for (final String bomEntryId : bomEntryIds) {
             if (StringUtils.isBlank(bomEntryId)) {
                 continue;
@@ -419,37 +421,7 @@ public class AggregateBomViewEntry {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("AggregateBomViewEntry [bomEntryIds=");
-        builder.append(bomEntryIds);
-        builder.append(", bomViewEntryIds=");
-        builder.append(bomViewEntryIds);
-        builder.append(", matchTypes=");
-        builder.append(matchTypes);
-        builder.append(", producerMatchTypes=");
-        builder.append(producerMatchTypes);
-        builder.append(", componentMatchTypes=");
-        builder.append(componentMatchTypes);
-        builder.append(", usages=");
-        builder.append(usages);
-        builder.append(", inUses=");
-        builder.append(inUses);
-        builder.append(", createdByUsers=");
-        builder.append(createdByUsers);
-        builder.append(", since=");
-        builder.append(since);
-        builder.append(", producerProject=");
-        builder.append(producerProject);
-        builder.append(", producerReleases=");
-        builder.append(producerReleases);
-        builder.append(", licenses=");
-        builder.append(licenses);
-        builder.append(", riskProfile=");
-        builder.append(riskProfile);
-        builder.append(", policyApprovalStatus=");
-        builder.append(policyApprovalStatus);
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

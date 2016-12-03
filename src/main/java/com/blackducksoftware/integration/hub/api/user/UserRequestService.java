@@ -24,12 +24,10 @@ package com.blackducksoftware.integration.hub.api.user;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_USERS;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
@@ -40,7 +38,7 @@ public class UserRequestService extends HubParameterizedRequestService<UserItem>
         super(restConnection, UserItem.class);
     }
 
-    public List<UserItem> getAllUsers() throws URISyntaxException, BDRestException, IOException {
+    public List<UserItem> getAllUsers() throws HubIntegrationException {
         final List<UserItem> allUserItems = getAllItems(USERS_SEGMENTS);
         return allUserItems;
     }

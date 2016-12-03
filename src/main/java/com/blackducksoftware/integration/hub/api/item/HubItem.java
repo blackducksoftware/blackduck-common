@@ -29,7 +29,7 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 
-import com.blackducksoftware.integration.hub.exception.UnexpectedHubResponseException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 
@@ -50,11 +50,11 @@ public class HubItem {
         return _meta;
     }
 
-    public String getLink(final String linkRel) throws UnexpectedHubResponseException {
+    public String getLink(final String linkRel) throws HubIntegrationException {
         final List<String> links = getLinks(linkRel);
         if (links.size() != 1) {
             final String combinedLinks = StringUtils.join(links, ", ");
-            throw new UnexpectedHubResponseException(
+            throw new HubIntegrationException(
                     String.format("1 link was expected, but found %s: %s", links.size(), combinedLinks));
         }
 

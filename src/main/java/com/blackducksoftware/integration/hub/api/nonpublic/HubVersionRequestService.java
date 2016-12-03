@@ -27,15 +27,12 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CUR
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CURRENT_VERSION_COMPARISON;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.version.VersionComparison;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.exception.ResourceDoesNotExistException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
@@ -48,21 +45,21 @@ public class HubVersionRequestService extends HubParameterizedRequestService<Ver
         super(restConnection, VersionComparison.class);
     }
 
-    public String getHubVersion() throws IOException, ResourceDoesNotExistException, URISyntaxException, BDRestException {
+    public String getHubVersion() throws HubIntegrationException {
         final String hubVersionWithPossibleSurroundingQuotes = getString(CURRENT_VERSION_SEGMENTS);
         final String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
 
         return hubVersion;
     }
 
-    public VersionComparison getHubVersionComparison(String consumerVersion) throws IOException, URISyntaxException, BDRestException {
+    public VersionComparison getHubVersionComparison(String consumerVersion) throws HubIntegrationException {
         final HubRequest hubVersionRequest = getHubRequestFactory().createGetRequest(CURRENT_VERSION_COMPARISON_SEGMENTS).addQueryParameter(QUERY_VERSION,
                 consumerVersion);
         final VersionComparison versionComparison = getItem(hubVersionRequest);
         return versionComparison;
     }
 
-    public boolean isConsumerVersionLessThanOrEqualToServerVersion(String consumerVersion) throws IOException, URISyntaxException, BDRestException {
+    public boolean isConsumerVersionLessThanOrEqualToServerVersion(String consumerVersion) throws HubIntegrationException {
         final VersionComparison versionComparison = getHubVersionComparison(consumerVersion);
         if (versionComparison.getNumericResult() <= 0) {
             return true;

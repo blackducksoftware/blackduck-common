@@ -21,10 +21,11 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.report.risk;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 /**
  * Summary stats of items that fall in each risk priority per risk category
- *
- *
  */
 public class RiskProfile {
     private final int numberOfItems;
@@ -90,13 +91,7 @@ public class RiskProfile {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("RiskProfile [numberOfItems=");
-        builder.append(numberOfItems);
-        builder.append(", categories=");
-        builder.append(categories);
-        builder.append("]");
-        return builder.toString();
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }
