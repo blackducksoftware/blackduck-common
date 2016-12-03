@@ -37,7 +37,6 @@ public class HostnameHelper {
             try {
                 // Get the network interfaces for this machine
                 final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-
                 while (interfaces.hasMoreElements()) {
                     final NetworkInterface nic = interfaces.nextElement();
                     // Get the addresses for this network interface
