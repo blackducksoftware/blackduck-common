@@ -36,6 +36,7 @@ import com.blackducksoftware.integration.builder.ValidationResultEnum;
 import com.blackducksoftware.integration.builder.ValidationResults;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.scan.HubScanConfigFieldEnum;
+import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
 import com.google.common.collect.ImmutableList;
 
 public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum, HubScanConfig> {
@@ -67,6 +68,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
 
     private File toolsDir;
 
+    private ThirdPartyName thirdPartyName;
+
     private String thirdPartyVersion;
 
     private String pluginVersion;
@@ -85,7 +88,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
 
         result.setConstructedObject(new HubScanConfig(projectName, version, phase, distribution, workingDirectory,
                 NumberUtils.toInt(scanMemory), shouldGenerateRiskReport, NumberUtils.toInt(maxWaitTimeForBomUpdate),
-                immutableScanTargetPaths, dryRun, toolsDir, thirdPartyVersion, pluginVersion));
+                immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion));
 
         return result;
     }
@@ -267,6 +270,10 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
 
     public void setToolsDir(File toolsDir) {
         this.toolsDir = toolsDir;
+    }
+
+    public void setThirdPartyName(ThirdPartyName thirdPartyName) {
+        this.thirdPartyName = thirdPartyName;
     }
 
     public void setThirdPartyVersion(String thirdPartyVersion) {

@@ -30,6 +30,7 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
 import com.google.common.collect.ImmutableList;
 
 public class HubScanConfig {
@@ -55,6 +56,8 @@ public class HubScanConfig {
 
     private final File toolsDir;
 
+    private final ThirdPartyName thirdPartyName;
+
     private final String thirdPartyVersion;
 
     private final String pluginVersion;
@@ -62,7 +65,8 @@ public class HubScanConfig {
     public HubScanConfig(final String projectName, final String version, final String phase,
             final String distribution, final File workingDirectory, final int scanMemory,
             final boolean shouldGenerateRiskReport, final int maxWaitTimeForBomUpdate,
-            final ImmutableList<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final String thirdPartyVersion,
+            final ImmutableList<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
+            final String thirdPartyVersion,
             final String pluginVersion) {
         this.projectName = projectName;
         this.version = version;
@@ -75,6 +79,7 @@ public class HubScanConfig {
         this.scanTargetPaths = scanTargetPaths;
         this.dryRun = dryRun;
         this.toolsDir = toolsDir;
+        this.thirdPartyName = thirdPartyName;
         this.thirdPartyVersion = thirdPartyVersion;
         this.pluginVersion = pluginVersion;
     }
@@ -125,6 +130,10 @@ public class HubScanConfig {
 
     public File getToolsDir() {
         return toolsDir;
+    }
+
+    public ThirdPartyName getThirdPartyName() {
+        return thirdPartyName;
     }
 
     public String getThirdPartyVersion() {
