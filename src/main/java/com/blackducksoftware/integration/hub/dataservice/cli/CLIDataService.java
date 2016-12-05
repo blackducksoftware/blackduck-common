@@ -69,7 +69,7 @@ public class CLIDataService extends HubRequestService {
         final SimpleScanService simpleScanService = new SimpleScanService(logger, getRestConnection(), hubServerConfig, hubSupportHelper,
                 ciEnvironmentVariables,
                 hubScanConfig.getToolsDir(),
-                hubScanConfig.getScanMemory(), true, hubScanConfig.isDryRun(), hubScanConfig.getProjectName(), hubScanConfig.getVersion(),
+                hubScanConfig.getScanMemory(), hubScanConfig.isDryRun(), hubScanConfig.getProjectName(), hubScanConfig.getVersion(),
                 hubScanConfig.getScanTargetPaths(), hubScanConfig.getWorkingDirectory());
         simpleScanService.setupAndExecuteScan();
         return simpleScanService.getScanSummaryItems();
