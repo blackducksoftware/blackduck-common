@@ -22,8 +22,6 @@
 package com.blackducksoftware.integration.hub.exception;
 
 public class HubTimeoutExceededException extends HubIntegrationException {
-    private static final long serialVersionUID = -7752926384289205234L;
-
     public HubTimeoutExceededException() {
     }
 
