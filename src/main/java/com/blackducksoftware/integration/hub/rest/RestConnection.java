@@ -21,9 +21,7 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.rest;
 
-import java.io.UnsupportedEncodingException;
 import java.net.CookieHandler;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
@@ -42,16 +40,10 @@ import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.Message;
 import org.restlet.Response;
-import org.restlet.data.CharacterSet;
-import org.restlet.data.Cookie;
-import org.restlet.data.CookieSetting;
-import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
-import org.restlet.data.Status;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 import org.restlet.util.NamedValue;
@@ -79,8 +71,6 @@ public abstract class RestConnection {
     public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
 
     private String baseUrl;
-
-    private Series<Cookie> cookies;
 
     private int timeout = 120;
 
@@ -238,75 +228,6 @@ public abstract class RestConnection {
     }
 
     /**
-     * Gets the cookie for the Authorized connection to the Hub server. Returns
-     * the response code from the connection.
-     *
-     */
-    public int setCookies(final String hubUserName, final String hubPassword)
-            throws HubIntegrationException {
-        final ClientResource resource = createClientResource();
-        try {
-            resource.addSegment("j_spring_security_check");
-            resource.setMethod(Method.POST);
-
-            String encodedHubUser = null;
-            String encodedHubPassword = null;
-            try {
-                encodedHubUser = URLEncoder.encode(hubUserName, "UTF-8");
-                encodedHubPassword = URLEncoder.encode(hubPassword, "UTF-8");
-            } catch (final UnsupportedEncodingException e) {
-                throw new HubIntegrationException("Could not encode the HubUsername and Password", e);
-            }
-
-            final StringRepresentation stringRep = new StringRepresentation(
-                    "j_username=" + encodedHubUser + "&j_password=" + encodedHubPassword);
-            stringRep.setCharacterSet(CharacterSet.UTF_8);
-            stringRep.setMediaType(MediaType.APPLICATION_WWW_FORM);
-            resource.getRequest().setEntity(stringRep);
-
-            handleRequest(resource);
-
-            final int statusCode = resource.getResponse().getStatus().getCode();
-            if (isSuccess(statusCode)) {
-                final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
-                final Series<Cookie> requestCookies = resource.getRequest().getCookies();
-                if (cookieSettings != null && !cookieSettings.isEmpty()) {
-                    for (final CookieSetting ck : cookieSettings) {
-                        if (ck == null) {
-                            continue;
-                        }
-                        final Cookie cookie = new Cookie();
-                        cookie.setName(ck.getName());
-                        cookie.setDomain(ck.getDomain());
-                        cookie.setPath(ck.getPath());
-                        cookie.setValue(ck.getValue());
-                        cookie.setVersion(ck.getVersion());
-                        requestCookies.add(cookie);
-                    }
-                }
-
-                if (requestCookies == null || requestCookies.size() == 0) {
-                    throw new HubIntegrationException(
-                            "Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
-                }
-                cookies = requestCookies;
-            } else {
-                logger.trace("Response entity : " + resource.getResponse().getEntityAsText());
-                final Status status = resource.getResponse().getStatus();
-                logger.trace("Status : " + status.toString(), status.getThrowable());
-                throw new HubIntegrationException(resource.getResponse().getStatus().toString(), status.getThrowable());
-            }
-            return statusCode;
-        } finally {
-            releaseResource(resource);
-        }
-    }
-
-    public Series<Cookie> getCookies() {
-        return cookies;
-    }
-
-    /**
      * Get a resource from via an absolute URL.
      *
      * @param modelClass
@@ -376,7 +297,7 @@ public abstract class RestConnection {
         }
     }
 
-    private void releaseResource(final ClientResource resource) {
+    protected void releaseResource(final ClientResource resource) {
         if (resource.getResponse() != null) {
             resource.getResponse().release();
         }
@@ -392,11 +313,12 @@ public abstract class RestConnection {
         // is 2 minutes
         final ClientResource resource = createClientResource(client.getContext(), providedUrl);
         resource.setNext(client);
-        resource.getRequest().setCookies(getCookies());
         return resource;
     }
 
     public abstract ClientResource createClientResource(final Context context, final String providedUrl) throws HubIntegrationException;
+
+    public abstract void connect() throws HubIntegrationException;
 
     public ClientResource createClientResource(final List<String> urlSegments,
             final Set<AbstractMap.SimpleEntry<String, String>> queryParameters) throws HubIntegrationException {
@@ -602,6 +524,10 @@ public abstract class RestConnection {
             throw new HubIntegrationException(
                     "There was a problem creating the resource. Error Code: " + responseCode);
         }
+    }
+
+    protected Client getClient() {
+        return client;
     }
 
     public Gson getGson() {
