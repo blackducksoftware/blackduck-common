@@ -35,22 +35,26 @@ import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 public class CLIDataService extends HubRequestService {
     private final IntLogger logger;
 
+    private final CIEnvironmentVariables ciEnvironmentVariables;
+
     private final HubVersionRequestService hubVersionRequestService;
 
     private final CLIDownloadService cliDownloadService;
 
     private final HubRegistrationRequestService hubRegistrationRequestService;
 
-    public CLIDataService(final IntLogger logger, final RestConnection restConnection, final HubVersionRequestService hubVersionRequestService,
+    public CLIDataService(final IntLogger logger, final RestConnection restConnection, CIEnvironmentVariables ciEnvironmentVariables,
+            final HubVersionRequestService hubVersionRequestService,
             CLIDownloadService cliDownloadService, HubRegistrationRequestService hubRegistrationRequestService) {
         super(restConnection);
         this.logger = logger;
+        this.ciEnvironmentVariables = ciEnvironmentVariables;
         this.hubVersionRequestService = hubVersionRequestService;
         this.cliDownloadService = cliDownloadService;
         this.hubRegistrationRequestService = hubRegistrationRequestService;
     }
 
-    public List<ScanSummaryItem> installAndRunScan(final CIEnvironmentVariables ciEnvironmentVariables, final HubServerConfig hubServerConfig,
+    public List<ScanSummaryItem> installAndRunScan(final HubServerConfig hubServerConfig,
             HubScanConfig hubScanConfig)
             throws HubIntegrationException, EncryptionException {
         final String localHostName = HostnameHelper.getMyHostname();

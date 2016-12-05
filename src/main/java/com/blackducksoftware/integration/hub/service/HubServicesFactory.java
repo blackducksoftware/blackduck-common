@@ -23,6 +23,7 @@ package com.blackducksoftware.integration.hub.service;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
@@ -58,10 +59,23 @@ import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class HubServicesFactory {
+    private final CIEnvironmentVariables ciEnvironmentVariables;
+
     private final RestConnection restConnection;
 
     public HubServicesFactory(final RestConnection restConnection) {
+        this.ciEnvironmentVariables = new CIEnvironmentVariables();
+        ciEnvironmentVariables.putAll(System.getenv());
+
         this.restConnection = restConnection;
+    }
+
+    public void addEnvironmentVariable(String key, String value) {
+        ciEnvironmentVariables.put(key, value);
+    }
+
+    public void addEnvironmentVariables(Map<String, String> environmentVariables) {
+        ciEnvironmentVariables.putAll(environmentVariables);
     }
 
     public HubRequestService createHubRequestService() {
@@ -69,7 +83,7 @@ public class HubServicesFactory {
     }
 
     public CLIDataService createCLIDataService(final IntLogger logger) {
-        return new CLIDataService(logger, restConnection, createHubVersionRequestService(), createCliDownloadService(logger),
+        return new CLIDataService(logger, restConnection, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
                 createHubRegistrationRequestService());
     }
 
@@ -175,7 +189,7 @@ public class HubServicesFactory {
 
     public SimpleScanService createSimpleScanService(IntLogger logger, RestConnection restConnection, HubServerConfig hubServerConfig,
             HubSupportHelper hubSupportHelper,
-            CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, int scanMemory, boolean verboseRun, boolean dryRun, String project,
+            final File directoryToInstallTo, int scanMemory, boolean verboseRun, boolean dryRun, String project,
             String version, List<String> scanTargetPaths, File workingDirectory) {
         return new SimpleScanService(logger, restConnection, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo, scanMemory,
                 verboseRun, dryRun, project, version, scanTargetPaths, workingDirectory);
