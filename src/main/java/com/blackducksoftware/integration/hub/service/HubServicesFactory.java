@@ -42,7 +42,6 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
-import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.VulnerableBomComponentRequestService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
@@ -184,10 +183,6 @@ public class HubServicesFactory {
 
     public ExtensionUserOptionRequestService createExtensionUserOptionRequestService() {
         return new ExtensionUserOptionRequestService(restConnection);
-    }
-
-    public VulnerableBomComponentRequestService createVulnerableBomComponentRequestService() {
-        return new VulnerableBomComponentRequestService(restConnection);
     }
 
     public CLIDownloadService createCliDownloadService(IntLogger logger) {
