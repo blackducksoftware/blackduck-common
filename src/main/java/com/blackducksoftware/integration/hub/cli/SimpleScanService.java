@@ -69,8 +69,6 @@ public class SimpleScanService extends HubRequestService {
 
     private final int scanMemory;
 
-    private final boolean verboseRun;
-
     private final boolean dryRun;
 
     private final String project;
@@ -86,7 +84,7 @@ public class SimpleScanService extends HubRequestService {
     private File logDirectory;
 
     public SimpleScanService(IntLogger logger, RestConnection restConnection, HubServerConfig hubServerConfig, HubSupportHelper hubSupportHelper,
-            CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, int scanMemory, boolean verboseRun, boolean dryRun, String project,
+            CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, int scanMemory, boolean dryRun, String project,
             String version, List<String> scanTargetPaths, File workingDirectory) {
         super(restConnection);
         this.logger = logger;
@@ -95,7 +93,6 @@ public class SimpleScanService extends HubRequestService {
         this.ciEnvironmentVariables = ciEnvironmentVariables;
         this.directoryToInstallTo = directoryToInstallTo;
         this.scanMemory = scanMemory;
-        this.verboseRun = verboseRun;
         this.dryRun = dryRun;
         this.project = project;
         this.version = version;
@@ -174,9 +171,7 @@ public class SimpleScanService extends HubRequestService {
             }
         }
 
-        if (verboseRun) {
-            cmd.add("-v");
-        }
+        makeVerbose(cmd);
 
         final String logDirectoryPath;
         try {
@@ -365,6 +360,10 @@ public class SimpleScanService extends HubRequestService {
             Arrays.fill(maskedArray, "*");
             cmd.set(indexToMask, StringUtils.join(maskedArray));
         }
+    }
+
+    private void makeVerbose(List<String> cmd) {
+        cmd.add("-v");
     }
 
     public IntLogger getLogger() {

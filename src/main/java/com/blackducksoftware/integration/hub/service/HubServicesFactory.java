@@ -42,7 +42,7 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
-import com.blackducksoftware.integration.hub.api.vulnerableBomComponent.VulnerableBomComponentRequestService;
+import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.VulnerableBomComponentRequestService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
@@ -53,6 +53,7 @@ import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStat
 import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -63,11 +64,12 @@ public class HubServicesFactory {
 
     private final RestConnection restConnection;
 
-    public HubServicesFactory(final RestConnection restConnection) {
+    public HubServicesFactory(final RestConnection restConnection) throws HubIntegrationException {
         this.ciEnvironmentVariables = new CIEnvironmentVariables();
         ciEnvironmentVariables.putAll(System.getenv());
 
         this.restConnection = restConnection;
+        this.restConnection.connect();
     }
 
     public void addEnvironmentVariable(String key, String value) {
@@ -189,10 +191,10 @@ public class HubServicesFactory {
 
     public SimpleScanService createSimpleScanService(IntLogger logger, RestConnection restConnection, HubServerConfig hubServerConfig,
             HubSupportHelper hubSupportHelper,
-            final File directoryToInstallTo, int scanMemory, boolean verboseRun, boolean dryRun, String project,
+            final File directoryToInstallTo, int scanMemory, boolean dryRun, String project,
             String version, List<String> scanTargetPaths, File workingDirectory) {
         return new SimpleScanService(logger, restConnection, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo, scanMemory,
-                verboseRun, dryRun, project, version, scanTargetPaths, workingDirectory);
+                dryRun, project, version, scanTargetPaths, workingDirectory);
     }
 
     public HubRegistrationRequestService createHubRegistrationRequestService() {
