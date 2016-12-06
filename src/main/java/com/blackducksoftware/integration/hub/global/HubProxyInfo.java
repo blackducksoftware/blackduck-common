@@ -58,23 +58,25 @@ public class HubProxyInfo implements Serializable {
     }
 
     public URLConnection openConnection(final URL url) throws IOException {
+        final Proxy proxy = getProxy(url);
+        return url.openConnection(proxy);
+    }
+
+    public Proxy getProxy(final URL url) {
         if (shouldUseProxyForUrl(url)) {
             final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
             setDefaultAuthenticator();
-
-            return url.openConnection(proxy);
+            return proxy;
         }
-
-        return url.openConnection();
+        return Proxy.NO_PROXY;
     }
 
     public boolean shouldUseProxyForUrl(final URL url) {
-        final List<Pattern> ignoredProxyHostPatterns = getIgnoredProxyHostPatterns();
-        boolean shouldUseProxy = !shouldIgnoreHost(url.getHost(), ignoredProxyHostPatterns);
         if (StringUtils.isBlank(host) || port <= 0) {
-            shouldUseProxy = false;
+            return false;
         }
-        return shouldUseProxy;
+        final List<Pattern> ignoredProxyHostPatterns = getIgnoredProxyHostPatterns();
+        return !shouldIgnoreHost(url.getHost(), ignoredProxyHostPatterns);
     }
 
     public void setDefaultAuthenticator() {

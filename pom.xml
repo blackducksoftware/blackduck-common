@@ -63,20 +63,16 @@
       <artifactId>gson</artifactId>
       <version>2.7</version>
     </dependency>
-    <dependency>
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet</artifactId>
-      <version>2.3.7</version>
+	<dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.7</version>
     </dependency>
-    <!--
-    We include the nio restlet dependency since the default implementation that restlet will use is not recommended for production use.
-    https://restlet.com/technical-resources/restlet-framework/guide/2.3/core/base/connectors
-    -->
     <dependency>
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet.ext.nio</artifactId>
-      <version>2.3.7</version>
-    </dependency>
+	    <groupId>com.squareup.okhttp3</groupId>
+	    <artifactId>okhttp</artifactId>
+	    <version>3.4.2</version>
+	</dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
