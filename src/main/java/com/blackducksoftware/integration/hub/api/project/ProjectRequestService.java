@@ -28,9 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.restlet.data.CharacterSet;
-import org.restlet.data.MediaType;
-import org.restlet.representation.StringRepresentation;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.HubRequest;
@@ -83,13 +80,9 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
 
     public String createHubProject(final String projectName) throws HubIntegrationException {
         final ProjectItem newProject = new ProjectItem(null, projectName, null, false, 1, SourceEnum.CUSTOM);
-        final StringRepresentation stringRepresentation = new StringRepresentation(getRestConnection().getGson().toJson(newProject));
-        stringRepresentation.setMediaType(MediaType.APPLICATION_JSON);
-        stringRepresentation.setCharacterSet(CharacterSet.UTF_8);
-
         final HubRequest projectItemRequest = getHubRequestFactory().createPostRequest(PROJECTS_SEGMENTS);
         String location = null;
-        location = projectItemRequest.executePost(stringRepresentation);
+        location = projectItemRequest.executePost(getRestConnection().getGson().toJson(newProject));
         return location;
     }
 

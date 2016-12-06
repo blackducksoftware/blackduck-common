@@ -24,11 +24,6 @@ package com.blackducksoftware.integration.hub.api.report;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.restlet.data.CharacterSet;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.representation.StringRepresentation;
-
 import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
@@ -76,22 +71,16 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
 
         final HubRequest hubRequest = new HubRequest(getRestConnection());
 
-        hubRequest.setMethod(Method.POST);
         hubRequest.setUrl(getVersionReportLink(version));
 
-        final StringRepresentation stringRep = new StringRepresentation(getRestConnection().getGson().toJson(json));
-        stringRep.setMediaType(MediaType.APPLICATION_JSON);
-        stringRep.setCharacterSet(CharacterSet.UTF_8);
-        final String location = hubRequest.executePost(stringRep);
+        final String location = hubRequest.executePost(getRestConnection().getGson().toJson(json));
 
         return location;
     }
 
     public void deleteHubReport(final String reportUrl) throws HubIntegrationException {
         final HubRequest hubRequest = new HubRequest(getRestConnection());
-        hubRequest.setMethod(Method.DELETE);
         hubRequest.setUrl(reportUrl);
-
         hubRequest.executeDelete();
     }
 
@@ -103,7 +92,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
     public VersionReport getReportContent(final String reportContentUrl) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(reportContentUrl);
 
-        final JsonObject json = hubRequest.executeForResponseJson();
+        final JsonObject json = hubRequest.executeGetForResponseJson();
         final JsonElement content = json.get("reportContent");
         final JsonArray reportConentArray = content.getAsJsonArray();
         final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
@@ -161,7 +150,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
 
     /**
      * Assumes the BOM has already been updated
-     * 
+     *
      * @throws HubIntegrationException
      */
     public HubRiskReportData generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,

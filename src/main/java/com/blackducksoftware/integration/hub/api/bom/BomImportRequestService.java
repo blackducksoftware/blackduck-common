@@ -25,15 +25,14 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_BOM_IMPORT;
 
 import java.io.File;
-import java.util.AbstractMap.SimpleEntry;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.restlet.data.MediaType;
-import org.restlet.representation.FileRepresentation;
+import org.apache.commons.io.FileUtils;
 
+import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
@@ -46,10 +45,12 @@ public class BomImportRequestService extends HubRequestService {
     }
 
     public void importBomFile(final File file, final String mediaType) throws HubIntegrationException {
-        final Set<SimpleEntry<String, String>> queryParameters = new HashSet<>();
-        final FileRepresentation content = new FileRepresentation(file, new MediaType(mediaType));
-
-        getRestConnection().httpPostFromRelativeUrl(BOM_IMPORT_SEGMENTS, queryParameters, content);
+        try {
+            final HubRequest hubRequest = getHubRequestFactory().createPostRequest(BOM_IMPORT_SEGMENTS);
+            hubRequest.executePost(mediaType, FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new HubIntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub with Error : " + e.getMessage(), e);
+        }
     }
 
 }

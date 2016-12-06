@@ -24,9 +24,6 @@ package com.blackducksoftware.integration.hub.api.project.version;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.restlet.data.CharacterSet;
-import org.restlet.data.MediaType;
-import org.restlet.representation.StringRepresentation;
 
 import com.blackducksoftware.integration.hub.api.HubPagedRequest;
 import com.blackducksoftware.integration.hub.api.HubRequest;
@@ -77,11 +74,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
 
         final HubRequest hubRequest = getHubRequestFactory().createPostRequest(versionsUrl);
 
-        final StringRepresentation stringRepresentation = new StringRepresentation(getRestConnection().getGson().toJson(newRelease));
-        stringRepresentation.setMediaType(MediaType.APPLICATION_JSON);
-        stringRepresentation.setCharacterSet(CharacterSet.UTF_8);
-
-        final String location = hubRequest.executePost(stringRepresentation);
+        final String location = hubRequest.executePost(getRestConnection().getGson().toJson(newRelease));
 
         return location;
     }

@@ -31,18 +31,18 @@ public class HubRequestService {
 
     public String getString(List<String> urlSegments) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(urlSegments);
-        final String s = hubRequest.executeForResponseString();
+        final String s = hubRequest.executeGetForResponseString();
         return s;
     }
 
     public JsonObject getJsonObject(List<String> urlSegments) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(urlSegments);
-        final JsonObject jsonObject = hubRequest.executeForResponseJson();
+        final JsonObject jsonObject = hubRequest.executeGetForResponseJson();
         return jsonObject;
     }
 
     public <T> T getItem(final HubRequest hubRequest, Class<T> clazz) throws HubIntegrationException {
-        final String response = hubRequest.executeForResponseString();
+        final String response = hubRequest.executeGetForResponseString();
         return getRestConnection().getGson().fromJson(response, clazz);
     }
 
