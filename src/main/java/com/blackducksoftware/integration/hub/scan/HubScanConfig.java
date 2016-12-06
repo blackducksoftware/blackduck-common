@@ -22,6 +22,7 @@
 package com.blackducksoftware.integration.hub.scan;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -44,10 +45,6 @@ public class HubScanConfig {
 
     private final File workingDirectory;
 
-    private final boolean shouldGenerateRiskReport;
-
-    private final int maxWaitTimeForBomUpdate;
-
     private final int scanMemory;
 
     private final ImmutableList<String> scanTargetPaths;
@@ -64,7 +61,6 @@ public class HubScanConfig {
 
     public HubScanConfig(final String projectName, final String version, final String phase,
             final String distribution, final File workingDirectory, final int scanMemory,
-            final boolean shouldGenerateRiskReport, final int maxWaitTimeForBomUpdate,
             final ImmutableList<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
             final String thirdPartyVersion,
             final String pluginVersion) {
@@ -73,8 +69,6 @@ public class HubScanConfig {
         this.phase = phase;
         this.distribution = distribution;
         this.workingDirectory = workingDirectory;
-        this.shouldGenerateRiskReport = shouldGenerateRiskReport;
-        this.maxWaitTimeForBomUpdate = maxWaitTimeForBomUpdate;
         this.scanMemory = scanMemory;
         this.scanTargetPaths = scanTargetPaths;
         this.dryRun = dryRun;
@@ -102,18 +96,6 @@ public class HubScanConfig {
 
     public File getWorkingDirectory() {
         return workingDirectory;
-    }
-
-    public boolean isShouldGenerateRiskReport() {
-        return shouldGenerateRiskReport;
-    }
-
-    public int getMaxWaitTimeForBomUpdate() {
-        return maxWaitTimeForBomUpdate;
-    }
-
-    public long getMaxWaitTimeForBomUpdateInMilliseconds() {
-        return maxWaitTimeForBomUpdate * 60 * 1000;
     }
 
     public int getScanMemory() {
@@ -145,7 +127,11 @@ public class HubScanConfig {
     }
 
     public void print(final IntLogger logger) {
-        logger.alwaysLog("--> Using Working Directory : " + getWorkingDirectory().getAbsolutePath());
+        try {
+            logger.alwaysLog("--> Using Working Directory : " + getWorkingDirectory().getCanonicalPath());
+        } catch (final IOException e) {
+            logger.alwaysLog("Extremely unlikely exception getting the canonical path: " + e.getMessage());
+        }
         logger.alwaysLog(
                 "--> Using Hub Project Name : " + getProjectName() + ", Version : " + getVersion());
 
@@ -159,9 +145,6 @@ public class HubScanConfig {
         }
         logger.alwaysLog("--> Scan Memory : " + getScanMemory());
         logger.alwaysLog("--> Dry Run : " + isDryRun());
-
-        logger.alwaysLog("--> Should Generate Report : " + isShouldGenerateRiskReport());
-        logger.alwaysLog("--> Maximum wait time for Bom Update (s) : " + getMaxWaitTimeForBomUpdate());
     }
 
     @Override

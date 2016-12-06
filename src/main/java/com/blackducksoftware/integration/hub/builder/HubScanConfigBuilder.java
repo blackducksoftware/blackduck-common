@@ -56,10 +56,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
 
     private File workingDirectory;
 
-    private boolean shouldGenerateRiskReport;
-
-    private String maxWaitTimeForBomUpdate;
-
     private String scanMemory;
 
     private final Set<String> scanTargetPaths = new HashSet<>();
@@ -76,6 +72,10 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
 
     private boolean disableScanTargetPathExistenceCheck;
 
+    public HubScanConfigBuilder() {
+        super(false);
+    }
+
     public HubScanConfigBuilder(final boolean shouldUseDefaultValues) {
         super(shouldUseDefaultValues);
     }
@@ -87,8 +87,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
                 .addAll(scanTargetPaths).build();
 
         result.setConstructedObject(new HubScanConfig(projectName, version, phase, distribution, workingDirectory,
-                NumberUtils.toInt(scanMemory), shouldGenerateRiskReport, NumberUtils.toInt(maxWaitTimeForBomUpdate),
-                immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion));
+                NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion));
 
         return result;
     }
@@ -100,10 +99,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
         validateProjectAndVersion(result);
 
         validateScanMemory(result, DEFAULT_MEMORY_IN_MEGABYTES);
-
-        validateShouldGenerateRiskReport(result);
-
-        validateMaxWaitTimeForBomUpdate(result, DEFAULT_BOM_UPDATE_WAIT_TIME_IN_MINUTES);
 
         validateScanTargetPaths(result, workingDirectory);
 
@@ -166,52 +161,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
         }
     }
 
-    public void validateShouldGenerateRiskReport(
-            final ValidationResults<HubScanConfigFieldEnum, HubScanConfig> result) {
-        if (!dryRun && (projectName == null || version == null) && shouldGenerateRiskReport) {
-            result.addResult(HubScanConfigFieldEnum.GENERATE_RISK_REPORT, new ValidationResult(ValidationResultEnum.ERROR,
-                    "To generate the Risk Report, you need to provide a Project name or version."));
-        }
-    }
-
-    public void validateMaxWaitTimeForBomUpdate(final ValidationResults<HubScanConfigFieldEnum, HubScanConfig> result) {
-        validateMaxWaitTimeForBomUpdate(result, null);
-    }
-
-    private void validateMaxWaitTimeForBomUpdate(final ValidationResults<HubScanConfigFieldEnum, HubScanConfig> result,
-            final Integer defaultMaxWaitTime) {
-        if (!dryRun) {
-            if (shouldUseDefaultValues() && defaultMaxWaitTime != null) {
-                final int maxWaitTime = NumberUtils.toInt(maxWaitTimeForBomUpdate);
-                if (maxWaitTime <= 0) {
-                    maxWaitTimeForBomUpdate = String.valueOf(defaultMaxWaitTime);
-                }
-                return;
-            }
-            if (StringUtils.isBlank(maxWaitTimeForBomUpdate)) {
-                result.addResult(HubScanConfigFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE, new ValidationResult(
-                        ValidationResultEnum.ERROR, "No maximum wait time for the Bom Update found."));
-                return;
-            }
-            int maxWaitTime = -1;
-            try {
-                maxWaitTime = stringToInteger(maxWaitTimeForBomUpdate);
-            } catch (final IllegalArgumentException e) {
-                result.addResult(HubScanConfigFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
-                        new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
-                return;
-            }
-            if (maxWaitTime <= 0) {
-                result.addResult(HubScanConfigFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
-                        new ValidationResult(ValidationResultEnum.ERROR,
-                                "The maximum wait time for the BOM Update must be greater than 0."));
-            } else if (maxWaitTime < 2) {
-                result.addResult(HubScanConfigFieldEnum.MAX_WAIT_TIME_FOR_BOM_UPDATE,
-                        new ValidationResult(ValidationResultEnum.WARN, "This wait time may be too short."));
-            }
-        }
-    }
-
     /**
      * If running this validation outside of a Build, make sure you run
      * disableScanTargetPathExistenceCheck() because the targets may not exist
@@ -253,7 +202,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
                     String targetCanonicalPath;
                     try {
                         targetCanonicalPath = target.getCanonicalPath();
-                        if (!targetCanonicalPath.startsWith(workingDirectory.getAbsolutePath())) {
+                        if (!targetCanonicalPath.startsWith(workingDirectory.getCanonicalPath())) {
                             result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(
                                     ValidationResultEnum.ERROR, "Can not scan targets outside the working directory."));
                         }
@@ -298,23 +247,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfigFieldEnum
 
     public void setDistribution(final String distribution) {
         this.distribution = distribution;
-    }
-
-    public void setShouldGenerateRiskReport(final boolean shouldGenerateRiskReport) {
-        this.shouldGenerateRiskReport = shouldGenerateRiskReport;
-    }
-
-    public void setShouldGenerateRiskReport(final String shouldGenerateRiskReport) {
-        final boolean shouldGenerateRiskReportValue = Boolean.valueOf(shouldGenerateRiskReport);
-        setShouldGenerateRiskReport(shouldGenerateRiskReportValue);
-    }
-
-    public void setMaxWaitTimeForBomUpdate(final int maxWaitTimeForBomUpdate) {
-        setMaxWaitTimeForBomUpdate(String.valueOf(maxWaitTimeForBomUpdate));
-    }
-
-    public void setMaxWaitTimeForBomUpdate(final String maxWaitTimeForBomUpdate) {
-        this.maxWaitTimeForBomUpdate = maxWaitTimeForBomUpdate;
     }
 
     public void setScanMemory(final int scanMemory) {
