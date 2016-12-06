@@ -42,13 +42,13 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
-import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.VulnerableBomComponentRequestService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
 import com.blackducksoftware.integration.hub.dataservice.extension.ExtensionConfigDataService;
 import com.blackducksoftware.integration.hub.dataservice.notification.NotificationDataService;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyNotificationFilter;
+import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
 import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
@@ -86,7 +86,11 @@ public class HubServicesFactory {
 
     public CLIDataService createCLIDataService(final IntLogger logger) {
         return new CLIDataService(logger, restConnection, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
-                createHubRegistrationRequestService());
+                createPhoneHomeDataService(logger));
+    }
+
+    public PhoneHomeDataService createPhoneHomeDataService(final IntLogger logger) {
+        return new PhoneHomeDataService(logger, restConnection, createHubRegistrationRequestService());
     }
 
     public RiskReportDataService createRiskReportDataService(final IntLogger logger) {
@@ -179,10 +183,6 @@ public class HubServicesFactory {
 
     public ExtensionUserOptionRequestService createExtensionUserOptionRequestService() {
         return new ExtensionUserOptionRequestService(restConnection);
-    }
-
-    public VulnerableBomComponentRequestService createVulnerableBomComponentRequestService() {
-        return new VulnerableBomComponentRequestService(restConnection);
     }
 
     public CLIDownloadService createCliDownloadService(IntLogger logger) {
