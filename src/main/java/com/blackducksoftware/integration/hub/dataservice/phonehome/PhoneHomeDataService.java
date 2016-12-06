@@ -25,7 +25,6 @@ import com.blackducksoftware.integration.phone.home.exception.PhoneHomeArgumentE
 import com.blackducksoftware.integration.phone.home.exception.PhoneHomeConnectionException;
 
 public class PhoneHomeDataService extends HubRequestService {
-
     private final IntLogger logger;
 
     private final HubRegistrationRequestService hubRegistrationRequestService;
@@ -58,7 +57,6 @@ public class PhoneHomeDataService extends HubRequestService {
                     hubServerConfig.getProxyInfo().getIgnoredProxyHosts());
             phClient.callHomeIntegrations(registrationId, hubHostName, BlackDuckName.HUB, hubVersion, hubScanConfig.getThirdPartyName(),
                     hubScanConfig.getThirdPartyVersion(), hubScanConfig.getPluginVersion());
-
         } catch (final PhoneHomeArgumentException e) {
             logger.debug(e.getMessage(), e);
         } catch (final PhoneHomeConnectionException e) {
