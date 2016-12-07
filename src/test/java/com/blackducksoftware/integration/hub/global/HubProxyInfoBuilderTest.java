@@ -407,7 +407,6 @@ public class HubProxyInfoBuilderTest {
         expectedException.expect(IllegalStateException.class);
 
         final HubProxyInfo proxyInfo = builder.build();
-
         assertNotNull(proxyInfo);
         assertNull(proxyInfo.getHost());
         assertEquals(-512431, proxyInfo.getPort());
