@@ -76,7 +76,13 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     public HubServerConfig buildObject() {
         URL hubURL = null;
         try {
-            hubURL = new URL(hubUrl);
+            String tempUrl = hubUrl;
+            if (!tempUrl.endsWith("/")) {
+                hubURL = new URL(tempUrl);
+            } else {
+                tempUrl = tempUrl.substring(0, tempUrl.length() - 1);
+                hubURL = new URL(tempUrl);
+            }
         } catch (final MalformedURLException e) {
         }
         final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo);
@@ -224,5 +230,4 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
         this.ignoredProxyHosts = ignoredProxyHosts;
     }
-
 }

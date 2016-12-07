@@ -203,6 +203,7 @@ public class HubServerConfigBuilderTest {
         builder.setTimeout(120);
         builder.setPassword("password");
         builder.setUsername("username");
+        builder.build();
     }
 
     @Test
@@ -212,6 +213,7 @@ public class HubServerConfigBuilderTest {
         builder.setTimeout("120");
         builder.setPassword("password");
         builder.setUsername("username");
+        builder.build();
     }
 
     @Test
@@ -226,5 +228,35 @@ public class HubServerConfigBuilderTest {
         builder.setUsername(VALID_PROXY_USERNAME);
         builder.setPassword(VALID_PROXY_PASSWORD);
         builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
+        builder.build();
+    }
+
+    @Test
+    public void testUrlwithTrailingSlash() {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setHubUrl("https://www.google.com:443/");
+        builder.setTimeout("120");
+        builder.setPassword("password");
+        builder.setUsername("username");
+        final HubServerConfig config = builder.build();
+        assertFalse(config.getHubUrl().toString().endsWith("/"));
+        assertEquals("https", config.getHubUrl().getProtocol());
+        assertEquals("www.google.com", config.getHubUrl().getHost());
+        assertEquals(443, config.getHubUrl().getPort());
+    }
+
+    @Test
+    public void testUrlwithTrailingPath() {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setHubUrl("https://github.com:443/blackducksoftware");
+        builder.setTimeout("120");
+        builder.setPassword("password");
+        builder.setUsername("username");
+        final HubServerConfig config = builder.build();
+        assertFalse(config.getHubUrl().toString().endsWith("/"));
+        assertEquals("https", config.getHubUrl().getProtocol());
+        assertEquals("github.com", config.getHubUrl().getHost());
+        assertEquals(443, config.getHubUrl().getPort());
+        assertEquals("/blackducksoftware", config.getHubUrl().getPath());
     }
 }

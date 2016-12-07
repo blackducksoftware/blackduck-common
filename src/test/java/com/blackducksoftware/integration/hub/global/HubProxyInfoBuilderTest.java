@@ -418,7 +418,6 @@ public class HubProxyInfoBuilderTest {
     @Test
     public void testBuildWithEmptyInput() throws Exception {
         final HubProxyInfoBuilder builder = new HubProxyInfoBuilder();
-
         final HubProxyInfo proxyInfo = builder.build();
 
         assertNotNull(proxyInfo);
