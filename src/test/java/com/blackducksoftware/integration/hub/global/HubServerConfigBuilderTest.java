@@ -36,12 +36,23 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.builder.ValidationResults;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
+import com.blackducksoftware.integration.hub.validator.HubServerConfigValidator;
+import com.blackducksoftware.integration.validator.ValidationResults;
 
 public class HubServerConfigBuilderTest {
 
     private static final String ERROR_MSG_NO_HUB_TIMEOUT = "No Hub Timeout was found.";
+
+    private static final int VALID_PROXY_PORT = 2303;
+
+    private static final String VALID_PROXY_HOST = "just need a non-empty string";
+
+    private static final String VALID_PROXY_PASSWORD = "itsasecret";
+
+    private static final String VALID_PROXY_USERNAME = "memyselfandi";
+
+    private static final String VALID_IGNORE_HOST_LIST = "google,msn,yahoo";
 
     private List<String> expectedMessages;
 
@@ -71,10 +82,10 @@ public class HubServerConfigBuilderTest {
         }
     }
 
-    private List<String> getMessages(final ValidationResults<GlobalFieldKey, HubServerConfig> result) {
+    private List<String> getMessages(final ValidationResults result) {
         final List<String> messageList = new ArrayList<>();
-        final Map<GlobalFieldKey, Set<String>> resultMap = result.getResultMap();
-        for (final GlobalFieldKey key : resultMap.keySet()) {
+        final Map<Object, Set<String>> resultMap = result.getResultMap();
+        for (final Object key : resultMap.keySet()) {
             final Set<String> resultList = resultMap.get(key);
 
             for (final String item : resultList) {
@@ -88,11 +99,11 @@ public class HubServerConfigBuilderTest {
 
     @Test
     public void testValidateHubURLEmpty() throws Exception {
-        expectedMessages.add(HubServerConfigBuilder.ERROR_MSG_URL_NOT_FOUND);
+        expectedMessages.add(HubServerConfigValidator.ERROR_MSG_URL_NOT_FOUND);
 
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
-        builder.validateHubUrl(result);
+        final HubServerConfigValidator validator = new HubServerConfigValidator();
+        final ValidationResults result = new ValidationResults();
+        validator.validateHubUrl(result);
         assertFalse(result.isSuccess());
 
         actualMessages = getMessages(result);
@@ -100,12 +111,12 @@ public class HubServerConfigBuilderTest {
 
     @Test
     public void testValidateHubURLMalformed() throws Exception {
-        expectedMessages.add(HubServerConfigBuilder.ERROR_MSG_URL_NOT_VALID);
+        expectedMessages.add(HubServerConfigValidator.ERROR_MSG_URL_NOT_VALID);
 
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl("TestString");
-        final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
-        builder.validateHubUrl(result);
+        final HubServerConfigValidator validator = new HubServerConfigValidator();
+        validator.setHubUrl("TestString");
+        final ValidationResults result = new ValidationResults();
+        validator.validateHubUrl(result);
         assertFalse(result.isSuccess());
 
         actualMessages = getMessages(result);
@@ -113,12 +124,12 @@ public class HubServerConfigBuilderTest {
 
     @Test
     public void testValidateHubURLMalformed2() throws Exception {
-        expectedMessages.add(HubServerConfigBuilder.ERROR_MSG_URL_NOT_VALID_PREFIX);
+        expectedMessages.add(HubServerConfigValidator.ERROR_MSG_URL_NOT_VALID_PREFIX);
 
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl("http:TestString");
-        final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
-        builder.validateHubUrl(result);
+        final HubServerConfigValidator validator = new HubServerConfigValidator();
+        validator.setHubUrl("http:TestString");
+        final ValidationResults result = new ValidationResults();
+        validator.validateHubUrl(result);
         assertFalse(result.isSuccess());
 
         actualMessages = getMessages(result);
@@ -126,12 +137,12 @@ public class HubServerConfigBuilderTest {
 
     @Test
     public void testValidateHubURLNotExisting() throws Exception {
-        expectedMessages.add(HubServerConfigBuilder.ERROR_MSG_UNREACHABLE_PREFIX);
+        expectedMessages.add(HubServerConfigValidator.ERROR_MSG_UNREACHABLE_PREFIX);
 
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl("http://TestString");
-        final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
-        builder.validateHubUrl(result);
+        final HubServerConfigValidator validator = new HubServerConfigValidator();
+        validator.setHubUrl("http://TestString");
+        final ValidationResults result = new ValidationResults();
+        validator.validateHubUrl(result);
         assertFalse(result.isSuccess());
 
         actualMessages = getMessages(result);
@@ -139,10 +150,10 @@ public class HubServerConfigBuilderTest {
 
     @Test
     public void testValidateHubURL() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl("https://www.google.com");
-        final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
-        builder.validateHubUrl(result);
+        final HubServerConfigValidator validator = new HubServerConfigValidator();
+        validator.setHubUrl("https://www.google.com");
+        final ValidationResults result = new ValidationResults();
+        validator.validateHubUrl(result);
         assertTrue(result.isSuccess());
 
         actualMessages = getMessages(result);
@@ -152,9 +163,9 @@ public class HubServerConfigBuilderTest {
     public void testValidateHubTimeoutEmpty() throws Exception {
         expectedMessages.add(ERROR_MSG_NO_HUB_TIMEOUT);
 
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
-        builder.validateTimeout(result);
+        final HubServerConfigValidator validator = new HubServerConfigValidator();
+        final ValidationResults result = new ValidationResults();
+        validator.validateTimeout(result);
         assertFalse(result.isSuccess());
 
         actualMessages = getMessages(result);
@@ -164,10 +175,10 @@ public class HubServerConfigBuilderTest {
     public void testValidateHubTimeoutInvalid() throws Exception {
         expectedMessages.add("The String : TestString , is not an Integer");
 
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setTimeout("TestString");
-        final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
-        builder.validateTimeout(result);
+        final HubServerConfigValidator validator = new HubServerConfigValidator();
+        validator.setTimeout("TestString");
+        final ValidationResults result = new ValidationResults();
+        validator.validateTimeout(result);
         assertFalse(result.isSuccess());
 
         actualMessages = getMessages(result);
@@ -176,13 +187,44 @@ public class HubServerConfigBuilderTest {
     @Test
     public void testValidateHubTimeout() throws Exception {
 
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setTimeout("678");
-        final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
-        builder.validateTimeout(result);
+        final HubServerConfigValidator validator = new HubServerConfigValidator();
+        validator.setTimeout("678");
+        final ValidationResults result = new ValidationResults();
+        validator.validateTimeout(result);
         assertTrue(result.isSuccess());
 
         actualMessages = getMessages(result);
     }
 
+    @Test
+    public void testValidBuild() {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setHubUrl("https://www.google.com");
+        builder.setTimeout(120);
+        builder.setPassword("password");
+        builder.setUsername("username");
+    }
+
+    @Test
+    public void testValidBuildTimeourString() {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setHubUrl("https://www.google.com");
+        builder.setTimeout("120");
+        builder.setPassword("password");
+        builder.setUsername("username");
+    }
+
+    @Test
+    public void testValidBuildWithProxy() {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setHubUrl("https://www.google.com");
+        builder.setTimeout("120");
+        builder.setPassword("password");
+        builder.setUsername("username");
+        builder.setProxyHost(VALID_PROXY_HOST);
+        builder.setProxyPort(VALID_PROXY_PORT);
+        builder.setUsername(VALID_PROXY_USERNAME);
+        builder.setPassword(VALID_PROXY_PASSWORD);
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
+    }
 }
