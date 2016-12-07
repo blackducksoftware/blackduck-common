@@ -24,11 +24,11 @@ package com.blackducksoftware.integration.hub.api.report;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
+import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 import com.blackducksoftware.integration.log.IntLogger;

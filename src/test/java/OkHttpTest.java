@@ -22,9 +22,14 @@ public class OkHttpTest {
     @Test
     public void testConnection() throws Exception {
         HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
-        builder.setHubUrl("http://int-hub01.dc1.lan:8080");
+        // builder.setHubUrl("http://int-hub01.dc1.lan:8080");
+        builder.setHubUrl("https://hub-beta.blackducksoftware.com");
         builder.setUsername("sysadmin");
         builder.setPassword("blackduck");
+        builder.setProxyHost("qasslproxy");
+        builder.setProxyPort(3129);
+        builder.setProxyUsername("bds");
+        builder.setProxyPassword("blackduck");
         HubServerConfig config = builder.build();
 
         CredentialsRestConnection restConnection = new CredentialsRestConnection(config);

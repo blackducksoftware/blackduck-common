@@ -25,11 +25,11 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubPagedRequest;
-import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.item.HubPagedResponse;
 import com.blackducksoftware.integration.hub.api.item.ParameterizedListType;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.request.HubPagedRequest;
+import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 

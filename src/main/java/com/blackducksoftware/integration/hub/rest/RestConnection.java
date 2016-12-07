@@ -40,7 +40,6 @@ import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import okhttp3.FormBody;
@@ -162,6 +161,21 @@ public abstract class RestConnection {
         builder.readTimeout(timeout, TimeUnit.SECONDS);
         if (getHubProxyInfo() != null) {
             builder.proxy(getHubProxyInfo().getProxy(httpUrl.url()));
+            String password;
+            try {
+                password = getHubProxyInfo().getDecryptedPassword();
+                if (StringUtils.isNotBlank(getHubProxyInfo().getUsername()) && StringUtils.isNotBlank(password)) {
+                    builder.proxyAuthenticator(
+                            new com.blackducksoftware.integration.hub.proxy.bak.ProxyAuthenticator(getHubProxyInfo().getUsername(),
+                                    password));
+                    // AuthenticatorUtil.resetAuthenticator();
+                    // AuthenticatorUtil.setAuthenticator(getHubProxyInfo().getUsername(), password);
+                    // builder.proxyAuthenticator(new JavaNetAuthenticator());
+                }
+
+            } catch (Exception e) {
+                throw new HubIntegrationException(e.getMessage(), e);
+            }
         }
     }
 
@@ -213,14 +227,6 @@ public abstract class RestConnection {
         Response response = client.newCall(request).execute();
         logResponseHeaders(response);
         return response;
-    }
-
-    private <T> T parseResponse(final Class<T> modelClass, final Response response) throws IOException {
-        final String responseString = response.body().string();
-        final JsonParser parser = new JsonParser();
-        final JsonObject json = parser.parse(responseString).getAsJsonObject();
-        final T modelObject = gson.fromJson(json, modelClass);
-        return modelObject;
     }
 
     private void logMessage(final LogLevel level, final String txt) {

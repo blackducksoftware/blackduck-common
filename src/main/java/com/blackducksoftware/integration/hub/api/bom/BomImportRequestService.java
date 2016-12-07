@@ -32,8 +32,8 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
-import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 

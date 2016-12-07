@@ -19,7 +19,7 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api;
+package com.blackducksoftware.integration.hub.request;
 
 import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_LIMIT;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_OFFSET;
