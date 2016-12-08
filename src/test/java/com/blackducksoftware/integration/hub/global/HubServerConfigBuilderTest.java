@@ -42,6 +42,16 @@ import com.blackducksoftware.integration.validator.ValidationResults;
 
 public class HubServerConfigBuilderTest {
 
+    private static final String VALID_TIMEOUT_STRING = "120";
+
+    private static final String VALID_USERNAME_STRING = "username";
+
+    private static final String VALID_PASSWORD_STRING = "password";
+
+    private static final int VALID_TIMEOUT_INTEGER = 120;
+
+    private static final String VALID_URL = "https://www.google.com";
+
     private static final String ERROR_MSG_NO_HUB_TIMEOUT = "No Hub Timeout was found.";
 
     private static final int VALID_PROXY_PORT = 2303;
@@ -151,7 +161,7 @@ public class HubServerConfigBuilderTest {
     @Test
     public void testValidateHubURL() throws Exception {
         final HubServerConfigValidator validator = new HubServerConfigValidator();
-        validator.setHubUrl("https://www.google.com");
+        validator.setHubUrl(VALID_URL);
         final ValidationResults result = new ValidationResults();
         validator.validateHubUrl(result);
         assertTrue(result.isSuccess());
@@ -221,47 +231,66 @@ public class HubServerConfigBuilderTest {
     }
 
     @Test
-    public void testValidBuild() {
+    public void testValidBuild() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl("https://www.google.com");
-        builder.setTimeout(120);
-        builder.setPassword("password");
-        builder.setUsername("username");
-        builder.build();
+        builder.setHubUrl(VALID_URL);
+        builder.setTimeout(VALID_TIMEOUT_INTEGER);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
+        final HubServerConfig config = builder.build();
+        assertEquals(VALID_URL, config.getHubUrl().toString());
+        assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
+        assertEquals(VALID_USERNAME_STRING, config.getGlobalCredentials().getUsername());
+        assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
     }
 
     @Test
-    public void testValidBuildTimeourString() {
+    public void testValidBuildTimeourString() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl("https://www.google.com");
-        builder.setTimeout("120");
-        builder.setPassword("password");
-        builder.setUsername("username");
-        builder.build();
+        builder.setHubUrl(VALID_URL);
+        builder.setTimeout(VALID_TIMEOUT_STRING);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
+        final HubServerConfig config = builder.build();
+
+        assertEquals(VALID_URL, config.getHubUrl().toString());
+        assertEquals(120, config.getTimeout());
+        assertEquals(VALID_USERNAME_STRING, config.getGlobalCredentials().getUsername());
+        assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
     }
 
     @Test
-    public void testValidBuildWithProxy() {
+    public void testValidBuildWithProxy() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl("https://www.google.com");
-        builder.setTimeout("120");
-        builder.setPassword("password");
-        builder.setUsername("username");
+        builder.setHubUrl(VALID_URL);
+        builder.setTimeout(VALID_TIMEOUT_STRING);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
         builder.setProxyHost(VALID_PROXY_HOST);
         builder.setProxyPort(VALID_PROXY_PORT);
-        builder.setUsername(VALID_PROXY_USERNAME);
-        builder.setPassword(VALID_PROXY_PASSWORD);
+        builder.setProxyUsername(VALID_PROXY_USERNAME);
+        builder.setProxyPassword(VALID_PROXY_PASSWORD);
         builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-        builder.build();
+        final HubServerConfig config = builder.build();
+
+        assertEquals(VALID_URL, config.getHubUrl().toString());
+        assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
+        assertEquals(VALID_USERNAME_STRING, config.getGlobalCredentials().getUsername());
+        assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
+        assertEquals(VALID_PROXY_HOST, config.getProxyInfo().getHost());
+        assertEquals(VALID_PROXY_PORT, config.getProxyInfo().getPort());
+        assertEquals(VALID_PROXY_USERNAME, config.getProxyInfo().getUsername());
+        assertEquals(VALID_PROXY_PASSWORD, config.getProxyInfo().getDecryptedPassword());
+        assertEquals(VALID_IGNORE_HOST_LIST, config.getProxyInfo().getIgnoredProxyHosts());
     }
 
     @Test
-    public void testUrlwithTrailingSlash() {
+    public void testUrlwithTrailingSlash() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         builder.setHubUrl("https://www.google.com:443/");
-        builder.setTimeout("120");
-        builder.setPassword("password");
-        builder.setUsername("username");
+        builder.setTimeout(VALID_TIMEOUT_STRING);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
         final HubServerConfig config = builder.build();
         assertFalse(config.getHubUrl().toString().endsWith("/"));
         assertEquals("https", config.getHubUrl().getProtocol());
@@ -273,9 +302,9 @@ public class HubServerConfigBuilderTest {
     public void testUrlwithTrailingPath() {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         builder.setHubUrl("https://github.com:443/blackducksoftware");
-        builder.setTimeout("120");
-        builder.setPassword("password");
-        builder.setUsername("username");
+        builder.setTimeout(VALID_TIMEOUT_STRING);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
         final HubServerConfig config = builder.build();
         assertFalse(config.getHubUrl().toString().endsWith("/"));
         assertEquals("https", config.getHubUrl().getProtocol());
