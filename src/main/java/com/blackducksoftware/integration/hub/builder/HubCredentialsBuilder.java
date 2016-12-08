@@ -38,14 +38,6 @@ public class HubCredentialsBuilder extends AbstractBuilder<HubCredentials> {
 
     private int passwordLength;
 
-    public HubCredentialsBuilder() {
-        this(false);
-    }
-
-    public HubCredentialsBuilder(final boolean shouldUseDefaultValues) {
-        super(shouldUseDefaultValues);
-    }
-
     @Override
     public HubCredentials buildObject() {
 

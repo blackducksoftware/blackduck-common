@@ -43,14 +43,6 @@ public class HubProxyInfoBuilder extends AbstractBuilder<HubProxyInfo> {
 
     private String ignoredProxyHosts;
 
-    public HubProxyInfoBuilder() {
-        super(false);
-    }
-
-    public HubProxyInfoBuilder(final boolean shouldUseDefaultValues) {
-        super(shouldUseDefaultValues);
-    }
-
     @Override
     public HubProxyInfo buildObject() throws IllegalArgumentException {
         HubProxyInfo proxyInfo = null;

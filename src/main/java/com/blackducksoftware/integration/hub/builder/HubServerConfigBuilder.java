@@ -60,14 +60,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
     private String ignoredProxyHosts;
 
-    public HubServerConfigBuilder() {
-        this(false);
-    }
-
-    public HubServerConfigBuilder(final boolean shouldUseDefaultValues) {
-        super(shouldUseDefaultValues);
-    }
-
     @Override
     public HubServerConfig buildObject() {
         URL hubURL = null;
