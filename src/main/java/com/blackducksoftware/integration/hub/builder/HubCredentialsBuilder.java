@@ -24,16 +24,13 @@ package com.blackducksoftware.integration.hub.builder;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.builder.AbstractBuilder;
-import com.blackducksoftware.integration.builder.ValidationResult;
-import com.blackducksoftware.integration.builder.ValidationResultEnum;
-import com.blackducksoftware.integration.builder.ValidationResults;
 import com.blackducksoftware.integration.encryption.PasswordEncrypter;
 import com.blackducksoftware.integration.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.global.GlobalFieldKey;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
-import com.blackducksoftware.integration.hub.global.HubCredentialsFieldEnum;
+import com.blackducksoftware.integration.hub.validator.HubCredentialsValidator;
+import com.blackducksoftware.integration.validator.AbstractValidator;
 
-public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCredentials> {
+public class HubCredentialsBuilder extends AbstractBuilder<HubCredentials> {
 
     private String username;
 
@@ -42,7 +39,7 @@ public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCr
     private int passwordLength;
 
     public HubCredentialsBuilder() {
-        super(false);
+        this(false);
     }
 
     public HubCredentialsBuilder(final boolean shouldUseDefaultValues) {
@@ -50,8 +47,8 @@ public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCr
     }
 
     @Override
-    public ValidationResults<GlobalFieldKey, HubCredentials> buildResults() {
-        final ValidationResults<GlobalFieldKey, HubCredentials> result = assertValid();
+    public HubCredentials buildObject() {
+
         HubCredentials creds = null;
         if (StringUtils.isNotBlank(password) && passwordLength == 0) {
             // Password needs to be encrypted
@@ -59,8 +56,7 @@ public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCr
             try {
                 encryptedPassword = PasswordEncrypter.encrypt(password);
             } catch (final EncryptionException e) {
-                result.addResult(HubCredentialsFieldEnum.PASSWORD,
-                        new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
+                throw new IllegalArgumentException(e);
             }
             creds = new HubCredentials(username, encryptedPassword, password.length());
         } else {
@@ -68,38 +64,15 @@ public class HubCredentialsBuilder extends AbstractBuilder<GlobalFieldKey, HubCr
             // values given to us
             creds = new HubCredentials(username, password, passwordLength);
         }
-
-        result.setConstructedObject(creds);
-        return result;
+        return creds;
     }
 
     @Override
-    public ValidationResults<GlobalFieldKey, HubCredentials> assertValid() {
-        final ValidationResults<GlobalFieldKey, HubCredentials> result = new ValidationResults<>();
-
-        validateCredentials(result);
-
-        return result;
-    }
-
-    public void validateCredentials(final ValidationResults<GlobalFieldKey, HubCredentials> result) {
-
-        validateUsername(result);
-        validatePassword(result);
-    }
-
-    public void validateUsername(final ValidationResults<GlobalFieldKey, HubCredentials> result) {
-        if (StringUtils.isBlank(username)) {
-            result.addResult(HubCredentialsFieldEnum.USERNAME,
-                    new ValidationResult(ValidationResultEnum.ERROR, "No Hub Username was found."));
-        }
-    }
-
-    public void validatePassword(final ValidationResults<GlobalFieldKey, HubCredentials> result) {
-        if (StringUtils.isBlank(password)) {
-            result.addResult(HubCredentialsFieldEnum.PASSWORD,
-                    new ValidationResult(ValidationResultEnum.ERROR, "No Hub Password was found."));
-        }
+    public AbstractValidator createValidator() {
+        final HubCredentialsValidator validator = new HubCredentialsValidator();
+        validator.setUsername(getUsername());
+        validator.setPassword(getPassword());
+        return validator;
     }
 
     public String getUsername() {

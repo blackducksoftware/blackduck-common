@@ -21,38 +21,21 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.builder;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.builder.AbstractBuilder;
-import com.blackducksoftware.integration.builder.ValidationResult;
-import com.blackducksoftware.integration.builder.ValidationResultEnum;
-import com.blackducksoftware.integration.builder.ValidationResults;
-import com.blackducksoftware.integration.hub.global.GlobalFieldKey;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
-import com.blackducksoftware.integration.hub.global.HubProxyInfoFieldEnum;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
-import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
+import com.blackducksoftware.integration.hub.validator.HubServerConfigValidator;
+import com.blackducksoftware.integration.validator.AbstractValidator;
 
-public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubServerConfig> {
-    public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
-
-    public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
-
-    public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
-
-    public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
-
-    public static final String ERROR_MSG_AUTHENTICATED_PROXY_WITH_HTTPS = "Using an authenticated proxy to connect to an http Hub server is not supported.";
-
+public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
 
     private String hubUrl;
@@ -77,12 +60,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
 
     private String ignoredProxyHosts;
 
-    HubProxyInfo proxyInfo;
-
-    HubCredentials credentials;
-
     public HubServerConfigBuilder() {
-        super(false);
+        this(false);
     }
 
     public HubServerConfigBuilder(final boolean shouldUseDefaultValues) {
@@ -90,163 +69,51 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
     }
 
     @Override
-    public ValidationResults<GlobalFieldKey, HubServerConfig> buildResults() {
-        final ValidationResults<GlobalFieldKey, HubServerConfig> result = assertValid();
-
+    public HubServerConfig buildObject() {
         URL hubURL = null;
         try {
-            hubURL = new URL(hubUrl);
+            String tempUrl = hubUrl;
+            if (!tempUrl.endsWith("/")) {
+                hubURL = new URL(tempUrl);
+            } else {
+                tempUrl = tempUrl.substring(0, tempUrl.length() - 1);
+                hubURL = new URL(tempUrl);
+            }
         } catch (final MalformedURLException e) {
         }
+
+        final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder();
+        credentialsBuilder.setUsername(getUsername());
+        credentialsBuilder.setPassword(getPassword());
+        credentialsBuilder.setPasswordLength(getPasswordLength());
+        final HubCredentials credentials = credentialsBuilder.build();
+
+        final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
+        proxyBuilder.setHost(getProxyHost());
+        proxyBuilder.setPort(getProxyPort());
+        proxyBuilder.setIgnoredProxyHosts(getIgnoredProxyHosts());
+        proxyBuilder.setUsername(getProxyUsername());
+        proxyBuilder.setPassword(getProxyPassword());
+        proxyBuilder.setPasswordLength(getProxyPasswordLength());
+        final HubProxyInfo proxyInfo = proxyBuilder.build();
         final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo);
-        result.setConstructedObject(config);
-        return result;
+        return config;
     }
 
     @Override
-    public ValidationResults<GlobalFieldKey, HubServerConfig> assertValid() {
-        final ValidationResults<GlobalFieldKey, HubProxyInfo> proxyResult = assertProxyValid();
-        final ValidationResults<GlobalFieldKey, HubCredentials> credentialResult = assertCredentialsValid();
-        final ValidationResults<GlobalFieldKey, HubServerConfig> result = new ValidationResults<>();
-        result.addAllResultsStrings(proxyResult.getResultMap(), proxyResult.getValidationStatus());
-        result.addAllResultsStrings(credentialResult.getResultMap(), credentialResult.getValidationStatus());
-        validateHubUrl(result);
-        if (shouldUseDefaultValues()) {
-            validateTimeout(result, DEFAULT_TIMEOUT_SECONDS);
-        } else {
-            validateTimeout(result, null);
-        }
-        return result;
-    }
-
-    public ValidationResults<GlobalFieldKey, HubProxyInfo> assertProxyValid() {
-        ValidationResults<GlobalFieldKey, HubProxyInfo> result = null;
-        final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder(shouldUseDefaultValues());
-        proxyBuilder.setHost(proxyHost);
-        proxyBuilder.setPort(proxyPort);
-        proxyBuilder.setIgnoredProxyHosts(ignoredProxyHosts);
-        proxyBuilder.setUsername(proxyUsername);
-        proxyBuilder.setPassword(proxyPassword);
-        if (proxyPasswordLength > 0) {
-            proxyBuilder.setPasswordLength(proxyPasswordLength);
-        }
-        result = proxyBuilder.buildResults();
-        proxyInfo = result.getConstructedObject();
-        return result;
-    }
-
-    public ValidationResults<GlobalFieldKey, HubCredentials> assertCredentialsValid() {
-        ValidationResults<GlobalFieldKey, HubCredentials> result = null;
-        final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder(shouldUseDefaultValues());
-        credentialsBuilder.setUsername(username);
-        credentialsBuilder.setPassword(password);
-        if (passwordLength > 0) {
-            credentialsBuilder.setPasswordLength(passwordLength);
-        }
-        result = credentialsBuilder.buildResults();
-        credentials = result.getConstructedObject();
-        return result;
-    }
-
-    public void validateHubUrl(final ValidationResults<GlobalFieldKey, HubServerConfig> result) {
-        assertProxyValid();
-        if (hubUrl == null) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL,
-                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_FOUND));
-            return;
-        }
-
-        URL hubURL = null;
-        try {
-            hubURL = new URL(hubUrl);
-            hubURL.toURI();
-        } catch (final MalformedURLException e) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL,
-                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
-        } catch (final URISyntaxException e) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL,
-                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
-        }
-
-        if (hubURL == null) {
-            return;
-        }
-
-        try {
-            URLConnection connection = null;
-            if (proxyInfo != null) {
-                if (!hubURL.getProtocol().equals("https") && proxyInfo.getUsername() != null
-                        && proxyInfo.getEncryptedPassword() != null) {
-                    result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
-                            new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_AUTHENTICATED_PROXY_WITH_HTTPS));
-                    return;
-                }
-                connection = proxyInfo.openConnection(hubURL);
-            } else {
-                connection = hubURL.openConnection();
-            }
-            final int timeoutIntMillisec = 1000 * stringToNonNegativeInteger(timeoutSeconds);
-            connection.setConnectTimeout(timeoutIntMillisec);
-            connection.setReadTimeout(timeoutIntMillisec);
-            connection.getContent();
-        } catch (final IOException ioe) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL,
-                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, ioe));
-            return;
-        } catch (final RuntimeException e) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL,
-                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl, e));
-            return;
-        }
-    }
-
-    private int stringToNonNegativeInteger(final String intString) {
-        try {
-            final int intValue = stringToInteger(intString);
-            if (intValue < 0) {
-                return 0;
-            }
-            return intValue;
-        } catch (final Exception e) {
-            return 0;
-        }
-    }
-
-    public void validateTimeout(final ValidationResults<GlobalFieldKey, HubServerConfig> result) {
-        validateTimeout(result, null);
-    }
-
-    private void validateTimeout(final ValidationResults<GlobalFieldKey, HubServerConfig> result,
-            final Integer defaultTimeoutSeconds) {
-        if (shouldUseDefaultValues() && defaultTimeoutSeconds != null) {
-            int timeoutToValidate = 0;
-            try {
-                timeoutToValidate = stringToInteger(timeoutSeconds);
-            } catch (final IllegalArgumentException e) {
-                timeoutSeconds = String.valueOf(defaultTimeoutSeconds);
-            }
-            if (timeoutToValidate <= 0) {
-                timeoutSeconds = String.valueOf(defaultTimeoutSeconds);
-            }
-            return;
-        }
-        if (StringUtils.isBlank(timeoutSeconds)) {
-            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
-                    new ValidationResult(ValidationResultEnum.ERROR, "No Hub Timeout was found."));
-            return;
-        }
-        int timeoutToValidate = 0;
-        try {
-            timeoutToValidate = stringToInteger(timeoutSeconds);
-        } catch (final IllegalArgumentException e) {
-            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
-                    new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
-            return;
-        }
-        if (timeoutToValidate <= 0) {
-            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
-                    new ValidationResult(ValidationResultEnum.ERROR, "The Timeout must be greater than 0."));
-        }
+    public AbstractValidator createValidator() {
+        final HubServerConfigValidator validator = new HubServerConfigValidator();
+        validator.setHubUrl(getHubUrl());
+        validator.setUsername(getUsername());
+        validator.setPassword(getPassword());
+        validator.setTimeout(getTimeout());
+        validator.setProxyHost(getProxyHost());
+        validator.setProxyPort(getProxyPort());
+        validator.setIgnoredProxyHosts(getIgnoredProxyHosts());
+        validator.setProxyUsername(getProxyUsername());
+        validator.setProxyPassword(getProxyPassword());
+        validator.setProxyPasswordLength(getProxyPasswordLength());
+        return validator;
     }
 
     public void setFromProperties(Properties properties) {
@@ -374,5 +241,4 @@ public class HubServerConfigBuilder extends AbstractBuilder<GlobalFieldKey, HubS
     public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
         this.ignoredProxyHosts = ignoredProxyHosts;
     }
-
 }
