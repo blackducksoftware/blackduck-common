@@ -64,9 +64,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private boolean disableScanTargetPathExistenceCheck;
 
-    public HubScanConfigBuilder() {
-    }
-
     @Override
     public HubScanConfig buildObject() {
         HubScanConfig config = null;
