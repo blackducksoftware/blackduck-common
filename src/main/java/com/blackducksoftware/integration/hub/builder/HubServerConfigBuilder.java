@@ -60,10 +60,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
     private String ignoredProxyHosts;
 
-    HubProxyInfo proxyInfo;
-
-    HubCredentials credentials;
-
     public HubServerConfigBuilder() {
         this(false);
     }
@@ -85,6 +81,21 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
             }
         } catch (final MalformedURLException e) {
         }
+
+        final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder();
+        credentialsBuilder.setUsername(getUsername());
+        credentialsBuilder.setPassword(getPassword());
+        credentialsBuilder.setPasswordLength(getPasswordLength());
+        final HubCredentials credentials = credentialsBuilder.build();
+
+        final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
+        proxyBuilder.setHost(getProxyHost());
+        proxyBuilder.setPort(getProxyPort());
+        proxyBuilder.setIgnoredProxyHosts(getIgnoredProxyHosts());
+        proxyBuilder.setUsername(getProxyUsername());
+        proxyBuilder.setPassword(getProxyPassword());
+        proxyBuilder.setPasswordLength(getProxyPasswordLength());
+        final HubProxyInfo proxyInfo = proxyBuilder.build();
         final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo);
         return config;
     }
