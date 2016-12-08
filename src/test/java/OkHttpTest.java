@@ -1,6 +1,11 @@
+import java.util.List;
+
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
@@ -22,8 +27,8 @@ public class OkHttpTest {
     @Test
     public void testConnection() throws Exception {
         HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
-        // builder.setHubUrl("http://int-hub01.dc1.lan:8080");
-        builder.setHubUrl("https://hub-beta.blackducksoftware.com");
+        builder.setHubUrl("http://int-hub01.dc1.lan:8080");
+        // builder.setHubUrl("https://hub-beta.blackducksoftware.com");
         builder.setUsername("sysadmin");
         builder.setPassword("blackduck");
         builder.setProxyHost("qasslproxy");
@@ -36,9 +41,11 @@ public class OkHttpTest {
         restConnection.connect();
 
         ProjectRequestService requestService = new ProjectRequestService(restConnection);
-
-        System.out.println(requestService.getAllProjects());
-
+        List<ProjectItem> projects = requestService.getAllProjects();
+        System.out.println(projects);
+        ProjectVersionRequestService versionService = new ProjectVersionRequestService(restConnection);
+        List<ProjectVersionItem> versions = versionService.getAllProjectVersions(projects.get(0));
+        System.out.println(versions);
     }
 
 }

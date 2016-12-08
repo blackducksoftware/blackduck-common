@@ -166,13 +166,9 @@ public abstract class RestConnection {
                 password = getHubProxyInfo().getDecryptedPassword();
                 if (StringUtils.isNotBlank(getHubProxyInfo().getUsername()) && StringUtils.isNotBlank(password)) {
                     builder.proxyAuthenticator(
-                            new com.blackducksoftware.integration.hub.proxy.bak.ProxyAuthenticator(getHubProxyInfo().getUsername(),
+                            new com.blackducksoftware.integration.hub.proxy.ProxyAuthenticator(getHubProxyInfo().getUsername(),
                                     password));
-                    // AuthenticatorUtil.resetAuthenticator();
-                    // AuthenticatorUtil.setAuthenticator(getHubProxyInfo().getUsername(), password);
-                    // builder.proxyAuthenticator(new JavaNetAuthenticator());
                 }
-
             } catch (Exception e) {
                 throw new HubIntegrationException(e.getMessage(), e);
             }

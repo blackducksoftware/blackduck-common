@@ -1,15 +1,19 @@
 
-package com.blackducksoftware.integration.hub.proxy.bak;
+package com.blackducksoftware.integration.hub.proxy;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.impl.auth.DigestScheme;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicHttpRequest;
+import org.apache.http.protocol.BasicHttpContext;
 
 import okhttp3.Authenticator;
 import okhttp3.Challenge;
@@ -41,17 +45,11 @@ public class ProxyAuthenticator implements Authenticator {
 
     private final String password;
 
-    private String lastNonce;
-
-    private long nounceCount;
-
     private String realm;
 
     private String nonce;
 
     private String qop;
-
-    private boolean stale;
 
     private String a1;
 
@@ -59,26 +57,13 @@ public class ProxyAuthenticator implements Authenticator {
 
     private boolean proxy;
 
+    private boolean basicAuth;
+
+    private boolean digestAuth;
+
     public ProxyAuthenticator(String username, String password) {
         this.username = username;
         this.password = password;
-    }
-
-    protected void parseChallenge(
-            final String buffer, int pos, int len, Map<String, String> params) {
-        HeaderValueParser parser = HeaderValueParser.INSTANCE;
-        ParserCursor cursor = new ParserCursor(pos, buffer.length());
-        CharArrayBuffer buf = new CharArrayBuffer(len);
-        buf.append(buffer);
-
-        HeaderElement[] elements = parser.parseElements(buf, cursor);
-        if (elements.length == 0) {
-            throw new IllegalArgumentException("Authentication challenge is empty");
-        }
-
-        for (HeaderElement element : elements) {
-            params.put(element.getName(), element.getValue());
-        }
     }
 
     @Override
@@ -86,33 +71,25 @@ public class ProxyAuthenticator implements Authenticator {
         if (route.proxy() != null) {
             setProxy(true);
         }
-        if (isBasicAuth(response)) {
+        checkAuthScheme(response);
+        if (isBasicAuth()) {
             return authenticateBasic(response);
         }
-        if (isDigestAuth(response)) {
+        if (isDigestAuth()) {
             return authenticateDigest(response);
         }
         return null;
     }
 
-    private boolean isBasicAuth(Response response) {
+    private void checkAuthScheme(Response response) {
         List<Challenge> challenges = response.challenges();
         for (Challenge challenge : challenges) {
             if ("Basic".equalsIgnoreCase(challenge.scheme())) {
-                return true;
+                setBasicAuth(true);
+            } else if ("Digest".equalsIgnoreCase(challenge.scheme())) {
+                setDigestAuth(true);
             }
         }
-        return false;
-    }
-
-    private boolean isDigestAuth(Response response) {
-        String headerKey;
-        if (isProxy()) {
-            headerKey = PROXY_AUTH;
-        } else {
-            headerKey = WWW_AUTH;
-        }
-        return StringUtils.isNotBlank(findDigestHeader(response.headers(), headerKey));
     }
 
     public synchronized Request authenticateBasic(Response response) throws IOException {
@@ -122,16 +99,8 @@ public class ProxyAuthenticator implements Authenticator {
         } else {
             headerKey = WWW_AUTH_RESP;
         }
-
-        List<Challenge> challenges = response.challenges();
-        for (Challenge challenge : challenges) {
-            if ("Basic".equalsIgnoreCase(challenge.scheme())) {
-                String credential = Credentials.basic(username, password);
-                return response.request().newBuilder().header(headerKey, credential).build();
-            }
-
-        }
-        return null;
+        String credential = Credentials.basic(username, password);
+        return response.request().newBuilder().header(headerKey, credential).build();
     }
 
     public synchronized Request authenticateDigest(Response response) throws IOException {
@@ -143,8 +112,28 @@ public class ProxyAuthenticator implements Authenticator {
         }
         String digestHeader = findDigestHeader(response.headers(), headerKey);
         parseHeader(digestHeader);
-        String responseDigest = createDigestHeader(response, digestHeader);
+        // String responseDigest = createDigestHeader(response, digestHeader);
+        String responseDigest = authenticateWithDigestScheme(headerKey, digestHeader, response.request());
         return response.request().newBuilder().header(PROXY_AUTH_RESP, responseDigest).build();
+    }
+
+    public String authenticateWithDigestScheme(String headerKey, String headerValue, Request request) {
+        Header newDigestHeader = null;
+        try {
+            DigestScheme scheme = new DigestScheme();
+
+            BasicHeader header = new BasicHeader(headerKey, headerValue);
+            scheme.processChallenge(header);
+
+            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
+            BasicHttpRequest basicRequest = new BasicHttpRequest(request.method(), request.url().uri().toString());
+            BasicHttpContext context = new BasicHttpContext();
+            newDigestHeader = scheme.authenticate(credentials, basicRequest, context);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return newDigestHeader.getValue();
     }
 
     public String createDigestHeader(Response response, String digestHeader) {
@@ -212,7 +201,6 @@ public class ProxyAuthenticator implements Authenticator {
             buffer[i * 2] = HEXADECIMAL[high];
             buffer[(i * 2) + 1] = HEXADECIMAL[low];
         }
-
         return new String(buffer);
     }
 
@@ -240,8 +228,6 @@ public class ProxyAuthenticator implements Authenticator {
                 nonce = value;
             } else if (key.equalsIgnoreCase("qop")) {
                 qop = value;
-            } else if (key.equalsIgnoreCase("stale")) {
-                stale = Boolean.valueOf(value);
             }
         }
 
@@ -265,6 +251,22 @@ public class ProxyAuthenticator implements Authenticator {
 
     public void setProxy(boolean proxy) {
         this.proxy = proxy;
+    }
+
+    public boolean isBasicAuth() {
+        return basicAuth;
+    }
+
+    public void setBasicAuth(boolean basicAuth) {
+        this.basicAuth = basicAuth;
+    }
+
+    public boolean isDigestAuth() {
+        return digestAuth;
+    }
+
+    public void setDigestAuth(boolean digestAuth) {
+        this.digestAuth = digestAuth;
     }
 
 }
