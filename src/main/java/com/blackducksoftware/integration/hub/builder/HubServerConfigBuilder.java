@@ -61,11 +61,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     private String ignoredProxyHosts;
 
     public HubServerConfigBuilder() {
-        this(false);
-    }
-
-    public HubServerConfigBuilder(final boolean shouldUseDefaultValues) {
-        super(shouldUseDefaultValues);
+        timeoutSeconds = String.valueOf(DEFAULT_TIMEOUT_SECONDS);
     }
 
     @Override
