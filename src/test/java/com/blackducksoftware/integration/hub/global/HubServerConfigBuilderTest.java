@@ -185,10 +185,34 @@ public class HubServerConfigBuilderTest {
     }
 
     @Test
+    public void testValidateNegativeHubTimeout() throws Exception {
+        expectedMessages.add("The Timeout must be greater than 0.");
+        final HubServerConfigValidator validator = new HubServerConfigValidator();
+        validator.setTimeout(-678);
+        final ValidationResults result = new ValidationResults();
+        validator.validateTimeout(result);
+        assertFalse(result.isSuccess());
+
+        actualMessages = getMessages(result);
+    }
+
+    @Test
     public void testValidateHubTimeout() throws Exception {
 
         final HubServerConfigValidator validator = new HubServerConfigValidator();
         validator.setTimeout("678");
+        final ValidationResults result = new ValidationResults();
+        validator.validateTimeout(result);
+        assertTrue(result.isSuccess());
+
+        actualMessages = getMessages(result);
+    }
+
+    @Test
+    public void testValidateHubTimeoutInteger() throws Exception {
+
+        final HubServerConfigValidator validator = new HubServerConfigValidator();
+        validator.setTimeout(678);
         final ValidationResults result = new ValidationResults();
         validator.validateTimeout(result);
         assertTrue(result.isSuccess());
