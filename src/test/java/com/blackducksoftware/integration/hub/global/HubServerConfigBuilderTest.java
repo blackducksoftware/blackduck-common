@@ -268,8 +268,6 @@ public class HubServerConfigBuilderTest {
         builder.setUsername(VALID_USERNAME_STRING);
         builder.setProxyHost(VALID_PROXY_HOST);
         builder.setProxyPort(VALID_PROXY_PORT);
-        builder.setProxyUsername(VALID_PROXY_USERNAME);
-        builder.setProxyPassword(VALID_PROXY_PASSWORD);
         builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
         final HubServerConfig config = builder.build();
 
@@ -279,8 +277,6 @@ public class HubServerConfigBuilderTest {
         assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
         assertEquals(VALID_PROXY_HOST, config.getProxyInfo().getHost());
         assertEquals(VALID_PROXY_PORT, config.getProxyInfo().getPort());
-        assertEquals(VALID_PROXY_USERNAME, config.getProxyInfo().getUsername());
-        assertEquals(VALID_PROXY_PASSWORD, config.getProxyInfo().getDecryptedPassword());
         assertEquals(VALID_IGNORE_HOST_LIST, config.getProxyInfo().getIgnoredProxyHosts());
     }
 

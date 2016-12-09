@@ -133,7 +133,6 @@ public class HubServerConfigValidator extends AbstractValidator {
     }
 
     public void validateHubUrl(final ValidationResults result) {
-        assertProxyValid();
         if (hubUrl == null) {
             result.addResult(HubServerConfigFieldEnum.HUBURL,
                     new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_FOUND));
@@ -159,7 +158,7 @@ public class HubServerConfigValidator extends AbstractValidator {
         try {
             URLConnection connection = null;
             if (proxyInfo != null) {
-                if (!hubURL.getProtocol().equals("https") && proxyInfo.getUsername() != null
+                if (hubURL.getProtocol().equals("https") && proxyInfo.getUsername() != null
                         && proxyInfo.getEncryptedPassword() != null) {
                     result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
                             new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_AUTHENTICATED_PROXY_WITH_HTTPS));
