@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.restlet.data.Cookie;
-import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -46,8 +44,6 @@ import okhttp3.Response;
 public class CredentialsRestConnection extends RestConnection {
 
     private final HubServerConfig hubServerConfig;
-
-    private Series<Cookie> cookies;
 
     public CredentialsRestConnection(final HubServerConfig hubServerConfig) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         this(null, hubServerConfig);
@@ -104,7 +100,4 @@ public class CredentialsRestConnection extends RestConnection {
         }
     }
 
-    public Series<Cookie> getCookies() {
-        return cookies;
-    }
 }
