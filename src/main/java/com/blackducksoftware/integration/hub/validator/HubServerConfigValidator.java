@@ -33,7 +33,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
-import com.blackducksoftware.integration.hub.global.HubProxyInfoFieldEnum;
 import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 import com.blackducksoftware.integration.validator.ValidationResult;
@@ -49,8 +48,6 @@ public class HubServerConfigValidator extends AbstractValidator {
     public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
 
     public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
-
-    public static final String ERROR_MSG_AUTHENTICATED_PROXY_WITH_HTTPS = "Using an authenticated proxy to connect to an http Hub server is not supported.";
 
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
 
@@ -158,12 +155,6 @@ public class HubServerConfigValidator extends AbstractValidator {
         try {
             URLConnection connection = null;
             if (proxyInfo != null) {
-                if (hubURL.getProtocol().equals("https") && proxyInfo.getUsername() != null
-                        && proxyInfo.getEncryptedPassword() != null) {
-                    result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
-                            new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_AUTHENTICATED_PROXY_WITH_HTTPS));
-                    return;
-                }
                 connection = proxyInfo.openConnection(hubURL);
             } else {
                 connection = hubURL.openConnection();
