@@ -38,7 +38,6 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 
 import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -65,9 +64,8 @@ public class HubRequest {
     public JsonObject executeGetForResponseJson() throws HubIntegrationException {
         try {
             HttpUrl httpUrl = buildHttpUrl();
-            OkHttpClient client = restConnection.createClient(httpUrl);
             Request request = restConnection.createGetRequest(httpUrl);
-            Response response = restConnection.handleExecuteClientCall(client, request);
+            Response response = restConnection.handleExecuteClientCall(request);
             if (response.isSuccessful()) {
                 final String responseString = response.body().string();
                 final JsonObject jsonObject = restConnection.getJsonParser().parse(responseString).getAsJsonObject();
@@ -83,9 +81,8 @@ public class HubRequest {
     public String executeGetForResponseString() throws HubIntegrationException {
         try {
             HttpUrl httpUrl = buildHttpUrl();
-            OkHttpClient client = restConnection.createClient(httpUrl);
             Request request = restConnection.createGetRequest(httpUrl);
-            Response response = restConnection.handleExecuteClientCall(client, request);
+            Response response = restConnection.handleExecuteClientCall(request);
             if (response.isSuccessful()) {
                 return response.body().string();
             } else {
@@ -99,11 +96,10 @@ public class HubRequest {
     public String executePost(String content) throws HubIntegrationException {
         try {
             HttpUrl httpUrl = buildHttpUrl();
-            OkHttpClient client = restConnection.createClient(httpUrl);
             Request request = restConnection.createPostRequest(httpUrl, restConnection.createJsonRequestBody(content));
-            Response response = restConnection.handleExecuteClientCall(client, request);
+            Response response = restConnection.handleExecuteClientCall(request);
             if (response.isSuccessful()) {
-                return response.body().string();
+                return response.header("location");
             } else {
                 throw new HubIntegrationException("There was a problem posting this item : " + url + ". Error : " + response.message());
             }
@@ -115,11 +111,10 @@ public class HubRequest {
     public String executePost(String mediaType, String content) throws HubIntegrationException {
         try {
             HttpUrl httpUrl = buildHttpUrl();
-            OkHttpClient client = restConnection.createClient(httpUrl);
             Request request = restConnection.createPostRequest(httpUrl, restConnection.createJsonRequestBody(mediaType, content));
-            Response response = restConnection.handleExecuteClientCall(client, request);
+            Response response = restConnection.handleExecuteClientCall(request);
             if (response.isSuccessful()) {
-                return response.body().string();
+                return response.header("location");
             } else {
                 throw new HubIntegrationException("There was a problem posting this item : " + url + ". Error : " + response.message());
             }
@@ -131,9 +126,8 @@ public class HubRequest {
     public void executeDelete() throws HubIntegrationException {
         try {
             HttpUrl httpUrl = buildHttpUrl();
-            OkHttpClient client = restConnection.createClient(httpUrl);
             Request request = restConnection.createDeleteRequest(httpUrl);
-            Response response = restConnection.handleExecuteClientCall(client, request);
+            Response response = restConnection.handleExecuteClientCall(request);
             if (!response.isSuccessful()) {
                 throw new HubIntegrationException("There was a problem deleting this item : " + url + ". Error : " + response.message());
             }
@@ -150,7 +144,7 @@ public class HubRequest {
 
     private HttpUrl buildHttpUrl() throws HubIntegrationException {
         populateQueryParameters();
-        if (url == null) {
+        if (StringUtils.isBlank(url)) {
             url = restConnection.getBaseUrl().toString();
         }
         return restConnection.createHttpUrl(url, urlSegments, queryParameters);

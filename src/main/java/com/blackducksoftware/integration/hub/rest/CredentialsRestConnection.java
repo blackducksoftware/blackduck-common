@@ -37,7 +37,6 @@ import com.blackducksoftware.integration.log.IntLogger;
 
 import okhttp3.HttpUrl;
 import okhttp3.JavaNetCookieJar;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -66,6 +65,8 @@ public class CredentialsRestConnection extends RestConnection {
                 CookieManager cookieManager = new CookieManager();
                 cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
                 getBuilder().cookieJar(new JavaNetCookieJar(cookieManager));
+                setupClient();
+                setClient(getBuilder().build());
                 setCookies(username, password);
             } catch (IllegalArgumentException | EncryptionException e) {
                 throw new HubIntegrationException(e.getMessage(), e);
@@ -84,14 +85,13 @@ public class CredentialsRestConnection extends RestConnection {
             ArrayList<String> segments = new ArrayList<>();
             segments.add("j_spring_security_check");
             HttpUrl httpUrl = createHttpUrl(segments, null);
-            OkHttpClient client = createClient(httpUrl);
 
             Map<String, String> content = new HashMap<>();
             content.put("j_username", hubUserName);
             content.put("j_password", hubPassword);
 
             Request request = createPostRequest(httpUrl, createEncodedRequestBody(content));
-            Response response = handleExecuteClientCall(client, request);
+            Response response = handleExecuteClientCall(request);
             if (!response.isSuccessful()) {
                 throw new HubIntegrationException(response.message());
             }

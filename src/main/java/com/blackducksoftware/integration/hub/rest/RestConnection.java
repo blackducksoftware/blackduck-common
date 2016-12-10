@@ -70,6 +70,8 @@ public abstract class RestConnection {
 
     private final OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
+    private OkHttpClient client;
+
     private IntLogger logger;
 
     private int timeout = 120;
@@ -155,12 +157,12 @@ public abstract class RestConnection {
         return urlBuilder.build();
     }
 
-    protected void setupClient(HttpUrl httpUrl) throws HubIntegrationException {
+    protected void setupClient() throws HubIntegrationException {
         builder.connectTimeout(timeout, TimeUnit.SECONDS);
         builder.writeTimeout(timeout, TimeUnit.SECONDS);
         builder.readTimeout(timeout, TimeUnit.SECONDS);
         if (getHubProxyInfo() != null) {
-            builder.proxy(getHubProxyInfo().getProxy(httpUrl.url()));
+            builder.proxy(getHubProxyInfo().getProxy(getBaseUrl()));
             String password;
             try {
                 password = getHubProxyInfo().getDecryptedPassword();
@@ -173,11 +175,6 @@ public abstract class RestConnection {
                 throw new HubIntegrationException(e.getMessage(), e);
             }
         }
-    }
-
-    public OkHttpClient createClient(HttpUrl httpUrl) throws HubIntegrationException {
-        setupClient(httpUrl);
-        return builder.build();
     }
 
     public RequestBody createJsonRequestBody(String content) {
@@ -197,7 +194,11 @@ public abstract class RestConnection {
     }
 
     public Request createGetRequest(HttpUrl httpUrl) {
-        return new Request.Builder()
+        return createGetRequest(httpUrl, "application/json;");
+    }
+
+    public Request createGetRequest(HttpUrl httpUrl, String mediaType) {
+        return new Request.Builder().addHeader("Accept", mediaType)
                 .url(httpUrl).get().build();
     }
 
@@ -218,9 +219,9 @@ public abstract class RestConnection {
                 .url(httpUrl).delete().build();
     }
 
-    public Response handleExecuteClientCall(OkHttpClient client, Request request) throws IOException {
+    public Response handleExecuteClientCall(Request request) throws IOException {
         logRequestHeaders(request);
-        Response response = client.newCall(request).execute();
+        Response response = getClient().newCall(request).execute();
         logResponseHeaders(response);
         return response;
     }
@@ -265,13 +266,12 @@ public abstract class RestConnection {
         if (headers != null && headers.size() > 0) {
             logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
             for (Entry<String, List<String>> headerEntry : headers.toMultimap().entrySet()) {
-                logMessage(LogLevel.TRACE, "Header key : " + headerEntry.getKey());
+                String key = headerEntry.getKey();
+                String value = "null";
                 if (headerEntry.getValue() != null && !headerEntry.getValue().isEmpty()) {
-                    logMessage(LogLevel.TRACE, "Header value : " + StringUtils.join(headerEntry.getValue(), System.lineSeparator()));
-                } else {
-                    logMessage(LogLevel.TRACE, "Header value : null");
+                    value = StringUtils.join(headerEntry.getValue(), System.lineSeparator());
                 }
-                logMessage(LogLevel.TRACE, "");
+                logMessage(LogLevel.TRACE, String.format("Header %s : %s", key, value));
             }
         } else {
             logMessage(LogLevel.TRACE, requestOrResponseName + " does not have any headers.");
@@ -285,6 +285,14 @@ public abstract class RestConnection {
 
     protected OkHttpClient.Builder getBuilder() {
         return builder;
+    }
+
+    public OkHttpClient getClient() {
+        return client;
+    }
+
+    public void setClient(OkHttpClient client) {
+        this.client = client;
     }
 
     public URL getBaseUrl() {
