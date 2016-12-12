@@ -26,18 +26,19 @@ import static java.lang.ProcessBuilder.Redirect.PIPE;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.restlet.engine.io.IoUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
@@ -258,7 +259,8 @@ public class SimpleScanService extends HubRequestService {
             }
 
             splitOutputStream.flush();
-            logger.info(IoUtils.toString((hubCliProcess.getInputStream())));
+
+            logger.info(IOUtils.toString(hubCliProcess.getInputStream(), StandardCharsets.UTF_8));
 
             logger.info("Hub CLI return code : " + returnCode);
             logger.info("You can view the BlackDuck Scan CLI logs at : '" + logDirectory.getCanonicalPath() + "'");

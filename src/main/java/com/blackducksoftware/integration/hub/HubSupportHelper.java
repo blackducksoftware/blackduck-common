@@ -25,8 +25,6 @@ import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.restlet.resource.ResourceException;
-
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -68,17 +66,8 @@ public class HubSupportHelper implements Serializable {
             }
             setHasBeenChecked(true);
         } catch (final HubIntegrationException e) {
-            ResourceException resEx = null;
-            if (e.getCause() != null && e.getCause() instanceof ResourceException) {
-                resEx = (ResourceException) e.getCause();
-            }
-            if (resEx != null) {
-                if (logger != null) {
-                    logger.error(resEx.getMessage());
-                }
-            }
             if (logger != null) {
-                logger.error(e.getMessage());
+                logger.error(e.getMessage(), e);
             }
         }
     }
