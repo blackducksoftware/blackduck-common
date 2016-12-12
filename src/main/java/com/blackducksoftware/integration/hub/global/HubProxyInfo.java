@@ -27,9 +27,7 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.encryption.PasswordDecrypter;
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.util.AuthenticatorUtil;
+import com.blackducksoftware.integration.util.proxy.ProxyUtil;
 
 public class HubProxyInfo implements Serializable {
     private static final long serialVersionUID = -7476704373593358472L;
@@ -75,8 +74,8 @@ public class HubProxyInfo implements Serializable {
         if (StringUtils.isBlank(host) || port <= 0) {
             return false;
         }
-        final List<Pattern> ignoredProxyHostPatterns = getIgnoredProxyHostPatterns();
-        return !shouldIgnoreHost(url.getHost(), ignoredProxyHostPatterns);
+        final List<Pattern> ignoredProxyHostPatterns = ProxyUtil.getIgnoredProxyHostPatterns(ignoredProxyHosts);
+        return !ProxyUtil.shouldIgnoreHost(url.getHost(), ignoredProxyHostPatterns);
     }
 
     public void setDefaultAuthenticator() {
@@ -90,43 +89,6 @@ public class HubProxyInfo implements Serializable {
         } else {
             AuthenticatorUtil.resetAuthenticator();
         }
-    }
-
-    /**
-     * Checks the list of user defined host names that should be connected to
-     * directly and not go through the proxy. If the hostToMatch matches any of
-     * these hose names then this method returns true.
-     *
-     */
-    private boolean shouldIgnoreHost(final String hostToMatch, final List<Pattern> ignoredProxyHostPatterns) {
-        if (StringUtils.isBlank(hostToMatch) || ignoredProxyHostPatterns == null
-                || ignoredProxyHostPatterns.isEmpty()) {
-            return false;
-        }
-
-        for (final Pattern ignoredProxyHostPattern : ignoredProxyHostPatterns) {
-            final Matcher m = ignoredProxyHostPattern.matcher(hostToMatch);
-            return m.find();
-        }
-        return false;
-    }
-
-    private List<Pattern> getIgnoredProxyHostPatterns() {
-        final List<Pattern> ignoredProxyHostPatterns = new ArrayList<>();
-        if (StringUtils.isNotBlank(ignoredProxyHosts)) {
-            String[] ignoreHosts = null;
-            if (ignoredProxyHosts.contains(",")) {
-                ignoreHosts = ignoredProxyHosts.split(",");
-                for (final String ignoreHost : ignoreHosts) {
-                    final Pattern pattern = Pattern.compile(ignoreHost.trim());
-                    ignoredProxyHostPatterns.add(pattern);
-                }
-            } else {
-                final Pattern pattern = Pattern.compile(ignoredProxyHosts);
-                ignoredProxyHostPatterns.add(pattern);
-            }
-        }
-        return ignoredProxyHostPatterns;
     }
 
     @Override

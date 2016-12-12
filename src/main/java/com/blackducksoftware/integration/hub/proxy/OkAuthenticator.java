@@ -14,7 +14,7 @@ import okhttp3.Route;
 /**
  * Proxy authenticator which is the same code ripped out of okhttp-digest
  */
-public class ProxyAuthenticator implements Authenticator {
+public class OkAuthenticator implements Authenticator {
 
     public static final String PROXY_AUTH = "Proxy-Authenticate";
 
@@ -32,7 +32,7 @@ public class ProxyAuthenticator implements Authenticator {
 
     private boolean basicAuth;
 
-    public ProxyAuthenticator(String username, String password) {
+    public OkAuthenticator(String username, String password) {
         this.username = username;
         this.password = password;
     }
