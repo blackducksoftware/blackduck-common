@@ -40,9 +40,12 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
 
     private final IntLogger logger;
 
-    public ReportRequestService(final RestConnection restConnection, IntLogger logger) {
+    private final MetaService metaService;
+
+    public ReportRequestService(final RestConnection restConnection, IntLogger logger, MetaService metaService) {
         super(restConnection, ReportInformationItem.class);
         this.logger = logger;
+        this.metaService = metaService;
     }
 
     /**
@@ -171,7 +174,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
         final ReportInformationItem reportInfo = isReportFinishedGenerating(reportUrl,
                 maxWaitTime);
 
-        final String contentLink = MetaService.getLink(logger, reportInfo, MetaService.CONTENT_LINK);
+        final String contentLink = metaService.getLink(reportInfo, MetaService.CONTENT_LINK);
 
         if (contentLink == null) {
             throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
@@ -179,7 +182,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
 
         final HubRiskReportData hubRiskReportData = new HubRiskReportData();
         logger.debug("Getting the Report content.");
-        final VersionReport report = getReportContent(MetaService.getHref(logger, reportInfo));
+        final VersionReport report = getReportContent(metaService.getHref(reportInfo));
         hubRiskReportData.setReport(report);
         logger.debug("Finished retrieving the Report.");
 
@@ -190,7 +193,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
     }
 
     private String getVersionReportLink(final ProjectVersionItem version) throws HubIntegrationException {
-        final String versionLink = MetaService.getLink(logger, version, MetaService.VERSION_REPORT_LINK);
+        final String versionLink = metaService.getLink(version, MetaService.VERSION_REPORT_LINK);
         return versionLink;
     }
 

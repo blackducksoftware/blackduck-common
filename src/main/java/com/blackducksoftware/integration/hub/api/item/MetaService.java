@@ -68,10 +68,17 @@ public class MetaService {
 
     public static final String USER_OPTIONS_LINK = "user-options";
 
-    private static final JsonParser jsonParser = new JsonParser();
+    private final IntLogger logger;
 
-    public static String getLink(IntLogger logger, HubItem item, String linkKey) throws HubIntegrationException {
-        List<String> linkHrefs = getLinks(logger, item).get(linkKey);
+    private final JsonParser jsonParser;
+
+    public MetaService(IntLogger logger, JsonParser jsonParser) {
+        this.logger = logger;
+        this.jsonParser = jsonParser;
+    }
+
+    public String getLink(HubItem item, String linkKey) throws HubIntegrationException {
+        List<String> linkHrefs = getLinks(item).get(linkKey);
         if (linkHrefs.size() > 1) {
             if (logger != null) {
                 logger.error("Hub Item has multiple links for key : " + linkKey + " : " + item.getJson());
@@ -81,9 +88,9 @@ public class MetaService {
         return linkHrefs.get(0);
     }
 
-    public static Map<String, List<String>> getLinks(IntLogger logger, HubItem item) throws HubIntegrationException {
+    public Map<String, List<String>> getLinks(HubItem item) throws HubIntegrationException {
         Map<String, List<String>> links = new HashMap<>();
-        JsonObject metaJson = getMeta(logger, item);
+        JsonObject metaJson = getMeta(item);
         JsonElement linksElement = metaJson.get("links");
         if (linksElement == null) {
             if (logger != null) {
@@ -110,9 +117,9 @@ public class MetaService {
         return links;
     }
 
-    public static List<MetaAllowEnum> getAllowedMethods(IntLogger logger, HubItem item) throws HubIntegrationException {
+    public List<MetaAllowEnum> getAllowedMethods(HubItem item) throws HubIntegrationException {
         List<MetaAllowEnum> allows = new ArrayList<>();
-        JsonObject metaJson = getMeta(logger, item);
+        JsonObject metaJson = getMeta(item);
         JsonElement allowElement = metaJson.get("allow");
         if (allowElement == null) {
             if (logger != null) {
@@ -128,8 +135,8 @@ public class MetaService {
         return allows;
     }
 
-    public static String getHref(IntLogger logger, HubItem item) throws HubIntegrationException {
-        JsonObject metaJson = getMeta(logger, item);
+    public String getHref(HubItem item) throws HubIntegrationException {
+        JsonObject metaJson = getMeta(item);
         JsonElement hrefElement = metaJson.get("href");
         if (hrefElement == null) {
             if (logger != null) {
@@ -140,7 +147,7 @@ public class MetaService {
         return hrefElement.getAsString();
     }
 
-    private static JsonObject getMeta(IntLogger logger, HubItem item) throws HubIntegrationException {
+    private JsonObject getMeta(HubItem item) throws HubIntegrationException {
         String json = item.getJson();
         JsonElement element = jsonParser.parse(json);
         JsonObject jsonObject = element.getAsJsonObject();

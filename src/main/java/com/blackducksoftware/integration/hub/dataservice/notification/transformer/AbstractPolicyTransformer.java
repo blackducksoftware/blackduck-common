@@ -44,23 +44,23 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Polic
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
-import com.blackducksoftware.integration.log.IntLogger;
 
 public abstract class AbstractPolicyTransformer extends AbstractNotificationTransformer {
     private final PolicyNotificationFilter policyFilter;
 
-    private final IntLogger logger;
+    private final MetaService metaService;
 
     /**
      * policyFilter.size() == 0: match no rules
      * policyFilter == null: match all rules
      */
-    public AbstractPolicyTransformer(IntLogger logger, final NotificationRequestService notificationService,
+    public AbstractPolicyTransformer(final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
-            final VersionBomPolicyRequestService bomVersionPolicyService, HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter) {
+            final VersionBomPolicyRequestService bomVersionPolicyService, HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter,
+            MetaService metaService) {
         super(notificationService, projectVersionService, policyService, bomVersionPolicyService, hubRequestService);
         this.policyFilter = policyFilter;
-        this.logger = logger;
+        this.metaService = metaService;
     }
 
     public abstract void handleNotification(final List<ComponentVersionStatus> componentVersionList,
@@ -80,7 +80,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
                 if (StringUtils.isNotBlank(policyStatusUrl)) {
                     final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
                             policyStatusUrl);
-                    final Map<String, List<String>> policyRulesLink = MetaService.getLinks(logger, bomComponentVersionPolicyStatus);
+                    final Map<String, List<String>> policyRulesLink = metaService.getLinks(bomComponentVersionPolicyStatus);
                     List<String> ruleList = getRuleUrls(policyRulesLink.get(MetaService.POLICY_RULE_LINK));
 
                     ruleList = getMatchingRuleUrls(ruleList);
@@ -131,7 +131,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null
                 && !policyFilter.getRuleLinksToInclude().isEmpty()) {
             for (final PolicyRule ruleViolated : rulesViolated) {
-                String ruleHref = MetaService.getHref(logger, ruleViolated);
+                String ruleHref = metaService.getHref(ruleViolated);
                 if (policyFilter.getRuleLinksToInclude().contains(ruleHref)) {
                     filteredRules.add(ruleViolated);
                 }
@@ -208,8 +208,8 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
             List<PolicyRule> policyRuleList,
             NotificationItem item, List<NotificationContentItem> templateData) throws URISyntaxException;
 
-    public IntLogger getLogger() {
-        return logger;
+    public MetaService getMetaService() {
+        return metaService;
     }
 
 }

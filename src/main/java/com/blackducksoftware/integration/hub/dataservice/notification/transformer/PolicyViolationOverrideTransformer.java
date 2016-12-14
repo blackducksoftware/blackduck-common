@@ -46,15 +46,14 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Polic
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
-import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationOverrideTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationOverrideTransformer(IntLogger logger, final NotificationRequestService notificationService,
+    public PolicyViolationOverrideTransformer(final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
             final VersionBomPolicyRequestService bomVersionPolicyService,
-            HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter) {
-        super(logger, notificationService, projectVersionService, policyService, bomVersionPolicyService,
-                hubRequestService, policyFilter);
+            HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter, MetaService metaService) {
+        super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
+                hubRequestService, policyFilter, metaService);
     }
 
     @Override
@@ -107,7 +106,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
                 if (StringUtils.isNotBlank(policyStatusUrl)) {
                     final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(policyStatusUrl);
 
-                    final Map<String, List<String>> policyRulesLink = MetaService.getLinks(getLogger(), bomComponentVersionPolicyStatus);
+                    final Map<String, List<String>> policyRulesLink = getMetaService().getLinks(bomComponentVersionPolicyStatus);
                     List<String> ruleList = getRuleUrls(policyRulesLink.get(MetaService.POLICY_RULE_LINK));
 
                     ruleList = getMatchingRuleUrls(ruleList);

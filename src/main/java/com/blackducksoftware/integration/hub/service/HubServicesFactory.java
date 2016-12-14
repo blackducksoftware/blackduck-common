@@ -31,6 +31,7 @@ import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationReques
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
@@ -99,34 +100,35 @@ public class HubServicesFactory {
     }
 
     public PolicyStatusDataService createPolicyStatusDataService(final IntLogger logger) {
-        return new PolicyStatusDataService(logger, restConnection, createProjectRequestService(),
-                createProjectVersionRequestService(logger), createHubRequestService());
+        return new PolicyStatusDataService(restConnection, createProjectRequestService(),
+                createProjectVersionRequestService(logger), createHubRequestService(), createMetaService(logger));
     }
 
     public ScanStatusDataService createScanStatusDataService(final IntLogger logger) {
-        return new ScanStatusDataService(logger, restConnection, createProjectRequestService(), createProjectVersionRequestService(logger),
-                createCodeLocationRequestService(), createScanSummaryRequestService());
+        return new ScanStatusDataService(restConnection, createProjectRequestService(), createProjectVersionRequestService(logger),
+                createCodeLocationRequestService(), createScanSummaryRequestService(), createMetaService(logger));
     }
 
     public NotificationDataService createNotificationDataService(final IntLogger logger) {
         return new NotificationDataService(logger, restConnection, createNotificationRequestService(logger), createProjectVersionRequestService(logger),
-                createPolicyRequestService(), createVersionBomPolicyRequestService(), createHubRequestService());
+                createPolicyRequestService(), createVersionBomPolicyRequestService(), createHubRequestService(), createMetaService(logger));
     }
 
     public NotificationDataService createNotificationDataService(final IntLogger logger,
             final PolicyNotificationFilter policyNotificationFilter) {
         return new NotificationDataService(logger, restConnection, createNotificationRequestService(logger), createProjectVersionRequestService(logger),
-                createPolicyRequestService(), createVersionBomPolicyRequestService(), createHubRequestService(), policyNotificationFilter);
+                createPolicyRequestService(), createVersionBomPolicyRequestService(), createHubRequestService(), policyNotificationFilter,
+                createMetaService(logger));
     }
 
     public ExtensionConfigDataService createExtensionConfigDataService(final IntLogger logger) {
         return new ExtensionConfigDataService(logger, restConnection, createUserRequestService(),
-                createHubRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService());
+                createHubRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService(), createMetaService(logger));
     }
 
     public VulnerabilityDataService createVulnerabilityDataService(final IntLogger logger) {
-        return new VulnerabilityDataService(logger, restConnection, createComponentRequestService(), createHubRequestService(),
-                createVulnerabilityRequestService());
+        return new VulnerabilityDataService(restConnection, createComponentRequestService(), createHubRequestService(),
+                createVulnerabilityRequestService(), createMetaService(logger));
     }
 
     public BomImportRequestService createBomImportRequestService() {
@@ -146,7 +148,7 @@ public class HubServicesFactory {
     }
 
     public NotificationRequestService createNotificationRequestService(final IntLogger logger) {
-        return new NotificationRequestService(logger, restConnection);
+        return new NotificationRequestService(logger, restConnection, createMetaService(logger));
     }
 
     public PolicyRequestService createPolicyRequestService() {
@@ -158,7 +160,7 @@ public class HubServicesFactory {
     }
 
     public ProjectVersionRequestService createProjectVersionRequestService(final IntLogger logger) {
-        return new ProjectVersionRequestService(logger, restConnection);
+        return new ProjectVersionRequestService(restConnection, createMetaService(logger));
     }
 
     public ScanSummaryRequestService createScanSummaryRequestService() {
@@ -202,7 +204,11 @@ public class HubServicesFactory {
     }
 
     public ReportRequestService createReportRequestService(IntLogger logger) {
-        return new ReportRequestService(restConnection, logger);
+        return new ReportRequestService(restConnection, logger, createMetaService(logger));
+    }
+
+    public MetaService createMetaService(IntLogger logger) {
+        return new MetaService(logger, restConnection.getJsonParser());
     }
 
     public RestConnection getRestConnection() {

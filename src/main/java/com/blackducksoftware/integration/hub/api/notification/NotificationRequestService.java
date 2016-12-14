@@ -49,11 +49,11 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
 
     private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();
 
-    private final IntLogger logger;
+    private final MetaService metaService;
 
-    public NotificationRequestService(IntLogger logger, final RestConnection restConnection) {
+    public NotificationRequestService(IntLogger logger, final RestConnection restConnection, MetaService metaService) {
         super(restConnection, NotificationItem.class);
-        this.logger = logger;
+        this.metaService = metaService;
         typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);
         typeMap.put("RULE_VIOLATION", RuleViolationNotificationItem.class);
         typeMap.put("POLICY_OVERRIDE", PolicyOverrideNotificationItem.class);
@@ -79,7 +79,7 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
-        final String url = MetaService.getLink(logger, user, MetaService.NOTIFICATIONS_LINK);
+        final String url = metaService.getLink(user, MetaService.NOTIFICATIONS_LINK);
 
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, url);
         hubPagedRequest.addQueryParameter("startDate", startDateString);

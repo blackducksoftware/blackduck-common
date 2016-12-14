@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
@@ -41,15 +42,14 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Polic
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
-import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationTransformer(IntLogger logger, final NotificationRequestService notificationService,
+    public PolicyViolationTransformer(final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
             final VersionBomPolicyRequestService bomVersionPolicyService,
-            final HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter) {
-        super(logger, notificationService, projectVersionService, policyService, bomVersionPolicyService,
-                hubRequestService, policyFilter);
+            final HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter, MetaService metaService) {
+        super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
+                hubRequestService, policyFilter, metaService);
     }
 
     @Override
