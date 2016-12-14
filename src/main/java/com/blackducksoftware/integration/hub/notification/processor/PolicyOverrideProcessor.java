@@ -26,7 +26,6 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Notif
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.notification.processor.event.PolicyEvent;
 import com.blackducksoftware.integration.hub.notification.processor.event.PolicyOverrideEvent;
-import com.blackducksoftware.integration.hub.notification.processor.event.ProcessingAction;
 
 public class PolicyOverrideProcessor extends NotificationSubProcessor<PolicyEvent> {
 
@@ -38,12 +37,12 @@ public class PolicyOverrideProcessor extends NotificationSubProcessor<PolicyEven
     public void process(final NotificationContentItem notification) {
         final PolicyOverrideContentItem policyOverrideContentItem = (PolicyOverrideContentItem) notification;
         for (final PolicyRule rule : policyOverrideContentItem.getPolicyRuleList()) {
-            final PolicyOverrideEvent event = new PolicyOverrideEvent(ProcessingAction.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION,
+            final PolicyOverrideEvent event = new PolicyOverrideEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION,
                     policyOverrideContentItem, rule);
             if (getCache().hasEvent(event.getEventKey())) {
                 getCache().removeEvent(event);
             } else {
-                event.setAction(ProcessingAction.ADD);
+                event.setAction(ProcessingActionEnum.ADD);
                 event.setCategoryType(NotificationCategoryEnum.POLICY_VIOLATION_OVERRIDE);
                 getCache().addEvent(event);
             }

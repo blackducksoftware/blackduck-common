@@ -30,10 +30,11 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Polic
 import com.blackducksoftware.integration.hub.notification.processor.ItemEntry;
 import com.blackducksoftware.integration.hub.notification.processor.ItemTypeEnum;
 import com.blackducksoftware.integration.hub.notification.processor.NotificationCategoryEnum;
+import com.blackducksoftware.integration.hub.notification.processor.ProcessingActionEnum;
 
 public class PolicyOverrideEvent extends PolicyEvent {
 
-    public PolicyOverrideEvent(ProcessingAction action, NotificationCategoryEnum categoryType, PolicyOverrideContentItem notificationContent,
+    public PolicyOverrideEvent(ProcessingActionEnum action, NotificationCategoryEnum categoryType, PolicyOverrideContentItem notificationContent,
             PolicyRule policyRule) {
         super(action, categoryType, notificationContent, policyRule);
     }

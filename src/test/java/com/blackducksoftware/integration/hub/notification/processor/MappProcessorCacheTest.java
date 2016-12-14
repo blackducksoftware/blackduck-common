@@ -23,7 +23,6 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.notification.processor.event.PolicyEvent;
-import com.blackducksoftware.integration.hub.notification.processor.event.ProcessingAction;
 
 public class MappProcessorCacheTest {
 
@@ -34,7 +33,7 @@ public class MappProcessorCacheTest {
         final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
                 EventTestUtil.COMPONENT,
                 EventTestUtil.VERSION);
-        final PolicyEvent event = new PolicyEvent(ProcessingAction.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
+        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
 
         final List<PolicyEvent> eventList = new ArrayList<>();
         final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
@@ -61,8 +60,8 @@ public class MappProcessorCacheTest {
                 EventTestUtil.PROJECT_VERSION_NAME2,
                 EventTestUtil.COMPONENT2,
                 EventTestUtil.VERSION2);
-        final PolicyEvent event = new PolicyEvent(ProcessingAction.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
-        final PolicyEvent removeEvent = new PolicyEvent(ProcessingAction.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, removeItem,
+        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
+        final PolicyEvent removeEvent = new PolicyEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, removeItem,
                 removeItem.getPolicyRuleList().get(0));
         final List<PolicyEvent> eventList = new ArrayList<>();
         final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
@@ -94,8 +93,8 @@ public class MappProcessorCacheTest {
                 EventTestUtil.PROJECT_VERSION_NAME2,
                 EventTestUtil.COMPONENT2,
                 EventTestUtil.VERSION2);
-        final PolicyEvent event = new PolicyEvent(ProcessingAction.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
-        final PolicyEvent removeEvent = new PolicyEvent(ProcessingAction.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, removeItem,
+        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
+        final PolicyEvent removeEvent = new PolicyEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, removeItem,
                 removeItem.getPolicyRuleList().get(0));
         final List<PolicyEvent> eventList = new ArrayList<>();
         final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
@@ -127,8 +126,8 @@ public class MappProcessorCacheTest {
                 EventTestUtil.PROJECT_VERSION_NAME2,
                 EventTestUtil.COMPONENT2,
                 EventTestUtil.VERSION2);
-        final PolicyEvent event = new PolicyEvent(ProcessingAction.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
-        final PolicyEvent event2 = new PolicyEvent(ProcessingAction.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, item2,
+        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
+        final PolicyEvent event2 = new PolicyEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, item2,
                 item2.getPolicyRuleList().get(0));
         final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
 
@@ -151,8 +150,8 @@ public class MappProcessorCacheTest {
                 EventTestUtil.PROJECT_VERSION_NAME2,
                 EventTestUtil.COMPONENT2,
                 EventTestUtil.VERSION2);
-        final PolicyEvent event = new PolicyEvent(ProcessingAction.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
-        final PolicyEvent event2 = new PolicyEvent(ProcessingAction.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, item2,
+        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
+        final PolicyEvent event2 = new PolicyEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, item2,
                 item2.getPolicyRuleList().get(0));
         final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
 

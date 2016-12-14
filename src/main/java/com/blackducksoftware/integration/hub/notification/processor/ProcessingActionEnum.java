@@ -19,8 +19,8 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.notification.processor.event;
+package com.blackducksoftware.integration.hub.notification.processor;
 
-public enum ProcessingAction {
+public enum ProcessingActionEnum {
     ADD, REMOVE;
 }

@@ -22,7 +22,6 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.notification.processor.event.PolicyEvent;
-import com.blackducksoftware.integration.hub.notification.processor.event.ProcessingAction;
 
 public class ListProcessorCacheTest {
 
@@ -33,7 +32,7 @@ public class ListProcessorCacheTest {
         final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
                 EventTestUtil.COMPONENT,
                 EventTestUtil.VERSION);
-        final PolicyEvent event = new PolicyEvent(ProcessingAction.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
+        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
 
         final List<PolicyEvent> eventList = new ArrayList<>();
         final ListProcessorCache<PolicyEvent> cache = new ListProcessorCache<>();
@@ -57,8 +56,8 @@ public class ListProcessorCacheTest {
         final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
                 EventTestUtil.COMPONENT,
                 EventTestUtil.VERSION);
-        final PolicyEvent event = new PolicyEvent(ProcessingAction.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
-        final PolicyEvent removeEvent = new PolicyEvent(ProcessingAction.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item,
+        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
+        final PolicyEvent removeEvent = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item,
                 item.getPolicyRuleList().get(0));
         final List<PolicyEvent> eventList = new ArrayList<>();
         final ListProcessorCache<PolicyEvent> cache = new ListProcessorCache<>();
