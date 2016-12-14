@@ -63,6 +63,8 @@ public class NotificationDataService extends HubRequestService {
 
     private final ParallelResourceProcessor<NotificationContentItem, NotificationItem> parallelProcessor;
 
+    private final IntLogger logger;
+
     public NotificationDataService(IntLogger logger, RestConnection restConnection, NotificationRequestService notificationRequestService,
             ProjectVersionRequestService projectVersionRequestService, PolicyRequestService policyRequestService,
             VersionBomPolicyRequestService versionBomPolicyRequestService,
@@ -83,22 +85,22 @@ public class NotificationDataService extends HubRequestService {
         this.hubRequestService = hubRequestService;
         this.policyNotificationFilter = policyNotificationFilter;
         this.parallelProcessor = new ParallelResourceProcessor<>(logger);
-
+        this.logger = logger;
         populateTransformerMap();
     }
 
     private void populateTransformerMap() {
         parallelProcessor.addTransform(RuleViolationNotificationItem.class,
-                new PolicyViolationTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
+                new PolicyViolationTransformer(logger, notificationRequestService, projectVersionRequestService, policyRequestService,
                         versionBomPolicyRequestService, hubRequestService, policyNotificationFilter));
         parallelProcessor.addTransform(PolicyOverrideNotificationItem.class,
-                new PolicyViolationOverrideTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
+                new PolicyViolationOverrideTransformer(logger, notificationRequestService, projectVersionRequestService, policyRequestService,
                         versionBomPolicyRequestService, hubRequestService, policyNotificationFilter));
         parallelProcessor.addTransform(VulnerabilityNotificationItem.class,
                 new VulnerabilityTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
                         versionBomPolicyRequestService, hubRequestService));
         parallelProcessor.addTransform(RuleViolationClearedNotificationItem.class,
-                new PolicyViolationClearedTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
+                new PolicyViolationClearedTransformer(logger, notificationRequestService, projectVersionRequestService, policyRequestService,
                         versionBomPolicyRequestService, hubRequestService, policyNotificationFilter));
     }
 

@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationItem;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationTypeEnum;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
@@ -53,11 +54,14 @@ public class ScanStatusDataService extends HubRequestService {
 
     private final ScanSummaryRequestService scanSummaryRequestService;
 
-    public ScanStatusDataService(final RestConnection restConnection,
+    private final IntLogger logger;
+
+    public ScanStatusDataService(IntLogger logger, final RestConnection restConnection,
             final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
             final CodeLocationRequestService codeLocationRequestService,
             final ScanSummaryRequestService scanSummaryRequestService) {
         super(restConnection);
+        this.logger = logger;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.codeLocationRequestService = codeLocationRequestService;
@@ -183,7 +187,7 @@ public class ScanStatusDataService extends HubRequestService {
         try {
             final ProjectItem projectItem = projectRequestService.getProjectByName(projectName);
             final ProjectVersionItem projectVersionItem = projectVersionRequestService.getProjectVersion(projectItem, projectVersion);
-            final String projectVersionUrl = projectVersionItem.getMeta().getHref();
+            final String projectVersionUrl = MetaService.getHref(logger, projectVersionItem);
 
             final List<CodeLocationItem> allCodeLocations = codeLocationRequestService
                     .getAllCodeLocationsForCodeLocationType(CodeLocationTypeEnum.BOM_IMPORT);
@@ -192,7 +196,7 @@ public class ScanStatusDataService extends HubRequestService {
             for (final CodeLocationItem codeLocationItem : allCodeLocations) {
                 final String mappedProjectVersionUrl = codeLocationItem.getMappedProjectVersion();
                 if (projectVersionUrl.equals(mappedProjectVersionUrl)) {
-                    final String scanSummariesLink = codeLocationItem.getLink("scans");
+                    final String scanSummariesLink = MetaService.getLink(logger, codeLocationItem, MetaService.SCANS_LINK);
                     allScanSummariesLinks.add(scanSummariesLink);
                 }
             }
@@ -220,7 +224,7 @@ public class ScanStatusDataService extends HubRequestService {
     private List<ScanSummaryItem> getPendingScans(final List<ScanSummaryItem> scanSummaries) throws HubIntegrationException {
         final List<ScanSummaryItem> pendingScans = new ArrayList<>();
         for (final ScanSummaryItem scanSummaryItem : scanSummaries) {
-            final String scanSummaryLink = scanSummaryItem.getMeta().getHref();
+            final String scanSummaryLink = MetaService.getHref(logger, scanSummaryItem);
             final ScanSummaryItem currentScanSummaryItem = scanSummaryRequestService.getItem(scanSummaryLink);
             if (currentScanSummaryItem.getStatus().isPending()) {
                 pendingScans.add(currentScanSummaryItem);

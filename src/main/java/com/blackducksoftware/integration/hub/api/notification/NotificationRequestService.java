@@ -39,6 +39,7 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -48,9 +49,11 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
 
     private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();
 
-    public NotificationRequestService(final RestConnection restConnection) {
-        super(restConnection, NotificationItem.class);
+    private final IntLogger logger;
 
+    public NotificationRequestService(IntLogger logger, final RestConnection restConnection) {
+        super(restConnection, NotificationItem.class);
+        this.logger = logger;
         typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);
         typeMap.put("RULE_VIOLATION", RuleViolationNotificationItem.class);
         typeMap.put("POLICY_OVERRIDE", PolicyOverrideNotificationItem.class);
@@ -76,7 +79,7 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
-        final String url = MetaService.getLink(user, MetaService.NOTIFICATIONS_LINK);
+        final String url = MetaService.getLink(logger, user, MetaService.NOTIFICATIONS_LINK);
 
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, url);
         hubPagedRequest.addQueryParameter("startDate", startDateString);

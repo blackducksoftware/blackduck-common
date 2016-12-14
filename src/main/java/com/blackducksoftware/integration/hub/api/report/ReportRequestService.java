@@ -171,7 +171,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
         final ReportInformationItem reportInfo = isReportFinishedGenerating(reportUrl,
                 maxWaitTime);
 
-        final String contentLink = MetaService.getLink(reportInfo, MetaService.CONTENT_LINK);
+        final String contentLink = MetaService.getLink(logger, reportInfo, MetaService.CONTENT_LINK);
 
         if (contentLink == null) {
             throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
@@ -179,7 +179,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
 
         final HubRiskReportData hubRiskReportData = new HubRiskReportData();
         logger.debug("Getting the Report content.");
-        final VersionReport report = getReportContent(MetaService.getHref(reportInfo));
+        final VersionReport report = getReportContent(MetaService.getHref(logger, reportInfo));
         hubRiskReportData.setReport(report);
         logger.debug("Finished retrieving the Report.");
 
@@ -190,7 +190,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
     }
 
     private String getVersionReportLink(final ProjectVersionItem version) throws HubIntegrationException {
-        final String versionLink = MetaService.getLink(version, MetaService.VERSION_REPORT_LINK);
+        final String versionLink = MetaService.getLink(logger, version, MetaService.VERSION_REPORT_LINK);
         return versionLink;
     }
 

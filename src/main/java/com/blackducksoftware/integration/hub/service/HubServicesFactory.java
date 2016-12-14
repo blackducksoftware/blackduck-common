@@ -95,27 +95,27 @@ public class HubServicesFactory {
 
     public RiskReportDataService createRiskReportDataService(final IntLogger logger) {
         return new RiskReportDataService(restConnection, createProjectRequestService(),
-                createProjectVersionRequestService(), createReportRequestService(logger));
+                createProjectVersionRequestService(logger), createReportRequestService(logger));
     }
 
-    public PolicyStatusDataService createPolicyStatusDataService() {
-        return new PolicyStatusDataService(restConnection, createProjectRequestService(),
-                createProjectVersionRequestService(), createHubRequestService());
+    public PolicyStatusDataService createPolicyStatusDataService(final IntLogger logger) {
+        return new PolicyStatusDataService(logger, restConnection, createProjectRequestService(),
+                createProjectVersionRequestService(logger), createHubRequestService());
     }
 
-    public ScanStatusDataService createScanStatusDataService() {
-        return new ScanStatusDataService(restConnection, createProjectRequestService(), createProjectVersionRequestService(),
+    public ScanStatusDataService createScanStatusDataService(final IntLogger logger) {
+        return new ScanStatusDataService(logger, restConnection, createProjectRequestService(), createProjectVersionRequestService(logger),
                 createCodeLocationRequestService(), createScanSummaryRequestService());
     }
 
     public NotificationDataService createNotificationDataService(final IntLogger logger) {
-        return new NotificationDataService(logger, restConnection, createNotificationRequestService(), createProjectVersionRequestService(),
+        return new NotificationDataService(logger, restConnection, createNotificationRequestService(logger), createProjectVersionRequestService(logger),
                 createPolicyRequestService(), createVersionBomPolicyRequestService(), createHubRequestService());
     }
 
     public NotificationDataService createNotificationDataService(final IntLogger logger,
             final PolicyNotificationFilter policyNotificationFilter) {
-        return new NotificationDataService(logger, restConnection, createNotificationRequestService(), createProjectVersionRequestService(),
+        return new NotificationDataService(logger, restConnection, createNotificationRequestService(logger), createProjectVersionRequestService(logger),
                 createPolicyRequestService(), createVersionBomPolicyRequestService(), createHubRequestService(), policyNotificationFilter);
     }
 
@@ -124,8 +124,8 @@ public class HubServicesFactory {
                 createHubRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService());
     }
 
-    public VulnerabilityDataService createVulnerabilityDataService() {
-        return new VulnerabilityDataService(restConnection, createComponentRequestService(), createHubRequestService(),
+    public VulnerabilityDataService createVulnerabilityDataService(final IntLogger logger) {
+        return new VulnerabilityDataService(logger, restConnection, createComponentRequestService(), createHubRequestService(),
                 createVulnerabilityRequestService());
     }
 
@@ -145,8 +145,8 @@ public class HubServicesFactory {
         return new HubVersionRequestService(restConnection);
     }
 
-    public NotificationRequestService createNotificationRequestService() {
-        return new NotificationRequestService(restConnection);
+    public NotificationRequestService createNotificationRequestService(final IntLogger logger) {
+        return new NotificationRequestService(logger, restConnection);
     }
 
     public PolicyRequestService createPolicyRequestService() {
@@ -157,8 +157,8 @@ public class HubServicesFactory {
         return new ProjectRequestService(restConnection);
     }
 
-    public ProjectVersionRequestService createProjectVersionRequestService() {
-        return new ProjectVersionRequestService(restConnection);
+    public ProjectVersionRequestService createProjectVersionRequestService(final IntLogger logger) {
+        return new ProjectVersionRequestService(logger, restConnection);
     }
 
     public ScanSummaryRequestService createScanSummaryRequestService() {

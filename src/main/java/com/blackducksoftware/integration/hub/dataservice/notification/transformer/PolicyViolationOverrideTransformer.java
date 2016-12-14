@@ -24,10 +24,12 @@ package com.blackducksoftware.integration.hub.dataservice.notification.transform
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
@@ -44,13 +46,14 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Polic
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationOverrideTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationOverrideTransformer(final NotificationRequestService notificationService,
+    public PolicyViolationOverrideTransformer(IntLogger logger, final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
             final VersionBomPolicyRequestService bomVersionPolicyService,
             HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter) {
-        super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
+        super(logger, notificationService, projectVersionService, policyService, bomVersionPolicyService,
                 hubRequestService, policyFilter);
     }
 
@@ -103,8 +106,9 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 
                 if (StringUtils.isNotBlank(policyStatusUrl)) {
                     final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(policyStatusUrl);
-                    List<String> ruleList = getRuleUrls(bomComponentVersionPolicyStatus
-                            .getLinks(BomComponentVersionPolicyStatus.POLICY_RULE_URL));
+
+                    final Map<String, List<String>> policyRulesLink = MetaService.getLinks(getLogger(), bomComponentVersionPolicyStatus);
+                    List<String> ruleList = getRuleUrls(policyRulesLink.get(MetaService.POLICY_RULE_LINK));
 
                     ruleList = getMatchingRuleUrls(ruleList);
                     if (ruleList != null && !ruleList.isEmpty()) {

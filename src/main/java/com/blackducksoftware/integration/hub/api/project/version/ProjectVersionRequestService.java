@@ -34,15 +34,20 @@ import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.JsonObject;
 
 public class ProjectVersionRequestService extends HubParameterizedRequestService<ProjectVersionItem> {
-    public ProjectVersionRequestService(final RestConnection restConnection) {
+
+    private final IntLogger logger;
+
+    public ProjectVersionRequestService(IntLogger logger, final RestConnection restConnection) {
         super(restConnection, ProjectVersionItem.class);
+        this.logger = logger;
     }
 
     public ProjectVersionItem getProjectVersion(ProjectItem project, String projectVersionName) throws HubIntegrationException {
-        final String versionsUrl = MetaService.getLink(project, MetaService.VERSIONS_LINK);
+        final String versionsUrl = MetaService.getLink(logger, project, MetaService.VERSIONS_LINK);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, versionsUrl);
         if (StringUtils.isNotBlank(projectVersionName)) {
             hubPagedRequest.setQ(String.format("versionName:%s", projectVersionName));
@@ -59,7 +64,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
     }
 
     public List<ProjectVersionItem> getAllProjectVersions(final ProjectItem project) throws HubIntegrationException {
-        final String versionsUrl = MetaService.getLink(project, MetaService.VERSIONS_LINK);
+        final String versionsUrl = MetaService.getLink(logger, project, MetaService.VERSIONS_LINK);
         return getAllProjectVersions(versionsUrl);
     }
 
@@ -75,7 +80,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
         json.addProperty("phase", phase.name());
         json.addProperty("distribution", dist.name());
 
-        final String versionsUrl = MetaService.getLink(project, MetaService.VERSIONS_LINK);
+        final String versionsUrl = MetaService.getLink(logger, project, MetaService.VERSIONS_LINK);
 
         final HubRequest hubRequest = getHubRequestFactory().createPostRequest(versionsUrl);
 
