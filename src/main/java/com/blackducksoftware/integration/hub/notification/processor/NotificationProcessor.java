@@ -29,14 +29,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
 public abstract class NotificationProcessor<T> {
-    private final Logger logger = LoggerFactory.getLogger(MockProcessor.class);
 
     private final Map<Class<?>, NotificationSubProcessor<?>> processorMap = new HashMap<>();
 
@@ -51,9 +47,7 @@ public abstract class NotificationProcessor<T> {
     private void createEvents(final SortedSet<NotificationContentItem> notifications) {
         for (final NotificationContentItem item : notifications) {
             final Class<?> key = item.getClass();
-            if (!processorMap.containsKey(key)) {
-                logger.error("Could not find converter for notification: {}", item);
-            } else {
+            if (processorMap.containsKey(key)) {
                 final NotificationSubProcessor<?> processor = processorMap.get(key);
                 processor.process(item);
             }
