@@ -23,6 +23,7 @@ package com.blackducksoftware.integration.hub.dataservice.policystatus;
 
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
@@ -39,9 +40,12 @@ public class PolicyStatusDataService extends HubRequestService {
 
     private final HubRequestService hubRequestService;
 
+    private final MetaService metaService;
+
     public PolicyStatusDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService,
-            final ProjectVersionRequestService projectVersionRequestService, final HubRequestService hubRequestService) {
+            final ProjectVersionRequestService projectVersionRequestService, final HubRequestService hubRequestService, MetaService metaService) {
         super(restConnection);
+        this.metaService = metaService;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.hubRequestService = hubRequestService;
@@ -50,7 +54,7 @@ public class PolicyStatusDataService extends HubRequestService {
     public PolicyStatusItem getPolicyStatusForProjectAndVersion(final String projectName,
             final String projectVersionName) throws HubIntegrationException {
         final ProjectItem projectItem = projectRequestService.getProjectByName(projectName);
-        final String versionsUrl = projectItem.getLink("versions");
+        final String versionsUrl = metaService.getLink(projectItem, MetaService.VERSIONS_LINK);
 
         final List<ProjectVersionItem> projectVersions = projectVersionRequestService.getAllProjectVersions(versionsUrl);
         final String policyStatusUrl = findPolicyStatusUrl(projectVersions, projectVersionName);
@@ -61,7 +65,8 @@ public class PolicyStatusDataService extends HubRequestService {
     private String findPolicyStatusUrl(final List<ProjectVersionItem> projectVersions, final String projectVersionName) throws HubIntegrationException {
         for (final ProjectVersionItem version : projectVersions) {
             if (projectVersionName.equals(version.getVersionName())) {
-                return version.getLink("policy-status");
+                final String policyStatusLink = metaService.getLink(version, MetaService.POLICY_STATUS_LINK);
+                return policyStatusLink;
             }
         }
 

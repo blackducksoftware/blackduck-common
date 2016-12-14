@@ -24,11 +24,13 @@ package com.blackducksoftware.integration.hub.dataservice.notification.transform
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
@@ -46,15 +48,19 @@ import com.blackducksoftware.integration.hub.service.HubRequestService;
 public abstract class AbstractPolicyTransformer extends AbstractNotificationTransformer {
     private final PolicyNotificationFilter policyFilter;
 
+    private final MetaService metaService;
+
     /**
      * policyFilter.size() == 0: match no rules
      * policyFilter == null: match all rules
      */
     public AbstractPolicyTransformer(final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
-            final VersionBomPolicyRequestService bomVersionPolicyService, HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter) {
+            final VersionBomPolicyRequestService bomVersionPolicyService, HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter,
+            MetaService metaService) {
         super(notificationService, projectVersionService, policyService, bomVersionPolicyService, hubRequestService);
         this.policyFilter = policyFilter;
+        this.metaService = metaService;
     }
 
     public abstract void handleNotification(final List<ComponentVersionStatus> componentVersionList,
@@ -74,8 +80,8 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
                 if (StringUtils.isNotBlank(policyStatusUrl)) {
                     final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
                             policyStatusUrl);
-                    List<String> ruleList = getRuleUrls(
-                            bomComponentVersionPolicyStatus.getLinks(BomComponentVersionPolicyStatus.POLICY_RULE_URL));
+                    final Map<String, List<String>> policyRulesLink = metaService.getLinks(bomComponentVersionPolicyStatus);
+                    List<String> ruleList = getRuleUrls(policyRulesLink.get(MetaService.POLICY_RULE_LINK));
 
                     ruleList = getMatchingRuleUrls(ruleList);
                     if (ruleList != null && !ruleList.isEmpty()) {
@@ -120,12 +126,13 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         return rules;
     }
 
-    protected List<PolicyRule> getMatchingRules(final List<PolicyRule> rulesViolated) {
+    protected List<PolicyRule> getMatchingRules(final List<PolicyRule> rulesViolated) throws HubIntegrationException {
         final List<PolicyRule> filteredRules = new ArrayList<>();
         if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null
                 && !policyFilter.getRuleLinksToInclude().isEmpty()) {
             for (final PolicyRule ruleViolated : rulesViolated) {
-                if (policyFilter.getRuleLinksToInclude().contains(ruleViolated.getMeta().getHref())) {
+                String ruleHref = metaService.getHref(ruleViolated);
+                if (policyFilter.getRuleLinksToInclude().contains(ruleHref)) {
                     filteredRules.add(ruleViolated);
                 }
             }
@@ -200,4 +207,9 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
             final String componentVersion, String componentUrl, final String componentVersionUrl,
             List<PolicyRule> policyRuleList,
             NotificationItem item, List<NotificationContentItem> templateData) throws URISyntaxException;
+
+    public MetaService getMetaService() {
+        return metaService;
+    }
+
 }

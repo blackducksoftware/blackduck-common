@@ -21,46 +21,28 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.policy;
 
-import org.joda.time.DateTime;
+import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class PolicyRule extends HubItem {
-    public static final String POLICY_RULES_URL_IDENTIFIER = "policy-rules";
+    private String name;
 
-    private final String name;
+    private String description;
 
-    private final String description;
+    private Boolean enabled;
 
-    private final Boolean enabled;
+    private Boolean overridable;
 
-    private final Boolean overridable;
+    private PolicyExpressions expression;
 
-    private final PolicyExpressions expression;
+    private Date createdAt;
 
-    private final String createdAt;
+    private Date createdBy;
 
-    private final String createdBy;
+    private Date updatedAt;
 
-    private final String updatedAt;
-
-    private final String updatedBy;
-
-    public PolicyRule(final MetaInformation meta, final String name, final String description, final Boolean enabled,
-            final Boolean overridable, final PolicyExpressions expression, final String createdAt,
-            final String createdBy, final String updatedAt, final String updatedBy) {
-        super(meta);
-        this.name = name;
-        this.description = description;
-        this.enabled = enabled;
-        this.overridable = overridable;
-        this.expression = expression;
-        this.createdAt = createdAt;
-        this.createdBy = createdBy;
-        this.updatedAt = updatedAt;
-        this.updatedBy = updatedBy;
-    }
+    private Date updatedBy;
 
     public String getName() {
         return name;
@@ -82,28 +64,20 @@ public class PolicyRule extends HubItem {
         return expression;
     }
 
-    public String getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public String getCreatedBy() {
+    public Date getCreatedBy() {
         return createdBy;
     }
 
-    public String getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public String getUpdatedBy() {
+    public Date getUpdatedBy() {
         return updatedBy;
-    }
-
-    public DateTime getUpdatedAtTime() {
-        return getDateTime(updatedAt);
-    }
-
-    public DateTime getCreatedAtTime() {
-        return getDateTime(createdAt);
     }
 
 }

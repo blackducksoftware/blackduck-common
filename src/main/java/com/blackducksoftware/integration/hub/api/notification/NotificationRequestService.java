@@ -33,11 +33,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -47,9 +49,11 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
 
     private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();
 
-    public NotificationRequestService(final RestConnection restConnection) {
-        super(restConnection, NotificationItem.class);
+    private final MetaService metaService;
 
+    public NotificationRequestService(IntLogger logger, final RestConnection restConnection, MetaService metaService) {
+        super(restConnection, NotificationItem.class);
+        this.metaService = metaService;
         typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);
         typeMap.put("RULE_VIOLATION", RuleViolationNotificationItem.class);
         typeMap.put("POLICY_OVERRIDE", PolicyOverrideNotificationItem.class);
@@ -75,7 +79,7 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
-        final String url = user.getLink("notifications");
+        final String url = metaService.getLink(user, MetaService.NOTIFICATIONS_LINK);
 
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, url);
         hubPagedRequest.addQueryParameter("startDate", startDateString);

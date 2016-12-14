@@ -21,13 +21,12 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.report;
 
-import java.util.List;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.meta.MetaLink;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
@@ -41,9 +40,12 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
 
     private final IntLogger logger;
 
-    public ReportRequestService(final RestConnection restConnection, IntLogger logger) {
+    private final MetaService metaService;
+
+    public ReportRequestService(final RestConnection restConnection, IntLogger logger, MetaService metaService) {
         super(restConnection, ReportInformationItem.class);
         this.logger = logger;
+        this.metaService = metaService;
     }
 
     /**
@@ -123,7 +125,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
             throws HubIntegrationException {
         final long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
-        String timeFinished = null;
+        Date timeFinished = null;
         ReportInformationItem reportInfo = null;
 
         while (timeFinished == null) {
@@ -172,22 +174,15 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
         final ReportInformationItem reportInfo = isReportFinishedGenerating(reportUrl,
                 maxWaitTime);
 
-        final List<MetaLink> links = reportInfo.getMeta().getLinks();
+        final String contentLink = metaService.getLink(reportInfo, MetaService.CONTENT_LINK);
 
-        MetaLink contentLink = null;
-        for (final MetaLink link : links) {
-            if (link.getRel().equalsIgnoreCase("content")) {
-                contentLink = link;
-                break;
-            }
-        }
         if (contentLink == null) {
             throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
         }
 
         final HubRiskReportData hubRiskReportData = new HubRiskReportData();
         logger.debug("Getting the Report content.");
-        final VersionReport report = getReportContent(contentLink.getHref());
+        final VersionReport report = getReportContent(metaService.getHref(reportInfo));
         hubRiskReportData.setReport(report);
         logger.debug("Finished retrieving the Report.");
 
@@ -198,12 +193,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
     }
 
     private String getVersionReportLink(final ProjectVersionItem version) throws HubIntegrationException {
-        final List<String> versionLinks = version.getLinks(ProjectVersionItem.VERSION_REPORT_LINK);
-        if (versionLinks.size() != 1) {
-            throw new HubIntegrationException("The release " + version.getVersionName() + " has "
-                    + versionLinks.size() + " " + ProjectItem.VERSION_LINK + " links; expected one");
-        }
-        final String versionLink = versionLinks.get(0);
+        final String versionLink = metaService.getLink(version, MetaService.VERSION_REPORT_LINK);
         return versionLink;
     }
 

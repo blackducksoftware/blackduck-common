@@ -21,44 +21,21 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.component.version;
 
-import org.joda.time.DateTime;
+import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ComponentVersion extends HubItem {
-    public static final String COMPONENT_URL_IDENTIFIER = "components";
-
-    public static final String VERSION_URL_IDENTIFIER = "versions";
-
     private String versionName;
 
-    private String releasedOn;
-
-    public ComponentVersion(final MetaInformation meta) {
-        super(meta);
-    }
-
-    // License goes here
+    private Date releasedOn;
 
     public String getVersionName() {
         return versionName;
     }
 
-    public void setVersionName(final String versionName) {
-        this.versionName = versionName;
-    }
-
-    public String getReleasedOn() {
+    public Date getReleasedOn() {
         return releasedOn;
-    }
-
-    public DateTime getReleasedOnDate() {
-        return getDateTime(releasedOn);
-    }
-
-    public void setReleasedOn(final String releasedOn) {
-        this.releasedOn = releasedOn;
     }
 
 }

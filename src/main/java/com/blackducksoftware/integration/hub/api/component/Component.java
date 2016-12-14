@@ -24,7 +24,9 @@ package com.blackducksoftware.integration.hub.api.component;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-public class Component {
+import com.blackducksoftware.integration.hub.api.item.HubResponse;
+
+public class Component extends HubResponse {
     // ****URL**** //
     private final String component;
 

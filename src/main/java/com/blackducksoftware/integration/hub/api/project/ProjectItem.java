@@ -23,37 +23,21 @@ package com.blackducksoftware.integration.hub.api.project;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ProjectItem extends HubItem {
-    public static final String PROJECT_URL_IDENTIFIER = "projects";
-
-    public static final String VERSION_LINK = "versions";
-
-    public static final String CANONICAL_VERSION_LINK = "canonicalVersion";
-
     // description from Hub API: "The general identifier of the project"
-    private final String name;
+    private String name;
 
     // description from Hub API: "Summary of what the project represents in terms of functionality and use"
-    private final String description;
+    private String description;
 
     // description from Hub API: "Whether BOM level adjustments are applied at the project level (to all releases)"
-    private final boolean projectLevelAdjustments;
+    private boolean projectLevelAdjustments;
 
     // description from Hub API: "Allowed values : [1,2,3,4,5]"
-    private final int projectTier;
+    private int projectTier;
 
-    private final SourceEnum source;
-
-    public ProjectItem(MetaInformation meta, String name, String description, boolean projectLevelAdjustments, int projectTier, SourceEnum source) {
-        super(meta);
-        this.name = name;
-        this.description = description;
-        this.projectLevelAdjustments = projectLevelAdjustments;
-        this.projectTier = projectTier;
-        this.source = source;
-    }
+    private SourceEnum source;
 
     public String getName() {
         return name;
