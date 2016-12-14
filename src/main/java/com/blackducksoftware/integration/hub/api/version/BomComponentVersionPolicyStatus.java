@@ -23,23 +23,12 @@ package com.blackducksoftware.integration.hub.api.version;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class BomComponentVersionPolicyStatus extends HubItem {
-    public static final String POLICY_RULE_URL = "policy-rule";
-
     private PolicyStatusEnum approvalStatus;
-
-    public BomComponentVersionPolicyStatus(final MetaInformation meta) {
-        super(meta);
-    }
 
     public PolicyStatusEnum getApprovalStatus() {
         return approvalStatus;
-    }
-
-    public void setApprovalStatus(final PolicyStatusEnum approvalStatus) {
-        this.approvalStatus = approvalStatus;
     }
 
 }

@@ -21,47 +21,26 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.report;
 
-import org.apache.commons.lang3.builder.RecursiveToStringStyle;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.joda.time.DateTime;
+import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ReportInformationItem extends HubItem {
-    public static final String REPORT_CONTENT_LINK = "content";
+    private String reportFormat;
 
-    public static final String REPORT_DOWNLOAD_LINK = "download";
+    private String locale;
 
-    private final String reportFormat;
+    private String fileName;
 
-    private final String locale;
+    private int fileSize;
 
-    private final String fileName;
+    private Date createdAt;
 
-    private final int fileSize;
+    private Date updatedAt;
 
-    private final String createdAt;
+    private Date finishedAt;
 
-    private final String updatedAt;
-
-    private final String finishedAt;
-
-    private final String createdBy;
-
-    public ReportInformationItem(final String reportFormat, final String locale, final String fileName,
-            final int fileSize, final String createdAt, final String updatedAt, final String finishedAt,
-            final String createdBy, final MetaInformation _meta) {
-        super(_meta);
-        this.reportFormat = reportFormat;
-        this.locale = locale;
-        this.fileName = fileName;
-        this.fileSize = fileSize;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.finishedAt = finishedAt;
-        this.createdBy = createdBy;
-    }
+    private Date createdBy;
 
     public String getReportFormat() {
         return reportFormat;
@@ -79,127 +58,20 @@ public class ReportInformationItem extends HubItem {
         return fileSize;
     }
 
-    public String getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public String getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public String getFinishedAt() {
+    public Date getFinishedAt() {
         return finishedAt;
     }
 
-    public String getCreatedBy() {
+    public Date getCreatedBy() {
         return createdBy;
-    }
-
-    public DateTime getTimeCreatedAt() {
-        return getDateTime(createdAt);
-    }
-
-    public DateTime getTimeUpdatedAt() {
-        return getDateTime(updatedAt);
-    }
-
-    public DateTime getTimeFinishedAt() {
-        return getDateTime(finishedAt);
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
-        result = prime * result + ((createdBy == null) ? 0 : createdBy.hashCode());
-        result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
-        result = prime * result + fileSize;
-        result = prime * result + ((finishedAt == null) ? 0 : finishedAt.hashCode());
-        result = prime * result + ((locale == null) ? 0 : locale.hashCode());
-        result = prime * result + ((reportFormat == null) ? 0 : reportFormat.hashCode());
-        result = prime * result + ((updatedAt == null) ? 0 : updatedAt.hashCode());
-        result = prime * result + ((getMeta() == null) ? 0 : getMeta().hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof ReportInformationItem)) {
-            return false;
-        }
-        final ReportInformationItem other = (ReportInformationItem) obj;
-        if (getMeta() == null) {
-            if (other.getMeta() != null) {
-                return false;
-            }
-        } else if (!getMeta().equals(other.getMeta())) {
-            return false;
-        }
-        if (createdAt == null) {
-            if (other.createdAt != null) {
-                return false;
-            }
-        } else if (!createdAt.equals(other.createdAt)) {
-            return false;
-        }
-        if (createdBy == null) {
-            if (other.createdBy != null) {
-                return false;
-            }
-        } else if (!createdBy.equals(other.createdBy)) {
-            return false;
-        }
-        if (fileName == null) {
-            if (other.fileName != null) {
-                return false;
-            }
-        } else if (!fileName.equals(other.fileName)) {
-            return false;
-        }
-        if (fileSize != other.fileSize) {
-            return false;
-        }
-        if (finishedAt == null) {
-            if (other.finishedAt != null) {
-                return false;
-            }
-        } else if (!finishedAt.equals(other.finishedAt)) {
-            return false;
-        }
-        if (locale == null) {
-            if (other.locale != null) {
-                return false;
-            }
-        } else if (!locale.equals(other.locale)) {
-            return false;
-        }
-        if (reportFormat == null) {
-            if (other.reportFormat != null) {
-                return false;
-            }
-        } else if (!reportFormat.equals(other.reportFormat)) {
-            return false;
-        }
-        if (updatedAt == null) {
-            if (other.updatedAt != null) {
-                return false;
-            }
-        } else if (!updatedAt.equals(other.updatedAt)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

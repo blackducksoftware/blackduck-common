@@ -21,27 +21,11 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.notification;
 
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
-
 public class PolicyOverrideNotificationItem extends NotificationItem {
     private PolicyOverrideNotificationContent content;
 
-    public PolicyOverrideNotificationItem(final MetaInformation meta) {
-        super(meta);
-    }
-
     public PolicyOverrideNotificationContent getContent() {
         return content;
-    }
-
-    public void setContent(final PolicyOverrideNotificationContent content) {
-        this.content = content;
-    }
-
-    @Override
-    public String toString() {
-        return "PolicyOverrideNotificationItem [content=" + content + ", contentType=" + contentType + ", type=" + type
-                + ", createdAt=" + createdAt + ", Meta=" + getMeta() + "]";
     }
 
 }

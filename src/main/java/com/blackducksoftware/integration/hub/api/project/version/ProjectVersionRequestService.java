@@ -33,6 +33,7 @@ import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.google.gson.JsonObject;
 
 public class ProjectVersionRequestService extends HubParameterizedRequestService<ProjectVersionItem> {
     public ProjectVersionRequestService(final RestConnection restConnection) {
@@ -68,13 +69,16 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
 
     public String createHubVersion(final ProjectItem project, final String versionName, final PhaseEnum phase, final DistributionEnum dist)
             throws HubIntegrationException {
-        final ProjectVersionItem newRelease = new ProjectVersionItem(null, dist, null, null, phase, null, null, null, versionName);
+        JsonObject json = new JsonObject();
+        json.addProperty("versionName", versionName);
+        json.addProperty("phase", phase.name());
+        json.addProperty("distribution", dist.name());
 
         final String versionsUrl = project.getLink("versions");
 
         final HubRequest hubRequest = getHubRequestFactory().createPostRequest(versionsUrl);
 
-        final String location = hubRequest.executePost(getRestConnection().getGson().toJson(newRelease));
+        final String location = hubRequest.executePost(getRestConnection().getGson().toJson(phase));
 
         return location;
     }

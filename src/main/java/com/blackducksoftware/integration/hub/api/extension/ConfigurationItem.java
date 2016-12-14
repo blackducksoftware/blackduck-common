@@ -24,38 +24,23 @@ package com.blackducksoftware.integration.hub.api.extension;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ConfigurationItem extends HubItem {
-    private final String name;
+    private String name;
 
-    private final OptionTypeEnum optionType;
+    private OptionTypeEnum optionType;
 
-    private final String title;
+    private String title;
 
-    private final boolean required;
+    private boolean required;
 
-    private final boolean singleValue;
+    private boolean singleValue;
 
-    private final String description;
+    private String description;
 
-    private final List<OptionItem> options;
+    private List<OptionItem> options;
 
-    private final List<String> value;
-
-    public ConfigurationItem(final MetaInformation meta, final String name, final OptionTypeEnum optionType,
-            final String title, final boolean required, final boolean singleValue, final String description,
-            final List<OptionItem> options, final List<String> value) {
-        super(meta);
-        this.name = name;
-        this.optionType = optionType;
-        this.title = title;
-        this.required = required;
-        this.singleValue = singleValue;
-        this.description = description;
-        this.options = options;
-        this.value = value;
-    }
+    private List<String> value;
 
     public String getName() {
         return name;

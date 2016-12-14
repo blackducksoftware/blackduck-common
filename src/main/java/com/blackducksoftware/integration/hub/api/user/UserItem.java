@@ -22,34 +22,20 @@
 package com.blackducksoftware.integration.hub.api.user;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class UserItem extends HubItem {
-    public static final String USER_URL_IDENTIFIER = "users";
 
-    private final String userName;
+    private String userName;
 
-    private final String firstName;
+    private String firstName;
 
-    private final String lastName;
+    private String lastName;
 
-    private final String email;
+    private String email;
 
-    private final UserType type;
+    private UserType type;
 
-    private final boolean active;
-
-    public UserItem(final MetaInformation meta, final String userName, final String firstName, final String lastName,
-            final String email, final UserType type, final boolean active) {
-        super(meta);
-
-        this.userName = userName;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.type = type;
-        this.active = active;
-    }
+    private Boolean active;
 
     public String getUserName() {
         return userName;

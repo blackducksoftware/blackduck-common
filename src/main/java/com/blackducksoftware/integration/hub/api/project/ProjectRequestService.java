@@ -29,12 +29,12 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.google.gson.JsonObject;
 
 public class ProjectRequestService extends HubParameterizedRequestService<ProjectItem> {
     private static final List<String> PROJECTS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS);
@@ -79,10 +79,10 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
     }
 
     public String createHubProject(final String projectName) throws HubIntegrationException {
-        final ProjectItem newProject = new ProjectItem(null, projectName, null, false, 1, SourceEnum.CUSTOM);
         final HubRequest projectItemRequest = getHubRequestFactory().createPostRequest(PROJECTS_SEGMENTS);
-        String location = null;
-        location = projectItemRequest.executePost(getRestConnection().getGson().toJson(newProject));
+        JsonObject json = new JsonObject();
+        json.addProperty("name", projectName);
+        String location = projectItemRequest.executePost(getRestConnection().getGson().toJson(json));
         return location;
     }
 
