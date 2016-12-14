@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.SortedSet;
 
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
 public abstract class NotificationProcessor<T> {
@@ -38,7 +39,7 @@ public abstract class NotificationProcessor<T> {
 
     private final List<MapProcessorCache<?>> cacheList = new ArrayList<>();
 
-    public T process(final SortedSet<NotificationContentItem> notifications) {
+    public T process(final SortedSet<NotificationContentItem> notifications) throws HubIntegrationException {
         createEvents(notifications);
         final Collection<NotificationEvent<?>> events = collectEvents();
         return processEvents(events);
@@ -54,9 +55,9 @@ public abstract class NotificationProcessor<T> {
         }
     }
 
-    public abstract T processEvents(Collection<NotificationEvent<?>> eventCollection);
+    public abstract T processEvents(Collection<NotificationEvent<?>> eventCollection) throws HubIntegrationException;
 
-    private Collection<NotificationEvent<?>> collectEvents() {
+    private Collection<NotificationEvent<?>> collectEvents() throws HubIntegrationException {
         final Collection<NotificationEvent<?>> eventList = new LinkedList<>();
         for (final MapProcessorCache<?> processor : cacheList) {
             eventList.addAll(processor.getEvents());

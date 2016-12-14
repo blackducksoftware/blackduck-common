@@ -24,6 +24,7 @@ package com.blackducksoftware.integration.hub.notification.processor;
 import java.util.Collection;
 
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
 public abstract class NotificationSubProcessor<T extends NotificationEvent<?>> {
@@ -34,7 +35,7 @@ public abstract class NotificationSubProcessor<T extends NotificationEvent<?>> {
         this.cache = cache;
     }
 
-    public Collection<T> getEvents() {
+    public Collection<T> getEvents() throws HubIntegrationException {
         return cache.getEvents();
     }
 

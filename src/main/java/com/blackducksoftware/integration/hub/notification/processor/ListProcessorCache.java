@@ -14,6 +14,7 @@ package com.blackducksoftware.integration.hub.notification.processor;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
 public class ListProcessorCache<T extends NotificationEvent<?>> implements SubProcessorCache<T> {
@@ -30,7 +31,7 @@ public class ListProcessorCache<T extends NotificationEvent<?>> implements SubPr
     }
 
     @Override
-    public Collection<T> getEvents() {
+    public Collection<T> getEvents() throws HubIntegrationException {
         return eventList;
     }
 }

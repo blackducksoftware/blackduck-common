@@ -13,6 +13,7 @@ package com.blackducksoftware.integration.hub.notification.processor;
 
 import java.util.Collection;
 
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
 public interface SubProcessorCache<T extends NotificationEvent<?>> {
@@ -21,5 +22,5 @@ public interface SubProcessorCache<T extends NotificationEvent<?>> {
 
     public void removeEvent(final T event);
 
-    public Collection<T> getEvents();
+    public Collection<T> getEvents() throws HubIntegrationException;
 }

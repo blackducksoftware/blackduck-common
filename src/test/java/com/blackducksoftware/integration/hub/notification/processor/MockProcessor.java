@@ -54,7 +54,6 @@ public class MockProcessor extends NotificationProcessor<Collection<Notification
         for (final NotificationEvent<?> entry : eventCollection) {
             dataList.add(entry);
         }
-
         return dataList;
     }
 }

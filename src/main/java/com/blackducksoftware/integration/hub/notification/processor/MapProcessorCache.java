@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
 public class MapProcessorCache<T extends NotificationEvent<?>> implements SubProcessorCache<T> {
@@ -65,7 +66,7 @@ public class MapProcessorCache<T extends NotificationEvent<?>> implements SubPro
     }
 
     @Override
-    public Collection<T> getEvents() {
+    public Collection<T> getEvents() throws HubIntegrationException {
         return eventMap.values();
     }
 
