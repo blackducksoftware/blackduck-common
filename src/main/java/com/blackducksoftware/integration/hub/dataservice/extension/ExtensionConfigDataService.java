@@ -31,6 +31,7 @@ import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigReques
 import com.blackducksoftware.integration.hub.api.extension.ExtensionItem;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
 import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkItem;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.dataservice.extension.transformer.UserConfigTransform;
@@ -70,15 +71,17 @@ public class ExtensionConfigDataService extends HubRequestService {
     public Map<String, ConfigurationItem> getGlobalConfigMap(final String extensionUrl) throws HubIntegrationException {
         Map<String, ConfigurationItem> globalConfigMap = new HashMap<>();
         final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
-        globalConfigMap = createGlobalConfigMap(extension.getLink("global-options"));
+        final String globalOptionsLink = MetaService.getLink(extension, MetaService.GLOBAL_OPTIONS_LINK);
+        globalConfigMap = createGlobalConfigMap(globalOptionsLink);
         return globalConfigMap;
     }
 
     public List<UserConfigItem> getUserConfigList(final String extensionUrl) throws HubIntegrationException {
         List<UserConfigItem> itemList = new LinkedList<>();
         final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
+        final String userOptionsLink = MetaService.getLink(extension, MetaService.USER_OPTIONS_LINK);
         final List<UserOptionLinkItem> userOptionList = extensionUserOptionRequestService
-                .getUserOptions(extension.getLink("user-options"));
+                .getUserOptions(userOptionsLink);
         itemList = parallelProcessor.process(userOptionList);
 
         return itemList;

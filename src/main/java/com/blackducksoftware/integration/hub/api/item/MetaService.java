@@ -11,7 +11,17 @@
  */
 package com.blackducksoftware.integration.hub.api.item;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class MetaService {
 
@@ -39,23 +49,85 @@ public class MetaService {
 
     public static final String VULNERABLE_COMPONENTS_LINK = "vulnerable-components";
 
-    public static final String REPORT_CONTENT_LINK = "content";
+    public static final String CONTENT_LINK = "content";
 
-    public static final String REPORT_DOWNLOAD_LINK = "download";
+    public static final String DOWNLOAD_LINK = "download";
 
     public static final String CODE_LOCATION_LINK = "codelocation";
 
+    public static final String NOTIFICATIONS_LINK = "notifications";
+
     public static final String USERS_LINK = "users";
 
-    public static String getLink(HubItem item, String linkKey) {
-        String json = item.getJson();
+    public static final String GLOBAL_OPTIONS_LINK = "global-options";
 
-        return null;
+    public static final String USER_OPTIONS_LINK = "user-options";
+
+    private static final JsonParser jsonParser = new JsonParser();
+
+    public static String getLink(HubItem item, String linkKey) throws HubIntegrationException {
+        return getLinks(item).get(linkKey);
     }
 
-    public static Map<String, String> getLinks(HubItem item) {
+    public static Map<String, String> getLinks(HubItem item) throws HubIntegrationException {
+        Map<String, String> links = new HashMap<>();
+        String json = item.getJson();
+        JsonElement element = jsonParser.parse(json);
+        JsonObject jsonObject = element.getAsJsonObject();
+        JsonElement metaElement = jsonObject.get("_meta");
+        if (metaElement == null) {
+            throw new HubIntegrationException("This Hub item does not have meta information.");
+        }
+        JsonObject metaJson = metaElement.getAsJsonObject();
+        JsonElement linksElement = metaJson.get("links");
+        if (linksElement == null) {
+            throw new HubIntegrationException("This Hub item does not have any link information.");
+        }
+        JsonArray linkArray = linksElement.getAsJsonArray();
+        for (JsonElement linkElement : linkArray) {
+            JsonObject linkObject = linkElement.getAsJsonObject();
+            links.put(linkObject.get("rel").getAsString(), linkObject.get("href").getAsString());
+        }
+        return links;
+    }
 
-        return null;
+    public static List<MetaAllowEnum> getAllowedMethods(HubItem item) throws HubIntegrationException {
+        List<MetaAllowEnum> allows = new ArrayList<>();
+        String json = item.getJson();
+        JsonElement element = jsonParser.parse(json);
+        JsonObject jsonObject = element.getAsJsonObject();
+        JsonElement metaElement = jsonObject.get("_meta");
+        if (metaElement == null) {
+            throw new HubIntegrationException("This Hub item does not have meta information.");
+        }
+        JsonObject metaJson = metaElement.getAsJsonObject();
+        JsonElement allowElement = metaJson.get("allow");
+        if (allowElement == null) {
+            throw new HubIntegrationException("This Hub item does not have any allow information.");
+        }
+        JsonArray allowArray = allowElement.getAsJsonArray();
+        for (JsonElement allow : allowArray) {
+            allows.add(MetaAllowEnum.valueOf(allow.getAsString()));
+        }
+
+        return allows;
+    }
+
+    public static String getHref(HubItem item) throws HubIntegrationException {
+        List<MetaAllowEnum> allows = new ArrayList<>();
+        String json = item.getJson();
+        JsonElement element = jsonParser.parse(json);
+        JsonObject jsonObject = element.getAsJsonObject();
+        JsonElement metaElement = jsonObject.get("_meta");
+        if (metaElement == null) {
+            throw new HubIntegrationException("This Hub item does not have meta information.");
+        }
+        JsonObject metaJson = metaElement.getAsJsonObject();
+        JsonElement hrefElement = metaJson.get("href");
+        if (hrefElement == null) {
+            throw new HubIntegrationException("This Hub item does not have any href information.");
+        }
+        return hrefElement.getAsString();
     }
 
 }

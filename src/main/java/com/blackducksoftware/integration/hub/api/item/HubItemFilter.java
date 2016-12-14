@@ -24,15 +24,19 @@ package com.blackducksoftware.integration.hub.api.item;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
+
 public class HubItemFilter<T extends HubItem> {
-    public List<T> getAccessibleItems(final List<T> hubItems) {
+    public List<T> getAccessibleItems(final List<T> hubItems) throws HubIntegrationException {
         final List<T> accessibleItems = new ArrayList<>();
         for (final T hubItem : hubItems) {
-            if (hubItem.getMeta().isAccessible()) {
+            List<MetaAllowEnum> allow = MetaService.getAllowedMethods(hubItem);
+            if (allow != null && !allow.isEmpty() && allow.contains(MetaAllowEnum.GET)
+                    && allow.contains(MetaAllowEnum.PUT)) {
                 accessibleItems.add(hubItem);
             }
         }
-
         return accessibleItems;
     }
 

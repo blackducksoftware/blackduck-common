@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
 import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
@@ -41,7 +42,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
     }
 
     public ProjectVersionItem getProjectVersion(ProjectItem project, String projectVersionName) throws HubIntegrationException {
-        final String versionsUrl = project.getLink("versions");
+        final String versionsUrl = MetaService.getLink(project, MetaService.VERSIONS_LINK);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, versionsUrl);
         if (StringUtils.isNotBlank(projectVersionName)) {
             hubPagedRequest.setQ(String.format("versionName:%s", projectVersionName));
@@ -58,7 +59,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
     }
 
     public List<ProjectVersionItem> getAllProjectVersions(final ProjectItem project) throws HubIntegrationException {
-        final String versionsUrl = project.getLink("versions");
+        final String versionsUrl = MetaService.getLink(project, MetaService.VERSIONS_LINK);
         return getAllProjectVersions(versionsUrl);
     }
 
@@ -74,7 +75,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
         json.addProperty("phase", phase.name());
         json.addProperty("distribution", dist.name());
 
-        final String versionsUrl = project.getLink("versions");
+        final String versionsUrl = MetaService.getLink(project, MetaService.VERSIONS_LINK);
 
         final HubRequest hubRequest = getHubRequestFactory().createPostRequest(versionsUrl);
 

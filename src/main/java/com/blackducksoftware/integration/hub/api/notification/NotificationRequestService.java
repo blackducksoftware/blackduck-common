@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
@@ -75,7 +76,7 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
-        final String url = user.getLink("notifications");
+        final String url = MetaService.getLink(user, MetaService.NOTIFICATIONS_LINK);
 
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, url);
         hubPagedRequest.addQueryParameter("startDate", startDateString);
