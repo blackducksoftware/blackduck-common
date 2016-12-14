@@ -21,34 +21,28 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.rest;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
+import java.io.IOException;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.restlet.Context;
-import org.restlet.data.CharacterSet;
-import org.restlet.data.Cookie;
-import org.restlet.data.CookieSetting;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Status;
-import org.restlet.representation.StringRepresentation;
-import org.restlet.resource.ClientResource;
-import org.restlet.util.Series;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.log.IntLogger;
+
+import okhttp3.HttpUrl;
+import okhttp3.JavaNetCookieJar;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class CredentialsRestConnection extends RestConnection {
 
     private final HubServerConfig hubServerConfig;
-
-    private Series<Cookie> cookies;
 
     public CredentialsRestConnection(final HubServerConfig hubServerConfig) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         this(null, hubServerConfig);
@@ -56,14 +50,8 @@ public class CredentialsRestConnection extends RestConnection {
 
     public CredentialsRestConnection(final IntLogger logger, final HubServerConfig hubServerConfig)
             throws IllegalArgumentException, HubIntegrationException {
-        super(logger);
+        super(logger, hubServerConfig.getHubUrl(), hubServerConfig.getProxyInfo());
         this.hubServerConfig = hubServerConfig;
-
-        setBaseUrl(hubServerConfig.getHubUrl().toString());
-        final HubProxyInfo proxyInfo = hubServerConfig.getProxyInfo();
-        if (proxyInfo.shouldUseProxyForUrl(hubServerConfig.getHubUrl())) {
-            setProxyProperties(proxyInfo);
-        }
         setTimeout(hubServerConfig.getTimeout());
     }
 
@@ -74,21 +62,15 @@ public class CredentialsRestConnection extends RestConnection {
         if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
             try {
                 password = hubServerConfig.getGlobalCredentials().getDecryptedPassword();
+                CookieManager cookieManager = new CookieManager();
+                cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+                getBuilder().cookieJar(new JavaNetCookieJar(cookieManager));
+                setupClient();
+                setClient(getBuilder().build());
                 setCookies(username, password);
             } catch (IllegalArgumentException | EncryptionException e) {
                 throw new HubIntegrationException(e.getMessage(), e);
             }
-        }
-    }
-
-    @Override
-    public ClientResource createClientResource(final Context context, final String providedUrl) throws HubIntegrationException {
-        try {
-            ClientResource resource = new ClientResource(context, new URI(providedUrl));
-            resource.getRequest().setCookies(getCookies());
-            return resource;
-        } catch (final URISyntaxException e) {
-            throw new HubIntegrationException(String.format("The providedUrl (%s) was invalid.", providedUrl), e);
         }
     }
 
@@ -97,67 +79,25 @@ public class CredentialsRestConnection extends RestConnection {
      * the response code from the connection.
      *
      */
-    public int setCookies(final String hubUserName, final String hubPassword)
+    public void setCookies(final String hubUserName, final String hubPassword)
             throws HubIntegrationException {
-        final ClientResource resource = createClientResource();
         try {
-            resource.addSegment("j_spring_security_check");
-            resource.setMethod(Method.POST);
+            ArrayList<String> segments = new ArrayList<>();
+            segments.add("j_spring_security_check");
+            HttpUrl httpUrl = createHttpUrl(segments, null);
 
-            String encodedHubUser = null;
-            String encodedHubPassword = null;
-            try {
-                encodedHubUser = URLEncoder.encode(hubUserName, "UTF-8");
-                encodedHubPassword = URLEncoder.encode(hubPassword, "UTF-8");
-            } catch (final UnsupportedEncodingException e) {
-                throw new HubIntegrationException("Could not encode the HubUsername and Password", e);
+            Map<String, String> content = new HashMap<>();
+            content.put("j_username", hubUserName);
+            content.put("j_password", hubPassword);
+
+            Request request = createPostRequest(httpUrl, createEncodedRequestBody(content));
+            Response response = handleExecuteClientCall(request);
+            if (!response.isSuccessful()) {
+                throw new HubIntegrationException(response.message());
             }
-
-            final StringRepresentation stringRep = new StringRepresentation(
-                    "j_username=" + encodedHubUser + "&j_password=" + encodedHubPassword);
-            stringRep.setCharacterSet(CharacterSet.UTF_8);
-            stringRep.setMediaType(MediaType.APPLICATION_WWW_FORM);
-            resource.getRequest().setEntity(stringRep);
-
-            handleRequest(resource);
-
-            final int statusCode = resource.getResponse().getStatus().getCode();
-            if (isSuccess(statusCode)) {
-                final Series<CookieSetting> cookieSettings = resource.getResponse().getCookieSettings();
-                final Series<Cookie> requestCookies = resource.getRequest().getCookies();
-                if (cookieSettings != null && !cookieSettings.isEmpty()) {
-                    for (final CookieSetting ck : cookieSettings) {
-                        if (ck == null) {
-                            continue;
-                        }
-                        final Cookie cookie = new Cookie();
-                        cookie.setName(ck.getName());
-                        cookie.setDomain(ck.getDomain());
-                        cookie.setPath(ck.getPath());
-                        cookie.setValue(ck.getValue());
-                        cookie.setVersion(ck.getVersion());
-                        requestCookies.add(cookie);
-                    }
-                }
-
-                if (requestCookies == null || requestCookies.size() == 0) {
-                    throw new HubIntegrationException(
-                            "Could not establish connection to '" + getBaseUrl() + "' . Failed to retrieve cookies");
-                }
-                cookies = requestCookies;
-            } else {
-                getLogger().trace("Response entity : " + resource.getResponse().getEntityAsText());
-                final Status status = resource.getResponse().getStatus();
-                getLogger().trace("Status : " + status.toString(), status.getThrowable());
-                throw new HubIntegrationException(resource.getResponse().getStatus().toString(), status.getThrowable());
-            }
-            return statusCode;
-        } finally {
-            releaseResource(resource);
+        } catch (IOException e) {
+            throw new HubIntegrationException(e.getMessage(), e);
         }
     }
 
-    public Series<Cookie> getCookies() {
-        return cookies;
-    }
 }

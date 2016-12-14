@@ -30,9 +30,9 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 import java.util.Arrays;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubRequest;
 import com.blackducksoftware.integration.hub.api.version.VersionComparison;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 

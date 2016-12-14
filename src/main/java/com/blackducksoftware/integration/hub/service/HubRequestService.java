@@ -23,9 +23,9 @@ package com.blackducksoftware.integration.hub.service;
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HubRequest;
-import com.blackducksoftware.integration.hub.api.HubRequestFactory;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.request.HubRequest;
+import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 
@@ -41,18 +41,18 @@ public class HubRequestService {
 
     public String getString(List<String> urlSegments) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(urlSegments);
-        final String s = hubRequest.executeForResponseString();
+        final String s = hubRequest.executeGetForResponseString();
         return s;
     }
 
     public JsonObject getJsonObject(List<String> urlSegments) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(urlSegments);
-        final JsonObject jsonObject = hubRequest.executeForResponseJson();
+        final JsonObject jsonObject = hubRequest.executeGetForResponseJson();
         return jsonObject;
     }
 
     public <T> T getItem(final HubRequest hubRequest, Class<T> clazz) throws HubIntegrationException {
-        final String response = hubRequest.executeForResponseString();
+        final String response = hubRequest.executeGetForResponseString();
         return getRestConnection().getGson().fromJson(response, clazz);
     }
 

@@ -26,49 +26,25 @@ import java.util.Date;
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
 import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class ProjectVersionItem extends HubItem {
-    public static final String VERSION_REPORT_LINK = "versionReport";
 
-    public static final String RISK_PROFILE_LINK = "riskProfile";
+    private DistributionEnum distribution;
 
-    public static final String VULNERABLE_COMPONENTS_LINK = "vulnerable-components";
+    private ComplexLicense license;
 
-    public static final String PROJECT_LINK = "project";
+    private String nickname;
 
-    public static final String POLICY_STATUS_LINK = "policy-status";
+    private PhaseEnum phase;
 
-    private final DistributionEnum distribution;
+    private String releaseComments;
 
-    private final ComplexLicense license;
-
-    private final String nickname;
-
-    private final PhaseEnum phase;
-
-    private final String releaseComments;
-
-    private final Date releasedOn;
+    private Date releasedOn;
 
     // description from Hub API: "Read-Only; No matter the value it will always default to 'CUSTOM'",
-    private final SourceEnum source;
+    private SourceEnum source;
 
-    private final String versionName;
-
-    public ProjectVersionItem(final MetaInformation meta, final DistributionEnum distribution,
-            final ComplexLicense license, final String nickname, final PhaseEnum phase, final String releaseComments,
-            final Date releasedOn, final SourceEnum source, final String versionName) {
-        super(meta);
-        this.distribution = distribution;
-        this.license = license;
-        this.nickname = nickname;
-        this.phase = phase;
-        this.releaseComments = releaseComments;
-        this.releasedOn = releasedOn;
-        this.source = source;
-        this.versionName = versionName;
-    }
+    private String versionName;
 
     public DistributionEnum getDistribution() {
         return distribution;

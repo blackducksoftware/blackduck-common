@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationClearedNotificationItem;
@@ -46,9 +47,9 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
     public PolicyViolationClearedTransformer(final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
             final VersionBomPolicyRequestService bomVersionPolicyService,
-            HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter) {
+            HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter, MetaService metaService) {
         super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
-                hubRequestService, policyFilter);
+                hubRequestService, policyFilter, metaService);
     }
 
     @Override

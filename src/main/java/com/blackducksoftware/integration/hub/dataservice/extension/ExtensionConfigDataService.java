@@ -31,6 +31,7 @@ import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigReques
 import com.blackducksoftware.integration.hub.api.extension.ExtensionItem;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
 import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkItem;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.dataservice.extension.transformer.UserConfigTransform;
@@ -41,7 +42,6 @@ import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ExtensionConfigDataService extends HubRequestService {
-    private final IntLogger logger;
 
     private final HubRequestService hubRequestService;
 
@@ -53,32 +53,37 @@ public class ExtensionConfigDataService extends HubRequestService {
 
     private final ParallelResourceProcessor<UserConfigItem, UserOptionLinkItem> parallelProcessor;
 
-    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserRequestService userRequestService,
+    private final MetaService metaService;
+
+    public ExtensionConfigDataService(IntLogger logger, final RestConnection restConnection, final UserRequestService userRequestService,
             final HubRequestService hubRequestService,
             final ExtensionConfigRequestService extensionConfigRequestService,
-            final ExtensionUserOptionRequestService extensionUserOptionRequestService) {
+            final ExtensionUserOptionRequestService extensionUserOptionRequestService, MetaService metaService) {
         super(restConnection);
-        this.logger = logger;
         this.hubRequestService = hubRequestService;
         this.extensionConfigRequestService = extensionConfigRequestService;
         this.extensionUserOptionRequestService = extensionUserOptionRequestService;
+        this.metaService = metaService;
         userConfigTransform = new UserConfigTransform(userRequestService, extensionConfigRequestService);
         parallelProcessor = new ParallelResourceProcessor<>(logger);
         parallelProcessor.addTransform(UserOptionLinkItem.class, userConfigTransform);
+
     }
 
     public Map<String, ConfigurationItem> getGlobalConfigMap(final String extensionUrl) throws HubIntegrationException {
         Map<String, ConfigurationItem> globalConfigMap = new HashMap<>();
         final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
-        globalConfigMap = createGlobalConfigMap(extension.getLink("global-options"));
+        final String globalOptionsLink = metaService.getLink(extension, MetaService.GLOBAL_OPTIONS_LINK);
+        globalConfigMap = createGlobalConfigMap(globalOptionsLink);
         return globalConfigMap;
     }
 
     public List<UserConfigItem> getUserConfigList(final String extensionUrl) throws HubIntegrationException {
         List<UserConfigItem> itemList = new LinkedList<>();
         final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
+        final String userOptionsLink = metaService.getLink(extension, MetaService.USER_OPTIONS_LINK);
         final List<UserOptionLinkItem> userOptionList = extensionUserOptionRequestService
-                .getUserOptions(extension.getLink("user-options"));
+                .getUserOptions(userOptionsLink);
         itemList = parallelProcessor.process(userOptionList);
 
         return itemList;

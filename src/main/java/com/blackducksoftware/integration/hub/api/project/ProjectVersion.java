@@ -21,15 +21,9 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.api.project;
 
-import org.apache.commons.lang3.builder.RecursiveToStringStyle;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-
 import com.google.gson.annotations.SerializedName;
 
 public class ProjectVersion {
-    public static final String PROJECT_URL_IDENTIFIER = "projects";
-
-    public static final String VERSION_URL_IDENTIFIER = "versions";
 
     private String projectName;
 
@@ -60,49 +54,6 @@ public class ProjectVersion {
 
     public void setUrl(final String url) {
         this.url = url;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
-        result = prime * result + ((projectVersionName == null) ? 0 : projectVersionName.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ProjectVersion other = (ProjectVersion) obj;
-        if (projectName == null) {
-            if (other.projectName != null) {
-                return false;
-            }
-        } else if (!projectName.equals(other.projectName)) {
-            return false;
-        }
-        if (projectVersionName == null) {
-            if (other.projectVersionName != null) {
-                return false;
-            }
-        } else if (!projectVersionName.equals(other.projectVersionName)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

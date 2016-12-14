@@ -21,45 +21,35 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.rest;
 
-import java.net.CookieHandler;
+import java.io.IOException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.AbstractMap;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TimeZone;
-import java.util.regex.Pattern;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
-import org.restlet.Client;
-import org.restlet.Context;
-import org.restlet.Message;
-import org.restlet.Response;
-import org.restlet.data.Method;
-import org.restlet.data.Protocol;
-import org.restlet.engine.header.HeaderConstants;
-import org.restlet.representation.Representation;
-import org.restlet.resource.ClientResource;
-import org.restlet.resource.ResourceException;
-import org.restlet.util.NamedValue;
-import org.restlet.util.Series;
 
-import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
-import com.blackducksoftware.integration.util.AuthenticatorUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import okhttp3.FormBody;
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * Manages the low-level details of communicating with the server via REST.
@@ -70,17 +60,21 @@ import com.google.gson.JsonParser;
 public abstract class RestConnection {
     public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
 
-    private String baseUrl;
+    private final URL baseUrl;
 
-    private int timeout = 120;
-
-    private IntLogger logger;
+    private final HubProxyInfo hubProxyInfo;
 
     private final Gson gson = new GsonBuilder().setDateFormat(JSON_DATE_FORMAT).create();
 
     private final JsonParser jsonParser = new JsonParser();
 
-    private final Client client;
+    private final OkHttpClient.Builder builder = new OkHttpClient.Builder();
+
+    private OkHttpClient client;
+
+    private IntLogger logger;
+
+    private int timeout = 120;
 
     public static Date parseDateString(final String dateString) throws ParseException {
         final SimpleDateFormat sdf = new SimpleDateFormat(JSON_DATE_FORMAT);
@@ -94,35 +88,17 @@ public abstract class RestConnection {
         return sdf.format(date);
     }
 
-    public RestConnection() {
-        this(null);
+    public RestConnection(URL baseUrl) {
+        this(null, baseUrl, null);
     }
 
-    public RestConnection(final IntLogger logger) {
+    public RestConnection(final IntLogger logger, URL baseUrl, HubProxyInfo hubProxyInfo) {
         if (logger != null) {
             setLogger(logger);
         }
-        client = createClient();
+        this.baseUrl = baseUrl;
+        this.hubProxyInfo = hubProxyInfo;
         setTimeout(timeout); // just in case setTimeout() is never called
-    }
-
-    private Client createClient() {
-        logMessage(LogLevel.DEBUG, "createClient()");
-        final Context context = new Context();
-        final List<Protocol> protocolList = new ArrayList<>();
-        protocolList.add(Protocol.HTTP);
-        protocolList.add(Protocol.HTTPS);
-        final Client client = new Client(context, protocolList);
-        // set the connection pool parameters for the httpClient. Since we are
-        // connecting to one hub instance then the maxConnections per host can
-        // be equal to the maxTotalConnections. If this rest connection object
-        // connects to more than one hub instance then the maxConnectionsPerHost
-        // would need to be divided by the number of hub instances.
-        logMessage(LogLevel.DEBUG, "Setting maxConnectionsPerHost and maxTotalConnections on client context");
-        client.getContext().getParameters().set("maxConnectionsPerHost", "100");
-        client.getContext().getParameters().set("maxTotalConnections", "100");
-
-        return client;
     }
 
     public IntLogger getLogger() {
@@ -142,301 +118,112 @@ public abstract class RestConnection {
             throw new IllegalArgumentException("Timeout must be greater than zero.");
         }
         this.timeout = timeout;
-        // the User sets the timeout in seconds, so we translate to ms
-        final String stringTimeout = String.valueOf(timeout * 1000);
-        logMessage(LogLevel.DEBUG, "Setting socketTimeout, socketConnectTimeoutMs, and readTimeout to: " + stringTimeout + " on client context");
-        client.getContext().getParameters().set("socketTimeout", stringTimeout);
-        client.getContext().getParameters().set("socketConnectTimeoutMs", stringTimeout);
-        client.getContext().getParameters().set("readTimeout", stringTimeout);
+        logMessage(LogLevel.DEBUG, "Setting connectTimeout to: " + timeout + "s on client context");
     }
-
-    public String getBaseUrl() {
-        return baseUrl;
-    }
-
-    public void setBaseUrl(final String baseUrl) {
-        this.baseUrl = baseUrl;
-    }
-
-    /**
-     * The proxy settings get set as System properties. I.E. https.proxyHost,
-     * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
-     *
-     */
-    public void setProxyProperties(final HubProxyInfo proxyInfo) {
-        cleanUpOldProxySettings();
-
-        if (!StringUtils.isBlank(proxyInfo.getHost()) && proxyInfo.getPort() > 0) {
-            if (logger != null) {
-                logger.debug("Using Proxy : " + proxyInfo.getHost() + ", at Port : " + proxyInfo.getPort());
-            }
-
-            System.setProperty("http.proxyHost", proxyInfo.getHost());
-            System.setProperty("http.proxyPort", Integer.toString(proxyInfo.getPort()));
-
-            try {
-                if (!StringUtils.isBlank(proxyInfo.getUsername())
-                        && !StringUtils.isBlank(proxyInfo.getDecryptedPassword())) {
-
-                    AuthenticatorUtil.setAuthenticator(proxyInfo.getUsername(), proxyInfo.getDecryptedPassword());
-                }
-            } catch (final Exception e) {
-                if (logger != null) {
-                    logger.error(e);
-                }
-            }
-        }
-        if (!StringUtils.isBlank(proxyInfo.getIgnoredProxyHosts())) {
-            System.setProperty("http.nonProxyHosts", proxyInfo.getIgnoredProxyHosts().replaceAll(",", "|"));
-        }
-    }
-
-    /**
-     * The proxy settings get set as System properties. I.E. https.proxyHost,
-     * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
-     *
-     */
-    public void setProxyProperties(final String proxyHost, final int proxyPort, final List<Pattern> noProxyHosts,
-            final String proxyUsername, final String proxyPassword) {
-
-        HubCredentials proxyCredentials = null;
-        try {
-            proxyCredentials = new HubCredentials(proxyUsername, proxyPassword);
-        } catch (final IllegalArgumentException e) {
-            if (logger != null) {
-                logger.error(e);
-            }
-        } catch (final EncryptionException e) {
-            if (logger != null) {
-                logger.error(e);
-            }
-        }
-        String noProxyHostsString = null;
-        if (noProxyHosts != null && !noProxyHosts.isEmpty()) {
-            for (final Pattern pattern : noProxyHosts) {
-                if (noProxyHostsString == null) {
-                    noProxyHostsString = pattern.toString();
-                } else {
-                    noProxyHostsString = noProxyHostsString + "|" + pattern.toString();
-                }
-            }
-        }
-
-        final HubProxyInfo proxyInfo = new HubProxyInfo(proxyHost, proxyPort, proxyCredentials, noProxyHostsString);
-        setProxyProperties(proxyInfo);
-
-    }
-
-    /**
-     * Get a resource from via an absolute URL.
-     *
-     * @param modelClass
-     *            The type of the returned object.
-     * @param url
-     *            The absolute URL for the resource.
-     * @return The resource gotten from the Hub.
-     * @throws ResourceDoesNotExistException
-     * @throws HubIntegrationException
-     */
-    public <T> T httpGetFromAbsoluteUrl(final Class<T> modelClass, final String url)
-            throws HubIntegrationException {
-        final ClientResource resource = createClientResource(url);
-        try {
-            resource.setMethod(Method.GET);
-            handleRequest(resource);
-
-            logMessage(LogLevel.DEBUG, "Resource: " + resource);
-            final int responseCode = getResponseStatusCode(resource);
-            if (isSuccess(responseCode)) {
-                return parseResponse(modelClass, resource);
-            } else {
-                throw new HubIntegrationException(
-                        "Error getting resource from " + url + ": " + responseCode + "; " + resource.toString());
-            }
-        } finally {
-            releaseResource(resource);
-        }
-    }
-
-    /**
-     * Get a resource via a relative URL.
-     *
-     * This method uses (and, if necessary, initializes) the re-usable
-     * ClientResource object.
-     *
-     * @param modelClass
-     *            The type of the returned object.
-     * @param urlSegments
-     *            URL segments to add to the base Hub URL.
-     * @param queryParameters
-     *            Query parameters to add to the URL.
-     * @return The resource gotten from the Hub.
-     * @throws HubIntegrationException
-     */
-    public <T> T httpGetFromRelativeUrl(final Class<T> modelClass, final List<String> urlSegments,
-            final Set<AbstractMap.SimpleEntry<String, String>> queryParameters)
-            throws HubIntegrationException {
-
-        final ClientResource resource = createClientResource(urlSegments, queryParameters);
-        try {
-            resource.setMethod(Method.GET);
-            handleRequest(resource);
-
-            logMessage(LogLevel.DEBUG, "Resource: " + resource);
-            final int responseCode = getResponseStatusCode(resource);
-
-            if (isSuccess(responseCode)) {
-                return parseResponse(modelClass, resource);
-            } else {
-                throw new HubIntegrationException(
-                        "Error getting resource from relative url segments " + urlSegments + " and query parameters "
-                                + queryParameters + "; errorCode: " + responseCode + "; " + resource.toString());
-            }
-        } finally {
-            releaseResource(resource);
-        }
-    }
-
-    protected void releaseResource(final ClientResource resource) {
-        if (resource.getResponse() != null) {
-            resource.getResponse().release();
-        }
-        resource.release();
-    }
-
-    public ClientResource createClientResource() throws HubIntegrationException {
-        return createClientResource(getBaseUrl());
-    }
-
-    public ClientResource createClientResource(final String providedUrl) throws HubIntegrationException {
-        // Should throw timeout exception after the specified timeout, default
-        // is 2 minutes
-        final ClientResource resource = createClientResource(client.getContext(), providedUrl);
-        resource.setNext(client);
-        return resource;
-    }
-
-    public abstract ClientResource createClientResource(final Context context, final String providedUrl) throws HubIntegrationException;
 
     public abstract void connect() throws HubIntegrationException;
 
-    public ClientResource createClientResource(final List<String> urlSegments,
-            final Set<AbstractMap.SimpleEntry<String, String>> queryParameters) throws HubIntegrationException {
-        final ClientResource resource = createClientResource();
-
-        for (final String urlSegment : urlSegments) {
-            resource.addSegment(urlSegment);
-        }
-        for (final AbstractMap.SimpleEntry<String, String> queryParameter : queryParameters) {
-            resource.addQueryParameter(queryParameter.getKey(), queryParameter.getValue());
-        }
-        return resource;
+    public HttpUrl createHttpUrl() {
+        return HttpUrl.get(getBaseUrl()).newBuilder().build();
     }
 
-    public int getResponseStatusCode(final ClientResource resource) {
-        return resource.getResponse().getStatus().getCode();
+    public HttpUrl createHttpUrl(final String providedUrl) {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(providedUrl).newBuilder();
+        return urlBuilder.build();
     }
 
-    public boolean isSuccess(final int responseCode) {
-        return responseCode >= 200 && responseCode < 300;
+    public HttpUrl createHttpUrl(final List<String> urlSegments) {
+        return createHttpUrl(urlSegments, null);
     }
 
-    public void handleRequest(final ClientResource resource) throws HubIntegrationException {
-        final boolean debugLogging = isDebugLogging();
-        if (debugLogging) {
-            logMessage(LogLevel.TRACE, "Resource : " + resource.toString());
-            logRestletRequestOrResponse(resource.getRequest());
-        }
+    public HttpUrl createHttpUrl(final List<String> urlSegments,
+            final Map<String, String> queryParameters) {
+        return createHttpUrl(getBaseUrl().toString(), urlSegments, queryParameters);
+    }
 
-        final CookieHandler originalCookieHandler = CookieHandler.getDefault();
-        try {
-            if (originalCookieHandler != null) {
-                if (debugLogging) {
-                    logMessage(LogLevel.TRACE, "Setting Cookie Handler to NULL");
-                }
-                CookieHandler.setDefault(null);
-            }
-            resource.handle();
-        } catch (final ResourceException e) {
-            throw new HubIntegrationException("Problem connecting to the Hub server provided.", e);
-        } finally {
-            if (originalCookieHandler != null) {
-                if (debugLogging) {
-                    logMessage(LogLevel.TRACE, "Setting Original Cookie Handler : " + originalCookieHandler.toString());
-                }
-                CookieHandler.setDefault(originalCookieHandler);
+    public HttpUrl createHttpUrl(String providedUrl, final List<String> urlSegments,
+            final Map<String, String> queryParameters) {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(providedUrl).newBuilder();
+        if (urlSegments != null) {
+            for (final String urlSegment : urlSegments) {
+                urlBuilder.addPathSegment(urlSegment);
             }
         }
-
-        if (debugLogging) {
-            logRestletRequestOrResponse(resource.getResponse());
-            logMessage(LogLevel.TRACE, "Status Code : " + resource.getResponse().getStatus().getCode());
+        if (queryParameters != null) {
+            for (Entry<String, String> queryParameter : queryParameters.entrySet()) {
+                urlBuilder.addQueryParameter(queryParameter.getKey(), queryParameter.getValue());
+            }
         }
+        return urlBuilder.build();
     }
 
-    private boolean isDebugLogging() {
-        return logger != null && logger.getLogLevel() == LogLevel.TRACE;
-    }
-
-    public String readResponseAsString(final Response response) {
-        return response.getEntityAsText();
-    }
-
-    private void logRestletRequestOrResponse(final Message requestOrResponse) {
-        if (isDebugLogging()) {
-            final String requestOrResponseName = requestOrResponse.getClass().getSimpleName();
-            logMessage(LogLevel.TRACE, requestOrResponseName + " : " + requestOrResponse.toString());
-
-            if (!requestOrResponse.getAttributes().isEmpty()) {
-                logMessage(LogLevel.TRACE, requestOrResponseName + " attributes : ");
-                for (final Entry<String, Object> requestAtt : requestOrResponse.getAttributes().entrySet()) {
-                    logMessage(LogLevel.TRACE, "Attribute key : " + requestAtt.getKey());
-                    logMessage(LogLevel.TRACE, "Attribute value : " + requestAtt.getValue());
-                    logMessage(LogLevel.TRACE, "");
+    protected void setupClient() throws HubIntegrationException {
+        builder.connectTimeout(timeout, TimeUnit.SECONDS);
+        builder.writeTimeout(timeout, TimeUnit.SECONDS);
+        builder.readTimeout(timeout, TimeUnit.SECONDS);
+        if (getHubProxyInfo() != null) {
+            builder.proxy(getHubProxyInfo().getProxy(getBaseUrl()));
+            String password;
+            try {
+                password = getHubProxyInfo().getDecryptedPassword();
+                if (StringUtils.isNotBlank(getHubProxyInfo().getUsername()) && StringUtils.isNotBlank(password)) {
+                    builder.proxyAuthenticator(
+                            new com.blackducksoftware.integration.hub.proxy.OkAuthenticator(getHubProxyInfo().getUsername(),
+                                    password));
                 }
-                @SuppressWarnings("unchecked")
-                final Series<? extends NamedValue> responseheaders = (Series<? extends NamedValue>) requestOrResponse
-                        .getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
-                if (responseheaders != null) {
-                    logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
-                    for (final NamedValue header : responseheaders) {
-                        if (header == null) {
-                            logMessage(LogLevel.TRACE, "received a null header");
-                        } else {
-                            logMessage(LogLevel.TRACE, "Header name : " + header.getName());
-                            logMessage(LogLevel.TRACE, "Header value : " + header.getValue());
-                            logMessage(LogLevel.TRACE, "");
-                        }
-                    }
-                } else {
-                    logMessage(LogLevel.TRACE, requestOrResponseName + " headers : NONE");
-                }
-            } else {
-                logMessage(LogLevel.TRACE, requestOrResponseName + " does not have any attributes/headers.");
+            } catch (Exception e) {
+                throw new HubIntegrationException(e.getMessage(), e);
             }
         }
     }
 
-    /**
-     * Clears the previously set System properties I.E. https.proxyHost,
-     * https.proxyPort, http.proxyHost, http.proxyPort, http.nonProxyHosts
-     *
-     */
-    private void cleanUpOldProxySettings() {
-        System.clearProperty("http.proxyHost");
-        System.clearProperty("http.proxyPort");
-        System.clearProperty("http.nonProxyHosts");
-
-        AuthenticatorUtil.resetAuthenticator();
+    public RequestBody createJsonRequestBody(String content) {
+        return createJsonRequestBody("application/json", content);
     }
 
-    private <T> T parseResponse(final Class<T> modelClass, final ClientResource resource) {
-        final String response = readResponseAsString(resource.getResponse());
-        final JsonParser parser = new JsonParser();
-        final JsonObject json = parser.parse(response).getAsJsonObject();
+    public RequestBody createJsonRequestBody(String mediaType, String content) {
+        return RequestBody.create(MediaType.parse(mediaType), content);
+    }
 
-        final T modelObject = gson.fromJson(json, modelClass);
-        return modelObject;
+    public RequestBody createEncodedRequestBody(Map<String, String> content) {
+        FormBody.Builder builder = new FormBody.Builder();
+        for (Entry<String, String> contentEntry : content.entrySet()) {
+            builder.addEncoded(contentEntry.getKey(), contentEntry.getValue());
+        }
+        return builder.build();
+    }
+
+    public Request createGetRequest(HttpUrl httpUrl) {
+        return createGetRequest(httpUrl, "application/json;");
+    }
+
+    public Request createGetRequest(HttpUrl httpUrl, String mediaType) {
+        return new Request.Builder().addHeader("Accept", mediaType)
+                .url(httpUrl).get().build();
+    }
+
+    public Request createPostRequest(HttpUrl httpUrl, RequestBody body) {
+        return new Request.Builder()
+                .url(httpUrl)
+                .post(body).build();
+    }
+
+    public Request createPutRequest(HttpUrl httpUrl, RequestBody body) {
+        return new Request.Builder()
+                .url(httpUrl)
+                .put(body).build();
+    }
+
+    public Request createDeleteRequest(HttpUrl httpUrl) {
+        return new Request.Builder()
+                .url(httpUrl).delete().build();
+    }
+
+    public Response handleExecuteClientCall(Request request) throws IOException {
+        logRequestHeaders(request);
+        Response response = getClient().newCall(request).execute();
+        logResponseHeaders(response);
+        return response;
     }
 
     private void logMessage(final LogLevel level, final String txt) {
@@ -455,79 +242,61 @@ public abstract class RestConnection {
         }
     }
 
+    private boolean isDebugLogging() {
+        return logger != null && logger.getLogLevel() == LogLevel.TRACE;
+    }
+
+    private void logRequestHeaders(final Request request) {
+        if (isDebugLogging()) {
+            final String requestName = request.getClass().getSimpleName();
+            logMessage(LogLevel.TRACE, requestName + " : " + request.toString());
+            logHeaders(requestName, request.headers());
+        }
+    }
+
+    private void logResponseHeaders(final Response response) {
+        if (isDebugLogging()) {
+            final String responseName = response.getClass().getSimpleName();
+            logMessage(LogLevel.TRACE, responseName + " : " + response.toString());
+            logHeaders(responseName, response.headers());
+        }
+    }
+
+    private void logHeaders(String requestOrResponseName, final Headers headers) {
+        if (headers != null && headers.size() > 0) {
+            logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
+            for (Entry<String, List<String>> headerEntry : headers.toMultimap().entrySet()) {
+                String key = headerEntry.getKey();
+                String value = "null";
+                if (headerEntry.getValue() != null && !headerEntry.getValue().isEmpty()) {
+                    value = StringUtils.join(headerEntry.getValue(), System.lineSeparator());
+                }
+                logMessage(LogLevel.TRACE, String.format("Header %s : %s", key, value));
+            }
+        } else {
+            logMessage(LogLevel.TRACE, requestOrResponseName + " does not have any headers.");
+        }
+    }
+
     @Override
     public String toString() {
         return "RestConnection [baseUrl=" + baseUrl + "]";
     }
 
-    public String httpPostFromAbsoluteUrl(final String url, final Representation content)
-            throws HubIntegrationException {
-
-        final ClientResource resource = createClientResource(url);
-        try {
-            resource.setMethod(Method.POST);
-            resource.getRequest().setEntity(content);
-            return handleHttpPost(resource);
-        } finally {
-            releaseResource(resource);
-        }
+    protected OkHttpClient.Builder getBuilder() {
+        return builder;
     }
 
-    public String httpPostFromRelativeUrl(final List<String> urlSegments, final Representation content)
-            throws HubIntegrationException {
-        final Set<SimpleEntry<String, String>> queryParameters = new HashSet<>();
-        return httpPostFromRelativeUrl(urlSegments, queryParameters, content);
-    }
-
-    public String httpPostFromRelativeUrl(final List<String> urlSegments,
-            final Set<AbstractMap.SimpleEntry<String, String>> queryParameters, final Representation content)
-            throws HubIntegrationException {
-
-        final ClientResource resource = createClientResource(urlSegments, queryParameters);
-        try {
-            resource.setMethod(Method.POST);
-            resource.getRequest().setEntity(content);
-            return handleHttpPost(resource);
-        } finally {
-            releaseResource(resource);
-        }
-    }
-
-    public String handleHttpPost(final ClientResource resource)
-            throws HubIntegrationException {
-        handleRequest(resource);
-
-        logMessage(LogLevel.DEBUG, "Resource: " + resource);
-        final int responseCode = getResponseStatusCode(resource);
-
-        if (isSuccess(responseCode)) {
-            if (resource.getResponse().getAttributes() == null
-                    || resource.getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS) == null) {
-                throw new HubIntegrationException(
-                        "Could not get the response headers after creating the resource.");
-            }
-
-            if (responseCode != 201) {
-                return "";
-            } else {
-                @SuppressWarnings("unchecked")
-                final Series<? extends NamedValue> responseHeaders = (Series<? extends NamedValue>) resource
-                        .getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
-                final NamedValue resourceUrl = responseHeaders.getFirst("location", true);
-                if (resourceUrl == null) {
-                    throw new HubIntegrationException("Could not get the resource URL from the response headers.");
-                }
-                final String value = (String) resourceUrl.getValue();
-                return value;
-            }
-        } else {
-            throw new HubIntegrationException(
-                    "There was a problem creating the resource. Error Code: " + responseCode);
-        }
-    }
-
-    protected Client getClient() {
+    public OkHttpClient getClient() {
         return client;
+    }
+
+    public void setClient(OkHttpClient client) {
+        this.client = client;
+    }
+
+    public URL getBaseUrl() {
+        return baseUrl;
     }
 
     public Gson getGson() {
@@ -536,6 +305,10 @@ public abstract class RestConnection {
 
     public JsonParser getJsonParser() {
         return jsonParser;
+    }
+
+    public HubProxyInfo getHubProxyInfo() {
+        return hubProxyInfo;
     }
 
 }

@@ -24,28 +24,17 @@ package com.blackducksoftware.integration.hub.api.codelocation;
 import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
 
 public class CodeLocationItem extends HubItem {
-    private final CodeLocationTypeEnum type;
+    private CodeLocationTypeEnum type;
 
-    private final String url;
+    private String url;
 
-    private final String mappedProjectVersion;
+    private String mappedProjectVersion;
 
-    private final Date createdAt;
+    private Date createdAt;
 
-    private final Date updatedAt;
-
-    public CodeLocationItem(final MetaInformation meta, final CodeLocationTypeEnum type, final String url,
-            final String mappedProjectVersion, final Date createdAt, final Date updatedAt) {
-        super(meta);
-        this.type = type;
-        this.url = url;
-        this.mappedProjectVersion = mappedProjectVersion;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
+    private Date updatedAt;
 
     public CodeLocationTypeEnum getType() {
         return type;

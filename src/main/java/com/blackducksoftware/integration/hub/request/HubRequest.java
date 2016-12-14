@@ -19,10 +19,11 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
-package com.blackducksoftware.integration.hub.api;
+package com.blackducksoftware.integration.hub.request;
 
 import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_Q;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,14 +32,14 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.restlet.Response;
-import org.restlet.data.Method;
-import org.restlet.representation.Representation;
-import org.restlet.resource.ClientResource;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
+
+import okhttp3.HttpUrl;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Most usages of the Hub endpoints as of 2016-11-23 (Hub 3.3.1) should use the HubPagedRequest, but there are several
@@ -47,8 +48,6 @@ import com.google.gson.JsonObject;
  */
 public class HubRequest {
     private final RestConnection restConnection;
-
-    private Method method;
 
     private String url;
 
@@ -62,65 +61,78 @@ public class HubRequest {
         this.restConnection = restConnection;
     }
 
-    public JsonObject executeForResponseJson() throws HubIntegrationException {
-        final ClientResource clientResource = buildClientResource(restConnection);
+    public JsonObject executeGetForResponseJson() throws HubIntegrationException {
         try {
-            restConnection.handleRequest(clientResource);
-
-            final Response response = clientResource.getResponse();
-            final int responseCode = response.getStatus().getCode();
-            if (restConnection.isSuccess(responseCode)) {
-                final String responseString = restConnection.readResponseAsString(response);
+            HttpUrl httpUrl = buildHttpUrl();
+            Request request = restConnection.createGetRequest(httpUrl);
+            Response response = restConnection.handleExecuteClientCall(request);
+            if (response.isSuccessful()) {
+                final String responseString = response.body().string();
                 final JsonObject jsonObject = restConnection.getJsonParser().parse(responseString).getAsJsonObject();
                 return jsonObject;
             } else {
-                throw new HubIntegrationException(String.format("Request was not successful. (responseCode: %s)", responseCode));
+                throw new HubIntegrationException("There was a problem getting this item : " + url + ". Error : " + response.message());
             }
-        } finally {
-            releaseResource(clientResource);
+        } catch (IOException e) {
+            throw new HubIntegrationException("There was a problem getting this item : " + url + ". Error : " + e.getMessage(), e);
         }
     }
 
-    public String executeForResponseString() throws HubIntegrationException {
-        final ClientResource clientResource = buildClientResource(restConnection);
+    public String executeGetForResponseString() throws HubIntegrationException {
         try {
-            restConnection.handleRequest(clientResource);
-
-            final Response response = clientResource.getResponse();
-            final int responseCode = response.getStatus().getCode();
-            if (restConnection.isSuccess(responseCode)) {
-                final String responseString = restConnection.readResponseAsString(response);
-                return responseString;
+            HttpUrl httpUrl = buildHttpUrl();
+            Request request = restConnection.createGetRequest(httpUrl);
+            Response response = restConnection.handleExecuteClientCall(request);
+            if (response.isSuccessful()) {
+                return response.body().string();
             } else {
-                final String message = String.format("Request was not successful. (responseCode: %s): %s", responseCode,
-                        clientResource.toString());
-                throw new HubIntegrationException(message);
+                throw new HubIntegrationException("There was a problem getting this item : " + url + ". Error : " + response.message());
             }
-        } finally {
-            releaseResource(clientResource);
+        } catch (IOException e) {
+            throw new HubIntegrationException("There was a problem getting this item : " + url + ". Error : " + e.getMessage(), e);
         }
     }
 
-    public String executePost(Representation representation) throws HubIntegrationException {
-        final ClientResource clientResource = buildClientResource(restConnection);
+    public String executePost(String content) throws HubIntegrationException {
         try {
-            clientResource.getRequest().setEntity(representation);
-            return restConnection.handleHttpPost(clientResource);
-        } finally {
-            releaseResource(clientResource);
+            HttpUrl httpUrl = buildHttpUrl();
+            Request request = restConnection.createPostRequest(httpUrl, restConnection.createJsonRequestBody(content));
+            Response response = restConnection.handleExecuteClientCall(request);
+            if (response.isSuccessful()) {
+                return response.header("location");
+            } else {
+                throw new HubIntegrationException("There was a problem posting this item : " + url + ". Error : " + response.message());
+            }
+        } catch (IOException e) {
+            throw new HubIntegrationException("There was a problem posting this item : " + url + ". Error : " + e.getMessage(), e);
+        }
+    }
+
+    public String executePost(String mediaType, String content) throws HubIntegrationException {
+        try {
+            HttpUrl httpUrl = buildHttpUrl();
+            Request request = restConnection.createPostRequest(httpUrl, restConnection.createJsonRequestBody(mediaType, content));
+            Response response = restConnection.handleExecuteClientCall(request);
+            if (response.isSuccessful()) {
+                return response.header("location");
+            } else {
+                throw new HubIntegrationException("There was a problem posting this item : " + url + ". Error : " + response.message());
+            }
+        } catch (IOException e) {
+            throw new HubIntegrationException("There was a problem posting this item : " + url + ". Error : " + e.getMessage(), e);
         }
     }
 
     public void executeDelete() throws HubIntegrationException {
-        final ClientResource clientResource = buildClientResource(restConnection);
         try {
-            restConnection.handleRequest(clientResource);
-            final int responseCode = clientResource.getResponse().getStatus().getCode();
-            if (!restConnection.isSuccess(responseCode)) {
-                throw new HubIntegrationException("There was a problem deleting this item : " + url + ". Error Code: " + responseCode);
+            HttpUrl httpUrl = buildHttpUrl();
+            Request request = restConnection.createDeleteRequest(httpUrl);
+            Response response = restConnection.handleExecuteClientCall(request);
+            if (!response.isSuccessful()) {
+                throw new HubIntegrationException("There was a problem deleting this item : " + url + ". Error : " + response.message());
             }
-        } finally {
-            releaseResource(clientResource);
+        } catch (IOException e) {
+            throw new HubIntegrationException("There was a problem deleting this item : " + url + ". Error : " + e.getMessage(), e);
         }
     }
 
@@ -130,41 +142,12 @@ public class HubRequest {
         }
     }
 
-    private void releaseResource(final ClientResource resource) {
-        if (resource.getResponse() != null) {
-            resource.getResponse().release();
-        }
-        resource.release();
-    }
-
-    private ClientResource buildClientResource(final RestConnection restConnection) throws HubIntegrationException {
-        final ClientResource resource;
-        if (StringUtils.isNotBlank(url)) {
-            resource = restConnection.createClientResource(url);
-        } else {
-            resource = restConnection.createClientResource();
-        }
-
-        for (final String segment : urlSegments) {
-            resource.addSegment(segment);
-        }
-
+    private HttpUrl buildHttpUrl() throws HubIntegrationException {
         populateQueryParameters();
-
-        for (final Map.Entry<String, String> entry : queryParameters.entrySet()) {
-            resource.addQueryParameter(entry.getKey(), entry.getValue());
+        if (StringUtils.isBlank(url)) {
+            url = restConnection.getBaseUrl().toString();
         }
-
-        resource.setMethod(method);
-        return resource;
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
-    public void setMethod(final Method method) {
-        this.method = method;
+        return restConnection.createHttpUrl(url, urlSegments, queryParameters);
     }
 
     public String getUrl() {
