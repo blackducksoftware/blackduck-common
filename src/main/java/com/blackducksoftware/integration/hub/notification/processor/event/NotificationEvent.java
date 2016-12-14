@@ -21,7 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.notification.processor.event;
 
-import java.net.URISyntaxException;
 import java.util.Set;
 
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
@@ -45,7 +44,7 @@ public abstract class NotificationEvent<T extends NotificationContentItem> {
         this.notificationContent = notificationContent;
     }
 
-    public void init() throws URISyntaxException {
+    public void init() {
         dataSet = generateDataSet();
         eventKey = generateEventKey();
     }
@@ -62,7 +61,7 @@ public abstract class NotificationEvent<T extends NotificationContentItem> {
 
     public abstract Set<ItemEntry> generateDataSet();
 
-    public abstract String generateEventKey() throws URISyntaxException;
+    public abstract String generateEventKey();
 
     public abstract int countCategoryItems();
 

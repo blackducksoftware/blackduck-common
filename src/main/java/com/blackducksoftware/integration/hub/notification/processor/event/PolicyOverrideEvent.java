@@ -21,7 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.notification.processor.event;
 
-import java.net.URISyntaxException;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,8 +34,7 @@ import com.blackducksoftware.integration.hub.notification.processor.Notification
 public class PolicyOverrideEvent extends PolicyEvent {
 
     public PolicyOverrideEvent(ProcessingAction action, NotificationCategoryEnum categoryType, PolicyOverrideContentItem notificationContent,
-            PolicyRule policyRule)
-            throws URISyntaxException {
+            PolicyRule policyRule) {
         super(action, categoryType, notificationContent, policyRule);
     }
 

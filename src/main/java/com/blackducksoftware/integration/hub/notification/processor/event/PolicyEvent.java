@@ -21,7 +21,6 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.notification.processor.event;
 
-import java.net.URISyntaxException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -35,7 +34,7 @@ public class PolicyEvent extends NotificationEvent<PolicyContentItem> {
     private final PolicyRule policyRule;
 
     public PolicyEvent(ProcessingAction action, NotificationCategoryEnum categoryType, PolicyContentItem notificationContent,
-            PolicyRule policyRule) throws URISyntaxException {
+            PolicyRule policyRule) {
         super(action, categoryType, notificationContent);
         this.policyRule = policyRule;
         init();
@@ -51,7 +50,7 @@ public class PolicyEvent extends NotificationEvent<PolicyContentItem> {
     }
 
     @Override
-    public String generateEventKey() throws URISyntaxException {
+    public String generateEventKey() {
         final StringBuilder keyBuilder = new StringBuilder();
         keyBuilder.append(NotificationEventConstants.EVENT_KEY_ISSUE_TYPE_NAME);
         keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
