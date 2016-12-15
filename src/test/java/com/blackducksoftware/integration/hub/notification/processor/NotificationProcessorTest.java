@@ -92,9 +92,9 @@ public class NotificationProcessorTest {
     private String createComponentJson() {
         return "{ \"_meta\": { \"href\": \"" + EventTestUtil.COMPONENT_VERSION_URL + "\","
                 + "\"links\": [ {"
-                + "\rel: \"" + MetaService.VULNERABILITIES_LINK + "\","
-                + " \"href\": \"" + EventTestUtil.COMPONENT_VERSION_URL + "\"},{"
-                + "\rel\":\"vulnerable-components\","
+                + "\"rel\": \"vulnerabilities\","
+                + "\"href\": \"" + EventTestUtil.COMPONENT_VERSION_URL + "\"},{"
+                + "\"rel\":\"vulnerable-components\","
                 + "\"href\": \"" + EventTestUtil.COMPONENT_VERSION_URL + "\""
                 + "}]}}";
     }
