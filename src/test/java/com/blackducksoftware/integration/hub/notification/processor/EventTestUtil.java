@@ -29,7 +29,6 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Polic
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.VulnerabilityContentItem;
 import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
-import com.blackducksoftware.integration.hub.meta.MetaLink;
 
 public class EventTestUtil {
     public static final String DESCRIPTION = "description";
@@ -107,8 +106,6 @@ public class EventTestUtil {
     public static final String COMPONENT_VERSION_ID = "component_version_id";
 
     public static final List<MetaAllowEnum> ALLOW_LIST = Collections.emptyList();
-
-    public static final List<MetaLink> META_LINK_LIST = Collections.emptyList();
 
     public List<VulnerabilityItem> createVulnerabiltyItemList(List<VulnerabilitySourceQualifiedId> vulnSourceList) {
         final List<VulnerabilityItem> vulnerabilityList = new ArrayList<>(vulnSourceList.size());
