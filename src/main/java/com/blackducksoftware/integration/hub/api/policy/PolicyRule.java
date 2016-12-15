@@ -38,11 +38,11 @@ public class PolicyRule extends HubItem {
 
     private Date createdAt;
 
-    private Date createdBy;
+    private String createdBy;
 
     private Date updatedAt;
 
-    private Date updatedBy;
+    private String updatedBy;
 
     public String getName() {
         return name;
@@ -68,7 +68,7 @@ public class PolicyRule extends HubItem {
         return createdAt;
     }
 
-    public Date getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
@@ -76,7 +76,7 @@ public class PolicyRule extends HubItem {
         return updatedAt;
     }
 
-    public Date getUpdatedBy() {
+    public String getUpdatedBy() {
         return updatedBy;
     }
 

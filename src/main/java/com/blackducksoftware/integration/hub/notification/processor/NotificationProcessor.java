@@ -45,7 +45,7 @@ public abstract class NotificationProcessor<T> {
         return processEvents(events);
     }
 
-    private void createEvents(final SortedSet<NotificationContentItem> notifications) {
+    private void createEvents(final SortedSet<NotificationContentItem> notifications) throws HubIntegrationException {
         for (final NotificationContentItem item : notifications) {
             final Class<?> key = item.getClass();
             if (processorMap.containsKey(key)) {

@@ -21,24 +21,26 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.notification.processor;
 
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyOverrideContentItem;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.PolicyEvent;
 import com.blackducksoftware.integration.hub.notification.processor.event.PolicyOverrideEvent;
 
 public class PolicyOverrideProcessor extends NotificationSubProcessor<PolicyEvent> {
 
-    public PolicyOverrideProcessor(final MapProcessorCache<PolicyEvent> cache) {
-        super(cache);
+    public PolicyOverrideProcessor(final MapProcessorCache<PolicyEvent> cache, final MetaService metaService) {
+        super(cache, metaService);
     }
 
     @Override
-    public void process(final NotificationContentItem notification) {
+    public void process(final NotificationContentItem notification) throws HubIntegrationException {
         final PolicyOverrideContentItem policyOverrideContentItem = (PolicyOverrideContentItem) notification;
         for (final PolicyRule rule : policyOverrideContentItem.getPolicyRuleList()) {
             final PolicyOverrideEvent event = new PolicyOverrideEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION,
-                    policyOverrideContentItem, rule);
+                    policyOverrideContentItem, rule, getMetaService().getHref(rule));
             if (getCache().hasEvent(event.getEventKey())) {
                 getCache().removeEvent(event);
             } else {

@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.mockito.Mockito;
+
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
@@ -27,7 +29,6 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Polic
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.VulnerabilityContentItem;
 import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
-import com.blackducksoftware.integration.hub.meta.MetaInformation;
 import com.blackducksoftware.integration.hub.meta.MetaLink;
 
 public class EventTestUtil {
@@ -127,8 +128,43 @@ public class EventTestUtil {
     }
 
     public VulnerabilityItem createVulnerability(final String vulnId, final SeverityEnum severity) {
-        return new VulnerabilityItem(null, vulnId, "A vulnerability", "today", "a minute ago", 10.0, 5.0, 1.0, "",
-                severity.name(), "", "", "", "", "", "", vulnId);
+        final VulnerabilityItem item = Mockito.mock(VulnerabilityItem.class);
+        Mockito.when(item.getVulnerabilityName()).thenReturn(vulnId);
+        Mockito.when(item.getDescription()).thenReturn("A vulnerability");
+        Mockito.when(item.getVulnerabilityPublishedDate()).thenReturn("today");
+        Mockito.when(item.getVulnerabilityUpdatedDate()).thenReturn("a minute ago");
+        Mockito.when(item.getBaseScore()).thenReturn(10.0);
+        Mockito.when(item.getImpactSubscore()).thenReturn(5.0);
+        Mockito.when(item.getExploitabilitySubscore()).thenReturn(1.0);
+        Mockito.when(item.getSource()).thenReturn("");
+        Mockito.when(item.getSeverity()).thenReturn(severity.name());
+        Mockito.when(item.getAccessVector()).thenReturn("");
+        Mockito.when(item.getAccessComplexity()).thenReturn("");
+        Mockito.when(item.getAuthentication()).thenReturn("");
+        Mockito.when(item.getAuthentication()).thenReturn("");
+        Mockito.when(item.getAuthentication()).thenReturn("");
+        Mockito.when(item.getAuthentication()).thenReturn("");
+        Mockito.when(item.getCweId()).thenReturn(vulnId);
+        return item;
+    }
+
+    public PolicyRule createPolicyRule(String name, String description, String createdBy, String updatedBy, String href) {
+        final PolicyRule rule = Mockito.mock(PolicyRule.class);
+        Mockito.when(rule.getName()).thenReturn(name);
+        Mockito.when(rule.getDescription()).thenReturn(description);
+        Mockito.when(rule.getEnabled()).thenReturn(true);
+        Mockito.when(rule.getOverridable()).thenReturn(true);
+        Mockito.when(rule.getExpression()).thenReturn(null);
+        Mockito.when(rule.getCreatedAt()).thenReturn(new Date());
+        Mockito.when(rule.getCreatedBy()).thenReturn(createdBy);
+        Mockito.when(rule.getUpdatedAt()).thenReturn(new Date());
+        Mockito.when(rule.getUpdatedBy()).thenReturn(updatedBy);
+        Mockito.when(rule.getJson()).thenReturn(createPolicyRuleJSon(href));
+        return rule;
+    }
+
+    public String createPolicyRuleJSon(String href) {
+        return "{ \"_meta\": { \"href\": \"" + href + "\" }}";
     }
 
     public PolicyOverrideContentItem createPolicyOverride(final Date createdTime, final String projectName,
@@ -143,10 +179,8 @@ public class EventTestUtil {
         final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT
                 + componentVersion;
         final List<PolicyRule> policyRuleList = new ArrayList<>();
-        MetaInformation meta = new MetaInformation(ALLOW_LIST, POLICY_RULE_1_HREF_URL, META_LINK_LIST);
-        policyRuleList.add(new PolicyRule(meta, RULE_NAME_1, DESCRIPTION, true, true, null, CREATED_AT, CREATED_BY, UPDATED_AT, UPDATED_BY));
-        meta = new MetaInformation(ALLOW_LIST, POLICY_RULE_2_HREF_URL, META_LINK_LIST);
-        policyRuleList.add(new PolicyRule(meta, RULE_NAME_2, DESCRIPTION, true, true, null, CREATED_AT, CREATED_BY, UPDATED_AT, UPDATED_BY));
+        policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
+        policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
         final PolicyOverrideContentItem item = new PolicyOverrideContentItem(createdTime, projectVersion, componentName,
                 componentVersion, componentUrl, componentVersionUrl, policyRuleList, FIRST_NAME, LAST_NAME);
         return item;
@@ -164,10 +198,8 @@ public class EventTestUtil {
         final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT
                 + componentVersion;
         final List<PolicyRule> policyRuleList = new ArrayList<>();
-        MetaInformation meta = new MetaInformation(ALLOW_LIST, POLICY_RULE_1_HREF_URL, META_LINK_LIST);
-        policyRuleList.add(new PolicyRule(meta, RULE_NAME_1, DESCRIPTION, true, true, null, CREATED_AT, CREATED_BY, UPDATED_AT, UPDATED_BY));
-        meta = new MetaInformation(ALLOW_LIST, POLICY_RULE_2_HREF_URL, META_LINK_LIST);
-        policyRuleList.add(new PolicyRule(meta, RULE_NAME_2, DESCRIPTION, true, true, null, CREATED_AT, CREATED_BY, UPDATED_AT, UPDATED_BY));
+        policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
+        policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
         final PolicyViolationClearedContentItem item = new PolicyViolationClearedContentItem(createdTime,
                 projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl, policyRuleList);
         return item;
@@ -185,10 +217,8 @@ public class EventTestUtil {
         final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT
                 + componentVersion;
         final List<PolicyRule> policyRuleList = new ArrayList<>();
-        MetaInformation meta = new MetaInformation(ALLOW_LIST, POLICY_RULE_1_HREF_URL, META_LINK_LIST);
-        policyRuleList.add(new PolicyRule(meta, RULE_NAME_1, DESCRIPTION, true, true, null, CREATED_AT, CREATED_BY, UPDATED_AT, UPDATED_BY));
-        meta = new MetaInformation(ALLOW_LIST, POLICY_RULE_2_HREF_URL, META_LINK_LIST);
-        policyRuleList.add(new PolicyRule(meta, RULE_NAME_2, DESCRIPTION, true, true, null, CREATED_AT, CREATED_BY, UPDATED_AT, UPDATED_BY));
+        policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
+        policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
         final PolicyViolationContentItem item = new PolicyViolationContentItem(createdTime, projectVersion,
                 componentName, componentVersion, componentUrl, componentVersionUrl, policyRuleList);
         return item;

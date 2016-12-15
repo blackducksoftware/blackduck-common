@@ -18,21 +18,40 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.notification.processor.event.PolicyEvent;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubServicesFactory;
+import com.blackducksoftware.integration.log.IntBufferedLogger;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class ListProcessorCacheTest {
 
     private final EventTestUtil testUtil = new EventTestUtil();
+
+    private MetaService metaService;
+
+    @Before
+    public void init() throws Exception {
+        final RestConnection restConnection = new MockRestConnection();
+        final HubServicesFactory factory = new HubServicesFactory(restConnection);
+        final IntLogger logger = new IntBufferedLogger();
+        metaService = factory.createMetaService(logger);
+    }
 
     @Test
     public void testEventAdd() throws Exception {
         final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
                 EventTestUtil.COMPONENT,
                 EventTestUtil.VERSION);
-        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
+        final PolicyRule policyRule = item.getPolicyRuleList().get(0);
+        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule,
+                metaService.getHref(policyRule));
 
         final List<PolicyEvent> eventList = new ArrayList<>();
         final ListProcessorCache<PolicyEvent> cache = new ListProcessorCache<>();
@@ -56,9 +75,11 @@ public class ListProcessorCacheTest {
         final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
                 EventTestUtil.COMPONENT,
                 EventTestUtil.VERSION);
-        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, item.getPolicyRuleList().get(0));
+        final PolicyRule policyRule = item.getPolicyRuleList().get(0);
+        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule,
+                metaService.getHref(policyRule));
         final PolicyEvent removeEvent = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item,
-                item.getPolicyRuleList().get(0));
+                policyRule, metaService.getHref(policyRule));
         final List<PolicyEvent> eventList = new ArrayList<>();
         final ListProcessorCache<PolicyEvent> cache = new ListProcessorCache<>();
         eventList.add(event);

@@ -36,10 +36,12 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityItem;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
@@ -49,28 +51,52 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Polic
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.VulnerabilityContentItem;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.hub.service.HubServicesFactory;
+import com.blackducksoftware.integration.log.IntBufferedLogger;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class NotificationProcessorTest {
 
     private final EventTestUtil testUtil = new EventTestUtil();
 
+    private MetaService metaService;
+
+    @Before
+    public void init() throws Exception {
+        final RestConnection restConnection = new MockRestConnection();
+        final HubServicesFactory factory = new HubServicesFactory(restConnection);
+        final IntLogger logger = new IntBufferedLogger();
+        metaService = factory.createMetaService(logger);
+    }
+
     public MockProcessor createMockedNotificationProcessor() {
         final VulnerabilityRequestService vulnerabilityRequestService = Mockito.mock(VulnerabilityRequestService.class);
         final HubRequestService hubRequestService = Mockito.mock(HubRequestService.class);
-        final MockProcessor processor = new MockProcessor(hubRequestService, vulnerabilityRequestService);
+        final MockProcessor processor = new MockProcessor(hubRequestService, vulnerabilityRequestService, metaService);
         return processor;
     }
 
     public MockProcessor createMockedNotificationProcessor(List<VulnerabilityItem> vulnerabilityList) throws Exception {
         final ComponentVersion compVersion = Mockito.mock(ComponentVersion.class);
-        Mockito.when(compVersion.getLink(Mockito.anyString())).thenReturn(EventTestUtil.COMPONENT_VERSION_URL);
+        Mockito.when(compVersion.getJson()).thenReturn(createComponentJson());
         final VulnerabilityRequestService vulnerabilityRequestService = Mockito.mock(VulnerabilityRequestService.class);
         final HubRequestService hubRequestService = Mockito.mock(HubRequestService.class);
         Mockito.when(hubRequestService.getItem(Mockito.anyString(), Mockito.eq(ComponentVersion.class))).thenReturn(compVersion);
         Mockito.when(vulnerabilityRequestService.getComponentVersionVulnerabilities(Mockito.anyString())).thenReturn(vulnerabilityList);
-        final MockProcessor processor = new MockProcessor(hubRequestService, vulnerabilityRequestService);
+        final MockProcessor processor = new MockProcessor(hubRequestService, vulnerabilityRequestService, metaService);
         return processor;
+    }
+
+    private String createComponentJson() {
+        return "{ \"_meta\": { \"href\": \"" + EventTestUtil.COMPONENT_VERSION_URL + "\","
+                + "\"links\": [ {"
+                + "\rel: \"" + MetaService.VULNERABILITIES_LINK + "\","
+                + " \"href\": \"" + EventTestUtil.COMPONENT_VERSION_URL + "\"},{"
+                + "\rel\":\"vulnerable-components\","
+                + "\"href\": \"" + EventTestUtil.COMPONENT_VERSION_URL + "\""
+                + "}]}}";
     }
 
     private void assertPolicyDataValid(final Collection<NotificationEvent<?>> eventList, NotificationCategoryEnum categoryType) {

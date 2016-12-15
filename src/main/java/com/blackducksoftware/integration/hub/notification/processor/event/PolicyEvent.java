@@ -34,10 +34,13 @@ import com.blackducksoftware.integration.hub.notification.processor.ProcessingAc
 public class PolicyEvent extends NotificationEvent<PolicyContentItem> {
     private final PolicyRule policyRule;
 
+    private final String policyRuleURL;
+
     public PolicyEvent(ProcessingActionEnum action, NotificationCategoryEnum categoryType, PolicyContentItem notificationContent,
-            PolicyRule policyRule) {
+            PolicyRule policyRule, String policyRuleUrl) {
         super(action, categoryType, notificationContent);
         this.policyRule = policyRule;
+        this.policyRuleURL = policyRuleUrl;
         init();
     }
 
@@ -75,7 +78,7 @@ public class PolicyEvent extends NotificationEvent<PolicyContentItem> {
 
         keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_POLICY_RULE_REL_URL_HASHED_NAME);
         keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
-        keyBuilder.append(hashString(getPolicyRule().getMeta().getHref()));
+        keyBuilder.append(hashString(policyRuleURL));
         final String key = keyBuilder.toString();
         return key;
     }

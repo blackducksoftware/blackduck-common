@@ -21,23 +21,26 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.notification.processor;
 
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationClearedContentItem;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.PolicyEvent;
 
 public class PolicyViolationClearedProcessor extends NotificationSubProcessor<PolicyEvent> {
 
-    public PolicyViolationClearedProcessor(final MapProcessorCache<PolicyEvent> cache) {
-        super(cache);
+    public PolicyViolationClearedProcessor(final MapProcessorCache<PolicyEvent> cache, final MetaService metaService) {
+        super(cache, metaService);
     }
 
     @Override
-    public void process(final NotificationContentItem notification) {
+    public void process(final NotificationContentItem notification) throws HubIntegrationException {
         if (notification instanceof PolicyViolationClearedContentItem) {
             final PolicyViolationClearedContentItem policyViolationCleared = (PolicyViolationClearedContentItem) notification;
             for (final PolicyRule rule : policyViolationCleared.getPolicyRuleList()) {
-                final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, policyViolationCleared, rule);
+                final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, policyViolationCleared, rule,
+                        getMetaService().getHref(rule));
                 if (getCache().hasEvent(event.getEventKey())) {
                     getCache().removeEvent(event);
                 } else {

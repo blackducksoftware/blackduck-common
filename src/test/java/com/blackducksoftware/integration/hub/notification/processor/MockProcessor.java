@@ -24,6 +24,7 @@ package com.blackducksoftware.integration.hub.notification.processor;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationClearedContentItem;
@@ -35,16 +36,16 @@ import com.blackducksoftware.integration.hub.service.HubRequestService;
 
 public class MockProcessor extends NotificationProcessor<Collection<NotificationEvent<?>>> {
 
-    public MockProcessor(HubRequestService hubRequestService, VulnerabilityRequestService vulnerabilityRequestService) {
+    public MockProcessor(HubRequestService hubRequestService, VulnerabilityRequestService vulnerabilityRequestService, MetaService metaService) {
         final MapProcessorCache<PolicyEvent> policyCache = new MapProcessorCache<>();
-        final VulnerabilityCache vulnerabilityCache = new VulnerabilityCache(hubRequestService, vulnerabilityRequestService);
+        final VulnerabilityCache vulnerabilityCache = new VulnerabilityCache(hubRequestService, vulnerabilityRequestService, metaService);
         getCacheList().add(policyCache);
         getCacheList().add(vulnerabilityCache);
-        getProcessorMap().put(PolicyViolationContentItem.class, new PolicyViolationProcessor(policyCache));
-        getProcessorMap().put(PolicyViolationClearedContentItem.class, new PolicyViolationClearedProcessor(policyCache));
-        getProcessorMap().put(PolicyOverrideContentItem.class, new PolicyOverrideProcessor(policyCache));
+        getProcessorMap().put(PolicyViolationContentItem.class, new PolicyViolationProcessor(policyCache, metaService));
+        getProcessorMap().put(PolicyViolationClearedContentItem.class, new PolicyViolationClearedProcessor(policyCache, metaService));
+        getProcessorMap().put(PolicyOverrideContentItem.class, new PolicyOverrideProcessor(policyCache, metaService));
         getProcessorMap().put(VulnerabilityContentItem.class,
-                new VulnerabilityProcessor(vulnerabilityCache));
+                new VulnerabilityProcessor(vulnerabilityCache, metaService));
 
     }
 
