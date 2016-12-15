@@ -40,7 +40,7 @@ public class ReportInformationItem extends HubItem {
 
     private Date finishedAt;
 
-    private Date createdBy;
+    private String createdBy;
 
     public String getReportFormat() {
         return reportFormat;
@@ -70,7 +70,7 @@ public class ReportInformationItem extends HubItem {
         return finishedAt;
     }
 
-    public Date getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 

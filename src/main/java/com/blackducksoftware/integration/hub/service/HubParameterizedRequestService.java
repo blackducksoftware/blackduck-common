@@ -23,17 +23,21 @@ package com.blackducksoftware.integration.hub.service;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.item.HubPagedResponse;
+import com.blackducksoftware.integration.hub.api.item.HubResponse;
 import com.blackducksoftware.integration.hub.api.item.ParameterizedListType;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class HubParameterizedRequestService<T> extends HubRequestService {
+public class HubParameterizedRequestService<T extends HubResponse> extends HubRequestService {
     private final Class<T> clazz;
 
     private final Type listType;
@@ -64,7 +68,16 @@ public class HubParameterizedRequestService<T> extends HubRequestService {
      * jsonObject.
      */
     public List<T> getItems(JsonObject jsonObject) {
-        return getRestConnection().getGson().fromJson(jsonObject.get("items"), listType);
+        final LinkedList<T> itemList = new LinkedList<>();
+        final JsonElement itemsElement = jsonObject.get("items");
+        final JsonArray itemsArray = itemsElement.getAsJsonArray();
+        final int count = itemsArray.size();
+        for (int index = 0; index < count; index++) {
+            final JsonElement element = itemsArray.get(index);
+            final T item = getItem(element, clazz);
+            itemList.add(item);
+        }
+        return itemList;
     }
 
     public List<T> getAllItems(final HubPagedRequest hubPagedRequest) throws HubIntegrationException {

@@ -182,7 +182,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
 
         final HubRiskReportData hubRiskReportData = new HubRiskReportData();
         logger.debug("Getting the Report content.");
-        final VersionReport report = getReportContent(metaService.getHref(reportInfo));
+        final VersionReport report = getReportContent(contentLink);
         hubRiskReportData.setReport(report);
         logger.debug("Finished retrieving the Report.");
 

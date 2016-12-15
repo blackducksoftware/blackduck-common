@@ -23,10 +23,12 @@ package com.blackducksoftware.integration.hub.service;
 
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.item.HubResponse;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class HubRequestService {
@@ -51,18 +53,28 @@ public class HubRequestService {
         return jsonObject;
     }
 
-    public <T> T getItem(final HubRequest hubRequest, Class<T> clazz) throws HubIntegrationException {
+    public <T extends HubResponse> T getItem(final HubRequest hubRequest, Class<T> clazz) throws HubIntegrationException {
         final String response = hubRequest.executeGetForResponseString();
-        return getRestConnection().getGson().fromJson(response, clazz);
+        final T item = getRestConnection().getGson().fromJson(response, clazz);
+        item.setJson(response);
+        return item;
     }
 
-    public <T> T getItem(String url, Class<T> clazz) throws HubIntegrationException {
+    public <T extends HubResponse> T getItem(String url, Class<T> clazz) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(url);
         return getItem(hubRequest, clazz);
     }
 
-    public <T> T getItem(final JsonObject jsonObject, final Class<T> clazz) {
-        return getRestConnection().getGson().fromJson(jsonObject, clazz);
+    public <T extends HubResponse> T getItem(final JsonObject jsonObject, final Class<T> clazz) {
+        final T item = getRestConnection().getGson().fromJson(jsonObject, clazz);
+        item.setJson(jsonObject.toString());
+        return item;
+    }
+
+    public <T extends HubResponse> T getItem(final JsonElement jsonElement, final Class<T> clazz) {
+        final T item = getRestConnection().getGson().fromJson(jsonElement, clazz);
+        item.setJson(jsonElement.toString());
+        return item;
     }
 
     public RestConnection getRestConnection() {

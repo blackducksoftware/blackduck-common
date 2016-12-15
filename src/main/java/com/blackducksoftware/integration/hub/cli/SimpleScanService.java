@@ -299,6 +299,7 @@ public class SimpleScanService extends HubRequestService {
                 return Collections.emptyList();
             }
             final ScanSummaryItem scanSummaryItem = getRestConnection().getGson().fromJson(fileContent, ScanSummaryItem.class);
+            scanSummaryItem.setJson(fileContent);
             scanSummaryItems.add(scanSummaryItem);
         }
 
