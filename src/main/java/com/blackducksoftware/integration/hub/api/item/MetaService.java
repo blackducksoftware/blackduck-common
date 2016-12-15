@@ -18,6 +18,8 @@ import java.util.Map;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
+import com.blackducksoftware.integration.hub.request.HubRequest;
+import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -72,9 +74,12 @@ public class MetaService {
 
     private final JsonParser jsonParser;
 
-    public MetaService(IntLogger logger, JsonParser jsonParser) {
+    private final HubRequestFactory hubRequestFactory;
+
+    public MetaService(IntLogger logger, JsonParser jsonParser, HubRequestFactory hubRequestFactory) {
         this.logger = logger;
         this.jsonParser = jsonParser;
+        this.hubRequestFactory = hubRequestFactory;
     }
 
     public String getLink(HubItem item, String linkKey) throws HubIntegrationException {
@@ -159,6 +164,12 @@ public class MetaService {
             throw new HubIntegrationException("This Hub item does not have meta information.");
         }
         return metaElement.getAsJsonObject();
+    }
+
+    public void deleteItem(HubItem hubItem) throws HubIntegrationException {
+        String itemUrl = getHref(hubItem);
+        HubRequest hubRequest = hubRequestFactory.createDeleteRequest(itemUrl);
+        hubRequest.executeDelete();
     }
 
 }

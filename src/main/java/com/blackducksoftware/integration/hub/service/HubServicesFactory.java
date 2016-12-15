@@ -56,6 +56,7 @@ import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataServ
 import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
+import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
@@ -208,7 +209,7 @@ public class HubServicesFactory {
     }
 
     public MetaService createMetaService(IntLogger logger) {
-        return new MetaService(logger, restConnection.getJsonParser());
+        return new MetaService(logger, restConnection.getJsonParser(), new HubRequestFactory(restConnection));
     }
 
     public RestConnection getRestConnection() {
