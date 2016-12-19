@@ -41,7 +41,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class CredentialsRestConnection extends RestConnection {
-
     private final HubServerConfig hubServerConfig;
 
     public CredentialsRestConnection(final HubServerConfig hubServerConfig) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
@@ -62,7 +61,7 @@ public class CredentialsRestConnection extends RestConnection {
         if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
             try {
                 password = hubServerConfig.getGlobalCredentials().getDecryptedPassword();
-                CookieManager cookieManager = new CookieManager();
+                final CookieManager cookieManager = new CookieManager();
                 cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
                 getBuilder().cookieJar(new JavaNetCookieJar(cookieManager));
                 setupClient();
@@ -82,22 +81,26 @@ public class CredentialsRestConnection extends RestConnection {
     public void setCookies(final String hubUserName, final String hubPassword)
             throws HubIntegrationException {
         try {
-            ArrayList<String> segments = new ArrayList<>();
+            final ArrayList<String> segments = new ArrayList<>();
             segments.add("j_spring_security_check");
-            HttpUrl httpUrl = createHttpUrl(segments, null);
+            final HttpUrl httpUrl = createHttpUrl(segments, null);
 
-            Map<String, String> content = new HashMap<>();
+            final Map<String, String> content = new HashMap<>();
             content.put("j_username", hubUserName);
             content.put("j_password", hubPassword);
 
-            Request request = createPostRequest(httpUrl, createEncodedRequestBody(content));
-            Response response = handleExecuteClientCall(request);
+            final Request request = createPostRequest(httpUrl, createEncodedRequestBody(content));
+            final Response response = handleExecuteClientCall(request);
             if (!response.isSuccessful()) {
                 throw new HubIntegrationException(response.message());
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new HubIntegrationException(e.getMessage(), e);
         }
+    }
+
+    public HubServerConfig getHubServerConfig() {
+        return hubServerConfig;
     }
 
 }
