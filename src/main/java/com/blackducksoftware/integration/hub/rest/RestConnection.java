@@ -121,7 +121,13 @@ public abstract class RestConnection {
         logMessage(LogLevel.DEBUG, "Setting connectTimeout to: " + timeout + "s on client context");
     }
 
-    public abstract void connect() throws HubIntegrationException;
+    public void connect() throws HubIntegrationException {
+        addBuilderConnectionTimes();
+        addBuilderProxyInformation();
+        setClient(getBuilder().build());
+    }
+
+    public abstract void addBuilderAuthentication() throws HubIntegrationException;
 
     public HttpUrl createHttpUrl() {
         return HttpUrl.get(getBaseUrl()).newBuilder().build();
@@ -157,10 +163,13 @@ public abstract class RestConnection {
         return urlBuilder.build();
     }
 
-    protected void setupClient() throws HubIntegrationException {
+    private void addBuilderConnectionTimes() throws HubIntegrationException {
         builder.connectTimeout(timeout, TimeUnit.SECONDS);
         builder.writeTimeout(timeout, TimeUnit.SECONDS);
         builder.readTimeout(timeout, TimeUnit.SECONDS);
+    }
+
+    private void addBuilderProxyInformation() throws HubIntegrationException {
         if (getHubProxyInfo() != null) {
             builder.proxy(getHubProxyInfo().getProxy(getBaseUrl()));
             String password;

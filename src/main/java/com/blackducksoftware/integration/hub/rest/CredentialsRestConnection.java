@@ -55,7 +55,7 @@ public class CredentialsRestConnection extends RestConnection {
     }
 
     @Override
-    public void connect() throws HubIntegrationException {
+    public void addBuilderAuthentication() throws HubIntegrationException {
         final String username = hubServerConfig.getGlobalCredentials().getUsername();
         String password = hubServerConfig.getGlobalCredentials().getEncryptedPassword();
         if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
@@ -64,9 +64,6 @@ public class CredentialsRestConnection extends RestConnection {
                 final CookieManager cookieManager = new CookieManager();
                 cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
                 getBuilder().cookieJar(new JavaNetCookieJar(cookieManager));
-                setupClient();
-                setClient(getBuilder().build());
-                setCookies(username, password);
             } catch (IllegalArgumentException | EncryptionException e) {
                 throw new HubIntegrationException(e.getMessage(), e);
             }
