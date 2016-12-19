@@ -21,6 +21,11 @@ public class MockRestConnection extends RestConnection {
     }
 
     @Override
+    public void addBuilderAuthentication() throws HubIntegrationException {
+        // do nothing
+    }
+
+    @Override
     public void connect() throws HubIntegrationException {
         // do nothing
     }
