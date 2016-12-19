@@ -124,6 +124,7 @@ public abstract class RestConnection {
     public void connect() throws HubIntegrationException {
         addBuilderConnectionTimes();
         addBuilderProxyInformation();
+        addBuilderAuthentication();
         setClient(getBuilder().build());
     }
 
