@@ -207,7 +207,7 @@ public abstract class RestConnection {
     }
 
     public Request createGetRequest(HttpUrl httpUrl) {
-        return createGetRequest(httpUrl, "application/json;");
+        return createGetRequest(httpUrl, "application/json");
     }
 
     public Request createGetRequest(HttpUrl httpUrl, String mediaType) {

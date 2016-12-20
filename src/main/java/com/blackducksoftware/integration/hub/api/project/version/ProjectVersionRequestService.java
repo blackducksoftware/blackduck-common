@@ -83,7 +83,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
 
         final HubRequest hubRequest = getHubRequestFactory().createPostRequest(versionsUrl);
 
-        final String location = hubRequest.executePost(getRestConnection().getGson().toJson(phase));
+        final String location = hubRequest.executePost(getRestConnection().getGson().toJson(json));
 
         return location;
     }
