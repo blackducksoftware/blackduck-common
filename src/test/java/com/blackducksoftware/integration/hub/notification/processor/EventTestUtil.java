@@ -138,9 +138,9 @@ public class EventTestUtil {
         Mockito.when(item.getAccessVector()).thenReturn("");
         Mockito.when(item.getAccessComplexity()).thenReturn("");
         Mockito.when(item.getAuthentication()).thenReturn("");
-        Mockito.when(item.getAuthentication()).thenReturn("");
-        Mockito.when(item.getAuthentication()).thenReturn("");
-        Mockito.when(item.getAuthentication()).thenReturn("");
+        Mockito.when(item.getConfidentialityImpact()).thenReturn("");
+        Mockito.when(item.getIntegrityImpact()).thenReturn("");
+        Mockito.when(item.getAvailabilityImpact()).thenReturn("");
         Mockito.when(item.getCweId()).thenReturn(vulnId);
         return item;
     }

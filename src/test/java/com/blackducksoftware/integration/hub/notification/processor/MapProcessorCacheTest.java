@@ -31,7 +31,7 @@ import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class MappProcessorCacheTest {
+public class MapProcessorCacheTest {
 
     private final EventTestUtil testUtil = new EventTestUtil();
 
