@@ -29,4 +29,10 @@ public class MockRestConnection extends RestConnection {
     public void connect() throws HubIntegrationException {
         // do nothing
     }
+
+    @Override
+    public void clientAuthenticate() throws HubIntegrationException {
+        // do nothing
+
+    }
 }

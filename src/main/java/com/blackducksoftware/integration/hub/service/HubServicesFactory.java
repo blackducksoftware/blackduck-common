@@ -72,7 +72,6 @@ public class HubServicesFactory {
         ciEnvironmentVariables.putAll(System.getenv());
 
         this.restConnection = restConnection;
-        this.restConnection.connect();
     }
 
     public void addEnvironmentVariable(String key, String value) {

@@ -126,9 +126,12 @@ public abstract class RestConnection {
         addBuilderProxyInformation();
         addBuilderAuthentication();
         setClient(getBuilder().build());
+        clientAuthenticate();
     }
 
     public abstract void addBuilderAuthentication() throws HubIntegrationException;
+
+    public abstract void clientAuthenticate() throws HubIntegrationException;
 
     public HttpUrl createHttpUrl() {
         return HttpUrl.get(getBaseUrl()).newBuilder().build();
@@ -229,11 +232,30 @@ public abstract class RestConnection {
                 .url(httpUrl).delete().build();
     }
 
-    public Response handleExecuteClientCall(Request request) throws IOException {
-        logRequestHeaders(request);
-        Response response = getClient().newCall(request).execute();
-        logResponseHeaders(response);
-        return response;
+    public Response handleExecuteClientCall(Request request) throws IOException, HubIntegrationException {
+        return handleExecuteClientCall(request, 0);
+    }
+
+    private Response handleExecuteClientCall(Request request, int retryCount) throws IOException, HubIntegrationException {
+        if (getClient() != null) {
+            logRequestHeaders(request);
+            Response response = getClient().newCall(request).execute();
+            if (!response.isSuccessful()) {
+                if (response.code() == 401 && retryCount < 2) {
+                    connect();
+                    return handleExecuteClientCall(request, retryCount + 1);
+                } else {
+                    throw new HubIntegrationException(
+                            "There was a problem trying to " + request.method() + " this item : " + request.url().uri().toString() + ". Error : "
+                                    + response.message());
+                }
+            }
+            logResponseHeaders(response);
+            return response;
+        } else {
+            connect();
+            return handleExecuteClientCall(request, retryCount);
+        }
     }
 
     private void logMessage(final LogLevel level, final String txt) {

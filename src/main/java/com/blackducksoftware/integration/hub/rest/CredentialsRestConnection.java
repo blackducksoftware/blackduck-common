@@ -64,6 +64,7 @@ public class CredentialsRestConnection extends RestConnection {
                 final CookieManager cookieManager = new CookieManager();
                 cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
                 getBuilder().cookieJar(new JavaNetCookieJar(cookieManager));
+
             } catch (IllegalArgumentException | EncryptionException e) {
                 throw new HubIntegrationException(e.getMessage(), e);
             }
@@ -75,7 +76,8 @@ public class CredentialsRestConnection extends RestConnection {
      * the response code from the connection.
      *
      */
-    public void setCookies(final String hubUserName, final String hubPassword)
+    @Override
+    public void clientAuthenticate()
             throws HubIntegrationException {
         try {
             final ArrayList<String> segments = new ArrayList<>();
@@ -83,13 +85,22 @@ public class CredentialsRestConnection extends RestConnection {
             final HttpUrl httpUrl = createHttpUrl(segments, null);
 
             final Map<String, String> content = new HashMap<>();
-            content.put("j_username", hubUserName);
-            content.put("j_password", hubPassword);
+            final String username = hubServerConfig.getGlobalCredentials().getUsername();
+            String password = hubServerConfig.getGlobalCredentials().getEncryptedPassword();
+            if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+                try {
+                    password = hubServerConfig.getGlobalCredentials().getDecryptedPassword();
 
-            final Request request = createPostRequest(httpUrl, createEncodedRequestBody(content));
-            final Response response = handleExecuteClientCall(request);
-            if (!response.isSuccessful()) {
-                throw new HubIntegrationException(response.message());
+                    content.put("j_username", username);
+                    content.put("j_password", password);
+                    final Request request = createPostRequest(httpUrl, createEncodedRequestBody(content));
+                    final Response response = handleExecuteClientCall(request);
+                    if (!response.isSuccessful()) {
+                        throw new HubIntegrationException(response.message());
+                    }
+                } catch (IllegalArgumentException | EncryptionException e) {
+                    throw new HubIntegrationException(e.getMessage(), e);
+                }
             }
         } catch (final IOException e) {
             throw new HubIntegrationException(e.getMessage(), e);

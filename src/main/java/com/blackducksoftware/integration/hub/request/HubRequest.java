@@ -62,77 +62,58 @@ public class HubRequest {
     }
 
     public JsonObject executeGetForResponseJson() throws HubIntegrationException {
+        HttpUrl httpUrl = buildHttpUrl();
         try {
-            HttpUrl httpUrl = buildHttpUrl();
             Request request = restConnection.createGetRequest(httpUrl);
             Response response = restConnection.handleExecuteClientCall(request);
-            if (response.isSuccessful()) {
-                final String responseString = response.body().string();
-                final JsonObject jsonObject = restConnection.getJsonParser().parse(responseString).getAsJsonObject();
-                return jsonObject;
-            } else {
-                throw new HubIntegrationException("There was a problem getting this item : " + url + ". Error : " + response.message());
-            }
+            final String responseString = response.body().string();
+            final JsonObject jsonObject = restConnection.getJsonParser().parse(responseString).getAsJsonObject();
+            return jsonObject;
         } catch (IOException e) {
-            throw new HubIntegrationException("There was a problem getting this item : " + url + ". Error : " + e.getMessage(), e);
+            throw new HubIntegrationException("There was a problem getting this item : " + httpUrl.uri().toString() + ". Error : " + e.getMessage(), e);
         }
     }
 
     public String executeGetForResponseString() throws HubIntegrationException {
+        HttpUrl httpUrl = buildHttpUrl();
         try {
-            HttpUrl httpUrl = buildHttpUrl();
             Request request = restConnection.createGetRequest(httpUrl);
             Response response = restConnection.handleExecuteClientCall(request);
-            if (response.isSuccessful()) {
-                return response.body().string();
-            } else {
-                throw new HubIntegrationException("There was a problem getting this item : " + url + ". Error : " + response.message());
-            }
+            return response.body().string();
         } catch (IOException e) {
-            throw new HubIntegrationException("There was a problem getting this item : " + url + ". Error : " + e.getMessage(), e);
+            throw new HubIntegrationException("There was a problem getting this item : " + httpUrl.uri().toString() + ". Error : " + e.getMessage(), e);
         }
     }
 
     public String executePost(String content) throws HubIntegrationException {
+        HttpUrl httpUrl = buildHttpUrl();
         try {
-            HttpUrl httpUrl = buildHttpUrl();
             Request request = restConnection.createPostRequest(httpUrl, restConnection.createJsonRequestBody(content));
             Response response = restConnection.handleExecuteClientCall(request);
-            if (response.isSuccessful()) {
-                return response.header("location");
-            } else {
-                throw new HubIntegrationException("There was a problem posting this item : " + url + ". Error : " + response.message());
-            }
+            return response.header("location");
         } catch (IOException e) {
-            throw new HubIntegrationException("There was a problem posting this item : " + url + ". Error : " + e.getMessage(), e);
+            throw new HubIntegrationException("There was a problem posting this item : " + httpUrl.uri().toString() + ". Error : " + e.getMessage(), e);
         }
     }
 
     public String executePost(String mediaType, String content) throws HubIntegrationException {
+        HttpUrl httpUrl = buildHttpUrl();
         try {
-            HttpUrl httpUrl = buildHttpUrl();
             Request request = restConnection.createPostRequest(httpUrl, restConnection.createJsonRequestBody(mediaType, content));
             Response response = restConnection.handleExecuteClientCall(request);
-            if (response.isSuccessful()) {
-                return response.header("location");
-            } else {
-                throw new HubIntegrationException("There was a problem posting this item : " + url + ". Error : " + response.message());
-            }
+            return response.header("location");
         } catch (IOException e) {
-            throw new HubIntegrationException("There was a problem posting this item : " + url + ". Error : " + e.getMessage(), e);
+            throw new HubIntegrationException("There was a problem posting this item : " + httpUrl.uri().toString() + ". Error : " + e.getMessage(), e);
         }
     }
 
     public void executeDelete() throws HubIntegrationException {
+        HttpUrl httpUrl = buildHttpUrl();
         try {
-            HttpUrl httpUrl = buildHttpUrl();
             Request request = restConnection.createDeleteRequest(httpUrl);
-            Response response = restConnection.handleExecuteClientCall(request);
-            if (!response.isSuccessful()) {
-                throw new HubIntegrationException("There was a problem deleting this item : " + url + ". Error : " + response.message());
-            }
+            restConnection.handleExecuteClientCall(request);
         } catch (IOException e) {
-            throw new HubIntegrationException("There was a problem deleting this item : " + url + ". Error : " + e.getMessage(), e);
+            throw new HubIntegrationException("There was a problem deleting this item : " + httpUrl.uri().toString() + ". Error : " + e.getMessage(), e);
         }
     }
 
