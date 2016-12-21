@@ -64,7 +64,6 @@ public class HubProxyInfo implements Serializable {
     public Proxy getProxy(final URL url) {
         if (shouldUseProxyForUrl(url)) {
             final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
-            setDefaultAuthenticator();
             return proxy;
         }
         return Proxy.NO_PROXY;
@@ -78,18 +77,6 @@ public class HubProxyInfo implements Serializable {
         return !ProxyUtil.shouldIgnoreHost(url.getHost(), ignoredProxyHostPatterns);
     }
 
-    public void setDefaultAuthenticator() {
-        if (getUsername() != null && getEncryptedPassword() != null) {
-            try {
-                AuthenticatorUtil.setAuthenticator(getProxyCredentials().getUsername(),
-                        PasswordDecrypter.decrypt(getProxyCredentials().getEncryptedPassword()));
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            AuthenticatorUtil.resetAuthenticator();
-        }
-    }
 
     @Override
     public String toString() {
