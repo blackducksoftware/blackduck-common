@@ -72,7 +72,7 @@ public class MockEventProcessor extends NotificationSubProcessor<NotificationEve
 
     private void handlePolicyOverride(final PolicyOverrideContentItem policyOverrideContentItem) throws HubIntegrationException {
         for (final PolicyRule rule : policyOverrideContentItem.getPolicyRuleList()) {
-            final PolicyOverrideEvent event = new PolicyOverrideEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION,
+            final PolicyOverrideEvent event = new PolicyOverrideEvent(NotificationCategoryEnum.POLICY_VIOLATION,
                     policyOverrideContentItem, rule, getMetaService().getHref(rule));
             if (getCache().hasEvent(event.getEventKey())) {
                 getCache().removeEvent(event);
