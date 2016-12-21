@@ -21,11 +21,10 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.validator;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -33,11 +32,17 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
+import com.blackducksoftware.integration.hub.global.HubProxyInfoFieldEnum;
 import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 import com.blackducksoftware.integration.validator.ValidationResult;
 import com.blackducksoftware.integration.validator.ValidationResultEnum;
 import com.blackducksoftware.integration.validator.ValidationResults;
+
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class HubServerConfigValidator extends AbstractValidator {
 
@@ -106,9 +111,9 @@ public class HubServerConfigValidator extends AbstractValidator {
             if (validator.hasAuthenticatedProxySettings()) {
 
                 final HubCredentialsBuilder credBuilder = new HubCredentialsBuilder();
-                credBuilder.setUsername(username);
-                credBuilder.setPassword(password);
-                credBuilder.setPasswordLength(passwordLength);
+                credBuilder.setUsername(proxyUsername);
+                credBuilder.setPassword(proxyPassword);
+                credBuilder.setPasswordLength(proxyPasswordLength);
                 final HubCredentials credResult = credBuilder.build();
 
                 proxyInfo = new HubProxyInfo(proxyHost, port, credResult, ignoredProxyHosts);
@@ -152,25 +157,45 @@ public class HubServerConfigValidator extends AbstractValidator {
             return;
         }
 
-        try {
-            URLConnection connection = null;
-            if (proxyInfo != null) {
-                connection = proxyInfo.openConnection(hubURL);
-            } else {
-                connection = hubURL.openConnection();
+        HttpUrl url = HttpUrl.parse(hubUrl);
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+
+        builder.connectTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
+        builder.writeTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
+        builder.readTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
+        if (proxyInfo != null) {
+            builder.proxy(proxyInfo.getProxy(hubURL));
+            String password = null;
+            try {
+                password = proxyInfo.getDecryptedPassword();
+            } catch (Exception e) {
+                result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD,
+                        new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
+                return;
             }
-            final int timeoutIntMillisec = 1000 * stringToNonNegativeInteger(timeoutSeconds);
-            connection.setConnectTimeout(timeoutIntMillisec);
-            connection.setReadTimeout(timeoutIntMillisec);
-            connection.getContent();
-        } catch (final IOException ioe) {
+            if (StringUtils.isNotBlank(proxyInfo.getUsername()) && StringUtils.isNotBlank(password)) {
+                builder.proxyAuthenticator(
+                        new com.blackducksoftware.integration.hub.proxy.OkAuthenticator(proxyInfo.getUsername(),
+                                password));
+            }
+        }
+        try {
+            OkHttpClient client = builder.build();
+
+            Request request = new Request.Builder()
+                    .url(url).get().build();
+
+            Response response = client.newCall(request).execute();
+
+            if (!response.isSuccessful()) {
+                result.addResult(HubServerConfigFieldEnum.HUBURL,
+                        new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl));
+
+            }
+        } catch (Exception e) {
             result.addResult(HubServerConfigFieldEnum.HUBURL,
-                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, ioe));
-            return;
-        } catch (final RuntimeException e) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL,
-                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID_PREFIX + hubUrl, e));
-            return;
+                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, e));
         }
     }
 

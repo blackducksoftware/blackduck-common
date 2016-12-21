@@ -134,7 +134,7 @@ public class HubServerConfigBuilderTest {
 
     @Test
     public void testValidateHubURLMalformed2() throws Exception {
-        expectedMessages.add(HubServerConfigValidator.ERROR_MSG_URL_NOT_VALID_PREFIX);
+        expectedMessages.add(HubServerConfigValidator.ERROR_MSG_UNREACHABLE_PREFIX);
 
         final HubServerConfigValidator validator = new HubServerConfigValidator();
         validator.setHubUrl("http:TestString");
