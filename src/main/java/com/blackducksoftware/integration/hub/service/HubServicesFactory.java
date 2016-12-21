@@ -193,7 +193,7 @@ public class HubServicesFactory {
     }
 
     public CLIDownloadService createCliDownloadService(IntLogger logger) {
-        return new CLIDownloadService(logger);
+        return new CLIDownloadService(logger, restConnection);
     }
 
     public SimpleScanService createSimpleScanService(IntLogger logger, RestConnection restConnection, HubServerConfig hubServerConfig,
