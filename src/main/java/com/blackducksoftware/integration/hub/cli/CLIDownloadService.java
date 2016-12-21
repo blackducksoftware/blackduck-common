@@ -42,7 +42,6 @@ import org.apache.tools.zip.ZipFile;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
@@ -62,7 +61,7 @@ public class CLIDownloadService {
         this.restConnection = restConnection;
     }
 
-    public void performInstallation(HubProxyInfo hubProxyInfo, final File directoryToInstallTo, final CIEnvironmentVariables ciEnvironmentVariables,
+    public void performInstallation(final File directoryToInstallTo, final CIEnvironmentVariables ciEnvironmentVariables,
             String hubUrl, String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
         if (StringUtils.isBlank(localHostName)) {
             throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
@@ -72,7 +71,7 @@ public class CLIDownloadService {
         final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(logger, hubUrl);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
             try {
-                customInstall(hubProxyInfo, cliLocation, ciEnvironmentVariables, new URL(cliDownloadUrl), hubVersion, localHostName);
+                customInstall(cliLocation, ciEnvironmentVariables, new URL(cliDownloadUrl), hubVersion, localHostName);
             } catch (final MalformedURLException e) {
                 throw new HubIntegrationException(String.format("The cli could not be downloaded from %s: %s", cliDownloadUrl, e.getMessage()), e);
             }
@@ -81,7 +80,7 @@ public class CLIDownloadService {
         }
     }
 
-    public void customInstall(HubProxyInfo hubProxyInfo, CLILocation cliLocation, CIEnvironmentVariables ciEnvironmentVariables, final URL archive,
+    public void customInstall(CLILocation cliLocation, CIEnvironmentVariables ciEnvironmentVariables, final URL archive,
             String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
         String directoryToInstallTo;
         try {
