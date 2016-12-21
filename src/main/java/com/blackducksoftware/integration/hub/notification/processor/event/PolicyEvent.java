@@ -90,4 +90,8 @@ public class PolicyEvent extends NotificationEvent<PolicyContentItem> {
     public PolicyRule getPolicyRule() {
         return policyRule;
     }
+
+    public String getPolicyRuleURL() {
+        return policyRuleURL;
+    }
 }
