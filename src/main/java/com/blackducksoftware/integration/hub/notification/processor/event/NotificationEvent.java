@@ -26,11 +26,8 @@ import java.util.Set;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.notification.processor.ItemEntry;
 import com.blackducksoftware.integration.hub.notification.processor.NotificationCategoryEnum;
-import com.blackducksoftware.integration.hub.notification.processor.ProcessingActionEnum;
 
 public abstract class NotificationEvent<T extends NotificationContentItem> {
-    private ProcessingActionEnum action;
-
     private NotificationCategoryEnum categoryType;
 
     private final T notificationContent;
@@ -39,8 +36,7 @@ public abstract class NotificationEvent<T extends NotificationContentItem> {
 
     private String eventKey;
 
-    public NotificationEvent(final ProcessingActionEnum action, final NotificationCategoryEnum categoryType, T notificationContent) {
-        this.action = action;
+    public NotificationEvent(final NotificationCategoryEnum categoryType, T notificationContent) {
         this.categoryType = categoryType;
         this.notificationContent = notificationContent;
     }
@@ -65,14 +61,6 @@ public abstract class NotificationEvent<T extends NotificationContentItem> {
     public abstract String generateEventKey();
 
     public abstract int countCategoryItems();
-
-    public ProcessingActionEnum getAction() {
-        return action;
-    }
-
-    public void setAction(ProcessingActionEnum action) {
-        this.action = action;
-    }
 
     public NotificationCategoryEnum getCategoryType() {
         return categoryType;

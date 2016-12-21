@@ -50,7 +50,7 @@ public class ListProcessorCacheTest {
                 EventTestUtil.COMPONENT,
                 EventTestUtil.VERSION);
         final PolicyRule policyRule = item.getPolicyRuleList().get(0);
-        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule,
+        final PolicyEvent event = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule,
                 metaService.getHref(policyRule));
 
         final List<PolicyEvent> eventList = new ArrayList<>();
@@ -76,9 +76,9 @@ public class ListProcessorCacheTest {
                 EventTestUtil.COMPONENT,
                 EventTestUtil.VERSION);
         final PolicyRule policyRule = item.getPolicyRuleList().get(0);
-        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule,
+        final PolicyEvent event = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule,
                 metaService.getHref(policyRule));
-        final PolicyEvent removeEvent = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item,
+        final PolicyEvent removeEvent = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, item,
                 policyRule, metaService.getHref(policyRule));
         final List<PolicyEvent> eventList = new ArrayList<>();
         final ListProcessorCache<PolicyEvent> cache = new ListProcessorCache<>();

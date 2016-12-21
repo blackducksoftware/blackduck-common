@@ -51,7 +51,7 @@ public class MapProcessorCacheTest {
                 EventTestUtil.COMPONENT,
                 EventTestUtil.VERSION);
         final PolicyRule policyRule = item.getPolicyRuleList().get(0);
-        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule,
+        final PolicyEvent event = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule,
                 metaService.getHref(policyRule));
 
         final List<PolicyEvent> eventList = new ArrayList<>();
@@ -81,9 +81,9 @@ public class MapProcessorCacheTest {
                 EventTestUtil.VERSION2);
         final PolicyRule policyRule1 = item.getPolicyRuleList().get(0);
         final PolicyRule policyRule2 = removeItem.getPolicyRuleList().get(0);
-        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule1,
+        final PolicyEvent event = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule1,
                 metaService.getHref(policyRule1));
-        final PolicyEvent removeEvent = new PolicyEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, removeItem, policyRule2,
+        final PolicyEvent removeEvent = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, removeItem, policyRule2,
                 metaService.getHref(policyRule2));
         final List<PolicyEvent> eventList = new ArrayList<>();
         final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
@@ -117,9 +117,9 @@ public class MapProcessorCacheTest {
                 EventTestUtil.VERSION2);
         final PolicyRule policyRule1 = item.getPolicyRuleList().get(0);
         final PolicyRule policyRule2 = removeItem.getPolicyRuleList().get(0);
-        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule1,
+        final PolicyEvent event = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule1,
                 metaService.getHref(policyRule1));
-        final PolicyEvent removeEvent = new PolicyEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, removeItem,
+        final PolicyEvent removeEvent = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, removeItem,
                 policyRule2, metaService.getHref(policyRule2));
         final List<PolicyEvent> eventList = new ArrayList<>();
         final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
@@ -153,9 +153,9 @@ public class MapProcessorCacheTest {
                 EventTestUtil.VERSION2);
         final PolicyRule policyRule1 = item.getPolicyRuleList().get(0);
         final PolicyRule policyRule2 = item2.getPolicyRuleList().get(0);
-        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule1,
+        final PolicyEvent event = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule1,
                 metaService.getHref(policyRule1));
-        final PolicyEvent event2 = new PolicyEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, item2,
+        final PolicyEvent event2 = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, item2,
                 policyRule2, metaService.getHref(policyRule2));
         final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
 
@@ -180,9 +180,9 @@ public class MapProcessorCacheTest {
                 EventTestUtil.VERSION2);
         final PolicyRule policyRule1 = item.getPolicyRuleList().get(0);
         final PolicyRule policyRule2 = item2.getPolicyRuleList().get(0);
-        final PolicyEvent event = new PolicyEvent(ProcessingActionEnum.ADD, NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule1,
+        final PolicyEvent event = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, item, policyRule1,
                 metaService.getHref(policyRule1));
-        final PolicyEvent event2 = new PolicyEvent(ProcessingActionEnum.REMOVE, NotificationCategoryEnum.POLICY_VIOLATION, item2,
+        final PolicyEvent event2 = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, item2,
                 policyRule2, metaService.getHref(policyRule2));
         final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
 

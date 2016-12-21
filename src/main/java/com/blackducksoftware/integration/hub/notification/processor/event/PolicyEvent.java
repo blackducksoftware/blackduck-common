@@ -29,16 +29,15 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Polic
 import com.blackducksoftware.integration.hub.notification.processor.ItemEntry;
 import com.blackducksoftware.integration.hub.notification.processor.ItemTypeEnum;
 import com.blackducksoftware.integration.hub.notification.processor.NotificationCategoryEnum;
-import com.blackducksoftware.integration.hub.notification.processor.ProcessingActionEnum;
 
 public class PolicyEvent extends NotificationEvent<PolicyContentItem> {
     private final PolicyRule policyRule;
 
     private final String policyRuleURL;
 
-    public PolicyEvent(ProcessingActionEnum action, NotificationCategoryEnum categoryType, PolicyContentItem notificationContent,
+    public PolicyEvent(NotificationCategoryEnum categoryType, PolicyContentItem notificationContent,
             PolicyRule policyRule, String policyRuleUrl) {
-        super(action, categoryType, notificationContent);
+        super(categoryType, notificationContent);
         this.policyRule = policyRule;
         this.policyRuleURL = policyRuleUrl;
         init();

@@ -36,7 +36,7 @@ public class PolicyOverrideEvent extends PolicyEvent {
 
     public PolicyOverrideEvent(ProcessingActionEnum action, NotificationCategoryEnum categoryType, PolicyOverrideContentItem notificationContent,
             PolicyRule policyRule, String policyRuleUrl) {
-        super(action, categoryType, notificationContent, policyRule, policyRuleUrl);
+        super(categoryType, notificationContent, policyRule, policyRuleUrl);
     }
 
     @Override

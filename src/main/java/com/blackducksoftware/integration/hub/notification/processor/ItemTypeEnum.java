@@ -22,5 +22,5 @@
 package com.blackducksoftware.integration.hub.notification.processor;
 
 public enum ItemTypeEnum {
-    RULE, COMPONENT, COUNT, PERSON;
+    NONE, RULE, COMPONENT, COUNT, PERSON, VERSION;
 }
