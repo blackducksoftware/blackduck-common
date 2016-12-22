@@ -40,7 +40,6 @@ import com.google.gson.JsonObject;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 /**
  * Most usages of the Hub endpoints as of 2016-11-23 (Hub 3.3.1) should use the HubPagedRequest, but there are several
@@ -64,53 +63,67 @@ public class HubRequest {
 
     public JsonObject executeGetForResponseJson() throws HubIntegrationException {
         final HttpUrl httpUrl = buildHttpUrl();
+        Response response = null;
         try {
             final Request request = restConnection.createGetRequest(httpUrl);
-            final Response response = restConnection.handleExecuteClientCall(request);
+            response = restConnection.handleExecuteClientCall(request);
             final String responseString = response.body().string();
             final JsonObject jsonObject = restConnection.getJsonParser().parse(responseString).getAsJsonObject();
             return jsonObject;
         } catch (final IOException e) {
             throw new HubIntegrationException("There was a problem getting this item : " + httpUrl.uri().toString() + ". Error : " + e.getMessage(), e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
     public String executeGetForResponseString() throws HubIntegrationException {
         final HttpUrl httpUrl = buildHttpUrl();
-        ResponseBody body = null;
+        Response response = null;
         try {
             final Request request = restConnection.createGetRequest(httpUrl);
-            final Response response = restConnection.handleExecuteClientCall(request);
-            body = response.body();
-            return body.string();
+            response = restConnection.handleExecuteClientCall(request);
+            return response.body().string();
         } catch (final IOException e) {
             throw new HubIntegrationException("There was a problem getting this item : " + httpUrl.uri().toString() + ". Error : " + e.getMessage(), e);
         } finally {
-            if (body != null) {
-                body.close();
+            if (response != null) {
+                response.close();
             }
         }
     }
 
     public String executePost(final String content) throws HubIntegrationException {
         final HttpUrl httpUrl = buildHttpUrl();
+        Response response = null;
         try {
             final Request request = restConnection.createPostRequest(httpUrl, restConnection.createJsonRequestBody(content));
-            final Response response = restConnection.handleExecuteClientCall(request);
+            response = restConnection.handleExecuteClientCall(request);
             return response.header("location");
         } catch (final IOException e) {
             throw new HubIntegrationException("There was a problem posting this item : " + httpUrl.uri().toString() + ". Error : " + e.getMessage(), e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
     public String executePost(final String mediaType, final String content) throws HubIntegrationException {
         final HttpUrl httpUrl = buildHttpUrl();
+        Response response = null;
         try {
             final Request request = restConnection.createPostRequest(httpUrl, restConnection.createJsonRequestBody(mediaType, content));
-            final Response response = restConnection.handleExecuteClientCall(request);
+            response = restConnection.handleExecuteClientCall(request);
             return response.header("location");
         } catch (final IOException e) {
             throw new HubIntegrationException("There was a problem posting this item : " + httpUrl.uri().toString() + ". Error : " + e.getMessage(), e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 

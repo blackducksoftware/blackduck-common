@@ -186,17 +186,24 @@ public class HubServerConfigValidator extends AbstractValidator {
             final Request request = new Request.Builder()
                     .url(url).get().build();
 
-            final Response response = client.newCall(request).execute();
+            Response response = null;
+            try {
+                response = client.newCall(request).execute();
 
-            if (!response.isSuccessful()) {
-                if (response.code() == 407) {
-                    result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
-                            new ValidationResult(ValidationResultEnum.ERROR, response.message()));
-                    return;
+                if (!response.isSuccessful()) {
+                    if (response.code() == 407) {
+                        result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
+                                new ValidationResult(ValidationResultEnum.ERROR, response.message()));
+                        return;
+                    }
+                    result.addResult(HubServerConfigFieldEnum.HUBURL,
+                            new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl));
+
                 }
-                result.addResult(HubServerConfigFieldEnum.HUBURL,
-                        new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl));
-
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         } catch (final Exception e) {
             result.addResult(HubServerConfigFieldEnum.HUBURL,
