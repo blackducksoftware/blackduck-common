@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -132,9 +133,15 @@ public class CLIDownloadService {
                 return;
             }
             String lastModified = response.header("Last-Modified");
+            Long lastModifiedLong = 0L;
+
+            if (StringUtils.isNotBlank(lastModified)) {
+                // Should parse the Date just like URLConnection did
+                lastModifiedLong = Date.parse(lastModified);
+            }
 
             if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
-                if (!cliMismatch && lastModified.equals(String.valueOf(cliTimestamp))) {
+                if (!cliMismatch && lastModifiedLong == cliTimestamp) {
                     logger.debug("The current Hub CLI is up to date.");
                     return;
                 }
@@ -144,8 +151,9 @@ public class CLIDownloadService {
             } else {
                 cliInstallDirectory.mkdir();
             }
+
             logger.debug("Updating the Hub CLI.");
-            hubVersionFile.setLastModified(Long.valueOf(lastModified));
+            hubVersionFile.setLastModified(lastModifiedLong);
 
             logger.info("Unpacking " + archive.toString() + " to " + directoryToInstallTo + " on "
                     + localHostName);
