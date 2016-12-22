@@ -26,6 +26,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -137,6 +138,11 @@ public abstract class RestConnection {
         return HttpUrl.get(getBaseUrl()).newBuilder().build();
     }
 
+    public HttpUrl createHttpUrl(final URL providedUrl) {
+        HttpUrl.Builder urlBuilder = HttpUrl.get(providedUrl).newBuilder();
+        return urlBuilder.build();
+    }
+
     public HttpUrl createHttpUrl(final String providedUrl) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(providedUrl).newBuilder();
         return urlBuilder.build();
@@ -211,7 +217,17 @@ public abstract class RestConnection {
     }
 
     public Request createGetRequest(HttpUrl httpUrl, String mediaType) {
-        return new Request.Builder().addHeader("Accept", mediaType)
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Accept", mediaType);
+        return createGetRequest(httpUrl, headers);
+    }
+
+    public Request createGetRequest(HttpUrl httpUrl, Map<String, String> headers) {
+        Request.Builder requestBuilder = new Request.Builder();
+        for (Entry<String, String> header : headers.entrySet()) {
+            requestBuilder.addHeader(header.getKey(), header.getValue());
+        }
+        return requestBuilder
                 .url(httpUrl).get().build();
     }
 

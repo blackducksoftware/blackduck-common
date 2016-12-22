@@ -27,13 +27,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
-import java.net.Proxy;
 import java.net.URL;
-import java.net.URLConnection;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -44,19 +43,26 @@ import org.apache.tools.zip.ZipFile;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.global.HubProxyInfo;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.util.AuthenticatorUtil;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+
+import okhttp3.HttpUrl;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class CLIDownloadService {
     private final IntLogger logger;
 
-    public CLIDownloadService(IntLogger logger) {
+    private final RestConnection restConnection;
+
+    public CLIDownloadService(IntLogger logger, RestConnection restConnection) {
         this.logger = logger;
+        this.restConnection = restConnection;
     }
 
-    public void performInstallation(HubProxyInfo hubProxyInfo, final File directoryToInstallTo, final CIEnvironmentVariables ciEnvironmentVariables,
+    public void performInstallation(final File directoryToInstallTo, final CIEnvironmentVariables ciEnvironmentVariables,
             String hubUrl, String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
         if (StringUtils.isBlank(localHostName)) {
             throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
@@ -66,7 +72,7 @@ public class CLIDownloadService {
         final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(logger, hubUrl);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
             try {
-                customInstall(hubProxyInfo, cliLocation, ciEnvironmentVariables, new URL(cliDownloadUrl), hubVersion, localHostName);
+                customInstall(cliLocation, ciEnvironmentVariables, new URL(cliDownloadUrl), hubVersion, localHostName);
             } catch (final MalformedURLException e) {
                 throw new HubIntegrationException(String.format("The cli could not be downloaded from %s: %s", cliDownloadUrl, e.getMessage()), e);
             }
@@ -75,7 +81,7 @@ public class CLIDownloadService {
         }
     }
 
-    public void customInstall(HubProxyInfo hubProxyInfo, CLILocation cliLocation, CIEnvironmentVariables ciEnvironmentVariables, final URL archive,
+    public void customInstall(CLILocation cliLocation, CIEnvironmentVariables ciEnvironmentVariables, final URL archive,
             String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
         String directoryToInstallTo;
         try {
@@ -110,49 +116,32 @@ public class CLIDownloadService {
             }
             final long cliTimestamp = hubVersionFile.lastModified();
 
-            URLConnection connection = null;
+            Response response;
             try {
-                Proxy proxy = null;
-                if (hubProxyInfo != null) {
-                    final String proxyHost = hubProxyInfo.getHost();
-                    final int proxyPort = hubProxyInfo.getPort();
-                    final String proxyUsername = hubProxyInfo.getUsername();
-                    final String proxyPassword = hubProxyInfo.getDecryptedPassword();
-
-                    if (StringUtils.isNotBlank(proxyHost) && proxyPort > 0) {
-                        proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
-                    }
-                    if (proxy != null) {
-                        if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-                            AuthenticatorUtil.setAuthenticator(proxyUsername, proxyPassword);
-                        } else {
-                            AuthenticatorUtil.resetAuthenticator();
-                        }
-                    }
-                }
-                if (proxy != null) {
-                    connection = archive.openConnection(proxy);
-                } else {
-                    connection = archive.openConnection();
-                }
-                connection.setIfModifiedSince(cliTimestamp);
-                connection.connect();
+                HttpUrl httpUrl = restConnection.createHttpUrl(archive);
+                Map<String, String> headers = new HashMap<>();
+                headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
+                Request request = restConnection.createGetRequest(httpUrl, headers);
+                response = restConnection.handleExecuteClientCall(request);
             } catch (final IOException ioe) {
                 logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo + ": "
                         + ioe.toString());
                 return;
             }
-
-            if (connection instanceof HttpURLConnection
-                    && ((HttpURLConnection) connection).getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
+            if (response.code() == 304) {
                 // CLI has not been modified
                 return;
             }
+            String lastModified = response.header("Last-Modified");
+            Long lastModifiedLong = 0L;
 
-            final long sourceTimestamp = connection.getLastModified();
+            if (StringUtils.isNotBlank(lastModified)) {
+                // Should parse the Date just like URLConnection did
+                lastModifiedLong = Date.parse(lastModified);
+            }
 
             if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
-                if (!cliMismatch && sourceTimestamp == cliTimestamp) {
+                if (!cliMismatch && lastModifiedLong == cliTimestamp) {
                     logger.debug("The current Hub CLI is up to date.");
                     return;
                 }
@@ -162,19 +151,32 @@ public class CLIDownloadService {
             } else {
                 cliInstallDirectory.mkdir();
             }
+
             logger.debug("Updating the Hub CLI.");
-            hubVersionFile.setLastModified(sourceTimestamp);
+            hubVersionFile.setLastModified(lastModifiedLong);
 
             logger.info("Unpacking " + archive.toString() + " to " + directoryToInstallTo + " on "
                     + localHostName);
-
-            final CountingInputStream cis = new CountingInputStream(connection.getInputStream());
+            ResponseBody responseBody = null;
+            InputStream cliStream = null;
             try {
-                unzip(cliInstallDirectory, cis, logger);
-                updateJreSecurity(logger, cliLocation, ciEnvironmentVariables);
-            } catch (final IOException e) {
-                throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", archive,
-                        cis.getByteCount(), connection.getContentLength()), e);
+                responseBody = response.body();
+                cliStream = responseBody.byteStream();
+                final CountingInputStream cis = new CountingInputStream(cliStream);
+                try {
+                    unzip(cliInstallDirectory, cis, logger);
+                    updateJreSecurity(logger, cliLocation, ciEnvironmentVariables);
+                } catch (final IOException e) {
+                    throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", archive,
+                            cis.getByteCount(), responseBody.contentLength()), e);
+                }
+            } finally {
+                if (responseBody != null) {
+                    responseBody.close();
+                }
+                if (cliStream != null) {
+                    cliStream.close();
+                }
             }
         } catch (final IOException e) {
             throw new HubIntegrationException("Failed to install " + archive + " to " + directoryToInstallTo, e);

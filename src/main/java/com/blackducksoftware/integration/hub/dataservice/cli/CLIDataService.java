@@ -68,7 +68,7 @@ public class CLIDataService extends HubRequestService {
         logger.info("Running on machine : " + localHostName);
         printConfiguration(hubScanConfig);
         final String hubVersion = hubVersionRequestService.getHubVersion();
-        cliDownloadService.performInstallation(hubServerConfig.getProxyInfo(), hubScanConfig.getToolsDir(), ciEnvironmentVariables,
+        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables,
                 hubServerConfig.getHubUrl().toString(),
                 hubVersion, localHostName);
 
