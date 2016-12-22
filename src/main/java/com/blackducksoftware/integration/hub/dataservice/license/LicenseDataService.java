@@ -30,6 +30,7 @@ public class LicenseDataService extends HubRequestService {
 		String[] componentSegmentArr = componentUrl.split("/");
 		String[] versionSegmentArr = versionUrl.split("/");
 		
+		//Return a blank list if split does not work
 		if(componentSegmentArr.length == 0 || versionSegmentArr.length == 0){
 			return new LinkedList<License>();
 		}
