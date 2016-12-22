@@ -228,7 +228,7 @@ public class SimpleScanService extends HubRequestService {
             throws IllegalArgumentException, EncryptionException, IOException, HubIntegrationException {
         printCommand();
 
-        final File standardOutFile = new File(logDirectory, "CLI_Output.txt");
+        final File standardOutFile = getStandardOutputFile();
         standardOutFile.createNewFile();
         try (FileOutputStream outputFileStream = new FileOutputStream(standardOutFile)) {
             final ScannerSplitStream splitOutputStream = new ScannerSplitStream(logger, outputFileStream);
@@ -278,7 +278,7 @@ public class SimpleScanService extends HubRequestService {
         if (logDirectory == null || !logDirectory.exists()) {
             return Collections.emptyList();
         }
-        final File scanStatusDirectory = new File(logDirectory, "status");
+        final File scanStatusDirectory = getStatusDirectory();
         if (!scanStatusDirectory.exists()) {
             return Collections.emptyList();
         }
@@ -379,6 +379,18 @@ public class SimpleScanService extends HubRequestService {
 
     public File getLogDirectory() {
         return logDirectory;
+    }
+
+    public File getStatusDirectory() {
+        return new File(logDirectory, "status");
+    }
+
+    public File getCLILogDirectory() {
+        return new File(logDirectory, "log");
+    }
+
+    public File getStandardOutputFile() {
+        return new File(logDirectory, "CLI_Output.txt");
     }
 
 }
