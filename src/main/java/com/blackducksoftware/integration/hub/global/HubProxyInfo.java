@@ -32,9 +32,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.encryption.PasswordDecrypter;
 import com.blackducksoftware.integration.exception.EncryptionException;
-import com.blackducksoftware.integration.util.AuthenticatorUtil;
 import com.blackducksoftware.integration.util.proxy.ProxyUtil;
 
 public class HubProxyInfo implements Serializable {
@@ -76,7 +74,6 @@ public class HubProxyInfo implements Serializable {
         final List<Pattern> ignoredProxyHostPatterns = ProxyUtil.getIgnoredProxyHostPatterns(ignoredProxyHosts);
         return !ProxyUtil.shouldIgnoreHost(url.getHost(), ignoredProxyHostPatterns);
     }
-
 
     @Override
     public String toString() {
