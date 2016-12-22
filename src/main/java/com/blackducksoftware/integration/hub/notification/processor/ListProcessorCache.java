@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
-public class ListProcessorCache<T extends NotificationEvent<?>> implements SubProcessorCache<T> {
+public class ListProcessorCache<T extends NotificationEvent> implements SubProcessorCache<T> {
     private final LinkedList<T> eventList = new LinkedList<>();
 
     @Override
@@ -43,5 +43,15 @@ public class ListProcessorCache<T extends NotificationEvent<?>> implements SubPr
     @Override
     public Collection<T> getEvents() throws HubIntegrationException {
         return eventList;
+    }
+
+    @Override
+    public boolean hasEvent(String eventKey) {
+        for (final T event : eventList) {
+            if (event.getEventKey().equals(eventKey)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

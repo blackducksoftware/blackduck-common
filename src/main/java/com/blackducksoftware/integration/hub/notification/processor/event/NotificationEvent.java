@@ -21,29 +21,22 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.notification.processor.event;
 
-import java.util.Set;
+import java.util.Map;
 
-import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
-import com.blackducksoftware.integration.hub.notification.processor.ItemEntry;
 import com.blackducksoftware.integration.hub.notification.processor.NotificationCategoryEnum;
 
-public abstract class NotificationEvent<T extends NotificationContentItem> {
+public abstract class NotificationEvent {
     private NotificationCategoryEnum categoryType;
 
-    private final T notificationContent;
+    private final Map<String, Object> dataSet;
 
-    private Set<ItemEntry> dataSet;
+    private final String eventKey;
 
-    private String eventKey;
-
-    public NotificationEvent(final NotificationCategoryEnum categoryType, T notificationContent) {
+    public NotificationEvent(final String eventKey, final NotificationCategoryEnum categoryType,
+            Map<String, Object> dataSet) {
+        this.eventKey = eventKey;
         this.categoryType = categoryType;
-        this.notificationContent = notificationContent;
-    }
-
-    public void init() {
-        dataSet = generateDataSet();
-        eventKey = generateEventKey();
+        this.dataSet = dataSet;
     }
 
     public String hashString(final String origString) {
@@ -56,10 +49,6 @@ public abstract class NotificationEvent<T extends NotificationContentItem> {
         return hashString;
     }
 
-    public abstract Set<ItemEntry> generateDataSet();
-
-    public abstract String generateEventKey();
-
     public abstract int countCategoryItems();
 
     public NotificationCategoryEnum getCategoryType() {
@@ -70,11 +59,7 @@ public abstract class NotificationEvent<T extends NotificationContentItem> {
         this.categoryType = categoryType;
     }
 
-    public T getNotificationContent() {
-        return notificationContent;
-    }
-
-    public Set<ItemEntry> getDataSet() {
+    public Map<String, Object> getDataSet() {
         return dataSet;
     }
 

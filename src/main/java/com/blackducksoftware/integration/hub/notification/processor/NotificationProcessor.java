@@ -31,17 +31,16 @@ import java.util.SortedSet;
 
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
-public abstract class NotificationProcessor<T> {
+public abstract class NotificationProcessor<T, E> {
 
     private final Map<Class<?>, NotificationSubProcessor<?>> processorMap = new HashMap<>();
 
-    private final List<MapProcessorCache<?>> cacheList = new ArrayList<>();
+    private final List<SubProcessorCache<E>> cacheList = new ArrayList<>();
 
     public T process(final SortedSet<NotificationContentItem> notifications) throws HubIntegrationException {
         createEvents(notifications);
-        final Collection<NotificationEvent<?>> events = collectEvents();
+        final Collection<E> events = collectEvents();
         return processEvents(events);
     }
 
@@ -55,11 +54,11 @@ public abstract class NotificationProcessor<T> {
         }
     }
 
-    public abstract T processEvents(Collection<NotificationEvent<?>> eventCollection) throws HubIntegrationException;
+    public abstract T processEvents(Collection<E> eventCollection) throws HubIntegrationException;
 
-    private Collection<NotificationEvent<?>> collectEvents() throws HubIntegrationException {
-        final Collection<NotificationEvent<?>> eventList = new LinkedList<>();
-        for (final MapProcessorCache<?> processor : cacheList) {
+    private Collection<E> collectEvents() throws HubIntegrationException {
+        final Collection<E> eventList = new LinkedList<>();
+        for (final SubProcessorCache<E> processor : cacheList) {
             eventList.addAll(processor.getEvents());
         }
         return eventList;
@@ -69,7 +68,7 @@ public abstract class NotificationProcessor<T> {
         return processorMap;
     }
 
-    public List<MapProcessorCache<?>> getCacheList() {
+    public List<SubProcessorCache<E>> getCacheList() {
         return cacheList;
     }
 }

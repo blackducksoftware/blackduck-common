@@ -11,10 +11,14 @@
  */
 package com.blackducksoftware.integration.hub.notification.processor;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,14 +32,14 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Polic
 import com.blackducksoftware.integration.hub.dataservice.notification.item.VulnerabilityContentItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
+import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEventConstants;
 import com.blackducksoftware.integration.hub.notification.processor.event.PolicyEvent;
-import com.blackducksoftware.integration.hub.notification.processor.event.PolicyOverrideEvent;
 import com.blackducksoftware.integration.hub.notification.processor.event.VulnerabilityEvent;
 
-public class MockEventProcessor extends NotificationSubProcessor<NotificationEvent<? extends NotificationContentItem>> {
+public class MockEventProcessor extends NotificationSubProcessor<NotificationEvent> {
     private final Logger logger = LoggerFactory.getLogger(MockEventProcessor.class);
 
-    public MockEventProcessor(final MapProcessorCache<NotificationEvent<? extends NotificationContentItem>> cache, final MetaService metaService) {
+    public MockEventProcessor(final MapProcessorCache<NotificationEvent> cache, final MetaService metaService) {
         super(cache, metaService);
     }
 
@@ -64,16 +68,19 @@ public class MockEventProcessor extends NotificationSubProcessor<NotificationEve
 
     private void handlePolicyViolation(final PolicyViolationContentItem policyViolationContentItem) throws HubIntegrationException {
         for (final PolicyRule rule : policyViolationContentItem.getPolicyRuleList()) {
-            final PolicyEvent event = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, policyViolationContentItem,
-                    rule, getMetaService().getHref(rule));
+            final String eventKey = generatePolicyEventKey(policyViolationContentItem, rule);
+            final Map<String, Object> dataSet = generatePolicyDataSet(policyViolationContentItem, rule);
+            final PolicyEvent event = new PolicyEvent(eventKey, NotificationCategoryEnum.POLICY_VIOLATION, rule, dataSet);
             getCache().addEvent(event);
         }
     }
 
     private void handlePolicyOverride(final PolicyOverrideContentItem policyOverrideContentItem) throws HubIntegrationException {
         for (final PolicyRule rule : policyOverrideContentItem.getPolicyRuleList()) {
-            final PolicyOverrideEvent event = new PolicyOverrideEvent(NotificationCategoryEnum.POLICY_VIOLATION,
-                    policyOverrideContentItem, rule, getMetaService().getHref(rule));
+            final String eventKey = generatePolicyEventKey(policyOverrideContentItem, rule);
+            final Map<String, Object> dataSet = generatePolicyOverrideDataSet(policyOverrideContentItem, rule);
+            final PolicyEvent event = new PolicyEvent(eventKey, NotificationCategoryEnum.POLICY_VIOLATION,
+                    rule, dataSet);
             if (getCache().hasEvent(event.getEventKey())) {
                 getCache().removeEvent(event);
             } else {
@@ -85,8 +92,10 @@ public class MockEventProcessor extends NotificationSubProcessor<NotificationEve
 
     private void handlePolicyCleared(final PolicyViolationClearedContentItem policyViolationCleared) throws HubIntegrationException {
         for (final PolicyRule rule : policyViolationCleared.getPolicyRuleList()) {
-            final PolicyEvent event = new PolicyEvent(NotificationCategoryEnum.POLICY_VIOLATION, policyViolationCleared, rule,
-                    getMetaService().getHref(rule));
+            final String eventKey = generatePolicyEventKey(policyViolationCleared, rule);
+            final Map<String, Object> dataSet = generatePolicyDataSet(policyViolationCleared, rule);
+            final PolicyEvent event = new PolicyEvent(eventKey, NotificationCategoryEnum.POLICY_VIOLATION, rule,
+                    dataSet);
             if (getCache().hasEvent(event.getEventKey())) {
                 getCache().removeEvent(event);
             } else {
@@ -116,8 +125,9 @@ public class MockEventProcessor extends NotificationSubProcessor<NotificationEve
 
     private VulnerabilityEvent createEvent(VulnerabilityContentItem vulnerabilityContent,
             final Set<String> vulnerabilityIdList) {
-
-        return new VulnerabilityEvent(NotificationCategoryEnum.VULNERABILITY, vulnerabilityContent, vulnerabilityIdList);
+        final String eventKey = generateVulnerabilityEventKey(vulnerabilityContent);
+        final Map<String, Object> dataSet = generateVulnerabilityDataSet(vulnerabilityContent);
+        return new VulnerabilityEvent(eventKey, NotificationCategoryEnum.VULNERABILITY, vulnerabilityIdList, dataSet);
     }
 
     private Set<String> getVulnerabilityIds(final List<VulnerabilitySourceQualifiedId> itemList) {
@@ -129,4 +139,90 @@ public class MockEventProcessor extends NotificationSubProcessor<NotificationEve
         return set;
     }
 
+    private String generatePolicyEventKey(final PolicyViolationContentItem content, PolicyRule rule) throws HubIntegrationException {
+        final StringBuilder keyBuilder = new StringBuilder();
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_ISSUE_TYPE_NAME);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_ISSUE_TYPE_VALUE_POLICY);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_PAIR_SEPARATOR);
+
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_PROJECT_VERSION_REL_URL_HASHED_NAME);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
+        keyBuilder.append(hashString(content.getProjectVersion().getUrl()));
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_PAIR_SEPARATOR);
+
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_COMPONENT_REL_URL_HASHED_NAME);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
+        keyBuilder.append(hashString(content.getComponentUrl()));
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_PAIR_SEPARATOR);
+
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_COMPONENT_VERSION_REL_URL_HASHED_NAME);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
+        keyBuilder.append(hashString(content.getComponentVersionUrl()));
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_PAIR_SEPARATOR);
+
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_POLICY_RULE_REL_URL_HASHED_NAME);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
+        keyBuilder.append(hashString(getMetaService().getHref(rule)));
+        final String key = keyBuilder.toString();
+        return key;
+    }
+
+    private String generateVulnerabilityEventKey(final VulnerabilityContentItem content) {
+        final StringBuilder keyBuilder = new StringBuilder();
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_ISSUE_TYPE_NAME);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_ISSUE_TYPE_VALUE_VULNERABILITY);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_PAIR_SEPARATOR);
+
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_PROJECT_VERSION_REL_URL_HASHED_NAME);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
+        keyBuilder.append(hashString(content.getProjectVersion().getUrl()));
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_PAIR_SEPARATOR);
+
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_COMPONENT_REL_URL_HASHED_NAME);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
+        keyBuilder.append(""); // There is never a component URL
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_PAIR_SEPARATOR);
+
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_COMPONENT_VERSION_REL_URL_HASHED_NAME);
+        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
+        keyBuilder.append(hashString(content.getComponentVersionUrl()));
+
+        final String key = keyBuilder.toString();
+        return key;
+    }
+
+    private Map<String, Object> generatePolicyDataSet(PolicyViolationContentItem content, PolicyRule rule) {
+        final Map<String, Object> dataSet = new LinkedHashMap<>(4);
+        dataSet.put(ItemTypeEnum.RULE.name(), rule.getName());
+        dataSet.put(ItemTypeEnum.COMPONENT.name(), content.getComponentName());
+        dataSet.put(ItemTypeEnum.VERSION.name(), content.getComponentVersion());
+        return dataSet;
+    }
+
+    private Map<String, Object> generatePolicyOverrideDataSet(PolicyOverrideContentItem content, PolicyRule rule) {
+        final Map<String, Object> dataSet = generatePolicyDataSet(content, rule);
+        final String person = StringUtils.join(" ", content.getFirstName(), content.getLastName());
+        dataSet.put(ItemTypeEnum.PERSON.name(), person);
+
+        return dataSet;
+    }
+
+    private Map<String, Object> generateVulnerabilityDataSet(VulnerabilityContentItem vulnerabilityContent) {
+        final Map<String, Object> dataSet = new LinkedHashMap<>();
+        dataSet.put(ItemTypeEnum.COMPONENT.name(), vulnerabilityContent.getComponentName());
+        dataSet.put(ItemTypeEnum.VERSION.name(), vulnerabilityContent.getComponentVersion());
+        return dataSet;
+    }
+
+    @Override
+    public String generateEventKey(Map<String, Object> dataMap) throws HubIntegrationException {
+        return ""; // ignore since we create multiple types of events from this processor
+    }
+
+    @Override
+    public Map<String, Object> generateDataSet(Map<String, Object> inputData) {
+        return Collections.emptyMap();
+    }
 }

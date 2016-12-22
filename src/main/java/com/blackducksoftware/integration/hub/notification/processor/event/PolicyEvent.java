@@ -21,65 +21,18 @@
  *******************************************************************************/
 package com.blackducksoftware.integration.hub.notification.processor.event;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.Map;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
-import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyContentItem;
-import com.blackducksoftware.integration.hub.notification.processor.ItemEntry;
-import com.blackducksoftware.integration.hub.notification.processor.ItemTypeEnum;
 import com.blackducksoftware.integration.hub.notification.processor.NotificationCategoryEnum;
 
-public class PolicyEvent extends NotificationEvent<PolicyContentItem> {
+public class PolicyEvent extends NotificationEvent {
     private final PolicyRule policyRule;
 
-    private final String policyRuleURL;
-
-    public PolicyEvent(NotificationCategoryEnum categoryType, PolicyContentItem notificationContent,
-            PolicyRule policyRule, String policyRuleUrl) {
-        super(categoryType, notificationContent);
+    public PolicyEvent(final String eventKey, final NotificationCategoryEnum categoryType,
+            PolicyRule policyRule, Map<String, Object> dataSet) {
+        super(eventKey, categoryType, dataSet);
         this.policyRule = policyRule;
-        this.policyRuleURL = policyRuleUrl;
-        init();
-    }
-
-    @Override
-    public Set<ItemEntry> generateDataSet() {
-        final Set<ItemEntry> dataSet = new LinkedHashSet<>(4);
-        dataSet.add(new ItemEntry(ItemTypeEnum.RULE.name(), policyRule.getName()));
-        dataSet.add(new ItemEntry(ItemTypeEnum.COMPONENT.name(), getNotificationContent().getComponentName()));
-        dataSet.add(new ItemEntry("", getNotificationContent().getComponentVersion()));
-        return dataSet;
-    }
-
-    @Override
-    public String generateEventKey() {
-        final StringBuilder keyBuilder = new StringBuilder();
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_ISSUE_TYPE_NAME);
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_ISSUE_TYPE_VALUE_POLICY);
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_PAIR_SEPARATOR);
-
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_PROJECT_VERSION_REL_URL_HASHED_NAME);
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
-        keyBuilder.append(hashString(getNotificationContent().getProjectVersion().getUrl()));
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_PAIR_SEPARATOR);
-
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_COMPONENT_REL_URL_HASHED_NAME);
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
-        keyBuilder.append(hashString(getNotificationContent().getComponentUrl()));
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_PAIR_SEPARATOR);
-
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_COMPONENT_VERSION_REL_URL_HASHED_NAME);
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
-        keyBuilder.append(hashString(getNotificationContent().getComponentVersionUrl()));
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_PAIR_SEPARATOR);
-
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_POLICY_RULE_REL_URL_HASHED_NAME);
-        keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
-        keyBuilder.append(hashString(policyRuleURL));
-        final String key = keyBuilder.toString();
-        return key;
     }
 
     @Override
@@ -89,9 +42,5 @@ public class PolicyEvent extends NotificationEvent<PolicyContentItem> {
 
     public PolicyRule getPolicyRule() {
         return policyRule;
-    }
-
-    public String getPolicyRuleURL() {
-        return policyRuleURL;
     }
 }
