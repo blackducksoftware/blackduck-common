@@ -2,6 +2,9 @@ package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import com.blackducksoftware.integration.hub.api.item.HubResponse;
 
 public class License extends HubResponse {
@@ -44,5 +47,18 @@ public class License extends HubResponse {
 		return license;
 	}
 	
+	public String getLicenseId(){
+		String[] urlElements = license.split("/");
+		if(urlElements.length > 0){
+			return urlElements[urlElements.length-1];
+		} else {
+			//FIXME proper exception handling
+			return "";
+		}
+	}
 	
+	@Override
+	public String toString() {
+		return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
+	}
 }
