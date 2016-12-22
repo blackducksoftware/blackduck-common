@@ -157,9 +157,9 @@ public class HubServerConfigValidator extends AbstractValidator {
             return;
         }
 
-        HttpUrl url = HttpUrl.parse(hubUrl);
+        final HttpUrl url = HttpUrl.parse(hubUrl);
 
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        final OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
         builder.connectTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
         builder.writeTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
@@ -169,7 +169,7 @@ public class HubServerConfigValidator extends AbstractValidator {
             String password = null;
             try {
                 password = proxyInfo.getDecryptedPassword();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD,
                         new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
                 return;
@@ -181,12 +181,12 @@ public class HubServerConfigValidator extends AbstractValidator {
             }
         }
         try {
-            OkHttpClient client = builder.build();
+            final OkHttpClient client = builder.build();
 
-            Request request = new Request.Builder()
+            final Request request = new Request.Builder()
                     .url(url).get().build();
 
-            Response response = client.newCall(request).execute();
+            final Response response = client.newCall(request).execute();
 
             if (!response.isSuccessful()) {
                 if (response.code() == 407) {
@@ -198,7 +198,7 @@ public class HubServerConfigValidator extends AbstractValidator {
                         new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl));
 
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             result.addResult(HubServerConfigFieldEnum.HUBURL,
                     new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, e));
         }
