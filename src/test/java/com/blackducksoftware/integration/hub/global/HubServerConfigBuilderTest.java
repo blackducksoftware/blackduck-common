@@ -1,4 +1,6 @@
-/*******************************************************************************
+/**
+ * Hub Common
+ *
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -18,13 +20,13 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
-
+ */
 package com.blackducksoftware.integration.hub.global;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,10 +59,6 @@ public class HubServerConfigBuilderTest {
     private static final int VALID_PROXY_PORT = 2303;
 
     private static final String VALID_PROXY_HOST = "just need a non-empty string";
-
-    private static final String VALID_PROXY_PASSWORD = "itsasecret";
-
-    private static final String VALID_PROXY_USERNAME = "memyselfandi";
 
     private static final String VALID_IGNORE_HOST_LIST = "google,msn,yahoo";
 
@@ -208,7 +206,6 @@ public class HubServerConfigBuilderTest {
 
     @Test
     public void testValidateHubTimeout() throws Exception {
-
         final HubServerConfigValidator validator = new HubServerConfigValidator();
         validator.setTimeout("678");
         final ValidationResults result = new ValidationResults();
@@ -220,7 +217,6 @@ public class HubServerConfigBuilderTest {
 
     @Test
     public void testValidateHubTimeoutInteger() throws Exception {
-
         final HubServerConfigValidator validator = new HubServerConfigValidator();
         validator.setTimeout(678);
         final ValidationResults result = new ValidationResults();
@@ -245,7 +241,7 @@ public class HubServerConfigBuilderTest {
     }
 
     @Test
-    public void testValidBuildTimeourString() throws Exception {
+    public void testValidBuildTimeoutString() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         builder.setHubUrl(VALID_URL);
         builder.setTimeout(VALID_TIMEOUT_STRING);
@@ -308,4 +304,31 @@ public class HubServerConfigBuilderTest {
         assertEquals(443, config.getHubUrl().getPort());
         assertEquals("/blackducksoftware", config.getHubUrl().getPath());
     }
+
+    @Test
+    public void testValidBuildWithProxyPortZero() throws Exception {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setHubUrl(VALID_URL);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
+        HubServerConfig config = builder.build();
+        assertFalse(config.shouldUseProxyForHub());
+
+        builder.setProxyPort(0);
+        config = builder.build();
+        assertFalse(config.shouldUseProxyForHub());
+
+        builder.setProxyPort("0");
+        config = builder.build();
+        assertFalse(config.shouldUseProxyForHub());
+
+        builder.setProxyPort(1);
+        try {
+            config = builder.build();
+            fail("Should have thrown an IllegalStateException with invalid proxy state");
+        } catch (final IllegalStateException e) {
+            assertTrue(e.getMessage().contains("proxy"));
+        }
+    }
+
 }
