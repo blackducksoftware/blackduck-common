@@ -23,14 +23,12 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.item.HubPagedResponse;
 import com.blackducksoftware.integration.hub.api.item.HubResponse;
-import com.blackducksoftware.integration.hub.api.item.ParameterizedListType;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
@@ -42,24 +40,19 @@ import com.google.gson.JsonObject;
 public class HubParameterizedRequestService<T extends HubResponse> extends HubRequestService {
     private final Class<T> clazz;
 
-    private final Type listType;
-
-    public HubParameterizedRequestService(final RestConnection restConnection, Class<T> clazz) {
+    public HubParameterizedRequestService(final RestConnection restConnection, final Class<T> clazz) {
         super(restConnection);
         this.clazz = clazz;
-        // we can use this once we don't need to support older versions (2.3.0 for hub-artifactory) anymore
-        // listType = TypeToken.getParameterized(List.class, new Type[] { clazz }).getType();
-        listType = new ParameterizedListType(clazz);
     }
 
-    public HubPagedResponse<T> getPagedResponse(HubPagedRequest hubPagedRequest) throws HubIntegrationException {
+    public HubPagedResponse<T> getPagedResponse(final HubPagedRequest hubPagedRequest) throws HubIntegrationException {
         final JsonObject jsonObject = hubPagedRequest.executeGetForResponseJson();
         final int totalCount = jsonObject.get("totalCount").getAsInt();
         final List<T> items = getItems(jsonObject);
         return new HubPagedResponse<>(totalCount, items);
     }
 
-    public List<T> getItems(HubPagedRequest hubPagedRequest) throws HubIntegrationException {
+    public List<T> getItems(final HubPagedRequest hubPagedRequest) throws HubIntegrationException {
         final JsonObject jsonObject = hubPagedRequest.executeGetForResponseJson();
         final List<T> items = getItems(jsonObject);
         return items;
@@ -69,7 +62,7 @@ public class HubParameterizedRequestService<T extends HubResponse> extends HubRe
      * This method can be overridden by subclasses to provide special treatment for extracting the items from the
      * jsonObject.
      */
-    public List<T> getItems(JsonObject jsonObject) {
+    public List<T> getItems(final JsonObject jsonObject) {
         final LinkedList<T> itemList = new LinkedList<>();
         final JsonElement itemsElement = jsonObject.get("items");
         final JsonArray itemsArray = itemsElement.getAsJsonArray();
@@ -102,12 +95,12 @@ public class HubParameterizedRequestService<T extends HubResponse> extends HubRe
         return allItems;
     }
 
-    public List<T> getAllItems(List<String> urlSegments) throws HubIntegrationException {
+    public List<T> getAllItems(final List<String> urlSegments) throws HubIntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(urlSegments);
         return getAllItems(hubPagedRequest);
     }
 
-    public List<T> getAllItems(String url) throws HubIntegrationException {
+    public List<T> getAllItems(final String url) throws HubIntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(url);
         return getAllItems(hubPagedRequest);
     }
@@ -116,7 +109,7 @@ public class HubParameterizedRequestService<T extends HubResponse> extends HubRe
         return getItem(hubRequest, clazz);
     }
 
-    public T getItem(String url) throws HubIntegrationException {
+    public T getItem(final String url) throws HubIntegrationException {
         return getItem(url, clazz);
     }
 

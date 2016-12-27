@@ -47,7 +47,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class HubServerConfigValidator extends AbstractValidator {
-
     public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
 
     public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
@@ -81,8 +80,6 @@ public class HubServerConfigValidator extends AbstractValidator {
     private String ignoredProxyHosts;
 
     private HubProxyInfo proxyInfo;
-
-    private HubCredentials credentials;
 
     @Override
     public ValidationResults assertValid() {
