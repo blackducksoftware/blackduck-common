@@ -21,9 +21,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/**
- * 
- */
 
 var RiskReport = function (myJQuery, jsonData) {
 	this.myJQuery = myJQuery;
