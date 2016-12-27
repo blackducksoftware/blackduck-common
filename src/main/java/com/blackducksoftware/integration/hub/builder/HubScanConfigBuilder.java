@@ -66,6 +66,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private boolean disableScanTargetPathExistenceCheck;
 
+    private boolean disableScanTargetPathsWithinWorkingDirectoryCheck;
+
     private boolean cleanupLogsOnSuccess = true;
 
     @Override
@@ -92,22 +94,25 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         if (disableScanTargetPathExistenceCheck) {
             validator.disableScanTargetPathExistenceCheck();
         }
+        if (disableScanTargetPathsWithinWorkingDirectoryCheck) {
+            validator.disableScanTargetPathsWithinWorkingDirectoryCheck();
+        }
         return validator;
     }
 
-    public void setToolsDir(File toolsDir) {
+    public void setToolsDir(final File toolsDir) {
         this.toolsDir = toolsDir;
     }
 
-    public void setThirdPartyName(ThirdPartyName thirdPartyName) {
+    public void setThirdPartyName(final ThirdPartyName thirdPartyName) {
         this.thirdPartyName = thirdPartyName;
     }
 
-    public void setThirdPartyVersion(String thirdPartyVersion) {
+    public void setThirdPartyVersion(final String thirdPartyVersion) {
         this.thirdPartyVersion = thirdPartyVersion;
     }
 
-    public void setPluginVersion(String pluginVersion) {
+    public void setPluginVersion(final String pluginVersion) {
         this.pluginVersion = pluginVersion;
     }
 
@@ -159,7 +164,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         return cleanupLogsOnSuccess;
     }
 
-    public void setCleanupLogsOnSuccess(boolean cleanupLogsOnSuccess) {
+    public void setCleanupLogsOnSuccess(final boolean cleanupLogsOnSuccess) {
         this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
     }
 
