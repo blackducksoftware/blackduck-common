@@ -1,4 +1,6 @@
-/*******************************************************************************
+/**
+ * Hub Common
+ *
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -18,7 +20,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
+ */
 package com.blackducksoftware.integration.hub.cli;
 
 import java.io.File;
@@ -57,13 +59,13 @@ public class CLIDownloadService {
 
     private final RestConnection restConnection;
 
-    public CLIDownloadService(IntLogger logger, RestConnection restConnection) {
+    public CLIDownloadService(final IntLogger logger, final RestConnection restConnection) {
         this.logger = logger;
         this.restConnection = restConnection;
     }
 
     public void performInstallation(final File directoryToInstallTo, final CIEnvironmentVariables ciEnvironmentVariables,
-            String hubUrl, String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
+            final String hubUrl, final String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
         if (StringUtils.isBlank(localHostName)) {
             throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
         }
@@ -81,8 +83,8 @@ public class CLIDownloadService {
         }
     }
 
-    public void customInstall(CLILocation cliLocation, CIEnvironmentVariables ciEnvironmentVariables, final URL archive,
-            String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
+    public void customInstall(final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables, final URL archive,
+            final String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
         String directoryToInstallTo;
         try {
             directoryToInstallTo = cliLocation.getCanonicalPath();
@@ -116,51 +118,51 @@ public class CLIDownloadService {
             }
             final long cliTimestamp = hubVersionFile.lastModified();
 
-            Response response;
-            try {
-                HttpUrl httpUrl = restConnection.createHttpUrl(archive);
-                Map<String, String> headers = new HashMap<>();
-                headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
-                Request request = restConnection.createGetRequest(httpUrl, headers);
-                response = restConnection.handleExecuteClientCall(request);
-            } catch (final IOException ioe) {
-                logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo + ": "
-                        + ioe.toString());
-                return;
-            }
-            if (response.code() == 304) {
-                // CLI has not been modified
-                return;
-            }
-            String lastModified = response.header("Last-Modified");
-            Long lastModifiedLong = 0L;
-
-            if (StringUtils.isNotBlank(lastModified)) {
-                // Should parse the Date just like URLConnection did
-                lastModifiedLong = Date.parse(lastModified);
-            }
-
-            if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
-                if (!cliMismatch && lastModifiedLong == cliTimestamp) {
-                    logger.debug("The current Hub CLI is up to date.");
-                    return;
-                }
-                for (final File file : cliInstallDirectory.listFiles()) {
-                    FileUtils.deleteDirectory(file);
-                }
-            } else {
-                cliInstallDirectory.mkdir();
-            }
-
-            logger.debug("Updating the Hub CLI.");
-            hubVersionFile.setLastModified(lastModifiedLong);
-
-            logger.info("Unpacking " + archive.toString() + " to " + directoryToInstallTo + " on "
-                    + localHostName);
-            ResponseBody responseBody = null;
+            Response response = null;
             InputStream cliStream = null;
             try {
-                responseBody = response.body();
+                try {
+                    final HttpUrl httpUrl = restConnection.createHttpUrl(archive);
+                    final Map<String, String> headers = new HashMap<>();
+                    headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
+                    final Request request = restConnection.createGetRequest(httpUrl, headers);
+                    response = restConnection.handleExecuteClientCall(request);
+                } catch (final IOException ioe) {
+                    logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo + ": "
+                            + ioe.toString());
+                    return;
+                }
+                if (response.code() == 304) {
+                    // CLI has not been modified
+                    return;
+                }
+                final String lastModified = response.header("Last-Modified");
+                Long lastModifiedLong = 0L;
+
+                if (StringUtils.isNotBlank(lastModified)) {
+                    // Should parse the Date just like URLConnection did
+                    lastModifiedLong = Date.parse(lastModified);
+                }
+
+                if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
+                    if (!cliMismatch && lastModifiedLong == cliTimestamp) {
+                        logger.debug("The current Hub CLI is up to date.");
+                        return;
+                    }
+                    for (final File file : cliInstallDirectory.listFiles()) {
+                        FileUtils.deleteDirectory(file);
+                    }
+                } else {
+                    cliInstallDirectory.mkdir();
+                }
+
+                logger.debug("Updating the Hub CLI.");
+                hubVersionFile.setLastModified(lastModifiedLong);
+
+                logger.info("Unpacking " + archive.toString() + " to " + directoryToInstallTo + " on "
+                        + localHostName);
+
+                final ResponseBody responseBody = response.body();
                 cliStream = responseBody.byteStream();
                 final CountingInputStream cis = new CountingInputStream(cliStream);
                 try {
@@ -171,19 +173,22 @@ public class CLIDownloadService {
                             cis.getByteCount(), responseBody.contentLength()), e);
                 }
             } finally {
-                if (responseBody != null) {
-                    responseBody.close();
-                }
                 if (cliStream != null) {
                     cliStream.close();
                 }
+                if (response != null) {
+                    response.close();
+                }
             }
-        } catch (final IOException e) {
+        } catch (
+
+        final IOException e) {
             throw new HubIntegrationException("Failed to install " + archive + " to " + directoryToInstallTo, e);
         }
     }
 
-    private void updateJreSecurity(final IntLogger logger, CLILocation cliLocation, CIEnvironmentVariables ciEnvironmentVariables) throws IOException {
+    private void updateJreSecurity(final IntLogger logger, final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables)
+            throws IOException {
         final String cacertsFilename = "cacerts";
         if (ciEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
             final File securityDirectory = cliLocation.getJreSecurityDirectory();

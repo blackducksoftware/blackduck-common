@@ -1,4 +1,6 @@
-/*******************************************************************************
+/**
+ * Hub Common
+ *
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -18,9 +20,10 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
+ */
 package com.blackducksoftware.integration.hub.dataservice.cli;
 
+import java.io.File;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
@@ -82,12 +85,30 @@ public class CLIDataService extends HubRequestService {
                 hubScanConfig.getScanMemory(), hubScanConfig.isDryRun(), hubScanConfig.getProjectName(), hubScanConfig.getVersion(),
                 hubScanConfig.getScanTargetPaths(), hubScanConfig.getWorkingDirectory());
         simpleScanService.setupAndExecuteScan();
+
+        if (hubScanConfig.isCleanupLogsOnSuccess()) {
+            cleanUpLogFiles(simpleScanService);
+        }
         return simpleScanService.getScanSummaryItems();
     }
 
     public void printConfiguration(HubScanConfig hubScanConfig) {
         logger.alwaysLog("--> Log Level : " + logger.getLogLevel().name());
         hubScanConfig.print(logger);
+    }
+
+    private void cleanUpLogFiles(final SimpleScanService simpleScanService) {
+        File standardOutputFile = simpleScanService.getStandardOutputFile();
+        if (standardOutputFile != null && standardOutputFile.exists()) {
+            standardOutputFile.delete();
+        }
+        File cliLogDirectory = simpleScanService.getCLILogDirectory();
+        if (cliLogDirectory != null && cliLogDirectory.exists()) {
+            for (File log : cliLogDirectory.listFiles()) {
+                log.delete();
+            }
+            cliLogDirectory.delete();
+        }
     }
 
 }

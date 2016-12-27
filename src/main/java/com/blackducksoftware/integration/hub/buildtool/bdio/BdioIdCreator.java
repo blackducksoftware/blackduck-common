@@ -1,4 +1,6 @@
-/*******************************************************************************
+/**
+ * Hub Common
+ *
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -18,41 +20,26 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
-package com.blackducksoftware.integration.hub.rest;
+ */
+package com.blackducksoftware.integration.hub.buildtool.bdio;
 
-import java.net.URL;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.blackducksoftware.bdio.model.ExternalIdentifier;
+import com.blackducksoftware.bdio.model.ExternalIdentifierBuilder;
+import com.blackducksoftware.integration.hub.buildtool.Gav;
 
-import okhttp3.Cookie;
-import okhttp3.CookieJar;
-import okhttp3.HttpUrl;
+public class BdioIdCreator {
+    private final ExternalIdentifierBuilder externalIdentifierBuilder = ExternalIdentifierBuilder.create();
 
-public class CredentialCookieJar implements CookieJar {
+    public ExternalIdentifier createExternalIdentifier(final Gav gav) {
+        final String groupId = gav.getGroupId();
+        final String artifactId = gav.getArtifactId();
+        final String version = gav.getVersion();
 
-    private URL hubUrl;
-
-    private Set<Cookie> cookies = new HashSet<>();
-
-    @Override
-    public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-
+        return externalIdentifierBuilder.maven(groupId, artifactId, version).build().get();
     }
 
-    @Override
-    public List<Cookie> loadForRequest(HttpUrl url) {
-
-        return null;
-    }
-
-    public URL getHubUrl() {
-        return hubUrl;
-    }
-
-    public void setHubUrl(URL hubUrl) {
-        this.hubUrl = hubUrl;
+    public String createMavenId(final Gav gav) {
+        return String.format("mvn:%s/%s/%s", gav.getGroupId(), gav.getArtifactId(), gav.getVersion());
     }
 
 }

@@ -1,4 +1,6 @@
-/*******************************************************************************
+/**
+ * Hub Common
+ *
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -18,7 +20,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
+ */
 package com.blackducksoftware.integration.hub.rest;
 
 import java.io.IOException;
@@ -40,6 +42,10 @@ import okhttp3.JavaNetCookieJar;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * With a valid HubServerConfig containing a username and password, this RestConnection subclass with perform form
+ * authentication and allow for authenticated Hub requests.
+ */
 public class CredentialsRestConnection extends RestConnection {
     private final HubServerConfig hubServerConfig;
 
@@ -74,7 +80,6 @@ public class CredentialsRestConnection extends RestConnection {
     /**
      * Gets the cookie for the Authorized connection to the Hub server. Returns
      * the response code from the connection.
-     *
      */
     @Override
     public void clientAuthenticate()
@@ -94,9 +99,16 @@ public class CredentialsRestConnection extends RestConnection {
                     content.put("j_username", username);
                     content.put("j_password", password);
                     final Request request = createPostRequest(httpUrl, createEncodedRequestBody(content));
-                    final Response response = handleExecuteClientCall(request);
-                    if (!response.isSuccessful()) {
-                        throw new HubIntegrationException(response.message());
+                    Response response = null;
+                    try {
+                        response = handleExecuteClientCall(request);
+                        if (!response.isSuccessful()) {
+                            throw new HubIntegrationException(response.message());
+                        }
+                    } finally {
+                        if (response != null) {
+                            response.close();
+                        }
                     }
                 } catch (IllegalArgumentException | EncryptionException e) {
                     throw new HubIntegrationException(e.getMessage(), e);
