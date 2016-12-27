@@ -16,6 +16,10 @@ public class LicenseDataService extends HubRequestService {
 	private final ComponentVersionRequestService componentVersionRequestService;
 	private final ComponentRequestService componentRequestService;
 	
+	public LicenseDataService(RestConnection restConnection) {
+		this(restConnection, new ComponentVersionRequestService(restConnection), new ComponentRequestService(restConnection));
+	}
+	
 	public LicenseDataService(RestConnection restConnection, ComponentVersionRequestService componentVersionRequestService, ComponentRequestService componentRequestService){
 		super(restConnection);
 		
