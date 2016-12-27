@@ -7,6 +7,7 @@ import com.blackducksoftware.integration.hub.api.component.Component;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRequestService;
 import com.blackducksoftware.integration.hub.api.component.version.License;
+import com.blackducksoftware.integration.hub.api.component.version.LicenseInfo;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
@@ -39,5 +40,19 @@ public class LicenseDataService extends HubRequestService {
 		String versionSegStr = versionSegmentArr[versionSegmentArr.length-1];
 		
 		return componentVersionRequestService.getAllLicenses(componentSegStr, versionSegStr);
+	}
+	
+	public LicenseInfo getLicensesInfoFromCompVersion(final String namespace, final String groupId, final String artifactId, final String version) throws HubIntegrationException {
+		Component component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
+		String componentUrl = component.getComponent();
+		String versionUrl = component.getVersion();
+		
+		String[] componentSegmentArr = componentUrl.split("/");
+		String[] versionSegmentArr = versionUrl.split("/");
+		
+		String componentSegStr = componentSegmentArr[componentSegmentArr.length-1];
+		String versionSegStr = versionSegmentArr[versionSegmentArr.length-1];
+		
+		return componentVersionRequestService.getLicenseInfo(componentSegStr, versionSegStr);
 	}
 }

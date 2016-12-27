@@ -57,4 +57,44 @@ public class ComponentVersionRequestService extends HubParameterizedRequestServi
 		return licenses;
 		
 	}
+	
+	public LicenseInfo getLicenseInfo(final String componentId, final String versionId) throws HubIntegrationException {
+		//create list of url segments
+		final LinkedList<String> urlSegments = new LinkedList<String>();
+		urlSegments.add(SEGMENT_API);
+		urlSegments.add(SEGMENT_COMPONENTS);
+		urlSegments.add(componentId);
+		urlSegments.add(SEGMENT_VERSIONS);
+		urlSegments.add(versionId);
+		
+		//Create request from url segments
+		final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(urlSegments);
+		
+		//Call helper method to retrieve licenses from request
+		final LicenseInfo licensesInfo = getLicenseInfo(hubPagedRequest);
+		return licensesInfo;
+	}
+	
+	public LicenseInfo getLicenseInfo(HubPagedRequest hubPagedRequest) throws HubIntegrationException{
+		//Create JSON object from response
+		final JsonObject jsonObject = hubPagedRequest.executeGetForResponseJson();
+		
+		//Create List of licenses
+		final LinkedList<License> licenses = new LinkedList<License>();
+		//Populate list from JSON object
+		final JsonElement licenseElement = jsonObject.get("license");
+		final JsonObject licenseObject = licenseElement.getAsJsonObject();
+		
+		final JsonElement licenseType = licenseObject.get("type");
+		
+		final JsonElement licensesElement = licenseObject.get("licenses");
+		final JsonArray licensesArray = licensesElement.getAsJsonArray();
+		for(int i=0; i<licensesArray.size(); i++){
+			final JsonElement element = licensesArray.get(i);
+			final License l = getItem(element, License.class);
+			licenses.add(l);
+		}
+		
+		return new LicenseInfo(licenseType.getAsString(), licenses);
+	}
 }
