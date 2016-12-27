@@ -1,5 +1,7 @@
-/*******************************************************************************
- * Copyright (C) 2016 Black Duck Software, Inc.
+/**
+ * Hub Common
+ *
+ * Copyright (C) 2016 Black Duck Software, Inc..
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -18,7 +20,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
+ */
 package com.blackducksoftware.integration.hub.validator;
 
 import java.util.regex.Pattern;
@@ -190,7 +192,8 @@ public class HubProxyValidator extends AbstractValidator {
     }
 
     public boolean hasProxySettings() {
-        return StringUtils.isNotBlank(host) || StringUtils.isNotBlank(port) || StringUtils.isNotBlank(username) || StringUtils.isNotBlank(password)
+        return StringUtils.isNotBlank(host) || (StringUtils.isNotBlank(port) && !"0".equals(port)) || StringUtils.isNotBlank(username)
+                || StringUtils.isNotBlank(password)
                 || StringUtils.isNotBlank(ignoredProxyHosts);
     }
 

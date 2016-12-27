@@ -25,6 +25,7 @@ package com.blackducksoftware.integration.hub.global;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -208,7 +209,6 @@ public class HubServerConfigBuilderTest {
 
     @Test
     public void testValidateHubTimeout() throws Exception {
-
         final HubServerConfigValidator validator = new HubServerConfigValidator();
         validator.setTimeout("678");
         final ValidationResults result = new ValidationResults();
@@ -220,7 +220,6 @@ public class HubServerConfigBuilderTest {
 
     @Test
     public void testValidateHubTimeoutInteger() throws Exception {
-
         final HubServerConfigValidator validator = new HubServerConfigValidator();
         validator.setTimeout(678);
         final ValidationResults result = new ValidationResults();
@@ -245,7 +244,7 @@ public class HubServerConfigBuilderTest {
     }
 
     @Test
-    public void testValidBuildTimeourString() throws Exception {
+    public void testValidBuildTimeoutString() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         builder.setHubUrl(VALID_URL);
         builder.setTimeout(VALID_TIMEOUT_STRING);
@@ -308,4 +307,31 @@ public class HubServerConfigBuilderTest {
         assertEquals(443, config.getHubUrl().getPort());
         assertEquals("/blackducksoftware", config.getHubUrl().getPath());
     }
+
+    @Test
+    public void testValidBuildWithProxyPortZero() throws Exception {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setHubUrl(VALID_URL);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
+        HubServerConfig config = builder.build();
+        assertFalse(config.shouldUseProxyForHub());
+
+        builder.setProxyPort(0);
+        config = builder.build();
+        assertFalse(config.shouldUseProxyForHub());
+
+        builder.setProxyPort("0");
+        config = builder.build();
+        assertFalse(config.shouldUseProxyForHub());
+
+        builder.setProxyPort(1);
+        try {
+            config = builder.build();
+            fail("Should have thrown an IllegalStateException with invalid proxy state");
+        } catch (final IllegalStateException e) {
+            assertTrue(e.getMessage().contains("proxy"));
+        }
+    }
+
 }
