@@ -55,10 +55,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
- * Manages the low-level details of communicating with the server via REST.
- *
- * @author sbillings
- *
+ * The parent class of all Hub connections.
  */
 public abstract class RestConnection {
     public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
@@ -91,17 +88,18 @@ public abstract class RestConnection {
         return sdf.format(date);
     }
 
-    public RestConnection(URL baseUrl) {
+    public RestConnection(final URL baseUrl) {
         this(null, baseUrl, null);
     }
 
-    public RestConnection(final IntLogger logger, URL baseUrl, HubProxyInfo hubProxyInfo) {
+    public RestConnection(final IntLogger logger, final URL baseUrl, final HubProxyInfo hubProxyInfo) {
         if (logger != null) {
             setLogger(logger);
         }
         this.baseUrl = baseUrl;
         this.hubProxyInfo = hubProxyInfo;
-        setTimeout(timeout); // just in case setTimeout() is never called
+        // just in case setTimeout() is never called
+        setTimeout(timeout);
     }
 
     public IntLogger getLogger() {
@@ -141,12 +139,12 @@ public abstract class RestConnection {
     }
 
     public HttpUrl createHttpUrl(final URL providedUrl) {
-        HttpUrl.Builder urlBuilder = HttpUrl.get(providedUrl).newBuilder();
+        final HttpUrl.Builder urlBuilder = HttpUrl.get(providedUrl).newBuilder();
         return urlBuilder.build();
     }
 
     public HttpUrl createHttpUrl(final String providedUrl) {
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(providedUrl).newBuilder();
+        final HttpUrl.Builder urlBuilder = HttpUrl.parse(providedUrl).newBuilder();
         return urlBuilder.build();
     }
 
@@ -159,16 +157,16 @@ public abstract class RestConnection {
         return createHttpUrl(getBaseUrl().toString(), urlSegments, queryParameters);
     }
 
-    public HttpUrl createHttpUrl(String providedUrl, final List<String> urlSegments,
+    public HttpUrl createHttpUrl(final String providedUrl, final List<String> urlSegments,
             final Map<String, String> queryParameters) {
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(providedUrl).newBuilder();
+        final HttpUrl.Builder urlBuilder = HttpUrl.parse(providedUrl).newBuilder();
         if (urlSegments != null) {
             for (final String urlSegment : urlSegments) {
                 urlBuilder.addPathSegment(urlSegment);
             }
         }
         if (queryParameters != null) {
-            for (Entry<String, String> queryParameter : queryParameters.entrySet()) {
+            for (final Entry<String, String> queryParameter : queryParameters.entrySet()) {
                 urlBuilder.addQueryParameter(queryParameter.getKey(), queryParameter.getValue());
             }
         }
@@ -192,72 +190,72 @@ public abstract class RestConnection {
                             new com.blackducksoftware.integration.hub.proxy.OkAuthenticator(getHubProxyInfo().getUsername(),
                                     password));
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new HubIntegrationException(e.getMessage(), e);
             }
         }
     }
 
-    public RequestBody createJsonRequestBody(String content) {
+    public RequestBody createJsonRequestBody(final String content) {
         return createJsonRequestBody("application/json", content);
     }
 
-    public RequestBody createJsonRequestBody(String mediaType, String content) {
+    public RequestBody createJsonRequestBody(final String mediaType, final String content) {
         return RequestBody.create(MediaType.parse(mediaType), content);
     }
 
-    public RequestBody createEncodedRequestBody(Map<String, String> content) {
-        FormBody.Builder builder = new FormBody.Builder();
-        for (Entry<String, String> contentEntry : content.entrySet()) {
+    public RequestBody createEncodedRequestBody(final Map<String, String> content) {
+        final FormBody.Builder builder = new FormBody.Builder();
+        for (final Entry<String, String> contentEntry : content.entrySet()) {
             builder.addEncoded(contentEntry.getKey(), contentEntry.getValue());
         }
         return builder.build();
     }
 
-    public Request createGetRequest(HttpUrl httpUrl) {
+    public Request createGetRequest(final HttpUrl httpUrl) {
         return createGetRequest(httpUrl, "application/json");
     }
 
-    public Request createGetRequest(HttpUrl httpUrl, String mediaType) {
-        Map<String, String> headers = new HashMap<>();
+    public Request createGetRequest(final HttpUrl httpUrl, final String mediaType) {
+        final Map<String, String> headers = new HashMap<>();
         headers.put("Accept", mediaType);
         return createGetRequest(httpUrl, headers);
     }
 
-    public Request createGetRequest(HttpUrl httpUrl, Map<String, String> headers) {
-        Request.Builder requestBuilder = new Request.Builder();
-        for (Entry<String, String> header : headers.entrySet()) {
+    public Request createGetRequest(final HttpUrl httpUrl, final Map<String, String> headers) {
+        final Request.Builder requestBuilder = new Request.Builder();
+        for (final Entry<String, String> header : headers.entrySet()) {
             requestBuilder.addHeader(header.getKey(), header.getValue());
         }
         return requestBuilder
                 .url(httpUrl).get().build();
     }
 
-    public Request createPostRequest(HttpUrl httpUrl, RequestBody body) {
+    public Request createPostRequest(final HttpUrl httpUrl, final RequestBody body) {
         return new Request.Builder()
                 .url(httpUrl)
                 .post(body).build();
     }
 
-    public Request createPutRequest(HttpUrl httpUrl, RequestBody body) {
+    public Request createPutRequest(final HttpUrl httpUrl, final RequestBody body) {
         return new Request.Builder()
                 .url(httpUrl)
                 .put(body).build();
     }
 
-    public Request createDeleteRequest(HttpUrl httpUrl) {
+    public Request createDeleteRequest(final HttpUrl httpUrl) {
         return new Request.Builder()
                 .url(httpUrl).delete().build();
     }
 
-    public Response handleExecuteClientCall(Request request) throws IOException, HubIntegrationException {
+    public Response handleExecuteClientCall(final Request request) throws IOException, HubIntegrationException {
         return handleExecuteClientCall(request, 0);
     }
 
-    private Response handleExecuteClientCall(Request request, int retryCount) throws IOException, HubIntegrationException {
+    private Response handleExecuteClientCall(final Request request, final int retryCount) throws IOException, HubIntegrationException {
         if (getClient() != null) {
             logRequestHeaders(request);
-            Response response = getClient().newCall(request).execute();
+            final Response response = getClient().newCall(request).execute();
             if (!response.isSuccessful()) {
                 if (response.code() == 401 && retryCount < 2) {
                     connect();
@@ -312,11 +310,11 @@ public abstract class RestConnection {
         }
     }
 
-    private void logHeaders(String requestOrResponseName, final Headers headers) {
+    private void logHeaders(final String requestOrResponseName, final Headers headers) {
         if (headers != null && headers.size() > 0) {
             logMessage(LogLevel.TRACE, requestOrResponseName + " headers : ");
-            for (Entry<String, List<String>> headerEntry : headers.toMultimap().entrySet()) {
-                String key = headerEntry.getKey();
+            for (final Entry<String, List<String>> headerEntry : headers.toMultimap().entrySet()) {
+                final String key = headerEntry.getKey();
                 String value = "null";
                 if (headerEntry.getValue() != null && !headerEntry.getValue().isEmpty()) {
                     value = StringUtils.join(headerEntry.getValue(), System.lineSeparator());
@@ -341,7 +339,7 @@ public abstract class RestConnection {
         return client;
     }
 
-    public void setClient(OkHttpClient client) {
+    public void setClient(final OkHttpClient client) {
         this.client = client;
     }
 

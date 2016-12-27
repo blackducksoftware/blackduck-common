@@ -59,13 +59,13 @@ public class CLIDownloadService {
 
     private final RestConnection restConnection;
 
-    public CLIDownloadService(IntLogger logger, RestConnection restConnection) {
+    public CLIDownloadService(final IntLogger logger, final RestConnection restConnection) {
         this.logger = logger;
         this.restConnection = restConnection;
     }
 
     public void performInstallation(final File directoryToInstallTo, final CIEnvironmentVariables ciEnvironmentVariables,
-            String hubUrl, String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
+            final String hubUrl, final String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
         if (StringUtils.isBlank(localHostName)) {
             throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
         }
@@ -83,8 +83,8 @@ public class CLIDownloadService {
         }
     }
 
-    public void customInstall(CLILocation cliLocation, CIEnvironmentVariables ciEnvironmentVariables, final URL archive,
-            String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
+    public void customInstall(final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables, final URL archive,
+            final String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
         String directoryToInstallTo;
         try {
             directoryToInstallTo = cliLocation.getCanonicalPath();
@@ -122,10 +122,10 @@ public class CLIDownloadService {
             InputStream cliStream = null;
             try {
                 try {
-                    HttpUrl httpUrl = restConnection.createHttpUrl(archive);
-                    Map<String, String> headers = new HashMap<>();
+                    final HttpUrl httpUrl = restConnection.createHttpUrl(archive);
+                    final Map<String, String> headers = new HashMap<>();
                     headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
-                    Request request = restConnection.createGetRequest(httpUrl, headers);
+                    final Request request = restConnection.createGetRequest(httpUrl, headers);
                     response = restConnection.handleExecuteClientCall(request);
                 } catch (final IOException ioe) {
                     logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo + ": "
@@ -136,7 +136,7 @@ public class CLIDownloadService {
                     // CLI has not been modified
                     return;
                 }
-                String lastModified = response.header("Last-Modified");
+                final String lastModified = response.header("Last-Modified");
                 Long lastModifiedLong = 0L;
 
                 if (StringUtils.isNotBlank(lastModified)) {
@@ -162,7 +162,7 @@ public class CLIDownloadService {
                 logger.info("Unpacking " + archive.toString() + " to " + directoryToInstallTo + " on "
                         + localHostName);
 
-                ResponseBody responseBody = response.body();
+                final ResponseBody responseBody = response.body();
                 cliStream = responseBody.byteStream();
                 final CountingInputStream cis = new CountingInputStream(cliStream);
                 try {
@@ -187,7 +187,8 @@ public class CLIDownloadService {
         }
     }
 
-    private void updateJreSecurity(final IntLogger logger, CLILocation cliLocation, CIEnvironmentVariables ciEnvironmentVariables) throws IOException {
+    private void updateJreSecurity(final IntLogger logger, final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables)
+            throws IOException {
         final String cacertsFilename = "cacerts";
         if (ciEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
             final File securityDirectory = cliLocation.getJreSecurityDirectory();

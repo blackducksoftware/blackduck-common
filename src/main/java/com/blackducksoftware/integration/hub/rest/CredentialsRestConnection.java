@@ -42,6 +42,10 @@ import okhttp3.JavaNetCookieJar;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * With a valid HubServerConfig containing a username and password, this RestConnection subclass with perform form
+ * authentication and allow for authenticated Hub requests.
+ */
 public class CredentialsRestConnection extends RestConnection {
     private final HubServerConfig hubServerConfig;
 
@@ -76,7 +80,6 @@ public class CredentialsRestConnection extends RestConnection {
     /**
      * Gets the cookie for the Authorized connection to the Hub server. Returns
      * the response code from the connection.
-     *
      */
     @Override
     public void clientAuthenticate()
