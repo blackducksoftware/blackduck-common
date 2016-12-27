@@ -38,7 +38,6 @@ import com.blackducksoftware.integration.validator.ValidationResultEnum;
 import com.blackducksoftware.integration.validator.ValidationResults;
 
 public class HubScanConfigValidator extends AbstractValidator {
-
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
 
     public static final int DEFAULT_BOM_UPDATE_WAIT_TIME_IN_MINUTES = 5;
@@ -58,6 +57,8 @@ public class HubScanConfigValidator extends AbstractValidator {
     private boolean dryRun;
 
     private boolean disableScanTargetPathExistenceCheck;
+
+    private boolean disableScanTargetPathsWithinWorkingDirectoryCheck;
 
     @Override
     public ValidationResults assertValid() {
@@ -125,7 +126,6 @@ public class HubScanConfigValidator extends AbstractValidator {
      * If running this validation outside of a Build, make sure you run
      * disableScanTargetPathExistenceCheck() because the targets may not exist
      * yet.
-     *
      */
     public void validateScanTargetPaths(final ValidationResults result) {
         validateScanTargetPaths(result, null);
@@ -159,16 +159,18 @@ public class HubScanConfigValidator extends AbstractValidator {
                                 "The scan target '" + target.getAbsolutePath() + "' does not exist."));
                     }
 
-                    String targetCanonicalPath;
-                    try {
-                        targetCanonicalPath = target.getCanonicalPath();
-                        if (!targetCanonicalPath.startsWith(workingDirectory.getCanonicalPath())) {
-                            result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(
-                                    ValidationResultEnum.ERROR, "Can not scan targets outside the working directory."));
+                    if (!disableScanTargetPathsWithinWorkingDirectoryCheck) {
+                        String targetCanonicalPath;
+                        try {
+                            targetCanonicalPath = target.getCanonicalPath();
+                            if (!targetCanonicalPath.startsWith(workingDirectory.getCanonicalPath())) {
+                                result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(
+                                        ValidationResultEnum.ERROR, "Can not scan targets outside the working directory."));
+                            }
+                        } catch (final IOException e) {
+                            result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
+                                    "Could not get the canonical path for Target : " + targetPath));
                         }
-                    } catch (final IOException e) {
-                        result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
-                                "Could not get the canonical path for Target : " + targetPath));
                     }
                 }
             }
@@ -212,4 +214,9 @@ public class HubScanConfigValidator extends AbstractValidator {
     public void disableScanTargetPathExistenceCheck() {
         disableScanTargetPathExistenceCheck = true;
     }
+
+    public void disableScanTargetPathsWithinWorkingDirectoryCheck() {
+        disableScanTargetPathsWithinWorkingDirectoryCheck = true;
+    }
+
 }
