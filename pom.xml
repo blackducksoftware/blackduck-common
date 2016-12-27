@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.blackducksoftware.integration</groupId>
     <artifactId>common-maven-parent</artifactId>
-    <version>2.2.2-SNAPSHOT</version>
+    <version>2.2.2</version>
   </parent>
 
   <artifactId>hub-common</artifactId>
@@ -31,7 +31,7 @@
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>integration-common</artifactId>
-      <version>5.0.0</version>
+      <version>5.0.1</version>
     </dependency>
     <dependency>
       <groupId>com.blackducksoftware.bdio</groupId>
