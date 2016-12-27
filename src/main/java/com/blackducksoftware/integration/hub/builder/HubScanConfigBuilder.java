@@ -66,6 +66,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private boolean disableScanTargetPathExistenceCheck;
 
+    private boolean cleanupLogsOnSuccess = true;
+
     @Override
     public HubScanConfig buildObject() {
         HubScanConfig config = null;
@@ -73,7 +75,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
                 .addAll(scanTargetPaths).build();
 
         config = new HubScanConfig(projectName, version, phase, distribution, workingDirectory,
-                NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion);
+                NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion,
+                cleanupLogsOnSuccess);
 
         return config;
     }
@@ -151,4 +154,13 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
     public void disableScanTargetPathExistenceCheck() {
         disableScanTargetPathExistenceCheck = true;
     }
+
+    public boolean isCleanupLogsOnSuccess() {
+        return cleanupLogsOnSuccess;
+    }
+
+    public void setCleanupLogsOnSuccess(boolean cleanupLogsOnSuccess) {
+        this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
+    }
+
 }

@@ -96,9 +96,16 @@ public class CredentialsRestConnection extends RestConnection {
                     content.put("j_username", username);
                     content.put("j_password", password);
                     final Request request = createPostRequest(httpUrl, createEncodedRequestBody(content));
-                    final Response response = handleExecuteClientCall(request);
-                    if (!response.isSuccessful()) {
-                        throw new HubIntegrationException(response.message());
+                    Response response = null;
+                    try {
+                        response = handleExecuteClientCall(request);
+                        if (!response.isSuccessful()) {
+                            throw new HubIntegrationException(response.message());
+                        }
+                    } finally {
+                        if (response != null) {
+                            response.close();
+                        }
                     }
                 } catch (IllegalArgumentException | EncryptionException e) {
                     throw new HubIntegrationException(e.getMessage(), e);

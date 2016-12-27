@@ -118,51 +118,51 @@ public class CLIDownloadService {
             }
             final long cliTimestamp = hubVersionFile.lastModified();
 
-            Response response;
-            try {
-                HttpUrl httpUrl = restConnection.createHttpUrl(archive);
-                Map<String, String> headers = new HashMap<>();
-                headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
-                Request request = restConnection.createGetRequest(httpUrl, headers);
-                response = restConnection.handleExecuteClientCall(request);
-            } catch (final IOException ioe) {
-                logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo + ": "
-                        + ioe.toString());
-                return;
-            }
-            if (response.code() == 304) {
-                // CLI has not been modified
-                return;
-            }
-            String lastModified = response.header("Last-Modified");
-            Long lastModifiedLong = 0L;
-
-            if (StringUtils.isNotBlank(lastModified)) {
-                // Should parse the Date just like URLConnection did
-                lastModifiedLong = Date.parse(lastModified);
-            }
-
-            if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
-                if (!cliMismatch && lastModifiedLong == cliTimestamp) {
-                    logger.debug("The current Hub CLI is up to date.");
-                    return;
-                }
-                for (final File file : cliInstallDirectory.listFiles()) {
-                    FileUtils.deleteDirectory(file);
-                }
-            } else {
-                cliInstallDirectory.mkdir();
-            }
-
-            logger.debug("Updating the Hub CLI.");
-            hubVersionFile.setLastModified(lastModifiedLong);
-
-            logger.info("Unpacking " + archive.toString() + " to " + directoryToInstallTo + " on "
-                    + localHostName);
-            ResponseBody responseBody = null;
+            Response response = null;
             InputStream cliStream = null;
             try {
-                responseBody = response.body();
+                try {
+                    HttpUrl httpUrl = restConnection.createHttpUrl(archive);
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
+                    Request request = restConnection.createGetRequest(httpUrl, headers);
+                    response = restConnection.handleExecuteClientCall(request);
+                } catch (final IOException ioe) {
+                    logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo + ": "
+                            + ioe.toString());
+                    return;
+                }
+                if (response.code() == 304) {
+                    // CLI has not been modified
+                    return;
+                }
+                String lastModified = response.header("Last-Modified");
+                Long lastModifiedLong = 0L;
+
+                if (StringUtils.isNotBlank(lastModified)) {
+                    // Should parse the Date just like URLConnection did
+                    lastModifiedLong = Date.parse(lastModified);
+                }
+
+                if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
+                    if (!cliMismatch && lastModifiedLong == cliTimestamp) {
+                        logger.debug("The current Hub CLI is up to date.");
+                        return;
+                    }
+                    for (final File file : cliInstallDirectory.listFiles()) {
+                        FileUtils.deleteDirectory(file);
+                    }
+                } else {
+                    cliInstallDirectory.mkdir();
+                }
+
+                logger.debug("Updating the Hub CLI.");
+                hubVersionFile.setLastModified(lastModifiedLong);
+
+                logger.info("Unpacking " + archive.toString() + " to " + directoryToInstallTo + " on "
+                        + localHostName);
+
+                ResponseBody responseBody = response.body();
                 cliStream = responseBody.byteStream();
                 final CountingInputStream cis = new CountingInputStream(cliStream);
                 try {
@@ -173,14 +173,16 @@ public class CLIDownloadService {
                             cis.getByteCount(), responseBody.contentLength()), e);
                 }
             } finally {
-                if (responseBody != null) {
-                    responseBody.close();
-                }
                 if (cliStream != null) {
                     cliStream.close();
                 }
+                if (response != null) {
+                    response.close();
+                }
             }
-        } catch (final IOException e) {
+        } catch (
+
+        final IOException e) {
             throw new HubIntegrationException("Failed to install " + archive + " to " + directoryToInstallTo, e);
         }
     }
