@@ -1,7 +1,7 @@
 /*
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc..
+ * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
