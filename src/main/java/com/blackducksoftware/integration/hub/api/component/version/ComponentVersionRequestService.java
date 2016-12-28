@@ -33,15 +33,15 @@ import java.util.List;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class ComponentVersionRequestService extends HubParameterizedRequestService<License> {
+public class ComponentVersionRequestService extends HubRequestService {
 
 	public ComponentVersionRequestService(RestConnection restConnection) {
-		super(restConnection, License.class);
+		super(restConnection);
 	}
 
 	public List<License> getAllLicenses(final String componentId, final String versionId) throws HubIntegrationException{
@@ -94,30 +94,18 @@ public class ComponentVersionRequestService extends HubParameterizedRequestServi
 		final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(urlSegments);
 		
 		//Call helper method to retrieve licenses from request
-		final LicenseInfo licensesInfo = getLicenseInfo(hubPagedRequest);
-		return licensesInfo;
+		return getLicenseInfo(hubPagedRequest);
 	}
 	
 	public LicenseInfo getLicenseInfo(HubPagedRequest hubPagedRequest) throws HubIntegrationException{
-		//Create JSON object from response
-		final JsonObject jsonObject = hubPagedRequest.executeGetForResponseJson();
-		
-		//Create List of licenses
-		final LinkedList<License> licenses = new LinkedList<License>();
-		//Populate list from JSON object
-		final JsonElement licenseElement = jsonObject.get("license");
-		final JsonObject licenseObject = licenseElement.getAsJsonObject();
-		
-		final JsonElement licenseType = licenseObject.get("type");
-		
-		final JsonElement licensesElement = licenseObject.get("licenses");
-		final JsonArray licensesArray = licensesElement.getAsJsonArray();
-		for(int i=0; i<licensesArray.size(); i++){
-			final JsonElement element = licensesArray.get(i);
-			final License l = getItem(element, License.class);
-			licenses.add(l);
-		}
-		
-		return new LicenseInfo(licenseType.getAsString(), licenses);
+		final JsonObject resultJsonObject = hubPagedRequest.executeGetForResponseJson();
+		final JsonElement licenseInfoElement = resultJsonObject.get("license");
+		final LicenseInfo lInfo = getItem(licenseInfoElement, LicenseInfo.class);
+		return lInfo;
+	}
+	
+	public LicenseInfo getLicenseInfo(final String url) throws HubIntegrationException {
+		final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(url);
+		return getLicenseInfo(hubPagedRequest);
 	}
 }

@@ -29,16 +29,16 @@ import com.blackducksoftware.integration.hub.api.item.HubResponse;
 
 public class LicenseInfo extends HubResponse {
 	
-	private final String licensesType;
+	private final String type;
 	private final List<License> licenses;
 	
-	public LicenseInfo(String licensesType, List<License> licenses){
-		this.licensesType = licensesType;
+	public LicenseInfo(final String licensesType, final List<License> licenses){
+		this.type = licensesType;
 		this.licenses = licenses;
 	}
 
 	public String getLicensesType() {
-		return licensesType;
+		return type;
 	}
 
 	public List<License> getLicenses() {

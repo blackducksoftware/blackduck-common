@@ -31,6 +31,7 @@ import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
@@ -50,6 +51,7 @@ import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
 import com.blackducksoftware.integration.hub.dataservice.extension.ExtensionConfigDataService;
+import com.blackducksoftware.integration.hub.dataservice.license.LicenseDataService;
 import com.blackducksoftware.integration.hub.dataservice.notification.NotificationDataService;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
@@ -220,6 +222,14 @@ public class HubServicesFactory {
 
     public RestConnection getRestConnection() {
         return restConnection;
+    }
+    
+    public ComponentVersionRequestService createComponentVersionRequestService() {
+    	return new ComponentVersionRequestService(restConnection);
+    }
+    
+    public LicenseDataService createLicenseDataService() {
+    	return new LicenseDataService(restConnection, createComponentVersionRequestService(), createComponentRequestService());
     }
 
 }

@@ -35,14 +35,10 @@ public class License extends HubResponse {
 	private final String name;
 	private final String ownership;
 	private final String codeSharing;
-	private final List<String> licenses;
+	private final List<License> licenses;
 	private final String license;
 	
-	public License(){
-		this(null, null, null, null, null);
-	}
-	
-	public License(String name, String ownership, String codeSharing, List<String> licenses, String license){
+	public License(final String name, final String ownership, final String codeSharing, final List<License> licenses, final String license){
 		this.name = name;
 		this.ownership = ownership;
 		this.codeSharing = codeSharing;
@@ -62,7 +58,7 @@ public class License extends HubResponse {
 		return codeSharing;
 	}
 
-	public List<String> getLicenses() {
+	public List<License> getLicenses() {
 		return licenses;
 	}
 
@@ -70,14 +66,12 @@ public class License extends HubResponse {
 		return license;
 	}
 	
+	/*
+	 * This method returns the LicenseID used by the hub.
+	 */
 	public String getLicenseId(){
 		String[] urlElements = license.split("/");
-		if(urlElements.length > 0){
-			return urlElements[urlElements.length-1];
-		} else {
-			//FIXME proper exception handling
-			return "";
-		}
+		return urlElements[urlElements.length-1];
 	}
 	
 	@Override
