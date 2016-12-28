@@ -23,10 +23,6 @@
  */
 package com.blackducksoftware.integration.hub.api.component.version;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_COMPONENTS;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_VERSIONS;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,17 +40,10 @@ public class ComponentVersionRequestService extends HubRequestService {
 		super(restConnection);
 	}
 
-	public List<License> getAllLicenses(final String componentId, final String versionId) throws HubIntegrationException{
-		//create list of url segments
-		final LinkedList<String> urlSegments = new LinkedList<String>();
-		urlSegments.add(SEGMENT_API);
-		urlSegments.add(SEGMENT_COMPONENTS);
-		urlSegments.add(componentId);
-		urlSegments.add(SEGMENT_VERSIONS);
-		urlSegments.add(versionId);
+	public List<License> getAllLicenses(String url) throws HubIntegrationException{
 		
-		//Create request from url segments
-		final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(urlSegments);
+		//Create request from given url
+		final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(url);
 		
 		//Call helper method to retrieve licenses from request
 		final List<License> allLicenses = getAllLicenses(hubPagedRequest);
@@ -79,22 +68,6 @@ public class ComponentVersionRequestService extends HubRequestService {
 		}
 		return licenses;
 		
-	}
-	
-	public LicenseInfo getLicenseInfo(final String componentId, final String versionId) throws HubIntegrationException {
-		//create list of url segments
-		final LinkedList<String> urlSegments = new LinkedList<String>();
-		urlSegments.add(SEGMENT_API);
-		urlSegments.add(SEGMENT_COMPONENTS);
-		urlSegments.add(componentId);
-		urlSegments.add(SEGMENT_VERSIONS);
-		urlSegments.add(versionId);
-		
-		//Create request from url segments
-		final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(urlSegments);
-		
-		//Call helper method to retrieve licenses from request
-		return getLicenseInfo(hubPagedRequest);
 	}
 	
 	public LicenseInfo getLicenseInfo(HubPagedRequest hubPagedRequest) throws HubIntegrationException{

@@ -25,6 +25,7 @@ package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -108,5 +109,19 @@ public class License extends HubResponse {
 		}
 		
 		return true;
+	}
+	
+	//https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/builder/HashCodeBuilder.html
+	@Override
+	public int hashCode(){
+		HashCodeBuilder builder = new HashCodeBuilder(7, 37).
+				append(name).
+				append(ownership).
+				append(codeSharing).
+				append(license);
+		for(License l : licenses){
+			builder.append(l);
+		}
+		return builder.toHashCode();
 	}
 }
