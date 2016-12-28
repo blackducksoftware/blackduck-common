@@ -25,6 +25,9 @@ package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import com.blackducksoftware.integration.hub.api.item.HubResponse;
 
 public class LicenseInfo extends HubResponse {
@@ -37,7 +40,7 @@ public class LicenseInfo extends HubResponse {
 		this.licenses = licenses;
 	}
 
-	public String getLicensesType() {
+	public String getType() {
 		return type;
 	}
 
@@ -45,5 +48,31 @@ public class LicenseInfo extends HubResponse {
 		return licenses;
 	}
 	
+	@Override
+	public String toString() {
+		return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
+	}
+	
+	//http://stackoverflow.com/questions/8180430/how-to-override-equals-method-in-java
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null){
+			return false;
+		}
+		
+		if(!LicenseInfo.class.isAssignableFrom(obj.getClass())){
+			return false;
+		}
+		final LicenseInfo licInfoObj = (LicenseInfo)obj;
+		
+		if((this.type==null) ? (licInfoObj.getType() != null) : (!this.type.equals(licInfoObj.getType()))){
+			return false;
+		}
+		if((this.licenses==null) ? (licInfoObj.getLicenses() != null) : (!this.licenses.equals(licInfoObj.getLicenses()))){
+			return false;
+		}
+		
+		return true;
+	}
 	
 }

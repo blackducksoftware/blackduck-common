@@ -100,6 +100,9 @@ public class ComponentVersionRequestService extends HubRequestService {
 	public LicenseInfo getLicenseInfo(HubPagedRequest hubPagedRequest) throws HubIntegrationException{
 		final JsonObject resultJsonObject = hubPagedRequest.executeGetForResponseJson();
 		final JsonElement licenseInfoElement = resultJsonObject.get("license");
+		if(licenseInfoElement == null){
+			throw new HubIntegrationException("Unable to parse 'license' information out of retrieved JsonObject");
+		}
 		final LicenseInfo lInfo = getItem(licenseInfoElement, LicenseInfo.class);
 		return lInfo;
 	}

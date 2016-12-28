@@ -78,4 +78,35 @@ public class License extends HubResponse {
 	public String toString() {
 		return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
 	}
+	
+	//http://stackoverflow.com/questions/8180430/how-to-override-equals-method-in-java
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null){
+			return false;
+		}
+		
+		if(!License.class.isAssignableFrom(obj.getClass())){
+			return false;
+		}
+		final License licObj = (License)obj;
+		
+		if((this.name==null) ? (licObj.getName() != null) : (!this.name.equals(licObj.getName()))){
+			return false;
+		}
+		if((this.ownership==null) ? (licObj.getOwnership() != null) : (!this.ownership.equals(licObj.getOwnership()))){
+			return false;
+		}
+		if((this.codeSharing==null) ? (licObj.getCodeSharing() != null) : (!this.codeSharing.equals(licObj.getCodeSharing()))){
+			return false;
+		}
+		if((this.license==null) ? (licObj.getLicense() != null) : (!this.license.equals(licObj.getLicense()))){
+			return false;
+		}
+		if((this.licenses==null) ? (licObj.getLicenses() != null) : (!this.licenses.equals(licObj.getLicenses()))){
+			return false;
+		}
+		
+		return true;
+	}
 }
