@@ -66,7 +66,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private boolean disableScanTargetPathExistenceCheck;
 
-    private boolean disableScanTargetPathsWithinWorkingDirectoryCheck;
+    private boolean enableScanTargetPathsWithinWorkingDirectoryCheck;
 
     private boolean cleanupLogsOnSuccess = true;
 
@@ -94,8 +94,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         if (disableScanTargetPathExistenceCheck) {
             validator.disableScanTargetPathExistenceCheck();
         }
-        if (disableScanTargetPathsWithinWorkingDirectoryCheck) {
-            validator.disableScanTargetPathsWithinWorkingDirectoryCheck();
+        if (enableScanTargetPathsWithinWorkingDirectoryCheck) {
+            validator.enableScanTargetPathsWithinWorkingDirectoryCheck();
         }
         return validator;
     }

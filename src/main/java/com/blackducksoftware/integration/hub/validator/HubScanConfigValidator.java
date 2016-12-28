@@ -58,7 +58,7 @@ public class HubScanConfigValidator extends AbstractValidator {
 
     private boolean disableScanTargetPathExistenceCheck;
 
-    private boolean disableScanTargetPathsWithinWorkingDirectoryCheck;
+    private boolean enableScanTargetPathsWithinWorkingDirectoryCheck;
 
     @Override
     public ValidationResults assertValid() {
@@ -159,7 +159,7 @@ public class HubScanConfigValidator extends AbstractValidator {
                                 "The scan target '" + target.getAbsolutePath() + "' does not exist."));
                     }
 
-                    if (!disableScanTargetPathsWithinWorkingDirectoryCheck) {
+                    if (enableScanTargetPathsWithinWorkingDirectoryCheck) {
                         String targetCanonicalPath;
                         try {
                             targetCanonicalPath = target.getCanonicalPath();
@@ -215,8 +215,8 @@ public class HubScanConfigValidator extends AbstractValidator {
         disableScanTargetPathExistenceCheck = true;
     }
 
-    public void disableScanTargetPathsWithinWorkingDirectoryCheck() {
-        disableScanTargetPathsWithinWorkingDirectoryCheck = true;
+    public void enableScanTargetPathsWithinWorkingDirectoryCheck() {
+        enableScanTargetPathsWithinWorkingDirectoryCheck = true;
     }
 
 }
