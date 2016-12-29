@@ -25,31 +25,31 @@ package com.blackducksoftware.integration.hub.dataservice.license;
 
 import com.blackducksoftware.integration.hub.api.component.Component;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRequestService;
-import com.blackducksoftware.integration.hub.api.component.version.LicenseInfo;
+import com.blackducksoftware.integration.hub.api.component.version.ComplexLicense;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 
 public class LicenseDataService extends HubRequestService {
-	private final ComponentVersionRequestService componentVersionRequestService;
-	private final ComponentRequestService componentRequestService;
-	
-	public LicenseDataService(RestConnection restConnection) {
-		this(restConnection, new ComponentVersionRequestService(restConnection), new ComponentRequestService(restConnection));
-	}
-	
-	public LicenseDataService(RestConnection restConnection, ComponentVersionRequestService componentVersionRequestService, ComponentRequestService componentRequestService){
-		super(restConnection);
-		
-		this.componentVersionRequestService = componentVersionRequestService;
-		this.componentRequestService = componentRequestService;
-	}
-	
-	public LicenseInfo getLicensesInfoFromCompVersion(final String namespace, final String groupId, final String artifactId, final String version) throws HubIntegrationException {
-		Component component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
-		String versionUrl = component.getVersion();
-		
-		return componentVersionRequestService.getLicenseInfo(versionUrl);
-	}
+    private final HubRequestService hubRequestService;
+
+    private final ComponentRequestService componentRequestService;
+
+    public LicenseDataService(final RestConnection restConnection, final HubRequestService hubRequestService,
+            final ComponentRequestService componentRequestService) {
+        super(restConnection);
+        this.hubRequestService = hubRequestService;
+        this.componentRequestService = componentRequestService;
+    }
+
+    public ComplexLicense getComplexLicenseFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
+            throws HubIntegrationException {
+        final Component component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
+        final String versionUrl = component.getVersion();
+
+        final ComponentVersion componentVersion = hubRequestService.getItem(versionUrl, ComponentVersion.class);
+        return componentVersion.getLicense();
+    }
+
 }

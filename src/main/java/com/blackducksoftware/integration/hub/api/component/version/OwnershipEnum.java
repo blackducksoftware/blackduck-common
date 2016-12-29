@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.project.version;
+package com.blackducksoftware.integration.hub.api.component.version;
 
 public enum OwnershipEnum {
     OPEN_SOURCE, PROPRIETARY, UNKNOWN;
