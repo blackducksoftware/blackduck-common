@@ -27,6 +27,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.google.common.base.Joiner;
 
@@ -40,11 +42,11 @@ public class SimpleLicense {
     private static final String CLOSED_PARENTHESIS = ")";
 	
 	private final ComplexLicense complexLicense;
-	private final String displayString;
+	private final String licenseDisplay;
 	
 	public SimpleLicense(ComplexLicense complexLicense) {
 		this.complexLicense = complexLicense;
-		this.displayString = this.toLicenseText(this.complexLicense);
+		this.licenseDisplay = this.toLicenseText(this.complexLicense);
 	}
 	
 	public ComplexLicense getComplexLicense() {
@@ -83,7 +85,12 @@ public class SimpleLicense {
 		}
 	}
 
-	public String getDisplayString() {
-		return displayString;
+	public String getLicenseDisplay() {
+		return licenseDisplay;
 	}
+	
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
+    }
 }
