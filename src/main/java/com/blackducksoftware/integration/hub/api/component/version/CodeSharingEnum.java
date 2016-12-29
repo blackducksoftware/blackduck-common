@@ -21,9 +21,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.project.version;
+package com.blackducksoftware.integration.hub.api.component.version;
 
-public enum LicenseType {
-    CONJUNCTIVE, DISJUNCTIVE;
+public enum CodeSharingEnum {
+    PERMISSIVE, RECIPROCAL, WEAK_RECIPROCAL, RECIPROCAL_AGPL, UNKNOWN;
 
 }
