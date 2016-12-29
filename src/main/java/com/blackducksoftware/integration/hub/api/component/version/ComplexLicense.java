@@ -25,6 +25,9 @@ package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import com.blackducksoftware.integration.hub.api.item.HubResponse;
 
 public class ComplexLicense extends HubResponse {
@@ -75,4 +78,8 @@ public class ComplexLicense extends HubResponse {
         return type;
     }
 
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
+    }
 }
