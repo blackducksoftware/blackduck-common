@@ -50,6 +50,7 @@ import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
 import com.blackducksoftware.integration.hub.dataservice.extension.ExtensionConfigDataService;
+import com.blackducksoftware.integration.hub.dataservice.license.LicenseDataService;
 import com.blackducksoftware.integration.hub.dataservice.notification.NotificationDataService;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
@@ -76,11 +77,11 @@ public class HubServicesFactory {
         this.restConnection = restConnection;
     }
 
-    public void addEnvironmentVariable(String key, String value) {
+    public void addEnvironmentVariable(final String key, final String value) {
         ciEnvironmentVariables.put(key, value);
     }
 
-    public void addEnvironmentVariables(Map<String, String> environmentVariables) {
+    public void addEnvironmentVariables(final Map<String, String> environmentVariables) {
         ciEnvironmentVariables.putAll(environmentVariables);
     }
 
@@ -132,6 +133,10 @@ public class HubServicesFactory {
     public VulnerabilityDataService createVulnerabilityDataService(final IntLogger logger) {
         return new VulnerabilityDataService(restConnection, createComponentRequestService(), createHubRequestService(),
                 createVulnerabilityRequestService(), createMetaService(logger));
+    }
+
+    public LicenseDataService createLicenseDataService() {
+        return new LicenseDataService(restConnection, createHubRequestService(), createComponentRequestService());
     }
 
     public BomImportRequestService createBomImportRequestService() {
@@ -194,14 +199,14 @@ public class HubServicesFactory {
         return new VulnerableBomComponentRequestService(restConnection);
     }
 
-    public CLIDownloadService createCliDownloadService(IntLogger logger) {
+    public CLIDownloadService createCliDownloadService(final IntLogger logger) {
         return new CLIDownloadService(logger, restConnection);
     }
 
-    public SimpleScanService createSimpleScanService(IntLogger logger, RestConnection restConnection, HubServerConfig hubServerConfig,
-            HubSupportHelper hubSupportHelper,
-            final File directoryToInstallTo, int scanMemory, boolean dryRun, String project,
-            String version, List<String> scanTargetPaths, File workingDirectory) {
+    public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
+            final HubSupportHelper hubSupportHelper,
+            final File directoryToInstallTo, final int scanMemory, final boolean dryRun, final String project,
+            final String version, final List<String> scanTargetPaths, final File workingDirectory) {
         return new SimpleScanService(logger, restConnection, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo, scanMemory,
                 dryRun, project, version, scanTargetPaths, workingDirectory);
     }
@@ -210,11 +215,11 @@ public class HubServicesFactory {
         return new HubRegistrationRequestService(restConnection);
     }
 
-    public ReportRequestService createReportRequestService(IntLogger logger) {
+    public ReportRequestService createReportRequestService(final IntLogger logger) {
         return new ReportRequestService(restConnection, logger, createMetaService(logger));
     }
 
-    public MetaService createMetaService(IntLogger logger) {
+    public MetaService createMetaService(final IntLogger logger) {
         return new MetaService(logger, restConnection.getJsonParser(), new HubRequestFactory(restConnection));
     }
 
