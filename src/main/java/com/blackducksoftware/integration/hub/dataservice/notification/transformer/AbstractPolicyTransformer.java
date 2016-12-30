@@ -130,8 +130,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
 
     protected List<PolicyRule> getMatchingRules(final List<PolicyRule> rulesViolated) throws HubIntegrationException {
         final List<PolicyRule> filteredRules = new ArrayList<>();
-        if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null
-                && !policyFilter.getRuleLinksToInclude().isEmpty()) {
+        if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null) {
             for (final PolicyRule ruleViolated : rulesViolated) {
                 String ruleHref = metaService.getHref(ruleViolated);
                 if (policyFilter.getRuleLinksToInclude().contains(ruleHref)) {
