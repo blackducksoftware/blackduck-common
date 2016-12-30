@@ -1,4 +1,6 @@
-/*******************************************************************************
+/**
+ * Hub Common
+ *
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -18,7 +20,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
+ */
 package com.blackducksoftware.integration.hub.scan;
 
 import java.io.File;
@@ -59,11 +61,13 @@ public class HubScanConfig {
 
     private final String pluginVersion;
 
+    private final boolean cleanupLogsOnSuccess;
+
     public HubScanConfig(final String projectName, final String version, final String phase,
             final String distribution, final File workingDirectory, final int scanMemory,
             final ImmutableList<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
             final String thirdPartyVersion,
-            final String pluginVersion) {
+            final String pluginVersion, boolean cleanupLogsOnSuccess) {
         this.projectName = projectName;
         this.version = version;
         this.phase = phase;
@@ -76,6 +80,7 @@ public class HubScanConfig {
         this.thirdPartyName = thirdPartyName;
         this.thirdPartyVersion = thirdPartyVersion;
         this.pluginVersion = pluginVersion;
+        this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
     }
 
     public String getProjectName() {
@@ -126,6 +131,10 @@ public class HubScanConfig {
         return pluginVersion;
     }
 
+    public boolean isCleanupLogsOnSuccess() {
+        return cleanupLogsOnSuccess;
+    }
+
     public void print(final IntLogger logger) {
         try {
             logger.alwaysLog("--> Using Working Directory : " + getWorkingDirectory().getCanonicalPath());
@@ -145,6 +154,7 @@ public class HubScanConfig {
         }
         logger.alwaysLog("--> Scan Memory : " + getScanMemory());
         logger.alwaysLog("--> Dry Run : " + isDryRun());
+        logger.alwaysLog("--> Clean-up logs on success : " + isCleanupLogsOnSuccess());
     }
 
     @Override

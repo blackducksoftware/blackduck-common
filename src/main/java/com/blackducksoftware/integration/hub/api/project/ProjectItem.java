@@ -1,4 +1,6 @@
-/*******************************************************************************
+/**
+ * Hub Common
+ *
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -18,11 +20,11 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
+ */
 package com.blackducksoftware.integration.hub.api.project;
 
+import com.blackducksoftware.integration.hub.api.component.version.SourceEnum;
 import com.blackducksoftware.integration.hub.api.item.HubItem;
-import com.blackducksoftware.integration.hub.api.project.version.SourceEnum;
 
 public class ProjectItem extends HubItem {
     // description from Hub API: "The general identifier of the project"

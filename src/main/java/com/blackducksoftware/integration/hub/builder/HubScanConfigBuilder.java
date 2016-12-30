@@ -1,4 +1,6 @@
-/*******************************************************************************
+/**
+ * Hub Common
+ *
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -18,7 +20,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
+ */
 package com.blackducksoftware.integration.hub.builder;
 
 import java.io.File;
@@ -64,6 +66,10 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private boolean disableScanTargetPathExistenceCheck;
 
+    private boolean enableScanTargetPathsWithinWorkingDirectoryCheck;
+
+    private boolean cleanupLogsOnSuccess = true;
+
     @Override
     public HubScanConfig buildObject() {
         HubScanConfig config = null;
@@ -71,7 +77,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
                 .addAll(scanTargetPaths).build();
 
         config = new HubScanConfig(projectName, version, phase, distribution, workingDirectory,
-                NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion);
+                NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion,
+                cleanupLogsOnSuccess);
 
         return config;
     }
@@ -87,22 +94,25 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         if (disableScanTargetPathExistenceCheck) {
             validator.disableScanTargetPathExistenceCheck();
         }
+        if (enableScanTargetPathsWithinWorkingDirectoryCheck) {
+            validator.enableScanTargetPathsWithinWorkingDirectoryCheck();
+        }
         return validator;
     }
 
-    public void setToolsDir(File toolsDir) {
+    public void setToolsDir(final File toolsDir) {
         this.toolsDir = toolsDir;
     }
 
-    public void setThirdPartyName(ThirdPartyName thirdPartyName) {
+    public void setThirdPartyName(final ThirdPartyName thirdPartyName) {
         this.thirdPartyName = thirdPartyName;
     }
 
-    public void setThirdPartyVersion(String thirdPartyVersion) {
+    public void setThirdPartyVersion(final String thirdPartyVersion) {
         this.thirdPartyVersion = thirdPartyVersion;
     }
 
-    public void setPluginVersion(String pluginVersion) {
+    public void setPluginVersion(final String pluginVersion) {
         this.pluginVersion = pluginVersion;
     }
 
@@ -149,4 +159,13 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
     public void disableScanTargetPathExistenceCheck() {
         disableScanTargetPathExistenceCheck = true;
     }
+
+    public boolean isCleanupLogsOnSuccess() {
+        return cleanupLogsOnSuccess;
+    }
+
+    public void setCleanupLogsOnSuccess(final boolean cleanupLogsOnSuccess) {
+        this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
+    }
+
 }

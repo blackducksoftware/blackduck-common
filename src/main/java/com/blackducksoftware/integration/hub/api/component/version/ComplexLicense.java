@@ -1,4 +1,6 @@
-/*******************************************************************************
+/**
+ * Hub Common
+ *
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -18,12 +20,14 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
-package com.blackducksoftware.integration.hub.api.project.version;
+ */
+package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.List;
 
-public class ComplexLicense {
+import com.blackducksoftware.integration.hub.api.item.HubResponse;
+
+public class ComplexLicense extends HubResponse {
     private final CodeSharingEnum codeSharing;
 
     private final String license;
@@ -34,10 +38,11 @@ public class ComplexLicense {
 
     private final OwnershipEnum ownership;
 
-    private final LicenseType type;
+    private final ComplexLicenseType type;
 
-    public ComplexLicense(final CodeSharingEnum codeSharing, final String license, final List<ComplexLicense> licenses,
-            final String name, final OwnershipEnum ownership, final LicenseType type) {
+    public ComplexLicense(final CodeSharingEnum codeSharing, final String license, final List<ComplexLicense> licenses, final String name,
+            final OwnershipEnum ownership,
+            final ComplexLicenseType type) {
         this.codeSharing = codeSharing;
         this.license = license;
         this.licenses = licenses;
@@ -66,7 +71,7 @@ public class ComplexLicense {
         return ownership;
     }
 
-    public LicenseType getType() {
+    public ComplexLicenseType getType() {
         return type;
     }
 

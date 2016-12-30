@@ -1,4 +1,6 @@
-/*******************************************************************************
+/**
+ * Hub Common
+ *
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -18,10 +20,10 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
-package com.blackducksoftware.integration.hub.api.project.version;
+ */
+package com.blackducksoftware.integration.hub.api.component.version;
 
-public enum OwnershipEnum {
-    OPEN_SOURCE, PROPRIETARY, UNKNOWN;
+public enum CodeSharingEnum {
+    PERMISSIVE, RECIPROCAL, WEAK_RECIPROCAL, RECIPROCAL_AGPL, UNKNOWN;
 
 }

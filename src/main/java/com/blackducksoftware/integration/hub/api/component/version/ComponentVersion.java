@@ -1,4 +1,6 @@
-/*******************************************************************************
+/**
+ * Hub Common
+ *
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -18,7 +20,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
+ */
 package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.Date;
@@ -26,16 +28,35 @@ import java.util.Date;
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 
 public class ComponentVersion extends HubItem {
-    private String versionName;
+    private final ComplexLicense license;
 
-    private Date releasedOn;
+    private final Date releasedOn;
 
-    public String getVersionName() {
-        return versionName;
+    private final SourceEnum source;
+
+    private final String versionName;
+
+    public ComponentVersion(final ComplexLicense license, final Date releasedOn, final SourceEnum source, final String versionName) {
+        this.license = license;
+        this.releasedOn = releasedOn;
+        this.source = source;
+        this.versionName = versionName;
+    }
+
+    public ComplexLicense getLicense() {
+        return license;
     }
 
     public Date getReleasedOn() {
         return releasedOn;
+    }
+
+    public SourceEnum getSource() {
+        return source;
+    }
+
+    public String getVersionName() {
+        return versionName;
     }
 
 }

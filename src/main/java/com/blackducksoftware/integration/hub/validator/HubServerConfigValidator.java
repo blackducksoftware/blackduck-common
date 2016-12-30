@@ -1,4 +1,6 @@
-/*******************************************************************************
+/**
+ * Hub Common
+ *
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -18,7 +20,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *******************************************************************************/
+ */
 package com.blackducksoftware.integration.hub.validator;
 
 import java.net.MalformedURLException;
@@ -45,7 +47,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class HubServerConfigValidator extends AbstractValidator {
-
     public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
 
     public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
@@ -79,8 +80,6 @@ public class HubServerConfigValidator extends AbstractValidator {
     private String ignoredProxyHosts;
 
     private HubProxyInfo proxyInfo;
-
-    private HubCredentials credentials;
 
     @Override
     public ValidationResults assertValid() {
@@ -186,17 +185,24 @@ public class HubServerConfigValidator extends AbstractValidator {
             final Request request = new Request.Builder()
                     .url(url).get().build();
 
-            final Response response = client.newCall(request).execute();
+            Response response = null;
+            try {
+                response = client.newCall(request).execute();
 
-            if (!response.isSuccessful()) {
-                if (response.code() == 407) {
-                    result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
-                            new ValidationResult(ValidationResultEnum.ERROR, response.message()));
-                    return;
+                if (!response.isSuccessful()) {
+                    if (response.code() == 407) {
+                        result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
+                                new ValidationResult(ValidationResultEnum.ERROR, response.message()));
+                        return;
+                    }
+                    result.addResult(HubServerConfigFieldEnum.HUBURL,
+                            new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl));
+
                 }
-                result.addResult(HubServerConfigFieldEnum.HUBURL,
-                        new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl));
-
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         } catch (final Exception e) {
             result.addResult(HubServerConfigFieldEnum.HUBURL,
