@@ -25,8 +25,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +34,8 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationContentItem;
-import com.blackducksoftware.integration.hub.notification.processor.event.PolicyEvent;
+import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
+import com.blackducksoftware.integration.hub.notification.processor.EventTestUtil;
 
 public class ListProcessorCacheTest {
 
@@ -46,12 +47,13 @@ public class ListProcessorCacheTest {
                 EventTestUtil.COMPONENT,
                 EventTestUtil.VERSION);
         final PolicyRule policyRule = item.getPolicyRuleList().get(0);
-        final Map<String, Object> dataSet = Collections.emptyMap();
-        final PolicyEvent event = new PolicyEvent("1", NotificationCategoryEnum.POLICY_VIOLATION, policyRule,
+        final Map<String, Object> dataSet = new HashMap<>();
+        dataSet.put("policyRule", policyRule);
+        final NotificationEvent event = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
 
-        final List<PolicyEvent> eventList = new ArrayList<>();
-        final ListProcessorCache<PolicyEvent> cache = new ListProcessorCache<>();
+        final List<NotificationEvent> eventList = new ArrayList<>();
+        final ListProcessorCache<NotificationEvent> cache = new ListProcessorCache<>();
         eventList.add(event);
         eventList.add(event);
         eventList.add(event);
@@ -61,7 +63,7 @@ public class ListProcessorCacheTest {
         cache.addEvent(event);
         assertEquals(eventList.size(), cache.getEvents().size());
         int index = 0;
-        for (final PolicyEvent cachedEvent : cache.getEvents()) {
+        for (final NotificationEvent cachedEvent : cache.getEvents()) {
             assertEquals(eventList.get(index), cachedEvent);
             index++;
         }
@@ -73,13 +75,14 @@ public class ListProcessorCacheTest {
                 EventTestUtil.COMPONENT,
                 EventTestUtil.VERSION);
         final PolicyRule policyRule = item.getPolicyRuleList().get(0);
-        final Map<String, Object> dataSet = Collections.emptyMap();
-        final PolicyEvent event = new PolicyEvent("1", NotificationCategoryEnum.POLICY_VIOLATION, policyRule,
+        final Map<String, Object> dataSet = new HashMap<>();
+        dataSet.put("policyRule", policyRule);
+        final NotificationEvent event = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
-        final PolicyEvent removeEvent = new PolicyEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
-                policyRule, dataSet);
-        final List<PolicyEvent> eventList = new ArrayList<>();
-        final ListProcessorCache<PolicyEvent> cache = new ListProcessorCache<>();
+        final NotificationEvent removeEvent = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
+                dataSet);
+        final List<NotificationEvent> eventList = new ArrayList<>();
+        final ListProcessorCache<NotificationEvent> cache = new ListProcessorCache<>();
         eventList.add(event);
         eventList.add(event);
         eventList.add(removeEvent);
@@ -92,7 +95,7 @@ public class ListProcessorCacheTest {
         cache.removeEvent(removeEvent);
         assertEquals(eventList.size() - 1, cache.getEvents().size());
         boolean found = false;
-        for (final PolicyEvent cachedEvent : cache.getEvents()) {
+        for (final NotificationEvent cachedEvent : cache.getEvents()) {
             if (cachedEvent.equals(removeEvent)) {
                 found = true;
             }

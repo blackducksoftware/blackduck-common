@@ -43,8 +43,6 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Vulne
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEventConstants;
-import com.blackducksoftware.integration.hub.notification.processor.event.PolicyEvent;
-import com.blackducksoftware.integration.hub.notification.processor.event.VulnerabilityEvent;
 
 public class MockEventProcessor extends NotificationSubProcessor<NotificationEvent> {
     private final Logger logger = LoggerFactory.getLogger(MockEventProcessor.class);
@@ -80,7 +78,7 @@ public class MockEventProcessor extends NotificationSubProcessor<NotificationEve
         for (final PolicyRule rule : policyViolationContentItem.getPolicyRuleList()) {
             final String eventKey = generatePolicyEventKey(policyViolationContentItem, rule);
             final Map<String, Object> dataSet = generatePolicyDataSet(policyViolationContentItem, rule);
-            final PolicyEvent event = new PolicyEvent(eventKey, NotificationCategoryEnum.POLICY_VIOLATION, rule, dataSet);
+            final NotificationEvent event = new NotificationEvent(eventKey, NotificationCategoryEnum.POLICY_VIOLATION, dataSet);
             getCache().addEvent(event);
         }
     }
@@ -89,8 +87,8 @@ public class MockEventProcessor extends NotificationSubProcessor<NotificationEve
         for (final PolicyRule rule : policyOverrideContentItem.getPolicyRuleList()) {
             final String eventKey = generatePolicyEventKey(policyOverrideContentItem, rule);
             final Map<String, Object> dataSet = generatePolicyOverrideDataSet(policyOverrideContentItem, rule);
-            final PolicyEvent event = new PolicyEvent(eventKey, NotificationCategoryEnum.POLICY_VIOLATION,
-                    rule, dataSet);
+            final NotificationEvent event = new NotificationEvent(eventKey, NotificationCategoryEnum.POLICY_VIOLATION,
+                    dataSet);
             if (getCache().hasEvent(event.getEventKey())) {
                 getCache().removeEvent(event);
             } else {
@@ -104,8 +102,7 @@ public class MockEventProcessor extends NotificationSubProcessor<NotificationEve
         for (final PolicyRule rule : policyViolationCleared.getPolicyRuleList()) {
             final String eventKey = generatePolicyEventKey(policyViolationCleared, rule);
             final Map<String, Object> dataSet = generatePolicyDataSet(policyViolationCleared, rule);
-            final PolicyEvent event = new PolicyEvent(eventKey, NotificationCategoryEnum.POLICY_VIOLATION, rule,
-                    dataSet);
+            final NotificationEvent event = new NotificationEvent(eventKey, NotificationCategoryEnum.POLICY_VIOLATION, dataSet);
             if (getCache().hasEvent(event.getEventKey())) {
                 getCache().removeEvent(event);
             } else {
@@ -133,11 +130,11 @@ public class MockEventProcessor extends NotificationSubProcessor<NotificationEve
         }
     }
 
-    private VulnerabilityEvent createEvent(VulnerabilityContentItem vulnerabilityContent,
+    private NotificationEvent createEvent(VulnerabilityContentItem vulnerabilityContent,
             final Set<String> vulnerabilityIdList) {
         final String eventKey = generateVulnerabilityEventKey(vulnerabilityContent);
         final Map<String, Object> dataSet = generateVulnerabilityDataSet(vulnerabilityContent);
-        return new VulnerabilityEvent(eventKey, NotificationCategoryEnum.VULNERABILITY, vulnerabilityIdList, dataSet);
+        return new NotificationEvent(eventKey, NotificationCategoryEnum.VULNERABILITY, dataSet);
     }
 
     private Set<String> getVulnerabilityIds(final List<VulnerabilitySourceQualifiedId> itemList) {

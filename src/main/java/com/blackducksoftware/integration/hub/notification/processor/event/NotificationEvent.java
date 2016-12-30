@@ -25,7 +25,7 @@ import java.util.Map;
 
 import com.blackducksoftware.integration.hub.notification.processor.NotificationCategoryEnum;
 
-public abstract class NotificationEvent {
+public class NotificationEvent {
     private NotificationCategoryEnum categoryType;
 
     private final Map<String, Object> dataSet;
@@ -49,8 +49,6 @@ public abstract class NotificationEvent {
         return hashString;
     }
 
-    public abstract int countCategoryItems();
-
     public NotificationCategoryEnum getCategoryType() {
         return categoryType;
     }
@@ -65,5 +63,23 @@ public abstract class NotificationEvent {
 
     public String getEventKey() {
         return eventKey;
+    }
+
+    public boolean isPolicyEvent() {
+        switch (getCategoryType()) {
+        case POLICY_VIOLATION:
+        case POLICY_VIOLATION_CLEARED:
+        case POLICY_VIOLATION_OVERRIDE:
+            return true;
+
+        case HIGH_VULNERABILITY:
+        case MEDIUM_VULNERABILITY:
+        case LOW_VULNERABILITY:
+        case VULNERABILITY:
+            return false;
+
+        default:
+            throw new IllegalArgumentException("Unrecognized notification type: " + getCategoryType());
+        }
     }
 }

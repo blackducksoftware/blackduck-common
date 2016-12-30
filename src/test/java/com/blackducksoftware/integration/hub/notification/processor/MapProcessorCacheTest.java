@@ -27,32 +27,23 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
-import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationContentItem;
-import com.blackducksoftware.integration.hub.notification.processor.event.PolicyEvent;
+import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
 public class MapProcessorCacheTest {
 
-    private final EventTestUtil testUtil = new EventTestUtil();
-
     @Test
     public void testEventAdd() throws Exception {
-        final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
-                EventTestUtil.COMPONENT,
-                EventTestUtil.VERSION);
-        final PolicyRule policyRule = item.getPolicyRuleList().get(0);
         final Map<String, Object> dataSet = Collections.emptyMap();
-        final PolicyEvent event = new PolicyEvent("1", NotificationCategoryEnum.POLICY_VIOLATION, policyRule,
+        final NotificationEvent event = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
 
-        final List<PolicyEvent> eventList = new ArrayList<>();
-        final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
+        final List<NotificationEvent> eventList = new ArrayList<>();
+        final MapProcessorCache<NotificationEvent> cache = new MapProcessorCache<>();
         eventList.add(event);
 
         cache.addEvent(event);
@@ -60,7 +51,7 @@ public class MapProcessorCacheTest {
         cache.addEvent(event);
         assertEquals(eventList.size(), cache.getEvents().size());
         int index = 0;
-        for (final PolicyEvent cachedEvent : cache.getEvents()) {
+        for (final NotificationEvent cachedEvent : cache.getEvents()) {
             assertEquals(eventList.get(index), cachedEvent);
             index++;
         }
@@ -68,23 +59,13 @@ public class MapProcessorCacheTest {
 
     @Test
     public void testEventRemove() throws Exception {
-        final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
-                EventTestUtil.COMPONENT,
-                EventTestUtil.VERSION);
-
-        final PolicyViolationContentItem removeItem = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME2,
-                EventTestUtil.PROJECT_VERSION_NAME2,
-                EventTestUtil.COMPONENT2,
-                EventTestUtil.VERSION2);
-        final PolicyRule policyRule1 = item.getPolicyRuleList().get(0);
-        final PolicyRule policyRule2 = removeItem.getPolicyRuleList().get(0);
         final Map<String, Object> dataSet = Collections.emptyMap();
-        final PolicyEvent event = new PolicyEvent("1", NotificationCategoryEnum.POLICY_VIOLATION, policyRule1,
+        final NotificationEvent event = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
-        final PolicyEvent removeEvent = new PolicyEvent("2", NotificationCategoryEnum.POLICY_VIOLATION, policyRule2,
+        final NotificationEvent removeEvent = new NotificationEvent("2", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
-        final List<PolicyEvent> eventList = new ArrayList<>();
-        final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
+        final List<NotificationEvent> eventList = new ArrayList<>();
+        final MapProcessorCache<NotificationEvent> cache = new MapProcessorCache<>();
         eventList.add(event);
         eventList.add(removeEvent);
 
@@ -95,7 +76,7 @@ public class MapProcessorCacheTest {
         cache.removeEvent(removeEvent);
         assertEquals(eventList.size() - 1, cache.getEvents().size());
         boolean found = false;
-        for (final PolicyEvent cachedEvent : cache.getEvents()) {
+        for (final NotificationEvent cachedEvent : cache.getEvents()) {
             if (cachedEvent.equals(removeEvent)) {
                 found = true;
             }
@@ -105,23 +86,13 @@ public class MapProcessorCacheTest {
 
     @Test
     public void testRemoveViaKey() throws Exception {
-        final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
-                EventTestUtil.COMPONENT,
-                EventTestUtil.VERSION);
-
-        final PolicyViolationContentItem removeItem = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME2,
-                EventTestUtil.PROJECT_VERSION_NAME2,
-                EventTestUtil.COMPONENT2,
-                EventTestUtil.VERSION2);
-        final PolicyRule policyRule1 = item.getPolicyRuleList().get(0);
-        final PolicyRule policyRule2 = removeItem.getPolicyRuleList().get(0);
         final Map<String, Object> dataSet = Collections.emptyMap();
-        final PolicyEvent event = new PolicyEvent("1", NotificationCategoryEnum.POLICY_VIOLATION, policyRule1,
+        final NotificationEvent event = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
-        final PolicyEvent removeEvent = new PolicyEvent("2", NotificationCategoryEnum.POLICY_VIOLATION,
-                policyRule2, dataSet);
-        final List<PolicyEvent> eventList = new ArrayList<>();
-        final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
+        final NotificationEvent removeEvent = new NotificationEvent("2", NotificationCategoryEnum.POLICY_VIOLATION,
+                dataSet);
+        final List<NotificationEvent> eventList = new ArrayList<>();
+        final MapProcessorCache<NotificationEvent> cache = new MapProcessorCache<>();
         eventList.add(event);
         eventList.add(removeEvent);
 
@@ -132,7 +103,7 @@ public class MapProcessorCacheTest {
         cache.removeEvent(removeEvent.getEventKey());
         assertEquals(eventList.size() - 1, cache.getEvents().size());
         boolean found = false;
-        for (final PolicyEvent cachedEvent : cache.getEvents()) {
+        for (final NotificationEvent cachedEvent : cache.getEvents()) {
             if (cachedEvent.equals(removeEvent)) {
                 found = true;
             }
@@ -142,21 +113,11 @@ public class MapProcessorCacheTest {
 
     @Test
     public void testHasEvent() throws Exception {
-        final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
-                EventTestUtil.COMPONENT,
-                EventTestUtil.VERSION);
-
-        final PolicyViolationContentItem item2 = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME2,
-                EventTestUtil.PROJECT_VERSION_NAME2,
-                EventTestUtil.COMPONENT2,
-                EventTestUtil.VERSION2);
-        final PolicyRule policyRule1 = item.getPolicyRuleList().get(0);
-        final PolicyRule policyRule2 = item2.getPolicyRuleList().get(0);
         final Map<String, Object> dataSet = Collections.emptyMap();
-        final PolicyEvent event = new PolicyEvent("1", NotificationCategoryEnum.POLICY_VIOLATION, policyRule1,
+        final NotificationEvent event = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
-        final PolicyEvent event2 = new PolicyEvent("2", NotificationCategoryEnum.POLICY_VIOLATION, policyRule2, dataSet);
-        final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
+        final NotificationEvent event2 = new NotificationEvent("2", NotificationCategoryEnum.POLICY_VIOLATION, dataSet);
+        final MapProcessorCache<NotificationEvent> cache = new MapProcessorCache<>();
 
         cache.addEvent(event);
 
@@ -169,28 +130,18 @@ public class MapProcessorCacheTest {
 
     @Test
     public void testGetEvent() throws Exception {
-        final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
-                EventTestUtil.COMPONENT,
-                EventTestUtil.VERSION);
-
-        final PolicyViolationContentItem item2 = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME2,
-                EventTestUtil.PROJECT_VERSION_NAME2,
-                EventTestUtil.COMPONENT2,
-                EventTestUtil.VERSION2);
-        final PolicyRule policyRule1 = item.getPolicyRuleList().get(0);
-        final PolicyRule policyRule2 = item2.getPolicyRuleList().get(0);
         final Map<String, Object> dataSet = Collections.emptyMap();
-        final PolicyEvent event = new PolicyEvent("1", NotificationCategoryEnum.POLICY_VIOLATION, policyRule1,
+        final NotificationEvent event = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
-        final PolicyEvent event2 = new PolicyEvent("2", NotificationCategoryEnum.POLICY_VIOLATION, policyRule2, dataSet);
-        final MapProcessorCache<PolicyEvent> cache = new MapProcessorCache<>();
+        final NotificationEvent event2 = new NotificationEvent("2", NotificationCategoryEnum.POLICY_VIOLATION, dataSet);
+        final MapProcessorCache<NotificationEvent> cache = new MapProcessorCache<>();
 
         cache.addEvent(event);
         cache.addEvent(event2);
         assertEquals(2, cache.getEvents().size());
         boolean foundEvent1 = false;
         boolean foundEvent2 = false;
-        for (final PolicyEvent cachedEvent : cache.getEvents()) {
+        for (final NotificationEvent cachedEvent : cache.getEvents()) {
             if (cachedEvent.equals(event)) {
                 foundEvent1 = true;
             }
