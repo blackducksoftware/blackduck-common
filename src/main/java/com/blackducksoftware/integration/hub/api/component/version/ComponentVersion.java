@@ -28,20 +28,13 @@ import java.util.Date;
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 
 public class ComponentVersion extends HubItem {
-    private final ComplexLicense license;
+    private ComplexLicense license;
 
-    private final Date releasedOn;
+    private Date releasedOn;
 
-    private final SourceEnum source;
+    private SourceEnum source;
 
-    private final String versionName;
-
-    public ComponentVersion(final ComplexLicense license, final Date releasedOn, final SourceEnum source, final String versionName) {
-        this.license = license;
-        this.releasedOn = releasedOn;
-        this.source = source;
-        this.versionName = versionName;
-    }
+    private String versionName;
 
     public ComplexLicense getLicense() {
         return license;
