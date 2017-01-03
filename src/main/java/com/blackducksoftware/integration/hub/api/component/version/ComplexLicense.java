@@ -28,28 +28,17 @@ import java.util.List;
 import com.blackducksoftware.integration.hub.api.item.HubResponse;
 
 public class ComplexLicense extends HubResponse {
-    private final CodeSharingEnum codeSharing;
+    private CodeSharingEnum codeSharing;
 
-    private final String license;
+    private String license;
 
-    private final List<ComplexLicense> licenses;
+    private List<ComplexLicense> licenses;
 
-    private final String name;
+    private String name;
 
-    private final OwnershipEnum ownership;
+    private OwnershipEnum ownership;
 
-    private final ComplexLicenseType type;
-
-    public ComplexLicense(final CodeSharingEnum codeSharing, final String license, final List<ComplexLicense> licenses, final String name,
-            final OwnershipEnum ownership,
-            final ComplexLicenseType type) {
-        this.codeSharing = codeSharing;
-        this.license = license;
-        this.licenses = licenses;
-        this.name = name;
-        this.ownership = ownership;
-        this.type = type;
-    }
+    private ComplexLicenseType type;
 
     public CodeSharingEnum getCodeSharing() {
         return codeSharing;
