@@ -1,6 +1,4 @@
-/**
- * Hub Common
- *
+/*******************************************************************************
  * Copyright (C) 2016 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -20,7 +18,7 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- */
+ *******************************************************************************/
 package com.blackducksoftware.integration.hub.dataservice.notification.transformer;
 
 import java.net.URISyntaxException;
@@ -130,8 +128,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
 
     protected List<PolicyRule> getMatchingRules(final List<PolicyRule> rulesViolated) throws HubIntegrationException {
         final List<PolicyRule> filteredRules = new ArrayList<>();
-        if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null
-                && !policyFilter.getRuleLinksToInclude().isEmpty()) {
+        if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null) {
             for (final PolicyRule ruleViolated : rulesViolated) {
                 String ruleHref = metaService.getHref(ruleViolated);
                 if (policyFilter.getRuleLinksToInclude().contains(ruleHref)) {
