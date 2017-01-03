@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc.
+ * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -45,7 +45,7 @@ public class MapProcessorCacheTest {
                 dataSet);
 
         final List<NotificationEvent> eventList = new ArrayList<>();
-        final MapProcessorCache<NotificationEvent> cache = new MapProcessorCache<>();
+        final MapProcessorCache cache = new MapProcessorCache();
         eventList.add(event);
 
         cache.addEvent(event);
@@ -67,7 +67,7 @@ public class MapProcessorCacheTest {
         final NotificationEvent removeEvent = new NotificationEvent("2", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
         final List<NotificationEvent> eventList = new ArrayList<>();
-        final MapProcessorCache<NotificationEvent> cache = new MapProcessorCache<>();
+        final MapProcessorCache cache = new MapProcessorCache();
         eventList.add(event);
         eventList.add(removeEvent);
 
@@ -94,7 +94,7 @@ public class MapProcessorCacheTest {
         final NotificationEvent removeEvent = new NotificationEvent("2", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
         final List<NotificationEvent> eventList = new ArrayList<>();
-        final MapProcessorCache<NotificationEvent> cache = new MapProcessorCache<>();
+        final MapProcessorCache cache = new MapProcessorCache();
         eventList.add(event);
         eventList.add(removeEvent);
 
@@ -119,7 +119,7 @@ public class MapProcessorCacheTest {
         final NotificationEvent event = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
         final NotificationEvent event2 = new NotificationEvent("2", NotificationCategoryEnum.POLICY_VIOLATION, dataSet);
-        final MapProcessorCache<NotificationEvent> cache = new MapProcessorCache<>();
+        final MapProcessorCache cache = new MapProcessorCache();
 
         cache.addEvent(event);
 
@@ -136,7 +136,7 @@ public class MapProcessorCacheTest {
         final NotificationEvent event = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
         final NotificationEvent event2 = new NotificationEvent("2", NotificationCategoryEnum.POLICY_VIOLATION, dataSet);
-        final MapProcessorCache<NotificationEvent> cache = new MapProcessorCache<>();
+        final MapProcessorCache cache = new MapProcessorCache();
 
         cache.addEvent(event);
         cache.addEvent(event2);

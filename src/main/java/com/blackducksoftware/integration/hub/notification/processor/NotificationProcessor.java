@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc.
+ * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -33,16 +33,17 @@ import java.util.SortedSet;
 
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
-public abstract class NotificationProcessor<T, E> {
+public abstract class NotificationProcessor<T> {
 
-    private final Map<Class<?>, NotificationSubProcessor<?>> processorMap = new HashMap<>();
+    private final Map<Class<?>, NotificationSubProcessor> processorMap = new HashMap<>();
 
-    private final List<SubProcessorCache<E>> cacheList = new ArrayList<>();
+    private final List<SubProcessorCache> cacheList = new ArrayList<>();
 
     public T process(final SortedSet<NotificationContentItem> notifications) throws HubIntegrationException {
         createEvents(notifications);
-        final Collection<E> events = collectEvents();
+        final Collection<NotificationEvent> events = collectEvents();
         return processEvents(events);
     }
 
@@ -50,27 +51,27 @@ public abstract class NotificationProcessor<T, E> {
         for (final NotificationContentItem item : notifications) {
             final Class<?> key = item.getClass();
             if (processorMap.containsKey(key)) {
-                final NotificationSubProcessor<?> processor = processorMap.get(key);
+                final NotificationSubProcessor processor = processorMap.get(key);
                 processor.process(item);
             }
         }
     }
 
-    public abstract T processEvents(Collection<E> eventCollection) throws HubIntegrationException;
+    public abstract T processEvents(Collection<NotificationEvent> eventCollection) throws HubIntegrationException;
 
-    private Collection<E> collectEvents() throws HubIntegrationException {
-        final Collection<E> eventList = new LinkedList<>();
-        for (final SubProcessorCache<E> processor : cacheList) {
+    private Collection<NotificationEvent> collectEvents() throws HubIntegrationException {
+        final Collection<NotificationEvent> eventList = new LinkedList<>();
+        for (final SubProcessorCache processor : cacheList) {
             eventList.addAll(processor.getEvents());
         }
         return eventList;
     }
 
-    public Map<Class<?>, NotificationSubProcessor<?>> getProcessorMap() {
+    public Map<Class<?>, NotificationSubProcessor> getProcessorMap() {
         return processorMap;
     }
 
-    public List<SubProcessorCache<E>> getCacheList() {
+    public List<SubProcessorCache> getCacheList() {
         return cacheList;
     }
 }

@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc.
+ * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -37,7 +37,6 @@ import org.junit.Test;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
-import com.blackducksoftware.integration.hub.notification.processor.EventTestUtil;
 
 public class ListProcessorCacheTest {
 
@@ -55,7 +54,7 @@ public class ListProcessorCacheTest {
                 dataSet);
 
         final List<NotificationEvent> eventList = new ArrayList<>();
-        final ListProcessorCache<NotificationEvent> cache = new ListProcessorCache<>();
+        final ListProcessorCache cache = new ListProcessorCache();
         eventList.add(event);
         eventList.add(event);
         eventList.add(event);
@@ -84,7 +83,7 @@ public class ListProcessorCacheTest {
         final NotificationEvent removeEvent = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
                 dataSet);
         final List<NotificationEvent> eventList = new ArrayList<>();
-        final ListProcessorCache<NotificationEvent> cache = new ListProcessorCache<>();
+        final ListProcessorCache cache = new ListProcessorCache();
         eventList.add(event);
         eventList.add(event);
         eventList.add(removeEvent);

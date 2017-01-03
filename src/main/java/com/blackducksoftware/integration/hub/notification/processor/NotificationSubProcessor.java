@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc.
+ * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -29,14 +29,15 @@ import java.util.Map;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
-public abstract class NotificationSubProcessor<E> {
+public abstract class NotificationSubProcessor {
 
-    private final SubProcessorCache<E> cache;
+    private final SubProcessorCache cache;
 
     private final MetaService metaService;
 
-    public NotificationSubProcessor(final SubProcessorCache<E> cache, final MetaService metaService) {
+    public NotificationSubProcessor(final SubProcessorCache cache, final MetaService metaService) {
         this.cache = cache;
         this.metaService = metaService;
     }
@@ -57,11 +58,11 @@ public abstract class NotificationSubProcessor<E> {
         return hashString;
     }
 
-    public Collection<E> getEvents() throws HubIntegrationException {
+    public Collection<NotificationEvent> getEvents() throws HubIntegrationException {
         return cache.getEvents();
     }
 
-    public SubProcessorCache<E> getCache() {
+    public SubProcessorCache getCache() {
         return cache;
     }
 

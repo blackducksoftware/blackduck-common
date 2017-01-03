@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc.
+ * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -46,10 +46,10 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEventConstants;
 
-public class MockEventProcessor extends NotificationSubProcessor<NotificationEvent> {
+public class MockEventProcessor extends NotificationSubProcessor {
     private final Logger logger = LoggerFactory.getLogger(MockEventProcessor.class);
 
-    public MockEventProcessor(final MapProcessorCache<NotificationEvent> cache, final MetaService metaService) {
+    public MockEventProcessor(final MapProcessorCache cache, final MetaService metaService) {
         super(cache, metaService);
     }
 

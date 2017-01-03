@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc.
+ * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -35,10 +35,10 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Vulne
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 
-public class MockProcessor extends NotificationProcessor<Collection<NotificationEvent>, NotificationEvent> {
+public class MockProcessor extends NotificationProcessor<Collection<NotificationEvent>> {
 
     public MockProcessor(HubRequestService hubRequestService, VulnerabilityRequestService vulnerabilityRequestService, MetaService metaService) {
-        final MapProcessorCache<NotificationEvent> cache = new MapProcessorCache<>();
+        final MapProcessorCache cache = new MapProcessorCache();
         getCacheList().add(cache);
         getProcessorMap().put(PolicyViolationContentItem.class, new MockEventProcessor(cache, metaService));
         getProcessorMap().put(PolicyViolationClearedContentItem.class, new MockEventProcessor(cache, metaService));

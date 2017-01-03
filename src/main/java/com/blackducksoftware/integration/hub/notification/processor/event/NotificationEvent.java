@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc.
+ * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,6 +28,9 @@ import java.util.Map;
 import com.blackducksoftware.integration.hub.notification.processor.NotificationCategoryEnum;
 
 public class NotificationEvent {
+
+    public final static String DATA_SET_KEY_NOTIFICATION_CONTENT = "notificationContentItem";
+
     private NotificationCategoryEnum categoryType;
 
     private final Map<String, Object> dataSet;
