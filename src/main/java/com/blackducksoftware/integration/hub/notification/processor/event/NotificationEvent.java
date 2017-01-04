@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc.
+ * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -23,29 +23,25 @@
  */
 package com.blackducksoftware.integration.hub.notification.processor.event;
 
-import java.util.Set;
+import java.util.Map;
 
-import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
-import com.blackducksoftware.integration.hub.notification.processor.ItemEntry;
 import com.blackducksoftware.integration.hub.notification.processor.NotificationCategoryEnum;
 
-public abstract class NotificationEvent<T extends NotificationContentItem> {
+public class NotificationEvent {
+
+    public final static String DATA_SET_KEY_NOTIFICATION_CONTENT = "notificationContentItem";
+
     private NotificationCategoryEnum categoryType;
 
-    private final T notificationContent;
+    private final Map<String, Object> dataSet;
 
-    private Set<ItemEntry> dataSet;
+    private final String eventKey;
 
-    private String eventKey;
-
-    public NotificationEvent(final NotificationCategoryEnum categoryType, T notificationContent) {
+    public NotificationEvent(final String eventKey, final NotificationCategoryEnum categoryType,
+            Map<String, Object> dataSet) {
+        this.eventKey = eventKey;
         this.categoryType = categoryType;
-        this.notificationContent = notificationContent;
-    }
-
-    public void init() {
-        dataSet = generateDataSet();
-        eventKey = generateEventKey();
+        this.dataSet = dataSet;
     }
 
     public String hashString(final String origString) {
@@ -58,12 +54,6 @@ public abstract class NotificationEvent<T extends NotificationContentItem> {
         return hashString;
     }
 
-    public abstract Set<ItemEntry> generateDataSet();
-
-    public abstract String generateEventKey();
-
-    public abstract int countCategoryItems();
-
     public NotificationCategoryEnum getCategoryType() {
         return categoryType;
     }
@@ -72,15 +62,29 @@ public abstract class NotificationEvent<T extends NotificationContentItem> {
         this.categoryType = categoryType;
     }
 
-    public T getNotificationContent() {
-        return notificationContent;
-    }
-
-    public Set<ItemEntry> getDataSet() {
+    public Map<String, Object> getDataSet() {
         return dataSet;
     }
 
     public String getEventKey() {
         return eventKey;
+    }
+
+    public boolean isPolicyEvent() {
+        switch (getCategoryType()) {
+        case POLICY_VIOLATION:
+        case POLICY_VIOLATION_CLEARED:
+        case POLICY_VIOLATION_OVERRIDE:
+            return true;
+
+        case HIGH_VULNERABILITY:
+        case MEDIUM_VULNERABILITY:
+        case LOW_VULNERABILITY:
+        case VULNERABILITY:
+            return false;
+
+        default:
+            throw new IllegalArgumentException("Unrecognized notification type: " + getCategoryType());
+        }
     }
 }

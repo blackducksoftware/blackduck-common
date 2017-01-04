@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc.
+ * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,7 +28,6 @@ import java.util.LinkedList;
 
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
-import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationClearedContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationContentItem;
@@ -36,10 +35,10 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Vulne
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 
-public class MockProcessor extends NotificationProcessor<Collection<NotificationEvent<?>>> {
+public class MockProcessor extends NotificationProcessor<Collection<NotificationEvent>> {
 
     public MockProcessor(HubRequestService hubRequestService, VulnerabilityRequestService vulnerabilityRequestService, MetaService metaService) {
-        final MapProcessorCache<NotificationEvent<? extends NotificationContentItem>> cache = new MapProcessorCache<>();
+        final MapProcessorCache cache = new MapProcessorCache();
         getCacheList().add(cache);
         getProcessorMap().put(PolicyViolationContentItem.class, new MockEventProcessor(cache, metaService));
         getProcessorMap().put(PolicyViolationClearedContentItem.class, new MockEventProcessor(cache, metaService));
@@ -49,9 +48,9 @@ public class MockProcessor extends NotificationProcessor<Collection<Notification
     }
 
     @Override
-    public Collection<NotificationEvent<?>> processEvents(Collection<NotificationEvent<?>> eventCollection) {
-        final Collection<NotificationEvent<?>> dataList = new LinkedList<>();
-        for (final NotificationEvent<?> entry : eventCollection) {
+    public Collection<NotificationEvent> processEvents(Collection<NotificationEvent> eventCollection) {
+        final Collection<NotificationEvent> dataList = new LinkedList<>();
+        for (final NotificationEvent entry : eventCollection) {
             dataList.add(entry);
         }
         return dataList;

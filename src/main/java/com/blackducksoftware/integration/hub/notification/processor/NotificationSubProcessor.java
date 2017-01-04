@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc.
+ * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,34 +24,49 @@
 package com.blackducksoftware.integration.hub.notification.processor;
 
 import java.util.Collection;
+import java.util.Map;
 
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
-public abstract class NotificationSubProcessor<T extends NotificationEvent<?>> {
+public abstract class NotificationSubProcessor {
 
-    private final MapProcessorCache<T> cache;
+    private final SubProcessorCache cache;
 
     private final MetaService metaService;
 
-    public NotificationSubProcessor(final MapProcessorCache<T> cache, final MetaService metaService) {
+    public NotificationSubProcessor(final SubProcessorCache cache, final MetaService metaService) {
         this.cache = cache;
         this.metaService = metaService;
     }
 
-    public Collection<T> getEvents() throws HubIntegrationException {
+    public abstract void process(NotificationContentItem notification) throws HubIntegrationException;
+
+    public abstract String generateEventKey(Map<String, Object> dataMap) throws HubIntegrationException;
+
+    public abstract Map<String, Object> generateDataSet(Map<String, Object> inputData);
+
+    public String hashString(final String origString) {
+        String hashString;
+        if (origString == null) {
+            hashString = "";
+        } else {
+            hashString = String.valueOf(origString.hashCode());
+        }
+        return hashString;
+    }
+
+    public Collection<NotificationEvent> getEvents() throws HubIntegrationException {
         return cache.getEvents();
     }
 
-    public MapProcessorCache<T> getCache() {
+    public SubProcessorCache getCache() {
         return cache;
     }
 
     public MetaService getMetaService() {
         return metaService;
     }
-
-    public abstract void process(NotificationContentItem notification) throws HubIntegrationException;
 }

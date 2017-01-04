@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc.
+ * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,11 +28,13 @@ import java.util.Collection;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
-public interface SubProcessorCache<T extends NotificationEvent<?>> {
+public interface SubProcessorCache {
 
-    public void addEvent(final T event);
+    public void addEvent(final NotificationEvent event);
 
-    public void removeEvent(final T event);
+    public void removeEvent(final NotificationEvent event);
 
-    public Collection<T> getEvents() throws HubIntegrationException;
+    public boolean hasEvent(final String eventKey);
+
+    public Collection<NotificationEvent> getEvents() throws HubIntegrationException;
 }

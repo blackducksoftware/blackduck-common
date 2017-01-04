@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2016 Black Duck Software, Inc.
+ * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -29,21 +29,31 @@ import java.util.LinkedList;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
-public class ListProcessorCache<T extends NotificationEvent<?>> implements SubProcessorCache<T> {
-    private final LinkedList<T> eventList = new LinkedList<>();
+public class ListProcessorCache implements SubProcessorCache {
+    private final LinkedList<NotificationEvent> eventList = new LinkedList<>();
 
     @Override
-    public void addEvent(T event) {
+    public void addEvent(NotificationEvent event) {
         eventList.add(event);
     }
 
     @Override
-    public void removeEvent(T event) {
+    public void removeEvent(NotificationEvent event) {
         eventList.remove(event);
     }
 
     @Override
-    public Collection<T> getEvents() throws HubIntegrationException {
+    public Collection<NotificationEvent> getEvents() throws HubIntegrationException {
         return eventList;
+    }
+
+    @Override
+    public boolean hasEvent(String eventKey) {
+        for (final NotificationEvent event : eventList) {
+            if (event.getEventKey().equals(eventKey)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
