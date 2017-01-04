@@ -37,7 +37,6 @@ import com.blackducksoftware.integration.hub.api.notification.NotificationReques
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
-import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.version.BomComponentVersionPolicyStatus;
@@ -45,6 +44,7 @@ import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequest
 import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyOverrideContentItem;
+import com.blackducksoftware.integration.hub.dataservice.notification.item.ProjectVersion;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
@@ -53,7 +53,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
     public PolicyViolationOverrideTransformer(final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
             final VersionBomPolicyRequestService bomVersionPolicyService,
-            HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter, MetaService metaService) {
+            final HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter, final MetaService metaService) {
         super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
                 hubRequestService, policyFilter, metaService);
     }

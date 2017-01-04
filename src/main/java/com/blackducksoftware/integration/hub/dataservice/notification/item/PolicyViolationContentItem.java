@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
-import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 
 public class PolicyViolationContentItem extends PolicyContentItem {
     private final List<PolicyRule> policyRuleList;
