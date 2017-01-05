@@ -113,7 +113,7 @@ public class NotificationDataService extends HubRequestService {
         final List<NotificationItem> itemList = notificationRequestService.getAllNotifications(startDate, endDate);
         final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
         contentList.addAll(processorResults.getResults());
-        final NotificationResults results = new NotificationResults(contentList, processorResults.getErrorMessages());
+        final NotificationResults results = new NotificationResults(contentList, processorResults.getExceptions());
         return results;
     }
 
@@ -123,7 +123,7 @@ public class NotificationDataService extends HubRequestService {
         final List<NotificationItem> itemList = notificationRequestService.getUserNotifications(startDate, endDate, user);
         final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
         contentList.addAll(processorResults.getResults());
-        final NotificationResults results = new NotificationResults(contentList, processorResults.getErrorMessages());
+        final NotificationResults results = new NotificationResults(contentList, processorResults.getExceptions());
         return results;
     }
 

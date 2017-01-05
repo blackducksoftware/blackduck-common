@@ -29,27 +29,27 @@ import java.util.List;
 public class ParallelResourceProcessorResults<R> {
     private final List<R> results;
 
-    private final List<String> errorMessages;
+    private final List<Exception> exceptions;
 
-    public ParallelResourceProcessorResults(final List<R> results, final List<String> exceptionMessages) {
+    public ParallelResourceProcessorResults(final List<R> results, final List<Exception> exceptionMessages) {
         if (results == null) {
             this.results = new ArrayList<>();
         } else {
             this.results = results;
         }
-        this.errorMessages = exceptionMessages;
+        this.exceptions = exceptionMessages;
     }
 
     public List<R> getResults() {
         return results;
     }
 
-    public List<String> getErrorMessages() {
-        return errorMessages;
+    public List<Exception> getExceptions() {
+        return exceptions;
     }
 
     public boolean isError() {
-        if ((errorMessages != null) && (errorMessages.size() > 0)) {
+        if ((exceptions != null) && (exceptions.size() > 0)) {
             return true;
         }
         return false;
@@ -57,6 +57,6 @@ public class ParallelResourceProcessorResults<R> {
 
     @Override
     public String toString() {
-        return "ParallelResourceProcessorResults [results=" + results + ", errorMessages=" + errorMessages + "]";
+        return "ParallelResourceProcessorResults [results=" + results + ", errorMessages=" + exceptions + "]";
     }
 }

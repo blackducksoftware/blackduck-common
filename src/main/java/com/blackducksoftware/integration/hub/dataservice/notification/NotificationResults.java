@@ -31,24 +31,24 @@ import com.blackducksoftware.integration.hub.dataservice.notification.item.Notif
 public class NotificationResults {
     private final SortedSet<NotificationContentItem> notificationContentItems;
 
-    private final List<String> errorMessages;
+    private final List<Exception> exceptions;
 
-    public NotificationResults(final SortedSet<NotificationContentItem> notificationContentItems, final List<String> errorMessages) {
+    public NotificationResults(final SortedSet<NotificationContentItem> notificationContentItems, final List<Exception> exceptions) {
         super();
         this.notificationContentItems = notificationContentItems;
-        this.errorMessages = errorMessages;
+        this.exceptions = exceptions;
     }
 
     public SortedSet<NotificationContentItem> getNotificationContentItems() {
         return notificationContentItems;
     }
 
-    public List<String> getErrorMessages() {
-        return errorMessages;
+    public List<Exception> getExceptions() {
+        return exceptions;
     }
 
     public boolean isError() {
-        if ((errorMessages != null) && (errorMessages.size() > 0)) {
+        if ((exceptions != null) && (exceptions.size() > 0)) {
             return true;
         }
         return false;
@@ -56,7 +56,7 @@ public class NotificationResults {
 
     @Override
     public String toString() {
-        return "NotificationResults [notificationContentItems=" + notificationContentItems + ", errorMessages=" + errorMessages + "]";
+        return "NotificationResults [notificationContentItems=" + notificationContentItems + ", errorMessages=" + exceptions + "]";
     }
 
 }

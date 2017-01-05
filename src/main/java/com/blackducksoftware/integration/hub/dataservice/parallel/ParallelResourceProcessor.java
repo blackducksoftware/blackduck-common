@@ -93,7 +93,7 @@ public class ParallelResourceProcessor<R, S> {
 
     private ParallelResourceProcessorResults<R> processItems(final int submitted) {
         final List<R> resultsList = new LinkedList<>();
-        final List<String> errorMessages = new ArrayList<>();
+        final List<Exception> exceptions = new ArrayList<>();
         for (int index = 0; index < submitted; index++) {
             try {
                 final Future<List<R>> future = completionService.take();
@@ -102,10 +102,10 @@ public class ParallelResourceProcessor<R, S> {
             } catch (final ExecutionException | InterruptedException e) {
                 final String msg = "Error from parallel task: " + e.getMessage();
                 logger.error(msg, e);
-                errorMessages.add(msg);
+                exceptions.add(e);
             }
         }
-        final ParallelResourceProcessorResults<R> resultsObject = new ParallelResourceProcessorResults<>(resultsList, errorMessages);
+        final ParallelResourceProcessorResults<R> resultsObject = new ParallelResourceProcessorResults<>(resultsList, exceptions);
         return resultsObject;
     }
 
