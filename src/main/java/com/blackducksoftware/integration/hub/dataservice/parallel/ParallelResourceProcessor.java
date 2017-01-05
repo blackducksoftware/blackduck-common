@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.parallel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,9 +70,9 @@ public class ParallelResourceProcessor<R, S> {
         transformerMap.remove(clazz);
     }
 
-    public List<R> process(final List<S> itemsToProcess) {
+    public ParallelResourceProcessorResults<R> process(final List<S> itemsToProcess) {
         final int submitted = submitItems(itemsToProcess);
-        final List<R> results = processItems(submitted);
+        final ParallelResourceProcessorResults<R> results = processItems(submitted);
         return results;
     }
 
@@ -90,18 +91,22 @@ public class ParallelResourceProcessor<R, S> {
         return submitted;
     }
 
-    private List<R> processItems(final int submitted) {
-        final List<R> results = new LinkedList<>();
+    private ParallelResourceProcessorResults<R> processItems(final int submitted) {
+        final List<R> resultsList = new LinkedList<>();
+        final List<String> errorMessages = new ArrayList<>();
         for (int index = 0; index < submitted; index++) {
             try {
                 final Future<List<R>> future = completionService.take();
                 final List<R> contentItems = future.get();
-                results.addAll(contentItems);
+                resultsList.addAll(contentItems);
             } catch (final ExecutionException | InterruptedException e) {
-                logger.error(e.getMessage(), e);
+                final String msg = "Error from parallel task: " + e.getMessage();
+                logger.error(msg, e);
+                errorMessages.add(msg);
             }
         }
-        return results;
+        final ParallelResourceProcessorResults<R> resultsObject = new ParallelResourceProcessorResults<>(resultsList, errorMessages);
+        return resultsObject;
     }
 
     private class TransformCallable implements Callable<List<R>> {
