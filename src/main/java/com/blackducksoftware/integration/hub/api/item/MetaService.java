@@ -93,17 +93,27 @@ public class MetaService {
         this.hubRequestFactory = hubRequestFactory;
     }
 
+    // This will be replaced soon with a getFirstLink() method
+    @Deprecated
     public String getLink(final HubItem item, final String linkKey) throws HubIntegrationException {
         final List<String> linkHrefs = getLinks(item).get(linkKey);
+        if (linkHrefs == null) {
+            return null;
+        }
         if (linkHrefs.size() > 1) {
             if (logger != null) {
                 logger.error("Hub Item has multiple links for key : " + linkKey + " : " + item.getJson());
             }
             throw new HubIntegrationException("Only expected to get a single link for the key : " + linkKey);
         }
+        if (linkHrefs.size() != 1) {
+            return null;
+        }
         return linkHrefs.get(0);
     }
 
+    // This public method will be replaced soon with a getLinks(item, linkName) method
+    @Deprecated
     public Map<String, List<String>> getLinks(final HubItem item) throws HubIntegrationException {
         final Map<String, List<String>> links = new HashMap<>();
         final JsonObject metaJson = getMeta(item);
