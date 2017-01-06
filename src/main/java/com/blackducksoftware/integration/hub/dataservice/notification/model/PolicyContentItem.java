@@ -21,28 +21,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.notification.item;
+package com.blackducksoftware.integration.hub.dataservice.notification.model;
 
-import java.util.List;
+import java.util.Date;
 
-public class PolicyNotificationFilter {
-    private final List<String> ruleLinksToInclude;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
 
-    public PolicyNotificationFilter(final List<String> ruleLinksToInclude) {
-        this.ruleLinksToInclude = ruleLinksToInclude;
+public class PolicyContentItem extends NotificationContentItem {
+    private final String componentUrl;
+
+    public PolicyContentItem(final Date createdAt, final ProjectVersion projectVersion, final String componentName,
+            final String componentVersion, final String componentUrl, final String componentVersionUrl) {
+        super(createdAt, projectVersion, componentName, componentVersion, componentVersionUrl);
+        this.componentUrl = componentUrl;
     }
 
-    public List<String> getRuleLinksToInclude() {
-        return ruleLinksToInclude;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("PolicyFilter [ruleLinksToInclude=");
-        builder.append(ruleLinksToInclude);
-        builder.append("]");
-        return builder.toString();
+    public String getComponentUrl() {
+        return componentUrl;
     }
 
 }
