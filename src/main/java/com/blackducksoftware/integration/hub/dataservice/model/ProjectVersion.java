@@ -21,9 +21,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.notification.item;
+package com.blackducksoftware.integration.hub.dataservice.model;
 
 import java.util.Date;
+
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComplexLicense;
 import com.blackducksoftware.integration.hub.api.component.version.SourceEnum;
@@ -214,7 +217,7 @@ public class ProjectVersion {
 
     @Override
     public String toString() {
-        return "ProjectVersion [projectName=" + projectName + ", projectVersionName=" + projectVersionName + "]";
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

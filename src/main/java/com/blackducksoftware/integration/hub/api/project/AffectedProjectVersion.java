@@ -23,13 +23,13 @@
  */
 package com.blackducksoftware.integration.hub.api.project;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
  * An object of this class represents one item in an affectedProjectVersion list returned by the Hub.
- * 
- * @author sbillings
- *
  */
 public class AffectedProjectVersion {
 
@@ -66,6 +66,6 @@ public class AffectedProjectVersion {
 
     @Override
     public String toString() {
-        return "AffectedProjectVersion [projectName=" + projectName + ", projectVersionName=" + projectVersionName + ", url=" + url + "]";
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 }

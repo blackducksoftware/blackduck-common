@@ -21,13 +21,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.notification.item;
+package com.blackducksoftware.integration.hub.dataservice.notification.model;
 
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
 
 public class PolicyOverrideContentItem extends PolicyViolationContentItem {
     private final String firstName;

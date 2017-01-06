@@ -26,7 +26,10 @@ package com.blackducksoftware.integration.hub.dataservice.notification;
 import java.util.List;
 import java.util.SortedSet;
 
-import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
+import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 
 public class NotificationResults {
     private final SortedSet<NotificationContentItem> notificationContentItems;
@@ -56,7 +59,7 @@ public class NotificationResults {
 
     @Override
     public String toString() {
-        return "NotificationResults [notificationContentItems=" + notificationContentItems + ", errorMessages=" + exceptions + "]";
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

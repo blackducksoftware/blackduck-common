@@ -26,6 +26,9 @@ package com.blackducksoftware.integration.hub.dataservice.parallel;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 public class ParallelResourceProcessorResults<R> {
     private final List<R> results;
 
@@ -57,6 +60,6 @@ public class ParallelResourceProcessorResults<R> {
 
     @Override
     public String toString() {
-        return "ParallelResourceProcessorResults [results=" + results + ", errorMessages=" + exceptions + "]";
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 }
