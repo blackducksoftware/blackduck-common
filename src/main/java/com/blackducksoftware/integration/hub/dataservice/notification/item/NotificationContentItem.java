@@ -28,7 +28,6 @@ import java.util.Date;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.google.common.base.Joiner;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {

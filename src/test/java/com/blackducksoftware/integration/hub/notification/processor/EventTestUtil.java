@@ -33,12 +33,12 @@ import org.mockito.Mockito;
 
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
-import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.api.vulnerability.SeverityEnum;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationClearedContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyViolationContentItem;
+import com.blackducksoftware.integration.hub.dataservice.notification.item.ProjectVersion;
 import com.blackducksoftware.integration.hub.dataservice.notification.item.VulnerabilityContentItem;
 import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
 
@@ -119,7 +119,7 @@ public class EventTestUtil {
 
     public static final List<MetaAllowEnum> ALLOW_LIST = Collections.emptyList();
 
-    public List<VulnerabilityItem> createVulnerabiltyItemList(List<VulnerabilitySourceQualifiedId> vulnSourceList) {
+    public List<VulnerabilityItem> createVulnerabiltyItemList(final List<VulnerabilitySourceQualifiedId> vulnSourceList) {
         final List<VulnerabilityItem> vulnerabilityList = new ArrayList<>(vulnSourceList.size());
         for (final VulnerabilitySourceQualifiedId vulnSource : vulnSourceList) {
             final String vulnId = vulnSource.getVulnerabilityId();
@@ -157,7 +157,7 @@ public class EventTestUtil {
         return item;
     }
 
-    public PolicyRule createPolicyRule(String name, String description, String createdBy, String updatedBy, String href) {
+    public PolicyRule createPolicyRule(final String name, final String description, final String createdBy, final String updatedBy, final String href) {
         final PolicyRule rule = Mockito.mock(PolicyRule.class);
         Mockito.when(rule.getName()).thenReturn(name);
         Mockito.when(rule.getDescription()).thenReturn(description);
@@ -172,7 +172,7 @@ public class EventTestUtil {
         return rule;
     }
 
-    public String createPolicyRuleJSon(String href) {
+    public String createPolicyRuleJSon(final String href) {
         return "{ \"_meta\": { \"href\": \"" + href + "\" }}";
     }
 

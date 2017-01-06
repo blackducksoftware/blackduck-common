@@ -24,7 +24,6 @@
 package com.blackducksoftware.integration.hub.dataservice.extension;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +37,7 @@ import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.dataservice.extension.transformer.UserConfigTransform;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
+import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
@@ -57,10 +57,10 @@ public class ExtensionConfigDataService extends HubRequestService {
 
     private final MetaService metaService;
 
-    public ExtensionConfigDataService(IntLogger logger, final RestConnection restConnection, final UserRequestService userRequestService,
+    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserRequestService userRequestService,
             final HubRequestService hubRequestService,
             final ExtensionConfigRequestService extensionConfigRequestService,
-            final ExtensionUserOptionRequestService extensionUserOptionRequestService, MetaService metaService) {
+            final ExtensionUserOptionRequestService extensionUserOptionRequestService, final MetaService metaService) {
         super(restConnection);
         this.hubRequestService = hubRequestService;
         this.extensionConfigRequestService = extensionConfigRequestService;
@@ -80,14 +80,13 @@ public class ExtensionConfigDataService extends HubRequestService {
         return globalConfigMap;
     }
 
-    public List<UserConfigItem> getUserConfigList(final String extensionUrl) throws HubIntegrationException {
-        List<UserConfigItem> itemList = new LinkedList<>();
+    public ParallelResourceProcessorResults<UserConfigItem> getUserConfigList(final String extensionUrl) throws HubIntegrationException {
+
         final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
         final String userOptionsLink = metaService.getLink(extension, MetaService.USER_OPTIONS_LINK);
         final List<UserOptionLinkItem> userOptionList = extensionUserOptionRequestService
                 .getUserOptions(userOptionsLink);
-        itemList = parallelProcessor.process(userOptionList);
-
+        final ParallelResourceProcessorResults<UserConfigItem> itemList = parallelProcessor.process(userOptionList);
         return itemList;
     }
 

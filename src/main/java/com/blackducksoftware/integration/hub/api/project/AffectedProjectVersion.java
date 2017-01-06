@@ -25,7 +25,13 @@ package com.blackducksoftware.integration.hub.api.project;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ProjectVersion {
+/**
+ * An object of this class represents one item in an affectedProjectVersion list returned by the Hub.
+ * 
+ * @author sbillings
+ *
+ */
+public class AffectedProjectVersion {
 
     private String projectName;
 
@@ -58,4 +64,8 @@ public class ProjectVersion {
         this.url = url;
     }
 
+    @Override
+    public String toString() {
+        return "AffectedProjectVersion [projectName=" + projectName + ", projectVersionName=" + projectVersionName + ", url=" + url + "]";
+    }
 }
