@@ -43,14 +43,20 @@ public class SimpleLicense {
 	
 	private final ComplexLicense complexLicense;
 	private final String licenseDisplay;
+	private final String textUrl;
 	
-	public SimpleLicense(ComplexLicense complexLicense) {
+	public SimpleLicense(ComplexLicense complexLicense, String textUrl) {
 		this.complexLicense = complexLicense;
 		this.licenseDisplay = this.toLicenseText(this.complexLicense);
+		this.textUrl = textUrl;
 	}
 	
 	public ComplexLicense getComplexLicense() {
 		return this.complexLicense;
+	}
+	
+	public String getTextUrl() {
+		return this.textUrl;
 	}
 	
 	private String toLicenseText(ComplexLicense complexLicense) {

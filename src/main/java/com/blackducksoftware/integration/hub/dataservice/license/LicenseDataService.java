@@ -27,7 +27,9 @@ import com.blackducksoftware.integration.hub.api.component.Component;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
 import com.blackducksoftware.integration.hub.api.component.version.ComplexLicense;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.version.License;
 import com.blackducksoftware.integration.hub.api.component.version.SimpleLicense;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
@@ -36,12 +38,15 @@ public class LicenseDataService extends HubRequestService {
     private final HubRequestService hubRequestService;
 
     private final ComponentRequestService componentRequestService;
+    
+    private final MetaService metaService;
 
     public LicenseDataService(final RestConnection restConnection, final HubRequestService hubRequestService,
-            final ComponentRequestService componentRequestService) {
+            final ComponentRequestService componentRequestService, final MetaService metaService) {
         super(restConnection);
         this.hubRequestService = hubRequestService;
         this.componentRequestService = componentRequestService;
+        this.metaService = metaService;
     }
 
     public SimpleLicense getSimpleLicenseFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
@@ -50,7 +55,12 @@ public class LicenseDataService extends HubRequestService {
         final String versionUrl = component.getVersion();
 
         final ComponentVersion componentVersion = hubRequestService.getItem(versionUrl, ComponentVersion.class);
-        return new SimpleLicense(componentVersion.getLicense());
+        
+        final License license = hubRequestService.getItem(componentVersion.getLicense().getLicense(), License.class);
+        
+        final String textUrl = metaService.getLink(license, "text");
+        
+        return new SimpleLicense(componentVersion.getLicense(), textUrl);
     }
 
 }
