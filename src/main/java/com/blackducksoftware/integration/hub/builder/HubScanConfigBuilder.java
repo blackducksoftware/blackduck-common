@@ -160,6 +160,10 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         disableScanTargetPathExistenceCheck = true;
     }
 
+    public void enableScanTargetPathsWithinWorkingDirectoryCheck() {
+        enableScanTargetPathsWithinWorkingDirectoryCheck = true;
+    }
+
     public boolean isCleanupLogsOnSuccess() {
         return cleanupLogsOnSuccess;
     }

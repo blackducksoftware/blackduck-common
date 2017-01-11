@@ -21,28 +21,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.notification.item;
+package com.blackducksoftware.integration.hub.dataservice.notification.model;
 
+import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
 
-public class PolicyNotificationFilter {
-    private final List<String> ruleLinksToInclude;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
 
-    public PolicyNotificationFilter(final List<String> ruleLinksToInclude) {
-        this.ruleLinksToInclude = ruleLinksToInclude;
-    }
-
-    public List<String> getRuleLinksToInclude() {
-        return ruleLinksToInclude;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("PolicyFilter [ruleLinksToInclude=");
-        builder.append(ruleLinksToInclude);
-        builder.append("]");
-        return builder.toString();
+public class PolicyViolationClearedContentItem extends PolicyViolationContentItem {
+    public PolicyViolationClearedContentItem(final Date createdAt, final ProjectVersion projectVersion,
+            final String componentName,
+            final String componentVersion, final String componentUrl,
+            final String componentVersionUrl,
+            final List<PolicyRule> policyRuleList) throws URISyntaxException {
+        super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl,
+                policyRuleList);
     }
 
 }

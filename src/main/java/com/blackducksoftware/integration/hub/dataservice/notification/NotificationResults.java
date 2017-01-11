@@ -21,54 +21,45 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.component.version;
+package com.blackducksoftware.integration.hub.dataservice.notification;
 
 import java.util.List;
+import java.util.SortedSet;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.api.item.HubResponse;
+import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 
-public class ComplexLicense extends HubResponse {
-    private CodeSharingEnum codeSharing;
+public class NotificationResults {
+    private final SortedSet<NotificationContentItem> notificationContentItems;
 
-    private String license;
+    private final List<Exception> exceptions;
 
-    private List<ComplexLicense> licenses;
-
-    private String name;
-
-    private OwnershipEnum ownership;
-
-    private ComplexLicenseType type;
-
-    public CodeSharingEnum getCodeSharing() {
-        return codeSharing;
+    public NotificationResults(final SortedSet<NotificationContentItem> notificationContentItems, final List<Exception> exceptions) {
+        super();
+        this.notificationContentItems = notificationContentItems;
+        this.exceptions = exceptions;
     }
 
-    public String getLicense() {
-        return license;
+    public SortedSet<NotificationContentItem> getNotificationContentItems() {
+        return notificationContentItems;
     }
 
-    public List<ComplexLicense> getLicenses() {
-        return licenses;
+    public List<Exception> getExceptions() {
+        return exceptions;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public OwnershipEnum getOwnership() {
-        return ownership;
-    }
-
-    public ComplexLicenseType getType() {
-        return type;
+    public boolean isError() {
+        if ((exceptions != null) && (exceptions.size() > 0)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
+
 }

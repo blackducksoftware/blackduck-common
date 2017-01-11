@@ -37,12 +37,12 @@ import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
-import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.version.BomComponentVersionPolicyStatus;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
-import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyNotificationFilter;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
+import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
@@ -58,8 +58,9 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
      */
     public AbstractPolicyTransformer(final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
-            final VersionBomPolicyRequestService bomVersionPolicyService, HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter,
-            MetaService metaService) {
+            final VersionBomPolicyRequestService bomVersionPolicyService, final HubRequestService hubRequestService,
+            final PolicyNotificationFilter policyFilter,
+            final MetaService metaService) {
         super(notificationService, projectVersionService, policyService, bomVersionPolicyService, hubRequestService);
         this.policyFilter = policyFilter;
         this.metaService = metaService;
@@ -132,7 +133,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         final List<PolicyRule> filteredRules = new ArrayList<>();
         if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null) {
             for (final PolicyRule ruleViolated : rulesViolated) {
-                String ruleHref = metaService.getHref(ruleViolated);
+                final String ruleHref = metaService.getHref(ruleViolated);
                 if (policyFilter.getRuleLinksToInclude().contains(ruleHref)) {
                     filteredRules.add(ruleViolated);
                 }

@@ -21,11 +21,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.notification.item;
+package com.blackducksoftware.integration.hub.dataservice.notification.model;
 
 import java.util.Date;
 
-import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
 
 public class PolicyContentItem extends NotificationContentItem {
     private final String componentUrl;

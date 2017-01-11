@@ -31,7 +31,7 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
-import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 

@@ -26,28 +26,28 @@ package com.blackducksoftware.integration.hub.notification.processor;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
-public class MapProcessorCache<T extends NotificationEvent<?>> implements SubProcessorCache<T> {
-    private final Map<String, T> eventMap = new LinkedHashMap<>(500);
+public class MapProcessorCache implements SubProcessorCache {
+    private final Map<String, NotificationEvent> eventMap = new LinkedHashMap<>(500);
 
+    @Override
     public boolean hasEvent(String eventKey) {
         return eventMap.containsKey(eventKey);
     }
 
     @Override
-    public void addEvent(final T event) {
+    public void addEvent(final NotificationEvent event) {
         final String key = event.getEventKey();
         if (!eventMap.containsKey(key)) {
             eventMap.put(key, event);
         } else {
-            final T storedEvent = eventMap.get(key);
-            final Set<ItemEntry> storedEventDataMap = storedEvent.getDataSet();
-            final Set<ItemEntry> eventDataMap = event.getDataSet();
-            storedEventDataMap.addAll(eventDataMap);
+            final NotificationEvent storedEvent = eventMap.get(key);
+            final Map<String, Object> storedEventDataMap = storedEvent.getDataSet();
+            final Map<String, Object> eventDataMap = event.getDataSet();
+            storedEventDataMap.putAll(eventDataMap);
         }
     }
 
@@ -58,21 +58,21 @@ public class MapProcessorCache<T extends NotificationEvent<?>> implements SubPro
     }
 
     @Override
-    public void removeEvent(final T event) {
+    public void removeEvent(final NotificationEvent event) {
         final String key = event.getEventKey();
         removeEvent(key);
     }
 
-    public T getEvent(final String eventKey) {
+    public NotificationEvent getEvent(final String eventKey) {
         return eventMap.get(eventKey);
     }
 
     @Override
-    public Collection<T> getEvents() throws HubIntegrationException {
+    public Collection<NotificationEvent> getEvents() throws HubIntegrationException {
         return eventMap.values();
     }
 
-    public Map<String, T> getEventMap() {
+    public Map<String, NotificationEvent> getEventMap() {
         return eventMap;
     }
 }

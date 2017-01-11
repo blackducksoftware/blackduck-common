@@ -39,13 +39,14 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
-import com.blackducksoftware.integration.hub.dataservice.notification.item.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.item.PolicyNotificationFilter;
+import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
+import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationClearedTransformer;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationOverrideTransformer;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationTransformer;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
+import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
@@ -68,18 +69,18 @@ public class NotificationDataService extends HubRequestService {
 
     private final MetaService metaService;
 
-    public NotificationDataService(IntLogger logger, RestConnection restConnection, NotificationRequestService notificationRequestService,
-            ProjectVersionRequestService projectVersionRequestService, PolicyRequestService policyRequestService,
-            VersionBomPolicyRequestService versionBomPolicyRequestService,
-            HubRequestService hubRequestService, MetaService metaService) {
+    public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final NotificationRequestService notificationRequestService,
+            final ProjectVersionRequestService projectVersionRequestService, final PolicyRequestService policyRequestService,
+            final VersionBomPolicyRequestService versionBomPolicyRequestService,
+            final HubRequestService hubRequestService, final MetaService metaService) {
         this(logger, restConnection, notificationRequestService, projectVersionRequestService, policyRequestService, versionBomPolicyRequestService,
                 hubRequestService, null, metaService);
     }
 
-    public NotificationDataService(IntLogger logger, RestConnection restConnection, NotificationRequestService notificationRequestService,
-            ProjectVersionRequestService projectVersionRequestService, PolicyRequestService policyRequestService,
-            VersionBomPolicyRequestService versionBomPolicyRequestService,
-            HubRequestService hubRequestService, PolicyNotificationFilter policyNotificationFilter, MetaService metaService) {
+    public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final NotificationRequestService notificationRequestService,
+            final ProjectVersionRequestService projectVersionRequestService, final PolicyRequestService policyRequestService,
+            final VersionBomPolicyRequestService versionBomPolicyRequestService,
+            final HubRequestService hubRequestService, final PolicyNotificationFilter policyNotificationFilter, final MetaService metaService) {
         super(restConnection);
         this.notificationRequestService = notificationRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
@@ -101,24 +102,29 @@ public class NotificationDataService extends HubRequestService {
                         versionBomPolicyRequestService, hubRequestService, policyNotificationFilter, metaService));
         parallelProcessor.addTransform(VulnerabilityNotificationItem.class,
                 new VulnerabilityTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
-                        versionBomPolicyRequestService, hubRequestService));
+                        versionBomPolicyRequestService, hubRequestService, metaService));
         parallelProcessor.addTransform(RuleViolationClearedNotificationItem.class,
                 new PolicyViolationClearedTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
                         versionBomPolicyRequestService, hubRequestService, policyNotificationFilter, metaService));
     }
 
-    public SortedSet<NotificationContentItem> getAllNotifications(final Date startDate, final Date endDate) throws HubIntegrationException {
+    public NotificationResults getAllNotifications(final Date startDate, final Date endDate) throws HubIntegrationException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
         final List<NotificationItem> itemList = notificationRequestService.getAllNotifications(startDate, endDate);
-        contentList.addAll(parallelProcessor.process(itemList));
-        return contentList;
+        final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
+        contentList.addAll(processorResults.getResults());
+        final NotificationResults results = new NotificationResults(contentList, processorResults.getExceptions());
+        return results;
     }
 
-    public SortedSet<NotificationContentItem> getUserNotifications(final Date startDate, final Date endDate, UserItem user) throws HubIntegrationException {
+    public NotificationResults getUserNotifications(final Date startDate, final Date endDate, final UserItem user)
+            throws HubIntegrationException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
         final List<NotificationItem> itemList = notificationRequestService.getUserNotifications(startDate, endDate, user);
-        contentList.addAll(parallelProcessor.process(itemList));
-        return contentList;
+        final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
+        contentList.addAll(processorResults.getResults());
+        final NotificationResults results = new NotificationResults(contentList, processorResults.getExceptions());
+        return results;
     }
 
 }

@@ -21,14 +21,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.notification.item;
+package com.blackducksoftware.integration.hub.dataservice.notification.model;
 
 import java.util.Date;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.api.project.ProjectVersion;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
 import com.google.common.base.Joiner;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {

@@ -21,41 +21,47 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification.processor;
+package com.blackducksoftware.integration.hub.api.project;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-public class ItemEntry {
+import com.google.gson.annotations.SerializedName;
 
-    private final String key;
+/**
+ * An object of this class represents one item in an affectedProjectVersion list returned by the Hub.
+ */
+public class AffectedProjectVersion {
 
-    private final String value;
+    private String projectName;
 
-    public ItemEntry(final String key, final String value) {
-        this.key = key;
-        this.value = value;
+    private String projectVersionName;
+
+    @SerializedName("projectVersion")
+    private String url;
+
+    public String getProjectName() {
+        return projectName;
     }
 
-    public String getKey() {
-        return key;
+    public String getProjectVersionName() {
+        return projectVersionName;
     }
 
-    public String getValue() {
-        return value;
+    public String getUrl() {
+        return url;
     }
 
-    // DO NOT REMOVE NEEDED DUE TO SET INSERTION
-    @Override
-    public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this, false);
+    public void setProjectName(final String projectName) {
+        this.projectName = projectName;
     }
 
-    @Override
-    public boolean equals(final Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj, false);
+    public void setProjectVersionName(final String projectVersionName) {
+        this.projectVersionName = projectVersionName;
+    }
+
+    public void setUrl(final String url) {
+        this.url = url;
     }
 
     @Override

@@ -21,50 +21,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.component.version;
+package com.blackducksoftware.integration.hub.dataservice.parallel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.api.item.HubResponse;
+public class ParallelResourceProcessorResults<R> {
+    private final List<R> results;
 
-public class ComplexLicense extends HubResponse {
-    private CodeSharingEnum codeSharing;
+    private final List<Exception> exceptions;
 
-    private String license;
-
-    private List<ComplexLicense> licenses;
-
-    private String name;
-
-    private OwnershipEnum ownership;
-
-    private ComplexLicenseType type;
-
-    public CodeSharingEnum getCodeSharing() {
-        return codeSharing;
+    public ParallelResourceProcessorResults(final List<R> results, final List<Exception> exceptionMessages) {
+        if (results == null) {
+            this.results = new ArrayList<>();
+        } else {
+            this.results = results;
+        }
+        this.exceptions = exceptionMessages;
     }
 
-    public String getLicense() {
-        return license;
+    public List<R> getResults() {
+        return results;
     }
 
-    public List<ComplexLicense> getLicenses() {
-        return licenses;
+    public List<Exception> getExceptions() {
+        return exceptions;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public OwnershipEnum getOwnership() {
-        return ownership;
-    }
-
-    public ComplexLicenseType getType() {
-        return type;
+    public boolean isError() {
+        if ((exceptions != null) && (exceptions.size() > 0)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
