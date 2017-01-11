@@ -25,6 +25,7 @@ package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
@@ -44,11 +45,13 @@ public class ComplexLicensePlusMeta {
 	private final ComplexLicense complexLicense;
 	private final String licenseDisplay;
 	private final String textUrl;
+	private final List<ComplexLicensePlusMeta> subLicensesPlusMeta;
 	
-	public ComplexLicensePlusMeta(ComplexLicense complexLicense, String textUrl) {
+	public ComplexLicensePlusMeta(ComplexLicense complexLicense, String textUrl, List<ComplexLicensePlusMeta> subLicensesPlusMeta) {
 		this.complexLicense = complexLicense;
 		this.licenseDisplay = this.toLicenseText(this.complexLicense);
 		this.textUrl = textUrl;
+		this.subLicensesPlusMeta = subLicensesPlusMeta;
 	}
 	
 	public ComplexLicense getComplexLicense() {
@@ -57,6 +60,10 @@ public class ComplexLicensePlusMeta {
 	
 	public String getTextUrl() {
 		return this.textUrl;
+	}
+	
+	public List<ComplexLicensePlusMeta> getSubLicensesPlusMeta() {
+		return this.subLicensesPlusMeta;
 	}
 	
 	private String toLicenseText(ComplexLicense complexLicense) {

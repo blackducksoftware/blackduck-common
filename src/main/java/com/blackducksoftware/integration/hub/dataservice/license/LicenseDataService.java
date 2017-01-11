@@ -23,8 +23,12 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.license;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.blackducksoftware.integration.hub.api.component.Component;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
+import com.blackducksoftware.integration.hub.api.component.version.ComplexLicense;
 import com.blackducksoftware.integration.hub.api.component.version.ComplexLicensePlusMeta;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.component.version.License;
@@ -54,12 +58,19 @@ public class LicenseDataService extends HubRequestService {
         final String versionUrl = component.getVersion();
 
         final ComponentVersion componentVersion = hubRequestService.getItem(versionUrl, ComponentVersion.class);
+        final ComplexLicense parentComplexLicense = componentVersion.getLicense();
         
-        final License license = hubRequestService.getItem(componentVersion.getLicense().getLicense(), License.class);
+        final List<ComplexLicensePlusMeta> subLicensesPlusMeta = new ArrayList<ComplexLicensePlusMeta>();
+        for(ComplexLicense subLicense : parentComplexLicense.getLicenses()) {
+        	final License license = hubRequestService.getItem(subLicense.getLicense(), License.class);
+        	//FIXME change to updated method once MetaService is updated
+            final String textUrl = metaService.getLink(license, MetaService.TEXT_LINK);
+            subLicensesPlusMeta.add(new ComplexLicensePlusMeta(subLicense, textUrl, new ArrayList<ComplexLicensePlusMeta>()));
+        }
         
-        final String textUrl = metaService.getLink(license, "text");
         
-        return new ComplexLicensePlusMeta(componentVersion.getLicense(), textUrl);
+        
+        return new ComplexLicensePlusMeta(parentComplexLicense, "", subLicensesPlusMeta);
     }
 
 }
