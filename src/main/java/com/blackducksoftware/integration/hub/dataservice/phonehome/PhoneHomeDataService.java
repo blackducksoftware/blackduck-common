@@ -48,41 +48,10 @@ public class PhoneHomeDataService extends HubRequestService {
         this.hubRegistrationRequestService = hubRegistrationRequestService;
     }
 
-    //FIXME reduce code reuse
     public void phoneHome(HubServerConfig hubServerConfig, HubScanConfig hubScanConfig, String hubVersion) {
         this.phoneHome(hubServerConfig, hubVersion, hubScanConfig.getThirdPartyName(), hubScanConfig.getThirdPartyVersion(), hubScanConfig.getPluginVersion());
-    	
-//    	try {
-//            String registrationId = null;
-//            try {
-//                registrationId = hubRegistrationRequestService.getRegistrationId();
-//            } catch (final Exception e) {
-//                logger.debug("Could not get the Hub registration Id.");
-//            }
-//
-//            String hubHostName = null;
-//            try {
-//                final URL url = hubServerConfig.getHubUrl();
-//                hubHostName = url.getHost();
-//            } catch (final Exception e) {
-//                logger.debug("Could not get the Hub Host name.");
-//            }
-//            final PhoneHomeClient phClient = new PhoneHomeClient(logger);
-//            phClient.setProxyProperties(hubServerConfig.getProxyInfo().getHost(), hubServerConfig.getProxyInfo().getPort(),
-//                    hubServerConfig.getProxyInfo().getUsername(), hubServerConfig.getProxyInfo().getDecryptedPassword(),
-//                    hubServerConfig.getProxyInfo().getIgnoredProxyHosts());
-//            phClient.callHomeIntegrations(registrationId, hubHostName, BlackDuckName.HUB, hubVersion, hubScanConfig.getThirdPartyName(),
-//                    hubScanConfig.getThirdPartyVersion(), hubScanConfig.getPluginVersion());
-//        } catch (final PhoneHomeArgumentException e) {
-//            logger.debug(e.getMessage(), e);
-//        } catch (final PhoneHomeConnectionException e) {
-//            logger.debug("Problem with phone-home connection : " + e.getMessage(), e);
-//        } catch (final Exception e) {
-//            logger.debug("Problem with phone-home : " + e.getMessage(), e);
-//        }
     }
     
-    //FIXME final???
     public void phoneHome(HubServerConfig hubServerConfig, String hubVersion, ThirdPartyName thirdPartyName, String thirdPartyVersion, String pluginVersion) {
         try {
             String registrationId = null;

@@ -32,7 +32,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.google.common.base.Joiner;
 
-public class SimpleLicense {
+public class ComplexLicensePlusMeta {
 
 	private static final String AND = " AND ";
 	private static final String OR = " OR ";
@@ -45,7 +45,7 @@ public class SimpleLicense {
 	private final String licenseDisplay;
 	private final String textUrl;
 	
-	public SimpleLicense(ComplexLicense complexLicense, String textUrl) {
+	public ComplexLicensePlusMeta(ComplexLicense complexLicense, String textUrl) {
 		this.complexLicense = complexLicense;
 		this.licenseDisplay = this.toLicenseText(this.complexLicense);
 		this.textUrl = textUrl;
