@@ -206,9 +206,9 @@ public class HubServicesFactory {
     public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
             final HubSupportHelper hubSupportHelper,
             final File directoryToInstallTo, final int scanMemory, final boolean dryRun, final String project,
-            final String version, final List<String> scanTargetPaths, final File workingDirectory) {
+            final String version, final List<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
         return new SimpleScanService(logger, restConnection, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo, scanMemory,
-                dryRun, project, version, scanTargetPaths, workingDirectory);
+                dryRun, project, version, scanTargetPaths, workingDirectory, excludePatterns);
     }
 
     public HubRegistrationRequestService createHubRegistrationRequestService() {

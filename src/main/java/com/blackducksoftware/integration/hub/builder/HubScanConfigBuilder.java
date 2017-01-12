@@ -70,6 +70,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private boolean cleanupLogsOnSuccess = true;
 
+    private String[] excludePatterns;
+
     @Override
     public HubScanConfig buildObject() {
         HubScanConfig config = null;
@@ -78,7 +80,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
         config = new HubScanConfig(projectName, version, phase, distribution, workingDirectory,
                 NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion,
-                cleanupLogsOnSuccess);
+                cleanupLogsOnSuccess, excludePatterns);
 
         return config;
     }
@@ -170,6 +172,10 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     public void setCleanupLogsOnSuccess(final boolean cleanupLogsOnSuccess) {
         this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
+    }
+
+    public void setExcludePatterns(final String[] excludePatterns) {
+        this.excludePatterns = excludePatterns;
     }
 
 }

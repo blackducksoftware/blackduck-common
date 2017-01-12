@@ -53,6 +53,7 @@ import com.blackducksoftware.integration.hub.exception.ScanFailedException;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
@@ -86,9 +87,31 @@ public class SimpleScanService extends HubRequestService {
 
     private File logDirectory;
 
-    public SimpleScanService(IntLogger logger, RestConnection restConnection, HubServerConfig hubServerConfig, HubSupportHelper hubSupportHelper,
-            CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, int scanMemory, boolean dryRun, String project,
-            String version, List<String> scanTargetPaths, File workingDirectory) {
+    private final String[] excludePatterns;
+
+    public SimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
+            final HubSupportHelper hubSupportHelper,
+            final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig) {
+        super(restConnection);
+        this.logger = logger;
+        this.hubServerConfig = hubServerConfig;
+        this.hubSupportHelper = hubSupportHelper;
+        this.ciEnvironmentVariables = ciEnvironmentVariables;
+        this.directoryToInstallTo = hubScanConfig.getToolsDir();
+        this.scanMemory = hubScanConfig.getScanMemory();
+        this.dryRun = hubScanConfig.isDryRun();
+        this.project = hubScanConfig.getProjectName();
+        this.version = hubScanConfig.getVersion();
+        this.scanTargetPaths = hubScanConfig.getScanTargetPaths();
+        this.workingDirectory = hubScanConfig.getWorkingDirectory();
+        this.excludePatterns = hubScanConfig.getExcludePatterns();
+    }
+
+    public SimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
+            final HubSupportHelper hubSupportHelper,
+            final CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, final int scanMemory, final boolean dryRun,
+            final String project,
+            final String version, final List<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
         super(restConnection);
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
@@ -101,6 +124,7 @@ public class SimpleScanService extends HubRequestService {
         this.version = version;
         this.scanTargetPaths = scanTargetPaths;
         this.workingDirectory = workingDirectory;
+        this.excludePatterns = excludePatterns;
     }
 
     /**
@@ -206,6 +230,13 @@ public class SimpleScanService extends HubRequestService {
             cmd.add(project);
             cmd.add("--release");
             cmd.add(version);
+        }
+
+        if (excludePatterns != null) {
+            for (final String exclusionPattern : excludePatterns) {
+                cmd.add("--exclude");
+                cmd.add(exclusionPattern);
+            }
         }
 
         for (final String target : scanTargetPaths) {
@@ -367,8 +398,9 @@ public class SimpleScanService extends HubRequestService {
         }
     }
 
-    private void makeVerbose(List<String> cmd) {
+    private void makeVerbose(final List<String> cmd) {
         cmd.add("-v");
+        cmd.add("--debug");
     }
 
     public IntLogger getLogger() {
