@@ -93,6 +93,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         validator.setVersion(pluginVersion);
         validator.setScanMemory(scanMemory);
         validator.setWorkingDirectory(workingDirectory);
+        validator.addAllScanTargetPaths(scanTargetPaths);
         if (disableScanTargetPathExistenceCheck) {
             validator.disableScanTargetPathExistenceCheck();
         }
