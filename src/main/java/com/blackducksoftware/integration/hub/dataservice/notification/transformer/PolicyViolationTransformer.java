@@ -68,10 +68,13 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
         } catch (final HubIntegrationException e) {
             throw new HubItemTransformException(e);
         }
-        final ProjectVersion projectVersion = new ProjectVersion();
-        projectVersion.setProjectName(projectName);
-        projectVersion.setProjectVersionName(releaseItem.getVersionName());
-        projectVersion.setUrl(policyViolation.getContent().getProjectVersionLink());
+        ProjectVersion projectVersion;
+        try {
+            projectVersion = createFullProjectVersion(policyViolation.getContent().getProjectVersionLink(),
+                    projectName, releaseItem.getVersionName());
+        } catch (final HubIntegrationException e) {
+            throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
+        }
 
         handleNotification(componentVersionList, projectVersion, item, templateData);
 

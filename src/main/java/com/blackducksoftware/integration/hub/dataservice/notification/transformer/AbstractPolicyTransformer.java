@@ -50,8 +50,6 @@ import com.blackducksoftware.integration.hub.service.HubRequestService;
 public abstract class AbstractPolicyTransformer extends AbstractNotificationTransformer {
     private final PolicyNotificationFilter policyFilter;
 
-    private final MetaService metaService;
-
     /**
      * policyFilter.size() == 0: match no rules
      * policyFilter == null: match all rules
@@ -61,9 +59,9 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
             final VersionBomPolicyRequestService bomVersionPolicyService, final HubRequestService hubRequestService,
             final PolicyNotificationFilter policyFilter,
             final MetaService metaService) {
-        super(notificationService, projectVersionService, policyService, bomVersionPolicyService, hubRequestService);
+        super(notificationService, projectVersionService, policyService, bomVersionPolicyService, hubRequestService,
+                metaService);
         this.policyFilter = policyFilter;
-        this.metaService = metaService;
     }
 
     public abstract void handleNotification(final List<ComponentVersionStatus> componentVersionList,
@@ -83,7 +81,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
                 if (StringUtils.isNotBlank(policyStatusUrl)) {
                     final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
                             policyStatusUrl);
-                    final Map<String, List<String>> policyRulesLink = metaService.getLinks(bomComponentVersionPolicyStatus);
+                    final Map<String, List<String>> policyRulesLink = getMetaService().getLinks(bomComponentVersionPolicyStatus);
                     List<String> ruleList = getRuleUrls(policyRulesLink.get(MetaService.POLICY_RULE_LINK));
 
                     ruleList = getMatchingRuleUrls(ruleList);
@@ -133,7 +131,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         final List<PolicyRule> filteredRules = new ArrayList<>();
         if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null) {
             for (final PolicyRule ruleViolated : rulesViolated) {
-                final String ruleHref = metaService.getHref(ruleViolated);
+                final String ruleHref = getMetaService().getHref(ruleViolated);
                 if (policyFilter.getRuleLinksToInclude().contains(ruleHref)) {
                     filteredRules.add(ruleViolated);
                 }
@@ -209,9 +207,5 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
             final String componentVersion, String componentUrl, final String componentVersionUrl,
             List<PolicyRule> policyRuleList,
             NotificationItem item, List<NotificationContentItem> templateData) throws URISyntaxException;
-
-    public MetaService getMetaService() {
-        return metaService;
-    }
 
 }

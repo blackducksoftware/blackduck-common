@@ -25,13 +25,17 @@ package com.blackducksoftware.integration.hub.dataservice.notification.transform
 
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 
@@ -47,14 +51,18 @@ public abstract class AbstractNotificationTransformer
 
     private final HubRequestService hubRequestService;
 
+    private final MetaService metaService;
+
     public AbstractNotificationTransformer(final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
-            final VersionBomPolicyRequestService bomVersionPolicyService, HubRequestService hubRequestService) {
+            final VersionBomPolicyRequestService bomVersionPolicyService, final HubRequestService hubRequestService,
+            final MetaService metaService) {
         this.notificationService = notificationService;
         this.projectVersionService = projectVersionService;
         this.policyService = policyService;
         this.bomVersionPolicyService = bomVersionPolicyService;
         this.hubRequestService = hubRequestService;
+        this.metaService = metaService;
     }
 
     public NotificationRequestService getNotificationService() {
@@ -80,4 +88,40 @@ public abstract class AbstractNotificationTransformer
     @Override
     public abstract List<NotificationContentItem> transform(NotificationItem item) throws HubItemTransformException;
 
+    protected ProjectVersion createFullProjectVersion(final String projectVersionUrl, final String projectName, final String versionName)
+            throws HubIntegrationException {
+        ProjectVersionItem item;
+        try {
+            item = getHubRequestService().getItem(projectVersionUrl, ProjectVersionItem.class);
+        } catch (final HubIntegrationException e) {
+            final String msg = "Error getting the full ProjectVersion for this affected project version URL: "
+                    + projectVersionUrl + ": " + e.getMessage();
+            throw new HubIntegrationException(msg, e);
+        }
+        final ProjectVersion fullProjectVersion = new ProjectVersion();
+        fullProjectVersion.setProjectName(projectName);
+        fullProjectVersion.setProjectVersionName(versionName);
+        fullProjectVersion.setDistribution(item.getDistribution());
+        fullProjectVersion.setLicense(item.getLicense());
+        fullProjectVersion.setNickname(item.getNickname());
+        fullProjectVersion.setPhase(item.getPhase());
+        fullProjectVersion.setReleaseComments(item.getReleaseComments());
+        fullProjectVersion.setReleasedOn(item.getReleasedOn());
+        fullProjectVersion.setSource(item.getSource());
+
+        fullProjectVersion.setUrl(metaService.getHref(item));
+        fullProjectVersion.setCodeLocationsLink((metaService.getLink(item, MetaService.CODE_LOCATION_LINK)));
+        fullProjectVersion.setComponentsLink((metaService.getLink(item, MetaService.COMPONENTS_LINK)));
+        fullProjectVersion.setPolicyStatusLink((metaService.getLink(item, MetaService.POLICY_STATUS_LINK)));
+        fullProjectVersion.setProjectLink((metaService.getLink(item, MetaService.PROJECT_LINK)));
+        fullProjectVersion.setRiskProfileLink((metaService.getLink(item, MetaService.RISK_PROFILE_LINK)));
+        fullProjectVersion.setVersionReportLink((metaService.getLink(item, MetaService.VERSION_REPORT_LINK)));
+        fullProjectVersion.setVulnerableComponentsLink((metaService.getLink(item, MetaService.VULNERABLE_COMPONENTS_LINK)));
+
+        return fullProjectVersion;
+    }
+
+    public MetaService getMetaService() {
+        return metaService;
+    }
 }
