@@ -26,7 +26,6 @@ package com.blackducksoftware.integration.hub.validator;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -199,7 +198,7 @@ public class HubScanConfigValidator extends AbstractValidator {
         scanTargetPaths.add(scanTargetPath);
     }
 
-    public void addAllScanTargetPaths(final List<String> scanTargetPaths) {
+    public void addAllScanTargetPaths(final Set<String> scanTargetPaths) {
         this.scanTargetPaths.addAll(scanTargetPaths);
     }
 
