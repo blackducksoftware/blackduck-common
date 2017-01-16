@@ -30,6 +30,8 @@ public enum HubScanConfigFieldEnum {
     DISTRIBUTION("hubDistribution"),
     GENERATE_RISK_REPORT("shouldGenerateRiskReport"),
     DRY_RUN("dryRun"),
+    CLEANUP_LOGS_ON_SUCCESS("cleanupLogsOnSuccess"),
+    EXCLUDE_PATTERNS("excludePatterns"),
     MAX_WAIT_TIME_FOR_BOM_UPDATE("maxWaitTimeForBomUpdate"),
     SCANMEMORY("hubScanMemory"),
     TARGETS("hubTargets"),
