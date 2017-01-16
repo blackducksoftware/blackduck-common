@@ -72,6 +72,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private String[] excludePatterns;
 
+    private String codeLocationAlias;
+
     @Override
     public HubScanConfig buildObject() {
         HubScanConfig config = null;
@@ -80,7 +82,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
         config = new HubScanConfig(projectName, version, phase, distribution, workingDirectory,
                 NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion,
-                cleanupLogsOnSuccess, excludePatterns);
+                cleanupLogsOnSuccess, excludePatterns, codeLocationAlias);
 
         return config;
     }
@@ -101,6 +103,20 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
             validator.enableScanTargetPathsWithinWorkingDirectoryCheck();
         }
         return validator;
+    }
+
+    public String getCodeLocationAlias() {
+        return codeLocationAlias;
+    }
+
+    public void setCodeLocationAlias(final String serverName, final String jobName) {
+        final String codeLocationAlias = String.format("%s:%s", serverName, jobName);
+
+        this.codeLocationAlias = codeLocationAlias;
+    }
+
+    public void setCodeLocationAlias(final String codeLocationAlias) {
+        this.codeLocationAlias = codeLocationAlias;
     }
 
     public void setToolsDir(final File toolsDir) {

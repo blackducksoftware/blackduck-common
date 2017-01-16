@@ -89,6 +89,8 @@ public class SimpleScanService extends HubRequestService {
 
     private final String[] excludePatterns;
 
+    private String codeLocationAlias;
+
     public SimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
             final HubSupportHelper hubSupportHelper,
             final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig) {
@@ -105,6 +107,7 @@ public class SimpleScanService extends HubRequestService {
         this.scanTargetPaths = hubScanConfig.getScanTargetPaths();
         this.workingDirectory = hubScanConfig.getWorkingDirectory();
         this.excludePatterns = hubScanConfig.getExcludePatterns();
+        this.codeLocationAlias = hubScanConfig.getCodeLocationAlias();
     }
 
     public SimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
@@ -230,6 +233,11 @@ public class SimpleScanService extends HubRequestService {
             cmd.add(project);
             cmd.add("--release");
             cmd.add(version);
+        }
+
+        if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CODE_LOCATION_ALIAS) && StringUtils.isNotBlank(codeLocationAlias)) {
+            cmd.add("--name");
+            cmd.add(codeLocationAlias);
         }
 
         if (excludePatterns != null) {
@@ -425,6 +433,14 @@ public class SimpleScanService extends HubRequestService {
 
     public File getStandardOutputFile() {
         return new File(logDirectory, "CLI_Output.txt");
+    }
+
+    public String getCodeLocationAlias() {
+        return codeLocationAlias;
+    }
+
+    public void setCodeLocationAlias(final String codeLocationAlias) {
+        this.codeLocationAlias = codeLocationAlias;
     }
 
 }
