@@ -38,16 +38,29 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class ReportRequestService extends HubParameterizedRequestService<ReportInformationItem> {
-    public final static long MAXIMUM_WAIT = 1000 * 60 * 30;
+    public final static long DEFAULT_TIMEOUT = 1000 * 60 * 5;
 
     private final IntLogger logger;
 
     private final MetaService metaService;
 
-    public ReportRequestService(final RestConnection restConnection, IntLogger logger, MetaService metaService) {
+    private final long timeoutInMilliseconds;
+
+    public ReportRequestService(final RestConnection restConnection, final IntLogger logger, final MetaService metaService) {
+        this(restConnection, logger, metaService, DEFAULT_TIMEOUT);
+    }
+
+    public ReportRequestService(final RestConnection restConnection, final IntLogger logger, final MetaService metaService, final long timeoutInMilliseconds) {
         super(restConnection, ReportInformationItem.class);
         this.logger = logger;
         this.metaService = metaService;
+
+        long timeout = timeoutInMilliseconds;
+        if (timeoutInMilliseconds <= 0l) {
+            timeout = DEFAULT_TIMEOUT;
+            logger.alwaysLog(timeoutInMilliseconds + "ms is not a valid BOM wait time, using : " + timeout + "ms instead");
+        }
+        this.timeoutInMilliseconds = timeout;
     }
 
     /**
@@ -114,7 +127,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      */
     public ReportInformationItem isReportFinishedGenerating(final String reportUrl)
             throws HubIntegrationException {
-        return isReportFinishedGenerating(reportUrl, MAXIMUM_WAIT);
+        return isReportFinishedGenerating(reportUrl, timeoutInMilliseconds);
     }
 
     /**
@@ -123,6 +136,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      * HubIntegrationException after the maximum wait if the report has not been
      * generated yet.
      */
+    @Deprecated
     public ReportInformationItem isReportFinishedGenerating(final String reportUrl, final long maximumWait)
             throws HubIntegrationException {
         final long startTime = System.currentTimeMillis();
@@ -159,7 +173,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      */
     public HubRiskReportData generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
             final ReportCategoriesEnum[] categories) throws HubIntegrationException {
-        return generateHubReport(version, reportFormat, categories, MAXIMUM_WAIT);
+        return generateHubReport(version, reportFormat, categories, timeoutInMilliseconds);
     }
 
     /**
@@ -167,8 +181,9 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      *
      * @throws HubIntegrationException
      */
+    @Deprecated
     public HubRiskReportData generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
-            final ReportCategoriesEnum[] categories, long maxWaitTime) throws HubIntegrationException {
+            final ReportCategoriesEnum[] categories, final long maxWaitTime) throws HubIntegrationException {
         logger.debug("Starting the Report generation.");
         final String reportUrl = startGeneratingHubReport(version, reportFormat, categories);
 
