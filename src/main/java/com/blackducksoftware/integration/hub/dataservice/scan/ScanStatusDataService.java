@@ -131,7 +131,7 @@ public class ScanStatusDataService extends HubRequestService {
      */
     @Deprecated
     public void assertBomImportScanStartedThenFinished(final String projectName, final String projectVersion,
-            final long scanStartedTimeoutInMilliseconds, final long scanFinishedTimeoutInMilliseconds)
+            final long scanStartedTimeoutInMilliseconds, final long scanFinishedTimeoutInMilliseconds, final IntLogger logger)
             throws HubTimeoutExceededException, HubIntegrationException {
         final List<ScanSummaryItem> pendingScans = waitForPendingScansToStart(projectName, projectVersion,
                 scanStartedTimeoutInMilliseconds);
