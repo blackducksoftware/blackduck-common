@@ -436,9 +436,8 @@ var RiskReport = function (myJQuery, jsonData) {
 		var tableBody = document.createElement("tbody");
 		this.myJQuery(tableBody).attr("id","hubBomReportBody");
 		var entryArray = this.rawdata.report.aggregateBomViewEntries;
-		var index;
 		var odd = true;
-		for (index in entryArray) {
+		for (var index = 0; index < entryArray.length; index++) { 
 			try {
 				var tableRow = this.createComponentTableRow(entryArray[index]);
 				adjustTableRow(tableRow, odd);

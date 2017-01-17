@@ -23,11 +23,12 @@
  */
 package com.blackducksoftware.integration.hub.api.scan;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 
-public class ScanSummaryItem extends HubItem {
+public class ScanSummaryItem extends HubItem implements Serializable {
     private ScanStatus status;
 
     private String statusMessage;
