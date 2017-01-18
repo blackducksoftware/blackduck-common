@@ -242,8 +242,10 @@ public class SimpleScanService extends HubRequestService {
 
         if (excludePatterns != null) {
             for (final String exclusionPattern : excludePatterns) {
-                cmd.add("--exclude");
-                cmd.add(exclusionPattern);
+                if (StringUtils.isNotBlank(exclusionPattern)) {
+                    cmd.add("--exclude");
+                    cmd.add(exclusionPattern);
+                }
             }
         }
 

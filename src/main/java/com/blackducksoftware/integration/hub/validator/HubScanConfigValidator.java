@@ -73,13 +73,8 @@ public class HubScanConfigValidator extends AbstractValidator {
     }
 
     public void validateProjectAndVersion(final ValidationResults result) {
-        if (!dryRun && projectName == null && version == null) {
-            result.addResult(HubScanConfigFieldEnum.VERSION, new ValidationResult(ValidationResultEnum.WARN,
-                    "No Project name or Version were found. Any scans run will not be mapped to a Version."));
-        } else {
-            validateProject(result);
-            validateVersion(result);
-        }
+        validateProject(result);
+        validateVersion(result);
     }
 
     public void validateProject(final ValidationResults result) {
