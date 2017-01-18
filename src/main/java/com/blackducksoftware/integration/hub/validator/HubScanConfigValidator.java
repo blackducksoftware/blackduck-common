@@ -112,7 +112,7 @@ public class HubScanConfigValidator extends AbstractValidator {
             scanMemoryInt = stringToInteger(scanMemory);
         } catch (final IllegalArgumentException e) {
             result.addResult(HubScanConfigFieldEnum.SCANMEMORY,
-                    new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
+                    new ValidationResult(ValidationResultEnum.ERROR, e.getMessage()));
             return;
         }
         if (scanMemoryInt < MINIMUM_MEMORY_IN_MEGABYTES) {
