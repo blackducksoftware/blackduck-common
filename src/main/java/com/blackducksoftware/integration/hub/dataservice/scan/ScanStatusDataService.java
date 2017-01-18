@@ -253,8 +253,8 @@ public class ScanStatusDataService extends HubRequestService {
             if (currentScanSummaryItem.getStatus().isPending()) {
                 pendingScans.add(currentScanSummaryItem);
             } else if (currentScanSummaryItem.getStatus().isError()) {
-                throw new HubIntegrationException("There was a problem with one of the scans. Error Status : "
-                        + currentScanSummaryItem.getStatus().toString());
+                throw new HubIntegrationException("There was a problem in the Hub processing the scan(s). Error Status : "
+                        + currentScanSummaryItem.getStatus().toString() + ", " + currentScanSummaryItem.getStatusMessage());
             }
         }
 
