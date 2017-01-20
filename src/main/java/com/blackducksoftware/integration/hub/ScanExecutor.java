@@ -301,6 +301,10 @@ public abstract class ScanExecutor {
                     if (StringUtils.isNotBlank(getProxyUsername()) && StringUtils.isNotBlank(getProxyPassword())) {
                         cmd.add("-Dhttp.proxyUser=" + getProxyUsername());
                         cmd.add("-Dhttp.proxyPassword=" + getProxyPassword());
+                    } else {
+                        // CLI will ignore the proxy host and port if no credentials are provided
+                        cmd.add("-Dhttp.proxyUser=user");
+                        cmd.add("-Dhttp.proxyPassword=password");
                     }
                 }
 
