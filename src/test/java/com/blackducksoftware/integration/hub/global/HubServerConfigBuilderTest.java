@@ -60,7 +60,7 @@ public class HubServerConfigBuilderTest {
 
     private static final String VALID_PROXY_HOST = "just need a non-empty string";
 
-    private static final String VALID_IGNORE_HOST_LIST = "google,msn,yahoo";
+    private static final String VALID_IGNORE_HOST_LIST = ".*google.*,.*msn.*,.*yahoo.*";
 
     private List<String> expectedMessages;
 

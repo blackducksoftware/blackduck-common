@@ -57,7 +57,7 @@ public class HubProxyInfoBuilderTest {
 
     private static final String VALID_IGNORE_HOST_LIST = "google,msn,yahoo";
 
-    private static final String VALID_IGNORE_HOST = "google";
+    private static final String VALID_IGNORE_HOST = "google.*";
 
     private static final String INVALID_IGNORE_HOST_LIST = "google,[^-z!,abc";
 
