@@ -42,17 +42,24 @@ public class PhoneHomeDataService extends HubRequestService {
 
     private final HubRegistrationRequestService hubRegistrationRequestService;
 
-    public PhoneHomeDataService(final IntLogger logger, RestConnection restConnection, HubRegistrationRequestService hubRegistrationRequestService) {
+    public PhoneHomeDataService(final IntLogger logger, final RestConnection restConnection,
+            final HubRegistrationRequestService hubRegistrationRequestService) {
         super(restConnection);
         this.logger = logger;
         this.hubRegistrationRequestService = hubRegistrationRequestService;
     }
 
-    public void phoneHome(HubServerConfig hubServerConfig, HubScanConfig hubScanConfig, String hubVersion) {
-        this.phoneHome(hubServerConfig, hubVersion, hubScanConfig.getThirdPartyName(), hubScanConfig.getThirdPartyVersion(), hubScanConfig.getPluginVersion());
+    public void phoneHome(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final String hubVersion) {
+        phoneHome(hubServerConfig, hubScanConfig.getThirdPartyName(), hubScanConfig.getThirdPartyVersion(), hubScanConfig.getPluginVersion(), hubVersion);
     }
-    
-    public void phoneHome(HubServerConfig hubServerConfig, String hubVersion, ThirdPartyName thirdPartyName, String thirdPartyVersion, String pluginVersion) {
+
+    public void phoneHome(final HubServerConfig hubServerConfig, final ThirdPartyName thirdPartyName, final String thirdPartyVersion,
+            final String pluginVersion, final String hubVersion) {
+        phoneHome(hubServerConfig, thirdPartyName, thirdPartyVersion, pluginVersion, hubVersion);
+    }
+
+    public void phoneHome(final HubServerConfig hubServerConfig, final String thirdPartyName, final String thirdPartyVersion,
+            final String pluginVersion, final String hubVersion) {
         try {
             String registrationId = null;
             try {
@@ -69,10 +76,11 @@ public class PhoneHomeDataService extends HubRequestService {
                 logger.debug("Could not get the Hub Host name.");
             }
             final PhoneHomeClient phClient = new PhoneHomeClient(logger);
+            phClient.setTimeout(hubServerConfig.getTimeout());
             phClient.setProxyProperties(hubServerConfig.getProxyInfo().getHost(), hubServerConfig.getProxyInfo().getPort(),
                     hubServerConfig.getProxyInfo().getUsername(), hubServerConfig.getProxyInfo().getDecryptedPassword(),
                     hubServerConfig.getProxyInfo().getIgnoredProxyHosts());
-            phClient.callHomeIntegrations(registrationId, hubHostName, BlackDuckName.HUB, hubVersion, thirdPartyName,
+            phClient.callHomeIntegrations(registrationId, hubHostName, BlackDuckName.HUB.name(), hubVersion, thirdPartyName,
                     thirdPartyVersion, pluginVersion);
         } catch (final PhoneHomeArgumentException e) {
             logger.debug(e.getMessage(), e);

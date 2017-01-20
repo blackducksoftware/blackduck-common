@@ -169,6 +169,10 @@ public class SimpleScanService extends HubRequestService {
             if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
                 cmd.add("-Dhttp.proxyUser=" + proxyUsername);
                 cmd.add("-Dhttp.proxyPassword=" + proxyPassword);
+            } else {
+                // CLI will ignore the proxy host and port if there are no credentials
+                cmd.add("-Dhttp.proxyUser=user");
+                cmd.add("-Dhttp.proxyPassword=password");
             }
         }
 
