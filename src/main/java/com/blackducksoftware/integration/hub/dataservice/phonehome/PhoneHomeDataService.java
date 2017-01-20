@@ -76,6 +76,7 @@ public class PhoneHomeDataService extends HubRequestService {
                 logger.debug("Could not get the Hub Host name.");
             }
             final PhoneHomeClient phClient = new PhoneHomeClient(logger);
+            phClient.setTimeout(hubServerConfig.getTimeout());
             phClient.setProxyProperties(hubServerConfig.getProxyInfo().getHost(), hubServerConfig.getProxyInfo().getPort(),
                     hubServerConfig.getProxyInfo().getUsername(), hubServerConfig.getProxyInfo().getDecryptedPassword(),
                     hubServerConfig.getProxyInfo().getIgnoredProxyHosts());
