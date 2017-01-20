@@ -33,6 +33,7 @@ import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phone.home.PhoneHomeClient;
 import com.blackducksoftware.integration.phone.home.enums.BlackDuckName;
+import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
 import com.blackducksoftware.integration.phone.home.exception.PhoneHomeArgumentException;
 import com.blackducksoftware.integration.phone.home.exception.PhoneHomeConnectionException;
 
@@ -41,13 +42,24 @@ public class PhoneHomeDataService extends HubRequestService {
 
     private final HubRegistrationRequestService hubRegistrationRequestService;
 
-    public PhoneHomeDataService(final IntLogger logger, RestConnection restConnection, HubRegistrationRequestService hubRegistrationRequestService) {
+    public PhoneHomeDataService(final IntLogger logger, final RestConnection restConnection,
+            final HubRegistrationRequestService hubRegistrationRequestService) {
         super(restConnection);
         this.logger = logger;
         this.hubRegistrationRequestService = hubRegistrationRequestService;
     }
 
-    public void phoneHome(HubServerConfig hubServerConfig, HubScanConfig hubScanConfig, String hubVersion) {
+    public void phoneHome(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final String hubVersion) {
+        phoneHome(hubServerConfig, hubScanConfig.getThirdPartyName(), hubScanConfig.getThirdPartyVersion(), hubScanConfig.getPluginVersion(), hubVersion);
+    }
+
+    public void phoneHome(final HubServerConfig hubServerConfig, final ThirdPartyName thirdPartyName, final String thirdPartyVersion,
+            final String pluginVersion, final String hubVersion) {
+        phoneHome(hubServerConfig, thirdPartyName, thirdPartyVersion, pluginVersion, hubVersion);
+    }
+
+    public void phoneHome(final HubServerConfig hubServerConfig, final String thirdPartyName, final String thirdPartyVersion,
+            final String pluginVersion, final String hubVersion) {
         try {
             String registrationId = null;
             try {
@@ -67,8 +79,8 @@ public class PhoneHomeDataService extends HubRequestService {
             phClient.setProxyProperties(hubServerConfig.getProxyInfo().getHost(), hubServerConfig.getProxyInfo().getPort(),
                     hubServerConfig.getProxyInfo().getUsername(), hubServerConfig.getProxyInfo().getDecryptedPassword(),
                     hubServerConfig.getProxyInfo().getIgnoredProxyHosts());
-            phClient.callHomeIntegrations(registrationId, hubHostName, BlackDuckName.HUB, hubVersion, hubScanConfig.getThirdPartyName(),
-                    hubScanConfig.getThirdPartyVersion(), hubScanConfig.getPluginVersion());
+            phClient.callHomeIntegrations(registrationId, hubHostName, BlackDuckName.HUB.name(), hubVersion, thirdPartyName,
+                    thirdPartyVersion, pluginVersion);
         } catch (final PhoneHomeArgumentException e) {
             logger.debug(e.getMessage(), e);
         } catch (final PhoneHomeConnectionException e) {
