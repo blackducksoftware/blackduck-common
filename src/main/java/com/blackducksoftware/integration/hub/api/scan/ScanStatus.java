@@ -26,6 +26,8 @@ package com.blackducksoftware.integration.hub.api.scan;
 import java.util.EnumSet;
 import java.util.Set;
 
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+
 public enum ScanStatus {
     UNSTARTED,
     SCANNING,
@@ -42,8 +44,7 @@ public enum ScanStatus {
     ERROR_SAVING_SCAN_DATA,
     ERROR_MATCHING,
     ERROR_BUILDING_BOM,
-    ERROR,
-    UNKNOWN;
+    ERROR;
 
     private static final Set<ScanStatus> PENDING_STATES = EnumSet.of(UNSTARTED, SCANNING, SAVING_SCAN_DATA,
             SCAN_DATA_SAVE_COMPLETE, REQUESTED_MATCH_JOB, MATCHING, BOM_VERSION_CHECK, BUILDING_BOM);
@@ -66,16 +67,15 @@ public enum ScanStatus {
         return ERROR_STATES.contains(this);
     }
 
-    public static ScanStatus getScanStatus(final String scanStatus) {
+    public static ScanStatus getScanStatus(final String scanStatus) throws HubIntegrationException {
         if (scanStatus == null) {
-            return ScanStatus.UNKNOWN;
+            return null;
         }
         ScanStatus scanStatusEnum;
         try {
             scanStatusEnum = ScanStatus.valueOf(scanStatus.toUpperCase());
         } catch (final IllegalArgumentException e) {
-            // ignore exception
-            scanStatusEnum = UNKNOWN;
+            throw new HubIntegrationException("Unknown Scan Status : " + scanStatus);
         }
         return scanStatusEnum;
     }

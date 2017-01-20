@@ -21,31 +21,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.scan;
+package com.blackducksoftware.integration.hub.exception;
 
-public enum HubScanConfigFieldEnum {
-    PROJECT("hubProject"),
-    VERSION("hubVersion"),
-    PHASE("hubPhase"),
-    DISTRIBUTION("hubDistribution"),
-    GENERATE_RISK_REPORT("shouldGenerateRiskReport"),
-    DRY_RUN("dryRun"),
-    CLEANUP_LOGS_ON_SUCCESS("cleanupLogsOnSuccess"),
-    EXCLUDE_PATTERNS("excludePatterns"),
-    CODE_LOCATION_ALIAS("codeLocationAlias"),
-    MAX_WAIT_TIME_FOR_BOM_UPDATE("maxWaitTimeForBomUpdate"),
-    SCANMEMORY("hubScanMemory"),
-    TARGETS("hubTargets"),
-    FAIL_ON_POLICY_VIOLATION("failOnPolicyViolation");
-
-    private String key;
-
-    private HubScanConfigFieldEnum(final String key) {
-        this.key = key;
+public class DoesNotExistException extends HubIntegrationException {
+    public DoesNotExistException() {
+        super();
     }
 
-    public String getKey() {
-        return key;
+    public DoesNotExistException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public DoesNotExistException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public DoesNotExistException(String message) {
+        super(message);
+    }
+
+    public DoesNotExistException(Throwable cause) {
+        super(cause);
     }
 
 }

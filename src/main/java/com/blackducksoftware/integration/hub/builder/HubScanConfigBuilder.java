@@ -70,6 +70,10 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private boolean cleanupLogsOnSuccess = true;
 
+    private String[] excludePatterns;
+
+    private String codeLocationAlias;
+
     @Override
     public HubScanConfig buildObject() {
         HubScanConfig config = null;
@@ -78,7 +82,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
         config = new HubScanConfig(projectName, version, phase, distribution, workingDirectory,
                 NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion,
-                cleanupLogsOnSuccess);
+                cleanupLogsOnSuccess, excludePatterns, codeLocationAlias);
 
         return config;
     }
@@ -91,6 +95,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         validator.setVersion(pluginVersion);
         validator.setScanMemory(scanMemory);
         validator.setWorkingDirectory(workingDirectory);
+        validator.addAllScanTargetPaths(scanTargetPaths);
         if (disableScanTargetPathExistenceCheck) {
             validator.disableScanTargetPathExistenceCheck();
         }
@@ -98,6 +103,14 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
             validator.enableScanTargetPathsWithinWorkingDirectoryCheck();
         }
         return validator;
+    }
+
+    public String getCodeLocationAlias() {
+        return codeLocationAlias;
+    }
+
+    public void setCodeLocationAlias(final String codeLocationAlias) {
+        this.codeLocationAlias = codeLocationAlias;
     }
 
     public void setToolsDir(final File toolsDir) {
@@ -170,6 +183,10 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     public void setCleanupLogsOnSuccess(final boolean cleanupLogsOnSuccess) {
         this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
+    }
+
+    public void setExcludePatterns(final String[] excludePatterns) {
+        this.excludePatterns = excludePatterns;
     }
 
 }

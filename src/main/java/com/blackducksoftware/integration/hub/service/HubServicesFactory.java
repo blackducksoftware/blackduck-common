@@ -98,9 +98,16 @@ public class HubServicesFactory {
         return new PhoneHomeDataService(logger, restConnection, createHubRegistrationRequestService());
     }
 
+    @Deprecated
     public RiskReportDataService createRiskReportDataService(final IntLogger logger) {
-        return new RiskReportDataService(restConnection, createProjectRequestService(),
+        return new RiskReportDataService(logger, restConnection, createProjectRequestService(),
                 createProjectVersionRequestService(logger), createReportRequestService(logger));
+    }
+
+    public RiskReportDataService createRiskReportDataService(final IntLogger logger,
+            final long timeoutInMilliseconds) {
+        return new RiskReportDataService(logger, restConnection, createProjectRequestService(),
+                createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds));
     }
 
     public PolicyStatusDataService createPolicyStatusDataService(final IntLogger logger) {
@@ -108,9 +115,17 @@ public class HubServicesFactory {
                 createProjectVersionRequestService(logger), createHubRequestService(), createMetaService(logger));
     }
 
+    @Deprecated
     public ScanStatusDataService createScanStatusDataService(final IntLogger logger) {
-        return new ScanStatusDataService(restConnection, createProjectRequestService(), createProjectVersionRequestService(logger),
+        return new ScanStatusDataService(logger, restConnection, createProjectRequestService(), createProjectVersionRequestService(logger),
                 createCodeLocationRequestService(), createScanSummaryRequestService(), createMetaService(logger));
+    }
+
+    public ScanStatusDataService createScanStatusDataService(final IntLogger logger,
+            final long timeoutInMilliseconds) {
+        return new ScanStatusDataService(logger, restConnection, createProjectRequestService(), createProjectVersionRequestService(logger),
+                createCodeLocationRequestService(), createScanSummaryRequestService(), createMetaService(logger),
+                timeoutInMilliseconds);
     }
 
     public NotificationDataService createNotificationDataService(final IntLogger logger) {
@@ -206,17 +221,22 @@ public class HubServicesFactory {
     public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
             final HubSupportHelper hubSupportHelper,
             final File directoryToInstallTo, final int scanMemory, final boolean dryRun, final String project,
-            final String version, final List<String> scanTargetPaths, final File workingDirectory) {
+            final String version, final List<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
         return new SimpleScanService(logger, restConnection, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo, scanMemory,
-                dryRun, project, version, scanTargetPaths, workingDirectory);
+                dryRun, project, version, scanTargetPaths, workingDirectory, excludePatterns);
     }
 
     public HubRegistrationRequestService createHubRegistrationRequestService() {
         return new HubRegistrationRequestService(restConnection);
     }
 
+    @Deprecated
     public ReportRequestService createReportRequestService(final IntLogger logger) {
         return new ReportRequestService(restConnection, logger, createMetaService(logger));
+    }
+
+    public ReportRequestService createReportRequestService(final IntLogger logger, final long timeoutInMilliseconds) {
+        return new ReportRequestService(restConnection, logger, createMetaService(logger), timeoutInMilliseconds);
     }
 
     public MetaService createMetaService(final IntLogger logger) {
