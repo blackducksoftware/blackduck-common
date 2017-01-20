@@ -26,12 +26,18 @@
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>phone-home-api</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.1</version>
+      <exclusions>
+      	<exclusion>
+      		<groupId>com.blackducksoftware.integration</groupId>
+      		<artifactId>integration-common</artifactId>
+      	</exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>integration-common</artifactId>
-      <version>5.0.1</version>
+      <version>5.0.2</version>
     </dependency>
     <dependency>
       <groupId>com.blackducksoftware.bdio</groupId>
