@@ -74,6 +74,17 @@ public class RiskReportDataService extends HubRequestService {
         return reportRequestService.generateHubReport(version, ReportFormatEnum.JSON, categories);
     }
 
+    public HubRiskReportData createRiskReport(final ProjectVersionItem version)
+            throws HubIntegrationException {
+        final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
+        return createRiskReport(version, categories);
+    }
+
+    public HubRiskReportData createRiskReport(final ProjectVersionItem version,
+            final ReportCategoriesEnum[] categories) throws HubIntegrationException {
+        return reportRequestService.generateHubReport(version, ReportFormatEnum.JSON, categories);
+    }
+
     @Deprecated
     public HubRiskReportData createRiskReport(final String projectName, final String projectVersionName, final long maximumWaitInMilliSeconds)
             throws HubIntegrationException {
