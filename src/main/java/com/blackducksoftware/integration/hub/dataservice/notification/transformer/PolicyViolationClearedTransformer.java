@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
@@ -92,7 +93,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
             try {
                 final String componentVersionLink = componentVersion.getComponentVersionLink();
-                final String componentVersionName = getComponentVersionName(componentVersionLink);
+                final ComponentVersion fullComponentVersion = getComponentVersion(componentVersionLink);
                 final List<String> policyUrls = componentVersion.getPolicies();
 
                 if (policyUrls != null) {
@@ -104,7 +105,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
                         for (final PolicyRule rule : ruleList) {
                             policyRuleList.add(rule);
                         }
-                        createContents(projectVersion, componentVersion.getComponentName(), componentVersionName,
+                        createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
                                 componentVersion.getComponentLink(),
                                 componentVersion.getComponentVersionLink(),
                                 policyRuleList, item, templateData);
@@ -123,7 +124,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
 
     @Override
     public void createContents(final ProjectVersion projectVersion, final String componentName,
-            final String componentVersion, final String componentUrl, final String componentVersionUrl,
+            final ComponentVersion componentVersion, final String componentUrl, final String componentVersionUrl,
             final List<PolicyRule> policyRuleList, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws URISyntaxException {
         final PolicyViolationClearedContentItem contentItem = new PolicyViolationClearedContentItem(item.getCreatedAt(),

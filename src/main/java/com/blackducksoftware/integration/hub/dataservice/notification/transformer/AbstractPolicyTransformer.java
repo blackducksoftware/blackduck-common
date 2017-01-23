@@ -75,7 +75,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
             try {
                 final String componentVersionLink = componentVersion.getComponentVersionLink();
-                final String componentVersionName = getComponentVersionName(componentVersionLink);
+                final ComponentVersion fullComponentVersion = getComponentVersion(componentVersionLink);
                 final String policyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
 
                 if (StringUtils.isNotBlank(policyStatusUrl)) {
@@ -91,7 +91,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
                             final PolicyRule rule = getPolicyRule(ruleUrl);
                             policyRuleList.add(rule);
                         }
-                        createContents(projectVersion, componentVersion.getComponentName(), componentVersionName,
+                        createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
                                 componentVersion.getComponentLink(),
                                 componentVersion.getComponentVersionLink(),
                                 policyRuleList, item, templateData);
@@ -101,18 +101,6 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
                 throw new HubItemTransformException(e);
             }
         }
-    }
-
-    protected String getComponentVersionName(final String componentVersionLink) throws HubIntegrationException {
-        String componentVersionName;
-        if (StringUtils.isBlank(componentVersionLink)) {
-            componentVersionName = "";
-        } else {
-            final ComponentVersion compVersion = getHubRequestService().getItem(componentVersionLink, ComponentVersion.class);
-            componentVersionName = compVersion.getVersionName();
-        }
-
-        return componentVersionName;
     }
 
     protected List<PolicyRule> getRulesFromUrls(final List<String> ruleUrlsViolated) throws HubIntegrationException {
@@ -204,7 +192,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     public abstract void createContents(final ProjectVersion projectVersion, final String componentName,
-            final String componentVersion, String componentUrl, final String componentVersionUrl,
+            final ComponentVersion componentVersion, String componentUrl, final String componentVersionUrl,
             List<PolicyRule> policyRuleList,
             NotificationItem item, List<NotificationContentItem> templateData) throws URISyntaxException;
 

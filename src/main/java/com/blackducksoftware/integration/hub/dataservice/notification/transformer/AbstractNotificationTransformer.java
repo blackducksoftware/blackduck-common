@@ -25,6 +25,9 @@ package com.blackducksoftware.integration.hub.dataservice.notification.transform
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
@@ -123,5 +126,24 @@ public abstract class AbstractNotificationTransformer
 
     public MetaService getMetaService() {
         return metaService;
+    }
+
+    protected ComponentVersion getComponentVersion(final String componentVersionLink) throws HubIntegrationException {
+        ComponentVersion componentVersion = null;
+        if (!StringUtils.isBlank(componentVersionLink)) {
+            componentVersion = getHubRequestService().getItem(componentVersionLink, ComponentVersion.class);
+        }
+        return componentVersion;
+    }
+
+    protected String getComponentVersionName(final String componentVersionLink) throws HubIntegrationException {
+        String componentVersionName = "";
+        if (!StringUtils.isBlank(componentVersionLink)) {
+            final ComponentVersion compVersion = getComponentVersion(componentVersionLink);
+            if (compVersion != null) {
+                componentVersionName = compVersion.getVersionName();
+            }
+        }
+        return componentVersionName;
     }
 }
