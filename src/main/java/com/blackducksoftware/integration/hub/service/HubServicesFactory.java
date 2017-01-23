@@ -150,8 +150,8 @@ public class HubServicesFactory {
                 createVulnerabilityRequestService(), createMetaService(logger));
     }
 
-    public LicenseDataService createLicenseDataService() {
-        return new LicenseDataService(restConnection, createHubRequestService(), createComponentRequestService());
+    public LicenseDataService createLicenseDataService(final IntLogger logger) {
+        return new LicenseDataService(restConnection, createHubRequestService(), createComponentRequestService(), createMetaService(logger));
     }
 
     public BomImportRequestService createBomImportRequestService() {

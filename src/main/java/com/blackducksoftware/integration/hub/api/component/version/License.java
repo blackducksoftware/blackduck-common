@@ -23,52 +23,37 @@
  */
 package com.blackducksoftware.integration.hub.api.component.version;
 
-import java.util.List;
-
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.api.item.HubResponse;
 
-public class ComplexLicense extends HubResponse {
-    private CodeSharingEnum codeSharing;
+public class License extends HubItem {
+	private final CodeSharingEnum codeSharing;
+	private final String name;
+	private final OwnershipEnum ownership;
+	
+	public License(CodeSharingEnum codeSharing, String name, OwnershipEnum ownership) {
+		this.codeSharing = codeSharing;
+		this.name = name;
+		this.ownership = ownership;
+	}
 
-    private String license;
+	public CodeSharingEnum getCodeSharing() {
+		return codeSharing;
+	}
 
-    private List<ComplexLicense> licenses;
+	public String getName() {
+		return name;
+	}
 
-    private String name;
-
-    private OwnershipEnum ownership;
-
-    private ComplexLicenseType type;
-
-    public CodeSharingEnum getCodeSharing() {
-        return codeSharing;
-    }
-
-    public String getLicense() {
-        return license;
-    }
-
-    public List<ComplexLicense> getLicenses() {
-        return licenses;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public OwnershipEnum getOwnership() {
-        return ownership;
-    }
-
-    public ComplexLicenseType getType() {
-        return type;
-    }
-
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
-    }
+	public OwnershipEnum getOwnership() {
+		return ownership;
+	}
+	
+	@Override
+	public String toString() {
+		return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
+	}
 }
