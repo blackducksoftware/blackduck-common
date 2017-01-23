@@ -25,9 +25,9 @@ package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.item.HubResponse;
+import com.blackducksoftware.integration.hub.api.item.HubItem;
 
-public class ComplexLicense extends HubResponse {
+public class ComplexLicense extends HubItem {
     private CodeSharingEnum codeSharing;
 
     private String license;
