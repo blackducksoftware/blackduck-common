@@ -55,7 +55,7 @@ public class PhoneHomeDataService extends HubRequestService {
 
     public void phoneHome(final HubServerConfig hubServerConfig, final ThirdPartyName thirdPartyName, final String thirdPartyVersion,
             final String pluginVersion, final String hubVersion) {
-        phoneHome(hubServerConfig, thirdPartyName, thirdPartyVersion, pluginVersion, hubVersion);
+        phoneHome(hubServerConfig, thirdPartyName.name(), thirdPartyVersion, pluginVersion, hubVersion);
     }
 
     public void phoneHome(final HubServerConfig hubServerConfig, final String thirdPartyName, final String thirdPartyVersion,
