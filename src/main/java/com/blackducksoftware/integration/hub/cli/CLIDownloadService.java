@@ -35,13 +35,13 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tools.zip.ZipEntry;
-import org.apache.tools.zip.ZipFile;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -230,7 +230,7 @@ public class CLIDownloadService {
         // without getAbsoluteFile, getParentFile below seems to fail
         dir = dir.getAbsoluteFile();
         final ZipFile zip = new ZipFile(zipFile);
-        final Enumeration<ZipEntry> entries = zip.getEntries();
+        final Enumeration<? extends ZipEntry> entries = zip.entries();
         try {
             while (entries.hasMoreElements()) {
                 final ZipEntry e = entries.nextElement();
