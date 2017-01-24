@@ -290,7 +290,7 @@
 
 #main-panel {
 	float: right;
-	margin-left: 0px;
+	margin-left: 0px !important;
 }
 
 #side-panel {
