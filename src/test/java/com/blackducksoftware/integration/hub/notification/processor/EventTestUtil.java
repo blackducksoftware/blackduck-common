@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.mockito.Mockito;
 
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.vulnerability.SeverityEnum;
@@ -179,6 +180,7 @@ public class EventTestUtil {
     public PolicyOverrideContentItem createPolicyOverride(final Date createdTime, final String projectName,
             final String projectVersionName, final String componentName, final String componentVersion)
             throws URISyntaxException {
+        final ComponentVersion fullComponentVersion = createComponentVersionMock(componentVersion);
         final String projectVersionUrl = PROJECT_VERSION_URL_PREFIX + projectName + PROJECT_VERSION_URL_SEGMENT + projectVersionName;
         final ProjectVersion projectVersion = new ProjectVersion();
         projectVersion.setProjectName(projectName);
@@ -191,13 +193,21 @@ public class EventTestUtil {
         policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
         policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
         final PolicyOverrideContentItem item = new PolicyOverrideContentItem(createdTime, projectVersion, componentName,
-                componentVersion, componentUrl, componentVersionUrl, policyRuleList, FIRST_NAME, LAST_NAME);
+                fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList, FIRST_NAME, LAST_NAME);
         return item;
+    }
+
+    private ComponentVersion createComponentVersionMock(final String componentVersion) {
+        ComponentVersion fullComponentVersion;
+        fullComponentVersion = Mockito.mock(ComponentVersion.class);
+        Mockito.when(fullComponentVersion.getVersionName()).thenReturn(componentVersion);
+        return fullComponentVersion;
     }
 
     public PolicyViolationClearedContentItem createPolicyCleared(final Date createdTime, final String projectName,
             final String projectVersionName, final String componentName, final String componentVersion)
             throws URISyntaxException {
+        final ComponentVersion fullComponentVersion = createComponentVersionMock(componentVersion);
         final String projectVersionUrl = PROJECT_VERSION_URL_PREFIX + projectName + PROJECT_VERSION_URL_SEGMENT + projectVersionName;
         final ProjectVersion projectVersion = new ProjectVersion();
         projectVersion.setProjectName(projectName);
@@ -210,13 +220,14 @@ public class EventTestUtil {
         policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
         policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
         final PolicyViolationClearedContentItem item = new PolicyViolationClearedContentItem(createdTime,
-                projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl, policyRuleList);
+                projectVersion, componentName, fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList);
         return item;
     }
 
     public PolicyViolationContentItem createPolicyViolation(final Date createdTime, final String projectName,
             final String projectVersionName, final String componentName, final String componentVersion)
             throws URISyntaxException {
+        final ComponentVersion fullComponentVersion = createComponentVersionMock(componentVersion);
         final String projectVersionUrl = PROJECT_VERSION_URL_PREFIX + projectName + PROJECT_VERSION_URL_SEGMENT + projectVersionName;
         final ProjectVersion projectVersion = new ProjectVersion();
         projectVersion.setProjectName(projectName);
@@ -229,7 +240,7 @@ public class EventTestUtil {
         policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
         policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
         final PolicyViolationContentItem item = new PolicyViolationContentItem(createdTime, projectVersion,
-                componentName, componentVersion, componentUrl, componentVersionUrl, policyRuleList);
+                componentName, fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList);
         return item;
     }
 
@@ -237,6 +248,7 @@ public class EventTestUtil {
             final String projectVersionName, final String componentName, final String componentVersion,
             final List<VulnerabilitySourceQualifiedId> added, final List<VulnerabilitySourceQualifiedId> updated,
             final List<VulnerabilitySourceQualifiedId> deleted) throws URISyntaxException {
+        final ComponentVersion fullComponentVersion = createComponentVersionMock(componentVersion);
         final String projectVersionUrl = PROJECT_VERSION_URL_PREFIX + projectName + PROJECT_VERSION_URL_SEGMENT + projectVersionName;
         final ProjectVersion projectVersion = new ProjectVersion();
         projectVersion.setProjectName(projectName);
@@ -245,7 +257,7 @@ public class EventTestUtil {
         final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT
                 + componentVersion;
         final VulnerabilityContentItem item = new VulnerabilityContentItem(createdTime, projectVersion, componentName,
-                componentVersion, componentVersionUrl, added, updated, deleted);
+                fullComponentVersion, componentVersionUrl, added, updated, deleted);
         return item;
     }
 }

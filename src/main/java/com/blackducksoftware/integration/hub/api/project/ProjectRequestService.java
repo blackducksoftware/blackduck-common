@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
@@ -70,21 +71,21 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
         return projectItems;
     }
 
-    public ProjectItem getProjectByName(String projectName) throws HubIntegrationException {
+    public ProjectItem getProjectByName(final String projectName) throws HubIntegrationException {
         final List<ProjectItem> allProjectItems = getAllProjectMatches(projectName);
         for (final ProjectItem project : allProjectItems) {
             if (projectName.equals(project.getName())) {
                 return project;
             }
         }
-        throw new HubIntegrationException("This Project does not exist. Project : " + projectName);
+        throw new DoesNotExistException("This Project does not exist. Project : " + projectName);
     }
 
     public String createHubProject(final String projectName) throws HubIntegrationException {
         final HubRequest projectItemRequest = getHubRequestFactory().createPostRequest(PROJECTS_SEGMENTS);
-        JsonObject json = new JsonObject();
+        final JsonObject json = new JsonObject();
         json.addProperty("name", projectName);
-        String location = projectItemRequest.executePost(getRestConnection().getGson().toJson(json));
+        final String location = projectItemRequest.executePost(getRestConnection().getGson().toJson(json));
         return location;
     }
 

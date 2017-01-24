@@ -63,11 +63,15 @@ public class HubScanConfig {
 
     private final boolean cleanupLogsOnSuccess;
 
+    private final String[] excludePatterns;
+
+    private final String codeLocationAlias;
+
     public HubScanConfig(final String projectName, final String version, final String phase,
             final String distribution, final File workingDirectory, final int scanMemory,
             final ImmutableList<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
             final String thirdPartyVersion,
-            final String pluginVersion, boolean cleanupLogsOnSuccess) {
+            final String pluginVersion, final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias) {
         this.projectName = projectName;
         this.version = version;
         this.phase = phase;
@@ -81,6 +85,8 @@ public class HubScanConfig {
         this.thirdPartyVersion = thirdPartyVersion;
         this.pluginVersion = pluginVersion;
         this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
+        this.excludePatterns = excludePatterns;
+        this.codeLocationAlias = codeLocationAlias;
     }
 
     public String getProjectName() {
@@ -135,6 +141,14 @@ public class HubScanConfig {
         return cleanupLogsOnSuccess;
     }
 
+    public String[] getExcludePatterns() {
+        return excludePatterns;
+    }
+
+    public String getCodeLocationAlias() {
+        return codeLocationAlias;
+    }
+
     public void print(final IntLogger logger) {
         try {
             logger.alwaysLog("--> Using Working Directory : " + getWorkingDirectory().getCanonicalPath());
@@ -152,9 +166,19 @@ public class HubScanConfig {
         } else {
             logger.alwaysLog("--> null");
         }
+        logger.alwaysLog("--> Directory Exclusion Patterns  : ");
+        if (excludePatterns != null) {
+            for (final String exclusionPattern : excludePatterns) {
+                logger.alwaysLog("--> " + exclusionPattern);
+            }
+        } else {
+            logger.alwaysLog("--> null");
+        }
+
         logger.alwaysLog("--> Scan Memory : " + getScanMemory());
         logger.alwaysLog("--> Dry Run : " + isDryRun());
         logger.alwaysLog("--> Clean-up logs on success : " + isCleanupLogsOnSuccess());
+        logger.alwaysLog("--> Code Location Name : " + getCodeLocationAlias());
     }
 
     @Override

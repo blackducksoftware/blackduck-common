@@ -52,15 +52,14 @@ public class HubSupportHelper implements Serializable {
      * Hub supports. You can use the get methods in this class after this method
      * has run to get the supported options.
      */
-    public void checkHubSupport(HubVersionRequestService hubVersionRequestService, final IntLogger logger) {
+    public void checkHubSupport(final HubVersionRequestService hubVersionRequestService, final IntLogger logger) {
         try {
-            if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.3.1")) {
+            if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.5.0")) {
+                setHub3_5Support();
+            } else if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.3.1")) {
                 setHub3_3_1Support();
-                setHub3_1Support();
-                setHub3_0Support();
             } else if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.1.0")) {
                 setHub3_1Support();
-                setHub3_0Support();
             } else {
                 if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.0.0")) {
                     setHub3_0Support();
@@ -85,11 +84,18 @@ public class HubSupportHelper implements Serializable {
     }
 
     private void setHub3_1Support() {
+        setHub3_0Support();
         capabilities.add(HubCapabilitiesEnum.CLI_PASSWORD_ENVIRONMENT_VARIABLE);
     }
 
     private void setHub3_3_1Support() {
+        setHub3_1Support();
         capabilities.add(HubCapabilitiesEnum.BOM_FILE_UPLOAD);
+    }
+
+    private void setHub3_5Support() {
+        setHub3_3_1Support();
+        capabilities.add(HubCapabilitiesEnum.CODE_LOCATION_ALIAS);
     }
 
 }

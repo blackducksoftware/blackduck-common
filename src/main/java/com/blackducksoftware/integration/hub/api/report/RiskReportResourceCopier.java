@@ -38,7 +38,7 @@ public class RiskReportResourceCopier extends JarResourceCopier {
 
     private final String destinationDirectory;
 
-    public RiskReportResourceCopier(String destinationDirectory) {
+    public RiskReportResourceCopier(final String destinationDirectory) {
         this.destinationDirectory = destinationDirectory;
     }
 
@@ -53,7 +53,7 @@ public class RiskReportResourceCopier extends JarResourceCopier {
         relativePathList.add("images/Hub_BD_logo.png");
         relativePathList.add(RISK_REPORT_HTML_FILE_NAME);
         relativePathList.addAll(findJavascriptFileList());
-        relativePathList.addAll(findFontAwesomeFileList());
+        // relativePathList.addAll(findFontAwesomeFileList());
         return relativePathList;
     }
 
@@ -64,54 +64,6 @@ public class RiskReportResourceCopier extends JarResourceCopier {
         fileList.add(parentDir + "HubRiskReport.js");
         fileList.add(parentDir + "jquery-3.1.1.min.js");
         fileList.add(parentDir + "Sortable.js");
-        return fileList;
-    }
-
-    private List<String> findFontAwesomeFileList() {
-        final List<String> fileList = new LinkedList<>();
-        final String parentDir = "font-awesome-4.5.0/";
-        final String cssDir = parentDir + "css/";
-        final String fontsDir = parentDir + "fonts/";
-        final String lessDir = parentDir + "less/";
-        final String scssDir = parentDir + "scss/";
-        // css
-        fileList.add(cssDir + "font-awesome.css");
-        fileList.add(cssDir + "font-awesome.min.css");
-        // fonts
-        fileList.add(fontsDir + "fontawesome-webfont.eot");
-        fileList.add(fontsDir + "fontawesome-webfont.svg");
-        fileList.add(fontsDir + "fontawesome-webfont.ttf");
-        fileList.add(fontsDir + "fontawesome-webfont.woff");
-        fileList.add(fontsDir + "fontawesome-webfont.woff2");
-        fileList.add(fontsDir + "FontAwesome.otf");
-        // less
-        fileList.add(lessDir + "animated.less");
-        fileList.add(lessDir + "bordered-pulled.less");
-        fileList.add(lessDir + "core.less");
-        fileList.add(lessDir + "fixed-width.less");
-        fileList.add(lessDir + "font-awesome.less");
-        fileList.add(lessDir + "icons.less");
-        fileList.add(lessDir + "larger.less");
-        fileList.add(lessDir + "list.less");
-        fileList.add(lessDir + "mixins.less");
-        fileList.add(lessDir + "path.less");
-        fileList.add(lessDir + "rotated-flipped.less");
-        fileList.add(lessDir + "stacked.less");
-        fileList.add(lessDir + "variables.less");
-        // scss
-        fileList.add(scssDir + "_animated.scss");
-        fileList.add(scssDir + "_bordered-pulled.scss");
-        fileList.add(scssDir + "_core.scss");
-        fileList.add(scssDir + "_fixed-width.scss");
-        fileList.add(scssDir + "_icons.scss");
-        fileList.add(scssDir + "_larger.scss");
-        fileList.add(scssDir + "_list.scss");
-        fileList.add(scssDir + "_mixins.scss");
-        fileList.add(scssDir + "_path.scss");
-        fileList.add(scssDir + "_rotated-flipped.scss");
-        fileList.add(scssDir + "_stacked.scss");
-        fileList.add(scssDir + "_variables.scss");
-        fileList.add(scssDir + "font-awesome.scss");
         return fileList;
     }
 

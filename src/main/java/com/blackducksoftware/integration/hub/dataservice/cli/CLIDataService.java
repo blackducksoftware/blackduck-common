@@ -53,9 +53,9 @@ public class CLIDataService extends HubRequestService {
 
     private final PhoneHomeDataService phoneHomeDataService;
 
-    public CLIDataService(final IntLogger logger, final RestConnection restConnection, CIEnvironmentVariables ciEnvironmentVariables,
+    public CLIDataService(final IntLogger logger, final RestConnection restConnection, final CIEnvironmentVariables ciEnvironmentVariables,
             final HubVersionRequestService hubVersionRequestService,
-            CLIDownloadService cliDownloadService, PhoneHomeDataService phoneHomeDataService) {
+            final CLIDownloadService cliDownloadService, final PhoneHomeDataService phoneHomeDataService) {
         super(restConnection);
         this.logger = logger;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
@@ -65,7 +65,7 @@ public class CLIDataService extends HubRequestService {
     }
 
     public List<ScanSummaryItem> installAndRunScan(final HubServerConfig hubServerConfig,
-            HubScanConfig hubScanConfig)
+            final HubScanConfig hubScanConfig)
             throws HubIntegrationException, EncryptionException {
         final String localHostName = HostnameHelper.getMyHostname();
         logger.info("Running on machine : " + localHostName);
@@ -80,10 +80,7 @@ public class CLIDataService extends HubRequestService {
         final HubSupportHelper hubSupportHelper = new HubSupportHelper();
         hubSupportHelper.checkHubSupport(hubVersionRequestService, logger);
         final SimpleScanService simpleScanService = new SimpleScanService(logger, getRestConnection(), hubServerConfig, hubSupportHelper,
-                ciEnvironmentVariables,
-                hubScanConfig.getToolsDir(),
-                hubScanConfig.getScanMemory(), hubScanConfig.isDryRun(), hubScanConfig.getProjectName(), hubScanConfig.getVersion(),
-                hubScanConfig.getScanTargetPaths(), hubScanConfig.getWorkingDirectory());
+                ciEnvironmentVariables, hubScanConfig);
         simpleScanService.setupAndExecuteScan();
 
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
@@ -92,19 +89,19 @@ public class CLIDataService extends HubRequestService {
         return simpleScanService.getScanSummaryItems();
     }
 
-    public void printConfiguration(HubScanConfig hubScanConfig) {
+    public void printConfiguration(final HubScanConfig hubScanConfig) {
         logger.alwaysLog("--> Log Level : " + logger.getLogLevel().name());
         hubScanConfig.print(logger);
     }
 
     private void cleanUpLogFiles(final SimpleScanService simpleScanService) {
-        File standardOutputFile = simpleScanService.getStandardOutputFile();
+        final File standardOutputFile = simpleScanService.getStandardOutputFile();
         if (standardOutputFile != null && standardOutputFile.exists()) {
             standardOutputFile.delete();
         }
-        File cliLogDirectory = simpleScanService.getCLILogDirectory();
+        final File cliLogDirectory = simpleScanService.getCLILogDirectory();
         if (cliLogDirectory != null && cliLogDirectory.exists()) {
-            for (File log : cliLogDirectory.listFiles()) {
+            for (final File log : cliLogDirectory.listFiles()) {
                 log.delete();
             }
             cliLogDirectory.delete();

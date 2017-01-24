@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
@@ -68,10 +69,13 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
         } catch (final HubIntegrationException e) {
             throw new HubItemTransformException(e);
         }
-        final ProjectVersion projectVersion = new ProjectVersion();
-        projectVersion.setProjectName(projectName);
-        projectVersion.setProjectVersionName(releaseItem.getVersionName());
-        projectVersion.setUrl(policyViolation.getContent().getProjectVersionLink());
+        ProjectVersion projectVersion;
+        try {
+            projectVersion = createFullProjectVersion(policyViolation.getContent().getProjectVersionLink(),
+                    projectName, releaseItem.getVersionName());
+        } catch (final HubIntegrationException e) {
+            throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
+        }
 
         handleNotification(componentVersionList, projectVersion, item, templateData);
 
@@ -93,7 +97,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 
     @Override
     public void createContents(final ProjectVersion projectVersion, final String componentName,
-            final String componentVersion, final String componentUrl, final String componentVersionUrl,
+            final ComponentVersion componentVersion, final String componentUrl, final String componentVersionUrl,
             final List<PolicyRule> policyRuleList, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws URISyntaxException {
         templateData.add(new PolicyViolationContentItem(item.getCreatedAt(), projectVersion, componentName,

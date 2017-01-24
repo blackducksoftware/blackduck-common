@@ -53,6 +53,7 @@ import com.blackducksoftware.integration.hub.exception.ScanFailedException;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
@@ -86,9 +87,34 @@ public class SimpleScanService extends HubRequestService {
 
     private File logDirectory;
 
-    public SimpleScanService(IntLogger logger, RestConnection restConnection, HubServerConfig hubServerConfig, HubSupportHelper hubSupportHelper,
-            CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, int scanMemory, boolean dryRun, String project,
-            String version, List<String> scanTargetPaths, File workingDirectory) {
+    private final String[] excludePatterns;
+
+    private String codeLocationAlias;
+
+    public SimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
+            final HubSupportHelper hubSupportHelper,
+            final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig) {
+        super(restConnection);
+        this.logger = logger;
+        this.hubServerConfig = hubServerConfig;
+        this.hubSupportHelper = hubSupportHelper;
+        this.ciEnvironmentVariables = ciEnvironmentVariables;
+        this.directoryToInstallTo = hubScanConfig.getToolsDir();
+        this.scanMemory = hubScanConfig.getScanMemory();
+        this.dryRun = hubScanConfig.isDryRun();
+        this.project = hubScanConfig.getProjectName();
+        this.version = hubScanConfig.getVersion();
+        this.scanTargetPaths = hubScanConfig.getScanTargetPaths();
+        this.workingDirectory = hubScanConfig.getWorkingDirectory();
+        this.excludePatterns = hubScanConfig.getExcludePatterns();
+        this.codeLocationAlias = hubScanConfig.getCodeLocationAlias();
+    }
+
+    public SimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
+            final HubSupportHelper hubSupportHelper,
+            final CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, final int scanMemory, final boolean dryRun,
+            final String project,
+            final String version, final List<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
         super(restConnection);
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
@@ -101,6 +127,7 @@ public class SimpleScanService extends HubRequestService {
         this.version = version;
         this.scanTargetPaths = scanTargetPaths;
         this.workingDirectory = workingDirectory;
+        this.excludePatterns = excludePatterns;
     }
 
     /**
@@ -142,6 +169,10 @@ public class SimpleScanService extends HubRequestService {
             if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
                 cmd.add("-Dhttp.proxyUser=" + proxyUsername);
                 cmd.add("-Dhttp.proxyPassword=" + proxyPassword);
+            } else {
+                // CLI will ignore the proxy host and port if there are no credentials
+                cmd.add("-Dhttp.proxyUser=user");
+                cmd.add("-Dhttp.proxyPassword=password");
             }
         }
 
@@ -206,6 +237,20 @@ public class SimpleScanService extends HubRequestService {
             cmd.add(project);
             cmd.add("--release");
             cmd.add(version);
+        }
+
+        if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CODE_LOCATION_ALIAS) && StringUtils.isNotBlank(codeLocationAlias)) {
+            cmd.add("--name");
+            cmd.add(codeLocationAlias);
+        }
+
+        if (excludePatterns != null) {
+            for (final String exclusionPattern : excludePatterns) {
+                if (StringUtils.isNotBlank(exclusionPattern)) {
+                    cmd.add("--exclude");
+                    cmd.add(exclusionPattern);
+                }
+            }
         }
 
         for (final String target : scanTargetPaths) {
@@ -367,8 +412,9 @@ public class SimpleScanService extends HubRequestService {
         }
     }
 
-    private void makeVerbose(List<String> cmd) {
+    private void makeVerbose(final List<String> cmd) {
         cmd.add("-v");
+        cmd.add("--debug");
     }
 
     public IntLogger getLogger() {
@@ -393,6 +439,14 @@ public class SimpleScanService extends HubRequestService {
 
     public File getStandardOutputFile() {
         return new File(logDirectory, "CLI_Output.txt");
+    }
+
+    public String getCodeLocationAlias() {
+        return codeLocationAlias;
+    }
+
+    public void setCodeLocationAlias(final String codeLocationAlias) {
+        this.codeLocationAlias = codeLocationAlias;
     }
 
 }
