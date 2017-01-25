@@ -115,12 +115,6 @@ public class HubServicesFactory {
                 createProjectVersionRequestService(logger), createHubRequestService(), createMetaService(logger));
     }
 
-    @Deprecated
-    public ScanStatusDataService createScanStatusDataService(final IntLogger logger) {
-        return new ScanStatusDataService(logger, restConnection, createProjectRequestService(), createProjectVersionRequestService(logger),
-                createCodeLocationRequestService(), createScanSummaryRequestService(), createMetaService(logger));
-    }
-
     public ScanStatusDataService createScanStatusDataService(final IntLogger logger,
             final long timeoutInMilliseconds) {
         return new ScanStatusDataService(logger, restConnection, createProjectRequestService(), createProjectVersionRequestService(logger),
