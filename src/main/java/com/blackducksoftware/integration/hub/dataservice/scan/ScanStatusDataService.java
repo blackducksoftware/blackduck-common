@@ -178,7 +178,7 @@ public class ScanStatusDataService extends HubRequestService {
             for (final CodeLocationItem codeLocationItem : allCodeLocations) {
                 final String mappedProjectVersionUrl = codeLocationItem.getMappedProjectVersion();
                 if (projectVersionUrl.equals(mappedProjectVersionUrl)) {
-                    final String scanSummariesLink = metaService.getLink(codeLocationItem, MetaService.SCANS_LINK);
+                    final String scanSummariesLink = metaService.getFirstLink(codeLocationItem, MetaService.SCANS_LINK);
                     allScanSummariesLinks.add(scanSummariesLink);
                 }
             }
