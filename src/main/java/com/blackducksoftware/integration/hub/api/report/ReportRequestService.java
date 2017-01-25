@@ -127,18 +127,6 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      */
     public ReportInformationItem isReportFinishedGenerating(final String reportUrl)
             throws HubIntegrationException {
-        return isReportFinishedGenerating(reportUrl, timeoutInMilliseconds);
-    }
-
-    /**
-     * Checks the report URL every 5 seconds until the report has a finished
-     * time available, then we know it is done being generated. Throws
-     * HubIntegrationException after the maximum wait if the report has not been
-     * generated yet.
-     */
-    @Deprecated
-    public ReportInformationItem isReportFinishedGenerating(final String reportUrl, final long maximumWait)
-            throws HubIntegrationException {
         final long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         Date timeFinished = null;
@@ -151,8 +139,8 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
             if (timeFinished != null) {
                 break;
             }
-            if (elapsedTime >= maximumWait) {
-                final String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(maximumWait));
+            if (elapsedTime >= timeoutInMilliseconds) {
+                final String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(timeoutInMilliseconds));
                 throw new HubIntegrationException("The Report has not finished generating in : " + formattedTime);
             }
             // Retry every 5 seconds
@@ -173,23 +161,11 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      */
     public HubRiskReportData generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
             final ReportCategoriesEnum[] categories) throws HubIntegrationException {
-        return generateHubReport(version, reportFormat, categories, timeoutInMilliseconds);
-    }
-
-    /**
-     * Assumes the BOM has already been updated
-     *
-     * @throws HubIntegrationException
-     */
-    @Deprecated
-    public HubRiskReportData generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
-            final ReportCategoriesEnum[] categories, final long maxWaitTime) throws HubIntegrationException {
         logger.debug("Starting the Report generation.");
         final String reportUrl = startGeneratingHubReport(version, reportFormat, categories);
 
         logger.debug("Waiting for the Report to complete.");
-        final ReportInformationItem reportInfo = isReportFinishedGenerating(reportUrl,
-                maxWaitTime);
+        final ReportInformationItem reportInfo = isReportFinishedGenerating(reportUrl);
 
         final String contentLink = metaService.getLink(reportInfo, MetaService.CONTENT_LINK);
 
