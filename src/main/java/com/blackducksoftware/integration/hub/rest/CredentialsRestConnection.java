@@ -101,7 +101,9 @@ public class CredentialsRestConnection extends RestConnection {
                     final Request request = createPostRequest(httpUrl, createEncodedRequestBody(content));
                     Response response = null;
                     try {
-                        response = handleExecuteClientCall(request);
+                        logRequestHeaders(request);
+                        response = getClient().newCall(request).execute();
+                        logResponseHeaders(response);
                         if (!response.isSuccessful()) {
                             throw new HubIntegrationException(response.message());
                         }

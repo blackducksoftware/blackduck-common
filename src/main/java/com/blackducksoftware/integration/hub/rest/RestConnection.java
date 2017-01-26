@@ -294,7 +294,7 @@ public abstract class RestConnection {
         return logger != null && logger.getLogLevel() == LogLevel.TRACE;
     }
 
-    private void logRequestHeaders(final Request request) {
+    protected void logRequestHeaders(final Request request) {
         if (isDebugLogging()) {
             final String requestName = request.getClass().getSimpleName();
             logMessage(LogLevel.TRACE, requestName + " : " + request.toString());
@@ -302,7 +302,7 @@ public abstract class RestConnection {
         }
     }
 
-    private void logResponseHeaders(final Response response) {
+    protected void logResponseHeaders(final Response response) {
         if (isDebugLogging()) {
             final String responseName = response.getClass().getSimpleName();
             logMessage(LogLevel.TRACE, responseName + " : " + response.toString());
