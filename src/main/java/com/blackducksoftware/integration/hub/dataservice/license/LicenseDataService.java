@@ -41,7 +41,7 @@ public class LicenseDataService extends HubRequestService {
     private final HubRequestService hubRequestService;
 
     private final ComponentRequestService componentRequestService;
-    
+
     private final MetaService metaService;
 
     public LicenseDataService(final RestConnection restConnection, final HubRequestService hubRequestService,
@@ -52,24 +52,22 @@ public class LicenseDataService extends HubRequestService {
         this.metaService = metaService;
     }
 
-    public ComplexLicensePlusMeta getComplexLicensePlusMetaFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
+    public ComplexLicensePlusMeta getComplexLicensePlusMetaFromComponent(final String namespace, final String groupId, final String artifactId,
+            final String version)
             throws HubIntegrationException {
         final Component component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
         final String versionUrl = component.getVersion();
 
         final ComponentVersion componentVersion = hubRequestService.getItem(versionUrl, ComponentVersion.class);
         final ComplexLicense parentComplexLicense = componentVersion.getLicense();
-        
-        final List<ComplexLicensePlusMeta> subLicensesPlusMeta = new ArrayList<ComplexLicensePlusMeta>();
-        for(ComplexLicense subLicense : parentComplexLicense.getLicenses()) {
-        	final License license = hubRequestService.getItem(subLicense.getLicense(), License.class);
-        	//FIXME change to updated method once MetaService is updated
-            final String textUrl = metaService.getLink(license, MetaService.TEXT_LINK);
+
+        final List<ComplexLicensePlusMeta> subLicensesPlusMeta = new ArrayList<>();
+        for (ComplexLicense subLicense : parentComplexLicense.getLicenses()) {
+            final License license = hubRequestService.getItem(subLicense.getLicense(), License.class);
+            final String textUrl = metaService.getFirstLink(license, MetaService.TEXT_LINK);
             subLicensesPlusMeta.add(new ComplexLicensePlusMeta(subLicense, textUrl, new ArrayList<ComplexLicensePlusMeta>()));
         }
-        
-        
-        
+
         return new ComplexLicensePlusMeta(parentComplexLicense, "", subLicensesPlusMeta);
     }
 
