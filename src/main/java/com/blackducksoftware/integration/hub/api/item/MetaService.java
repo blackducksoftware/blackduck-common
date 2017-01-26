@@ -24,9 +24,7 @@
 package com.blackducksoftware.integration.hub.api.item;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
@@ -93,29 +91,74 @@ public class MetaService {
         this.hubRequestFactory = hubRequestFactory;
     }
 
-    // This will be replaced soon with a getFirstLink() method
-    @Deprecated
-    public String getLink(final HubItem item, final String linkKey) throws HubIntegrationException {
-        final List<String> linkHrefs = getLinks(item).get(linkKey);
-        if (linkHrefs == null) {
-            return null;
+    public boolean hasLink(final HubItem item, final String linkKey) throws HubIntegrationException {
+        final JsonArray linksArray = getLinks(item);
+        if (linksArray == null) {
+            return false;
         }
-        if (linkHrefs.size() > 1) {
-            if (logger != null) {
-                logger.error("Hub Item has multiple links for key : " + linkKey + " : " + item.getJson());
+        for (final JsonElement linkElement : linksArray) {
+            final JsonObject linkObject = linkElement.getAsJsonObject();
+            final String rel = linkObject.get("rel").getAsString();
+            if (rel.equals(linkKey)) {
+                return true;
             }
-            throw new HubIntegrationException("Only expected to get a single link for the key : " + linkKey);
         }
-        if (linkHrefs.size() != 1) {
-            return null;
-        }
-        return linkHrefs.get(0);
+        return false;
     }
 
-    // This public method will be replaced soon with a getLinks(item, linkName) method
-    @Deprecated
-    public Map<String, List<String>> getLinks(final HubItem item) throws HubIntegrationException {
-        final Map<String, List<String>> links = new HashMap<>();
+    public String getFirstLink(final HubItem item, final String linkKey) throws HubIntegrationException {
+        final JsonArray linksArray = getLinks(item);
+        if (linksArray == null) {
+            throw new HubIntegrationException("Could not find any links for this item : " + item.getJson());
+        }
+
+        final StringBuilder linksAvailable = new StringBuilder();
+        linksAvailable.append("Could not find the link '" + linkKey + "', these are the available links : ");
+        int i = 0;
+        for (final JsonElement linkElement : linksArray) {
+            final JsonObject linkObject = linkElement.getAsJsonObject();
+            final String rel = linkObject.get("rel").getAsString();
+            if (rel.equals(linkKey)) {
+                return linkObject.get("href").getAsString();
+            }
+            if (i > 0) {
+                linksAvailable.append(", ");
+            }
+            linksAvailable.append("'" + rel + "'");
+            i++;
+        }
+        throw new HubIntegrationException(linksAvailable.toString());
+    }
+
+    public List<String> getLinks(final HubItem item, final String linkKey) throws HubIntegrationException {
+        final JsonArray linksArray = getLinks(item);
+        if (linksArray == null) {
+            throw new HubIntegrationException("Could not find any links for this item : " + item.getJson());
+        }
+
+        final List<String> links = new ArrayList<>();
+        final StringBuilder linksAvailable = new StringBuilder();
+        linksAvailable.append("Could not find the link '" + linkKey + "', these are the available links : ");
+        int i = 0;
+        for (final JsonElement linkElement : linksArray) {
+            final JsonObject linkObject = linkElement.getAsJsonObject();
+            final String rel = linkObject.get("rel").getAsString();
+            if (rel.equals(linkKey)) {
+                links.add(rel);
+            }
+            if (i > 0) {
+                linksAvailable.append(", ");
+            }
+            linksAvailable.append("'" + rel + "'");
+            i++;
+        }
+        if (!links.isEmpty()) {
+            return links;
+        }
+        throw new HubIntegrationException(linksAvailable.toString());
+    }
+
+    private JsonArray getLinks(final HubItem item) throws HubIntegrationException {
         final JsonObject metaJson = getMeta(item);
         final JsonElement linksElement = metaJson.get("links");
         if (linksElement == null) {
@@ -124,23 +167,7 @@ public class MetaService {
             }
             throw new HubIntegrationException("This Hub item does not have any link information.");
         }
-        final JsonArray linkArray = linksElement.getAsJsonArray();
-        for (final JsonElement linkElement : linkArray) {
-            final JsonObject linkObject = linkElement.getAsJsonObject();
-            final String ref = linkObject.get("rel").getAsString();
-            final String linkHref = linkObject.get("href").getAsString();
-
-            final List<String> existingHrefs = links.get(ref);
-            if (existingHrefs != null) {
-                existingHrefs.add(linkHref);
-                links.put(ref, existingHrefs);
-            } else {
-                final List<String> linkHrefs = new ArrayList<>();
-                linkHrefs.add(linkHref);
-                links.put(ref, linkHrefs);
-            }
-        }
-        return links;
+        return linksElement.getAsJsonArray();
     }
 
     public List<MetaAllowEnum> getAllowedMethods(final HubItem item) throws HubIntegrationException {

@@ -98,12 +98,6 @@ public class HubServicesFactory {
         return new PhoneHomeDataService(logger, restConnection, createHubRegistrationRequestService());
     }
 
-    @Deprecated
-    public RiskReportDataService createRiskReportDataService(final IntLogger logger) {
-        return new RiskReportDataService(logger, restConnection, createProjectRequestService(),
-                createProjectVersionRequestService(logger), createReportRequestService(logger));
-    }
-
     public RiskReportDataService createRiskReportDataService(final IntLogger logger,
             final long timeoutInMilliseconds) {
         return new RiskReportDataService(logger, restConnection, createProjectRequestService(),
@@ -113,12 +107,6 @@ public class HubServicesFactory {
     public PolicyStatusDataService createPolicyStatusDataService(final IntLogger logger) {
         return new PolicyStatusDataService(restConnection, createProjectRequestService(),
                 createProjectVersionRequestService(logger), createHubRequestService(), createMetaService(logger));
-    }
-
-    @Deprecated
-    public ScanStatusDataService createScanStatusDataService(final IntLogger logger) {
-        return new ScanStatusDataService(logger, restConnection, createProjectRequestService(), createProjectVersionRequestService(logger),
-                createCodeLocationRequestService(), createScanSummaryRequestService(), createMetaService(logger));
     }
 
     public ScanStatusDataService createScanStatusDataService(final IntLogger logger,
@@ -228,11 +216,6 @@ public class HubServicesFactory {
 
     public HubRegistrationRequestService createHubRegistrationRequestService() {
         return new HubRegistrationRequestService(restConnection);
-    }
-
-    @Deprecated
-    public ReportRequestService createReportRequestService(final IntLogger logger) {
-        return new ReportRequestService(restConnection, logger, createMetaService(logger));
     }
 
     public ReportRequestService createReportRequestService(final IntLogger logger, final long timeoutInMilliseconds) {

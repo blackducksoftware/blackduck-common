@@ -75,7 +75,7 @@ public class ExtensionConfigDataService extends HubRequestService {
     public Map<String, ConfigurationItem> getGlobalConfigMap(final String extensionUrl) throws HubIntegrationException {
         Map<String, ConfigurationItem> globalConfigMap = new HashMap<>();
         final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
-        final String globalOptionsLink = metaService.getLink(extension, MetaService.GLOBAL_OPTIONS_LINK);
+        final String globalOptionsLink = metaService.getFirstLink(extension, MetaService.GLOBAL_OPTIONS_LINK);
         globalConfigMap = createGlobalConfigMap(globalOptionsLink);
         return globalConfigMap;
     }
@@ -83,7 +83,7 @@ public class ExtensionConfigDataService extends HubRequestService {
     public ParallelResourceProcessorResults<UserConfigItem> getUserConfigList(final String extensionUrl) throws HubIntegrationException {
 
         final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
-        final String userOptionsLink = metaService.getLink(extension, MetaService.USER_OPTIONS_LINK);
+        final String userOptionsLink = metaService.getFirstLink(extension, MetaService.USER_OPTIONS_LINK);
         final List<UserOptionLinkItem> userOptionList = extensionUserOptionRequestService
                 .getUserOptions(userOptionsLink);
         final ParallelResourceProcessorResults<UserConfigItem> itemList = parallelProcessor.process(userOptionList);

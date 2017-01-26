@@ -53,7 +53,7 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
 
     private final MetaService metaService;
 
-    public NotificationRequestService(IntLogger logger, final RestConnection restConnection, MetaService metaService) {
+    public NotificationRequestService(final IntLogger logger, final RestConnection restConnection, final MetaService metaService) {
         super(restConnection, NotificationItem.class);
         this.metaService = metaService;
         typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);
@@ -81,7 +81,7 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
-        final String url = metaService.getLink(user, MetaService.NOTIFICATIONS_LINK);
+        final String url = metaService.getFirstLink(user, MetaService.NOTIFICATIONS_LINK);
 
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, url);
         hubPagedRequest.addQueryParameter("startDate", startDateString);

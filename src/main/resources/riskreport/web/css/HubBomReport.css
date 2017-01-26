@@ -246,7 +246,7 @@
 .clickable, .componentColumn, .riskColumn, .licenseColumn  {
 	border-collapse: collapse !important;
 	border-spacing: 0px !important;
-	min-width: 60px;
+	min-width: 65px;
 	white-space: normal;
 	word-wrap: break-word;
 	max-width: 300px;

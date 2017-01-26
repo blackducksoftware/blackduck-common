@@ -26,7 +26,6 @@ package com.blackducksoftware.integration.hub.dataservice.notification.transform
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -107,8 +106,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
                 if (StringUtils.isNotBlank(policyStatusUrl)) {
                     final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(policyStatusUrl);
 
-                    final Map<String, List<String>> policyRulesLink = getMetaService().getLinks(bomComponentVersionPolicyStatus);
-                    List<String> ruleList = getRuleUrls(policyRulesLink.get(MetaService.POLICY_RULE_LINK));
+                    List<String> ruleList = getMetaService().getLinks(bomComponentVersionPolicyStatus, MetaService.POLICY_RULE_LINK);
 
                     ruleList = getMatchingRuleUrls(ruleList);
                     if (ruleList != null && !ruleList.isEmpty()) {
