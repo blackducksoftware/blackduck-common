@@ -49,7 +49,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
     }
 
     public ProjectVersionItem getProjectVersion(final ProjectItem project, final String projectVersionName) throws HubIntegrationException {
-        final String versionsUrl = metaService.getLink(project, MetaService.VERSIONS_LINK);
+        final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, versionsUrl);
         if (StringUtils.isNotBlank(projectVersionName)) {
             hubPagedRequest.setQ(String.format("versionName:%s", projectVersionName));
@@ -66,7 +66,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
     }
 
     public List<ProjectVersionItem> getAllProjectVersions(final ProjectItem project) throws HubIntegrationException {
-        final String versionsUrl = metaService.getLink(project, MetaService.VERSIONS_LINK);
+        final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
         return getAllProjectVersions(versionsUrl);
     }
 
@@ -82,7 +82,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
         json.addProperty("phase", phase.name());
         json.addProperty("distribution", dist.name());
 
-        final String versionsUrl = metaService.getLink(project, MetaService.VERSIONS_LINK);
+        final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
 
         final HubRequest hubRequest = getHubRequestFactory().createPostRequest(versionsUrl);
 

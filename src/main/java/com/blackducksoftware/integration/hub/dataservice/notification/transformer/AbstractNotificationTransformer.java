@@ -25,6 +25,9 @@ package com.blackducksoftware.integration.hub.dataservice.notification.transform
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
@@ -110,18 +113,37 @@ public abstract class AbstractNotificationTransformer
         fullProjectVersion.setSource(item.getSource());
 
         fullProjectVersion.setUrl(metaService.getHref(item));
-        fullProjectVersion.setCodeLocationsLink((metaService.getLink(item, MetaService.CODE_LOCATION_LINK)));
-        fullProjectVersion.setComponentsLink((metaService.getLink(item, MetaService.COMPONENTS_LINK)));
-        fullProjectVersion.setPolicyStatusLink((metaService.getLink(item, MetaService.POLICY_STATUS_LINK)));
-        fullProjectVersion.setProjectLink((metaService.getLink(item, MetaService.PROJECT_LINK)));
-        fullProjectVersion.setRiskProfileLink((metaService.getLink(item, MetaService.RISK_PROFILE_LINK)));
-        fullProjectVersion.setVersionReportLink((metaService.getLink(item, MetaService.VERSION_REPORT_LINK)));
-        fullProjectVersion.setVulnerableComponentsLink((metaService.getLink(item, MetaService.VULNERABLE_COMPONENTS_LINK)));
+        fullProjectVersion.setCodeLocationsLink((metaService.getFirstLink(item, MetaService.CODE_LOCATION_LINK)));
+        fullProjectVersion.setComponentsLink((metaService.getFirstLink(item, MetaService.COMPONENTS_LINK)));
+        fullProjectVersion.setPolicyStatusLink((metaService.getFirstLink(item, MetaService.POLICY_STATUS_LINK)));
+        fullProjectVersion.setProjectLink((metaService.getFirstLink(item, MetaService.PROJECT_LINK)));
+        fullProjectVersion.setRiskProfileLink((metaService.getFirstLink(item, MetaService.RISK_PROFILE_LINK)));
+        fullProjectVersion.setVersionReportLink((metaService.getFirstLink(item, MetaService.VERSION_REPORT_LINK)));
+        fullProjectVersion.setVulnerableComponentsLink((metaService.getFirstLink(item, MetaService.VULNERABLE_COMPONENTS_LINK)));
 
         return fullProjectVersion;
     }
 
     public MetaService getMetaService() {
         return metaService;
+    }
+
+    protected ComponentVersion getComponentVersion(final String componentVersionLink) throws HubIntegrationException {
+        ComponentVersion componentVersion = null;
+        if (!StringUtils.isBlank(componentVersionLink)) {
+            componentVersion = getHubRequestService().getItem(componentVersionLink, ComponentVersion.class);
+        }
+        return componentVersion;
+    }
+
+    protected String getComponentVersionName(final String componentVersionLink) throws HubIntegrationException {
+        String componentVersionName = "";
+        if (!StringUtils.isBlank(componentVersionLink)) {
+            final ComponentVersion compVersion = getComponentVersion(componentVersionLink);
+            if (compVersion != null) {
+                componentVersionName = compVersion.getVersionName();
+            }
+        }
+        return componentVersionName;
     }
 }

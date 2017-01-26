@@ -27,13 +27,14 @@ import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
 
 public class PolicyViolationClearedContentItem extends PolicyViolationContentItem {
     public PolicyViolationClearedContentItem(final Date createdAt, final ProjectVersion projectVersion,
             final String componentName,
-            final String componentVersion, final String componentUrl,
+            final ComponentVersion componentVersion, final String componentUrl,
             final String componentVersionUrl,
             final List<PolicyRule> policyRuleList) throws URISyntaxException {
         super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl,

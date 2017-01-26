@@ -45,7 +45,7 @@ public class PolicyStatusDataService extends HubRequestService {
     private final MetaService metaService;
 
     public PolicyStatusDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService,
-            final ProjectVersionRequestService projectVersionRequestService, final HubRequestService hubRequestService, MetaService metaService) {
+            final ProjectVersionRequestService projectVersionRequestService, final HubRequestService hubRequestService, final MetaService metaService) {
         super(restConnection);
         this.metaService = metaService;
         this.projectRequestService = projectRequestService;
@@ -56,7 +56,7 @@ public class PolicyStatusDataService extends HubRequestService {
     public PolicyStatusItem getPolicyStatusForProjectAndVersion(final String projectName,
             final String projectVersionName) throws HubIntegrationException {
         final ProjectItem projectItem = projectRequestService.getProjectByName(projectName);
-        final String versionsUrl = metaService.getLink(projectItem, MetaService.VERSIONS_LINK);
+        final String versionsUrl = metaService.getFirstLink(projectItem, MetaService.VERSIONS_LINK);
 
         final List<ProjectVersionItem> projectVersions = projectVersionRequestService.getAllProjectVersions(versionsUrl);
         final String policyStatusUrl = findPolicyStatusUrl(projectVersions, projectVersionName);
@@ -67,7 +67,7 @@ public class PolicyStatusDataService extends HubRequestService {
     private String findPolicyStatusUrl(final List<ProjectVersionItem> projectVersions, final String projectVersionName) throws HubIntegrationException {
         for (final ProjectVersionItem version : projectVersions) {
             if (projectVersionName.equals(version.getVersionName())) {
-                final String policyStatusLink = metaService.getLink(version, MetaService.POLICY_STATUS_LINK);
+                final String policyStatusLink = metaService.getFirstLink(version, MetaService.POLICY_STATUS_LINK);
                 return policyStatusLink;
             }
         }

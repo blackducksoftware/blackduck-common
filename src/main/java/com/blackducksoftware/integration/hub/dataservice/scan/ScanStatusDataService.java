@@ -60,15 +60,6 @@ public class ScanStatusDataService extends HubRequestService {
 
     private final long timeoutInMilliseconds;
 
-    @Deprecated
-    public ScanStatusDataService(final IntLogger logger, final RestConnection restConnection,
-            final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
-            final CodeLocationRequestService codeLocationRequestService,
-            final ScanSummaryRequestService scanSummaryRequestService, final MetaService metaService) {
-        this(logger, restConnection, projectRequestService, projectVersionRequestService, codeLocationRequestService,
-                scanSummaryRequestService, metaService, DEFAULT_TIMEOUT);
-    }
-
     public ScanStatusDataService(final IntLogger logger, final RestConnection restConnection,
             final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
             final CodeLocationRequestService codeLocationRequestService,
@@ -116,39 +107,6 @@ public class ScanStatusDataService extends HubRequestService {
      */
     public void assertBomImportScansFinished(final List<ScanSummaryItem> pendingScans) throws HubTimeoutExceededException, HubIntegrationException {
         waitForScansToComplete(pendingScans, timeoutInMilliseconds);
-    }
-
-    /**
-     * For the provided projectName and projectVersion, wait at most
-     * scanStartedTimeoutInMilliseconds for the project/version to exist and/or
-     * at least one pending bom import scan to begin. Then, wait at most
-     * scanFinishedTimeoutInMilliseconds for all discovered pending scans to
-     * complete.
-     *
-     * If the timeouts are exceeded, a HubTimeoutExceededException will be
-     * thrown.
-     *
-     */
-    @Deprecated
-    public void assertBomImportScanStartedThenFinished(final String projectName, final String projectVersion,
-            final long scanStartedTimeoutInMilliseconds, final long scanFinishedTimeoutInMilliseconds, final IntLogger logger)
-            throws HubTimeoutExceededException, HubIntegrationException {
-        final List<ScanSummaryItem> pendingScans = waitForPendingScansToStart(projectName, projectVersion,
-                scanStartedTimeoutInMilliseconds);
-        waitForScansToComplete(pendingScans, scanFinishedTimeoutInMilliseconds);
-    }
-
-    /**
-     * For the given pendingScans, wait at most
-     * scanFinishedTimeoutInMilliseconds for the scans to complete.
-     *
-     * If the timeout is exceeded, a HubTimeoutExceededException will be thrown.
-     *
-     */
-    @Deprecated
-    public void assertBomImportScansFinished(final List<ScanSummaryItem> pendingScans,
-            final long scanFinishedTimeoutInMilliseconds) throws HubTimeoutExceededException, HubIntegrationException {
-        waitForScansToComplete(pendingScans, scanFinishedTimeoutInMilliseconds);
     }
 
     private List<ScanSummaryItem> waitForPendingScansToStart(final String projectName, final String projectVersion,
@@ -220,7 +178,7 @@ public class ScanStatusDataService extends HubRequestService {
             for (final CodeLocationItem codeLocationItem : allCodeLocations) {
                 final String mappedProjectVersionUrl = codeLocationItem.getMappedProjectVersion();
                 if (projectVersionUrl.equals(mappedProjectVersionUrl)) {
-                    final String scanSummariesLink = metaService.getLink(codeLocationItem, MetaService.SCANS_LINK);
+                    final String scanSummariesLink = metaService.getFirstLink(codeLocationItem, MetaService.SCANS_LINK);
                     allScanSummariesLinks.add(scanSummariesLink);
                 }
             }

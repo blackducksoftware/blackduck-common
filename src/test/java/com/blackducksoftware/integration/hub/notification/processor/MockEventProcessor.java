@@ -132,7 +132,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
         }
     }
 
-    private NotificationEvent createEvent(VulnerabilityContentItem vulnerabilityContent,
+    private NotificationEvent createEvent(final VulnerabilityContentItem vulnerabilityContent,
             final Set<String> vulnerabilityIdList) {
         final String eventKey = generateVulnerabilityEventKey(vulnerabilityContent);
         final Map<String, Object> dataSet = generateVulnerabilityDataSet(vulnerabilityContent);
@@ -148,7 +148,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
         return set;
     }
 
-    private String generatePolicyEventKey(final PolicyViolationContentItem content, PolicyRule rule) throws HubIntegrationException {
+    private String generatePolicyEventKey(final PolicyViolationContentItem content, final PolicyRule rule) throws HubIntegrationException {
         final StringBuilder keyBuilder = new StringBuilder();
         keyBuilder.append(NotificationEventConstants.EVENT_KEY_ISSUE_TYPE_NAME);
         keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
@@ -202,15 +202,15 @@ public class MockEventProcessor extends NotificationSubProcessor {
         return key;
     }
 
-    private Map<String, Object> generatePolicyDataSet(PolicyViolationContentItem content, PolicyRule rule) {
+    private Map<String, Object> generatePolicyDataSet(final PolicyViolationContentItem content, final PolicyRule rule) {
         final Map<String, Object> dataSet = new LinkedHashMap<>(4);
         dataSet.put(ItemTypeEnum.RULE.name(), rule.getName());
         dataSet.put(ItemTypeEnum.COMPONENT.name(), content.getComponentName());
-        dataSet.put(ItemTypeEnum.VERSION.name(), content.getComponentVersion());
+        dataSet.put(ItemTypeEnum.VERSION.name(), content.getComponentVersion().getVersionName());
         return dataSet;
     }
 
-    private Map<String, Object> generatePolicyOverrideDataSet(PolicyOverrideContentItem content, PolicyRule rule) {
+    private Map<String, Object> generatePolicyOverrideDataSet(final PolicyOverrideContentItem content, final PolicyRule rule) {
         final Map<String, Object> dataSet = generatePolicyDataSet(content, rule);
         final String person = StringUtils.join(" ", content.getFirstName(), content.getLastName());
         dataSet.put(ItemTypeEnum.PERSON.name(), person);
@@ -218,20 +218,20 @@ public class MockEventProcessor extends NotificationSubProcessor {
         return dataSet;
     }
 
-    private Map<String, Object> generateVulnerabilityDataSet(VulnerabilityContentItem vulnerabilityContent) {
+    private Map<String, Object> generateVulnerabilityDataSet(final VulnerabilityContentItem vulnerabilityContent) {
         final Map<String, Object> dataSet = new LinkedHashMap<>();
         dataSet.put(ItemTypeEnum.COMPONENT.name(), vulnerabilityContent.getComponentName());
-        dataSet.put(ItemTypeEnum.VERSION.name(), vulnerabilityContent.getComponentVersion());
+        dataSet.put(ItemTypeEnum.VERSION.name(), vulnerabilityContent.getComponentVersion().getVersionName());
         return dataSet;
     }
 
     @Override
-    public String generateEventKey(Map<String, Object> dataMap) throws HubIntegrationException {
+    public String generateEventKey(final Map<String, Object> dataMap) throws HubIntegrationException {
         return ""; // ignore since we create multiple types of events from this processor
     }
 
     @Override
-    public Map<String, Object> generateDataSet(Map<String, Object> inputData) {
+    public Map<String, Object> generateDataSet(final Map<String, Object> inputData) {
         return Collections.emptyMap();
     }
 }

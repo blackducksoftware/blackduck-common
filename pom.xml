@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>hub-common</artifactId>
-  <version>6.1.2-SNAPSHOT</version>
+  <version>7.0.2-SNAPSHOT</version>
 
   <name>Hub Common</name>
   <description>General Code for Hub Integration with CI systems</description>
@@ -26,27 +26,23 @@
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>phone-home-api</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.blackducksoftware.integration</groupId>
+          <artifactId>integration-common</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>integration-common</artifactId>
-      <version>5.0.1</version>
+      <version>5.0.2</version>
     </dependency>
     <dependency>
       <groupId>com.blackducksoftware.bdio</groupId>
       <artifactId>bdio</artifactId>
       <version>2.0.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.ant</groupId>
-      <artifactId>ant</artifactId>
-      <version>1.9.7</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>20.0</version>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>

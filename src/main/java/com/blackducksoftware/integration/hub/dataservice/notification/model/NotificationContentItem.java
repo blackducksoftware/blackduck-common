@@ -28,6 +28,7 @@ import java.util.Date;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
 import com.google.common.base.Joiner;
 
@@ -36,7 +37,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
     private final String componentName;
 
-    private final String componentVersion;
+    private final ComponentVersion componentVersion;
 
     private final String componentVersionUrl;
 
@@ -47,7 +48,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
     public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
             final String componentName,
-            final String componentVersion,
+            final ComponentVersion componentVersion,
             final String componentVersionUrl) {
         this.createdAt = createdAt;
         this.projectVersion = projectVersion;
@@ -64,7 +65,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
         return componentName;
     }
 
-    public String getComponentVersion() {
+    public ComponentVersion getComponentVersion() {
         return componentVersion;
     }
 

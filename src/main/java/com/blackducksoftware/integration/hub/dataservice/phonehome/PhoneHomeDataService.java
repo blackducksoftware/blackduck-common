@@ -80,7 +80,7 @@ public class PhoneHomeDataService extends HubRequestService {
             phClient.setProxyProperties(hubServerConfig.getProxyInfo().getHost(), hubServerConfig.getProxyInfo().getPort(),
                     hubServerConfig.getProxyInfo().getUsername(), hubServerConfig.getProxyInfo().getDecryptedPassword(),
                     hubServerConfig.getProxyInfo().getIgnoredProxyHosts());
-            phClient.callHomeIntegrations(registrationId, hubHostName, BlackDuckName.HUB.name(), hubVersion, thirdPartyName,
+            phClient.callHomeIntegrations(registrationId, hubHostName, BlackDuckName.HUB.getName(), hubVersion, thirdPartyName,
                     thirdPartyVersion, pluginVersion);
         } catch (final PhoneHomeArgumentException e) {
             logger.debug(e.getMessage(), e);

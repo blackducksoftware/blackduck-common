@@ -127,50 +127,56 @@ public class HubScanConfigValidator extends AbstractValidator {
 
     private void validateScanTargetPaths(final ValidationResults result,
             final File defaultTargetPath) {
-        if (scanTargetPaths.isEmpty() && defaultTargetPath != null) {
-            scanTargetPaths.add(defaultTargetPath.getAbsolutePath());
-        }
-
-        final Set<String> targetPaths = new HashSet<>();
-        for (final String currentTargetPath : scanTargetPaths) {
-            String targetPath;
-            if (StringUtils.isBlank(currentTargetPath) && defaultTargetPath != null) {
-                targetPath = defaultTargetPath.getAbsolutePath();
-            } else {
-                targetPath = currentTargetPath;
+        try {
+            if (scanTargetPaths.isEmpty() && defaultTargetPath != null) {
+                scanTargetPaths.add(defaultTargetPath.getCanonicalPath());
             }
-            targetPaths.add(targetPath);
 
-            if (!disableScanTargetPathExistenceCheck) {
-                if (StringUtils.isNotBlank(targetPath)) {
-                    // If the targetPath is blank then it will be set to the
-                    // defaultTargetPath during the build
-                    // Since we dont know the defaultTargetPath at this point we
-                    // only validate non blank entries
-                    final File target = new File(targetPath);
-                    if (target == null || !target.exists()) {
-                        result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
-                                "The scan target '" + target.getAbsolutePath() + "' does not exist."));
-                    }
+            final Set<String> targetPaths = new HashSet<>();
+            for (final String currentTargetPath : scanTargetPaths) {
+                String targetPath;
+                if (StringUtils.isBlank(currentTargetPath) && defaultTargetPath != null) {
+                    targetPath = defaultTargetPath.getCanonicalPath();
+                } else {
+                    targetPath = currentTargetPath;
+                }
+                targetPaths.add(targetPath);
 
-                    if (enableScanTargetPathsWithinWorkingDirectoryCheck) {
-                        String targetCanonicalPath;
-                        try {
-                            targetCanonicalPath = target.getCanonicalPath();
-                            if (!targetCanonicalPath.startsWith(workingDirectory.getCanonicalPath())) {
-                                result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(
-                                        ValidationResultEnum.ERROR, "Can not scan targets outside the working directory."));
-                            }
-                        } catch (final IOException e) {
+                if (!disableScanTargetPathExistenceCheck) {
+                    if (StringUtils.isNotBlank(targetPath)) {
+                        // If the targetPath is blank then it will be set to the
+                        // defaultTargetPath during the build
+                        // Since we dont know the defaultTargetPath at this point we
+                        // only validate non blank entries
+                        final File target = new File(targetPath);
+
+                        if (target == null || !target.exists()) {
                             result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
-                                    "Could not get the canonical path for Target : " + targetPath));
+                                    "The scan target '" + target.getCanonicalPath() + "' does not exist or can not be read."));
+                        }
+
+                        if (enableScanTargetPathsWithinWorkingDirectoryCheck) {
+                            String targetCanonicalPath;
+                            try {
+                                targetCanonicalPath = target.getCanonicalPath();
+                                if (!targetCanonicalPath.startsWith(workingDirectory.getCanonicalPath())) {
+                                    result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(
+                                            ValidationResultEnum.ERROR, "Can not scan targets outside the working directory."));
+                                }
+                            } catch (final IOException e) {
+                                result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
+                                        "Could not get the canonical path for Target : " + targetPath));
+                            }
                         }
                     }
                 }
             }
+            scanTargetPaths.clear();
+            scanTargetPaths.addAll(targetPaths);
+        } catch (final IOException e) {
+            result.addResult(HubScanConfigFieldEnum.TARGETS, new ValidationResult(ValidationResultEnum.ERROR,
+                    e.getMessage(), e));
         }
-        scanTargetPaths.clear();
-        scanTargetPaths.addAll(targetPaths);
     }
 
     public void setProjectName(final String projectName) {

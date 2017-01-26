@@ -35,7 +35,7 @@ public class HubResponse {
         return json;
     }
 
-    public void setJson(String json) {
+    public void setJson(final String json) {
         this.json = json;
     }
 
@@ -45,7 +45,7 @@ public class HubResponse {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         return EqualsBuilder.reflectionEquals(this, obj);
     }
 

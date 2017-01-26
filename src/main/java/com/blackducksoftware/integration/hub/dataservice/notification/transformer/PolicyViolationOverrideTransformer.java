@@ -26,10 +26,10 @@ package com.blackducksoftware.integration.hub.dataservice.notification.transform
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
@@ -99,17 +99,14 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
             try {
                 final String componentLink = policyOverrideItem.getContent().getComponentLink();
                 final String componentVersionLink = policyOverrideItem.getContent().getComponentVersionLink();
-                String componentVersionName = null;
-                if (componentVersionLink != null) {
-                    componentVersionName = getComponentVersionName(componentVersionLink);
-                }
+                final ComponentVersion fullComponentVersion = getComponentVersion(componentVersionLink);
+
                 final String policyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
 
                 if (StringUtils.isNotBlank(policyStatusUrl)) {
                     final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(policyStatusUrl);
 
-                    final Map<String, List<String>> policyRulesLink = getMetaService().getLinks(bomComponentVersionPolicyStatus);
-                    List<String> ruleList = getRuleUrls(policyRulesLink.get(MetaService.POLICY_RULE_LINK));
+                    List<String> ruleList = getMetaService().getLinks(bomComponentVersionPolicyStatus, MetaService.POLICY_RULE_LINK);
 
                     ruleList = getMatchingRuleUrls(ruleList);
                     if (ruleList != null && !ruleList.isEmpty()) {
@@ -118,7 +115,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
                             final PolicyRule rule = getPolicyRule(ruleUrl);
                             policyRuleList.add(rule);
                         }
-                        createContents(projectVersion, componentVersion.getComponentName(), componentVersionName,
+                        createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
                                 componentLink, componentVersionLink, policyRuleList, item, templateData);
                     }
                 }
@@ -130,7 +127,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 
     @Override
     public void createContents(final ProjectVersion projectVersion, final String componentName,
-            final String componentVersion, final String componentUrl, final String componentVersionUrl,
+            final ComponentVersion componentVersion, final String componentUrl, final String componentVersionUrl,
             final List<PolicyRule> policyRuleList, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws URISyntaxException {
         final PolicyOverrideNotificationItem policyOverride = (PolicyOverrideNotificationItem) item;
