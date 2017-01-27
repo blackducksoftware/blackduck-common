@@ -30,8 +30,6 @@ import java.util.List;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.google.common.base.Joiner;
-
 public class ComplexLicensePlusMeta {
 
     private static final String AND = " AND ";
@@ -100,8 +98,16 @@ public class ComplexLicensePlusMeta {
                     result.removeAll(removalCollection);
                 }
             }
-            return result.size() > 1 ? OPEN_PARENTHESIS + Joiner.on(operator).join(result) + CLOSED_PARENTHESIS
-                    : Joiner.on(operator).join(result);
+            StringBuilder licenseText = new StringBuilder();
+            int pos = 0;
+            for (String text : result) {
+                pos++;
+                licenseText.append(text);
+                if (pos != result.size())
+                    licenseText.append(operator);
+            }
+            return result.size() > 1 ? OPEN_PARENTHESIS + licenseText.toString() + CLOSED_PARENTHESIS
+                    : licenseText.toString();
         }
     }
 
