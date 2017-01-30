@@ -67,7 +67,7 @@ public class MetaService {
 
     public static final String DOWNLOAD_LINK = "download";
 
-    public static final String CODE_LOCATION_LINK = "codelocation";
+    public static final String CODE_LOCATION_LINK = "codelocations";
 
     public static final String SCANS_LINK = "scans";
 
@@ -132,6 +132,17 @@ public class MetaService {
         throw new HubIntegrationException(linksAvailable.toString());
     }
 
+    public String getFirstLinkSafely(final HubItem item, final String linkKey) {
+        try {
+            final String link = getFirstLink(item, linkKey);
+            return link;
+        } catch (final HubIntegrationException e) {
+            logger.warn("Link '" + linkKey + "' not found on item");
+            return null;
+        }
+
+    }
+
     public List<String> getLinks(final HubItem item, final String linkKey) throws HubIntegrationException {
         final JsonArray linksArray = getLinks(item);
         if (linksArray == null) {
@@ -145,8 +156,9 @@ public class MetaService {
         for (final JsonElement linkElement : linksArray) {
             final JsonObject linkObject = linkElement.getAsJsonObject();
             final String rel = linkObject.get("rel").getAsString();
+            final String linkValue = linkObject.get("href").getAsString();
             if (rel.equals(linkKey)) {
-                links.add(rel);
+                links.add(linkValue);
             }
             if (i > 0) {
                 linksAvailable.append(", ");
