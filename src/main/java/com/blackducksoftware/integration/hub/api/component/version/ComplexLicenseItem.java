@@ -23,33 +23,52 @@
  */
 package com.blackducksoftware.integration.hub.api.component.version;
 
-import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 
-public class ComponentVersion extends HubItem {
-    private ComplexLicenseItem license;
+public class ComplexLicenseItem extends HubItem {
+    private CodeSharingEnum codeSharing;
 
-    private Date releasedOn;
+    private String license;
 
-    private SourceEnum source;
+    private String name;
 
-    private String versionName;
+    private OwnershipEnum ownership;
 
-    public ComplexLicenseItem getLicense() {
+    private ComplexLicenseType type;
+
+    private List<ComplexLicenseItem> wrappedComplexLicenseItems;
+
+    public CodeSharingEnum getCodeSharing() {
+        return codeSharing;
+    }
+
+    public String getLicense() {
         return license;
     }
 
-    public Date getReleasedOn() {
-        return releasedOn;
+    public List<ComplexLicenseItem> getWrappedComplexLicenseItems() {
+        return wrappedComplexLicenseItems;
     }
 
-    public SourceEnum getSource() {
-        return source;
+    public String getName() {
+        return name;
     }
 
-    public String getVersionName() {
-        return versionName;
+    public OwnershipEnum getOwnership() {
+        return ownership;
     }
 
+    public ComplexLicenseType getType() {
+        return type;
+    }
+
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
+    }
 }

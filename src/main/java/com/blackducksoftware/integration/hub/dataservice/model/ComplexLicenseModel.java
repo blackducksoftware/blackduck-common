@@ -21,50 +21,49 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.component.version;
+package com.blackducksoftware.integration.hub.dataservice.model;
 
 import java.util.List;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseItem;
 
-public class ComplexLicense extends HubItem {
-    private CodeSharingEnum codeSharing;
+public class ComplexLicenseModel {
 
-    private String license;
+    private final ComplexLicenseItem complexLicense;
 
-    private List<ComplexLicense> licenses;
+    private final String licenseDisplay;
 
-    private String name;
+    private final String textUrl;
 
-    private OwnershipEnum ownership;
+    private final List<ComplexLicenseModel> wrappedComplexLicenseModels;
 
-    private ComplexLicenseType type;
-
-    public CodeSharingEnum getCodeSharing() {
-        return codeSharing;
+    // TODO: Revisit in 3.6?
+    public ComplexLicenseModel(ComplexLicenseItem complexLicense, List<ComplexLicenseModel> wrappedComplexLicenseModels, String textUrl,
+            String licenseDisplay) {
+        this.complexLicense = complexLicense;
+        this.licenseDisplay = licenseDisplay;
+        this.textUrl = textUrl;
+        this.wrappedComplexLicenseModels = wrappedComplexLicenseModels;
     }
 
-    public String getLicense() {
-        return license;
+    public ComplexLicenseItem getComplexLicenseItem() {
+        return this.complexLicense;
     }
 
-    public List<ComplexLicense> getLicenses() {
-        return licenses;
+    public String getTextUrl() {
+        return this.textUrl;
     }
 
-    public String getName() {
-        return name;
+    public String getLicenseDisplay() {
+        return licenseDisplay;
     }
 
-    public OwnershipEnum getOwnership() {
-        return ownership;
-    }
-
-    public ComplexLicenseType getType() {
-        return type;
+    @Deprecated
+    public List<ComplexLicenseModel> getWrappedComplexLicenseModels() {
+        return this.wrappedComplexLicenseModels;
     }
 
     @Override

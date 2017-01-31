@@ -28,7 +28,7 @@ import java.util.Date;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.api.component.version.ComplexLicense;
+import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseItem;
 import com.blackducksoftware.integration.hub.api.component.version.SourceEnum;
 import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
 import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
@@ -42,7 +42,7 @@ public class ProjectVersion {
 
     private DistributionEnum distribution;
 
-    private ComplexLicense license;
+    private ComplexLicenseItem license;
 
     private String nickname;
 
@@ -103,11 +103,11 @@ public class ProjectVersion {
         this.distribution = distribution;
     }
 
-    public ComplexLicense getLicense() {
+    public ComplexLicenseItem getLicense() {
         return license;
     }
 
-    public void setLicense(final ComplexLicense license) {
+    public void setLicense(final ComplexLicenseItem license) {
         this.license = license;
     }
 

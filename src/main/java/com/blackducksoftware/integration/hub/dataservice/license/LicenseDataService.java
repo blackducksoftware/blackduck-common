@@ -28,16 +28,17 @@ import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.component.Component;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
-import com.blackducksoftware.integration.hub.api.component.version.ComplexLicense;
-import com.blackducksoftware.integration.hub.api.component.version.ComplexLicensePlusMeta;
+import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseItem;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.component.version.License;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.dataservice.model.ComplexLicenseModel;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 
 public class LicenseDataService extends HubRequestService {
+
     private final HubRequestService hubRequestService;
 
     private final ComponentRequestService componentRequestService;
@@ -52,23 +53,33 @@ public class LicenseDataService extends HubRequestService {
         this.metaService = metaService;
     }
 
-    public ComplexLicensePlusMeta getComplexLicensePlusMetaFromComponent(final String namespace, final String groupId, final String artifactId,
-            final String version)
+    public ComplexLicenseItem getComplexLicenseItemFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
             throws HubIntegrationException {
         final Component component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
         final String versionUrl = component.getVersion();
 
         final ComponentVersion componentVersion = hubRequestService.getItem(versionUrl, ComponentVersion.class);
-        final ComplexLicense parentComplexLicense = componentVersion.getLicense();
+        return componentVersion.getLicense();
+    }
 
-        final List<ComplexLicensePlusMeta> subLicensesPlusMeta = new ArrayList<>();
-        for (ComplexLicense subLicense : parentComplexLicense.getLicenses()) {
-            final License license = hubRequestService.getItem(subLicense.getLicense(), License.class);
+    public ComplexLicenseModel getComplexLicenseModelFromComponent(final String namespace, final String groupId, final String artifactId,
+            final String version)
+            throws HubIntegrationException {
+
+        // final ComplexLicenseItem complexLicenseItem = getComplexLicenseItemFromComponent(namespace, groupId,
+        // artifactId, version);
+        // final String textUrl = metaService.getFirstLink(complexLicenseItem, MetaService.TEXT_LINK);
+        final ComplexLicenseItem wrappingComplexLicenseItem = this.getComplexLicenseItemFromComponent(namespace, groupId, artifactId, version);
+
+        final List<ComplexLicenseModel> unwrappedComplexLicenseModels = new ArrayList<>();
+        for (ComplexLicenseItem complexLicenseItem : wrappingComplexLicenseItem.getWrappedComplexLicenseItems()) {
+            final License license = hubRequestService.getItem(complexLicenseItem.getLicense(), License.class);
             final String textUrl = metaService.getFirstLink(license, MetaService.TEXT_LINK);
-            subLicensesPlusMeta.add(new ComplexLicensePlusMeta(subLicense, textUrl, new ArrayList<ComplexLicensePlusMeta>()));
+            unwrappedComplexLicenseModels
+                    .add(new ComplexLicenseModel(complexLicenseItem, new ArrayList<ComplexLicenseModel>(), textUrl, complexLicenseItem.getName()));
         }
 
-        return new ComplexLicensePlusMeta(parentComplexLicense, "", subLicensesPlusMeta);
+        return new ComplexLicenseModel(wrappingComplexLicenseItem, unwrappedComplexLicenseModels, "", "");
     }
 
 }
