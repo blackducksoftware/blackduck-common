@@ -41,7 +41,7 @@ public class ComplexLicenseItem extends HubItem {
 
     private ComplexLicenseType type;
 
-    private List<ComplexLicenseItem> wrappedComplexLicenseItems;
+    private List<ComplexLicenseItem> licenses;
 
     public CodeSharingEnum getCodeSharing() {
         return codeSharing;
@@ -52,7 +52,7 @@ public class ComplexLicenseItem extends HubItem {
     }
 
     public List<ComplexLicenseItem> getWrappedComplexLicenseItems() {
-        return wrappedComplexLicenseItems;
+        return licenses;
     }
 
     public String getName() {

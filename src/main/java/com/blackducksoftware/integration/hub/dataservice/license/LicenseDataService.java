@@ -76,10 +76,10 @@ public class LicenseDataService extends HubRequestService {
             final License license = hubRequestService.getItem(complexLicenseItem.getLicense(), License.class);
             final String textUrl = metaService.getFirstLink(license, MetaService.TEXT_LINK);
             unwrappedComplexLicenseModels
-                    .add(new ComplexLicenseModel(complexLicenseItem, new ArrayList<ComplexLicenseModel>(), textUrl, complexLicenseItem.getName()));
+                    .add(new ComplexLicenseModel(complexLicenseItem, textUrl, new ArrayList<ComplexLicenseModel>()));
         }
 
-        return new ComplexLicenseModel(wrappingComplexLicenseItem, unwrappedComplexLicenseModels, "", "");
+        return new ComplexLicenseModel(wrappingComplexLicenseItem, "", unwrappedComplexLicenseModels);
     }
 
 }

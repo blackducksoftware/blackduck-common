@@ -32,34 +32,36 @@ import com.blackducksoftware.integration.hub.api.component.version.ComplexLicens
 
 public class ComplexLicenseModel {
 
-    private final ComplexLicenseItem complexLicense;
+    private final ComplexLicenseItem complexLicenseItem;
 
-    private final String licenseDisplay;
+    // private final String licenseDisplay;
 
     private final String textUrl;
 
     private final List<ComplexLicenseModel> wrappedComplexLicenseModels;
 
     // TODO: Revisit in 3.6?
-    public ComplexLicenseModel(ComplexLicenseItem complexLicense, List<ComplexLicenseModel> wrappedComplexLicenseModels, String textUrl,
-            String licenseDisplay) {
-        this.complexLicense = complexLicense;
-        this.licenseDisplay = licenseDisplay;
+    // public ComplexLicenseModel(ComplexLicenseItem complexLicense, List<ComplexLicenseModel>
+    // wrappedComplexLicenseModels, String textUrl,
+    // String licenseDisplay) {
+    public ComplexLicenseModel(ComplexLicenseItem complexLicenseItem, String textUrl, List<ComplexLicenseModel> wrappedComplexLicenseModels) {
+        this.complexLicenseItem = complexLicenseItem;
+        // this.licenseDisplay = licenseDisplay;
         this.textUrl = textUrl;
         this.wrappedComplexLicenseModels = wrappedComplexLicenseModels;
     }
 
     public ComplexLicenseItem getComplexLicenseItem() {
-        return this.complexLicense;
+        return this.complexLicenseItem;
     }
 
     public String getTextUrl() {
         return this.textUrl;
     }
 
-    public String getLicenseDisplay() {
-        return licenseDisplay;
-    }
+    // public String getLicenseDisplay() {
+    // return licenseDisplay;
+    // }
 
     @Deprecated
     public List<ComplexLicenseModel> getWrappedComplexLicenseModels() {
