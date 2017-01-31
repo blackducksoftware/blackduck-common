@@ -93,6 +93,21 @@ public class RiskReportDataService extends HubRequestService {
     public void createRiskReportFiles(final File outputDirectory, final String projectName, final String projectVersionName,
             final ReportCategoriesEnum[] categories) throws HubIntegrationException {
         final HubRiskReportData riskreportData = createRiskReport(projectName, projectVersionName, categories);
+        createRiskReportFiles(outputDirectory, riskreportData);
+    }
+
+    public void createRiskReportFiles(final File outputDirectory, final ProjectVersionItem version) throws HubIntegrationException {
+        final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
+        createRiskReportFiles(outputDirectory, version, categories);
+    }
+
+    public void createRiskReportFiles(final File outputDirectory, final ProjectVersionItem version,
+            final ReportCategoriesEnum[] categories) throws HubIntegrationException {
+        final HubRiskReportData riskreportData = createRiskReport(version, categories);
+        createRiskReportFiles(outputDirectory, riskreportData);
+    }
+
+    public void createRiskReportFiles(final File outputDirectory, final HubRiskReportData riskreportData) throws HubIntegrationException {
         try {
             final RiskReportResourceCopier copier = new RiskReportResourceCopier(outputDirectory.getCanonicalPath());
             File htmlFile = null;
@@ -119,5 +134,4 @@ public class RiskReportDataService extends HubRequestService {
             throw new HubIntegrationException("Couldn't create the report: " + e.getMessage(), e);
         }
     }
-
 }

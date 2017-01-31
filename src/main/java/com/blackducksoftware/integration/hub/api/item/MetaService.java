@@ -69,6 +69,8 @@ public class MetaService {
 
     public static final String CODE_LOCATION_LINK = "codelocations";
 
+    public static final String CODE_LOCATION_BOM_STATUS_LINK = "codelocation";
+
     public static final String SCANS_LINK = "scans";
 
     public static final String NOTIFICATIONS_LINK = "notifications";
@@ -129,6 +131,7 @@ public class MetaService {
             linksAvailable.append("'" + rel + "'");
             i++;
         }
+        linksAvailable.append(". For Item : " + getHref(item));
         throw new HubIntegrationException(linksAvailable.toString());
     }
 
@@ -169,6 +172,7 @@ public class MetaService {
         if (!links.isEmpty()) {
             return links;
         }
+        linksAvailable.append(". For Item : " + getHref(item));
         throw new HubIntegrationException(linksAvailable.toString());
     }
 

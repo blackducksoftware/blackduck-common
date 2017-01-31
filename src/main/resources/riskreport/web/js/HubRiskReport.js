@@ -362,18 +362,27 @@ var RiskReport = function (myJQuery, jsonData) {
 		this.myJQuery(columnComponent).text(entry.producerProject.name);
 
         var columnVersion = document.createElement("td");
-        this.myJQuery(columnVersion).addClass("clickable componentColumn evenPadding");
-        var componentVersionUrl = this.createComponentVersionUrl(entry);
-        if (componentVersionUrl) {
-        	this.myJQuery(columnVersion).attr("onclick" ,"window.open('"+componentVersionUrl+"', '_blank');");
+        if(entry.producerReleases[0]){
+	        this.myJQuery(columnVersion).addClass("clickable componentColumn evenPadding");
+	        var componentVersionUrl = this.createComponentVersionUrl(entry);
+	        if (componentVersionUrl) {
+	        	this.myJQuery(columnVersion).attr("onclick" ,"window.open('"+componentVersionUrl+"', '_blank');");
+	        }
+			this.myJQuery(columnVersion).text(entry.producerReleases[0].version);
+        } else{
+        	 this.myJQuery(columnVersion).addClass("componentColumn evenPadding");
+        	this.myJQuery(columnVersion).text("?");
         }
-		this.myJQuery(columnVersion).text(entry.producerReleases[0].version);
-        
+		
         var columnLicense = document.createElement("td");
         this.myJQuery(columnLicense).addClass("licenseColumn evenPadding");
+        if(entry.licenses[0]){
         this.myJQuery(columnLicense).attr("title",entry.licenses[0].licenseDisplay);
         this.myJQuery(columnLicense).text(entry.licenses[0].licenseDisplay);
-        
+        } else{
+        	this.myJQuery(columnLicense).attr("title","Unknown License");
+            this.myJQuery(columnLicense).text("Unknown License");
+        }
         var riskCategories = entry.riskProfile.categories;
         var vulnerabilityRiskProfile = riskCategories.VULNERABILITY;
         
