@@ -199,13 +199,13 @@ public class HubScanConfigValidator extends AbstractValidator {
 
     private void validateExcludePattern(final ValidationResults result, final String excludePattern) {
         if (StringUtils.isNotBlank(excludePattern)) {
-            if (!excludePattern.startsWith("/") || !excludePattern.startsWith("\\")) {
+            if (!excludePattern.startsWith("/")) {
                 result.addResult(HubScanConfigFieldEnum.EXCLUDE_PATTERNS,
-                        new ValidationResult(ValidationResultEnum.WARN, "The exclusion pattern must start with a slash."));
+                        new ValidationResult(ValidationResultEnum.WARN, "The exclusion pattern must start with a /."));
             }
-            if (!excludePattern.endsWith("/") || !excludePattern.endsWith("\\")) {
+            if (!excludePattern.endsWith("/")) {
                 result.addResult(HubScanConfigFieldEnum.EXCLUDE_PATTERNS,
-                        new ValidationResult(ValidationResultEnum.WARN, "The exclusion pattern must end with a slash."));
+                        new ValidationResult(ValidationResultEnum.WARN, "The exclusion pattern must end with a /."));
             }
             if (excludePattern.contains("**")) {
                 result.addResult(HubScanConfigFieldEnum.EXCLUDE_PATTERNS,
