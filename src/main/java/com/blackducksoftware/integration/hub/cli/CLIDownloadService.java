@@ -70,7 +70,7 @@ public class CLIDownloadService {
             throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
         }
 
-        final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
+        final CLILocation cliLocation = new CLILocation(logger, directoryToInstallTo);
         final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(logger, hubUrl);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
             try {

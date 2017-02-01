@@ -141,7 +141,7 @@ public class SimpleScanService extends HubRequestService {
      * @throws ScanFailedException
      */
     public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
+        final CLILocation cliLocation = new CLILocation(logger, directoryToInstallTo);
         String pathToJavaExecutable;
         String pathToOneJar;
         String pathToScanExecutable;

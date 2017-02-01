@@ -47,22 +47,30 @@ public class CLILocation {
 
     private final File directoryToInstallTo;
 
-    public CLILocation(final File directoryToInstallTo) {
+    private final IntLogger logger;
+
+    public CLILocation(final IntLogger logger, final File directoryToInstallTo) {
+        if (logger == null) {
+            throw new IllegalArgumentException("You must provided a logger.");
+        }
         if (directoryToInstallTo == null) {
             throw new IllegalArgumentException("You must provided a directory to install the CLI to.");
         }
+        this.logger = logger;
         this.directoryToInstallTo = directoryToInstallTo;
     }
 
-    public File getJreSecurityDirectory() {
+    public File getJreSecurityDirectory() throws IOException {
         final File cliHomeFile = getCLIHome();
         if (cliHomeFile == null) {
+            logger.error("Could not find the CLI home directory");
             return null;
         }
 
         final File[] files = cliHomeFile.listFiles();
         final File jreFolder = findFileByName(files, "jre");
         if (jreFolder == null) {
+            logger.error("Could not find the JRE directory in : " + cliHomeFile.getCanonicalPath());
             return null;
         }
 
@@ -73,7 +81,7 @@ public class CLILocation {
         return jreContents;
     }
 
-    public String getCLIDownloadUrl(final IntLogger logger, String hubUrl) {
+    public String getCLIDownloadUrl(final IntLogger logger, final String hubUrl) {
         if (SystemUtils.IS_OS_MAC_OSX) {
             return getCLIWrapperLink(hubUrl, MAC_CLI_DOWNLOAD);
         } else if (SystemUtils.IS_OS_WINDOWS) {
@@ -83,9 +91,10 @@ public class CLILocation {
         }
     }
 
-    public File getOneJarFile() {
+    public File getOneJarFile() throws IOException {
         final File cliHomeFile = getCLIHome();
         if (cliHomeFile == null) {
+            logger.error("Could not find the CLI home directory");
             return null;
         }
         File oneJarFile = new File(cliHomeFile, "lib");
@@ -114,13 +123,15 @@ public class CLILocation {
         return directoryToInstallTo.getCanonicalPath();
     }
 
-    public File getCLIHome() {
+    public File getCLIHome() throws IOException {
         final File cliHome = getCLIInstallDir();
         if (cliHome == null) {
+            logger.error("Could not find the CLI home directory");
             return null;
         }
         final File[] installDirFiles = cliHome.listFiles();
         if (installDirFiles == null) {
+            logger.error("Could not find the directories in the CLI home : " + cliHome.getCanonicalPath());
             return null;
         }
         if (installDirFiles.length > 1) {
@@ -133,19 +144,22 @@ public class CLILocation {
         } else if (installDirFiles.length == 1) {
             return installDirFiles[0];
         } else {
+            logger.error("Could not find any directories in the CLI home : " + cliHome.getCanonicalPath());
             return null;
         }
     }
 
-    public File getProvidedJavaExec() {
+    public File getProvidedJavaExec() throws IOException {
         final File cliHomeFile = getCLIHome();
         if (cliHomeFile == null) {
+            logger.error("Could not find the CLI home directory");
             return null;
         }
 
         final File[] files = cliHomeFile.listFiles();
         final File jreFolder = findFileByName(files, "jre");
         if (jreFolder == null) {
+            logger.error("Could not find the JRE directory in : " + cliHomeFile.getCanonicalPath());
             return null;
         }
 
@@ -157,6 +171,7 @@ public class CLILocation {
             javaExec = new File(javaExec, "java");
         }
         if (!javaExec.exists()) {
+            logger.error("The java executable does not exist at : " + javaExec.getCanonicalPath());
             return null;
         }
 
@@ -172,6 +187,7 @@ public class CLILocation {
     public File getCLI(final IntLogger logger) throws IOException {
         final File cliHomeFile = getCLIHome();
         if (cliHomeFile == null) {
+            logger.error("Could not find the CLI home directory");
             return null;
         }
 
@@ -226,7 +242,7 @@ public class CLILocation {
         return null;
     }
 
-    private String getCLIWrapperLink(final String hubUrl, String downloadFilename) {
+    private String getCLIWrapperLink(final String hubUrl, final String downloadFilename) {
         if (StringUtils.isBlank(hubUrl)) {
             throw new IllegalArgumentException("You must provide a valid Hub URL in order to get the correct link.");
         }
