@@ -183,7 +183,7 @@ public class HubScanConfigValidator extends AbstractValidator {
         }
     }
 
-    private void validateExcludePatterns(final ValidationResults result) {
+    public void validateExcludePatterns(final ValidationResults result) {
         validateExcludePatterns(result, excludePatterns);
     }
 
@@ -197,7 +197,7 @@ public class HubScanConfigValidator extends AbstractValidator {
         }
     }
 
-    private void validateExcludePattern(final ValidationResults result, final String excludePattern) {
+    public void validateExcludePattern(final ValidationResults result, final String excludePattern) {
         if (StringUtils.isNotBlank(excludePattern)) {
             if (!excludePattern.startsWith("/")) {
                 result.addResult(HubScanConfigFieldEnum.EXCLUDE_PATTERNS,
