@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.buildtool;
 import java.io.File;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class FilePathGavExtractor {
@@ -33,9 +34,9 @@ public class FilePathGavExtractor {
         if (filePath == null || localMavenRepoPath == null) {
             return null;
         }
-
-        final String cleanedFilePath = filePath.replaceFirst(localMavenRepoPath, "");
-        final String[] cleanedFilePathSegments = cleanedFilePath.split(File.separator);
+        
+        final String cleanedFilePath = filePath.replaceFirst(StringEscapeUtils.escapeJava(localMavenRepoPath), "");
+        final String[] cleanedFilePathSegments = cleanedFilePath.split(StringEscapeUtils.escapeJava(File.separator));
 
         String[] groupIdSegments;
         if (cleanedFilePathSegments[0].equals("")) {
@@ -63,7 +64,7 @@ public class FilePathGavExtractor {
             return null;
         }
 
-        final String[] filePathSegments = filePath.split(File.separator);
+        final String[] filePathSegments = filePath.split(StringEscapeUtils.escapeJava(File.separator));
 
         if (filePathSegments.length < 5) {
             return null;
