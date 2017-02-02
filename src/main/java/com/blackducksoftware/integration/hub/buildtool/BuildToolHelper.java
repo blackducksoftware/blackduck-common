@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dependency;
+package com.blackducksoftware.integration.hub.buildtool;
 
 import static com.blackducksoftware.integration.hub.buildtool.BuildToolConstants.BDIO_FILE_MEDIA_TYPE;
 import static com.blackducksoftware.integration.hub.buildtool.BuildToolConstants.SCAN_ERROR_MESSAGE;
@@ -32,9 +32,6 @@ import java.io.IOException;
 
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
-import com.blackducksoftware.integration.hub.buildtool.DependencyNode;
-import com.blackducksoftware.integration.hub.buildtool.FlatDependencyListWriter;
-import com.blackducksoftware.integration.hub.buildtool.HubProjectDetailsWriter;
 import com.blackducksoftware.integration.hub.buildtool.bdio.BdioDependencyWriter;
 import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataService;
@@ -43,10 +40,10 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class DependencyManagerHelper {
+public class BuildToolHelper {
     private final IntLogger logger;
 
-    public DependencyManagerHelper(final IntLogger logger) {
+    public BuildToolHelper(final IntLogger logger) {
         this.logger = logger;
     }
 
