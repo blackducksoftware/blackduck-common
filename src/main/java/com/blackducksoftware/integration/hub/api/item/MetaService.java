@@ -138,7 +138,7 @@ public class MetaService {
             final String link = getFirstLink(item, linkKey);
             return link;
         } catch (final HubIntegrationException e) {
-            logger.warn("Link '" + linkKey + "' not found on item");
+            logger.debug("Link '" + linkKey + "' not found on item");
             return null;
         }
 
