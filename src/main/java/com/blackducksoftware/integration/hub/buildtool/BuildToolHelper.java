@@ -48,7 +48,6 @@ public class BuildToolHelper {
 
     public void createFlatOutput(final DependencyNode rootNode, final String hubProjectName, final String hubProjectVersion,
             final File outputDirectory) throws IOException {
-
         final FlatDependencyListWriter flatDependencyListWriter = new FlatDependencyListWriter();
         flatDependencyListWriter.write(outputDirectory, hubProjectName, rootNode);
 
@@ -58,7 +57,6 @@ public class BuildToolHelper {
 
     public void createHubOutput(final DependencyNode rootNode, final String projectName, final String hubProjectName, final String hubProjectVersion,
             final File outputDirectory) throws IOException {
-
         final BdioDependencyWriter bdioDependencyWriter = new BdioDependencyWriter();
         bdioDependencyWriter.write(outputDirectory, projectName, hubProjectName, rootNode);
 
