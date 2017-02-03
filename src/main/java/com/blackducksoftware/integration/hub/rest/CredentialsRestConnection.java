@@ -49,12 +49,12 @@ import okhttp3.Response;
 public class CredentialsRestConnection extends RestConnection {
     private final HubServerConfig hubServerConfig;
 
-    public CredentialsRestConnection(final HubServerConfig hubServerConfig) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+    public CredentialsRestConnection(final HubServerConfig hubServerConfig) throws IllegalArgumentException, EncryptionException {
         this(null, hubServerConfig);
     }
 
     public CredentialsRestConnection(final IntLogger logger, final HubServerConfig hubServerConfig)
-            throws IllegalArgumentException, HubIntegrationException {
+            throws IllegalArgumentException {
         super(logger, hubServerConfig.getHubUrl(), hubServerConfig.getProxyInfo());
         this.hubServerConfig = hubServerConfig;
         setTimeout(hubServerConfig.getTimeout());

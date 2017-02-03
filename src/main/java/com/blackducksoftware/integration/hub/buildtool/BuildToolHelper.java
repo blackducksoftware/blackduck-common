@@ -24,7 +24,6 @@
 package com.blackducksoftware.integration.hub.buildtool;
 
 import static com.blackducksoftware.integration.hub.buildtool.BuildToolConstants.BDIO_FILE_MEDIA_TYPE;
-import static com.blackducksoftware.integration.hub.buildtool.BuildToolConstants.SCAN_ERROR_MESSAGE;
 import static com.blackducksoftware.integration.hub.buildtool.BuildToolConstants.UPLOAD_FILE_MESSAGE;
 
 import java.io.File;
@@ -78,13 +77,9 @@ public class BuildToolHelper {
     }
 
     public void waitForHub(final HubServicesFactory services, final String hubProjectName,
-            final String hubProjectVersion, final long timeoutInSeconds) {
+            final String hubProjectVersion, final long timeoutInSeconds) throws HubIntegrationException {
         final ScanStatusDataService scanStatusDataService = services.createScanStatusDataService(logger, timeoutInSeconds * 1000);
-        try {
-            scanStatusDataService.assertBomImportScanStartedThenFinished(hubProjectName, hubProjectVersion);
-        } catch (final HubIntegrationException e) {
-            logger.error(String.format(SCAN_ERROR_MESSAGE, e.getMessage()), e);
-        }
+        scanStatusDataService.assertBomImportScanStartedThenFinished(hubProjectName, hubProjectVersion);
     }
 
     public void createRiskReport(final HubServicesFactory services,

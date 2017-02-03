@@ -58,7 +58,6 @@ import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStat
 import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -70,7 +69,7 @@ public class HubServicesFactory {
 
     private final RestConnection restConnection;
 
-    public HubServicesFactory(final RestConnection restConnection) throws HubIntegrationException {
+    public HubServicesFactory(final RestConnection restConnection) {
         this.ciEnvironmentVariables = new CIEnvironmentVariables();
         ciEnvironmentVariables.putAll(System.getenv());
 
