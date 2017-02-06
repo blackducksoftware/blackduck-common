@@ -33,7 +33,6 @@ import com.blackducksoftware.integration.hub.validator.HubCredentialsValidator;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 
 public class HubCredentialsBuilder extends AbstractBuilder<HubCredentials> {
-
     private String username;
 
     private String password;
@@ -42,7 +41,6 @@ public class HubCredentialsBuilder extends AbstractBuilder<HubCredentials> {
 
     @Override
     public HubCredentials buildObject() {
-
         HubCredentials creds = null;
         if (StringUtils.isNotBlank(password) && passwordLength == 0) {
             // Password needs to be encrypted
