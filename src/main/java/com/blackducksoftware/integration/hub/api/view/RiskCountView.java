@@ -33,7 +33,7 @@
  * Do not edit the class manually.
  */
 
-package com.blackducksoftware.integration.hub.api.bom;
+package com.blackducksoftware.integration.hub.api.view;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;

@@ -33,7 +33,7 @@
  * Do not edit the class manually.
  */
 
-package com.blackducksoftware.integration.hub.api.bom;
+package com.blackducksoftware.integration.hub.api.view;
 
 import java.util.ArrayList;
 import java.util.List;
