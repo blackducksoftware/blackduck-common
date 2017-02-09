@@ -100,6 +100,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         if (enableScanTargetPathsWithinWorkingDirectoryCheck) {
             validator.enableScanTargetPathsWithinWorkingDirectoryCheck();
         }
+        validator.setExcludePatterns(excludePatterns);
         return validator;
     }
 

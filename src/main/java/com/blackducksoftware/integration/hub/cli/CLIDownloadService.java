@@ -70,7 +70,7 @@ public class CLIDownloadService {
             throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
         }
 
-        final CLILocation cliLocation = new CLILocation(directoryToInstallTo);
+        final CLILocation cliLocation = new CLILocation(logger, directoryToInstallTo);
         final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(logger, hubUrl);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
             try {
@@ -191,9 +191,12 @@ public class CLIDownloadService {
             throws IOException {
         final String cacertsFilename = "cacerts";
         if (ciEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
+            logger.trace("Found the variable : " + CIEnvironmentVariables.BDS_CACERTS_OVERRIDE + ", using value : " + ciEnvironmentVariables
+                    .getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE));
             final File securityDirectory = cliLocation.getJreSecurityDirectory();
             if (securityDirectory == null) {
                 // the cli might not have the jre included
+                logger.trace("Can not copy the cacerts into the CLI JRE. Can not find the CLI JRE.");
                 return;
             }
             final String customCacertsPath = ciEnvironmentVariables
@@ -211,6 +214,8 @@ public class CLIDownloadService {
                         + cacerts.getAbsolutePath() + " msg: " + e.getMessage());
                 throw e;
             }
+        } else {
+            logger.trace("Did not find the variable : " + CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
         }
     }
 

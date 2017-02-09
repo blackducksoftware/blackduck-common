@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.policystatus;
 
+import com.blackducksoftware.integration.hub.api.policy.ComponentVersionStatusCount;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 
 public class PolicyStatusDescription {
@@ -33,13 +34,25 @@ public class PolicyStatusDescription {
     }
 
     public String getPolicyStatusMessage() {
+        if (policyStatusItem.getComponentVersionStatusCounts() == null || policyStatusItem.getComponentVersionStatusCounts().size() == 0) {
+            return "The Hub found no components.";
+        }
+
+        final ComponentVersionStatusCount inViolation = policyStatusItem.getCountInViolation();
+        final ComponentVersionStatusCount inViolationOverridden = policyStatusItem.getCountInViolationOverridden();
+        final ComponentVersionStatusCount notInViolation = policyStatusItem.getCountNotInViolation();
+
+        final int inViolationCount = inViolation == null ? 0 : inViolation.getValue();
+        final int inViolationOverriddenCount = inViolationOverridden == null ? 0 : inViolationOverridden.getValue();
+        final int notInViolationCount = notInViolation == null ? 0 : notInViolation.getValue();
+
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("The Hub found: ");
-        stringBuilder.append(policyStatusItem.getCountInViolation().getValue());
+        stringBuilder.append(inViolationCount);
         stringBuilder.append(" components in violation, ");
-        stringBuilder.append(policyStatusItem.getCountInViolationOverridden().getValue());
+        stringBuilder.append(inViolationOverriddenCount);
         stringBuilder.append(" components in violation, but overridden, and ");
-        stringBuilder.append(policyStatusItem.getCountNotInViolation().getValue());
+        stringBuilder.append(notInViolationCount);
         stringBuilder.append(" components not in violation.");
         return stringBuilder.toString();
     }

@@ -53,6 +53,8 @@ public class HubScanConfigValidator extends AbstractValidator {
 
     private final Set<String> scanTargetPaths = new HashSet<>();
 
+    private String[] excludePatterns;
+
     private boolean dryRun;
 
     private boolean disableScanTargetPathExistenceCheck;
@@ -68,6 +70,8 @@ public class HubScanConfigValidator extends AbstractValidator {
         validateScanMemory(result, DEFAULT_MEMORY_IN_MEGABYTES);
 
         validateScanTargetPaths(result, workingDirectory);
+
+        validateExcludePatterns(result);
 
         return result;
     }
@@ -179,6 +183,37 @@ public class HubScanConfigValidator extends AbstractValidator {
         }
     }
 
+    public void validateExcludePatterns(final ValidationResults result) {
+        validateExcludePatterns(result, excludePatterns);
+    }
+
+    private void validateExcludePatterns(final ValidationResults result, final String[] excludePatterns) {
+        if (excludePatterns == null || excludePatterns.length == 0) {
+            return;
+        }
+
+        for (final String excludePattern : excludePatterns) {
+            validateExcludePattern(result, excludePattern);
+        }
+    }
+
+    public void validateExcludePattern(final ValidationResults result, final String excludePattern) {
+        if (StringUtils.isNotBlank(excludePattern)) {
+            if (!excludePattern.startsWith("/")) {
+                result.addResult(HubScanConfigFieldEnum.EXCLUDE_PATTERNS,
+                        new ValidationResult(ValidationResultEnum.WARN, "The exclusion pattern : " + excludePattern + " must start with a /."));
+            }
+            if (!excludePattern.endsWith("/")) {
+                result.addResult(HubScanConfigFieldEnum.EXCLUDE_PATTERNS,
+                        new ValidationResult(ValidationResultEnum.WARN, "The exclusion pattern : " + excludePattern + " must end with a /."));
+            }
+            if (excludePattern.contains("**")) {
+                result.addResult(HubScanConfigFieldEnum.EXCLUDE_PATTERNS,
+                        new ValidationResult(ValidationResultEnum.WARN, " The exclusion pattern : " + excludePattern + " can not contain **."));
+            }
+        }
+    }
+
     public void setProjectName(final String projectName) {
         this.projectName = StringUtils.trimToNull(projectName);
     }
@@ -201,6 +236,10 @@ public class HubScanConfigValidator extends AbstractValidator {
 
     public void addAllScanTargetPaths(final Set<String> scanTargetPaths) {
         this.scanTargetPaths.addAll(scanTargetPaths);
+    }
+
+    public void setExcludePatterns(final String[] excludePatterns) {
+        this.excludePatterns = excludePatterns;
     }
 
     public void setDryRun(final boolean dryRun) {

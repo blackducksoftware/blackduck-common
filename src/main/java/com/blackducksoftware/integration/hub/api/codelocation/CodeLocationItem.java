@@ -32,6 +32,9 @@ public class CodeLocationItem extends HubItem {
 
     private String url;
 
+    // Since Hub 3.5
+    private String name;
+
     private String mappedProjectVersion;
 
     private Date createdAt;
@@ -44,6 +47,10 @@ public class CodeLocationItem extends HubItem {
 
     public String getUrl() {
         return url;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getMappedProjectVersion() {
