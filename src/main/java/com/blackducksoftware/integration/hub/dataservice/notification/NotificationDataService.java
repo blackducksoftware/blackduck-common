@@ -90,10 +90,10 @@ public class NotificationDataService extends HubRequestService {
         this.policyNotificationFilter = policyNotificationFilter;
         this.parallelProcessor = new ParallelResourceProcessor<>(logger);
         this.metaService = metaService;
-        populateTransformerMap();
+        populateTransformerMap(logger);
     }
 
-    private void populateTransformerMap() {
+    private void populateTransformerMap(final IntLogger logger) {
         parallelProcessor.addTransform(RuleViolationNotificationItem.class,
                 new PolicyViolationTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
                         versionBomPolicyRequestService, hubRequestService, policyNotificationFilter, metaService));
@@ -102,7 +102,8 @@ public class NotificationDataService extends HubRequestService {
                         versionBomPolicyRequestService, hubRequestService, policyNotificationFilter, metaService));
         parallelProcessor.addTransform(VulnerabilityNotificationItem.class,
                 new VulnerabilityTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
-                        versionBomPolicyRequestService, hubRequestService, metaService));
+                        versionBomPolicyRequestService, hubRequestService, metaService,
+                        logger));
         parallelProcessor.addTransform(RuleViolationClearedNotificationItem.class,
                 new PolicyViolationClearedTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
                         versionBomPolicyRequestService, hubRequestService, policyNotificationFilter, metaService));
