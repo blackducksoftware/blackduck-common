@@ -23,16 +23,21 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.hub.api.UrlConstants;
 import com.blackducksoftware.integration.hub.api.component.Component;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
+import com.blackducksoftware.integration.hub.api.component.id.ComponentIdItem;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ComponentDataService {
@@ -41,11 +46,18 @@ public class ComponentDataService {
 
     private final HubParameterizedRequestService<ComponentVersion> hubParameterizedRequestService;
 
+    private final HubRequestService hubRequestService;
+
+    private final MetaService metaService;
+
     private final IntLogger logger;
 
-    public ComponentDataService(final IntLogger logger, final RestConnection restConnection, final ComponentRequestService componentRequestService) {
+    public ComponentDataService(final IntLogger logger, final RestConnection restConnection, final HubRequestService hubRequestService,
+            final ComponentRequestService componentRequestService, final MetaService metaService) {
         this.logger = logger;
         this.componentRequestService = componentRequestService;
+        this.metaService = metaService;
+        this.hubRequestService = hubRequestService;
         this.hubParameterizedRequestService = new HubParameterizedRequestService<>(restConnection, ComponentVersion.class);
     }
 
@@ -65,8 +77,14 @@ public class ComponentDataService {
             final String version)
             throws HubIntegrationException {
         final Component component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
-        final String componentURL = component.getComponent();
-        return hubParameterizedRequestService.getAllItems(componentURL);
+        component.getComponent();
+        ComponentIdItem componentItem = hubRequestService.getItem(component.getComponent(), ComponentIdItem.class);
+        String versionsURL = metaService.getFirstLinkSafely(componentItem, UrlConstants.SEGMENT_VERSIONS);
+        List<ComponentVersion> versions = new ArrayList<>();
+        if (versionsURL != null) {
+            versions = hubParameterizedRequestService.getAllItems(versionsURL);
+        }
+        return versions;
     }
 
 }

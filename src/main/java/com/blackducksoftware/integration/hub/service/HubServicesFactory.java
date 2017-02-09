@@ -227,7 +227,7 @@ public class HubServicesFactory {
     }
 
     public ComponentDataService createComponentDataService(final IntLogger logger) {
-        return new ComponentDataService(logger, restConnection, createComponentRequestService());
+        return new ComponentDataService(logger, restConnection, createHubRequestService(), createComponentRequestService(), createMetaService(logger));
     }
 
     public RestConnection getRestConnection() {
