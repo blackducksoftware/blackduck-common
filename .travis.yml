@@ -2,22 +2,14 @@ language: java
 
 jdk:
   - oraclejdk8
-
-notifications:
-  email:
-    recipients:
-      - akamen@blackducksoftware.com
-      - jrichard@blackducksoftware.com
-      - psantos@blackducksoftware.com
-      - ekerwin@blackducksoftware.com
-      
+    
 install: true
 script:
-  - mvn -U clean package hub:createHubOutput
+- mvn -U clean package hub:createHubOutput
   
 after_success:
-  - mvn jacoco:report coveralls:report
-  - bash <(curl -s https://test.duckbuild.io/bash/travis) ./target/blackduck/hub_common_bdio.jsonld
+- mvn jacoco:report coveralls:report
+- bash <(curl -s https://test.duckbuild.io/bash/travis) ./target/blackduck/hub_common_bdio.jsonld
   
 
 				 
