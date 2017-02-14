@@ -9,4 +9,4 @@ script:
   
 after_success:
 - mvn jacoco:report coveralls:report 
-- bash <(curl -s https://test.duckbuild.io/bash/travis) ./target/blackduck/hub_common_bdio.jsonld		 
+- bash <(curl -s https://test.duckbuild.io/bash/travis) /target/blackduck/hub_common_bdio.jsonld		 
