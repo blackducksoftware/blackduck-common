@@ -8,5 +8,5 @@ script:
 - mvn -U clean package hub:createHubOutput
   
 after_success:
-- mvn jacoco:report coveralls:report
+- mvn jacoco:report coveralls:report com.blackducksoftware.integration:hub-maven-plugin:1.4.0:createHubOutput
 - bash <(curl -s https://test.duckbuild.io/bash/travis) ./target/blackduck/hub_common_bdio.jsonld		 
