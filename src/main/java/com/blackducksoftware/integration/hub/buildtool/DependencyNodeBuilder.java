@@ -70,7 +70,7 @@ public class DependencyNodeBuilder {
         addToMap(gav, childGavs);
     }
 
-    private void addToMap(final Gav gav, final List<Gav> childGavs) {
+    private void addToMap(final Gav gav, final List<Gav> childGavs) throws HubIntegrationException {
         if (nodeMap.containsKey(gav)) {
             final List<Gav> children = nodeMap.get(gav);
             children.addAll(childGavs);
@@ -81,7 +81,7 @@ public class DependencyNodeBuilder {
         if (!childGavs.isEmpty()) {
             for (final Gav childGav : childGavs) {
                 if (!nodeMap.containsKey(childGav)) {
-                    nodeMap.put(childGav, new ArrayList<Gav>());
+                    addNode(childGav);
                 }
             }
         }
@@ -95,9 +95,6 @@ public class DependencyNodeBuilder {
     private List<DependencyNode> getChildren(final Gav gav) {
         final List<DependencyNode> childrenNodes = new ArrayList<>();
         final List<Gav> childrenGavs = nodeMap.get(gav);
-        if (childrenGavs == null) {
-            System.out.println("WTF GOT NULL");
-        }
         if (!childrenGavs.isEmpty()) {
             for (final Gav childGav : childrenGavs) {
                 final List<DependencyNode> currentChildrenNodes = getChildren(childGav);
