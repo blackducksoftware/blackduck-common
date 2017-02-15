@@ -82,42 +82,8 @@ public class VersionBomComponentView extends HubItem {
     @SerializedName("securityRiskProfile")
     private RiskProfileView securityRiskProfile = null;
 
-    /**
-     * Gets or Sets usages
-     */
-    public enum UsagesEnum {
-        @SerializedName("DYNAMICALLY_LINKED")
-        DYNAMICALLY_LINKED("DYNAMICALLY_LINKED"),
-
-        @SerializedName("STATICALLY_LINKED")
-        STATICALLY_LINKED("STATICALLY_LINKED"),
-
-        @SerializedName("SOURCE_CODE")
-        SOURCE_CODE("SOURCE_CODE"),
-
-        @SerializedName("DEV_TOOL_EXCLUDED")
-        DEV_TOOL_EXCLUDED("DEV_TOOL_EXCLUDED"),
-
-        @SerializedName("SEPARATE_WORK")
-        SEPARATE_WORK("SEPARATE_WORK"),
-
-        @SerializedName("IMPLEMENTATION_OF_STANDARD")
-        IMPLEMENTATION_OF_STANDARD("IMPLEMENTATION_OF_STANDARD");
-
-        private final String value;
-
-        UsagesEnum(final String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return String.valueOf(value);
-        }
-    }
-
     @SerializedName("usages")
-    private List<UsagesEnum> usages = new ArrayList<UsagesEnum>();
+    private List<UsageEnum> usages = new ArrayList<UsageEnum>();
 
     @SerializedName("versionRiskProfile")
     private RiskProfileView versionRiskProfile = null;
@@ -325,12 +291,12 @@ public class VersionBomComponentView extends HubItem {
         this.securityRiskProfile = securityRiskProfile;
     }
 
-    public VersionBomComponentView usages(final List<UsagesEnum> usages) {
+    public VersionBomComponentView usages(final List<UsageEnum> usages) {
         this.usages = usages;
         return this;
     }
 
-    public VersionBomComponentView addUsagesItem(final UsagesEnum usagesItem) {
+    public VersionBomComponentView addUsagesItem(final UsageEnum usagesItem) {
         this.usages.add(usagesItem);
         return this;
     }
@@ -340,11 +306,11 @@ public class VersionBomComponentView extends HubItem {
      * 
      * @return usages
      **/
-    public List<UsagesEnum> getUsages() {
+    public List<UsageEnum> getUsages() {
         return usages;
     }
 
-    public void setUsages(final List<UsagesEnum> usages) {
+    public void setUsages(final List<UsageEnum> usages) {
         this.usages = usages;
     }
 
