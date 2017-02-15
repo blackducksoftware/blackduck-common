@@ -41,6 +41,7 @@ import java.util.List;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseType;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -53,30 +54,8 @@ public class VersionBomLicenseView {
     @SerializedName("licenseDisplay")
     private String licenseDisplay = null;
 
-    /**
-     * How this license is related to other licenses within a given context
-     */
-    public enum LicenseTypeEnum {
-        @SerializedName("CONJUNCTIVE")
-        CONJUNCTIVE("CONJUNCTIVE"),
-
-        @SerializedName("DISJUNCTIVE")
-        DISJUNCTIVE("DISJUNCTIVE");
-
-        private final String value;
-
-        LicenseTypeEnum(final String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return String.valueOf(value);
-        }
-    }
-
     @SerializedName("licenseType")
-    private LicenseTypeEnum licenseType = null;
+    private ComplexLicenseType licenseType = null;
 
     @SerializedName("licenses")
     private List<VersionBomLicenseView> licenses = new ArrayList<VersionBomLicenseView>();
@@ -117,7 +96,7 @@ public class VersionBomLicenseView {
         this.licenseDisplay = licenseDisplay;
     }
 
-    public VersionBomLicenseView licenseType(final LicenseTypeEnum licenseType) {
+    public VersionBomLicenseView licenseType(final ComplexLicenseType licenseType) {
         this.licenseType = licenseType;
         return this;
     }
@@ -127,11 +106,11 @@ public class VersionBomLicenseView {
      * 
      * @return licenseType
      **/
-    public LicenseTypeEnum getLicenseType() {
+    public ComplexLicenseType getLicenseType() {
         return licenseType;
     }
 
-    public void setLicenseType(final LicenseTypeEnum licenseType) {
+    public void setLicenseType(final ComplexLicenseType licenseType) {
         this.licenseType = licenseType;
     }
 

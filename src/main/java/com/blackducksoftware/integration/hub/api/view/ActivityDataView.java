@@ -55,31 +55,6 @@ public class ActivityDataView {
     @SerializedName("lastCommitDate")
     private Date lastCommitDate = null;
 
-    /**
-     * The overall characteristics of development activity
-     */
-    public enum TrendingEnum {
-        @SerializedName("DECREASING")
-        DECREASING("DECREASING"),
-
-        @SerializedName("STABLE")
-        STABLE("STABLE"),
-
-        @SerializedName("INCREASING")
-        INCREASING("INCREASING");
-
-        private final String value;
-
-        TrendingEnum(final String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return String.valueOf(value);
-        }
-    }
-
     @SerializedName("trending")
     private TrendingEnum trending = null;
 

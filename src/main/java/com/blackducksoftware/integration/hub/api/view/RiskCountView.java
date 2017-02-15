@@ -47,37 +47,6 @@ public class RiskCountView {
     @SerializedName("count")
     private Integer count = null;
 
-    /**
-     * The level of severity being quantified
-     */
-    public enum CountTypeEnum {
-        @SerializedName("UNKNOWN")
-        UNKNOWN("UNKNOWN"),
-
-        @SerializedName("OK")
-        OK("OK"),
-
-        @SerializedName("LOW")
-        LOW("LOW"),
-
-        @SerializedName("MEDIUM")
-        MEDIUM("MEDIUM"),
-
-        @SerializedName("HIGH")
-        HIGH("HIGH");
-
-        private final String value;
-
-        CountTypeEnum(final String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return String.valueOf(value);
-        }
-    }
-
     @SerializedName("countType")
     private CountTypeEnum countType = null;
 
