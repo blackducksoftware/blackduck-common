@@ -75,10 +75,10 @@ class DependencyNodeTest {
 
         //Adding the relationships randomly
         DependencyNodeBuilder builder = new DependencyNodeBuilder(root);
-        builder.addNodeWithChild(fourthChild,subThirdChild)
+        builder.addNodeWithChild(fourthChild,subFirstChild)
         builder.addNodeWithChild(firstChild,subFirstChild)
         builder.addNodeWithChildren(fourthChild,[
-            subFirstChild,
+            subThirdChild,
             subSecondChild
         ])
         builder.addNodeWithChildren(root,[
@@ -93,7 +93,19 @@ class DependencyNodeTest {
         DependencyNode rootNode = builder.buildRootNode()
         println("$rootNode")
 
-        assertEquals(rootToCompareTo.getGav(), rootNode.getGav())
-        assert rootToCompareTo.children.equals(rootNode.children)
+        compareNode(rootToCompareTo, rootNode)
+    }
+
+    void compareNode(DependencyNode expected, DependencyNode actual){
+        assertEquals(expected.gav, actual.gav)
+        assert actual.children.size() == expected.children.size()
+        if(actual.children.size() > 0){
+            actual.children.each{ actualChild ->
+                DependencyNode expectedChildMatch = expected.children.find{ expectedChild ->
+                    expectedChild.gav == actualChild.gav
+                }
+                compareNode(expectedChildMatch, actualChild)
+            }
+        }
     }
 }
