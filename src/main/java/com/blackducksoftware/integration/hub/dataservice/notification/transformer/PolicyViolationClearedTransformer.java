@@ -45,6 +45,7 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Poli
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer {
     public PolicyViolationClearedTransformer(final NotificationRequestService notificationService,
@@ -52,6 +53,15 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
             final VersionBomPolicyRequestService bomVersionPolicyService,
             final HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter, final MetaService metaService) {
         super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
+                hubRequestService, policyFilter, metaService);
+    }
+
+    public PolicyViolationClearedTransformer(final IntLogger logger,
+            final NotificationRequestService notificationService,
+            final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
+            final VersionBomPolicyRequestService bomVersionPolicyService,
+            final HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter, final MetaService metaService) {
+        super(logger, notificationService, projectVersionService, policyService, bomVersionPolicyService,
                 hubRequestService, policyFilter, metaService);
     }
 
@@ -91,6 +101,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
             final ProjectVersion projectVersion, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException {
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
+            // TODO should this component be skipped based on status in bomComponentVersionPolicyStatus?
             try {
                 final String componentVersionLink = componentVersion.getComponentVersionLink();
                 final ComponentVersion fullComponentVersion = getComponentVersion(componentVersionLink);

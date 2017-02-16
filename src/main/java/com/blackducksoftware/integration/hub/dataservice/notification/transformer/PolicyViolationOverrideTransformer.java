@@ -48,6 +48,7 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Poli
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationOverrideTransformer extends AbstractPolicyTransformer {
     public PolicyViolationOverrideTransformer(final NotificationRequestService notificationService,
@@ -55,6 +56,15 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
             final VersionBomPolicyRequestService bomVersionPolicyService,
             final HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter, final MetaService metaService) {
         super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
+                hubRequestService, policyFilter, metaService);
+    }
+
+    public PolicyViolationOverrideTransformer(final IntLogger logger,
+            final NotificationRequestService notificationService,
+            final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
+            final VersionBomPolicyRequestService bomVersionPolicyService,
+            final HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter, final MetaService metaService) {
+        super(logger, notificationService, projectVersionService, policyService, bomVersionPolicyService,
                 hubRequestService, policyFilter, metaService);
     }
 
@@ -96,16 +106,17 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 
         final PolicyOverrideNotificationItem policyOverrideItem = (PolicyOverrideNotificationItem) item;
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
+            // TODO should this component be skipped based on status in bomComponentVersionPolicyStatus?
             try {
                 final String componentLink = policyOverrideItem.getContent().getComponentLink();
                 final String componentVersionLink = policyOverrideItem.getContent().getComponentVersionLink();
                 final ComponentVersion fullComponentVersion = getComponentVersion(componentVersionLink);
 
-                final String policyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
-
-                if (StringUtils.isNotBlank(policyStatusUrl)) {
-                    final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(policyStatusUrl);
-
+                final String bomComponentVersionPolicyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
+                if (StringUtils.isNotBlank(bomComponentVersionPolicyStatusUrl)) {
+                    final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
+                            bomComponentVersionPolicyStatusUrl);
+                    // TODO this is the wrong place to get the rules!!
                     List<String> ruleList = getMetaService().getLinks(bomComponentVersionPolicyStatus, MetaService.POLICY_RULE_LINK);
 
                     ruleList = getMatchingRuleUrls(ruleList);
