@@ -104,13 +104,13 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
             try {
                 final String bomComponentVersionPolicyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
                 if (StringUtils.isBlank(bomComponentVersionPolicyStatusUrl)) {
-                    getLogger().warn(String.format("bomComponentVersionPolicyStatus is missing for component %s",
+                    getLogger().warn(String.format("bomComponentVersionPolicyStatus is missing for component %s; skipping it",
                             componentVersion.getComponentName()));
-                    continue; // skip
+                    continue;
                 }
                 final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(bomComponentVersionPolicyStatusUrl);
                 if (bomComponentVersionPolicyStatus.getApprovalStatus() != PolicyStatusEnum.IN_VIOLATION) {
-                    getLogger().debug(String.format("Component %s is not in violation", componentVersion.getComponentName()));
+                    getLogger().debug(String.format("Component %s is not in violation; skipping it", componentVersion.getComponentName()));
                     continue;
                 }
 

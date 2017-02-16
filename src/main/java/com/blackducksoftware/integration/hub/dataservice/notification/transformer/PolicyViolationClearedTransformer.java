@@ -101,11 +101,10 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
             final ProjectVersion projectVersion, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException {
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
-            // TODO should this component be skipped based on status in bomComponentVersionPolicyStatus?
             try {
                 final String componentVersionLink = componentVersion.getComponentVersionLink();
                 final ComponentVersion fullComponentVersion = getComponentVersion(componentVersionLink);
-                final List<String> policyUrls = componentVersion.getPolicies();
+                final List<String> policyUrls = getMatchingRuleUrls(componentVersion.getPolicies());
 
                 if (policyUrls != null) {
                     List<PolicyRule> ruleList = getRulesFromUrls(policyUrls);

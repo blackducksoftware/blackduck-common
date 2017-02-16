@@ -37,6 +37,7 @@ import com.blackducksoftware.integration.hub.api.notification.NotificationReques
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.version.BomComponentVersionPolicyStatus;
@@ -106,29 +107,32 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 
         final PolicyOverrideNotificationItem policyOverrideItem = (PolicyOverrideNotificationItem) item;
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
-            // TODO should this component be skipped based on status in bomComponentVersionPolicyStatus?
             try {
                 final String componentLink = policyOverrideItem.getContent().getComponentLink();
                 final String componentVersionLink = policyOverrideItem.getContent().getComponentVersionLink();
                 final ComponentVersion fullComponentVersion = getComponentVersion(componentVersionLink);
 
                 final String bomComponentVersionPolicyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
-                if (StringUtils.isNotBlank(bomComponentVersionPolicyStatusUrl)) {
-                    final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
-                            bomComponentVersionPolicyStatusUrl);
-                    // TODO this is the wrong place to get the rules!!
-                    List<String> ruleList = getMetaService().getLinks(bomComponentVersionPolicyStatus, MetaService.POLICY_RULE_LINK);
-
-                    ruleList = getMatchingRuleUrls(ruleList);
-                    if (ruleList != null && !ruleList.isEmpty()) {
-                        final List<PolicyRule> policyRuleList = new ArrayList<>();
-                        for (final String ruleUrl : ruleList) {
-                            final PolicyRule rule = getPolicyRule(ruleUrl);
-                            policyRuleList.add(rule);
-                        }
-                        createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
-                                componentLink, componentVersionLink, policyRuleList, item, templateData);
+                if (StringUtils.isBlank(bomComponentVersionPolicyStatusUrl)) {
+                    getLogger().warn(String.format("bomComponentVersionPolicyStatus is missing for component %s; skipping it",
+                            componentVersion.getComponentName()));
+                    continue;
+                }
+                final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
+                        bomComponentVersionPolicyStatusUrl);
+                if (bomComponentVersionPolicyStatus.getApprovalStatus() != PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN) {
+                    getLogger().debug(String.format("Component %s status is not 'violation overridden'; skipping it", componentVersion.getComponentName()));
+                    continue;
+                }
+                final List<String> ruleList = getMatchingRuleUrls(policyOverrideItem.getContent().getPolicies());
+                if (ruleList != null && !ruleList.isEmpty()) {
+                    final List<PolicyRule> policyRuleList = new ArrayList<>();
+                    for (final String ruleUrl : ruleList) {
+                        final PolicyRule rule = getPolicyRule(ruleUrl);
+                        policyRuleList.add(rule);
                     }
+                    createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
+                            componentLink, componentVersionLink, policyRuleList, item, templateData);
                 }
             } catch (final Exception e) {
                 throw new HubItemTransformException(e);
