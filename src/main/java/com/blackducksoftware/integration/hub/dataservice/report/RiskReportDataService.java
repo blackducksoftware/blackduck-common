@@ -181,6 +181,8 @@ public class RiskReportDataService extends HubRequestService {
     }
 
     private BomComponent createBomComponentFromBomViewEntry(final AggregateBomViewEntry bomEntry) {
+        final BomComponent component = new BomComponent();
+        component.setComponentName(bomEntry.getProducerProject().getName());
 
         return null;
     }
