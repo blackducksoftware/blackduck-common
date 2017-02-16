@@ -159,7 +159,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      *
      * @throws HubIntegrationException
      */
-    public HubRiskReportData generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
+    public VersionReport generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
             final ReportCategoriesEnum[] categories) throws HubIntegrationException {
         logger.debug("Starting the Report generation.");
         final String reportUrl = startGeneratingHubReport(version, reportFormat, categories);
@@ -173,16 +173,13 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
             throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
         }
 
-        final HubRiskReportData hubRiskReportData = new HubRiskReportData();
         logger.debug("Getting the Report content.");
         final VersionReport report = getReportContent(contentLink);
-        hubRiskReportData.setReport(report);
         logger.debug("Finished retrieving the Report.");
-
         logger.debug("Cleaning up the Report on the server.");
         deleteHubReport(reportUrl);
 
-        return hubRiskReportData;
+        return report;
     }
 
     private String getVersionReportLink(final ProjectVersionItem version) throws HubIntegrationException {

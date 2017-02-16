@@ -28,11 +28,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.api.aggregate.bom.risk.RiskCount;
-import com.blackducksoftware.integration.hub.api.aggregate.bom.risk.RiskCountTypeEnum;
+import com.blackducksoftware.integration.hub.api.view.CountTypeEnum;
+import com.blackducksoftware.integration.hub.api.view.RiskCountView;
+import com.blackducksoftware.integration.hub.api.view.VersionBomComponentView;
 
 public class AggregateBomData {
-    private List<ComponentItem> components;
+    private List<VersionBomComponentView> components;
 
     private int totalComponents;
 
@@ -60,7 +61,7 @@ public class AggregateBomData {
 
     private int operationalRiskNoneCount;
 
-    public void setComponents(final List<ComponentItem> components) {
+    public void setComponents(final List<VersionBomComponentView> components) {
         this.components = components;
 
         vulnerabilityRiskHighCount = 0;
@@ -75,40 +76,40 @@ public class AggregateBomData {
         operationalRiskMediumCount = 0;
         operationalRiskLowCount = 0;
 
-        for (final ComponentItem component : components) {
+        for (final VersionBomComponentView component : components) {
             if (component != null) {
                 if (component.getSecurityRiskProfile() != null && component.getSecurityRiskProfile().getCounts() != null
                         && !component.getSecurityRiskProfile().getCounts().isEmpty()) {
-                    for (final RiskCount count : component.getSecurityRiskProfile().getCounts()) {
-                        if (count.getCountType() == RiskCountTypeEnum.HIGH && count.getCount() > 0) {
+                    for (final RiskCountView count : component.getSecurityRiskProfile().getCounts()) {
+                        if (count.getCountType() == CountTypeEnum.HIGH && count.getCount() > 0) {
                             vulnerabilityRiskHighCount++;
-                        } else if (count.getCountType() == RiskCountTypeEnum.MEDIUM && count.getCount() > 0) {
+                        } else if (count.getCountType() == CountTypeEnum.MEDIUM && count.getCount() > 0) {
                             vulnerabilityRiskMediumCount++;
-                        } else if (count.getCountType() == RiskCountTypeEnum.LOW && count.getCount() > 0) {
+                        } else if (count.getCountType() == CountTypeEnum.LOW && count.getCount() > 0) {
                             vulnerabilityRiskLowCount++;
                         }
                     }
                 }
                 if (component.getLicenseRiskProfile() != null && component.getLicenseRiskProfile().getCounts() != null
                         && !component.getLicenseRiskProfile().getCounts().isEmpty()) {
-                    for (final RiskCount count : component.getLicenseRiskProfile().getCounts()) {
-                        if (count.getCountType() == RiskCountTypeEnum.HIGH && count.getCount() > 0) {
+                    for (final RiskCountView count : component.getLicenseRiskProfile().getCounts()) {
+                        if (count.getCountType() == CountTypeEnum.HIGH && count.getCount() > 0) {
                             licenseRiskHighCount++;
-                        } else if (count.getCountType() == RiskCountTypeEnum.MEDIUM && count.getCount() > 0) {
+                        } else if (count.getCountType() == CountTypeEnum.MEDIUM && count.getCount() > 0) {
                             licenseRiskMediumCount++;
-                        } else if (count.getCountType() == RiskCountTypeEnum.LOW && count.getCount() > 0) {
+                        } else if (count.getCountType() == CountTypeEnum.LOW && count.getCount() > 0) {
                             licenseRiskLowCount++;
                         }
                     }
                 }
                 if (component.getOperationalRiskProfile() != null && component.getOperationalRiskProfile().getCounts() != null
                         && !component.getOperationalRiskProfile().getCounts().isEmpty()) {
-                    for (final RiskCount count : component.getOperationalRiskProfile().getCounts()) {
-                        if (count.getCountType() == RiskCountTypeEnum.HIGH && count.getCount() > 0) {
+                    for (final RiskCountView count : component.getOperationalRiskProfile().getCounts()) {
+                        if (count.getCountType() == CountTypeEnum.HIGH && count.getCount() > 0) {
                             operationalRiskHighCount++;
-                        } else if (count.getCountType() == RiskCountTypeEnum.MEDIUM && count.getCount() > 0) {
+                        } else if (count.getCountType() == CountTypeEnum.MEDIUM && count.getCount() > 0) {
                             operationalRiskMediumCount++;
-                        } else if (count.getCountType() == RiskCountTypeEnum.LOW && count.getCount() > 0) {
+                        } else if (count.getCountType() == CountTypeEnum.LOW && count.getCount() > 0) {
                             operationalRiskLowCount++;
                         }
                     }
@@ -141,7 +142,7 @@ public class AggregateBomData {
         return StringEscapeUtils.escapeHtml4(valueToEscape);
     }
 
-    public List<ComponentItem> getComponents() {
+    public List<VersionBomComponentView> getComponents() {
         return components;
     }
 

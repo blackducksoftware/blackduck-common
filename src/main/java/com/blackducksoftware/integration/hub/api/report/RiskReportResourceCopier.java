@@ -53,7 +53,6 @@ public class RiskReportResourceCopier extends JarResourceCopier {
         relativePathList.add("images/Hub_BD_logo.png");
         relativePathList.add(RISK_REPORT_HTML_FILE_NAME);
         relativePathList.addAll(findJavascriptFileList());
-        // relativePathList.addAll(findFontAwesomeFileList());
         return relativePathList;
     }
 

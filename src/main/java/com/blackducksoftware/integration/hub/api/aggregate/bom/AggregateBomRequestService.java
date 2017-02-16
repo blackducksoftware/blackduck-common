@@ -25,21 +25,22 @@ package com.blackducksoftware.integration.hub.api.aggregate.bom;
 
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
-public class AggregateBomRequestService extends HubParameterizedRequestService<ComponentItem> {
+public class AggregateBomRequestService extends HubParameterizedRequestService<VersionBomComponentView> {
 
     public AggregateBomRequestService(final RestConnection restConnection) {
-        super(restConnection, ComponentItem.class);
+        super(restConnection, VersionBomComponentView.class);
     }
 
-    public List<ComponentItem> getComponents(final String componentsUrl) throws HubIntegrationException {
+    public List<VersionBomComponentView> getBomEntries(final String componentsUrl) throws HubIntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(componentsUrl);
 
-        final List<ComponentItem> allComponentItems = getAllItems(hubPagedRequest);
+        final List<VersionBomComponentView> allComponentItems = getAllItems(hubPagedRequest);
         return allComponentItems;
     }
 

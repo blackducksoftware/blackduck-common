@@ -234,4 +234,10 @@ public class HubServicesFactory {
         return restConnection;
     }
 
+    public HubSupportHelper createCheckedHubSupport(final IntLogger logger) {
+        final HubSupportHelper supportHelper = new HubSupportHelper();
+        supportHelper.checkHubSupport(createHubVersionRequestService(), logger);
+        return supportHelper;
+    }
+
 }
