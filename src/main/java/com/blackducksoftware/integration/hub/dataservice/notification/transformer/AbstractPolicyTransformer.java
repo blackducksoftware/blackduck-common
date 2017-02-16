@@ -27,8 +27,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
@@ -75,25 +73,22 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
             try {
                 final String componentVersionLink = componentVersion.getComponentVersionLink();
                 final ComponentVersion fullComponentVersion = getComponentVersion(componentVersionLink);
-                final String policyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
-
-                if (StringUtils.isNotBlank(policyStatusUrl)) {
-                    final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
-                            policyStatusUrl);
-                    List<String> ruleList = getMetaService().getLinks(bomComponentVersionPolicyStatus, MetaService.POLICY_RULE_LINK);
-                    ruleList = getMatchingRuleUrls(ruleList);
-                    if (ruleList != null && !ruleList.isEmpty()) {
-                        final List<PolicyRule> policyRuleList = new ArrayList<>();
-                        for (final String ruleUrl : ruleList) {
-                            final PolicyRule rule = getPolicyRule(ruleUrl);
-                            policyRuleList.add(rule);
-                        }
-                        createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
-                                componentVersion.getComponentLink(),
-                                componentVersion.getComponentVersionLink(),
-                                policyRuleList, item, templateData);
-                    }
+                if ((componentVersion.getPolicies() == null) || (componentVersion.getPolicies().size() == 0)) {
+                    throw new HubItemTransformException("The polices list in the component version status is null or empty");
                 }
+                final List<String> ruleList = getMatchingRuleUrls(componentVersion.getPolicies());
+                if (ruleList != null && !ruleList.isEmpty()) {
+                    final List<PolicyRule> policyRuleList = new ArrayList<>();
+                    for (final String ruleUrl : ruleList) {
+                        final PolicyRule rule = getPolicyRule(ruleUrl);
+                        policyRuleList.add(rule);
+                    }
+                    createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
+                            componentVersion.getComponentLink(),
+                            componentVersion.getComponentVersionLink(),
+                            policyRuleList, item, templateData);
+                }
+
             } catch (final Exception e) {
                 throw new HubItemTransformException(e);
             }

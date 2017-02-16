@@ -29,6 +29,7 @@ import java.util.Map;
 
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
+import com.blackducksoftware.integration.hub.api.bom.BomRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
@@ -226,12 +227,16 @@ public class HubServicesFactory {
         return new MetaService(logger, restConnection.getJsonParser(), new HubRequestFactory(restConnection));
     }
 
-    public ComponentDataService createComponentDataService(final IntLogger logger) {
-        return new ComponentDataService(logger, restConnection, createHubRequestService(), createComponentRequestService(), createMetaService(logger));
+    public BomRequestService createBomRequestService() {
+        return new BomRequestService(restConnection);
     }
 
     public RestConnection getRestConnection() {
         return restConnection;
+    }
+
+    public ComponentDataService createComponentDataService(final IntLogger logger) {
+        return new ComponentDataService(logger, restConnection, createHubRequestService(), createComponentRequestService(), createMetaService(logger));
     }
 
 }
