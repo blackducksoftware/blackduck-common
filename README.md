@@ -5,6 +5,7 @@ The hub-common library supplies convenient communication with a Hub server throu
 
 [![Build Status](https://travis-ci.org/blackducksoftware/hub-common.svg?branch=master)](https://travis-ci.org/blackducksoftware/hub-common)
 [![Black Duck Security Risk](https://test.duckbuild.io/github/groups/blackducksoftware/locations/hub-common/public/results/branches/master/badge-risk.svg)](https://test.duckbuild.io/github/groups/blackducksoftware/locations/hub-common/public/results/branches/master)
+[![CircleCI](https://circleci.com/gh/blackducksoftware/hub-common/tree/master.svg?style=svg&circle-token=e46637f3fa1c9b84d11fa9462348f64dc3b70af9)](https://circleci.com/gh/blackducksoftware/hub-common/tree/master)
 [![Coverage Status](https://coveralls.io/repos/github/blackducksoftware/hub-common/badge.svg?branch=master)](https://coveralls.io/github/blackducksoftware/hub-common?branch=master)
 
 ## Where can I get the latest release? ##
