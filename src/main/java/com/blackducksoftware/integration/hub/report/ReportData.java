@@ -77,15 +77,33 @@ public class ReportData {
 
         for (final BomComponent component : components) {
             if (component != null) {
-                vulnerabilityRiskHighCount += component.getHighSecurityRisk();
-                vulnerabilityRiskMediumCount += component.getMediumSecurityRisk();
-                vulnerabilityRiskLowCount += component.getLowSecurityRisk();
-                licenseRiskHighCount += component.getHighLicenseRisk();
-                licenseRiskMediumCount += component.getMediumLicenseRisk();
-                licenseRiskLowCount += component.getLowLicenseRisk();
-                operationalRiskHighCount += component.getHighOperationalRisk();
-                operationalRiskMediumCount += component.getMediumOperationalRisk();
-                operationalRiskLowCount += component.getLowOperationalRisk();
+                if (component.getHighSecurityRisk() > 0) {
+                    vulnerabilityRiskHighCount++;
+                }
+                if (component.getMediumSecurityRisk() > 0) {
+                    vulnerabilityRiskMediumCount++;
+                }
+                if (component.getLowSecurityRisk() > 0) {
+                    vulnerabilityRiskLowCount++;
+                }
+                if (component.getHighLicenseRisk() > 0) {
+                    licenseRiskHighCount++;
+                }
+                if (component.getMediumLicenseRisk() > 0) {
+                    licenseRiskMediumCount++;
+                }
+                if (component.getLowLicenseRisk() > 0) {
+                    licenseRiskLowCount++;
+                }
+                if (component.getHighOperationalRisk() > 0) {
+                    operationalRiskHighCount++;
+                }
+                if (component.getMediumOperationalRisk() > 0) {
+                    operationalRiskMediumCount++;
+                }
+                if (component.getLowOperationalRisk() > 0) {
+                    operationalRiskLowCount++;
+                }
             }
         }
         totalComponents = components.size();

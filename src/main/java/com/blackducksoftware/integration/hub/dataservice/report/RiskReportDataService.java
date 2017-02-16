@@ -121,7 +121,7 @@ public class RiskReportDataService extends HubRequestService {
             final VersionReport versionReport = reportRequestService.generateHubReport(version, ReportFormatEnum.JSON, categories);
             final List<AggregateBomViewEntry> bomEntries = versionReport.getAggregateBomViewEntries();
             for (final AggregateBomViewEntry bomEntry : bomEntries) {
-                final BomComponent component = createBomComponentFromBomViewEntry(bomEntry);
+                final BomComponent component = createBomComponentFromBomViewEntry(versionReport, bomEntry);
                 components.add(component);
             }
         }
@@ -180,11 +180,31 @@ public class RiskReportDataService extends HubRequestService {
         return versionURL + componentVersionSegments;
     }
 
-    private BomComponent createBomComponentFromBomViewEntry(final AggregateBomViewEntry bomEntry) {
+    private BomComponent createBomComponentFromBomViewEntry(final VersionReport report, final AggregateBomViewEntry bomEntry) {
         final BomComponent component = new BomComponent();
         component.setComponentName(bomEntry.getProducerProject().getName());
+        component.setComponentVersion(bomEntry.getProducerReleases().get(0).getVersion());
+        component.setComponentURL(report.getComponentUrl(bomEntry));
+        component.setComponentVersionURL(report.getVersionUrl(bomEntry));
+        component.setLicense(bomEntry.getLicensesDisplay());
+        component.setPolicyStatus(bomEntry.getPolicyApprovalStatusEnum());
+        if (bomEntry.getVulnerabilityRisk() != null) {
+            component.setHighSecurityRisk(bomEntry.getVulnerabilityRisk().getHIGH());
+            component.setMediumSecurityRisk(bomEntry.getVulnerabilityRisk().getMEDIUM());
+            component.setLowSecurityRisk(bomEntry.getVulnerabilityRisk().getLOW());
+        }
+        if (bomEntry.getLicenseRisk() != null) {
+            component.setHighLicenseRisk(bomEntry.getLicenseRisk().getHIGH());
+            component.setMediumLicenseRisk(bomEntry.getLicenseRisk().getMEDIUM());
+            component.setLowLicenseRisk(bomEntry.getLicenseRisk().getLOW());
+        }
+        if (bomEntry.getOperationalRisk() != null) {
+            component.setHighOperationalRisk(bomEntry.getOperationalRisk().getHIGH());
+            component.setMediumOperationalRisk(bomEntry.getOperationalRisk().getMEDIUM());
+            component.setLowOperationalRisk(bomEntry.getOperationalRisk().getLOW());
+        }
 
-        return null;
+        return component;
     }
 
     private BomComponent createBomComponentFromBomComponentView(final VersionBomComponentView bomEntry) {
