@@ -27,6 +27,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
@@ -35,8 +37,10 @@ import com.blackducksoftware.integration.hub.api.notification.NotificationReques
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.version.BomComponentVersionPolicyStatus;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
@@ -45,6 +49,7 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Poli
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     public PolicyViolationTransformer(final NotificationRequestService notificationService,
@@ -52,6 +57,15 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
             final VersionBomPolicyRequestService bomVersionPolicyService,
             final HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter, final MetaService metaService) {
         super(notificationService, projectVersionService, policyService, bomVersionPolicyService,
+                hubRequestService, policyFilter, metaService);
+    }
+
+    public PolicyViolationTransformer(final IntLogger logger,
+            final NotificationRequestService notificationService,
+            final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
+            final VersionBomPolicyRequestService bomVersionPolicyService,
+            final HubRequestService hubRequestService, final PolicyNotificationFilter policyFilter, final MetaService metaService) {
+        super(logger, notificationService, projectVersionService, policyService, bomVersionPolicyService,
                 hubRequestService, policyFilter, metaService);
     }
 
@@ -86,8 +100,42 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
             final ProjectVersion projectVersion, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException {
-        handleNotificationUsingBomComponentVersionPolicyStatusLink(componentVersionList, projectVersion, item,
-                templateData);
+        for (final ComponentVersionStatus componentVersion : componentVersionList) {
+            try {
+                final String bomComponentVersionPolicyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
+                if (StringUtils.isBlank(bomComponentVersionPolicyStatusUrl)) {
+                    getLogger().warn(String.format("bomComponentVersionPolicyStatus is missing for component %s; skipping it",
+                            componentVersion.getComponentName()));
+                    continue;
+                }
+                final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(bomComponentVersionPolicyStatusUrl);
+                if (bomComponentVersionPolicyStatus.getApprovalStatus() != PolicyStatusEnum.IN_VIOLATION) {
+                    getLogger().debug(String.format("Component %s is not in violation; skipping it", componentVersion.getComponentName()));
+                    continue;
+                }
+
+                final String componentVersionLink = componentVersion.getComponentVersionLink();
+                final ComponentVersion fullComponentVersion = getComponentVersion(componentVersionLink);
+                if ((componentVersion.getPolicies() == null) || (componentVersion.getPolicies().size() == 0)) {
+                    throw new HubItemTransformException("The polices list in the component version status is null or empty");
+                }
+                final List<String> ruleList = getMatchingRuleUrls(componentVersion.getPolicies());
+                if (ruleList != null && !ruleList.isEmpty()) {
+                    final List<PolicyRule> policyRuleList = new ArrayList<>();
+                    for (final String ruleUrl : ruleList) {
+                        final PolicyRule rule = getPolicyRule(ruleUrl);
+                        policyRuleList.add(rule);
+                    }
+                    createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
+                            componentVersion.getComponentLink(),
+                            componentVersion.getComponentVersionLink(),
+                            policyRuleList, item, templateData);
+                }
+
+            } catch (final Exception e) {
+                throw new HubItemTransformException(e);
+            }
+        }
     }
 
     private ProjectVersionItem getReleaseItem(final String projectVersionLink) throws HubIntegrationException {
@@ -103,5 +151,4 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
         templateData.add(new PolicyViolationContentItem(item.getCreatedAt(), projectVersion, componentName,
                 componentVersion, componentUrl, componentVersionUrl, policyRuleList));
     }
-
 }

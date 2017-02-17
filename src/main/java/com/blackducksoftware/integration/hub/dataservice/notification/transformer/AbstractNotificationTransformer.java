@@ -41,9 +41,13 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Noti
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.log.IntBufferedLogger;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public abstract class AbstractNotificationTransformer
         implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
+    private final IntLogger logger;
+
     private final NotificationRequestService notificationService;
 
     private final ProjectVersionRequestService projectVersionService;
@@ -60,12 +64,31 @@ public abstract class AbstractNotificationTransformer
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
             final VersionBomPolicyRequestService bomVersionPolicyService, final HubRequestService hubRequestService,
             final MetaService metaService) {
+        this.logger = new IntBufferedLogger();
         this.notificationService = notificationService;
         this.projectVersionService = projectVersionService;
         this.policyService = policyService;
         this.bomVersionPolicyService = bomVersionPolicyService;
         this.hubRequestService = hubRequestService;
         this.metaService = metaService;
+    }
+
+    public AbstractNotificationTransformer(final IntLogger logger,
+            final NotificationRequestService notificationService,
+            final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
+            final VersionBomPolicyRequestService bomVersionPolicyService, final HubRequestService hubRequestService,
+            final MetaService metaService) {
+        this.logger = logger;
+        this.notificationService = notificationService;
+        this.projectVersionService = projectVersionService;
+        this.policyService = policyService;
+        this.bomVersionPolicyService = bomVersionPolicyService;
+        this.hubRequestService = hubRequestService;
+        this.metaService = metaService;
+    }
+
+    protected IntLogger getLogger() {
+        return logger;
     }
 
     public NotificationRequestService getNotificationService() {

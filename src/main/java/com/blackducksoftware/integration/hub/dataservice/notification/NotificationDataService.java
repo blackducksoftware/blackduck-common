@@ -95,17 +95,17 @@ public class NotificationDataService extends HubRequestService {
 
     private void populateTransformerMap(final IntLogger logger) {
         parallelProcessor.addTransform(RuleViolationNotificationItem.class,
-                new PolicyViolationTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
+                new PolicyViolationTransformer(logger, notificationRequestService, projectVersionRequestService, policyRequestService,
                         versionBomPolicyRequestService, hubRequestService, policyNotificationFilter, metaService));
         parallelProcessor.addTransform(PolicyOverrideNotificationItem.class,
-                new PolicyViolationOverrideTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
+                new PolicyViolationOverrideTransformer(logger, notificationRequestService, projectVersionRequestService, policyRequestService,
                         versionBomPolicyRequestService, hubRequestService, policyNotificationFilter, metaService));
         parallelProcessor.addTransform(VulnerabilityNotificationItem.class,
                 new VulnerabilityTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
                         versionBomPolicyRequestService, hubRequestService, metaService,
                         logger));
         parallelProcessor.addTransform(RuleViolationClearedNotificationItem.class,
-                new PolicyViolationClearedTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
+                new PolicyViolationClearedTransformer(logger, notificationRequestService, projectVersionRequestService, policyRequestService,
                         versionBomPolicyRequestService, hubRequestService, policyNotificationFilter, metaService));
     }
 
