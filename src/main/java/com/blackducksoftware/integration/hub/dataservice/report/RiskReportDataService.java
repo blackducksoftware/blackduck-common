@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
@@ -110,8 +111,13 @@ public class RiskReportDataService extends HubRequestService {
             final List<VersionBomComponentView> bomEntries = bomRequestService.getBomEntries(version);
             for (final VersionBomComponentView bomEntry : bomEntries) {
                 final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
-                final BomComponentPolicyStatusView bomPolicyStatus = requestService.getItem(
-                        getComponentPolicyURL(originalVersionUrl, bomEntry.getComponentVersion()),
+                String componentPolicyStatusURL = null;
+                if (!StringUtils.isBlank(bomEntry.getComponentVersion())) {
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.getComponentVersion());
+                } else {
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.getComponent());
+                }
+                final BomComponentPolicyStatusView bomPolicyStatus = requestService.getItem(componentPolicyStatusURL,
                         BomComponentPolicyStatusView.class);
                 component.setPolicyStatus(bomPolicyStatus.getApprovalStatus());
                 components.add(component);
@@ -167,18 +173,22 @@ public class RiskReportDataService extends HubRequestService {
         }
     }
 
-    private String getComponentPolicyURL(final String versionURL, final String componentVersionURL) {
-        final String componentVersionSegments = componentVersionURL
-                .substring(componentVersionURL.indexOf(MetaService.COMPONENTS_LINK));
+    private String getComponentPolicyURL(final String versionURL, final String componentURL) {
+        final String componentVersionSegments = componentURL
+                .substring(componentURL.indexOf(MetaService.COMPONENTS_LINK));
         return versionURL + "/" + componentVersionSegments + "/" + MetaService.POLICY_STATUS_LINK;
     }
 
     private BomComponent createBomComponentFromBomViewEntry(final VersionReport report, final AggregateBomViewEntry bomEntry) {
         final BomComponent component = new BomComponent();
-        component.setComponentName(bomEntry.getProducerProject().getName());
-        component.setComponentVersion(bomEntry.getProducerReleases().get(0).getVersion());
-        component.setComponentURL(report.getComponentUrl(bomEntry));
-        component.setComponentVersionURL(report.getVersionUrl(bomEntry));
+        if (bomEntry.getProducerProject() != null) {
+            component.setComponentName(bomEntry.getProducerProject().getName());
+            component.setComponentURL(report.getComponentUrl(bomEntry));
+        }
+        if (bomEntry.getProducerReleases() != null && !bomEntry.getProducerReleases().isEmpty()) {
+            component.setComponentVersion(bomEntry.getProducerReleases().get(0).getVersion());
+            component.setComponentVersionURL(report.getVersionUrl(bomEntry));
+        }
         component.setLicense(bomEntry.getLicensesDisplay());
         component.setPolicyStatus(bomEntry.getPolicyApprovalStatusEnum());
         if (bomEntry.getVulnerabilityRisk() != null) {
