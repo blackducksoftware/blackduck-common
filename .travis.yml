@@ -5,8 +5,9 @@ jdk:
     
 install: true
 script:
-- mvn -U clean package com.blackducksoftware.integration:hub-maven-plugin:1.4.0:createHubOutput
+- mvn -U clean package 
   
 after_success:
 - mvn jacoco:report coveralls:report 
-- bash <(curl -s https://test.duckbuild.io/bash/travis) ./target/blackduck/hub-common_bdio.jsonld 
+- mvn com.blackducksoftware.integration:hub-maven-plugin:1.4.0:createHubOutput -Dhub.output.directory=.
+- bash <(curl -s https://test.duckbuild.io/bash/travis) ./*bdio.jsonld 
