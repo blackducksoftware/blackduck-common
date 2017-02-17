@@ -92,7 +92,6 @@ var RiskReport = function (myJQuery, jsonData) {
 	};
 	
 	RiskReport.prototype.createVersionSummary = function () {
-		var detailedReleaseSummary = this.rawdata.report.detailedReleaseSummary;
 		var table = document.createElement("div");
 		this.myJQuery(table).addClass("versionSummaryTable");
 		var versionInfo = document.createElement("div");
@@ -299,8 +298,8 @@ var RiskReport = function (myJQuery, jsonData) {
 	
 		var columnComponent = document.createElement("td");
 		this.myJQuery(columnComponent).addClass("clickable componentColumn evenPadding");
-		if(entry.componentUrl) {
-			this.myJQuery(columnComponent).attr("onclick" ,"window.open('"+entry.componentUrl+"', '_blank');");
+		if(entry.componentURL) {
+			this.myJQuery(columnComponent).attr("onclick" ,"window.open('"+entry.componentURL+"', '_blank');");
 		}
 		this.myJQuery(columnComponent).text(entry.componentName);
 
@@ -384,7 +383,7 @@ var RiskReport = function (myJQuery, jsonData) {
 		this.myJQuery(table).append(this.createComponentTableHead());
 		var tableBody = document.createElement("tbody");
 		this.myJQuery(tableBody).attr("id","hubBomReportBody");
-		var entryArray = this.rawdata.report.aggregateBomViewEntries;
+		var entryArray = this.rawdata.components;
 		var odd = true;
 		for (var index = 0; index < entryArray.length; index++) { 
 			try {

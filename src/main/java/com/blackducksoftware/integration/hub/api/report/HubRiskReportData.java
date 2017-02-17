@@ -90,7 +90,7 @@ public class HubRiskReportData {
                     } else if (bomEntry.getLicenseRisk().getMEDIUM() > 0) {
                         licenseRiskMediumCount++;
                     } else if (bomEntry.getLicenseRisk().getLOW() > 0) {
-                        licenseRiskLowCount += 1;
+                        licenseRiskLowCount++;
                     }
                 }
                 if (bomEntry.getOperationalRisk() != null) {

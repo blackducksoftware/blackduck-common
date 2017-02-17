@@ -96,21 +96,22 @@ public class RiskReportDataService extends HubRequestService {
 
     public ReportData getRiskReportData(final ProjectItem project, final ProjectVersionItem version)
             throws HubIntegrationException {
+        final String originalProjectUrl = metaService.getHref(project);
+        final String originalVersionUrl = metaService.getHref(version);
         final ReportData reportData = new ReportData();
         reportData.setProjectName(project.getName());
-        reportData.setProjectURL(getReportProjectUrl(metaService.getHref(project)));
+        reportData.setProjectURL(getReportProjectUrl(originalProjectUrl));
         reportData.setProjectVersion(version.getVersionName());
-        reportData.setProjectVersionURL(getReportVersionUrl(metaService.getHref(version), false));
+        reportData.setProjectVersionURL(getReportVersionUrl(originalVersionUrl, false));
         reportData.setPhase(version.getPhase());
         reportData.setDistribution(version.getDistribution());
         final List<BomComponent> components = new ArrayList<>();
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.AGGREGATE_BOM_REST_SERVER)) {
-            final String componentURL = metaService.getFirstLink(version, MetaService.COMPONENTS_LINK);
-            final List<VersionBomComponentView> bomEntries = bomRequestService.getBomEntries(componentURL);
+            final List<VersionBomComponentView> bomEntries = bomRequestService.getBomEntries(version);
             for (final VersionBomComponentView bomEntry : bomEntries) {
                 final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
                 final BomComponentPolicyStatusView bomPolicyStatus = requestService.getItem(
-                        getComponentPolicyURL(reportData.getProjectVersionURL(), component.getComponentVersionURL()),
+                        getComponentPolicyURL(originalVersionUrl, bomEntry.getComponentVersion()),
                         BomComponentPolicyStatusView.class);
                 component.setPolicyStatus(bomPolicyStatus.getApprovalStatus());
                 components.add(component);
@@ -168,8 +169,8 @@ public class RiskReportDataService extends HubRequestService {
 
     private String getComponentPolicyURL(final String versionURL, final String componentVersionURL) {
         final String componentVersionSegments = componentVersionURL
-                .substring(componentVersionURL.indexOf(MetaService.COMPONENTS_LINK) + MetaService.COMPONENTS_LINK.length());
-        return versionURL + componentVersionSegments;
+                .substring(componentVersionURL.indexOf(MetaService.COMPONENTS_LINK));
+        return versionURL + "/" + componentVersionSegments + "/" + MetaService.POLICY_STATUS_LINK;
     }
 
     private BomComponent createBomComponentFromBomViewEntry(final VersionReport report, final AggregateBomViewEntry bomEntry) {
@@ -253,7 +254,7 @@ public class RiskReportDataService extends HubRequestService {
         if (projectURL == null) {
             return null;
         }
-        final String projectId = projectURL.substring(projectURL.lastIndexOf("/"));
+        final String projectId = projectURL.substring(projectURL.lastIndexOf("/") + 1);
         final StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(getBaseUrl());
         urlBuilder.append("#");
@@ -267,7 +268,7 @@ public class RiskReportDataService extends HubRequestService {
         if (versionURL == null) {
             return null;
         }
-        final String versionId = versionURL.substring(versionURL.lastIndexOf("/"));
+        final String versionId = versionURL.substring(versionURL.lastIndexOf("/") + 1);
         final StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(getBaseUrl());
         urlBuilder.append("#");

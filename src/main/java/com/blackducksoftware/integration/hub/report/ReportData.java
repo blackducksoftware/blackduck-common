@@ -91,29 +91,23 @@ public class ReportData {
             if (component != null) {
                 if (component.getSecurityRiskHighCount() > 0) {
                     vulnerabilityRiskHighCount++;
-                }
-                if (component.getSecurityRiskMediumCount() > 0) {
+                } else if (component.getSecurityRiskMediumCount() > 0) {
                     vulnerabilityRiskMediumCount++;
-                }
-                if (component.getSecurityRiskLowCount() > 0) {
+                } else if (component.getSecurityRiskLowCount() > 0) {
                     vulnerabilityRiskLowCount++;
                 }
                 if (component.getLicenseRiskHighCount() > 0) {
                     licenseRiskHighCount++;
-                }
-                if (component.getLicenseRiskMediumCount() > 0) {
+                } else if (component.getLicenseRiskMediumCount() > 0) {
                     licenseRiskMediumCount++;
-                }
-                if (component.getLicenseRiskLowCount() > 0) {
+                } else if (component.getLicenseRiskLowCount() > 0) {
                     licenseRiskLowCount++;
                 }
                 if (component.getOperationalRiskHighCount() > 0) {
                     operationalRiskHighCount++;
-                }
-                if (component.getOperationalRiskMediumCount() > 0) {
+                } else if (component.getOperationalRiskMediumCount() > 0) {
                     operationalRiskMediumCount++;
-                }
-                if (component.getOperationalRiskLowCount() > 0) {
+                } else if (component.getOperationalRiskLowCount() > 0) {
                     operationalRiskLowCount++;
                 }
             }

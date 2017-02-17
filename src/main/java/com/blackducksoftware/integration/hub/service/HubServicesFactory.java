@@ -102,7 +102,7 @@ public class HubServicesFactory {
     public RiskReportDataService createRiskReportDataService(final IntLogger logger,
             final long timeoutInMilliseconds) {
         return new RiskReportDataService(logger, restConnection, createProjectRequestService(),
-                createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds), createAggregateBomRequestService(),
+                createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds), createAggregateBomRequestService(logger),
                 createHubRequestService(), createMetaService(logger), createCheckedHubSupport(logger));
     }
 
@@ -224,8 +224,8 @@ public class HubServicesFactory {
         return new ReportRequestService(restConnection, logger, createMetaService(logger), timeoutInMilliseconds);
     }
 
-    public AggregateBomRequestService createAggregateBomRequestService() {
-        return new AggregateBomRequestService(restConnection);
+    public AggregateBomRequestService createAggregateBomRequestService(final IntLogger logger) {
+        return new AggregateBomRequestService(restConnection, createMetaService(logger));
     }
 
     public MetaService createMetaService(final IntLogger logger) {
