@@ -26,7 +26,7 @@ var RiskReport = function (myJQuery, jsonData) {
 	this.rawdata = jsonData;
 };
 	RiskReport.prototype.getPercentage = function (count) {
-		var totalCount = this.rawdata.totalBomEntries;
+		var totalCount = this.rawdata.totalComponents;
         var percentage = 0;
         if (totalCount > 0 && count > 0) {
             percentage = (count / totalCount) * 100;
@@ -34,65 +34,12 @@ var RiskReport = function (myJQuery, jsonData) {
         return percentage;
 	};
 	
-	RiskReport.prototype.createBaseUrl = function () {
-		var detailedReleaseSummary = this.rawdata.report.detailedReleaseSummary; 
-		var url = detailedReleaseSummary.uiUrlGenerator.baseUrl;
-		return url;
-	};
-	
-	RiskReport.prototype.createProjectUrl = function () {
-		var detailedReleaseSummary = this.rawdata.report.detailedReleaseSummary;
-		if(detailedReleaseSummary) {
-			var url = this.createBaseUrl();
-			url = url +"#projects/id:";
-	        url = url +detailedReleaseSummary.projectId;
-	        return url;
-		} else {
-			return "";
-		}
-	};
-	
-	RiskReport.prototype.createComponentUrl = function (entry) { 
-		if(entry.producerProject) {
-			var url = this.createBaseUrl();
-			url = url+"#projects/id:";
-			url = url + entry.producerProject.id;
-			return url;
-		} else {
-			return "";
-		}
-	};
-	
-	RiskReport.prototype.createComponentVersionUrl = function (entry) {
-		if(entry.producerReleases && entry.producerReleases.length > 0) {
-			var url = this.createBaseUrl();
-	        url = url + "#versions/id:";
-	        url = url + entry.producerReleases[0].id;
-	        return url;
-		} else {
-			return "";
-		}
-	};
-	
-	RiskReport.prototype.createVersionUrl = function () {
-		var detailedReleaseSummary = this.rawdata.report.detailedReleaseSummary; 
-		if (detailedReleaseSummary) {
-		var url = this.createBaseUrl();
-		url = url + "#versions/id:";
-		url = url + detailedReleaseSummary.versionId;
-		url = url + "/view:bom";
-		return url;
-		} else {
-			return "";
-		}
-	};
-	
-	RiskReport.prototype.createRiskString = function (riskCategory) {
-        if (riskCategory.HIGH != 0) {
+	RiskReport.prototype.createRiskString = function (high, medium, low) {
+        if (high != 0) {
             return "H";
-        } else if (riskCategory.MEDIUM != 0) {
+        } else if (medium != 0) {
             return "M";
-        } else if (riskCategory.LOW != 0) {
+        } else if (low != 0) {
             return "L";
         } else {
             return "-";
@@ -152,27 +99,24 @@ var RiskReport = function (myJQuery, jsonData) {
 		var projectName = document.createElement("div");
 		var projectVersion = document.createElement("div");
 		var moreDetail = document.createElement("div");
-		var projectUrl = this.createProjectUrl();
-		var versionUrl = this.createVersionUrl();
 		
 		this.myJQuery(projectName).addClass("clickable linkText versionSummaryLargeLabel");
 		
-		
-		if(projectUrl) {
-			this.myJQuery(projectName).attr("onclick" ,"window.open('"+projectUrl+"', '_blank');");
+		if(this.rawdata.projectURL) {
+			this.myJQuery(projectName).attr("onclick" ,"window.open('"+this.rawdata.projectURL+"', '_blank');");
 		}
-		this.myJQuery(projectName).text(detailedReleaseSummary.projectName);
+		this.myJQuery(projectName).text(this.rawdata.projectName);
 		
 		this.myJQuery(projectVersion).addClass("clickable linkText versionSummaryLargeLabel");
-		if(versionUrl) {
-			this.myJQuery(projectVersion).attr("onclick" ,"window.open('"+versionUrl+"', '_blank');");
+		if(this.rawdata.projectVersionURL) {
+			this.myJQuery(projectVersion).attr("onclick" ,"window.open('"+this.rawdata.projectVersionURL+"', '_blank');");
 		}
-		this.myJQuery(projectVersion).text(detailedReleaseSummary.version);
+		this.myJQuery(projectVersion).text(this.rawdata.projectVersion);
 		
 		this.myJQuery(moreDetail).addClass("linkText riskReportText clickable evenPadding");
 		this.myJQuery(moreDetail).css({"float": "right"});
-		if(versionUrl) {
-			this.myJQuery(moreDetail).attr("onclick" ,"window.open('"+versionUrl+"', '_blank');");
+		if(this.rawdata.projectVersionURL) {
+			this.myJQuery(moreDetail).attr("onclick" ,"window.open('"+this.rawdata.projectVersionURL+"', '_blank');");
 		}
 		this.myJQuery(moreDetail).text("See more detail...");
 		
@@ -183,14 +127,14 @@ var RiskReport = function (myJQuery, jsonData) {
 		
 		var info = this.myJQuery(document.createElement("div"));
 		this.myJQuery(info).append(this.myJQuery('<div class="versionSummaryLabel">Phase:</div>'));
-		 this.myJQuery(info).append(this.myJQuery('<div class="versionSummaryLabel">'+this.createPhaseString(detailedReleaseSummary.phase)+'</div>'));
-	        this.myJQuery(info).append(this.myJQuery('<div class="versionSummaryLabel">|</div>'));
-	        this.myJQuery(info).append(this.myJQuery('<div class="versionSummaryLabel">Distribution:</div>'));
-	        this.myJQuery(info).append(this.myJQuery('<div class="versionSummaryLabel">'+this.createDistributionString(detailedReleaseSummary.distribution)+'</div>'));		
-	   this.myJQuery(table).append(versionInfo);
-       this.myJQuery(table).append(info);	
+		this.myJQuery(info).append(this.myJQuery('<div class="versionSummaryLabel">'+this.createPhaseString(this.rawdata.phase)+'</div>'));
+		this.myJQuery(info).append(this.myJQuery('<div class="versionSummaryLabel">|</div>'));
+		this.myJQuery(info).append(this.myJQuery('<div class="versionSummaryLabel">Distribution:</div>'));
+		this.myJQuery(info).append(this.myJQuery('<div class="versionSummaryLabel">'+this.createDistributionString(this.rawdata.distribution)+'</div>'));		
+		this.myJQuery(table).append(versionInfo);
+		this.myJQuery(table).append(info);	
 	        
-	   return table;
+		return table;
 	};
 	
 	RiskReport.prototype.createHorizontalBar = function (labelId,labelValue, clickFnName, barId,barValue,barStyleClass) {
@@ -269,7 +213,7 @@ var RiskReport = function (myJQuery, jsonData) {
 		this.myJQuery(tableDataLabel).text("BOM Entries");
 		var tableDataValue = document.createElement("td");
 		this.myJQuery(tableDataValue).addClass("summaryLabel");
-		this.myJQuery(tableDataValue).text(this.rawdata.totalBomEntries);
+		this.myJQuery(tableDataValue).text(this.rawdata.totalComponents);
 		
 		this.myJQuery(tableRow).append(tableDataLabel);
 		this.myJQuery(tableRow).append(tableDataValue);
@@ -350,25 +294,23 @@ var RiskReport = function (myJQuery, jsonData) {
 		this.myJQuery(columnApprovalStatus).addClass("evenPadding violation");
 		this.myJQuery(columnApprovalStatus).append(this.myJQuery('<i class="fa fa-ban"></i>'));
 		var approvalDiv = document.createElement("div");
-		this.myJQuery(approvalDiv).text(entry.policyApprovalStatus);
+		this.myJQuery(approvalDiv).text(entry.policyStatus);
 		this.myJQuery(columnApprovalStatus).append(approvalDiv);
 	
 		var columnComponent = document.createElement("td");
 		this.myJQuery(columnComponent).addClass("clickable componentColumn evenPadding");
-		var componentUrl = this.createComponentUrl(entry);
-		if(componentUrl) {
-			this.myJQuery(columnComponent).attr("onclick" ,"window.open('"+componentUrl+"', '_blank');");
+		if(entry.componentUrl) {
+			this.myJQuery(columnComponent).attr("onclick" ,"window.open('"+entry.componentUrl+"', '_blank');");
 		}
-		this.myJQuery(columnComponent).text(entry.producerProject.name);
+		this.myJQuery(columnComponent).text(entry.componentName);
 
         var columnVersion = document.createElement("td");
-        if(entry.producerReleases[0]){
+        if(entry.componentVersion){
 	        this.myJQuery(columnVersion).addClass("clickable componentColumn evenPadding");
-	        var componentVersionUrl = this.createComponentVersionUrl(entry);
-	        if (componentVersionUrl) {
-	        	this.myJQuery(columnVersion).attr("onclick" ,"window.open('"+componentVersionUrl+"', '_blank');");
+	        if (entry.componentVersionURL) {
+	        	this.myJQuery(columnVersion).attr("onclick" ,"window.open('"+entry.componentVersionURL+"', '_blank');");
 	        }
-			this.myJQuery(columnVersion).text(entry.producerReleases[0].version);
+			this.myJQuery(columnVersion).text(entry.componentVersion);
         } else{
         	 this.myJQuery(columnVersion).addClass("componentColumn evenPadding");
         	this.myJQuery(columnVersion).text("?");
@@ -376,42 +318,40 @@ var RiskReport = function (myJQuery, jsonData) {
 		
         var columnLicense = document.createElement("td");
         this.myJQuery(columnLicense).addClass("licenseColumn evenPadding");
-        if(entry.licenses[0]){
-        this.myJQuery(columnLicense).attr("title",entry.licenses[0].licenseDisplay);
-        this.myJQuery(columnLicense).text(entry.licenses[0].licenseDisplay);
+        if(entry.license){
+        this.myJQuery(columnLicense).attr("title",entry.license);
+        this.myJQuery(columnLicense).text(entry.license);
         } else{
         	this.myJQuery(columnLicense).attr("title","Unknown License");
             this.myJQuery(columnLicense).text("Unknown License");
         }
-        var riskCategories = entry.riskProfile.categories;
-        var vulnerabilityRiskProfile = riskCategories.VULNERABILITY;
         
         var columnHighRisk = document.createElement("td");
         this.myJQuery(columnHighRisk).addClass("riskColumn");
         var highRiskDiv = document.createElement("div");
         this.myJQuery(highRiskDiv).addClass("risk-span riskColumn risk-count");
-        this.myJQuery(highRiskDiv).text(vulnerabilityRiskProfile.HIGH);
+        this.myJQuery(highRiskDiv).text(entry.securityRiskHighCount);
         this.myJQuery(columnHighRisk).append(highRiskDiv);
 
         var columnMediumRisk = document.createElement("td");
         this.myJQuery(columnMediumRisk).addClass("riskColumn");
         var mediumRiskDiv = document.createElement("div");
         this.myJQuery(mediumRiskDiv).addClass("risk-span riskColumn risk-count");
-        this.myJQuery( mediumRiskDiv).text(vulnerabilityRiskProfile.MEDIUM);
+        this.myJQuery( mediumRiskDiv).text(entry.securityRiskMediumCount);
         this.myJQuery(columnMediumRisk).append(mediumRiskDiv);
 
         var columnLowRisk = document.createElement("td");
         this.myJQuery(columnLowRisk).addClass("riskColumn");
         var lowRiskDiv = document.createElement("div");
         this.myJQuery(lowRiskDiv).addClass("risk-span riskColumn risk-count");
-        this.myJQuery(lowRiskDiv).text(vulnerabilityRiskProfile.LOW);
+        this.myJQuery(lowRiskDiv).text(entry.securityRiskLowCount);
         this.myJQuery(columnLowRisk).append(lowRiskDiv);
 
         var columnLicenseRisk = document.createElement("td");
         this.myJQuery(columnLicenseRisk).addClass("riskColumn");
         var licRiskDiv = document.createElement("div");
         this.myJQuery(licRiskDiv).addClass("risk-span riskColumn risk-count");
-        this.myJQuery(licRiskDiv).text(this.createRiskString(riskCategories.LICENSE));
+        this.myJQuery(licRiskDiv).text(this.createRiskString(entry.licenseRiskHighCount, entry.licenseRiskMediumCount, entry.licenseRiskLowCount));
         this.myJQuery(columnLicenseRisk).append(licRiskDiv);
         
         var columnOperationalRisk = document.createElement("td");
@@ -419,7 +359,7 @@ var RiskReport = function (myJQuery, jsonData) {
         this.myJQuery(columnOperationalRisk).addClass("riskColumn");
         var opRiskDiv = document.createElement("div");
         this.myJQuery(opRiskDiv).addClass("risk-span riskColumn risk-count");
-        this.myJQuery(opRiskDiv).text(this.createRiskString(riskCategories.OPERATIONAL));
+        this.myJQuery(opRiskDiv).text(this.createRiskString(entry.operationalRiskHighCount, entry.operationalRiskMediumCount, entry.operationalRiskLowCount));
         this.myJQuery(columnOperationalRisk).append(opRiskDiv);
         
         this.myJQuery(tableRow).append(columnApprovalStatus);

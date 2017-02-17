@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.hub.HubSupportHelper;
+import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
 import com.blackducksoftware.integration.hub.api.bom.BomRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
@@ -101,7 +102,8 @@ public class HubServicesFactory {
     public RiskReportDataService createRiskReportDataService(final IntLogger logger,
             final long timeoutInMilliseconds) {
         return new RiskReportDataService(logger, restConnection, createProjectRequestService(),
-                createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds));
+                createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds), createAggregateBomRequestService(),
+                createHubRequestService(), createMetaService(logger), createCheckedHubSupport(logger));
     }
 
     public PolicyStatusDataService createPolicyStatusDataService(final IntLogger logger) {
@@ -220,6 +222,10 @@ public class HubServicesFactory {
 
     public ReportRequestService createReportRequestService(final IntLogger logger, final long timeoutInMilliseconds) {
         return new ReportRequestService(restConnection, logger, createMetaService(logger), timeoutInMilliseconds);
+    }
+
+    public AggregateBomRequestService createAggregateBomRequestService() {
+        return new AggregateBomRequestService(restConnection);
     }
 
     public MetaService createMetaService(final IntLogger logger) {

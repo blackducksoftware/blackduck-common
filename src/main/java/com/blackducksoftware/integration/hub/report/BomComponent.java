@@ -1,13 +1,25 @@
-/*
- * Copyright (C) 2017 Black Duck Software Inc.
- * http://www.blackducksoftware.com/
- * All rights reserved.
+/**
+ * Hub Common
  *
- * This software is the confidential and proprietary information of
- * Black Duck Software ("Confidential Information"). You shall not
- * disclose such Confidential Information and shall use it only in
- * accordance with the terms of the license agreement you entered into
- * with Black Duck Software.
+ * Copyright (C) 2017 Black Duck Software, Inc.
+ * http://www.blackducksoftware.com/
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package com.blackducksoftware.integration.hub.report;
 
@@ -26,23 +38,23 @@ public class BomComponent {
 
     private String license;
 
-    private int highSecurityRisk;
+    private int securityRiskHighCount;
 
-    private int mediumSecurityRisk;
+    private int securityRiskMediumCount;
 
-    private int lowSecurityRisk;
+    private int securityRiskLowCount;
 
-    private int highLicenseRisk;
+    private int licenseRiskHighCount;
 
-    private int mediumLicenseRisk;
+    private int licenseRiskMediumCount;
 
-    private int lowLicenseRisk;
+    private int licenseRiskLowCount;
 
-    private int highOperationalRisk;
+    private int operationalRiskHighCount;
 
-    private int mediumOperationalRisk;
+    private int operationalRiskMediumCount;
 
-    private int lowOperationalRisk;
+    private int operationalRiskLowCount;
 
     public PolicyStatusEnum getPolicyStatus() {
         return policyStatus;
@@ -92,76 +104,76 @@ public class BomComponent {
         this.license = license;
     }
 
-    public int getHighSecurityRisk() {
-        return highSecurityRisk;
+    public int getSecurityRiskHighCount() {
+        return securityRiskHighCount;
     }
 
-    public void setHighSecurityRisk(final int highSecurityRisk) {
-        this.highSecurityRisk = highSecurityRisk;
+    public void setSecurityRiskHighCount(final int securityRiskHighCount) {
+        this.securityRiskHighCount = securityRiskHighCount;
     }
 
-    public int getMediumSecurityRisk() {
-        return mediumSecurityRisk;
+    public int getSecurityRiskMediumCount() {
+        return securityRiskMediumCount;
     }
 
-    public void setMediumSecurityRisk(final int mediumSecurityRisk) {
-        this.mediumSecurityRisk = mediumSecurityRisk;
+    public void setSecurityRiskMediumCount(final int securityRiskMediumCount) {
+        this.securityRiskMediumCount = securityRiskMediumCount;
     }
 
-    public int getLowSecurityRisk() {
-        return lowSecurityRisk;
+    public int getSecurityRiskLowCount() {
+        return securityRiskLowCount;
     }
 
-    public void setLowSecurityRisk(final int lowSecurityRisk) {
-        this.lowSecurityRisk = lowSecurityRisk;
+    public void setSecurityRiskLowCount(final int securityRiskLowCount) {
+        this.securityRiskLowCount = securityRiskLowCount;
     }
 
-    public int getHighLicenseRisk() {
-        return highLicenseRisk;
+    public int getLicenseRiskHighCount() {
+        return licenseRiskHighCount;
     }
 
-    public void setHighLicenseRisk(final int highLicenseRisk) {
-        this.highLicenseRisk = highLicenseRisk;
+    public void setLicenseRiskHighCount(final int licenseRiskHighCount) {
+        this.licenseRiskHighCount = licenseRiskHighCount;
     }
 
-    public int getMediumLicenseRisk() {
-        return mediumLicenseRisk;
+    public int getLicenseRiskMediumCount() {
+        return licenseRiskMediumCount;
     }
 
-    public void setMediumLicenseRisk(final int mediumLicenseRisk) {
-        this.mediumLicenseRisk = mediumLicenseRisk;
+    public void setLicenseRiskMediumCount(final int licenseRiskMediumCount) {
+        this.licenseRiskMediumCount = licenseRiskMediumCount;
     }
 
-    public int getLowLicenseRisk() {
-        return lowLicenseRisk;
+    public int getLicenseRiskLowCount() {
+        return licenseRiskLowCount;
     }
 
-    public void setLowLicenseRisk(final int lowLicenseRisk) {
-        this.lowLicenseRisk = lowLicenseRisk;
+    public void setLicenseRiskLowCount(final int licenseRiskLowCount) {
+        this.licenseRiskLowCount = licenseRiskLowCount;
     }
 
-    public int getHighOperationalRisk() {
-        return highOperationalRisk;
+    public int getOperationalRiskHighCount() {
+        return operationalRiskHighCount;
     }
 
-    public void setHighOperationalRisk(final int highOperationalRisk) {
-        this.highOperationalRisk = highOperationalRisk;
+    public void setOperationalRiskHighCount(final int operationalRiskHighCount) {
+        this.operationalRiskHighCount = operationalRiskHighCount;
     }
 
-    public int getMediumOperationalRisk() {
-        return mediumOperationalRisk;
+    public int getOperationalRiskMediumCount() {
+        return operationalRiskMediumCount;
     }
 
-    public void setMediumOperationalRisk(final int mediumOperationalRisk) {
-        this.mediumOperationalRisk = mediumOperationalRisk;
+    public void setOperationalRiskMediumCount(final int operationalRiskMediumCount) {
+        this.operationalRiskMediumCount = operationalRiskMediumCount;
     }
 
-    public int getLowOperationalRisk() {
-        return lowOperationalRisk;
+    public int getOperationalRiskLowCount() {
+        return operationalRiskLowCount;
     }
 
-    public void setLowOperationalRisk(final int lowOperationalRisk) {
-        this.lowOperationalRisk = lowOperationalRisk;
+    public void setOperationalRiskLowCount(final int operationalRiskLowCount) {
+        this.operationalRiskLowCount = operationalRiskLowCount;
     }
 
 }

@@ -39,7 +39,6 @@ import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
-import com.blackducksoftware.integration.hub.api.report.HubRiskReportData;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
@@ -99,9 +98,9 @@ public class RiskReportDataService extends HubRequestService {
             throws HubIntegrationException {
         final ReportData reportData = new ReportData();
         reportData.setProjectName(project.getName());
-        reportData.setProjectURL(metaService.getHref(project));
+        reportData.setProjectURL(getReportProjectUrl(metaService.getHref(project)));
         reportData.setProjectVersion(version.getVersionName());
-        reportData.setProjectVersionURL(metaService.getHref(version));
+        reportData.setProjectVersionURL(getReportVersionUrl(metaService.getHref(version), false));
         reportData.setPhase(version.getPhase());
         reportData.setDistribution(version.getDistribution());
         final List<BomComponent> components = new ArrayList<>();
@@ -129,24 +128,17 @@ public class RiskReportDataService extends HubRequestService {
         return reportData;
     }
 
-    public void createRiskReportFiles(final File outputDirectory, final String projectName, final String projectVersionName,
-            final ReportCategoriesEnum[] categories) throws HubIntegrationException {
-        final HubRiskReportData riskreportData = createRiskReport(projectName, projectVersionName, categories);
-        createRiskReportFiles(outputDirectory, riskreportData);
+    public void createReportFiles(final File outputDirectory, final String projectName, final String projectVersionName) throws HubIntegrationException {
+        final ReportData reportData = getRiskReportData(projectName, projectVersionName);
+        createReportFiles(outputDirectory, reportData);
     }
 
-    public void createRiskReportFiles(final File outputDirectory, final ProjectVersionItem version) throws HubIntegrationException {
-        final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
-        createRiskReportFiles(outputDirectory, version, categories);
+    public void createReportFiles(final File outputDirectory, final ProjectItem project, final ProjectVersionItem version) throws HubIntegrationException {
+        final ReportData reportData = getRiskReportData(project, version);
+        createReportFiles(outputDirectory, reportData);
     }
 
-    public void createRiskReportFiles(final File outputDirectory, final ProjectVersionItem version,
-            final ReportCategoriesEnum[] categories) throws HubIntegrationException {
-        final HubRiskReportData riskreportData = createRiskReport(version, categories);
-        createRiskReportFiles(outputDirectory, riskreportData);
-    }
-
-    public void createRiskReportFiles(final File outputDirectory, final HubRiskReportData riskreportData) throws HubIntegrationException {
+    public void createReportFiles(final File outputDirectory, final ReportData reportData) throws HubIntegrationException {
         try {
             final RiskReportResourceCopier copier = new RiskReportResourceCopier(outputDirectory.getCanonicalPath());
             File htmlFile = null;
@@ -166,7 +158,7 @@ public class RiskReportDataService extends HubRequestService {
                         + ", the report files must not have been copied into the report directory.");
             }
             String htmlFileString = FileUtils.readFileToString(htmlFile, "UTF-8");
-            final String reportString = getRestConnection().getGson().toJson(riskreportData);
+            final String reportString = getRestConnection().getGson().toJson(reportData);
             htmlFileString = htmlFileString.replace(RiskReportResourceCopier.JSON_TOKEN_TO_REPLACE, reportString);
             FileUtils.writeStringToFile(htmlFile, htmlFileString, "UTF-8");
         } catch (final IOException e) {
@@ -189,19 +181,19 @@ public class RiskReportDataService extends HubRequestService {
         component.setLicense(bomEntry.getLicensesDisplay());
         component.setPolicyStatus(bomEntry.getPolicyApprovalStatusEnum());
         if (bomEntry.getVulnerabilityRisk() != null) {
-            component.setHighSecurityRisk(bomEntry.getVulnerabilityRisk().getHIGH());
-            component.setMediumSecurityRisk(bomEntry.getVulnerabilityRisk().getMEDIUM());
-            component.setLowSecurityRisk(bomEntry.getVulnerabilityRisk().getLOW());
+            component.setSecurityRiskHighCount(bomEntry.getVulnerabilityRisk().getHIGH());
+            component.setSecurityRiskMediumCount(bomEntry.getVulnerabilityRisk().getMEDIUM());
+            component.setSecurityRiskLowCount(bomEntry.getVulnerabilityRisk().getLOW());
         }
         if (bomEntry.getLicenseRisk() != null) {
-            component.setHighLicenseRisk(bomEntry.getLicenseRisk().getHIGH());
-            component.setMediumLicenseRisk(bomEntry.getLicenseRisk().getMEDIUM());
-            component.setLowLicenseRisk(bomEntry.getLicenseRisk().getLOW());
+            component.setLicenseRiskHighCount(bomEntry.getLicenseRisk().getHIGH());
+            component.setLicenseRiskMediumCount(bomEntry.getLicenseRisk().getMEDIUM());
+            component.setLicenseRiskLowCount(bomEntry.getLicenseRisk().getLOW());
         }
         if (bomEntry.getOperationalRisk() != null) {
-            component.setHighOperationalRisk(bomEntry.getOperationalRisk().getHIGH());
-            component.setMediumOperationalRisk(bomEntry.getOperationalRisk().getMEDIUM());
-            component.setLowOperationalRisk(bomEntry.getOperationalRisk().getLOW());
+            component.setOperationalRiskHighCount(bomEntry.getOperationalRisk().getHIGH());
+            component.setOperationalRiskMediumCount(bomEntry.getOperationalRisk().getMEDIUM());
+            component.setOperationalRiskLowCount(bomEntry.getOperationalRisk().getLOW());
         }
 
         return component;
@@ -210,19 +202,19 @@ public class RiskReportDataService extends HubRequestService {
     private BomComponent createBomComponentFromBomComponentView(final VersionBomComponentView bomEntry) {
         final BomComponent component = new BomComponent();
         component.setComponentName(bomEntry.getComponentName());
-        component.setComponentURL(bomEntry.getComponent());
+        component.setComponentURL(getReportProjectUrl(bomEntry.getComponent()));
         component.setComponentVersion(bomEntry.getComponentVersionName());
-        component.setComponentVersionURL(bomEntry.getComponentVersion());
+        component.setComponentVersionURL(getReportVersionUrl(bomEntry.getComponentVersion(), true));
 
         if (bomEntry.getSecurityRiskProfile() != null && bomEntry.getSecurityRiskProfile().getCounts() != null
                 && !bomEntry.getSecurityRiskProfile().getCounts().isEmpty()) {
             for (final RiskCountView count : bomEntry.getSecurityRiskProfile().getCounts()) {
                 if (count.getCountType() == CountTypeEnum.HIGH && count.getCount() > 0) {
-                    component.setHighSecurityRisk(count.getCount());
+                    component.setSecurityRiskHighCount(count.getCount());
                 } else if (count.getCountType() == CountTypeEnum.MEDIUM && count.getCount() > 0) {
-                    component.setMediumSecurityRisk(count.getCount());
+                    component.setSecurityRiskMediumCount(count.getCount());
                 } else if (count.getCountType() == CountTypeEnum.LOW && count.getCount() > 0) {
-                    component.setLowSecurityRisk(count.getCount());
+                    component.setSecurityRiskLowCount(count.getCount());
                 }
             }
         }
@@ -230,11 +222,11 @@ public class RiskReportDataService extends HubRequestService {
                 && !bomEntry.getLicenseRiskProfile().getCounts().isEmpty()) {
             for (final RiskCountView count : bomEntry.getLicenseRiskProfile().getCounts()) {
                 if (count.getCountType() == CountTypeEnum.HIGH && count.getCount() > 0) {
-                    component.setHighLicenseRisk(count.getCount());
+                    component.setLicenseRiskHighCount(count.getCount());
                 } else if (count.getCountType() == CountTypeEnum.MEDIUM && count.getCount() > 0) {
-                    component.setMediumLicenseRisk(count.getCount());
+                    component.setLicenseRiskMediumCount(count.getCount());
                 } else if (count.getCountType() == CountTypeEnum.LOW && count.getCount() > 0) {
-                    component.setLowLicenseRisk(count.getCount());
+                    component.setLicenseRiskLowCount(count.getCount());
                 }
             }
         }
@@ -242,14 +234,48 @@ public class RiskReportDataService extends HubRequestService {
                 && !bomEntry.getOperationalRiskProfile().getCounts().isEmpty()) {
             for (final RiskCountView count : bomEntry.getOperationalRiskProfile().getCounts()) {
                 if (count.getCountType() == CountTypeEnum.HIGH && count.getCount() > 0) {
-                    component.setHighOperationalRisk(count.getCount());
+                    component.setOperationalRiskHighCount(count.getCount());
                 } else if (count.getCountType() == CountTypeEnum.MEDIUM && count.getCount() > 0) {
-                    component.setMediumOperationalRisk(count.getCount());
+                    component.setOperationalRiskMediumCount(count.getCount());
                 } else if (count.getCountType() == CountTypeEnum.LOW && count.getCount() > 0) {
-                    component.setLowOperationalRisk(count.getCount());
+                    component.setOperationalRiskLowCount(count.getCount());
                 }
             }
         }
         return component;
+    }
+
+    private String getBaseUrl() {
+        return requestService.getRestConnection().getBaseUrl().toString();
+    }
+
+    private String getReportProjectUrl(final String projectURL) {
+        if (projectURL == null) {
+            return null;
+        }
+        final String projectId = projectURL.substring(projectURL.lastIndexOf("/"));
+        final StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("#");
+        urlBuilder.append("projects/id:");
+        urlBuilder.append(projectId);
+
+        return urlBuilder.toString();
+    }
+
+    private String getReportVersionUrl(final String versionURL, final boolean isComponent) {
+        if (versionURL == null) {
+            return null;
+        }
+        final String versionId = versionURL.substring(versionURL.lastIndexOf("/"));
+        final StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("#");
+        urlBuilder.append("versions/id:");
+        urlBuilder.append(versionId);
+        if (!isComponent) {
+            urlBuilder.append("/view:bom");
+        }
+        return urlBuilder.toString();
     }
 }

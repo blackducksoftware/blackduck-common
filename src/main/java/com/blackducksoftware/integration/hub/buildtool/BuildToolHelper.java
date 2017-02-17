@@ -84,7 +84,7 @@ public class BuildToolHelper {
             final File outputDirectory, final String projectName, final String projectVersionName, final long timeoutInSeconds)
             throws HubIntegrationException {
         final RiskReportDataService reportDataService = services.createRiskReportDataService(logger, timeoutInSeconds * 1000);
-        reportDataService.createRiskReportFiles(outputDirectory, projectName, projectVersionName);
+        reportDataService.createReportFiles(outputDirectory, projectName, projectVersionName);
     }
 
     public PolicyStatusItem checkPolicies(final HubServicesFactory services, final String hubProjectName,

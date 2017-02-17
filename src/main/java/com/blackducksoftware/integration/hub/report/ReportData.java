@@ -1,13 +1,25 @@
-/*
- * Copyright (C) 2017 Black Duck Software Inc.
- * http://www.blackducksoftware.com/
- * All rights reserved.
+/**
+ * Hub Common
  *
- * This software is the confidential and proprietary information of
- * Black Duck Software ("Confidential Information"). You shall not
- * disclose such Confidential Information and shall use it only in
- * accordance with the terms of the license agreement you entered into
- * with Black Duck Software.
+ * Copyright (C) 2017 Black Duck Software, Inc.
+ * http://www.blackducksoftware.com/
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package com.blackducksoftware.integration.hub.report;
 
@@ -77,31 +89,31 @@ public class ReportData {
 
         for (final BomComponent component : components) {
             if (component != null) {
-                if (component.getHighSecurityRisk() > 0) {
+                if (component.getSecurityRiskHighCount() > 0) {
                     vulnerabilityRiskHighCount++;
                 }
-                if (component.getMediumSecurityRisk() > 0) {
+                if (component.getSecurityRiskMediumCount() > 0) {
                     vulnerabilityRiskMediumCount++;
                 }
-                if (component.getLowSecurityRisk() > 0) {
+                if (component.getSecurityRiskLowCount() > 0) {
                     vulnerabilityRiskLowCount++;
                 }
-                if (component.getHighLicenseRisk() > 0) {
+                if (component.getLicenseRiskHighCount() > 0) {
                     licenseRiskHighCount++;
                 }
-                if (component.getMediumLicenseRisk() > 0) {
+                if (component.getLicenseRiskMediumCount() > 0) {
                     licenseRiskMediumCount++;
                 }
-                if (component.getLowLicenseRisk() > 0) {
+                if (component.getLicenseRiskLowCount() > 0) {
                     licenseRiskLowCount++;
                 }
-                if (component.getHighOperationalRisk() > 0) {
+                if (component.getOperationalRiskHighCount() > 0) {
                     operationalRiskHighCount++;
                 }
-                if (component.getMediumOperationalRisk() > 0) {
+                if (component.getOperationalRiskMediumCount() > 0) {
                     operationalRiskMediumCount++;
                 }
-                if (component.getLowOperationalRisk() > 0) {
+                if (component.getOperationalRiskLowCount() > 0) {
                     operationalRiskLowCount++;
                 }
             }
@@ -111,15 +123,6 @@ public class ReportData {
         vulnerabilityRiskNoneCount = totalComponents - vulnerabilityRiskHighCount - vulnerabilityRiskMediumCount - vulnerabilityRiskLowCount;
         licenseRiskNoneCount = totalComponents - licenseRiskHighCount - licenseRiskMediumCount - licenseRiskLowCount;
         operationalRiskNoneCount = totalComponents - operationalRiskHighCount - operationalRiskMediumCount - operationalRiskLowCount;
-    }
-
-    public double getPercentage(final double count) {
-        final double totalCount = totalComponents;
-        double percentage = 0;
-        if (totalCount > 0 && count > 0) {
-            percentage = (count / totalCount) * 100;
-        }
-        return percentage;
     }
 
     public String htmlEscape(final String valueToEscape) {
