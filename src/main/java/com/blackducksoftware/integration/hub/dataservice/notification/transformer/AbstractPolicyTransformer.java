@@ -27,8 +27,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
@@ -45,6 +43,7 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Poli
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public abstract class AbstractPolicyTransformer extends AbstractNotificationTransformer {
     private final PolicyNotificationFilter policyFilter;
@@ -63,42 +62,20 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         this.policyFilter = policyFilter;
     }
 
+    public AbstractPolicyTransformer(final IntLogger logger,
+            final NotificationRequestService notificationService,
+            final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
+            final VersionBomPolicyRequestService bomVersionPolicyService, final HubRequestService hubRequestService,
+            final PolicyNotificationFilter policyFilter,
+            final MetaService metaService) {
+        super(logger, notificationService, projectVersionService, policyService, bomVersionPolicyService, hubRequestService,
+                metaService);
+        this.policyFilter = policyFilter;
+    }
+
     public abstract void handleNotification(final List<ComponentVersionStatus> componentVersionList,
             final ProjectVersion projectVersion, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException;
-
-    protected void handleNotificationUsingBomComponentVersionPolicyStatusLink(
-            final List<ComponentVersionStatus> componentVersionList, final ProjectVersion projectVersion,
-            final NotificationItem item, final List<NotificationContentItem> templateData)
-            throws HubItemTransformException {
-        for (final ComponentVersionStatus componentVersion : componentVersionList) {
-            try {
-                final String componentVersionLink = componentVersion.getComponentVersionLink();
-                final ComponentVersion fullComponentVersion = getComponentVersion(componentVersionLink);
-                final String policyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
-
-                if (StringUtils.isNotBlank(policyStatusUrl)) {
-                    final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
-                            policyStatusUrl);
-                    List<String> ruleList = getMetaService().getLinks(bomComponentVersionPolicyStatus, MetaService.POLICY_RULE_LINK);
-                    ruleList = getMatchingRuleUrls(ruleList);
-                    if (ruleList != null && !ruleList.isEmpty()) {
-                        final List<PolicyRule> policyRuleList = new ArrayList<>();
-                        for (final String ruleUrl : ruleList) {
-                            final PolicyRule rule = getPolicyRule(ruleUrl);
-                            policyRuleList.add(rule);
-                        }
-                        createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
-                                componentVersion.getComponentLink(),
-                                componentVersion.getComponentVersionLink(),
-                                policyRuleList, item, templateData);
-                    }
-                }
-            } catch (final Exception e) {
-                throw new HubItemTransformException(e);
-            }
-        }
-    }
 
     protected List<PolicyRule> getRulesFromUrls(final List<String> ruleUrlsViolated) throws HubIntegrationException {
         if (ruleUrlsViolated == null || ruleUrlsViolated.isEmpty()) {
@@ -192,5 +169,4 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
             final ComponentVersion componentVersion, String componentUrl, final String componentVersionUrl,
             List<PolicyRule> policyRuleList,
             NotificationItem item, List<NotificationContentItem> templateData) throws URISyntaxException;
-
 }

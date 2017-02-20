@@ -29,6 +29,7 @@ import java.util.Set;
 
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
+import com.blackducksoftware.integration.hub.api.bom.BomRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
@@ -223,6 +224,10 @@ public class HubServicesFactory {
 
     public MetaService createMetaService(final IntLogger logger) {
         return new MetaService(logger, restConnection.getJsonParser(), new HubRequestFactory(restConnection));
+    }
+
+    public BomRequestService createBomRequestService() {
+        return new BomRequestService(restConnection);
     }
 
     public RestConnection getRestConnection() {
