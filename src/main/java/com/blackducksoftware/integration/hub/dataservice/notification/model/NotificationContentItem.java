@@ -25,12 +25,12 @@ package com.blackducksoftware.integration.hub.dataservice.notification.model;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
-import com.google.common.base.Joiner;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {
     private final ProjectVersion projectVersion;
@@ -95,10 +95,9 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
         }
 
         // Identify same-time non-equal items as non-equal
-        final Joiner joiner = Joiner.on(":").skipNulls();
-        final String thisProjectVersionString = joiner.join(getProjectVersion().getProjectName(), getProjectVersion()
+        final String thisProjectVersionString = StringUtils.join(getProjectVersion().getProjectName(), getProjectVersion()
                 .getProjectVersionName(), getComponentVersionUrl());
-        final String otherProjectVersionString = joiner.join(o.getProjectVersion().getProjectName(), o
+        final String otherProjectVersionString = StringUtils.join(o.getProjectVersion().getProjectName(), o
                 .getProjectVersion().getProjectVersionName(), o.getComponentVersionUrl().toString());
 
         return thisProjectVersionString.compareTo(otherProjectVersionString);

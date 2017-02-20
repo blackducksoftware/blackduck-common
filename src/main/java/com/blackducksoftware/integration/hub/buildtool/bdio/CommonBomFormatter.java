@@ -26,18 +26,16 @@ package com.blackducksoftware.integration.hub.buildtool.bdio;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.blackducksoftware.bdio.io.BdioWriter;
-import com.blackducksoftware.bdio.io.LinkedDataContext;
-import com.blackducksoftware.bdio.model.BillOfMaterials;
-import com.blackducksoftware.bdio.model.Component;
-import com.blackducksoftware.bdio.model.CreationInfo;
-import com.blackducksoftware.bdio.model.ExternalIdentifier;
-import com.blackducksoftware.bdio.model.Project;
+import com.blackducksoftware.integration.hub.bdio.simple.BdioBillOfMaterials;
+import com.blackducksoftware.integration.hub.bdio.simple.BdioComponent;
+import com.blackducksoftware.integration.hub.bdio.simple.BdioExternalIdentifier;
+import com.blackducksoftware.integration.hub.bdio.simple.BdioProject;
+import com.blackducksoftware.integration.hub.bdio.simple.BdioWriter;
 import com.blackducksoftware.integration.hub.buildtool.DependencyNode;
+import com.google.gson.Gson;
 
 public class CommonBomFormatter {
     private final BdioConverter bdioConverter;
@@ -50,18 +48,16 @@ public class CommonBomFormatter {
 
     public void writeProject(final OutputStream outputStream, final String projectName, final DependencyNode root)
             throws IOException {
-        final LinkedDataContext linkedDataContext = new LinkedDataContext();
+        final BdioBillOfMaterials billOfMaterials = new BdioBillOfMaterials();
+        billOfMaterials.setId(String.format("uuid:%s", UUID.randomUUID()));
+        billOfMaterials.setName(String.format("%s Black Duck I/O Export", projectName));
+        billOfMaterials.setSpecVersion("1.1.0");
 
-        try (BdioWriter bdioWriter = new BdioWriter(linkedDataContext, outputStream)) {
-            final BillOfMaterials bom = new BillOfMaterials();
-            bom.setId(String.format("uuid:%s", UUID.randomUUID()));
-            bom.setName(String.format("%s Black Duck I/O Export", projectName));
-            bom.setSpecVersion(linkedDataContext.getSpecVersion());
-            bom.setCreationInfo(CreationInfo.currentTool());
-            bdioWriter.write(bom);
+        final BdioProject project = bdioConverter.createProject(root.getGav(), projectName, root.getChildren());
 
-            final Project project = bdioConverter.createProject(root.getGav(), projectName, root.getChildren());
-            bdioWriter.write(project);
+        try (BdioWriter bdioWriter = new BdioWriter(new Gson(), outputStream)) {
+            bdioWriter.writeBdioNode(billOfMaterials);
+            bdioWriter.writeBdioNode(project);
 
             for (final DependencyNode child : root.getChildren()) {
                 writeDependencyGraph(bdioWriter, child);
@@ -78,18 +74,16 @@ public class CommonBomFormatter {
     }
 
     private void writeDependencyNode(final BdioWriter writer, final DependencyNode dependencyNode) throws IOException {
-        final Component component = bdioConverter.createComponent(dependencyNode.getGav(),
+        final BdioComponent bdioComponent = bdioConverter.createComponent(dependencyNode.getGav(),
                 dependencyNode.getChildren());
-        final List<ExternalIdentifier> externalIdentifiers = component.getExternalIdentifiers();
+        final BdioExternalIdentifier externalIdentifier = bdioComponent.getBdioExternalIdentifier();
         boolean alreadyAdded = false;
-        for (final ExternalIdentifier externalIdentifier : externalIdentifiers) {
-            if (!externalIds.add(externalIdentifier.getExternalId())) {
-                alreadyAdded = true;
-            }
+        if (!externalIds.add(externalIdentifier.getExternalId())) {
+            alreadyAdded = true;
         }
 
         if (!alreadyAdded) {
-            writer.write(component);
+            writer.writeBdioNode(bdioComponent);
         }
     }
 

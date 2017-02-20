@@ -25,7 +25,7 @@ package com.blackducksoftware.integration.hub.scan;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -34,7 +34,6 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
-import com.google.common.collect.ImmutableList;
 
 public class HubScanConfig {
     private final String projectName;
@@ -49,7 +48,7 @@ public class HubScanConfig {
 
     private final int scanMemory;
 
-    private final ImmutableList<String> scanTargetPaths;
+    private final Set<String> scanTargetPaths;
 
     private final boolean dryRun;
 
@@ -69,7 +68,7 @@ public class HubScanConfig {
 
     public HubScanConfig(final String projectName, final String version, final String phase,
             final String distribution, final File workingDirectory, final int scanMemory,
-            final ImmutableList<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
+            final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
             final String thirdPartyVersion,
             final String pluginVersion, final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias) {
         this.projectName = projectName;
@@ -113,7 +112,7 @@ public class HubScanConfig {
         return scanMemory;
     }
 
-    public List<String> getScanTargetPaths() {
+    public Set<String> getScanTargetPaths() {
         return scanTargetPaths;
     }
 

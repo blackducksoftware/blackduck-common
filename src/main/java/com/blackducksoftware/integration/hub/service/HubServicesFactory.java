@@ -24,8 +24,8 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
@@ -208,7 +208,7 @@ public class HubServicesFactory {
     public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
             final HubSupportHelper hubSupportHelper,
             final File directoryToInstallTo, final int scanMemory, final boolean dryRun, final String project,
-            final String version, final List<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
+            final String version, final Set<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
         return new SimpleScanService(logger, restConnection, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo, scanMemory,
                 dryRun, project, version, scanTargetPaths, workingDirectory, excludePatterns);
     }

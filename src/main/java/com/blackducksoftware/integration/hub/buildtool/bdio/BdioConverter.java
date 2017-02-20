@@ -25,55 +25,61 @@ package com.blackducksoftware.integration.hub.buildtool.bdio;
 
 import java.util.List;
 
-import com.blackducksoftware.bdio.model.Component;
-import com.blackducksoftware.bdio.model.ExternalIdentifier;
-import com.blackducksoftware.bdio.model.Project;
-import com.blackducksoftware.bdio.model.Relationship;
+import com.blackducksoftware.integration.hub.bdio.simple.BdioComponent;
+import com.blackducksoftware.integration.hub.bdio.simple.BdioExternalIdentifier;
+import com.blackducksoftware.integration.hub.bdio.simple.BdioNode;
+import com.blackducksoftware.integration.hub.bdio.simple.BdioProject;
+import com.blackducksoftware.integration.hub.bdio.simple.BdioRelationship;
 import com.blackducksoftware.integration.hub.buildtool.DependencyNode;
 import com.blackducksoftware.integration.hub.buildtool.Gav;
 
 public class BdioConverter {
-    private final BdioIdCreator bdioIdCreator = new BdioIdCreator();
+    public BdioProject createProject(final Gav gav, final String projectName, final List<DependencyNode> children) {
+        final String id = createIdForMavenArtifact(gav);
+        final BdioExternalIdentifier externalIdentifier = createExternalIdentifierForMavenArtifact(gav);
 
-    public Project createProject(final Gav gav, final String projectName, final List<DependencyNode> children) {
-        final String id = bdioIdCreator.createMavenId(gav);
-        final ExternalIdentifier externalIdentifier = bdioIdCreator.createExternalIdentifier(gav);
-
-        final Project project = new Project();
+        final BdioProject project = new BdioProject();
         project.setId(id);
         project.setName(projectName);
-        project.setVersion(gav.getVersion());
-        project.addExternalIdentifier(externalIdentifier);
+        project.setRevision(gav.getVersion());
+        project.setBdioExternalIdentifier(externalIdentifier);
         addRelationships(project, children);
 
         return project;
     }
 
-    public Component createComponent(final Gav gav, final List<DependencyNode> children) {
-        final String id = bdioIdCreator.createMavenId(gav);
-        final ExternalIdentifier externalIdentifier = bdioIdCreator.createExternalIdentifier(gav);
+    public BdioComponent createComponent(final Gav gav, final List<DependencyNode> children) {
+        final String id = createIdForMavenArtifact(gav);
+        final BdioExternalIdentifier externalIdentifier = createExternalIdentifierForMavenArtifact(gav);
 
-        final Component component = new Component();
+        final BdioComponent component = new BdioComponent();
         component.setId(id);
-        component.setVersion(gav.getVersion());
-        component.addExternalIdentifier(externalIdentifier);
+        component.setRevision(gav.getVersion());
+        component.setBdioExternalIdentifier(externalIdentifier);
         addRelationships(component, children);
 
         return component;
     }
 
-    private void addRelationships(final Project project, final List<DependencyNode> children) {
+    private void addRelationships(final BdioNode node, final List<DependencyNode> children) {
         for (final DependencyNode child : children) {
             final Gav childGav = child.getGav();
-            project.addRelationship(Relationship.dynamicLink(bdioIdCreator.createMavenId(childGav)));
+            final BdioRelationship singleRelationship = new BdioRelationship();
+            singleRelationship.setRelated(createIdForMavenArtifact(childGav));
+            singleRelationship.setRelationshipType("DYNAMIC_LINK");
+            node.addRelationship(singleRelationship);
         }
     }
 
-    private void addRelationships(final Component component, final List<DependencyNode> children) {
-        for (final DependencyNode child : children) {
-            final Gav childGav = child.getGav();
-            component.addRelationship(Relationship.dynamicLink(bdioIdCreator.createMavenId(childGav)));
-        }
+    private String createIdForMavenArtifact(final Gav gav) {
+        return String.format("mvn:%s/%s/%s", gav.getGroupId(), gav.getArtifactId(), gav.getVersion());
+    }
+
+    private BdioExternalIdentifier createExternalIdentifierForMavenArtifact(final Gav gav) {
+        final BdioExternalIdentifier externalIdentifier = new BdioExternalIdentifier();
+        externalIdentifier.setExternalId(gav.toString());
+        externalIdentifier.setExternalSystemTypeId("maven");
+        return externalIdentifier;
     }
 
 }
