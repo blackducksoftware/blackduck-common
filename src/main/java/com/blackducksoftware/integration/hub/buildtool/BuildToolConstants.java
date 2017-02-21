@@ -70,12 +70,12 @@ public class BuildToolConstants {
 
     public static final String CREATE_REPORT_FINISHED = "Finished creating Hub Risk Report.";
 
-    public static final String DEPLOY_HUB_OUTPUT_AND_CHECK_POLICIES_STARTING = "Deploying: %s for checking latest policy status starting.";
-
-    public static final String DEPLOY_HUB_OUTPUT_AND_CHECK_POLICIES_FINISHED = "Deploying: %s for checking latest policy status finished.";
-
     public static final String UPLOAD_FILE_MESSAGE = "Uploaded the file %s to %s";
 
-    public static final String SCAN_ERROR_MESSAGE = "There was an error waiting for the scans: %s";
+    public static final String BOM_WAIT_STARTING = "Waiting for Hub to finish the Bom calculations.";
+
+    public static final String BOM_WAIT_ERROR = "There was an error waiting for the Bom calculations: %s";
+
+    public static final String BOM_WAIT_FINISHED = "Finished waiting for Hub to finish the Bom calculations";
 
 }
