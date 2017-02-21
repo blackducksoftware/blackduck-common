@@ -23,6 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.api.notification;
 
+import java.util.List;
+
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -56,6 +58,8 @@ public class PolicyOverrideNotificationContent {
 
     @SerializedName("bomComponentVersionPolicyStatus")
     private String bomComponentVersionPolicyStatusLink;
+
+    private List<String> policies;
 
     public String getProjectName() {
         return projectName;
@@ -135,6 +139,14 @@ public class PolicyOverrideNotificationContent {
 
     public void setBomComponentVersionPolicyStatusLink(final String bomComponentVersionPolicyStatusLink) {
         this.bomComponentVersionPolicyStatusLink = bomComponentVersionPolicyStatusLink;
+    }
+
+    public List<String> getPolicies() {
+        return policies;
+    }
+
+    public void setPolicies(final List<String> policies) {
+        this.policies = policies;
     }
 
     @Override
