@@ -24,12 +24,9 @@
 package com.blackducksoftware.integration.hub.dataservice.report;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.HubSupportHelper;
@@ -43,7 +40,6 @@ import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
-import com.blackducksoftware.integration.hub.api.report.RiskReportResourceCopier;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.view.BomComponentPolicyStatusView;
 import com.blackducksoftware.integration.hub.api.view.CountTypeEnum;
@@ -53,6 +49,8 @@ import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.report.BomComponent;
 import com.blackducksoftware.integration.hub.report.ReportData;
+import com.blackducksoftware.integration.hub.report.RiskReportWriter;
+import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -104,8 +102,8 @@ public class RiskReportDataService extends HubRequestService {
         reportData.setProjectURL(getReportProjectUrl(originalProjectUrl));
         reportData.setProjectVersion(version.getVersionName());
         reportData.setProjectVersionURL(getReportVersionUrl(originalVersionUrl, false));
-        reportData.setPhase(version.getPhase());
-        reportData.setDistribution(version.getDistribution());
+        reportData.setPhase(version.getPhase().toString());
+        reportData.setDistribution(version.getDistribution().toString());
         final List<BomComponent> components = new ArrayList<>();
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.AGGREGATE_BOM_REST_SERVER)) {
             final List<VersionBomComponentView> bomEntries = bomRequestService.getBomEntries(version);
@@ -119,7 +117,7 @@ public class RiskReportDataService extends HubRequestService {
                 }
                 final BomComponentPolicyStatusView bomPolicyStatus = requestService.getItem(componentPolicyStatusURL,
                         BomComponentPolicyStatusView.class);
-                component.setPolicyStatus(bomPolicyStatus.getApprovalStatus());
+                component.setPolicyStatus(bomPolicyStatus.getApprovalStatus().toString());
                 components.add(component);
             }
         } else {
@@ -147,29 +145,10 @@ public class RiskReportDataService extends HubRequestService {
 
     public void createReportFiles(final File outputDirectory, final ReportData reportData) throws HubIntegrationException {
         try {
-            final RiskReportResourceCopier copier = new RiskReportResourceCopier(outputDirectory.getCanonicalPath());
-            File htmlFile = null;
-            try {
-                final List<File> writtenFiles = copier.copy();
-                for (final File file : writtenFiles) {
-                    if (file.getName().equals(RiskReportResourceCopier.RISK_REPORT_HTML_FILE_NAME)) {
-                        htmlFile = file;
-                        break;
-                    }
-                }
-            } catch (final URISyntaxException e) {
-                throw new HubIntegrationException("Couldn't create the report: " + e.getMessage(), e);
-            }
-            if (htmlFile == null) {
-                throw new HubIntegrationException("Could not find the file : " + RiskReportResourceCopier.RISK_REPORT_HTML_FILE_NAME
-                        + ", the report files must not have been copied into the report directory.");
-            }
-            String htmlFileString = FileUtils.readFileToString(htmlFile, "UTF-8");
-            final String reportString = getRestConnection().getGson().toJson(reportData);
-            htmlFileString = htmlFileString.replace(RiskReportResourceCopier.JSON_TOKEN_TO_REPLACE, reportString);
-            FileUtils.writeStringToFile(htmlFile, htmlFileString, "UTF-8");
-        } catch (final IOException e) {
-            throw new HubIntegrationException("Couldn't create the report: " + e.getMessage(), e);
+            final RiskReportWriter writer = new RiskReportWriter();
+            writer.createHtmlReportFiles(outputDirectory, reportData);
+        } catch (final RiskReportException e) {
+            throw new HubIntegrationException(e.getMessage(), e);
         }
     }
 
@@ -190,7 +169,7 @@ public class RiskReportDataService extends HubRequestService {
             component.setComponentVersionURL(report.getVersionUrl(bomEntry));
         }
         component.setLicense(bomEntry.getLicensesDisplay());
-        component.setPolicyStatus(bomEntry.getPolicyApprovalStatusEnum());
+        component.setPolicyStatus(bomEntry.getPolicyApprovalStatusEnum().toString());
         if (bomEntry.getVulnerabilityRisk() != null) {
             component.setSecurityRiskHighCount(bomEntry.getVulnerabilityRisk().getHIGH());
             component.setSecurityRiskMediumCount(bomEntry.getVulnerabilityRisk().getMEDIUM());
