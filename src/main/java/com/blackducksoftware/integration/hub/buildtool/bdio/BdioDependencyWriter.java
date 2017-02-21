@@ -74,7 +74,6 @@ public class BdioDependencyWriter {
 
     public void writeProject(final OutputStream outputStream, final String projectName, final DependencyNode root)
             throws IOException {
-
         final BdioBillOfMaterials billOfMaterials = bdioHelper.createBillOfMaterials(projectName);
 
         final String projectVersion = root.getGav().getVersion();
@@ -146,7 +145,7 @@ public class BdioDependencyWriter {
         final String artifact = gav.getArtifactId();
         final String version = gav.getVersion();
 
-        final String id = externalIdentifierHelper.createMavenBdioId(group, artifact, version);
+        final String id = externalIdentifierHelper.createBdioId(group, artifact, version);
         return id;
     }
 }

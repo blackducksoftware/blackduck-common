@@ -41,7 +41,7 @@
     </dependency>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
-      <artifactId>hub-bdio-simple</artifactId>
+      <artifactId>integration-bdio</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
