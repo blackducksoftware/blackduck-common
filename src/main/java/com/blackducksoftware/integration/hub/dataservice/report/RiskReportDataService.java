@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.dataservice.report;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +58,8 @@ import com.blackducksoftware.integration.log.IntLogger;
 
 public class RiskReportDataService extends HubRequestService {
 
+    private final IntLogger logger;
+
     private final ProjectRequestService projectRequestService;
 
     private final ProjectVersionRequestService projectVersionRequestService;
@@ -76,6 +79,7 @@ public class RiskReportDataService extends HubRequestService {
             final AggregateBomRequestService bomRequestService, final HubRequestService requestService,
             final MetaService metaService, final HubSupportHelper hubSupportHelper) {
         super(restConnection);
+        this.logger = logger;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.reportRequestService = reportRequestService;
@@ -106,6 +110,7 @@ public class RiskReportDataService extends HubRequestService {
         reportData.setDistribution(version.getDistribution().toString());
         final List<BomComponent> components = new ArrayList<>();
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.AGGREGATE_BOM_REST_SERVER)) {
+            logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
             final List<VersionBomComponentView> bomEntries = bomRequestService.getBomEntries(version);
             for (final VersionBomComponentView bomEntry : bomEntries) {
                 final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
@@ -121,6 +126,7 @@ public class RiskReportDataService extends HubRequestService {
                 components.add(component);
             }
         } else {
+            logger.trace("Getting the Report Contents using the Report Rest Server");
             final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
             final VersionReport versionReport = reportRequestService.generateHubReport(version, ReportFormatEnum.JSON, categories);
             final List<AggregateBomViewEntry> bomEntries = versionReport.getAggregateBomViewEntries();
@@ -145,9 +151,10 @@ public class RiskReportDataService extends HubRequestService {
 
     public void createReportFiles(final File outputDirectory, final ReportData reportData) throws HubIntegrationException {
         try {
+            logger.trace("Creating Risk Report Files in : " + outputDirectory.getCanonicalPath());
             final RiskReportWriter writer = new RiskReportWriter();
             writer.createHtmlReportFiles(outputDirectory, reportData);
-        } catch (final RiskReportException e) {
+        } catch (final RiskReportException | IOException e) {
             throw new HubIntegrationException(e.getMessage(), e);
         }
     }
