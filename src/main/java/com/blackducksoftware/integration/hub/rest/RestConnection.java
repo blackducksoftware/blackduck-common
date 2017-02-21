@@ -262,8 +262,8 @@ public abstract class RestConnection {
                     return handleExecuteClientCall(request, retryCount + 1);
                 } else {
                     throw new HubIntegrationException(
-                            "There was a problem trying to " + request.method() + " this item : " + request.url().uri().toString() + ". Error : "
-                                    + response.message());
+                            String.format("There was a problem trying to %1$s this item: %2$s. Error: %3$s %4$s",
+                                    request.method(), request.url().uri().toString(), response.code(), response.message()));
                 }
             }
             logResponseHeaders(response);
