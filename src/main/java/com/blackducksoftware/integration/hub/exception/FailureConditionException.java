@@ -21,27 +21,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.buildtool;
+package com.blackducksoftware.integration.hub.exception;
 
-import java.util.List;
-
-public class DependencyNode {
-
-    private final Gav gav;
-
-    private final List<DependencyNode> children;
-
-    public DependencyNode(final Gav gav, final List<DependencyNode> children) {
-        this.gav = gav;
-        this.children = children;
+public class FailureConditionException extends HubIntegrationException {
+    public FailureConditionException() {
+        super();
     }
 
-    public Gav getGav() {
-        return gav;
+    public FailureConditionException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public List<DependencyNode> getChildren() {
-        return children;
+    public FailureConditionException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    public FailureConditionException(final String message) {
+        super(message);
+    }
+
+    public FailureConditionException(final Throwable cause) {
+        super(cause);
     }
 
 }

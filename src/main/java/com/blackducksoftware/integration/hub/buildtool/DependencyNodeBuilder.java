@@ -25,23 +25,24 @@ package com.blackducksoftware.integration.hub.buildtool;
 
 import java.util.List;
 
-public class DependencyNode {
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 
-    private final Gav gav;
+public class DependencyNodeBuilder {
 
-    private final List<DependencyNode> children;
-
-    public DependencyNode(final Gav gav, final List<DependencyNode> children) {
-        this.gav = gav;
-        this.children = children;
+    public DependencyNodeBuilder(final Gav rootGav) {
     }
 
-    public Gav getGav() {
-        return gav;
+    public void addNodeWithChildren(final Gav gav, final List<Gav> childGavs) throws HubIntegrationException {
     }
 
-    public List<DependencyNode> getChildren() {
-        return children;
+    public void addNodeWithChild(final Gav gav, final Gav childGav) throws HubIntegrationException {
+    }
+
+    public void addNode(final Gav gav) throws HubIntegrationException {
+    }
+
+    public DependencyNode buildRootNode() {
+        return null;
     }
 
 }
