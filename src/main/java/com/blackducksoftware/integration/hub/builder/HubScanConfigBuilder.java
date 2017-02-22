@@ -88,9 +88,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
     @Override
     public AbstractValidator createValidator() {
         final HubScanConfigValidator validator = new HubScanConfigValidator();
-        validator.setDryRun(dryRun);
         validator.setProjectName(projectName);
-        validator.setVersion(pluginVersion);
+        validator.setVersion(version);
         validator.setScanMemory(scanMemory);
         validator.setWorkingDirectory(workingDirectory);
         validator.addAllScanTargetPaths(scanTargetPaths);
