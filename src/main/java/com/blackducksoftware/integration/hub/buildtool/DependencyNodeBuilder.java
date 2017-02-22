@@ -28,8 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-
 public class DependencyNodeBuilder {
     final Map<Gav, DependencyNode> nodes = new HashMap<>();
 
@@ -40,24 +38,28 @@ public class DependencyNodeBuilder {
         nodes.put(rootGav, root);
     }
 
-    public void addNodeWithChildren(final Gav gav, final List<Gav> childGavs) throws HubIntegrationException {
-        addNodesToMap(gav, childGavs);
+    public void addParentNodeWithChildren(final Gav parent, final List<Gav> children) {
+        if (!nodes.containsKey(parent)) {
+            final DependencyNode nodeToAdd = new DependencyNode(parent, new ArrayList<DependencyNode>());
+            nodes.put(parent, nodeToAdd);
+        }
+
+        for (final Gav child : children) {
+            if (!nodes.containsKey(child)) {
+                final DependencyNode childNode = new DependencyNode(child, new ArrayList<DependencyNode>());
+                nodes.put(child, childNode);
+            }
+
+            // here, we are looping over the children, so 'child' will be different every time, but parent will always
+            // be the same
+            nodes.get(parent).getChildren().add(nodes.get(child));
+        }
     }
 
-    public void addNodeWithChild(final Gav gav, final Gav childGav) throws HubIntegrationException {
-    }
-
-    public void addNode(final Gav gav) throws HubIntegrationException {
-    }
-
-    public DependencyNode buildRootNode() {
-        return root;
-    }
-
-    private void addNodesToMap(final Gav toAdd, final List<Gav> parents) {
-        if (!nodes.containsKey(toAdd)) {
-            final DependencyNode nodeToAdd = new DependencyNode(toAdd, new ArrayList<DependencyNode>());
-            nodes.put(toAdd, nodeToAdd);
+    public void addChildNodeWithParents(final Gav child, final List<Gav> parents) {
+        if (!nodes.containsKey(child)) {
+            final DependencyNode nodeToAdd = new DependencyNode(child, new ArrayList<DependencyNode>());
+            nodes.put(child, nodeToAdd);
         }
 
         for (final Gav parent : parents) {
@@ -66,8 +68,14 @@ public class DependencyNodeBuilder {
                 nodes.put(parent, parentNode);
             }
 
-            nodes.get(parent).getChildren().add(nodes.get(toAdd));
+            // here, we are looping over the parents, so 'parent' will be different every time, but child will always be
+            // the same
+            nodes.get(parent).getChildren().add(nodes.get(child));
         }
+    }
+
+    public DependencyNode buildRootNode() {
+        return root;
     }
 
 }

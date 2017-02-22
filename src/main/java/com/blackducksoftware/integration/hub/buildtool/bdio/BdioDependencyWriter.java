@@ -33,13 +33,13 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.blackducksoftware.integration.hub.bdio.simple.BdioBillOfMaterials;
-import com.blackducksoftware.integration.hub.bdio.simple.BdioComponent;
-import com.blackducksoftware.integration.hub.bdio.simple.BdioExternalIdentifier;
 import com.blackducksoftware.integration.hub.bdio.simple.BdioHelper;
-import com.blackducksoftware.integration.hub.bdio.simple.BdioProject;
 import com.blackducksoftware.integration.hub.bdio.simple.BdioWriter;
 import com.blackducksoftware.integration.hub.bdio.simple.ExternalIdentifierHelper;
+import com.blackducksoftware.integration.hub.bdio.simple.model.BdioBillOfMaterials;
+import com.blackducksoftware.integration.hub.bdio.simple.model.BdioComponent;
+import com.blackducksoftware.integration.hub.bdio.simple.model.BdioExternalIdentifier;
+import com.blackducksoftware.integration.hub.bdio.simple.model.BdioProject;
 import com.blackducksoftware.integration.hub.buildtool.BuildToolConstants;
 import com.blackducksoftware.integration.hub.buildtool.DependencyNode;
 import com.blackducksoftware.integration.hub.buildtool.Gav;
