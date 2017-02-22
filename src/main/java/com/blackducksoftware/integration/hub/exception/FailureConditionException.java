@@ -21,25 +21,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.buildtool.bdio;
+package com.blackducksoftware.integration.hub.exception;
 
-import com.blackducksoftware.bdio.model.ExternalIdentifier;
-import com.blackducksoftware.bdio.model.ExternalIdentifierBuilder;
-import com.blackducksoftware.integration.hub.buildtool.Gav;
-
-public class BdioIdCreator {
-    private final ExternalIdentifierBuilder externalIdentifierBuilder = ExternalIdentifierBuilder.create();
-
-    public ExternalIdentifier createExternalIdentifier(final Gav gav) {
-        final String groupId = gav.getGroupId();
-        final String artifactId = gav.getArtifactId();
-        final String version = gav.getVersion();
-
-        return externalIdentifierBuilder.maven(groupId, artifactId, version).build().get();
+public class FailureConditionException extends HubIntegrationException {
+    public FailureConditionException() {
+        super();
     }
 
-    public String createMavenId(final Gav gav) {
-        return String.format("mvn:%s/%s/%s", gav.getGroupId(), gav.getArtifactId(), gav.getVersion());
+    public FailureConditionException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public FailureConditionException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    public FailureConditionException(final String message) {
+        super(message);
+    }
+
+    public FailureConditionException(final Throwable cause) {
+        super(cause);
     }
 
 }

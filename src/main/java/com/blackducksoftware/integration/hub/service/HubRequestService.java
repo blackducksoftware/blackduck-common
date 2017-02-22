@@ -43,26 +43,26 @@ public class HubRequestService {
         this.hubRequestFactory = new HubRequestFactory(restConnection);
     }
 
-    public String getString(List<String> urlSegments) throws HubIntegrationException {
+    public String getString(final List<String> urlSegments) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(urlSegments);
         final String s = hubRequest.executeGetForResponseString();
         return s;
     }
 
-    public JsonObject getJsonObject(List<String> urlSegments) throws HubIntegrationException {
+    public JsonObject getJsonObject(final List<String> urlSegments) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(urlSegments);
         final JsonObject jsonObject = hubRequest.executeGetForResponseJson();
         return jsonObject;
     }
 
-    public <T extends HubResponse> T getItem(final HubRequest hubRequest, Class<T> clazz) throws HubIntegrationException {
+    public <T extends HubResponse> T getItem(final HubRequest hubRequest, final Class<T> clazz) throws HubIntegrationException {
         final String response = hubRequest.executeGetForResponseString();
         final T item = getRestConnection().getGson().fromJson(response, clazz);
         item.setJson(response);
         return item;
     }
 
-    public <T extends HubResponse> T getItem(String url, Class<T> clazz) throws HubIntegrationException {
+    public <T extends HubResponse> T getItem(final String url, final Class<T> clazz) throws HubIntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createGetRequest(url);
         return getItem(hubRequest, clazz);
     }
@@ -77,6 +77,11 @@ public class HubRequestService {
         final T item = getRestConnection().getGson().fromJson(jsonElement, clazz);
         item.setJson(jsonElement.toString());
         return item;
+    }
+
+    public void deleteItem(final String url) throws HubIntegrationException {
+        final HubRequest hubRequest = hubRequestFactory.createDeleteRequest(url);
+        hubRequest.executeDelete();
     }
 
     public RestConnection getRestConnection() {

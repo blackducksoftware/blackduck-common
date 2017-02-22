@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.buildtool;
 import java.util.List;
 
 public class DependencyNode {
+
     private final Gav gav;
 
     private final List<DependencyNode> children;

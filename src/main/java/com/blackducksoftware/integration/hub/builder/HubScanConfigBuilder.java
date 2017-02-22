@@ -24,7 +24,7 @@
 package com.blackducksoftware.integration.hub.builder;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -76,11 +76,9 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     @Override
     public HubScanConfig buildObject() {
-        HubScanConfig config = null;
-        final List<String> immutableScanTargetPaths = new ArrayList<>(scanTargetPaths);
-        config = new HubScanConfig(projectName, version, phase, distribution, workingDirectory,
-                NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion,
-                cleanupLogsOnSuccess, excludePatterns, codeLocationAlias);
+        final HubScanConfig config = new HubScanConfig(projectName, version, phase, distribution, workingDirectory, NumberUtils.toInt(scanMemory),
+                Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion, cleanupLogsOnSuccess,
+                excludePatterns, codeLocationAlias);
 
         return config;
     }
