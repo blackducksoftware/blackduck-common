@@ -48,7 +48,7 @@ public class ComplexLicenseItem extends HubItem {
         return license;
     }
 
-    public List<ComplexLicenseItem> getWrappedComplexLicenseItems() {
+    public List<ComplexLicenseItem> getLicenses() {
         return licenses;
     }
 

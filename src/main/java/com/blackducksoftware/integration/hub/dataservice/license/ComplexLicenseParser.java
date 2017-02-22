@@ -36,23 +36,24 @@ public class ComplexLicenseParser {
         this.complexLicense = complexLicense;
     }
 
-    @Override
-    public String toString() {
-        licenseString = (licenseString == null) ? parse(complexLicense) : licenseString;
+    public String parse() {
+        if (licenseString == null) {
+            licenseString = parse(this.complexLicense);
+        }
         return licenseString;
     }
 
-    public String parse(ComplexLicenseItem complexLicense) {
+    private String parse(ComplexLicenseItem complexLicense) {
 
-        if (complexLicense.getWrappedComplexLicenseItems() != null && complexLicense.getWrappedComplexLicenseItems().isEmpty()) {
+        if (complexLicense.getLicenses() != null && complexLicense.getLicenses().isEmpty()) {
             return complexLicense.getName();
         } else {
             String operator = complexLicense.getType() == ComplexLicenseType.CONJUNCTIVE ? " AND " : " OR ";
             StringBuilder licenseText = new StringBuilder();
             int i = 1;
-            for (ComplexLicenseItem childLicense : complexLicense.getWrappedComplexLicenseItems()) {
+            for (ComplexLicenseItem childLicense : complexLicense.getLicenses()) {
                 licenseText.append(this.parse(childLicense));
-                if (i < complexLicense.getWrappedComplexLicenseItems().size()) licenseText.append(operator);
+                if (i < complexLicense.getLicenses().size()) licenseText.append(operator);
                 i++;
             }
             return i > 2 ? "(" + licenseText.toString() + ")" : licenseText.toString();

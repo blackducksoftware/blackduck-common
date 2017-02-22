@@ -26,17 +26,11 @@ package com.blackducksoftware.integration.hub.api.component.version;
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 
 public class LicenseItem extends HubItem {
-    private final CodeSharingEnum codeSharing;
+    private CodeSharingEnum codeSharing;
 
-    private final String name;
+    private String name;
 
-    private final OwnershipEnum ownership;
-
-    public LicenseItem(CodeSharingEnum codeSharing, String name, OwnershipEnum ownership) {
-        this.codeSharing = codeSharing;
-        this.name = name;
-        this.ownership = ownership;
-    }
+    private OwnershipEnum ownership;
 
     public CodeSharingEnum getCodeSharing() {
         return codeSharing;
