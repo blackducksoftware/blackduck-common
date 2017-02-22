@@ -35,7 +35,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.blackducksoftware.integration.builder.AbstractBuilder;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.validator.HubScanConfigValidator;
-import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 
 public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
@@ -53,12 +52,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
     private boolean dryRun;
 
     private File toolsDir;
-
-    private ThirdPartyName thirdPartyName;
-
-    private String thirdPartyVersion;
-
-    private String pluginVersion;
 
     private boolean disableScanTargetPathExistenceCheck;
 
@@ -79,7 +72,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         HubScanConfig config = null;
         final List<String> immutableScanTargetPaths = new ArrayList<>(scanTargetPaths);
         config = new HubScanConfig(projectName, version, workingDirectory,
-                NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion,
+                NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir,
                 cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations);
 
         return config;
@@ -113,18 +106,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     public void setToolsDir(final File toolsDir) {
         this.toolsDir = toolsDir;
-    }
-
-    public void setThirdPartyName(final ThirdPartyName thirdPartyName) {
-        this.thirdPartyName = thirdPartyName;
-    }
-
-    public void setThirdPartyVersion(final String thirdPartyVersion) {
-        this.thirdPartyVersion = thirdPartyVersion;
-    }
-
-    public void setPluginVersion(final String pluginVersion) {
-        this.pluginVersion = pluginVersion;
     }
 
     public void setProjectName(final String projectName) {

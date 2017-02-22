@@ -43,6 +43,7 @@ import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
+import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
@@ -87,7 +88,7 @@ public class CLIDataService extends HubRequestService {
     }
 
     public List<ScanSummaryItem> installAndRunScan(final HubServerConfig hubServerConfig,
-            final HubScanConfig hubScanConfig)
+            final HubScanConfig hubScanConfig, final IntegrationInfo integrationInfo)
             throws HubIntegrationException, EncryptionException {
         final String localHostName = HostnameHelper.getMyHostname();
         logger.info("Running on machine : " + localHostName);
@@ -97,7 +98,7 @@ public class CLIDataService extends HubRequestService {
                 hubServerConfig.getHubUrl().toString(),
                 hubVersion, localHostName);
 
-        phoneHomeDataService.phoneHome(hubServerConfig, hubScanConfig, hubVersion);
+        phoneHomeDataService.phoneHome(hubServerConfig, integrationInfo, hubVersion);
 
         final HubSupportHelper hubSupportHelper = new HubSupportHelper();
         hubSupportHelper.checkHubSupport(hubVersionRequestService, logger);

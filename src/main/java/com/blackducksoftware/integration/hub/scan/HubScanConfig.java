@@ -33,7 +33,6 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
 
 public class HubScanConfig {
     private final String projectName;
@@ -50,12 +49,6 @@ public class HubScanConfig {
 
     private final File toolsDir;
 
-    private final ThirdPartyName thirdPartyName;
-
-    private final String thirdPartyVersion;
-
-    private final String pluginVersion;
-
     private final boolean cleanupLogsOnSuccess;
 
     private final String[] excludePatterns;
@@ -68,8 +61,7 @@ public class HubScanConfig {
 
     public HubScanConfig(final String projectName, final String version, final File workingDirectory,
             final int scanMemory,
-            final List<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
-            final String thirdPartyVersion, final String pluginVersion,
+            final List<String> scanTargetPaths, final boolean dryRun, final File toolsDir,
             final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias, final boolean unmapPreviousCodeLocations,
             final boolean deletePreviousCodeLocations) {
         this.projectName = projectName;
@@ -79,9 +71,6 @@ public class HubScanConfig {
         this.scanTargetPaths = scanTargetPaths;
         this.dryRun = dryRun;
         this.toolsDir = toolsDir;
-        this.thirdPartyName = thirdPartyName;
-        this.thirdPartyVersion = thirdPartyVersion;
-        this.pluginVersion = pluginVersion;
         this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
         this.excludePatterns = excludePatterns;
         this.codeLocationAlias = codeLocationAlias;
@@ -115,18 +104,6 @@ public class HubScanConfig {
 
     public File getToolsDir() {
         return toolsDir;
-    }
-
-    public ThirdPartyName getThirdPartyName() {
-        return thirdPartyName;
-    }
-
-    public String getThirdPartyVersion() {
-        return thirdPartyVersion;
-    }
-
-    public String getPluginVersion() {
-        return pluginVersion;
     }
 
     public boolean isCleanupLogsOnSuccess() {
