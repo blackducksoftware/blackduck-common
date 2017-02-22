@@ -21,9 +21,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.capability;
+package com.blackducksoftware.integration.hub.api.view;
 
-public enum HubCapabilitiesEnum {
-    JRE_PROVIDED, POLICY_API, CLI_STATUS_DIRECTORY_OPTION, CLI_PASSWORD_ENVIRONMENT_VARIABLE, BOM_FILE_UPLOAD, CODE_LOCATION_ALIAS, AGGREGATE_BOM_REST_SERVER;
+import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
+
+public class BomComponentPolicyStatusView extends HubItem {
+    private PolicyStatusEnum approvalStatus;
+
+    public PolicyStatusEnum getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(final PolicyStatusEnum approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
 
 }

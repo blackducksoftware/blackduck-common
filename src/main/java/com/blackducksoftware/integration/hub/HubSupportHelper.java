@@ -56,6 +56,8 @@ public class HubSupportHelper implements Serializable {
         try {
             if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.5.0")) {
                 setHub3_5Support();
+            } else if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.4.0")) {
+                sertHub3_4_0Support();
             } else if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.3.1")) {
                 setHub3_3_1Support();
             } else if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.1.0")) {
@@ -91,6 +93,11 @@ public class HubSupportHelper implements Serializable {
     private void setHub3_3_1Support() {
         setHub3_1Support();
         capabilities.add(HubCapabilitiesEnum.BOM_FILE_UPLOAD);
+    }
+
+    private void sertHub3_4_0Support() {
+        setHub3_3_1Support();
+        capabilities.add(HubCapabilitiesEnum.AGGREGATE_BOM_REST_SERVER);
     }
 
     private void setHub3_5Support() {
