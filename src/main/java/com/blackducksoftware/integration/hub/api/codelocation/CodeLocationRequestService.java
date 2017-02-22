@@ -36,6 +36,8 @@ import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class CodeLocationRequestService extends HubParameterizedRequestService<CodeLocationItem> {
     private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
@@ -76,13 +78,14 @@ public class CodeLocationRequestService extends HubParameterizedRequestService<C
 
     public void unmapCodeLocation(final CodeLocationItem codeLocationItem) throws HubIntegrationException {
         final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
-        codeLocationItem.setMappedProjectVersion(null);
-        codeLocationItem.setJson(null);
-        final String codeLocationItemJson = getRestConnection().getGson().toJson(codeLocationItem);
-        unmapCodeLocation(codeLocationItemUrl, codeLocationItemJson);
+        final JsonParser jsonParser = getRestConnection().getJsonParser();
+        final JsonObject codeLocationItemJson = jsonParser.parse(codeLocationItem.getJson()).getAsJsonObject();
+        codeLocationItemJson.remove("mappedProjectVersion");
+        codeLocationItemJson.addProperty("mappedProjectVersion", "");
+        unmapCodeLocation(codeLocationItemUrl, getRestConnection().getGson().toJson(codeLocationItemJson));
     }
 
-    public void unmapCodeLocation(final String codeLocationItemJson, final String codeLocationItemUrl) throws HubIntegrationException {
+    public void unmapCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws HubIntegrationException {
         final HubRequest request = getHubRequestFactory().createRequest(codeLocationItemUrl);
         request.executePut(codeLocationItemJson);
     }
