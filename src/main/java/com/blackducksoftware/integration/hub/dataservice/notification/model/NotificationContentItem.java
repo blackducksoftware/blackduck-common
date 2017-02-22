@@ -30,7 +30,6 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
-import com.google.common.base.Joiner;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {
     private final ProjectVersion projectVersion;
@@ -95,13 +94,25 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
         }
 
         // Identify same-time non-equal items as non-equal
-        final Joiner joiner = Joiner.on(":").skipNulls();
-        final String thisProjectVersionString = joiner.join(getProjectVersion().getProjectName(), getProjectVersion()
-                .getProjectVersionName(), getComponentVersionUrl());
-        final String otherProjectVersionString = joiner.join(o.getProjectVersion().getProjectName(), o
-                .getProjectVersion().getProjectVersionName(), o.getComponentVersionUrl().toString());
+        final String thisProjectVersionString = constructVersionString(getProjectVersion().getProjectName(), getProjectVersion().getProjectVersionName(),
+                getComponentVersionUrl());
+        final String otherProjectVersionString = constructVersionString(o.getProjectVersion().getProjectName(), o.getProjectVersion().getProjectVersionName(),
+                o.getComponentVersionUrl());
 
         return thisProjectVersionString.compareTo(otherProjectVersionString);
+    }
+
+    private String constructVersionString(String... versionFragments) {
+        int pos = 1;
+        StringBuilder builder = new StringBuilder();
+        for (String fragment : versionFragments) {
+            if (fragment != null) {
+                builder.append(fragment);
+                if (pos != versionFragments.length) builder.append(":");
+            }
+            pos++;
+        }
+        return builder.toString();
     }
 
     @Override

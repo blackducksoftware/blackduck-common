@@ -25,7 +25,7 @@ package com.blackducksoftware.integration.hub.api.project.version;
 
 import java.util.Date;
 
-import com.blackducksoftware.integration.hub.api.component.version.ComplexLicense;
+import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseItem;
 import com.blackducksoftware.integration.hub.api.component.version.SourceEnum;
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
@@ -34,7 +34,7 @@ import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
 public class ProjectVersionItem extends HubItem {
     private DistributionEnum distribution;
 
-    private ComplexLicense license;
+    private ComplexLicenseItem license;
 
     private String nickname;
 
@@ -53,7 +53,7 @@ public class ProjectVersionItem extends HubItem {
         return distribution;
     }
 
-    public ComplexLicense getLicense() {
+    public ComplexLicenseItem getLicense() {
         return license;
     }
 

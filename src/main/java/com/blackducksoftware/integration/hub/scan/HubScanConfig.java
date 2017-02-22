@@ -34,7 +34,6 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
-import com.google.common.collect.ImmutableList;
 
 public class HubScanConfig {
     private final String projectName;
@@ -45,7 +44,7 @@ public class HubScanConfig {
 
     private final int scanMemory;
 
-    private final ImmutableList<String> scanTargetPaths;
+    private final List<String> scanTargetPaths;
 
     private final boolean dryRun;
 
@@ -69,7 +68,7 @@ public class HubScanConfig {
 
     public HubScanConfig(final String projectName, final String version, final File workingDirectory,
             final int scanMemory,
-            final ImmutableList<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
+            final List<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
             final String thirdPartyVersion, final String pluginVersion,
             final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias, final boolean unmapPreviousCodeLocations,
             final boolean deletePreviousCodeLocations) {

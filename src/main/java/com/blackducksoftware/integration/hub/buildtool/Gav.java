@@ -77,7 +77,11 @@ public class Gav {
 
     @Override
     public String toString() {
-        return String.format("%s:%s:%s", groupId, artifactId, version);
+        if (namespace != null) {
+            return String.format("%s:%s:%s:%s", namespace, groupId, artifactId, version);
+        } else {
+            return String.format("%s:%s:%s", groupId, artifactId, version);
+        }
     }
 
 }
