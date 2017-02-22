@@ -55,25 +55,6 @@ public class ComplexLicenseParser {
                 if (i < complexLicense.getWrappedComplexLicenseItems().size()) licenseText.append(operator);
                 i++;
             }
-
-            /**
-             * AND 'Mapping Pending' => 'UNKNOWN'
-             * OR 'Mapping Pending' => discard 'Mapping Pending' at all
-             */
-            // result.contains("") is needed for Mapping Pending OR Mapping Pending
-
-            // if (result.contains("Mapping Pending") || result.contains("")) {
-            // LinkedList<String> removalCollection = new LinkedList<>();
-            // removalCollection.add("Mapping Pending");
-            // removalCollection.add("");
-            // if (operator.equals(" AND ") && result.contains("Mapping Pending")) {
-            // result.removeAll(removalCollection);
-            // result.add("UNKNOWN");
-            // } else {
-            // result.removeAll(removalCollection);
-            // }
-            // }
-
             return i > 2 ? "(" + licenseText.toString() + ")" : licenseText.toString();
         }
     }

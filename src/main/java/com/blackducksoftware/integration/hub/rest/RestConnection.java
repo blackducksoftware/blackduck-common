@@ -262,7 +262,7 @@ public abstract class RestConnection {
                     return handleExecuteClientCall(request, retryCount + 1);
                 } else {
                     throw new HubIntegrationException(
-                            String.format("There was a problem trying to %1$s this item: %2$s. Error: %3$s %4$s",
+                            String.format("There was a problem trying to %s this item: %s. Error: %s %s",
                                     request.method(), request.url().uri().toString(), response.code(), response.message()));
                 }
             }

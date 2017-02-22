@@ -140,7 +140,7 @@ public class HubServicesFactory {
     }
 
     public LicenseDataService createLicenseDataService(final IntLogger logger) {
-        return new LicenseDataService(restConnection, createHubRequestService(), createComponentRequestService(), createMetaService(logger));
+        return new LicenseDataService(restConnection, createHubRequestService(), createComponentRequestService());
     }
 
     public BomImportRequestService createBomImportRequestService() {
