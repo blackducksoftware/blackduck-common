@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.builder;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +37,6 @@ import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.validator.HubScanConfigValidator;
 import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
 import com.blackducksoftware.integration.validator.AbstractValidator;
-import com.google.common.collect.ImmutableList;
 
 public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
@@ -77,9 +77,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
     @Override
     public HubScanConfig buildObject() {
         HubScanConfig config = null;
-        final ImmutableList<String> immutableScanTargetPaths = new ImmutableList.Builder<String>()
-                .addAll(scanTargetPaths).build();
-
+        final List<String> immutableScanTargetPaths = new ArrayList<>(scanTargetPaths);
         config = new HubScanConfig(projectName, version, phase, distribution, workingDirectory,
                 NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion,
                 cleanupLogsOnSuccess, excludePatterns, codeLocationAlias);

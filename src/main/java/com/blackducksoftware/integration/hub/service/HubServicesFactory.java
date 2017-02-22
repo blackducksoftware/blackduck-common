@@ -50,6 +50,7 @@ import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.Vulnerab
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
+import com.blackducksoftware.integration.hub.dataservice.component.ComponentDataService;
 import com.blackducksoftware.integration.hub.dataservice.extension.ExtensionConfigDataService;
 import com.blackducksoftware.integration.hub.dataservice.license.LicenseDataService;
 import com.blackducksoftware.integration.hub.dataservice.notification.NotificationDataService;
@@ -138,7 +139,7 @@ public class HubServicesFactory {
                 createVulnerabilityRequestService(), createMetaService(logger));
     }
 
-    public LicenseDataService createLicenseDataService() {
+    public LicenseDataService createLicenseDataService(final IntLogger logger) {
         return new LicenseDataService(restConnection, createHubRequestService(), createComponentRequestService());
     }
 
@@ -232,6 +233,10 @@ public class HubServicesFactory {
 
     public RestConnection getRestConnection() {
         return restConnection;
+    }
+
+    public ComponentDataService createComponentDataService(final IntLogger logger) {
+        return new ComponentDataService(logger, restConnection, createHubRequestService(), createComponentRequestService(), createMetaService(logger));
     }
 
 }

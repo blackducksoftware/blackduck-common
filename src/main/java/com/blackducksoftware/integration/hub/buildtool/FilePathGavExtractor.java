@@ -23,55 +23,44 @@
  */
 package com.blackducksoftware.integration.hub.buildtool;
 
-import java.io.File;
-import java.util.Arrays;
-
-import org.apache.commons.lang3.StringUtils;
+import java.net.URL;
 
 public class FilePathGavExtractor {
-    public Gav getMavenPathGav(final String filePath, final String localMavenRepoPath) {
+    public Gav getMavenPathGav(final URL filePath, final URL localMavenRepoPath) {
         if (filePath == null || localMavenRepoPath == null) {
             return null;
         }
-
-        final String cleanedFilePath = filePath.replaceFirst(localMavenRepoPath, "");
-        final String[] cleanedFilePathSegments = cleanedFilePath.split(File.separator);
-
-        String[] groupIdSegments;
-        if (cleanedFilePathSegments[0].equals("")) {
-            if (cleanedFilePathSegments.length < 4) {
-                return null;
-            }
-            groupIdSegments = Arrays.copyOfRange(cleanedFilePathSegments, 1, cleanedFilePathSegments.length - 3);
-        } else {
-            if (cleanedFilePathSegments.length < 3) {
-                return null;
-            }
-            groupIdSegments = Arrays.copyOfRange(cleanedFilePathSegments, 0, cleanedFilePathSegments.length - 3);
+        String stringPath = filePath.getFile();
+        stringPath = stringPath.replace(localMavenRepoPath.getFile(), "");
+        String[] pathArray = stringPath.split("/");
+        StringBuilder groupIdBuilder = new StringBuilder();
+        for(int i = 0; i<pathArray.length-3; i++){
+        	groupIdBuilder.append(pathArray[i]);
+        	if(i!= pathArray.length-4){
+        		groupIdBuilder.append(".");
+        	}
         }
-
-        final String groupId = StringUtils.join(groupIdSegments, ".");
-        final String artifactId = cleanedFilePathSegments[cleanedFilePathSegments.length - 3];
-        final String version = cleanedFilePathSegments[cleanedFilePathSegments.length - 2];
+        final String groupId = groupIdBuilder.toString();
+        final String artifactId = pathArray[pathArray.length - 3];
+        final String version = pathArray[pathArray.length - 2];
 
         return new Gav(groupId, artifactId, version);
 
     }
 
-    public Gav getGradlePathGav(final String filePath) {
+    public Gav getGradlePathGav(final URL filePath) {
         if (filePath == null) {
             return null;
         }
-
-        final String[] filePathSegments = filePath.split(File.separator);
-
-        if (filePathSegments.length < 5) {
+        String[] pathArray = filePath.getFile().split("/");
+        
+        if (pathArray.length < 5) {
             return null;
         }
 
-        final String groupId = filePathSegments[filePathSegments.length - 5];
-        final String artifactId = filePathSegments[filePathSegments.length - 4];
-        final String version = filePathSegments[filePathSegments.length - 3];
+        final String groupId = pathArray[pathArray.length - 5];
+        final String artifactId = pathArray[pathArray.length - 4];
+        final String version = pathArray[pathArray.length - 3];
 
         return new Gav(groupId, artifactId, version);
     }

@@ -23,33 +23,24 @@
  */
 package com.blackducksoftware.integration.hub.api.component.version;
 
-import java.util.Date;
-
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 
-public class ComponentVersion extends HubItem {
-    private ComplexLicenseItem license;
+public class LicenseItem extends HubItem {
+    private CodeSharingEnum codeSharing;
 
-    private Date releasedOn;
+    private String name;
 
-    private SourceEnum source;
+    private OwnershipEnum ownership;
 
-    private String versionName;
-
-    public ComplexLicenseItem getLicense() {
-        return license;
+    public CodeSharingEnum getCodeSharing() {
+        return codeSharing;
     }
 
-    public Date getReleasedOn() {
-        return releasedOn;
+    public String getName() {
+        return name;
     }
 
-    public SourceEnum getSource() {
-        return source;
+    public OwnershipEnum getOwnership() {
+        return ownership;
     }
-
-    public String getVersionName() {
-        return versionName;
-    }
-
 }
