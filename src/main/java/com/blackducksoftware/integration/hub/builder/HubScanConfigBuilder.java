@@ -44,10 +44,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private String version;
 
-    private String phase;
-
-    private String distribution;
-
     private File workingDirectory;
 
     private String scanMemory;
@@ -74,15 +70,19 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private String codeLocationAlias;
 
+    private boolean unmapPreviousCodeLocations;
+
+    private boolean deletePreviousCodeLocations;
+
     @Override
     public HubScanConfig buildObject() {
         HubScanConfig config = null;
         final ImmutableList<String> immutableScanTargetPaths = new ImmutableList.Builder<String>()
                 .addAll(scanTargetPaths).build();
 
-        config = new HubScanConfig(projectName, version, phase, distribution, workingDirectory,
+        config = new HubScanConfig(projectName, version, workingDirectory,
                 NumberUtils.toInt(scanMemory), immutableScanTargetPaths, dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion,
-                cleanupLogsOnSuccess, excludePatterns, codeLocationAlias);
+                cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations);
 
         return config;
     }
@@ -138,14 +138,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         this.version = StringUtils.trimToNull(version);
     }
 
-    public void setPhase(final String phase) {
-        this.phase = phase;
-    }
-
-    public void setDistribution(final String distribution) {
-        this.distribution = distribution;
-    }
-
     public void setScanMemory(final int scanMemory) {
         setScanMemory(String.valueOf(scanMemory));
     }
@@ -188,6 +180,14 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     public void setExcludePatterns(final String[] excludePatterns) {
         this.excludePatterns = excludePatterns;
+    }
+
+    public void setUnmapPreviousCodeLocations(final boolean unmapPreviousCodeLocations) {
+        this.unmapPreviousCodeLocations = unmapPreviousCodeLocations;
+    }
+
+    public void setDeletePreviousCodeLocations(final boolean deletePreviousCodeLocations) {
+        this.deletePreviousCodeLocations = deletePreviousCodeLocations;
     }
 
 }

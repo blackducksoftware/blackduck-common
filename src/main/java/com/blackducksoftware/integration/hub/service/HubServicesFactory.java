@@ -91,7 +91,8 @@ public class HubServicesFactory {
 
     public CLIDataService createCLIDataService(final IntLogger logger) {
         return new CLIDataService(logger, restConnection, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
-                createPhoneHomeDataService(logger));
+                createPhoneHomeDataService(logger), createProjectRequestService(), createProjectVersionRequestService(logger),
+                createCodeLocationRequestService(logger), createMetaService(logger));
     }
 
     public PhoneHomeDataService createPhoneHomeDataService(final IntLogger logger) {
@@ -112,7 +113,7 @@ public class HubServicesFactory {
     public ScanStatusDataService createScanStatusDataService(final IntLogger logger,
             final long timeoutInMilliseconds) {
         return new ScanStatusDataService(logger, restConnection, createProjectRequestService(), createProjectVersionRequestService(logger),
-                createCodeLocationRequestService(), createScanSummaryRequestService(), createMetaService(logger),
+                createCodeLocationRequestService(logger), createScanSummaryRequestService(), createMetaService(logger),
                 timeoutInMilliseconds);
     }
 
@@ -146,8 +147,8 @@ public class HubServicesFactory {
         return new BomImportRequestService(restConnection);
     }
 
-    public CodeLocationRequestService createCodeLocationRequestService() {
-        return new CodeLocationRequestService(restConnection);
+    public CodeLocationRequestService createCodeLocationRequestService(final IntLogger logger) {
+        return new CodeLocationRequestService(restConnection, createMetaService(logger));
     }
 
     public ComponentRequestService createComponentRequestService() {

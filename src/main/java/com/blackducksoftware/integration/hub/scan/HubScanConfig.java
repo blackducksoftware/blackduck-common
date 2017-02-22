@@ -41,10 +41,6 @@ public class HubScanConfig {
 
     private final String version;
 
-    private final String phase;
-
-    private final String distribution;
-
     private final File workingDirectory;
 
     private final int scanMemory;
@@ -67,15 +63,18 @@ public class HubScanConfig {
 
     private final String codeLocationAlias;
 
-    public HubScanConfig(final String projectName, final String version, final String phase,
-            final String distribution, final File workingDirectory, final int scanMemory,
+    private final boolean unmapPreviousCodeLocations;
+
+    private final boolean deletePreviousCodeLocations;
+
+    public HubScanConfig(final String projectName, final String version, final File workingDirectory,
+            final int scanMemory,
             final ImmutableList<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
-            final String thirdPartyVersion,
-            final String pluginVersion, final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias) {
+            final String thirdPartyVersion, final String pluginVersion,
+            final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias, final boolean unmapPreviousCodeLocations,
+            final boolean deletePreviousCodeLocations) {
         this.projectName = projectName;
         this.version = version;
-        this.phase = phase;
-        this.distribution = distribution;
         this.workingDirectory = workingDirectory;
         this.scanMemory = scanMemory;
         this.scanTargetPaths = scanTargetPaths;
@@ -87,6 +86,8 @@ public class HubScanConfig {
         this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
         this.excludePatterns = excludePatterns;
         this.codeLocationAlias = codeLocationAlias;
+        this.unmapPreviousCodeLocations = unmapPreviousCodeLocations;
+        this.deletePreviousCodeLocations = deletePreviousCodeLocations;
     }
 
     public String getProjectName() {
@@ -95,14 +96,6 @@ public class HubScanConfig {
 
     public String getVersion() {
         return version;
-    }
-
-    public String getPhase() {
-        return phase;
-    }
-
-    public String getDistribution() {
-        return distribution;
     }
 
     public File getWorkingDirectory() {
@@ -149,6 +142,14 @@ public class HubScanConfig {
         return codeLocationAlias;
     }
 
+    public boolean isUnmapPreviousCodeLocations() {
+        return unmapPreviousCodeLocations;
+    }
+
+    public boolean isDeletePreviousCodeLocations() {
+        return deletePreviousCodeLocations;
+    }
+
     public void print(final IntLogger logger) {
         try {
             logger.alwaysLog("--> Using Working Directory : " + getWorkingDirectory().getCanonicalPath());
@@ -179,6 +180,8 @@ public class HubScanConfig {
         logger.alwaysLog("--> Dry Run : " + isDryRun());
         logger.alwaysLog("--> Clean-up logs on success : " + isCleanupLogsOnSuccess());
         logger.alwaysLog("--> Code Location Name : " + getCodeLocationAlias());
+        logger.alwaysLog("--> Un-map previous Code Locations : " + isUnmapPreviousCodeLocations());
+        logger.alwaysLog("--> Delete previous Code Locations : " + isDeletePreviousCodeLocations());
     }
 
     @Override

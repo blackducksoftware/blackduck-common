@@ -57,6 +57,10 @@ public class CodeLocationItem extends HubItem {
         return mappedProjectVersion;
     }
 
+    public void setMappedProjectVersion(final String mappedProjectVersion) {
+        this.mappedProjectVersion = mappedProjectVersion;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }

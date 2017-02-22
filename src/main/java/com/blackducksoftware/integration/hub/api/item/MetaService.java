@@ -232,7 +232,7 @@ public class MetaService {
 
     public void deleteItem(final HubItem hubItem) throws HubIntegrationException {
         final String itemUrl = getHref(hubItem);
-        final HubRequest hubRequest = hubRequestFactory.createDeleteRequest(itemUrl);
+        final HubRequest hubRequest = hubRequestFactory.createRequest(itemUrl);
         hubRequest.executeDelete();
     }
 
