@@ -33,9 +33,9 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.blackducksoftware.integration.hub.bdio.simple.BdioHelper;
+import com.blackducksoftware.integration.hub.bdio.simple.BdioNodeFactory;
+import com.blackducksoftware.integration.hub.bdio.simple.BdioPropertyHelper;
 import com.blackducksoftware.integration.hub.bdio.simple.BdioWriter;
-import com.blackducksoftware.integration.hub.bdio.simple.ExternalIdentifierHelper;
 import com.blackducksoftware.integration.hub.bdio.simple.model.BdioBillOfMaterials;
 import com.blackducksoftware.integration.hub.bdio.simple.model.BdioComponent;
 import com.blackducksoftware.integration.hub.bdio.simple.model.BdioExternalIdentifier;
@@ -50,9 +50,9 @@ public class BdioDependencyWriter {
 
     private final Set<String> externalIds = new HashSet<>();
 
-    private final BdioHelper bdioHelper = new BdioHelper();
+    BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
 
-    private final ExternalIdentifierHelper externalIdentifierHelper = new ExternalIdentifierHelper(bdioHelper);
+    BdioNodeFactory bdioNodeFactory = new BdioNodeFactory(bdioPropertyHelper);
 
     public static String getFilename(final String artifactId) {
         return artifactId + BuildToolConstants.BDIO_FILE_SUFFIX;
@@ -74,16 +74,16 @@ public class BdioDependencyWriter {
 
     public void writeProject(final OutputStream outputStream, final String projectName, final DependencyNode root)
             throws IOException {
-        final BdioBillOfMaterials billOfMaterials = bdioHelper.createBillOfMaterials(projectName);
+        final BdioBillOfMaterials billOfMaterials = bdioNodeFactory.createBillOfMaterials(projectName);
 
         final String projectVersion = root.getGav().getVersion();
         final String projectId = idFromGav(root.getGav());
         final BdioExternalIdentifier projectExternalIdentifier = externalIdentifierFromGav(root.getGav());
-        final BdioProject project = bdioHelper.createProject(projectName, projectVersion, projectId, projectExternalIdentifier);
+        final BdioProject project = bdioNodeFactory.createProject(projectName, projectVersion, projectId, projectExternalIdentifier);
 
         for (final DependencyNode child : root.getChildren()) {
             final BdioComponent component = componentFromDependencyNode(child);
-            bdioHelper.addRelationship(project, component);
+            bdioPropertyHelper.addRelationship(project, component);
         }
 
         try (BdioWriter bdioWriter = new BdioWriter(new Gson(), outputStream)) {
@@ -106,16 +106,16 @@ public class BdioDependencyWriter {
 
     private void writeDependencyNode(final BdioWriter writer, final DependencyNode dependencyNode) throws IOException {
         final BdioComponent bdioComponent = componentFromDependencyNode(dependencyNode);
-        final BdioExternalIdentifier externalIdentifier = bdioComponent.getBdioExternalIdentifier();
+        final BdioExternalIdentifier externalIdentifier = bdioComponent.bdioExternalIdentifier;
         boolean alreadyAdded = false;
-        if (!externalIds.add(externalIdentifier.getExternalId())) {
+        if (!externalIds.add(externalIdentifier.externalId)) {
             alreadyAdded = true;
         }
 
         if (!alreadyAdded) {
             for (final DependencyNode child : dependencyNode.getChildren()) {
                 final BdioComponent childComponent = componentFromDependencyNode(child);
-                bdioHelper.addRelationship(bdioComponent, childComponent);
+                bdioPropertyHelper.addRelationship(bdioComponent, childComponent);
             }
             writer.writeBdioNode(bdioComponent);
         }
@@ -127,7 +127,7 @@ public class BdioDependencyWriter {
         final String componentId = idFromGav(dependencyNode.getGav());
         final BdioExternalIdentifier componentExternalIdentifier = externalIdentifierFromGav(dependencyNode.getGav());
 
-        final BdioComponent component = bdioHelper.createComponent(componentName, componentVersion, componentId, componentExternalIdentifier);
+        final BdioComponent component = bdioNodeFactory.createComponent(componentName, componentVersion, componentId, componentExternalIdentifier);
         return component;
     }
 
@@ -136,7 +136,7 @@ public class BdioDependencyWriter {
         final String artifact = gav.getArtifactId();
         final String version = gav.getVersion();
 
-        final BdioExternalIdentifier externalIdentifier = externalIdentifierHelper.createMavenExternalIdentifier(group, artifact, version);
+        final BdioExternalIdentifier externalIdentifier = bdioPropertyHelper.createMavenExternalIdentifier(group, artifact, version);
         return externalIdentifier;
     }
 
@@ -145,7 +145,7 @@ public class BdioDependencyWriter {
         final String artifact = gav.getArtifactId();
         final String version = gav.getVersion();
 
-        final String id = externalIdentifierHelper.createBdioId(group, artifact, version);
+        final String id = bdioPropertyHelper.createBdioId(group, artifact, version);
         return id;
     }
 }

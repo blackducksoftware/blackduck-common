@@ -27,18 +27,18 @@ import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
 
-public class ComplexLicense extends HubItem {
+public class ComplexLicenseItem extends HubItem {
     private CodeSharingEnum codeSharing;
 
     private String license;
-
-    private List<ComplexLicense> licenses;
 
     private String name;
 
     private OwnershipEnum ownership;
 
     private ComplexLicenseType type;
+
+    private List<ComplexLicenseItem> licenses;
 
     public CodeSharingEnum getCodeSharing() {
         return codeSharing;
@@ -48,7 +48,7 @@ public class ComplexLicense extends HubItem {
         return license;
     }
 
-    public List<ComplexLicense> getLicenses() {
+    public List<ComplexLicenseItem> getLicenses() {
         return licenses;
     }
 
@@ -63,5 +63,4 @@ public class ComplexLicense extends HubItem {
     public ComplexLicenseType getType() {
         return type;
     }
-
 }

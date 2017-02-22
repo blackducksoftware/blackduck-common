@@ -66,11 +66,10 @@ public class HubScanConfig {
 
     private final String codeLocationAlias;
 
-    public HubScanConfig(final String projectName, final String version, final String phase,
-            final String distribution, final File workingDirectory, final int scanMemory,
-            final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
-            final String thirdPartyVersion,
-            final String pluginVersion, final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias) {
+    public HubScanConfig(final String projectName, final String version, final String phase, final String distribution, final File workingDirectory,
+            final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
+            final String thirdPartyVersion, final String pluginVersion, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
+            final String codeLocationAlias) {
         this.projectName = projectName;
         this.version = version;
         this.phase = phase;

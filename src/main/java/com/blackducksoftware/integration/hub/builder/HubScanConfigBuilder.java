@@ -76,9 +76,9 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     @Override
     public HubScanConfig buildObject() {
-        final HubScanConfig config = new HubScanConfig(projectName, version, phase, distribution, workingDirectory,
-                NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion,
-                cleanupLogsOnSuccess, excludePatterns, codeLocationAlias);
+        final HubScanConfig config = new HubScanConfig(projectName, version, phase, distribution, workingDirectory, NumberUtils.toInt(scanMemory),
+                Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion, cleanupLogsOnSuccess,
+                excludePatterns, codeLocationAlias);
 
         return config;
     }
