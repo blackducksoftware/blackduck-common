@@ -42,7 +42,7 @@ import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionI
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.version.BomComponentVersionPolicyStatus;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
-import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
@@ -91,7 +91,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
             throw new HubItemTransformException(e);
         }
 
-        final ProjectVersion projectVersion = new ProjectVersion();
+        final ProjectVersionModel projectVersion = new ProjectVersionModel();
         projectVersion.setProjectName(projectName);
         projectVersion.setProjectVersionName(releaseItem.getVersionName());
         projectVersion.setUrl(policyOverride.getContent().getProjectVersionLink());
@@ -102,7 +102,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 
     @Override
     public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
-            final ProjectVersion projectVersion, final NotificationItem item,
+            final ProjectVersionModel projectVersion, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException {
 
         final PolicyOverrideNotificationItem policyOverrideItem = (PolicyOverrideNotificationItem) item;
@@ -141,7 +141,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
     }
 
     @Override
-    public void createContents(final ProjectVersion projectVersion, final String componentName,
+    public void createContents(final ProjectVersionModel projectVersion, final String componentName,
             final ComponentVersion componentVersion, final String componentUrl, final String componentVersionUrl,
             final List<PolicyRule> policyRuleList, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws URISyntaxException {

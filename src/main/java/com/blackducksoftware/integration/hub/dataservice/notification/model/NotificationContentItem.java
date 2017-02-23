@@ -30,10 +30,10 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
-import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {
-    private final ProjectVersion projectVersion;
+    private final ProjectVersionModel projectVersion;
 
     private final String componentName;
 
@@ -46,7 +46,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
     // they are collected multi-threaded
     public final Date createdAt;
 
-    public NotificationContentItem(final Date createdAt, final ProjectVersion projectVersion,
+    public NotificationContentItem(final Date createdAt, final ProjectVersionModel projectVersion,
             final String componentName,
             final ComponentVersion componentVersion,
             final String componentVersionUrl) {
@@ -57,7 +57,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
         this.componentVersionUrl = componentVersionUrl;
     }
 
-    public ProjectVersion getProjectVersion() {
+    public ProjectVersionModel getProjectVersion() {
         return projectVersion;
     }
 

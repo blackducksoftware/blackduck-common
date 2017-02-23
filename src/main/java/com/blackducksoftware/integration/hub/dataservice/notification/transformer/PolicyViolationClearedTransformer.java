@@ -38,7 +38,7 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
-import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
@@ -81,7 +81,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
             throw new HubItemTransformException("Error getting release item while transforming notification " + item
                     + "; projectVersionLink: " + projectVersionLink + ": " + e1.getMessage(), e1);
         }
-        final ProjectVersion projectVersion = new ProjectVersion();
+        final ProjectVersionModel projectVersion = new ProjectVersionModel();
         projectVersion.setProjectName(projectName);
         projectVersion.setProjectVersionName(releaseItem.getVersionName());
         projectVersion.setUrl(projectVersionLink);
@@ -98,7 +98,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
 
     @Override
     public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
-            final ProjectVersion projectVersion, final NotificationItem item,
+            final ProjectVersionModel projectVersion, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException {
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
             try {
@@ -133,7 +133,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
     }
 
     @Override
-    public void createContents(final ProjectVersion projectVersion, final String componentName,
+    public void createContents(final ProjectVersionModel projectVersion, final String componentName,
             final ComponentVersion componentVersion, final String componentUrl, final String componentVersionUrl,
             final List<PolicyRule> policyRuleList, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws URISyntaxException {

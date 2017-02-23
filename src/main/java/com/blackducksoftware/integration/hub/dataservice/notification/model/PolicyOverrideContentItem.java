@@ -29,14 +29,14 @@ import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
-import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 
 public class PolicyOverrideContentItem extends PolicyViolationContentItem {
     private final String firstName;
 
     private final String lastName;
 
-    public PolicyOverrideContentItem(final Date createdAt, final ProjectVersion projectVersion,
+    public PolicyOverrideContentItem(final Date createdAt, final ProjectVersionModel projectVersion,
             final String componentName,
             final ComponentVersion componentVersion, final String componentUrl,
             final String componentVersionUrl,

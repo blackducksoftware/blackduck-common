@@ -36,7 +36,7 @@ import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionI
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
-import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
@@ -114,7 +114,7 @@ public abstract class AbstractNotificationTransformer
     @Override
     public abstract List<NotificationContentItem> transform(NotificationItem item) throws HubItemTransformException;
 
-    protected ProjectVersion createFullProjectVersion(final String projectVersionUrl, final String projectName, final String versionName)
+    protected ProjectVersionModel createFullProjectVersion(final String projectVersionUrl, final String projectName, final String versionName)
             throws HubIntegrationException {
         ProjectVersionItem item;
         try {
@@ -124,7 +124,7 @@ public abstract class AbstractNotificationTransformer
                     + projectVersionUrl + ": " + e.getMessage();
             throw new HubIntegrationException(msg, e);
         }
-        final ProjectVersion fullProjectVersion = new ProjectVersion();
+        final ProjectVersionModel fullProjectVersion = new ProjectVersionModel();
         fullProjectVersion.setProjectName(projectName);
         fullProjectVersion.setProjectVersionName(versionName);
         fullProjectVersion.setDistribution(item.getDistribution());
