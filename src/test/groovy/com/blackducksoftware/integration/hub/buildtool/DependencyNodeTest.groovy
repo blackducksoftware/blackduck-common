@@ -71,27 +71,20 @@ class DependencyNodeTest {
     @Test
     void testDependencyNodeBuilder() {
         def rootToCompareTo = getRootNodeToCompareWith()
-        println("$rootToCompareTo")
 
         //Adding the relationships randomly
         DependencyNodeBuilder builder = new DependencyNodeBuilder(root);
-        builder.addNodeWithChild(fourthChild,subFirstChild)
-        builder.addNodeWithChild(firstChild,subFirstChild)
-        builder.addNodeWithChildren(fourthChild,[
-            subThirdChild,
-            subSecondChild
-        ])
-        builder.addNodeWithChildren(root,[
+        builder.addChildNodeWithParents(subSecondChild,[fourthChild, firstChild])
+        builder.addChildNodeWithParents(subFirstChild,[fourthChild, firstChild])
+        builder.addParentNodeWithChildren(root,[
             firstChild,
             secondChild,
             thirdChild,
             fourthChild
         ])
-        builder.addNodeWithChild(firstChild,subSecondChild)
-        builder.addNodeWithChild(secondChild, subThirdChild)
-        builder.addNode(thirdChild)
+        builder.addChildNodeWithParents(subThirdChild,[fourthChild, secondChild])
+
         DependencyNode rootNode = builder.buildRootNode()
-        println("$rootNode")
 
         compareNode(rootToCompareTo, rootNode)
     }
