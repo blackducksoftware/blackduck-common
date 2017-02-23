@@ -21,52 +21,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.codelocation;
-
-import java.util.Date;
+package com.blackducksoftware.integration.hub.api.view;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
 
-public class CodeLocationItem extends HubItem {
-    private CodeLocationTypeEnum type;
+public class BomComponentPolicyStatusView extends HubItem {
+    private PolicyStatusEnum approvalStatus;
 
-    private String url;
-
-    // Since Hub 3.5
-    private String name;
-
-    private String mappedProjectVersion;
-
-    private Date createdAt;
-
-    private Date updatedAt;
-
-    public CodeLocationTypeEnum getType() {
-        return type;
+    public PolicyStatusEnum getApprovalStatus() {
+        return approvalStatus;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getMappedProjectVersion() {
-        return mappedProjectVersion;
-    }
-
-    public void setMappedProjectVersion(final String mappedProjectVersion) {
-        this.mappedProjectVersion = mappedProjectVersion;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
+    public void setApprovalStatus(final PolicyStatusEnum approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 
 }

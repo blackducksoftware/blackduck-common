@@ -27,8 +27,8 @@ import java.net.URL;
 
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
+import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phone.home.PhoneHomeClient;
@@ -49,13 +49,22 @@ public class PhoneHomeDataService extends HubRequestService {
         this.hubRegistrationRequestService = hubRegistrationRequestService;
     }
 
-    public void phoneHome(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final String hubVersion) {
-        phoneHome(hubServerConfig, hubScanConfig.getThirdPartyName(), hubScanConfig.getThirdPartyVersion(), hubScanConfig.getPluginVersion(), hubVersion);
+    public void phoneHome(final HubServerConfig hubServerConfig, final IntegrationInfo integrationInfo, final String hubVersion) {
+        if (integrationInfo != null) {
+            phoneHome(hubServerConfig, integrationInfo.getThirdPartyName(), integrationInfo.getThirdPartyVersion(), integrationInfo.getPluginVersion(),
+                    hubVersion);
+        } else {
+            logger.debug("Skipping phone-home, IntegrationInfo was null");
+        }
     }
 
     public void phoneHome(final HubServerConfig hubServerConfig, final ThirdPartyName thirdPartyName, final String thirdPartyVersion,
             final String pluginVersion, final String hubVersion) {
-        phoneHome(hubServerConfig, thirdPartyName.getName(), thirdPartyVersion, pluginVersion, hubVersion);
+        if (thirdPartyName != null) {
+            phoneHome(hubServerConfig, thirdPartyName.getName(), thirdPartyVersion, pluginVersion, hubVersion);
+        } else {
+            logger.debug("Skipping phone-home, ThirdPartyName was null");
+        }
     }
 
     public void phoneHome(final HubServerConfig hubServerConfig, final String thirdPartyName, final String thirdPartyVersion,

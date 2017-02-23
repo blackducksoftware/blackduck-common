@@ -55,8 +55,6 @@ public class HubScanConfigValidator extends AbstractValidator {
 
     private String[] excludePatterns;
 
-    private boolean dryRun;
-
     private boolean disableScanTargetPathExistenceCheck;
 
     private boolean enableScanTargetPathsWithinWorkingDirectoryCheck;
@@ -240,10 +238,6 @@ public class HubScanConfigValidator extends AbstractValidator {
 
     public void setExcludePatterns(final String[] excludePatterns) {
         this.excludePatterns = excludePatterns;
-    }
-
-    public void setDryRun(final boolean dryRun) {
-        this.dryRun = dryRun;
     }
 
     public void setWorkingDirectory(final File workingDirectory) {

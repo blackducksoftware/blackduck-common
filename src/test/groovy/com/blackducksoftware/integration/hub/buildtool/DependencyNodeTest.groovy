@@ -62,7 +62,7 @@ class DependencyNodeTest {
         new DependencyNode(gav, [])
     }
 
-    DependencyNode createDependencyNodeWithChildren(Gav gav, ArrayList<DependencyNode> children){
+    DependencyNode createDependencyNodeWithChildren(Gav gav, ArrayList children){
         new DependencyNode(gav, children)
     }
 

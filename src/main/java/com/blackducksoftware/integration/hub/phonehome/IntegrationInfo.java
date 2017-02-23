@@ -21,52 +21,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.codelocation;
+package com.blackducksoftware.integration.hub.phonehome;
 
-import java.util.Date;
+import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
+public class IntegrationInfo {
 
-public class CodeLocationItem extends HubItem {
-    private CodeLocationTypeEnum type;
+    private final ThirdPartyName thirdPartyName;
 
-    private String url;
+    private final String thirdPartyVersion;
 
-    // Since Hub 3.5
-    private String name;
+    private final String pluginVersion;
 
-    private String mappedProjectVersion;
-
-    private Date createdAt;
-
-    private Date updatedAt;
-
-    public CodeLocationTypeEnum getType() {
-        return type;
+    public IntegrationInfo(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
+        this.thirdPartyName = thirdPartyName;
+        this.thirdPartyVersion = thirdPartyVersion;
+        this.pluginVersion = pluginVersion;
     }
 
-    public String getUrl() {
-        return url;
+    public ThirdPartyName getThirdPartyName() {
+        return thirdPartyName;
     }
 
-    public String getName() {
-        return name;
+    public String getThirdPartyVersion() {
+        return thirdPartyVersion;
     }
 
-    public String getMappedProjectVersion() {
-        return mappedProjectVersion;
-    }
-
-    public void setMappedProjectVersion(final String mappedProjectVersion) {
-        this.mappedProjectVersion = mappedProjectVersion;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
+    public String getPluginVersion() {
+        return pluginVersion;
     }
 
 }

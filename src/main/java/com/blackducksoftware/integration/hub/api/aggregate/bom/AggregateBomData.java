@@ -21,17 +21,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.report;
+package com.blackducksoftware.integration.hub.api.aggregate.bom;
 
 import java.util.List;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-public class HubRiskReportData {
-    private VersionReport report;
+import com.blackducksoftware.integration.hub.api.view.CountTypeEnum;
+import com.blackducksoftware.integration.hub.api.view.RiskCountView;
+import com.blackducksoftware.integration.hub.api.view.VersionBomComponentView;
 
-    private int totalBomEntries;
+public class AggregateBomData {
+    private List<VersionBomComponentView> components;
+
+    private int totalComponents;
 
     private int vulnerabilityRiskHighCount;
 
@@ -57,8 +61,8 @@ public class HubRiskReportData {
 
     private int operationalRiskNoneCount;
 
-    public void setReport(final VersionReport report) {
-        this.report = report;
+    public void setComponents(final List<VersionBomComponentView> components) {
+        this.components = components;
 
         vulnerabilityRiskHighCount = 0;
         vulnerabilityRiskMediumCount = 0;
@@ -72,50 +76,58 @@ public class HubRiskReportData {
         operationalRiskMediumCount = 0;
         operationalRiskLowCount = 0;
 
-        final List<AggregateBomViewEntry> bomEntries = report.getAggregateBomViewEntries();
-        for (final AggregateBomViewEntry bomEntry : bomEntries) {
-            if (bomEntry != null) {
-                if (bomEntry.getVulnerabilityRisk() != null) {
-                    if (bomEntry.getVulnerabilityRisk().getHIGH() > 0) {
-                        vulnerabilityRiskHighCount++;
-                    } else if (bomEntry.getVulnerabilityRisk().getMEDIUM() > 0) {
-                        vulnerabilityRiskMediumCount++;
-                    } else if (bomEntry.getVulnerabilityRisk().getLOW() > 0) {
-                        vulnerabilityRiskLowCount++;
+        for (final VersionBomComponentView component : components) {
+            if (component != null) {
+                if (component.getSecurityRiskProfile() != null && component.getSecurityRiskProfile().getCounts() != null
+                        && !component.getSecurityRiskProfile().getCounts().isEmpty()) {
+                    for (final RiskCountView count : component.getSecurityRiskProfile().getCounts()) {
+                        if (count.getCountType() == CountTypeEnum.HIGH && count.getCount() > 0) {
+                            vulnerabilityRiskHighCount++;
+                        } else if (count.getCountType() == CountTypeEnum.MEDIUM && count.getCount() > 0) {
+                            vulnerabilityRiskMediumCount++;
+                        } else if (count.getCountType() == CountTypeEnum.LOW && count.getCount() > 0) {
+                            vulnerabilityRiskLowCount++;
+                        }
                     }
                 }
-                if (bomEntry.getLicenseRisk() != null) {
-                    if (bomEntry.getLicenseRisk().getHIGH() > 0) {
-                        licenseRiskHighCount++;
-                    } else if (bomEntry.getLicenseRisk().getMEDIUM() > 0) {
-                        licenseRiskMediumCount++;
-                    } else if (bomEntry.getLicenseRisk().getLOW() > 0) {
-                        licenseRiskLowCount++;
+                if (component.getLicenseRiskProfile() != null && component.getLicenseRiskProfile().getCounts() != null
+                        && !component.getLicenseRiskProfile().getCounts().isEmpty()) {
+                    for (final RiskCountView count : component.getLicenseRiskProfile().getCounts()) {
+                        if (count.getCountType() == CountTypeEnum.HIGH && count.getCount() > 0) {
+                            licenseRiskHighCount++;
+                        } else if (count.getCountType() == CountTypeEnum.MEDIUM && count.getCount() > 0) {
+                            licenseRiskMediumCount++;
+                        } else if (count.getCountType() == CountTypeEnum.LOW && count.getCount() > 0) {
+                            licenseRiskLowCount++;
+                        }
                     }
                 }
-                if (bomEntry.getOperationalRisk() != null) {
-                    if (bomEntry.getOperationalRisk().getHIGH() > 0) {
-                        operationalRiskHighCount++;
-                    } else if (bomEntry.getOperationalRisk().getMEDIUM() > 0) {
-                        operationalRiskMediumCount++;
-                    } else if (bomEntry.getOperationalRisk().getLOW() > 0) {
-                        operationalRiskLowCount++;
+                if (component.getOperationalRiskProfile() != null && component.getOperationalRiskProfile().getCounts() != null
+                        && !component.getOperationalRiskProfile().getCounts().isEmpty()) {
+                    for (final RiskCountView count : component.getOperationalRiskProfile().getCounts()) {
+                        if (count.getCountType() == CountTypeEnum.HIGH && count.getCount() > 0) {
+                            operationalRiskHighCount++;
+                        } else if (count.getCountType() == CountTypeEnum.MEDIUM && count.getCount() > 0) {
+                            operationalRiskMediumCount++;
+                        } else if (count.getCountType() == CountTypeEnum.LOW && count.getCount() > 0) {
+                            operationalRiskLowCount++;
+                        }
                     }
                 }
             }
         }
 
-        totalBomEntries = bomEntries.size();
+        totalComponents = components.size();
 
-        vulnerabilityRiskNoneCount = totalBomEntries - vulnerabilityRiskHighCount - vulnerabilityRiskMediumCount
+        vulnerabilityRiskNoneCount = totalComponents - vulnerabilityRiskHighCount - vulnerabilityRiskMediumCount
                 - vulnerabilityRiskLowCount;
-        licenseRiskNoneCount = totalBomEntries - licenseRiskHighCount - licenseRiskMediumCount - licenseRiskLowCount;
-        operationalRiskNoneCount = totalBomEntries - operationalRiskHighCount - operationalRiskMediumCount
+        licenseRiskNoneCount = totalComponents - licenseRiskHighCount - licenseRiskMediumCount - licenseRiskLowCount;
+        operationalRiskNoneCount = totalComponents - operationalRiskHighCount - operationalRiskMediumCount
                 - operationalRiskLowCount;
     }
 
     public double getPercentage(final double count) {
-        final double totalCount = totalBomEntries;
+        final double totalCount = totalComponents;
         double percentage = 0;
         if (totalCount > 0 && count > 0) {
             percentage = (count / totalCount) * 100;
@@ -130,12 +142,8 @@ public class HubRiskReportData {
         return StringEscapeUtils.escapeHtml4(valueToEscape);
     }
 
-    public List<AggregateBomViewEntry> getBomEntries() {
-        return report.getAggregateBomViewEntries();
-    }
-
-    public VersionReport getReport() {
-        return report;
+    public List<VersionBomComponentView> getComponents() {
+        return components;
     }
 
     public int getVulnerabilityRiskHighCount() {

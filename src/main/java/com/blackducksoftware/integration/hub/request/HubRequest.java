@@ -129,6 +129,36 @@ public class HubRequest {
         }
     }
 
+    public void executePut(final String content) throws HubIntegrationException {
+        final HttpUrl httpUrl = buildHttpUrl();
+        Response response = null;
+        try {
+            final Request request = restConnection.createPutRequest(httpUrl, restConnection.createJsonRequestBody(content));
+            response = restConnection.handleExecuteClientCall(request);
+        } catch (final IOException e) {
+            throw new HubIntegrationException("There was a problem updating this item : " + httpUrl.uri().toString() + ". Error : " + e.getMessage(), e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+
+    public void executePut(final String mediaType, final String content) throws HubIntegrationException {
+        final HttpUrl httpUrl = buildHttpUrl();
+        Response response = null;
+        try {
+            final Request request = restConnection.createPutRequest(httpUrl, restConnection.createJsonRequestBody(mediaType, content));
+            response = restConnection.handleExecuteClientCall(request);
+        } catch (final IOException e) {
+            throw new HubIntegrationException("There was a problem updating this item : " + httpUrl.uri().toString() + ". Error : " + e.getMessage(), e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+
     public void executeDelete() throws HubIntegrationException {
         final HttpUrl httpUrl = buildHttpUrl();
         try {
