@@ -33,7 +33,6 @@ import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phone.home.PhoneHomeClient;
 import com.blackducksoftware.integration.phone.home.enums.BlackDuckName;
-import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
 import com.blackducksoftware.integration.phone.home.exception.PhoneHomeArgumentException;
 import com.blackducksoftware.integration.phone.home.exception.PhoneHomeConnectionException;
 
@@ -50,24 +49,16 @@ public class PhoneHomeDataService extends HubRequestService {
     }
 
     public void phoneHome(final HubServerConfig hubServerConfig, final IntegrationInfo integrationInfo, final String hubVersion) {
-        if (integrationInfo != null) {
-            phoneHome(hubServerConfig, integrationInfo.getThirdPartyName(), integrationInfo.getThirdPartyVersion(), integrationInfo.getPluginVersion(),
+        if (IntegrationInfo.DO_NOT_PHONE_HOME == integrationInfo) {
+            logger.debug("Skipping phone-home");
+        } else {
+            phoneHome(hubServerConfig, integrationInfo.getThirdPartyName(), integrationInfo.getThirdPartyVersion(),
+                    integrationInfo.getPluginVersion(),
                     hubVersion);
-        } else {
-            logger.debug("Skipping phone-home, IntegrationInfo was null");
         }
     }
 
-    public void phoneHome(final HubServerConfig hubServerConfig, final ThirdPartyName thirdPartyName, final String thirdPartyVersion,
-            final String pluginVersion, final String hubVersion) {
-        if (thirdPartyName != null) {
-            phoneHome(hubServerConfig, thirdPartyName.getName(), thirdPartyVersion, pluginVersion, hubVersion);
-        } else {
-            logger.debug("Skipping phone-home, ThirdPartyName was null");
-        }
-    }
-
-    public void phoneHome(final HubServerConfig hubServerConfig, final String thirdPartyName, final String thirdPartyVersion,
+    private void phoneHome(final HubServerConfig hubServerConfig, final String thirdPartyName, final String thirdPartyVersion,
             final String pluginVersion, final String hubVersion) {
         try {
             String registrationId = null;
