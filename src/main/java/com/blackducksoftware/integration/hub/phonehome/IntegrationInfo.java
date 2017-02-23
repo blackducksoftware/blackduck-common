@@ -23,23 +23,22 @@
  */
 package com.blackducksoftware.integration.hub.phonehome;
 
-import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
-
 public class IntegrationInfo {
+    public static final IntegrationInfo DO_NOT_PHONE_HOME = new IntegrationInfo(null, null, null);
 
-    private final ThirdPartyName thirdPartyName;
+    private final String thirdPartyName;
 
     private final String thirdPartyVersion;
 
     private final String pluginVersion;
 
-    public IntegrationInfo(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
+    public IntegrationInfo(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
         this.thirdPartyName = thirdPartyName;
         this.thirdPartyVersion = thirdPartyVersion;
         this.pluginVersion = pluginVersion;
     }
 
-    public ThirdPartyName getThirdPartyName() {
+    public String getThirdPartyName() {
         return thirdPartyName;
     }
 
