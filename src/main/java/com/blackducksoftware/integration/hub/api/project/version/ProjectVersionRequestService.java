@@ -84,7 +84,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
 
         final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
 
-        final HubRequest hubRequest = getHubRequestFactory().createPostRequest(versionsUrl);
+        final HubRequest hubRequest = getHubRequestFactory().createRequest(versionsUrl);
 
         final String location = hubRequest.executePost(getRestConnection().getGson().toJson(json));
 

@@ -80,7 +80,7 @@ public class HubRequestService {
     }
 
     public void deleteItem(final String url) throws HubIntegrationException {
-        final HubRequest hubRequest = hubRequestFactory.createDeleteRequest(url);
+        final HubRequest hubRequest = hubRequestFactory.createRequest(url);
         hubRequest.executeDelete();
     }
 

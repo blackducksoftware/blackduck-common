@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.blackducksoftware.integration.hub.HubSupportHelper;
+import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
 import com.blackducksoftware.integration.hub.api.bom.BomRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
@@ -91,7 +92,8 @@ public class HubServicesFactory {
 
     public CLIDataService createCLIDataService(final IntLogger logger) {
         return new CLIDataService(logger, restConnection, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
-                createPhoneHomeDataService(logger));
+                createPhoneHomeDataService(logger), createProjectRequestService(), createProjectVersionRequestService(logger),
+                createCodeLocationRequestService(logger), createMetaService(logger));
     }
 
     public PhoneHomeDataService createPhoneHomeDataService(final IntLogger logger) {
@@ -101,7 +103,8 @@ public class HubServicesFactory {
     public RiskReportDataService createRiskReportDataService(final IntLogger logger,
             final long timeoutInMilliseconds) {
         return new RiskReportDataService(logger, restConnection, createProjectRequestService(),
-                createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds));
+                createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds), createAggregateBomRequestService(logger),
+                createHubRequestService(), createMetaService(logger), createCheckedHubSupport(logger));
     }
 
     public PolicyStatusDataService createPolicyStatusDataService(final IntLogger logger) {
@@ -112,7 +115,7 @@ public class HubServicesFactory {
     public ScanStatusDataService createScanStatusDataService(final IntLogger logger,
             final long timeoutInMilliseconds) {
         return new ScanStatusDataService(logger, restConnection, createProjectRequestService(), createProjectVersionRequestService(logger),
-                createCodeLocationRequestService(), createScanSummaryRequestService(), createMetaService(logger),
+                createCodeLocationRequestService(logger), createScanSummaryRequestService(), createMetaService(logger),
                 timeoutInMilliseconds);
     }
 
@@ -146,8 +149,8 @@ public class HubServicesFactory {
         return new BomImportRequestService(restConnection);
     }
 
-    public CodeLocationRequestService createCodeLocationRequestService() {
-        return new CodeLocationRequestService(restConnection);
+    public CodeLocationRequestService createCodeLocationRequestService(final IntLogger logger) {
+        return new CodeLocationRequestService(restConnection, createMetaService(logger));
     }
 
     public ComponentRequestService createComponentRequestService() {
@@ -222,6 +225,10 @@ public class HubServicesFactory {
         return new ReportRequestService(restConnection, logger, createMetaService(logger), timeoutInMilliseconds);
     }
 
+    public AggregateBomRequestService createAggregateBomRequestService(final IntLogger logger) {
+        return new AggregateBomRequestService(restConnection, createMetaService(logger));
+    }
+
     public MetaService createMetaService(final IntLogger logger) {
         return new MetaService(logger, restConnection.getJsonParser());
     }
@@ -232,6 +239,12 @@ public class HubServicesFactory {
 
     public RestConnection getRestConnection() {
         return restConnection;
+    }
+
+    public HubSupportHelper createCheckedHubSupport(final IntLogger logger) {
+        final HubSupportHelper supportHelper = new HubSupportHelper();
+        supportHelper.checkHubSupport(createHubVersionRequestService(), logger);
+        return supportHelper;
     }
 
     public ComponentDataService createComponentDataService(final IntLogger logger) {

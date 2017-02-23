@@ -78,7 +78,7 @@ public class MetaService {
     public static final String GLOBAL_OPTIONS_LINK = "global-options";
 
     public static final String USER_OPTIONS_LINK = "user-options";
-    
+
     public static final String TEXT_LINK = "text";
 
     private final IntLogger logger;

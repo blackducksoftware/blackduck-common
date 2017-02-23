@@ -35,7 +35,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.blackducksoftware.integration.builder.AbstractBuilder;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.validator.HubScanConfigValidator;
-import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 
 public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
@@ -43,10 +42,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
     private String projectName;
 
     private String version;
-
-    private String phase;
-
-    private String distribution;
 
     private File workingDirectory;
 
@@ -58,12 +53,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private File toolsDir;
 
-    private ThirdPartyName thirdPartyName;
-
-    private String thirdPartyVersion;
-
-    private String pluginVersion;
-
     private boolean disableScanTargetPathExistenceCheck;
 
     private boolean enableScanTargetPathsWithinWorkingDirectoryCheck;
@@ -74,11 +63,15 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private String codeLocationAlias;
 
+    private boolean unmapPreviousCodeLocations;
+
+    private boolean deletePreviousCodeLocations;
+
     @Override
     public HubScanConfig buildObject() {
-        final HubScanConfig config = new HubScanConfig(projectName, version, phase, distribution, workingDirectory, NumberUtils.toInt(scanMemory),
-                Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, thirdPartyName, thirdPartyVersion, pluginVersion, cleanupLogsOnSuccess,
-                excludePatterns, codeLocationAlias);
+        final HubScanConfig config = new HubScanConfig(projectName, version, workingDirectory,
+                NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir,
+                cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations);
 
         return config;
     }
@@ -86,9 +79,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
     @Override
     public AbstractValidator createValidator() {
         final HubScanConfigValidator validator = new HubScanConfigValidator();
-        validator.setDryRun(dryRun);
         validator.setProjectName(projectName);
-        validator.setVersion(pluginVersion);
+        validator.setVersion(version);
         validator.setScanMemory(scanMemory);
         validator.setWorkingDirectory(workingDirectory);
         validator.addAllScanTargetPaths(scanTargetPaths);
@@ -114,32 +106,12 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         this.toolsDir = toolsDir;
     }
 
-    public void setThirdPartyName(final ThirdPartyName thirdPartyName) {
-        this.thirdPartyName = thirdPartyName;
-    }
-
-    public void setThirdPartyVersion(final String thirdPartyVersion) {
-        this.thirdPartyVersion = thirdPartyVersion;
-    }
-
-    public void setPluginVersion(final String pluginVersion) {
-        this.pluginVersion = pluginVersion;
-    }
-
     public void setProjectName(final String projectName) {
         this.projectName = StringUtils.trimToNull(projectName);
     }
 
     public void setVersion(final String version) {
         this.version = StringUtils.trimToNull(version);
-    }
-
-    public void setPhase(final String phase) {
-        this.phase = phase;
-    }
-
-    public void setDistribution(final String distribution) {
-        this.distribution = distribution;
     }
 
     public void setScanMemory(final int scanMemory) {
@@ -184,6 +156,14 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     public void setExcludePatterns(final String[] excludePatterns) {
         this.excludePatterns = excludePatterns;
+    }
+
+    public void setUnmapPreviousCodeLocations(final boolean unmapPreviousCodeLocations) {
+        this.unmapPreviousCodeLocations = unmapPreviousCodeLocations;
+    }
+
+    public void setDeletePreviousCodeLocations(final boolean deletePreviousCodeLocations) {
+        this.deletePreviousCodeLocations = deletePreviousCodeLocations;
     }
 
 }

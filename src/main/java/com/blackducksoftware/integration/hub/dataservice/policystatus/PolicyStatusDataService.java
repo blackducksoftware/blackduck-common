@@ -59,12 +59,18 @@ public class PolicyStatusDataService extends HubRequestService {
         final String versionsUrl = metaService.getFirstLink(projectItem, MetaService.VERSIONS_LINK);
 
         final List<ProjectVersionItem> projectVersions = projectVersionRequestService.getAllProjectVersions(versionsUrl);
-        final String policyStatusUrl = findPolicyStatusUrl(projectVersions, projectVersionName);
+        final String policyStatusUrl = findPolicyStatusUrlFromVersions(projectVersions, projectVersionName);
 
         return hubRequestService.getItem(policyStatusUrl, PolicyStatusItem.class);
     }
 
-    private String findPolicyStatusUrl(final List<ProjectVersionItem> projectVersions, final String projectVersionName) throws HubIntegrationException {
+    public PolicyStatusItem getPolicyStatusForVersion(final ProjectVersionItem version) throws HubIntegrationException {
+        final String policyStatusUrl = metaService.getFirstLink(version, MetaService.POLICY_STATUS_LINK);
+        return hubRequestService.getItem(policyStatusUrl, PolicyStatusItem.class);
+    }
+
+    private String findPolicyStatusUrlFromVersions(final List<ProjectVersionItem> projectVersions, final String projectVersionName)
+            throws HubIntegrationException {
         for (final ProjectVersionItem version : projectVersions) {
             if (projectVersionName.equals(version.getVersionName())) {
                 final String policyStatusLink = metaService.getFirstLink(version, MetaService.POLICY_STATUS_LINK);

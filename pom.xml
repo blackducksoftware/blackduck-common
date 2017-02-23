@@ -25,6 +25,11 @@
   <dependencies>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
+      <artifactId>hub-reporting-common</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>phone-home-api</artifactId>
       <version>1.5.1</version>
       <exclusions>
@@ -79,6 +84,23 @@
         <artifactId>gmaven-plugin</artifactId>
         <version>1.0</version>
         <extensions>true</extensions>
+        <executions>
+          <execution>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <fileset>
+                  <directory>${pom.basedir}/src/test/groovy</directory>
+                  <includes>
+                    <include>**/*Test*.*</include>
+                  </includes>
+                </fileset>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
         <dependencies>
           <dependency>
             <groupId>org.codehaus.groovy</groupId>

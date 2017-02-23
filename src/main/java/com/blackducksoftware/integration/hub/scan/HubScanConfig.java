@@ -33,16 +33,11 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.phone.home.enums.ThirdPartyName;
 
 public class HubScanConfig {
     private final String projectName;
 
     private final String version;
-
-    private final String phase;
-
-    private final String distribution;
 
     private final File workingDirectory;
 
@@ -54,37 +49,33 @@ public class HubScanConfig {
 
     private final File toolsDir;
 
-    private final ThirdPartyName thirdPartyName;
-
-    private final String thirdPartyVersion;
-
-    private final String pluginVersion;
-
     private final boolean cleanupLogsOnSuccess;
 
     private final String[] excludePatterns;
 
     private final String codeLocationAlias;
 
-    public HubScanConfig(final String projectName, final String version, final String phase, final String distribution, final File workingDirectory,
-            final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final ThirdPartyName thirdPartyName,
-            final String thirdPartyVersion, final String pluginVersion, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
-            final String codeLocationAlias) {
+    private final boolean unmapPreviousCodeLocations;
+
+    private final boolean deletePreviousCodeLocations;
+
+    public HubScanConfig(final String projectName, final String version, final File workingDirectory,
+            final int scanMemory,
+            final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir,
+            final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias, final boolean unmapPreviousCodeLocations,
+            final boolean deletePreviousCodeLocations) {
         this.projectName = projectName;
         this.version = version;
-        this.phase = phase;
-        this.distribution = distribution;
         this.workingDirectory = workingDirectory;
         this.scanMemory = scanMemory;
         this.scanTargetPaths = scanTargetPaths;
         this.dryRun = dryRun;
         this.toolsDir = toolsDir;
-        this.thirdPartyName = thirdPartyName;
-        this.thirdPartyVersion = thirdPartyVersion;
-        this.pluginVersion = pluginVersion;
         this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
         this.excludePatterns = excludePatterns;
         this.codeLocationAlias = codeLocationAlias;
+        this.unmapPreviousCodeLocations = unmapPreviousCodeLocations;
+        this.deletePreviousCodeLocations = deletePreviousCodeLocations;
     }
 
     public String getProjectName() {
@@ -93,14 +84,6 @@ public class HubScanConfig {
 
     public String getVersion() {
         return version;
-    }
-
-    public String getPhase() {
-        return phase;
-    }
-
-    public String getDistribution() {
-        return distribution;
     }
 
     public File getWorkingDirectory() {
@@ -123,18 +106,6 @@ public class HubScanConfig {
         return toolsDir;
     }
 
-    public ThirdPartyName getThirdPartyName() {
-        return thirdPartyName;
-    }
-
-    public String getThirdPartyVersion() {
-        return thirdPartyVersion;
-    }
-
-    public String getPluginVersion() {
-        return pluginVersion;
-    }
-
     public boolean isCleanupLogsOnSuccess() {
         return cleanupLogsOnSuccess;
     }
@@ -145,6 +116,14 @@ public class HubScanConfig {
 
     public String getCodeLocationAlias() {
         return codeLocationAlias;
+    }
+
+    public boolean isUnmapPreviousCodeLocations() {
+        return unmapPreviousCodeLocations;
+    }
+
+    public boolean isDeletePreviousCodeLocations() {
+        return deletePreviousCodeLocations;
     }
 
     public void print(final IntLogger logger) {
@@ -177,6 +156,8 @@ public class HubScanConfig {
         logger.alwaysLog("--> Dry Run : " + isDryRun());
         logger.alwaysLog("--> Clean-up logs on success : " + isCleanupLogsOnSuccess());
         logger.alwaysLog("--> Code Location Name : " + getCodeLocationAlias());
+        logger.alwaysLog("--> Un-map previous Code Locations : " + isUnmapPreviousCodeLocations());
+        logger.alwaysLog("--> Delete previous Code Locations : " + isDeletePreviousCodeLocations());
     }
 
     @Override
