@@ -25,10 +25,10 @@ package com.blackducksoftware.integration.hub.api.aggregate.bom;
 
 import java.util.List;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.view.VersionBomComponentView;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
@@ -42,13 +42,13 @@ public class AggregateBomRequestService extends HubParameterizedRequestService<V
         this.metaService = metaService;
     }
 
-    public List<VersionBomComponentView> getBomEntries(final ProjectVersionItem projectVersion) throws HubIntegrationException {
+    public List<VersionBomComponentView> getBomEntries(final ProjectVersionItem projectVersion) throws IntegrationException {
         final String componentURL = metaService.getFirstLink(projectVersion, MetaService.COMPONENTS_LINK);
         return getBomEntries(componentURL);
     }
 
-    public List<VersionBomComponentView> getBomEntries(final String componentsUrl) throws HubIntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(componentsUrl);
+    public List<VersionBomComponentView> getBomEntries(final String componentsUrl) throws IntegrationException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(componentsUrl);
 
         final List<VersionBomComponentView> allComponentItems = getAllItems(hubPagedRequest);
         return allComponentItems;

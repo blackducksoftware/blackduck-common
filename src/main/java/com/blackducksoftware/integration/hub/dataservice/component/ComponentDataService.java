@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.UrlConstants;
 import com.blackducksoftware.integration.hub.api.component.Component;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
@@ -62,24 +63,24 @@ public class ComponentDataService {
     }
 
     public ComponentVersion getExactComponentVersionFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
-            throws HubIntegrationException {
-        for (ComponentVersion componentVersion : this.getAllComponentVersionsFromComponent(namespace, groupId, artifactId, version)) {
+            throws IntegrationException {
+        for (final ComponentVersion componentVersion : this.getAllComponentVersionsFromComponent(namespace, groupId, artifactId, version)) {
             if (componentVersion.getVersionName().equals(version)) {
                 return componentVersion;
             }
         }
-        String errMsg = "Could not find version " + version + " of component " + StringUtils.join(new String[] { groupId, artifactId, version }, ":");
+        final String errMsg = "Could not find version " + version + " of component " + StringUtils.join(new String[] { groupId, artifactId, version }, ":");
         logger.error(errMsg);
         throw new HubIntegrationException(errMsg);
     }
 
     public List<ComponentVersion> getAllComponentVersionsFromComponent(final String namespace, final String groupId, final String artifactId,
             final String version)
-            throws HubIntegrationException {
+            throws IntegrationException {
         final Component component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
         component.getComponent();
-        ComponentIdItem componentItem = hubRequestService.getItem(component.getComponent(), ComponentIdItem.class);
-        String versionsURL = metaService.getFirstLinkSafely(componentItem, UrlConstants.SEGMENT_VERSIONS);
+        final ComponentIdItem componentItem = hubRequestService.getItem(component.getComponent(), ComponentIdItem.class);
+        final String versionsURL = metaService.getFirstLinkSafely(componentItem, UrlConstants.SEGMENT_VERSIONS);
         List<ComponentVersion> versions = new ArrayList<>();
         if (versionsURL != null) {
             versions = hubParameterizedRequestService.getAllItems(versionsURL);

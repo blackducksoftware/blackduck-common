@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
 import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkItem;
@@ -36,7 +37,6 @@ import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 
 public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, UserOptionLinkItem> {
     private final UserRequestService userRequestService;
@@ -50,7 +50,7 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
     }
 
     @Override
-    public List<UserConfigItem> transform(final UserOptionLinkItem item) throws HubIntegrationException {
+    public List<UserConfigItem> transform(final UserOptionLinkItem item) throws IntegrationException {
         final UserItem user = userRequestService.getItem(item.getUser());
         if (!user.isActive()) {
             return Collections.emptyList();
@@ -62,7 +62,7 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
         }
     }
 
-    private Map<String, ConfigurationItem> getUserConfigOptions(final String userConfigUrl) throws HubIntegrationException {
+    private Map<String, ConfigurationItem> getUserConfigOptions(final String userConfigUrl) throws IntegrationException {
         final List<ConfigurationItem> userItemList = extensionConfigRequestService.getUserConfiguration(userConfigUrl);
         final Map<String, ConfigurationItem> itemMap = createConfigMap(userItemList);
         return itemMap;

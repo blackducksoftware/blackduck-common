@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
@@ -101,7 +102,7 @@ public class HubServicesFactory {
     }
 
     public RiskReportDataService createRiskReportDataService(final IntLogger logger,
-            final long timeoutInMilliseconds) {
+            final long timeoutInMilliseconds) throws IntegrationException {
         return new RiskReportDataService(logger, restConnection, createProjectRequestService(),
                 createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds), createAggregateBomRequestService(logger),
                 createHubRequestService(), createMetaService(logger), createCheckedHubSupport(logger));
@@ -241,7 +242,7 @@ public class HubServicesFactory {
         return restConnection;
     }
 
-    public HubSupportHelper createCheckedHubSupport(final IntLogger logger) {
+    public HubSupportHelper createCheckedHubSupport(final IntLogger logger) throws IntegrationException {
         final HubSupportHelper supportHelper = new HubSupportHelper();
         supportHelper.checkHubSupport(createHubVersionRequestService(), logger);
         return supportHelper;

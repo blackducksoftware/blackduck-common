@@ -27,7 +27,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.blackducksoftware.integration.exception.EncryptionException;
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationItem;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
@@ -41,7 +41,6 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -89,7 +88,7 @@ public class CLIDataService extends HubRequestService {
 
     public List<ScanSummaryItem> installAndRunScan(final HubServerConfig hubServerConfig,
             final HubScanConfig hubScanConfig, final IntegrationInfo integrationInfo)
-            throws HubIntegrationException, EncryptionException {
+            throws IntegrationException {
         final String localHostName = HostnameHelper.getMyHostname();
         logger.info("Running on machine : " + localHostName);
         printConfiguration(hubScanConfig);
@@ -133,7 +132,7 @@ public class CLIDataService extends HubRequestService {
         }
     }
 
-    private void cleanupCodeLocations(final List<ScanSummaryItem> scans, final HubScanConfig hubScanConfig) throws HubIntegrationException {
+    private void cleanupCodeLocations(final List<ScanSummaryItem> scans, final HubScanConfig hubScanConfig) throws IntegrationException {
         if (hubScanConfig.isDeletePreviousCodeLocations() || hubScanConfig.isUnmapPreviousCodeLocations()) {
             final ProjectItem project = projectRequestService.getProjectByName(hubScanConfig.getProjectName());
             final ProjectVersionItem version = projectVersionRequestService.getProjectVersion(project, hubScanConfig.getVersion());
@@ -148,7 +147,7 @@ public class CLIDataService extends HubRequestService {
         }
     }
 
-    private List<CodeLocationItem> getCodeLocationsFromScanSummaries(final List<ScanSummaryItem> scans) throws HubIntegrationException {
+    private List<CodeLocationItem> getCodeLocationsFromScanSummaries(final List<ScanSummaryItem> scans) throws IntegrationException {
         final List<CodeLocationItem> codeLocations = new ArrayList<>();
         for (final ScanSummaryItem scan : scans) {
             final CodeLocationItem codeLocation = codeLocationRequestService
@@ -159,7 +158,7 @@ public class CLIDataService extends HubRequestService {
     }
 
     private List<CodeLocationItem> getCodeLocationsNotJustScanned(final ProjectVersionItem version,
-            final List<CodeLocationItem> codeLocationsFromCurentScan) throws HubIntegrationException {
+            final List<CodeLocationItem> codeLocationsFromCurentScan) throws IntegrationException {
         final List<CodeLocationItem> codeLocationsMappedToVersion = codeLocationRequestService.getAllCodeLocationsForProjectVersion(version);
         return getCodeLocationsNotJustScanned(codeLocationsMappedToVersion, codeLocationsFromCurentScan);
     }

@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
@@ -40,7 +41,6 @@ import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequest
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -77,7 +77,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
             final ProjectVersion projectVersion, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException;
 
-    protected List<PolicyRule> getRulesFromUrls(final List<String> ruleUrlsViolated) throws HubIntegrationException {
+    protected List<PolicyRule> getRulesFromUrls(final List<String> ruleUrlsViolated) throws IntegrationException {
         if (ruleUrlsViolated == null || ruleUrlsViolated.isEmpty()) {
             return null;
         }
@@ -89,7 +89,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         return rules;
     }
 
-    protected List<PolicyRule> getMatchingRules(final List<PolicyRule> rulesViolated) throws HubIntegrationException {
+    protected List<PolicyRule> getMatchingRules(final List<PolicyRule> rulesViolated) throws IntegrationException {
         final List<PolicyRule> filteredRules = new ArrayList<>();
         if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null) {
             for (final PolicyRule ruleViolated : rulesViolated) {
@@ -108,7 +108,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         return policyFilter;
     }
 
-    protected PolicyRule getPolicyRule(final String ruleUrl) throws HubIntegrationException {
+    protected PolicyRule getPolicyRule(final String ruleUrl) throws IntegrationException {
         PolicyRule rule;
         rule = getPolicyService().getItem(ruleUrl);
         return rule;
@@ -158,7 +158,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         return fixedRuleUrl;
     }
 
-    protected BomComponentVersionPolicyStatus getBomComponentVersionPolicyStatus(final String policyStatusUrl) throws HubIntegrationException {
+    protected BomComponentVersionPolicyStatus getBomComponentVersionPolicyStatus(final String policyStatusUrl) throws IntegrationException {
         BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus;
         bomComponentVersionPolicyStatus = getBomVersionPolicyService().getItem(policyStatusUrl);
 

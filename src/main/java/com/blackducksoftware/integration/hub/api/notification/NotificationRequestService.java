@@ -35,9 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
@@ -62,13 +62,13 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
         typeMap.put("RULE_VIOLATION_CLEARED", RuleViolationClearedNotificationItem.class);
     }
 
-    public List<NotificationItem> getAllNotifications(final Date startDate, final Date endDate) throws HubIntegrationException {
+    public List<NotificationItem> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, NOTIFICATIONS_SEGMENTS);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, NOTIFICATIONS_SEGMENTS);
         hubPagedRequest.addQueryParameter("startDate", startDateString);
         hubPagedRequest.addQueryParameter("endDate", endDateString);
 
@@ -76,14 +76,14 @@ public class NotificationRequestService extends HubParameterizedRequestService<N
         return allNotificationItems;
     }
 
-    public List<NotificationItem> getUserNotifications(final Date startDate, final Date endDate, final UserItem user) throws HubIntegrationException {
+    public List<NotificationItem> getUserNotifications(final Date startDate, final Date endDate, final UserItem user) throws IntegrationException {
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
         final String url = metaService.getFirstLink(user, MetaService.NOTIFICATIONS_LINK);
 
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, url);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, url);
         hubPagedRequest.addQueryParameter("startDate", startDateString);
         hubPagedRequest.addQueryParameter("endDate", endDateString);
 

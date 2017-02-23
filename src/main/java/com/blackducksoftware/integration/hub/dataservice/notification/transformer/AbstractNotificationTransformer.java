@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
@@ -115,7 +116,7 @@ public abstract class AbstractNotificationTransformer
     public abstract List<NotificationContentItem> transform(NotificationItem item) throws HubItemTransformException;
 
     protected ProjectVersion createFullProjectVersion(final String projectVersionUrl, final String projectName, final String versionName)
-            throws HubIntegrationException {
+            throws IntegrationException {
         ProjectVersionItem item;
         try {
             item = getHubRequestService().getItem(projectVersionUrl, ProjectVersionItem.class);
@@ -151,7 +152,7 @@ public abstract class AbstractNotificationTransformer
         return metaService;
     }
 
-    protected ComponentVersion getComponentVersion(final String componentVersionLink) throws HubIntegrationException {
+    protected ComponentVersion getComponentVersion(final String componentVersionLink) throws IntegrationException {
         ComponentVersion componentVersion = null;
         if (!StringUtils.isBlank(componentVersionLink)) {
             componentVersion = getHubRequestService().getItem(componentVersionLink, ComponentVersion.class);
@@ -159,7 +160,7 @@ public abstract class AbstractNotificationTransformer
         return componentVersion;
     }
 
-    protected String getComponentVersionName(final String componentVersionLink) throws HubIntegrationException {
+    protected String getComponentVersionName(final String componentVersionLink) throws IntegrationException {
         String componentVersionName = "";
         if (!StringUtils.isBlank(componentVersionLink)) {
             final ComponentVersion compVersion = getComponentVersion(componentVersionLink);

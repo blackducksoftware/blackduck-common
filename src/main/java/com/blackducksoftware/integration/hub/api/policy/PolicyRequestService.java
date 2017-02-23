@@ -29,7 +29,7 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_POL
 import java.util.Arrays;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
@@ -40,7 +40,7 @@ public class PolicyRequestService extends HubParameterizedRequestService<PolicyR
         super(restConnection, PolicyRule.class);
     }
 
-    public List<PolicyRule> getAllPolicyRules() throws HubIntegrationException {
+    public List<PolicyRule> getAllPolicyRules() throws IntegrationException {
         final List<PolicyRule> allPolicyRuleItems = getAllItems(POLICY_RULE_SEGMENTS);
         return allPolicyRuleItems;
     }

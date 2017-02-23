@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
@@ -91,14 +92,14 @@ public class RiskReportDataService extends HubRequestService {
     }
 
     public ReportData getRiskReportData(final String projectName, final String projectVersionName)
-            throws HubIntegrationException {
+            throws IntegrationException {
         final ProjectItem project = projectRequestService.getProjectByName(projectName);
         final ProjectVersionItem version = projectVersionRequestService.getProjectVersion(project, projectVersionName);
         return getRiskReportData(project, version);
     }
 
     public ReportData getRiskReportData(final ProjectItem project, final ProjectVersionItem version)
-            throws HubIntegrationException {
+            throws IntegrationException {
         final String originalProjectUrl = metaService.getHref(project);
         final String originalVersionUrl = metaService.getHref(version);
         final ReportData reportData = new ReportData();
@@ -139,12 +140,12 @@ public class RiskReportDataService extends HubRequestService {
         return reportData;
     }
 
-    public void createReportFiles(final File outputDirectory, final String projectName, final String projectVersionName) throws HubIntegrationException {
+    public void createReportFiles(final File outputDirectory, final String projectName, final String projectVersionName) throws IntegrationException {
         final ReportData reportData = getRiskReportData(projectName, projectVersionName);
         createReportFiles(outputDirectory, reportData);
     }
 
-    public void createReportFiles(final File outputDirectory, final ProjectItem project, final ProjectVersionItem version) throws HubIntegrationException {
+    public void createReportFiles(final File outputDirectory, final ProjectItem project, final ProjectVersionItem version) throws IntegrationException {
         final ReportData reportData = getRiskReportData(project, version);
         createReportFiles(outputDirectory, reportData);
     }
@@ -243,7 +244,7 @@ public class RiskReportDataService extends HubRequestService {
     }
 
     private String getBaseUrl() {
-        return requestService.getRestConnection().getBaseUrl().toString();
+        return requestService.getRestConnection().getHubBaseUrl().toString();
     }
 
     private String getReportProjectUrl(final String projectURL) {

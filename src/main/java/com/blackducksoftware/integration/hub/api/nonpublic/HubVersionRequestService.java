@@ -23,7 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.api.nonpublic;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.QUERY_VERSION;
+import static com.blackducksoftware.integration.hub.RestConstants.QUERY_VERSION;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CURRENT_VERSION;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CURRENT_VERSION_COMPARISON;
@@ -32,8 +32,8 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 import java.util.Arrays;
 import java.util.List;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.version.VersionComparison;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
@@ -43,25 +43,25 @@ public class HubVersionRequestService extends HubParameterizedRequestService<Ver
 
     private static final List<String> CURRENT_VERSION_COMPARISON_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON);
 
-    public HubVersionRequestService(RestConnection restConnection) {
+    public HubVersionRequestService(final RestConnection restConnection) {
         super(restConnection, VersionComparison.class);
     }
 
-    public String getHubVersion() throws HubIntegrationException {
+    public String getHubVersion() throws IntegrationException {
         final String hubVersionWithPossibleSurroundingQuotes = getString(CURRENT_VERSION_SEGMENTS);
         final String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
 
         return hubVersion;
     }
 
-    public VersionComparison getHubVersionComparison(String consumerVersion) throws HubIntegrationException {
-        final HubRequest hubVersionRequest = getHubRequestFactory().createGetRequest(CURRENT_VERSION_COMPARISON_SEGMENTS).addQueryParameter(QUERY_VERSION,
+    public VersionComparison getHubVersionComparison(final String consumerVersion) throws IntegrationException {
+        final HubRequest hubVersionRequest = getHubRequestFactory().createRequest(CURRENT_VERSION_COMPARISON_SEGMENTS).addQueryParameter(QUERY_VERSION,
                 consumerVersion);
         final VersionComparison versionComparison = getItem(hubVersionRequest);
         return versionComparison;
     }
 
-    public boolean isConsumerVersionLessThanOrEqualToServerVersion(String consumerVersion) throws HubIntegrationException {
+    public boolean isConsumerVersionLessThanOrEqualToServerVersion(final String consumerVersion) throws IntegrationException {
         final VersionComparison versionComparison = getHubVersionComparison(consumerVersion);
         if (versionComparison.getNumericResult() <= 0) {
             return true;

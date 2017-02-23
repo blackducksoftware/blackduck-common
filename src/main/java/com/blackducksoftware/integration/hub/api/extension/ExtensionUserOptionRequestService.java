@@ -25,7 +25,7 @@ package com.blackducksoftware.integration.hub.api.extension;
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
@@ -35,7 +35,7 @@ public class ExtensionUserOptionRequestService extends HubParameterizedRequestSe
     }
 
     public List<UserOptionLinkItem> getUserOptions(final String userOptionsUrl)
-            throws HubIntegrationException {
+            throws IntegrationException {
         final List<UserOptionLinkItem> allItems = getAllItems(userOptionsUrl);
         return allItems;
     }

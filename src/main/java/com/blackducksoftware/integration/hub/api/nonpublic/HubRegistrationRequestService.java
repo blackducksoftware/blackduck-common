@@ -30,7 +30,7 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 import java.util.Arrays;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.google.gson.JsonObject;
@@ -38,11 +38,11 @@ import com.google.gson.JsonObject;
 public class HubRegistrationRequestService extends HubRequestService {
     private static final List<String> REGISTRATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_REGISTRATIONS);
 
-    public HubRegistrationRequestService(RestConnection restConnection) {
+    public HubRegistrationRequestService(final RestConnection restConnection) {
         super(restConnection);
     }
 
-    public String getRegistrationId() throws HubIntegrationException {
+    public String getRegistrationId() throws IntegrationException {
         final JsonObject jsonObject = getJsonObject(REGISTRATION_SEGMENTS);
 
         final String registrationId = jsonObject.get("registrationId").getAsString();

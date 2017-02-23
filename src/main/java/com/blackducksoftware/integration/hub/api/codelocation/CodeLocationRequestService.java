@@ -29,9 +29,9 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_COD
 import java.util.Arrays;
 import java.util.List;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -49,34 +49,34 @@ public class CodeLocationRequestService extends HubParameterizedRequestService<C
         this.metaService = metaService;
     }
 
-    public List<CodeLocationItem> getAllCodeLocations() throws HubIntegrationException {
+    public List<CodeLocationItem> getAllCodeLocations() throws IntegrationException {
         final List<CodeLocationItem> allCodeLocations = getAllItems(CODE_LOCATION_SEGMENTS);
         return allCodeLocations;
     }
 
-    public List<CodeLocationItem> getAllCodeLocationsForCodeLocationType(final CodeLocationTypeEnum codeLocationType) throws HubIntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType",
+    public List<CodeLocationItem> getAllCodeLocationsForCodeLocationType(final CodeLocationTypeEnum codeLocationType) throws IntegrationException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType",
                 codeLocationType.toString());
 
         final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest);
         return allCodeLocations;
     }
 
-    public List<CodeLocationItem> getAllCodeLocationsForProjectVersion(final ProjectVersionItem version) throws HubIntegrationException {
+    public List<CodeLocationItem> getAllCodeLocationsForProjectVersion(final ProjectVersionItem version) throws IntegrationException {
         final String codeLocationUrls = metaService.getFirstLink(version, MetaService.CODE_LOCATION_LINK);
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(codeLocationUrls);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(codeLocationUrls);
 
         final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest);
         return allCodeLocations;
     }
 
-    public void unmapCodeLocations(final List<CodeLocationItem> codeLocationItems) throws HubIntegrationException {
+    public void unmapCodeLocations(final List<CodeLocationItem> codeLocationItems) throws IntegrationException {
         for (final CodeLocationItem codeLocationItem : codeLocationItems) {
             unmapCodeLocation(codeLocationItem);
         }
     }
 
-    public void unmapCodeLocation(final CodeLocationItem codeLocationItem) throws HubIntegrationException {
+    public void unmapCodeLocation(final CodeLocationItem codeLocationItem) throws IntegrationException {
         final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
         final JsonParser jsonParser = getRestConnection().getJsonParser();
         final JsonObject codeLocationItemJson = jsonParser.parse(codeLocationItem.getJson()).getAsJsonObject();
@@ -85,23 +85,23 @@ public class CodeLocationRequestService extends HubParameterizedRequestService<C
         unmapCodeLocation(codeLocationItemUrl, getRestConnection().getGson().toJson(codeLocationItemJson));
     }
 
-    public void unmapCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws HubIntegrationException {
+    public void unmapCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws IntegrationException {
         final HubRequest request = getHubRequestFactory().createRequest(codeLocationItemUrl);
         request.executePut(codeLocationItemJson);
     }
 
-    public void deleteCodeLocations(final List<CodeLocationItem> codeLocationItems) throws HubIntegrationException {
+    public void deleteCodeLocations(final List<CodeLocationItem> codeLocationItems) throws IntegrationException {
         for (final CodeLocationItem codeLocationItem : codeLocationItems) {
             deleteCodeLocation(codeLocationItem);
         }
     }
 
-    public void deleteCodeLocation(final CodeLocationItem codeLocationItem) throws HubIntegrationException {
+    public void deleteCodeLocation(final CodeLocationItem codeLocationItem) throws IntegrationException {
         final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
         deleteCodeLocation(codeLocationItemUrl);
     }
 
-    public void deleteCodeLocation(final String codeLocationItemUrl) throws HubIntegrationException {
+    public void deleteCodeLocation(final String codeLocationItemUrl) throws IntegrationException {
         final HubRequest request = getHubRequestFactory().createRequest(codeLocationItemUrl);
         request.executeDelete();
     }

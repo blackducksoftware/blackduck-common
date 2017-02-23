@@ -29,7 +29,7 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_USE
 import java.util.Arrays;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
@@ -40,7 +40,7 @@ public class UserRequestService extends HubParameterizedRequestService<UserItem>
         super(restConnection, UserItem.class);
     }
 
-    public List<UserItem> getAllUsers() throws HubIntegrationException {
+    public List<UserItem> getAllUsers() throws IntegrationException {
         final List<UserItem> allUserItems = getAllItems(USERS_SEGMENTS);
         return allUserItems;
     }

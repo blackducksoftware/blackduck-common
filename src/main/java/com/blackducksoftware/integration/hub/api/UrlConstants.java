@@ -65,13 +65,4 @@ public class UrlConstants {
 
     public static final String SEGMENT_REGISTRATIONS = "registrations";
 
-    // query parameters
-    public static final String QUERY_OFFSET = "offset";
-
-    public static final String QUERY_LIMIT = "limit";
-
-    public static final String QUERY_Q = "q";
-
-    public static final String QUERY_VERSION = "version";
-
 }

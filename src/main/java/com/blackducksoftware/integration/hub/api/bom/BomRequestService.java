@@ -25,8 +25,8 @@ package com.blackducksoftware.integration.hub.api.bom;
 
 import java.util.List;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.view.VersionBomComponentView;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
@@ -37,8 +37,8 @@ public class BomRequestService extends HubParameterizedRequestService<VersionBom
         super(restConnection, VersionBomComponentView.class);
     }
 
-    public List<VersionBomComponentView> getBom(final String url) throws HubIntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(url);
+    public List<VersionBomComponentView> getBom(final String url) throws IntegrationException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(url);
 
         final List<VersionBomComponentView> allComponents = getAllItems(hubPagedRequest);
         return allComponents;

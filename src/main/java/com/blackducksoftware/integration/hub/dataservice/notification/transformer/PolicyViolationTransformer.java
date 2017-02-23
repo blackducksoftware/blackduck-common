@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
@@ -46,7 +47,6 @@ import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -80,14 +80,14 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
         ProjectVersionItem releaseItem;
         try {
             releaseItem = getReleaseItem(projectVersionLink);
-        } catch (final HubIntegrationException e) {
+        } catch (final IntegrationException e) {
             throw new HubItemTransformException(e);
         }
         ProjectVersion projectVersion;
         try {
             projectVersion = createFullProjectVersion(policyViolation.getContent().getProjectVersionLink(),
                     projectName, releaseItem.getVersionName());
-        } catch (final HubIntegrationException e) {
+        } catch (final IntegrationException e) {
             throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
         }
 
@@ -138,7 +138,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
         }
     }
 
-    private ProjectVersionItem getReleaseItem(final String projectVersionLink) throws HubIntegrationException {
+    private ProjectVersionItem getReleaseItem(final String projectVersionLink) throws IntegrationException {
         final ProjectVersionItem releaseItem = getProjectVersionService().getItem(projectVersionLink);
         return releaseItem;
     }

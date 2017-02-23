@@ -29,7 +29,7 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 public class MockRestConnection extends RestConnection {
 
     public MockRestConnection() {
-        super(null);
+        super(null, null, 120);
     }
 
     @Override

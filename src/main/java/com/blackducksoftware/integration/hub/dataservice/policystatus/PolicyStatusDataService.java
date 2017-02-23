@@ -25,6 +25,7 @@ package com.blackducksoftware.integration.hub.dataservice.policystatus;
 
 import java.util.List;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
@@ -54,7 +55,7 @@ public class PolicyStatusDataService extends HubRequestService {
     }
 
     public PolicyStatusItem getPolicyStatusForProjectAndVersion(final String projectName,
-            final String projectVersionName) throws HubIntegrationException {
+            final String projectVersionName) throws IntegrationException {
         final ProjectItem projectItem = projectRequestService.getProjectByName(projectName);
         final String versionsUrl = metaService.getFirstLink(projectItem, MetaService.VERSIONS_LINK);
 
@@ -64,7 +65,7 @@ public class PolicyStatusDataService extends HubRequestService {
         return hubRequestService.getItem(policyStatusUrl, PolicyStatusItem.class);
     }
 
-    public PolicyStatusItem getPolicyStatusForVersion(final ProjectVersionItem version) throws HubIntegrationException {
+    public PolicyStatusItem getPolicyStatusForVersion(final ProjectVersionItem version) throws IntegrationException {
         final String policyStatusUrl = metaService.getFirstLink(version, MetaService.POLICY_STATUS_LINK);
         return hubRequestService.getItem(policyStatusUrl, PolicyStatusItem.class);
     }

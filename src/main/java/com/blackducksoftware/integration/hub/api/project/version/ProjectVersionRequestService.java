@@ -27,12 +27,12 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
 import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -48,9 +48,9 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
         this.metaService = metaService;
     }
 
-    public ProjectVersionItem getProjectVersion(final ProjectItem project, final String projectVersionName) throws HubIntegrationException {
+    public ProjectVersionItem getProjectVersion(final ProjectItem project, final String projectVersionName) throws IntegrationException {
         final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(100, versionsUrl);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, versionsUrl);
         if (StringUtils.isNotBlank(projectVersionName)) {
             hubPagedRequest.setQ(String.format("versionName:%s", projectVersionName));
         }
@@ -65,18 +65,18 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
         throw new DoesNotExistException(String.format("Could not find the version: %s for project: %s", projectVersionName, project.getName()));
     }
 
-    public List<ProjectVersionItem> getAllProjectVersions(final ProjectItem project) throws HubIntegrationException {
+    public List<ProjectVersionItem> getAllProjectVersions(final ProjectItem project) throws IntegrationException {
         final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
         return getAllProjectVersions(versionsUrl);
     }
 
-    public List<ProjectVersionItem> getAllProjectVersions(final String versionsUrl) throws HubIntegrationException {
+    public List<ProjectVersionItem> getAllProjectVersions(final String versionsUrl) throws IntegrationException {
         final List<ProjectVersionItem> allProjectVersionItems = getAllItems(versionsUrl);
         return allProjectVersionItems;
     }
 
     public String createHubVersion(final ProjectItem project, final String versionName, final PhaseEnum phase, final DistributionEnum dist)
-            throws HubIntegrationException {
+            throws IntegrationException {
         final JsonObject json = new JsonObject();
         json.addProperty("versionName", versionName);
         json.addProperty("phase", phase.name());

@@ -44,6 +44,7 @@ import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -127,9 +128,9 @@ public class CLIDownloadService {
                     headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
                     final Request request = restConnection.createGetRequest(httpUrl, headers);
                     response = restConnection.handleExecuteClientCall(request);
-                } catch (final IOException ioe) {
+                } catch (final IntegrationException e) {
                     logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo + ": "
-                            + ioe.toString());
+                            + e.toString());
                     return;
                 }
                 if (response.code() == 304) {

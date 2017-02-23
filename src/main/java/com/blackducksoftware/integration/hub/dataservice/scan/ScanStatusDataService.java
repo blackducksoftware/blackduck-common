@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationItem;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationTypeEnum;
@@ -92,7 +93,7 @@ public class ScanStatusDataService extends HubRequestService {
      *
      */
     public void assertBomImportScanStartedThenFinished(final String projectName, final String projectVersion)
-            throws HubTimeoutExceededException, HubIntegrationException {
+            throws HubTimeoutExceededException, IntegrationException {
         final List<ScanSummaryItem> pendingScans = waitForPendingScansToStart(projectName, projectVersion,
                 timeoutInMilliseconds);
         waitForScansToComplete(pendingScans, timeoutInMilliseconds);
@@ -105,7 +106,7 @@ public class ScanStatusDataService extends HubRequestService {
      * If the timeout is exceeded, a HubTimeoutExceededException will be thrown.
      *
      */
-    public void assertBomImportScansFinished(final List<ScanSummaryItem> pendingScans) throws HubTimeoutExceededException, HubIntegrationException {
+    public void assertBomImportScansFinished(final List<ScanSummaryItem> pendingScans) throws HubTimeoutExceededException, IntegrationException {
         waitForScansToComplete(pendingScans, timeoutInMilliseconds);
     }
 
@@ -129,7 +130,7 @@ public class ScanStatusDataService extends HubRequestService {
     }
 
     private void waitForScansToComplete(List<ScanSummaryItem> pendingScans, final long scanStartedTimeoutInMilliseconds)
-            throws HubTimeoutExceededException, HubIntegrationException {
+            throws HubTimeoutExceededException, IntegrationException {
         pendingScans = getPendingScans(pendingScans);
         final long startedTime = System.currentTimeMillis();
         boolean pendingScansOk = pendingScans.isEmpty();
@@ -203,7 +204,7 @@ public class ScanStatusDataService extends HubRequestService {
         return pendingScans;
     }
 
-    private List<ScanSummaryItem> getPendingScans(final List<ScanSummaryItem> scanSummaries) throws HubIntegrationException {
+    private List<ScanSummaryItem> getPendingScans(final List<ScanSummaryItem> scanSummaries) throws IntegrationException {
         final List<ScanSummaryItem> pendingScans = new ArrayList<>();
         for (final ScanSummaryItem scanSummaryItem : scanSummaries) {
             final String scanSummaryLink = metaService.getHref(scanSummaryItem);

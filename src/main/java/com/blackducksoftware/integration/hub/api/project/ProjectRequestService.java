@@ -31,8 +31,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -46,13 +46,13 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
         super(restConnection, ProjectItem.class);
     }
 
-    public List<ProjectItem> getAllProjects() throws HubIntegrationException {
+    public List<ProjectItem> getAllProjects() throws IntegrationException {
         final List<ProjectItem> allProjectItems = getAllItems(PROJECTS_SEGMENTS);
         return allProjectItems;
     }
 
-    public List<ProjectItem> getAllProjectMatches(final String projectName) throws HubIntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(PROJECTS_SEGMENTS);
+    public List<ProjectItem> getAllProjectMatches(final String projectName) throws IntegrationException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(PROJECTS_SEGMENTS);
         if (StringUtils.isNotBlank(projectName)) {
             hubPagedRequest.setQ("name:" + projectName);
         }
@@ -61,8 +61,8 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
         return allProjectItems;
     }
 
-    public List<ProjectItem> getProjectMatches(final String projectName, final int limit) throws HubIntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(limit, PROJECTS_SEGMENTS);
+    public List<ProjectItem> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(limit, PROJECTS_SEGMENTS);
         if (StringUtils.isNotBlank(projectName)) {
             hubPagedRequest.setQ("name:" + projectName);
         }
@@ -71,7 +71,7 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
         return projectItems;
     }
 
-    public ProjectItem getProjectByName(final String projectName) throws HubIntegrationException {
+    public ProjectItem getProjectByName(final String projectName) throws IntegrationException {
         final List<ProjectItem> allProjectItems = getAllProjectMatches(projectName);
         for (final ProjectItem project : allProjectItems) {
             if (projectName.equals(project.getName())) {
@@ -81,8 +81,8 @@ public class ProjectRequestService extends HubParameterizedRequestService<Projec
         throw new DoesNotExistException("This Project does not exist. Project : " + projectName);
     }
 
-    public String createHubProject(final String projectName) throws HubIntegrationException {
-        final HubRequest projectItemRequest = getHubRequestFactory().createPostRequest(PROJECTS_SEGMENTS);
+    public String createHubProject(final String projectName) throws IntegrationException {
+        final HubRequest projectItemRequest = getHubRequestFactory().createRequest(PROJECTS_SEGMENTS);
         final JsonObject json = new JsonObject();
         json.addProperty("name", projectName);
         final String location = projectItemRequest.executePost(getRestConnection().getGson().toJson(json));

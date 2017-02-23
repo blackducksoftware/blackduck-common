@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.Set;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -52,7 +53,7 @@ public class HubSupportHelper implements Serializable {
      * Hub supports. You can use the get methods in this class after this method
      * has run to get the supported options.
      */
-    public void checkHubSupport(final HubVersionRequestService hubVersionRequestService, final IntLogger logger) {
+    public void checkHubSupport(final HubVersionRequestService hubVersionRequestService, final IntLogger logger) throws IntegrationException {
         try {
             if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.5.0")) {
                 setHub3_5Support();

@@ -25,7 +25,7 @@ package com.blackducksoftware.integration.hub.api.vulnerablebomcomponent;
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
@@ -36,8 +36,8 @@ public class VulnerableBomComponentRequestService extends HubParameterizedReques
     }
 
     public List<VulnerableBomComponentItem> getVulnerableComponentsMatchingComponentName(
-            final String vulnerableBomComponentsUrl, final String componentName) throws HubIntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createGetPagedRequest(vulnerableBomComponentsUrl, componentName);
+            final String vulnerableBomComponentsUrl, final String componentName) throws IntegrationException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(vulnerableBomComponentsUrl, componentName);
 
         final List<VulnerableBomComponentItem> allItems = getAllItems(hubPagedRequest);
         return allItems;

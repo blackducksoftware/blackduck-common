@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
@@ -47,7 +48,6 @@ import com.blackducksoftware.integration.hub.dataservice.notification.transforme
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -109,7 +109,7 @@ public class NotificationDataService extends HubRequestService {
                         versionBomPolicyRequestService, hubRequestService, policyNotificationFilter, metaService));
     }
 
-    public NotificationResults getAllNotifications(final Date startDate, final Date endDate) throws HubIntegrationException {
+    public NotificationResults getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
         final List<NotificationItem> itemList = notificationRequestService.getAllNotifications(startDate, endDate);
         final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
@@ -119,7 +119,7 @@ public class NotificationDataService extends HubRequestService {
     }
 
     public NotificationResults getUserNotifications(final Date startDate, final Date endDate, final UserItem user)
-            throws HubIntegrationException {
+            throws IntegrationException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
         final List<NotificationItem> itemList = notificationRequestService.getUserNotifications(startDate, endDate, user);
         final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);

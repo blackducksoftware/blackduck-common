@@ -34,6 +34,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -46,11 +47,11 @@ public class BomImportRequestService extends HubRequestService {
         super(restConnection);
     }
 
-    public void importBomFile(final File file, final String mediaType) throws HubIntegrationException {
+    public void importBomFile(final File file, final String mediaType) throws IntegrationException {
         try {
-            final HubRequest hubRequest = getHubRequestFactory().createPostRequest(BOM_IMPORT_SEGMENTS);
+            final HubRequest hubRequest = getHubRequestFactory().createRequest(BOM_IMPORT_SEGMENTS);
             hubRequest.executePost(mediaType, FileUtils.readFileToString(file, StandardCharsets.UTF_8));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new HubIntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub with Error : " + e.getMessage(), e);
         }
     }

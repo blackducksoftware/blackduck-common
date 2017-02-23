@@ -25,7 +25,7 @@ package com.blackducksoftware.integration.hub.api.extension;
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
 
@@ -34,17 +34,17 @@ public class ExtensionConfigRequestService extends HubParameterizedRequestServic
         super(restConnection, ConfigurationItem.class);
     }
 
-    public List<ConfigurationItem> getGlobalOptions(final String globalConfigUrl) throws HubIntegrationException {
+    public List<ConfigurationItem> getGlobalOptions(final String globalConfigUrl) throws IntegrationException {
         final List<ConfigurationItem> allItems = getAllItems(globalConfigUrl);
         return allItems;
     }
 
-    public List<ConfigurationItem> getCurrentUserOptions(final String currentUserConfigUrl) throws HubIntegrationException {
+    public List<ConfigurationItem> getCurrentUserOptions(final String currentUserConfigUrl) throws IntegrationException {
         final List<ConfigurationItem> allItems = getAllItems(currentUserConfigUrl);
         return allItems;
     }
 
-    public List<ConfigurationItem> getUserConfiguration(final String userConfigUrl) throws HubIntegrationException {
+    public List<ConfigurationItem> getUserConfiguration(final String userConfigUrl) throws IntegrationException {
         final List<ConfigurationItem> allItems = getAllItems(userConfigUrl);
         return allItems;
     }
