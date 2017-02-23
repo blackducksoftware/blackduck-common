@@ -33,7 +33,7 @@ import com.blackducksoftware.integration.hub.api.component.version.SourceEnum;
 import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
 import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
 
-public class ProjectVersion {
+public class ProjectVersionModel {
     private String projectName;
 
     private String projectVersionName;

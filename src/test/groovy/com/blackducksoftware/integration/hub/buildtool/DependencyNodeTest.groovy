@@ -28,7 +28,6 @@ import static org.junit.Assert.*
 import org.junit.Test
 
 class DependencyNodeTest {
-
     def Gav root = new Gav('testRoot','root','1.0')
     def Gav firstChild = new Gav('children','first','1.0')
     def Gav secondChild = new Gav('children','second','2.0')
@@ -38,7 +37,7 @@ class DependencyNodeTest {
     def Gav subSecondChild = new Gav('subChild','second','2.0')
     def Gav subThirdChild = new Gav('subChild','third','3.0')
 
-    DependencyNode getRootNodeToCompareWith(){
+    DependencyNode getRootNodeToCompareWith() {
         //Constructing the root node in a specific structure
         def children = []
         def firstChildList = [
@@ -59,14 +58,13 @@ class DependencyNodeTest {
         createDependencyNodeWithChildren(root,children)
     }
 
-    DependencyNode createDependencyNode(Gav gav){
+    DependencyNode createDependencyNode(Gav gav) {
         new DependencyNode(gav, [])
     }
 
-    DependencyNode createDependencyNodeWithChildren(Gav gav, ArrayList children){
+    DependencyNode createDependencyNodeWithChildren(Gav gav, List children) {
         new DependencyNode(gav, children)
     }
-
 
     @Test
     void testDependencyNodeBuilder() {

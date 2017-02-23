@@ -38,7 +38,7 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.version.BomComponentVersionPolicyStatus;
 import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
-import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersion;
+import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
@@ -74,7 +74,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     public abstract void handleNotification(final List<ComponentVersionStatus> componentVersionList,
-            final ProjectVersion projectVersion, final NotificationItem item,
+            final ProjectVersionModel projectVersion, final NotificationItem item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException;
 
     protected List<PolicyRule> getRulesFromUrls(final List<String> ruleUrlsViolated) throws IntegrationException {
@@ -165,7 +165,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         return bomComponentVersionPolicyStatus;
     }
 
-    public abstract void createContents(final ProjectVersion projectVersion, final String componentName,
+    public abstract void createContents(final ProjectVersionModel projectVersion, final String componentName,
             final ComponentVersion componentVersion, String componentUrl, final String componentVersionUrl,
             List<PolicyRule> policyRuleList,
             NotificationItem item, List<NotificationContentItem> templateData) throws URISyntaxException;
