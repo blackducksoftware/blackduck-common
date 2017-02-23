@@ -23,7 +23,7 @@
   </scm>
 
   <dependencies>
-  	<dependency>
+    <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>hub-rest-common</artifactId>
       <version>1.0.0-SNAPSHOT</version>
