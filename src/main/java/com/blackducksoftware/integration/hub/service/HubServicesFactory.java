@@ -24,8 +24,8 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
@@ -62,7 +62,6 @@ import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataSe
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
-import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
@@ -213,7 +212,7 @@ public class HubServicesFactory {
     public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
             final HubSupportHelper hubSupportHelper,
             final File directoryToInstallTo, final int scanMemory, final boolean dryRun, final String project,
-            final String version, final List<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
+            final String version, final Set<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
         return new SimpleScanService(logger, restConnection, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo, scanMemory,
                 dryRun, project, version, scanTargetPaths, workingDirectory, excludePatterns);
     }
@@ -231,7 +230,7 @@ public class HubServicesFactory {
     }
 
     public MetaService createMetaService(final IntLogger logger) {
-        return new MetaService(logger, restConnection.getJsonParser(), new HubRequestFactory(restConnection));
+        return new MetaService(logger, restConnection.getJsonParser());
     }
 
     public BomRequestService createBomRequestService() {

@@ -25,6 +25,7 @@ package com.blackducksoftware.integration.hub.dataservice.notification.model;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -94,25 +95,12 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
         }
 
         // Identify same-time non-equal items as non-equal
-        final String thisProjectVersionString = constructVersionString(getProjectVersion().getProjectName(), getProjectVersion().getProjectVersionName(),
-                getComponentVersionUrl());
-        final String otherProjectVersionString = constructVersionString(o.getProjectVersion().getProjectName(), o.getProjectVersion().getProjectVersionName(),
-                o.getComponentVersionUrl());
+        final String thisProjectVersionString = StringUtils.join(getProjectVersion().getProjectName(), getProjectVersion()
+                .getProjectVersionName(), getComponentVersionUrl());
+        final String otherProjectVersionString = StringUtils.join(o.getProjectVersion().getProjectName(), o
+                .getProjectVersion().getProjectVersionName(), o.getComponentVersionUrl().toString());
 
         return thisProjectVersionString.compareTo(otherProjectVersionString);
-    }
-
-    private String constructVersionString(String... versionFragments) {
-        int pos = 1;
-        StringBuilder builder = new StringBuilder();
-        for (String fragment : versionFragments) {
-            if (fragment != null) {
-                builder.append(fragment);
-                if (pos != versionFragments.length) builder.append(":");
-            }
-            pos++;
-        }
-        return builder.toString();
     }
 
     @Override

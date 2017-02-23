@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -79,7 +80,7 @@ public class SimpleScanService extends HubRequestService {
 
     private final String version;
 
-    private final List<String> scanTargetPaths;
+    private final Set<String> scanTargetPaths;
 
     private final File workingDirectory;
 
@@ -114,7 +115,7 @@ public class SimpleScanService extends HubRequestService {
             final HubSupportHelper hubSupportHelper,
             final CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, final int scanMemory, final boolean dryRun,
             final String project,
-            final String version, final List<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
+            final String version, final Set<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
         super(restConnection);
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
