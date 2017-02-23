@@ -28,7 +28,6 @@ import static org.junit.Assert.*
 import org.junit.Test
 
 class DependencyNodeTest {
-
     def Gav root = new Gav('testRoot','root','1.0')
     def Gav firstChild = new Gav('children','first','1.0')
     def Gav secondChild = new Gav('children','second','2.0')
@@ -66,7 +65,6 @@ class DependencyNodeTest {
     DependencyNode createDependencyNodeWithChildren(Gav gav, ArrayList<DependencyNode> children){
         new DependencyNode(gav, children)
     }
-
 
     @Test
     void testDependencyNodeBuilder() {
