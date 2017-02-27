@@ -98,7 +98,7 @@ public class HubServicesFactory {
     }
 
     public PhoneHomeDataService createPhoneHomeDataService(final IntLogger logger) {
-        return new PhoneHomeDataService(logger, restConnection, createHubRegistrationRequestService());
+        return new PhoneHomeDataService(logger, restConnection, createHubRegistrationRequestService(), createHubVersionRequestService());
     }
 
     public RiskReportDataService createRiskReportDataService(final IntLogger logger,

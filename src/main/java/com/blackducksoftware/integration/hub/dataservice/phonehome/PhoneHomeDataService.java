@@ -25,7 +25,9 @@ package com.blackducksoftware.integration.hub.dataservice.phonehome;
 
 import java.net.URL;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
+import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -41,11 +43,25 @@ public class PhoneHomeDataService extends HubRequestService {
 
     private final HubRegistrationRequestService hubRegistrationRequestService;
 
+    private final HubVersionRequestService hubVersionRequestService;
+
     public PhoneHomeDataService(final IntLogger logger, final RestConnection restConnection,
-            final HubRegistrationRequestService hubRegistrationRequestService) {
+            final HubRegistrationRequestService hubRegistrationRequestService, final HubVersionRequestService hubVersionRequestService) {
         super(restConnection);
         this.logger = logger;
         this.hubRegistrationRequestService = hubRegistrationRequestService;
+        this.hubVersionRequestService = hubVersionRequestService;
+    }
+
+    public void phoneHome(final HubServerConfig hubServerConfig, final IntegrationInfo integrationInfo) throws IntegrationException {
+        if (IntegrationInfo.DO_NOT_PHONE_HOME == integrationInfo) {
+            logger.debug("Skipping phone-home");
+        } else {
+            final String hubVersion = hubVersionRequestService.getHubVersion();
+            phoneHome(hubServerConfig, integrationInfo.getThirdPartyName(), integrationInfo.getThirdPartyVersion(),
+                    integrationInfo.getPluginVersion(),
+                    hubVersion);
+        }
     }
 
     public void phoneHome(final HubServerConfig hubServerConfig, final IntegrationInfo integrationInfo, final String hubVersion) {
