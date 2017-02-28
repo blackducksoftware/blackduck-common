@@ -53,14 +53,15 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ScanFailedException;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import com.google.gson.Gson;
 
-public class SimpleScanService extends HubRequestService {
+public class SimpleScanService {
     public static final int DEFAULT_MEMORY = 4096;
+
+    private final Gson gson;
 
     private final IntLogger logger;
 
@@ -92,10 +93,10 @@ public class SimpleScanService extends HubRequestService {
 
     private String codeLocationAlias;
 
-    public SimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
+    public SimpleScanService(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig,
             final HubSupportHelper hubSupportHelper,
             final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig) {
-        super(restConnection);
+        this.gson = gson;
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
         this.hubSupportHelper = hubSupportHelper;
@@ -111,12 +112,12 @@ public class SimpleScanService extends HubRequestService {
         this.codeLocationAlias = hubScanConfig.getCodeLocationAlias();
     }
 
-    public SimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
+    public SimpleScanService(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig,
             final HubSupportHelper hubSupportHelper,
             final CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, final int scanMemory, final boolean dryRun,
             final String project,
             final String version, final Set<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
-        super(restConnection);
+        this.gson = gson;
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
         this.hubSupportHelper = hubSupportHelper;
@@ -346,7 +347,7 @@ public class SimpleScanService extends HubRequestService {
                 logger.error(String.format("There was an exception reading the status file: %s", e.getMessage(), e));
                 return Collections.emptyList();
             }
-            final ScanSummaryItem scanSummaryItem = getRestConnection().getGson().fromJson(fileContent, ScanSummaryItem.class);
+            final ScanSummaryItem scanSummaryItem = gson.fromJson(fileContent, ScanSummaryItem.class);
             scanSummaryItem.setJson(fileContent);
             scanSummaryItems.add(scanSummaryItem);
         }

@@ -39,7 +39,6 @@ import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotif
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
-import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationClearedTransformer;
@@ -48,20 +47,17 @@ import com.blackducksoftware.integration.hub.dataservice.notification.transforme
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class NotificationDataService extends HubRequestService {
+public class NotificationDataService {
+    private final HubResponseService hubResponseService;
+
     private final NotificationRequestService notificationRequestService;
 
     private final ProjectVersionRequestService projectVersionRequestService;
 
     private final PolicyRequestService policyRequestService;
-
-    private final VersionBomPolicyRequestService versionBomPolicyRequestService;
-
-    private final HubRequestService hubRequestService;
 
     private final PolicyNotificationFilter policyNotificationFilter;
 
@@ -69,24 +65,22 @@ public class NotificationDataService extends HubRequestService {
 
     private final MetaService metaService;
 
-    public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final NotificationRequestService notificationRequestService,
+    public NotificationDataService(final IntLogger logger, final HubResponseService hubResponseService,
+            final NotificationRequestService notificationRequestService,
             final ProjectVersionRequestService projectVersionRequestService, final PolicyRequestService policyRequestService,
-            final VersionBomPolicyRequestService versionBomPolicyRequestService,
-            final HubRequestService hubRequestService, final MetaService metaService) {
-        this(logger, restConnection, notificationRequestService, projectVersionRequestService, policyRequestService, versionBomPolicyRequestService,
-                hubRequestService, null, metaService);
+            final MetaService metaService) {
+        this(logger, hubResponseService, notificationRequestService, projectVersionRequestService, policyRequestService,
+                null, metaService);
     }
 
-    public NotificationDataService(final IntLogger logger, final RestConnection restConnection, final NotificationRequestService notificationRequestService,
+    public NotificationDataService(final IntLogger logger, final HubResponseService hubResponseService,
+            final NotificationRequestService notificationRequestService,
             final ProjectVersionRequestService projectVersionRequestService, final PolicyRequestService policyRequestService,
-            final VersionBomPolicyRequestService versionBomPolicyRequestService,
-            final HubRequestService hubRequestService, final PolicyNotificationFilter policyNotificationFilter, final MetaService metaService) {
-        super(restConnection);
+            final PolicyNotificationFilter policyNotificationFilter, final MetaService metaService) {
+        this.hubResponseService = hubResponseService;
         this.notificationRequestService = notificationRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.policyRequestService = policyRequestService;
-        this.versionBomPolicyRequestService = versionBomPolicyRequestService;
-        this.hubRequestService = hubRequestService;
         this.policyNotificationFilter = policyNotificationFilter;
         this.parallelProcessor = new ParallelResourceProcessor<>(logger);
         this.metaService = metaService;
@@ -95,18 +89,20 @@ public class NotificationDataService extends HubRequestService {
 
     private void populateTransformerMap(final IntLogger logger) {
         parallelProcessor.addTransform(RuleViolationNotificationItem.class,
-                new PolicyViolationTransformer(logger, notificationRequestService, projectVersionRequestService, policyRequestService,
-                        versionBomPolicyRequestService, hubRequestService, policyNotificationFilter, metaService));
+                new PolicyViolationTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService, policyRequestService,
+                        policyNotificationFilter, metaService));
         parallelProcessor.addTransform(PolicyOverrideNotificationItem.class,
-                new PolicyViolationOverrideTransformer(logger, notificationRequestService, projectVersionRequestService, policyRequestService,
-                        versionBomPolicyRequestService, hubRequestService, policyNotificationFilter, metaService));
+                new PolicyViolationOverrideTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService,
+                        policyRequestService,
+                        policyNotificationFilter, metaService));
         parallelProcessor.addTransform(VulnerabilityNotificationItem.class,
-                new VulnerabilityTransformer(notificationRequestService, projectVersionRequestService, policyRequestService,
-                        versionBomPolicyRequestService, hubRequestService, metaService,
+                new VulnerabilityTransformer(hubResponseService, notificationRequestService, projectVersionRequestService, policyRequestService,
+                        metaService,
                         logger));
         parallelProcessor.addTransform(RuleViolationClearedNotificationItem.class,
-                new PolicyViolationClearedTransformer(logger, notificationRequestService, projectVersionRequestService, policyRequestService,
-                        versionBomPolicyRequestService, hubRequestService, policyNotificationFilter, metaService));
+                new PolicyViolationClearedTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService,
+                        policyRequestService,
+                        policyNotificationFilter, metaService));
     }
 
     public NotificationResults getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {

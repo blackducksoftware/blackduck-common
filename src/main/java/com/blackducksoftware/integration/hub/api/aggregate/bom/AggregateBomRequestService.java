@@ -31,14 +31,13 @@ import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionI
 import com.blackducksoftware.integration.hub.api.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 
-public class AggregateBomRequestService extends HubParameterizedRequestService<VersionBomComponentView> {
-
+public class AggregateBomRequestService extends HubResponseService {
     private final MetaService metaService;
 
     public AggregateBomRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, VersionBomComponentView.class);
+        super(restConnection);
         this.metaService = metaService;
     }
 
@@ -49,8 +48,7 @@ public class AggregateBomRequestService extends HubParameterizedRequestService<V
 
     public List<VersionBomComponentView> getBomEntries(final String componentsUrl) throws IntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(componentsUrl);
-
-        final List<VersionBomComponentView> allComponentItems = getAllItems(hubPagedRequest);
+        final List<VersionBomComponentView> allComponentItems = getAllItems(hubPagedRequest, VersionBomComponentView.class);
         return allComponentItems;
     }
 

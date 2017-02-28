@@ -36,30 +36,21 @@ import com.blackducksoftware.integration.hub.api.component.id.ComponentIdItem;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ComponentDataService {
 
     private final ComponentRequestService componentRequestService;
 
-    private final HubParameterizedRequestService<ComponentVersion> hubParameterizedRequestService;
-
-    private final HubRequestService hubRequestService;
-
     private final MetaService metaService;
 
     private final IntLogger logger;
 
-    public ComponentDataService(final IntLogger logger, final RestConnection restConnection, final HubRequestService hubRequestService,
+    public ComponentDataService(final IntLogger logger,
             final ComponentRequestService componentRequestService, final MetaService metaService) {
         this.logger = logger;
         this.componentRequestService = componentRequestService;
         this.metaService = metaService;
-        this.hubRequestService = hubRequestService;
-        this.hubParameterizedRequestService = new HubParameterizedRequestService<>(restConnection, ComponentVersion.class);
     }
 
     public ComponentVersion getExactComponentVersionFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
@@ -79,11 +70,12 @@ public class ComponentDataService {
             throws IntegrationException {
         final Component component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
         component.getComponent();
-        final ComponentIdItem componentItem = hubRequestService.getItem(component.getComponent(), ComponentIdItem.class);
+
+        final ComponentIdItem componentItem = componentRequestService.getItem(component.getComponent(), ComponentIdItem.class);
         final String versionsURL = metaService.getFirstLinkSafely(componentItem, UrlConstants.SEGMENT_VERSIONS);
         List<ComponentVersion> versions = new ArrayList<>();
         if (versionsURL != null) {
-            versions = hubParameterizedRequestService.getAllItems(versionsURL);
+            versions = componentRequestService.getAllItems(versionsURL, ComponentVersion.class);
         }
         return versions;
     }

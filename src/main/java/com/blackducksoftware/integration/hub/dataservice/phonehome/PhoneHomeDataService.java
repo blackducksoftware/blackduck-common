@@ -31,14 +31,14 @@ import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestServ
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phone.home.PhoneHomeClient;
 import com.blackducksoftware.integration.phone.home.enums.BlackDuckName;
 import com.blackducksoftware.integration.phone.home.exception.PhoneHomeArgumentException;
 import com.blackducksoftware.integration.phone.home.exception.PhoneHomeConnectionException;
 
-public class PhoneHomeDataService extends HubRequestService {
+public class PhoneHomeDataService extends HubResponseService {
     private final IntLogger logger;
 
     private final HubRegistrationRequestService hubRegistrationRequestService;

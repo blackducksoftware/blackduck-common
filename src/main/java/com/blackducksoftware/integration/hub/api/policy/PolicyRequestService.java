@@ -30,18 +30,21 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 
-public class PolicyRequestService extends HubParameterizedRequestService<PolicyRule> {
+public class PolicyRequestService extends HubResponseService {
     private static final List<String> POLICY_RULE_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_POLICY_RULES);
 
     public PolicyRequestService(final RestConnection restConnection) {
-        super(restConnection, PolicyRule.class);
+        super(restConnection);
     }
 
     public List<PolicyRule> getAllPolicyRules() throws IntegrationException {
-        final List<PolicyRule> allPolicyRuleItems = getAllItems(POLICY_RULE_SEGMENTS);
+        final HubPagedRequest request = getHubRequestFactory().createPagedRequest(POLICY_RULE_SEGMENTS);
+
+        final List<PolicyRule> allPolicyRuleItems = getAllItems(request, PolicyRule.class);
         return allPolicyRuleItems;
     }
 

@@ -36,15 +36,16 @@ import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.google.gson.JsonObject;
 
-public class ProjectVersionRequestService extends HubParameterizedRequestService<ProjectVersionItem> {
+import okhttp3.Response;
 
+public class ProjectVersionRequestService extends HubResponseService {
     private final MetaService metaService;
 
     public ProjectVersionRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, ProjectVersionItem.class);
+        super(restConnection);
         this.metaService = metaService;
     }
 
@@ -55,7 +56,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
             hubPagedRequest.setQ(String.format("versionName:%s", projectVersionName));
         }
 
-        final List<ProjectVersionItem> allProjectVersionMatchingItems = getAllItems(hubPagedRequest);
+        final List<ProjectVersionItem> allProjectVersionMatchingItems = getAllItems(hubPagedRequest, ProjectVersionItem.class);
         for (final ProjectVersionItem projectVersion : allProjectVersionMatchingItems) {
             if (projectVersionName.equals(projectVersion.getVersionName())) {
                 return projectVersion;
@@ -71,7 +72,7 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
     }
 
     public List<ProjectVersionItem> getAllProjectVersions(final String versionsUrl) throws IntegrationException {
-        final List<ProjectVersionItem> allProjectVersionItems = getAllItems(versionsUrl);
+        final List<ProjectVersionItem> allProjectVersionItems = getAllItems(versionsUrl, ProjectVersionItem.class);
         return allProjectVersionItems;
     }
 
@@ -85,10 +86,9 @@ public class ProjectVersionRequestService extends HubParameterizedRequestService
         final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
 
         final HubRequest hubRequest = getHubRequestFactory().createRequest(versionsUrl);
-
-        final String location = hubRequest.executePost(getRestConnection().getGson().toJson(json));
-
-        return location;
+        try (Response response = hubRequest.executePost(getGson().toJson(json))) {
+            return response.header("location");
+        }
     }
 
 }

@@ -40,11 +40,9 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ScanStatusDataService extends HubRequestService {
+public class ScanStatusDataService {
     private static final long FIVE_SECONDS = 5 * 1000;
 
     private static final long DEFAULT_TIMEOUT = 300000l;
@@ -61,12 +59,11 @@ public class ScanStatusDataService extends HubRequestService {
 
     private final long timeoutInMilliseconds;
 
-    public ScanStatusDataService(final IntLogger logger, final RestConnection restConnection,
+    public ScanStatusDataService(final IntLogger logger,
             final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
             final CodeLocationRequestService codeLocationRequestService,
             final ScanSummaryRequestService scanSummaryRequestService, final MetaService metaService,
             final long timeoutInMilliseconds) {
-        super(restConnection);
         this.metaService = metaService;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
@@ -208,7 +205,7 @@ public class ScanStatusDataService extends HubRequestService {
         final List<ScanSummaryItem> pendingScans = new ArrayList<>();
         for (final ScanSummaryItem scanSummaryItem : scanSummaries) {
             final String scanSummaryLink = metaService.getHref(scanSummaryItem);
-            final ScanSummaryItem currentScanSummaryItem = scanSummaryRequestService.getItem(scanSummaryLink);
+            final ScanSummaryItem currentScanSummaryItem = scanSummaryRequestService.getItem(scanSummaryLink, ScanSummaryItem.class);
             if (currentScanSummaryItem.getStatus().isPending()) {
                 pendingScans.add(currentScanSummaryItem);
             } else if (currentScanSummaryItem.getStatus().isError()) {

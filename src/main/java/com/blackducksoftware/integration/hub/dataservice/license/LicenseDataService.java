@@ -28,19 +28,13 @@ import com.blackducksoftware.integration.hub.api.component.Component;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
 import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseItem;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
 
-public class LicenseDataService extends HubRequestService {
-
-    private final HubRequestService hubRequestService;
+public class LicenseDataService {
 
     private final ComponentRequestService componentRequestService;
 
-    public LicenseDataService(final RestConnection restConnection, final HubRequestService hubRequestService,
+    public LicenseDataService(
             final ComponentRequestService componentRequestService) {
-        super(restConnection);
-        this.hubRequestService = hubRequestService;
         this.componentRequestService = componentRequestService;
     }
 
@@ -48,7 +42,7 @@ public class LicenseDataService extends HubRequestService {
             throws IntegrationException {
         final Component component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
         final String versionUrl = component.getVersion();
-        final ComponentVersion componentVersion = hubRequestService.getItem(versionUrl, ComponentVersion.class);
+        final ComponentVersion componentVersion = componentRequestService.getItem(versionUrl, ComponentVersion.class);
         return componentVersion.getLicense();
     }
 

@@ -40,12 +40,10 @@ import com.blackducksoftware.integration.hub.dataservice.extension.transformer.U
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ExtensionConfigDataService extends HubRequestService {
-
-    private final HubRequestService hubRequestService;
+public class ExtensionConfigDataService extends HubResponseService {
 
     private final ExtensionConfigRequestService extensionConfigRequestService;
 
@@ -58,11 +56,9 @@ public class ExtensionConfigDataService extends HubRequestService {
     private final MetaService metaService;
 
     public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserRequestService userRequestService,
-            final HubRequestService hubRequestService,
             final ExtensionConfigRequestService extensionConfigRequestService,
             final ExtensionUserOptionRequestService extensionUserOptionRequestService, final MetaService metaService) {
         super(restConnection);
-        this.hubRequestService = hubRequestService;
         this.extensionConfigRequestService = extensionConfigRequestService;
         this.extensionUserOptionRequestService = extensionUserOptionRequestService;
         this.metaService = metaService;
@@ -74,7 +70,7 @@ public class ExtensionConfigDataService extends HubRequestService {
 
     public Map<String, ConfigurationItem> getGlobalConfigMap(final String extensionUrl) throws IntegrationException {
         Map<String, ConfigurationItem> globalConfigMap = new HashMap<>();
-        final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
+        final ExtensionItem extension = getItem(extensionUrl, ExtensionItem.class);
         final String globalOptionsLink = metaService.getFirstLink(extension, MetaService.GLOBAL_OPTIONS_LINK);
         globalConfigMap = createGlobalConfigMap(globalOptionsLink);
         return globalConfigMap;
@@ -82,7 +78,7 @@ public class ExtensionConfigDataService extends HubRequestService {
 
     public ParallelResourceProcessorResults<UserConfigItem> getUserConfigList(final String extensionUrl) throws IntegrationException {
 
-        final ExtensionItem extension = hubRequestService.getItem(extensionUrl, ExtensionItem.class);
+        final ExtensionItem extension = getItem(extensionUrl, ExtensionItem.class);
         final String userOptionsLink = metaService.getFirstLink(extension, MetaService.USER_OPTIONS_LINK);
         final List<UserOptionLinkItem> userOptionList = extensionUserOptionRequestService
                 .getUserOptions(userOptionsLink);

@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.api.report;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -32,13 +33,15 @@ import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionI
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class ReportRequestService extends HubParameterizedRequestService<ReportInformationItem> {
+import okhttp3.Response;
+
+public class ReportRequestService extends HubResponseService {
     public final static long DEFAULT_TIMEOUT = 1000 * 60 * 5;
 
     private final IntLogger logger;
@@ -52,7 +55,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
     }
 
     public ReportRequestService(final RestConnection restConnection, final IntLogger logger, final MetaService metaService, final long timeoutInMilliseconds) {
-        super(restConnection, ReportInformationItem.class);
+        super(restConnection);
         this.logger = logger;
         this.metaService = metaService;
 
@@ -87,18 +90,15 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
             json.add("categories", categoriesJson);
         }
 
-        final HubRequest hubRequest = new HubRequest(getRestConnection());
+        final HubRequest hubRequest = getHubRequestFactory().createRequest(getVersionReportLink(version));
 
-        hubRequest.setUrl(getVersionReportLink(version));
-
-        final String location = hubRequest.executePost(getRestConnection().getGson().toJson(json));
-
-        return location;
+        try (Response response = hubRequest.executePost(getGson().toJson(json))) {
+            return response.header("location");
+        }
     }
 
     public void deleteHubReport(final String reportUrl) throws IntegrationException {
-        final HubRequest hubRequest = new HubRequest(getRestConnection());
-        hubRequest.setUrl(reportUrl);
+        final HubRequest hubRequest = getHubRequestFactory().createRequest(reportUrl);
         hubRequest.executeDelete();
     }
 
@@ -110,14 +110,18 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
     public VersionReport getReportContent(final String reportContentUrl) throws IntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createRequest(reportContentUrl);
 
-        final JsonObject json = hubRequest.executeGetForResponseJson();
-        final JsonElement content = json.get("reportContent");
-        final JsonArray reportConentArray = content.getAsJsonArray();
-        final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
+        try (Response response = hubRequest.executeGet()) {
+            final String jsonResponse = response.body().string();
 
-        final VersionReport report = getRestConnection().getGson().fromJson(reportFile.get("fileContent"), VersionReport.class);
-
-        return report;
+            final JsonObject json = getJsonParser().parse(jsonResponse).getAsJsonObject();
+            final JsonElement content = json.get("reportContent");
+            final JsonArray reportConentArray = content.getAsJsonArray();
+            final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
+            final VersionReport report = getGson().fromJson(reportFile.get("fileContent"), VersionReport.class);
+            return report;
+        } catch (final IOException e) {
+            throw new HubIntegrationException(e);
+        }
     }
 
     /**
@@ -135,7 +139,12 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
 
         while (timeFinished == null) {
             final HubRequest hubRequest = getHubRequestFactory().createRequest(reportUrl);
-            reportInfo = getItem(hubRequest);
+            try (Response response = hubRequest.executeGet()) {
+                final String jsonResponse = response.body().string();
+                reportInfo = getItemAs(jsonResponse, ReportInformationItem.class);
+            } catch (final IOException e) {
+                throw new HubIntegrationException(e);
+            }
             timeFinished = reportInfo.getFinishedAt();
             if (timeFinished != null) {
                 break;

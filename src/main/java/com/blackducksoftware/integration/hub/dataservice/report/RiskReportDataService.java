@@ -54,10 +54,10 @@ import com.blackducksoftware.integration.hub.report.api.BomComponent;
 import com.blackducksoftware.integration.hub.report.api.ReportData;
 import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class RiskReportDataService extends HubRequestService {
+public class RiskReportDataService extends HubResponseService {
 
     private final IntLogger logger;
 
@@ -69,15 +69,13 @@ public class RiskReportDataService extends HubRequestService {
 
     private final AggregateBomRequestService bomRequestService;
 
-    private final HubRequestService requestService;
-
     private final MetaService metaService;
 
     private final HubSupportHelper hubSupportHelper;
 
     public RiskReportDataService(final IntLogger logger, final RestConnection restConnection, final ProjectRequestService projectRequestService,
             final ProjectVersionRequestService projectVersionRequestService, final ReportRequestService reportRequestService,
-            final AggregateBomRequestService bomRequestService, final HubRequestService requestService,
+            final AggregateBomRequestService bomRequestService,
             final MetaService metaService, final HubSupportHelper hubSupportHelper) {
         super(restConnection);
         this.logger = logger;
@@ -85,7 +83,6 @@ public class RiskReportDataService extends HubRequestService {
         this.projectVersionRequestService = projectVersionRequestService;
         this.reportRequestService = reportRequestService;
         this.bomRequestService = bomRequestService;
-        this.requestService = requestService;
         this.metaService = metaService;
         this.hubSupportHelper = hubSupportHelper;
 
@@ -121,7 +118,7 @@ public class RiskReportDataService extends HubRequestService {
                 } else {
                     componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.getComponent());
                 }
-                final BomComponentPolicyStatusView bomPolicyStatus = requestService.getItem(componentPolicyStatusURL,
+                final BomComponentPolicyStatusView bomPolicyStatus = getItem(componentPolicyStatusURL,
                         BomComponentPolicyStatusView.class);
                 component.setPolicyStatus(bomPolicyStatus.getApprovalStatus().toString());
                 components.add(component);
@@ -244,7 +241,7 @@ public class RiskReportDataService extends HubRequestService {
     }
 
     private String getBaseUrl() {
-        return requestService.getRestConnection().getHubBaseUrl().toString();
+        return getHubBaseUrl().toString();
     }
 
     private String getReportProjectUrl(final String projectURL) {

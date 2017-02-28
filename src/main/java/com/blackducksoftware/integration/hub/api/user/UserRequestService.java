@@ -30,18 +30,20 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 
-public class UserRequestService extends HubParameterizedRequestService<UserItem> {
+public class UserRequestService extends HubResponseService {
     private static final List<String> USERS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_USERS);
 
     public UserRequestService(final RestConnection restConnection) {
-        super(restConnection, UserItem.class);
+        super(restConnection);
     }
 
     public List<UserItem> getAllUsers() throws IntegrationException {
-        final List<UserItem> allUserItems = getAllItems(USERS_SEGMENTS);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, USERS_SEGMENTS);
+        final List<UserItem> allUserItems = getAllItems(hubPagedRequest, UserItem.class);
         return allUserItems;
     }
 

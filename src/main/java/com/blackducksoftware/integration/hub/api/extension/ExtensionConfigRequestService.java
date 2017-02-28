@@ -27,25 +27,25 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 
-public class ExtensionConfigRequestService extends HubParameterizedRequestService<ConfigurationItem> {
+public class ExtensionConfigRequestService extends HubResponseService {
     public ExtensionConfigRequestService(final RestConnection restConnection) {
-        super(restConnection, ConfigurationItem.class);
+        super(restConnection);
     }
 
     public List<ConfigurationItem> getGlobalOptions(final String globalConfigUrl) throws IntegrationException {
-        final List<ConfigurationItem> allItems = getAllItems(globalConfigUrl);
+        final List<ConfigurationItem> allItems = getAllItems(globalConfigUrl, ConfigurationItem.class);
         return allItems;
     }
 
     public List<ConfigurationItem> getCurrentUserOptions(final String currentUserConfigUrl) throws IntegrationException {
-        final List<ConfigurationItem> allItems = getAllItems(currentUserConfigUrl);
+        final List<ConfigurationItem> allItems = getAllItems(currentUserConfigUrl, ConfigurationItem.class);
         return allItems;
     }
 
     public List<ConfigurationItem> getUserConfiguration(final String userConfigUrl) throws IntegrationException {
-        final List<ConfigurationItem> allItems = getAllItems(userConfigUrl);
+        final List<ConfigurationItem> allItems = getAllItems(userConfigUrl, ConfigurationItem.class);
         return allItems;
     }
 
