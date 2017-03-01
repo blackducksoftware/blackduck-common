@@ -23,6 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.api.report;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,14 +32,18 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 
-import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
-import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
+import com.blackducksoftware.integration.hub.model.type.ProjectVersionDistributionEnum;
+import com.blackducksoftware.integration.hub.model.type.ProjectVersionPhaseEnum;
 
 /**
  * Detailed release summary.
  *
  */
 public class DetailedReleaseSummary {
+    private final static Map<ProjectVersionDistributionEnum, String> distributionDisplayStringsMap = new HashMap<>();
+
+    private final static Map<ProjectVersionPhaseEnum, String> phaseDisplayStringsMap = new HashMap<>();
+
     private final String projectId;
 
     private final String versionId;
@@ -57,6 +63,19 @@ public class DetailedReleaseSummary {
     private final String distribution;
 
     private final URLProvider uiUrlGenerator;
+
+    static {
+        distributionDisplayStringsMap.put(ProjectVersionDistributionEnum.EXTERNAL, "External");
+        distributionDisplayStringsMap.put(ProjectVersionDistributionEnum.SAAS, "SaaS");
+        distributionDisplayStringsMap.put(ProjectVersionDistributionEnum.INTERNAL, "Internal");
+        distributionDisplayStringsMap.put(ProjectVersionDistributionEnum.OPENSOURCE, "Open Source");
+
+        phaseDisplayStringsMap.put(ProjectVersionPhaseEnum.ARCHIVED, "Archived");
+        phaseDisplayStringsMap.put(ProjectVersionPhaseEnum.DEPRECATED, "Deprecated");
+        phaseDisplayStringsMap.put(ProjectVersionPhaseEnum.DEVELOPMENT, "In Development");
+        phaseDisplayStringsMap.put(ProjectVersionPhaseEnum.PLANNING, "In Planning");
+        phaseDisplayStringsMap.put(ProjectVersionPhaseEnum.RELEASED, "Released");
+    }
 
     public DetailedReleaseSummary(final String projectId, final String versionId, final String projectName,
             final String version, final String versionComments, final String nickname, final String releasedOn,
@@ -134,15 +153,31 @@ public class DetailedReleaseSummary {
     public String getPhaseDisplayValue() {
         if (StringUtils.isBlank(phase)) {
             return null;
+        } else {
+            final String fixedPhaseString = phase.replaceAll("\\s", "").toUpperCase();
+            for (final ProjectVersionPhaseEnum type : ProjectVersionPhaseEnum.values()) {
+                if (type.toString().equals(fixedPhaseString)) {
+                    return phaseDisplayStringsMap.get(type);
+                }
+            }
         }
-        return PhaseEnum.getPhaseEnum(phase).getDisplayValue();
+
+        return "Unknown Phase";
     }
 
     public String getDistributionDisplayValue() {
         if (StringUtils.isBlank(distribution)) {
             return null;
+        } else {
+            final String fixedDistributionString = distribution.replaceAll("\\s", "").toUpperCase();
+            for (final ProjectVersionDistributionEnum type : ProjectVersionDistributionEnum.values()) {
+                if (type.toString().equals(fixedDistributionString)) {
+                    return distributionDisplayStringsMap.get(type);
+                }
+            }
         }
-        return DistributionEnum.getDistributionEnum(distribution).getDisplayValue();
+
+        return "Unknown Distribution";
     }
 
     public DateTime getReleasedOnTime() {

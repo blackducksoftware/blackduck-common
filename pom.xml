@@ -30,6 +30,11 @@
     </dependency>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
+      <artifactId>hub-response-common</artifactId>
+      <version>0.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>hub-reporting-common</artifactId>
       <version>1.0.0</version>
     </dependency>

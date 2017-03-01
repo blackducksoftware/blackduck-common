@@ -26,9 +26,10 @@ package com.blackducksoftware.integration.hub.api.codelocation;
 import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.type.CodeLocationEnum;
 
 public class CodeLocationItem extends HubItem {
-    private CodeLocationTypeEnum type;
+    private CodeLocationEnum type;
 
     private String url;
 
@@ -41,7 +42,7 @@ public class CodeLocationItem extends HubItem {
 
     private Date updatedAt;
 
-    public CodeLocationTypeEnum getType() {
+    public CodeLocationEnum getType() {
         return type;
     }
 

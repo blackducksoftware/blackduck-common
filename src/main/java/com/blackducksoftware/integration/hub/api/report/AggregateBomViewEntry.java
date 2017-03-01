@@ -32,9 +32,9 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskCounts;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskProfile;
+import com.blackducksoftware.integration.hub.model.type.VersionBomPolicyStatusOverallStatusEnum;
 
 /**
  * This is a view of an aggregation of BomEntries.
@@ -98,8 +98,8 @@ public class AggregateBomViewEntry {
         return policyApprovalStatus;
     }
 
-    public PolicyStatusEnum getPolicyApprovalStatusEnum() {
-        return PolicyStatusEnum.valueOf(policyApprovalStatus);
+    public VersionBomPolicyStatusOverallStatusEnum getPolicyApprovalStatusEnum() {
+        return VersionBomPolicyStatusOverallStatusEnum.valueOf(policyApprovalStatus);
     }
 
     public List<String> getBomEntryIds() {

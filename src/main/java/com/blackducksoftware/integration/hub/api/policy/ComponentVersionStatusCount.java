@@ -26,17 +26,19 @@ package com.blackducksoftware.integration.hub.api.policy;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import com.blackducksoftware.integration.hub.model.type.VersionBomPolicyStatusOverallStatusEnum;
+
 public class ComponentVersionStatusCount {
-    private final PolicyStatusEnum name;
+    private final VersionBomPolicyStatusOverallStatusEnum name;
 
     private final int value;
 
-    public ComponentVersionStatusCount(final PolicyStatusEnum name, final int value) {
+    public ComponentVersionStatusCount(final VersionBomPolicyStatusOverallStatusEnum name, final int value) {
         this.name = name;
         this.value = value;
     }
 
-    public PolicyStatusEnum getName() {
+    public VersionBomPolicyStatusOverallStatusEnum getName() {
         return name;
     }
 

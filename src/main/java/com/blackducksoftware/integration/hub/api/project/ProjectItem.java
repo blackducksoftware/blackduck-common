@@ -23,8 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.api.project;
 
-import com.blackducksoftware.integration.hub.api.component.version.SourceEnum;
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.type.ProjectSourceEnum;
 
 public class ProjectItem extends HubItem {
     // description from Hub API: "The general identifier of the project"
@@ -39,7 +39,7 @@ public class ProjectItem extends HubItem {
     // description from Hub API: "Allowed values : [1,2,3,4,5]"
     private int projectTier;
 
-    private SourceEnum source;
+    private ProjectSourceEnum source;
 
     public String getName() {
         return name;
@@ -57,7 +57,7 @@ public class ProjectItem extends HubItem {
         return projectTier;
     }
 
-    public SourceEnum getSource() {
+    public ProjectSourceEnum getSource() {
         return source;
     }
 

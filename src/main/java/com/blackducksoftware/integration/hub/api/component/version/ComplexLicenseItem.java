@@ -26,21 +26,24 @@ package com.blackducksoftware.integration.hub.api.component.version;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.type.ComplexLicenseCodeSharingEnum;
+import com.blackducksoftware.integration.hub.model.type.ComplexLicenseEnum;
+import com.blackducksoftware.integration.hub.model.type.ComplexLicenseOwnershipEnum;
 
 public class ComplexLicenseItem extends HubItem {
-    private CodeSharingEnum codeSharing;
+    private ComplexLicenseCodeSharingEnum codeSharing;
 
     private String license;
 
     private String name;
 
-    private OwnershipEnum ownership;
+    private ComplexLicenseOwnershipEnum ownership;
 
-    private ComplexLicenseType type;
+    private ComplexLicenseEnum type;
 
     private List<ComplexLicenseItem> licenses;
 
-    public CodeSharingEnum getCodeSharing() {
+    public ComplexLicenseCodeSharingEnum getCodeSharing() {
         return codeSharing;
     }
 
@@ -56,11 +59,11 @@ public class ComplexLicenseItem extends HubItem {
         return name;
     }
 
-    public OwnershipEnum getOwnership() {
+    public ComplexLicenseOwnershipEnum getOwnership() {
         return ownership;
     }
 
-    public ComplexLicenseType getType() {
+    public ComplexLicenseEnum getType() {
         return type;
     }
 }
