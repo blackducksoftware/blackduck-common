@@ -28,6 +28,8 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.model.type.ScanSummaryStatusEnum;
+
 public class ScanHistoryItem {
     private String scannerVersion;
 
@@ -37,7 +39,7 @@ public class ScanHistoryItem {
 
     private String createdByUserName;
 
-    private ScanStatus status;
+    private ScanSummaryStatusEnum status;
 
     private String scanSourceType;
 
@@ -77,11 +79,11 @@ public class ScanHistoryItem {
         this.createdByUserName = createdByUserName;
     }
 
-    public ScanStatus getStatus() {
+    public ScanSummaryStatusEnum getStatus() {
         return status;
     }
 
-    public void setStatus(final ScanStatus status) {
+    public void setStatus(final ScanSummaryStatusEnum status) {
         this.status = status;
     }
 

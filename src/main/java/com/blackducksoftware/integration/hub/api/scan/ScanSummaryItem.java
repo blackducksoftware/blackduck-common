@@ -26,9 +26,10 @@ package com.blackducksoftware.integration.hub.api.scan;
 import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.type.ScanSummaryStatusEnum;
 
 public class ScanSummaryItem extends HubItem {
-    private ScanStatus status;
+    private ScanSummaryStatusEnum status;
 
     private String statusMessage;
 
@@ -36,7 +37,7 @@ public class ScanSummaryItem extends HubItem {
 
     private Date updatedAt;
 
-    public ScanStatus getStatus() {
+    public ScanSummaryStatusEnum getStatus() {
         return status;
     }
 

@@ -30,6 +30,7 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.model.type.ReportReportFormatEnum;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
@@ -70,12 +71,8 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      * @return the Report URL
      * @throws HubIntegrationException
      */
-    public String startGeneratingHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories)
+    public String startGeneratingHubReport(final ProjectVersionItem version, final ReportReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories)
             throws IntegrationException {
-        if (ReportFormatEnum.UNKNOWN == reportFormat) {
-            throw new IllegalArgumentException("Can not generate a report of format : " + reportFormat);
-        }
-
         final JsonObject json = new JsonObject();
         json.addProperty("reportFormat", reportFormat.name());
 
@@ -160,7 +157,7 @@ public class ReportRequestService extends HubParameterizedRequestService<ReportI
      *
      * @throws HubIntegrationException
      */
-    public VersionReport generateHubReport(final ProjectVersionItem version, final ReportFormatEnum reportFormat,
+    public VersionReport generateHubReport(final ProjectVersionItem version, final ReportReportFormatEnum reportFormat,
             final ReportCategoriesEnum[] categories) throws IntegrationException {
         logger.debug("Starting the Report generation.");
         final String reportUrl = startGeneratingHubReport(version, reportFormat, categories);
