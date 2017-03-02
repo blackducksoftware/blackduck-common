@@ -33,11 +33,10 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Poli
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.VulnerabilityContentItem;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
 
 public class MockProcessor extends NotificationProcessor<Collection<NotificationEvent>> {
 
-    public MockProcessor(HubRequestService hubRequestService, VulnerabilityRequestService vulnerabilityRequestService, MetaService metaService) {
+    public MockProcessor(final VulnerabilityRequestService vulnerabilityRequestService, final MetaService metaService) {
         final MapProcessorCache cache = new MapProcessorCache();
         getCacheList().add(cache);
         getProcessorMap().put(PolicyViolationContentItem.class, new MockEventProcessor(cache, metaService));
@@ -48,7 +47,7 @@ public class MockProcessor extends NotificationProcessor<Collection<Notification
     }
 
     @Override
-    public Collection<NotificationEvent> processEvents(Collection<NotificationEvent> eventCollection) {
+    public Collection<NotificationEvent> processEvents(final Collection<NotificationEvent> eventCollection) {
         final Collection<NotificationEvent> dataList = new LinkedList<>();
         for (final NotificationEvent entry : eventCollection) {
             dataList.add(entry);

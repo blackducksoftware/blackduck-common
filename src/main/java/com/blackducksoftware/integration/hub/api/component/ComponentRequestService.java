@@ -33,13 +33,13 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 
-public class ComponentRequestService extends HubParameterizedRequestService<Component> {
+public class ComponentRequestService extends HubResponseService {
     private static final List<String> COMPONENT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_COMPONENTS);
 
     public ComponentRequestService(final RestConnection restConnection) {
-        super(restConnection, Component.class);
+        super(restConnection);
     }
 
     public List<Component> getAllComponents(final String namespace, final String groupId, final String artifactId, final String version)
@@ -47,7 +47,7 @@ public class ComponentRequestService extends HubParameterizedRequestService<Comp
         final String componentQuery = String.format("id:%s|%s|%s|%s", namespace, groupId, artifactId, version);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(COMPONENT_SEGMENTS, componentQuery);
 
-        final List<Component> allComponents = getAllItems(hubPagedRequest);
+        final List<Component> allComponents = getAllItems(hubPagedRequest, Component.class);
         return allComponents;
     }
 

@@ -46,7 +46,6 @@ import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionR
 import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
-import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
 import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.VulnerableBomComponentRequestService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
@@ -87,12 +86,8 @@ public class HubServicesFactory {
         ciEnvironmentVariables.putAll(environmentVariables);
     }
 
-    public HubRequestService createHubRequestService() {
-        return new HubRequestService(restConnection);
-    }
-
     public CLIDataService createCLIDataService(final IntLogger logger) {
-        return new CLIDataService(logger, restConnection, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
+        return new CLIDataService(logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
                 createPhoneHomeDataService(logger), createProjectRequestService(), createProjectVersionRequestService(logger),
                 createCodeLocationRequestService(logger), createMetaService(logger));
     }
@@ -105,45 +100,47 @@ public class HubServicesFactory {
             final long timeoutInMilliseconds) throws IntegrationException {
         return new RiskReportDataService(logger, restConnection, createProjectRequestService(),
                 createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds), createAggregateBomRequestService(logger),
-                createHubRequestService(), createMetaService(logger), createCheckedHubSupport(logger));
+                createMetaService(logger), createCheckedHubSupport(logger));
     }
 
     public PolicyStatusDataService createPolicyStatusDataService(final IntLogger logger) {
         return new PolicyStatusDataService(restConnection, createProjectRequestService(),
-                createProjectVersionRequestService(logger), createHubRequestService(), createMetaService(logger));
+                createProjectVersionRequestService(logger), createMetaService(logger));
     }
 
     public ScanStatusDataService createScanStatusDataService(final IntLogger logger,
             final long timeoutInMilliseconds) {
-        return new ScanStatusDataService(logger, restConnection, createProjectRequestService(), createProjectVersionRequestService(logger),
+        return new ScanStatusDataService(logger, createProjectRequestService(), createProjectVersionRequestService(logger),
                 createCodeLocationRequestService(logger), createScanSummaryRequestService(), createMetaService(logger),
                 timeoutInMilliseconds);
     }
 
     public NotificationDataService createNotificationDataService(final IntLogger logger) {
-        return new NotificationDataService(logger, restConnection, createNotificationRequestService(logger), createProjectVersionRequestService(logger),
-                createPolicyRequestService(), createVersionBomPolicyRequestService(), createHubRequestService(), createMetaService(logger));
+        return new NotificationDataService(logger, createHubResponseService(), createNotificationRequestService(logger),
+                createProjectVersionRequestService(logger),
+                createPolicyRequestService(), createMetaService(logger));
     }
 
     public NotificationDataService createNotificationDataService(final IntLogger logger,
             final PolicyNotificationFilter policyNotificationFilter) {
-        return new NotificationDataService(logger, restConnection, createNotificationRequestService(logger), createProjectVersionRequestService(logger),
-                createPolicyRequestService(), createVersionBomPolicyRequestService(), createHubRequestService(), policyNotificationFilter,
+        return new NotificationDataService(logger, createHubResponseService(), createNotificationRequestService(logger),
+                createProjectVersionRequestService(logger),
+                createPolicyRequestService(), policyNotificationFilter,
                 createMetaService(logger));
     }
 
     public ExtensionConfigDataService createExtensionConfigDataService(final IntLogger logger) {
         return new ExtensionConfigDataService(logger, restConnection, createUserRequestService(),
-                createHubRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService(), createMetaService(logger));
+                createExtensionConfigRequestService(), createExtensionUserOptionRequestService(), createMetaService(logger));
     }
 
     public VulnerabilityDataService createVulnerabilityDataService(final IntLogger logger) {
-        return new VulnerabilityDataService(restConnection, createComponentRequestService(), createHubRequestService(),
+        return new VulnerabilityDataService(restConnection, createComponentRequestService(),
                 createVulnerabilityRequestService(), createMetaService(logger));
     }
 
-    public LicenseDataService createLicenseDataService(final IntLogger logger) {
-        return new LicenseDataService(restConnection, createHubRequestService(), createComponentRequestService());
+    public LicenseDataService createLicenseDataService() {
+        return new LicenseDataService(createComponentRequestService());
     }
 
     public BomImportRequestService createBomImportRequestService() {
@@ -186,10 +183,6 @@ public class HubServicesFactory {
         return new UserRequestService(restConnection);
     }
 
-    public VersionBomPolicyRequestService createVersionBomPolicyRequestService() {
-        return new VersionBomPolicyRequestService(restConnection);
-    }
-
     public VulnerabilityRequestService createVulnerabilityRequestService() {
         return new VulnerabilityRequestService(restConnection);
     }
@@ -214,7 +207,8 @@ public class HubServicesFactory {
             final HubSupportHelper hubSupportHelper,
             final File directoryToInstallTo, final int scanMemory, final boolean dryRun, final String project,
             final String version, final Set<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
-        return new SimpleScanService(logger, restConnection, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo, scanMemory,
+        return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo,
+                scanMemory,
                 dryRun, project, version, scanTargetPaths, workingDirectory, excludePatterns);
     }
 
@@ -231,11 +225,15 @@ public class HubServicesFactory {
     }
 
     public MetaService createMetaService(final IntLogger logger) {
-        return new MetaService(logger, restConnection.getJsonParser());
+        return new MetaService(logger, restConnection.jsonParser);
     }
 
     public BomRequestService createBomRequestService() {
         return new BomRequestService(restConnection);
+    }
+
+    public HubResponseService createHubResponseService() {
+        return new HubResponseService(restConnection);
     }
 
     public RestConnection getRestConnection() {
@@ -249,7 +247,7 @@ public class HubServicesFactory {
     }
 
     public ComponentDataService createComponentDataService(final IntLogger logger) {
-        return new ComponentDataService(logger, restConnection, createHubRequestService(), createComponentRequestService(), createMetaService(logger));
+        return new ComponentDataService(logger, createComponentRequestService(), createMetaService(logger));
     }
 
 }

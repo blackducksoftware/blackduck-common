@@ -54,7 +54,6 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Poli
 import com.blackducksoftware.integration.hub.dataservice.notification.model.VulnerabilityContentItem;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -75,19 +74,16 @@ public class NotificationProcessorTest {
 
     public MockProcessor createMockedNotificationProcessor() {
         final VulnerabilityRequestService vulnerabilityRequestService = Mockito.mock(VulnerabilityRequestService.class);
-        final HubRequestService hubRequestService = Mockito.mock(HubRequestService.class);
-        final MockProcessor processor = new MockProcessor(hubRequestService, vulnerabilityRequestService, metaService);
+        final MockProcessor processor = new MockProcessor(vulnerabilityRequestService, metaService);
         return processor;
     }
 
-    public MockProcessor createMockedNotificationProcessor(List<VulnerabilityItem> vulnerabilityList) throws Exception {
+    public MockProcessor createMockedNotificationProcessor(final List<VulnerabilityItem> vulnerabilityList) throws Exception {
         final ComponentVersion compVersion = Mockito.mock(ComponentVersion.class);
         Mockito.when(compVersion.getJson()).thenReturn(createComponentJson());
         final VulnerabilityRequestService vulnerabilityRequestService = Mockito.mock(VulnerabilityRequestService.class);
-        final HubRequestService hubRequestService = Mockito.mock(HubRequestService.class);
-        Mockito.when(hubRequestService.getItem(Mockito.anyString(), Mockito.eq(ComponentVersion.class))).thenReturn(compVersion);
         Mockito.when(vulnerabilityRequestService.getComponentVersionVulnerabilities(Mockito.anyString())).thenReturn(vulnerabilityList);
-        final MockProcessor processor = new MockProcessor(hubRequestService, vulnerabilityRequestService, metaService);
+        final MockProcessor processor = new MockProcessor(vulnerabilityRequestService, metaService);
         return processor;
     }
 
@@ -101,7 +97,7 @@ public class NotificationProcessorTest {
                 + "}]}}";
     }
 
-    private void assertPolicyDataValid(final Collection<NotificationEvent> eventList, NotificationCategoryEnum categoryType) {
+    private void assertPolicyDataValid(final Collection<NotificationEvent> eventList, final NotificationCategoryEnum categoryType) {
         int ruleIndex = 1;
         for (final NotificationEvent event : eventList) {
             final Map<String, Object> dataSet = event.getDataSet();

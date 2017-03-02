@@ -37,12 +37,11 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.version.BomComponentVersionPolicyStatus;
-import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public abstract class AbstractPolicyTransformer extends AbstractNotificationTransformer {
@@ -52,23 +51,21 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
      * policyFilter.size() == 0: match no rules
      * policyFilter == null: match all rules
      */
-    public AbstractPolicyTransformer(final NotificationRequestService notificationService,
+    public AbstractPolicyTransformer(final HubResponseService hubResponseService, final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
-            final VersionBomPolicyRequestService bomVersionPolicyService, final HubRequestService hubRequestService,
             final PolicyNotificationFilter policyFilter,
             final MetaService metaService) {
-        super(notificationService, projectVersionService, policyService, bomVersionPolicyService, hubRequestService,
+        super(hubResponseService, notificationService, projectVersionService, policyService,
                 metaService);
         this.policyFilter = policyFilter;
     }
 
-    public AbstractPolicyTransformer(final IntLogger logger,
+    public AbstractPolicyTransformer(final HubResponseService hubResponseService, final IntLogger logger,
             final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
-            final VersionBomPolicyRequestService bomVersionPolicyService, final HubRequestService hubRequestService,
             final PolicyNotificationFilter policyFilter,
             final MetaService metaService) {
-        super(logger, notificationService, projectVersionService, policyService, bomVersionPolicyService, hubRequestService,
+        super(hubResponseService, logger, notificationService, projectVersionService, policyService,
                 metaService);
         this.policyFilter = policyFilter;
     }
@@ -83,7 +80,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         }
         final List<PolicyRule> rules = new ArrayList<>();
         for (final String ruleUrlViolated : ruleUrlsViolated) {
-            final PolicyRule ruleViolated = getPolicyService().getItem(ruleUrlViolated);
+            final PolicyRule ruleViolated = getPolicyService().getItem(ruleUrlViolated, PolicyRule.class);
             rules.add(ruleViolated);
         }
         return rules;
@@ -109,8 +106,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     protected PolicyRule getPolicyRule(final String ruleUrl) throws IntegrationException {
-        PolicyRule rule;
-        rule = getPolicyService().getItem(ruleUrl);
+        final PolicyRule rule = getPolicyService().getItem(ruleUrl, PolicyRule.class);
         return rule;
     }
 
@@ -160,7 +156,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
 
     protected BomComponentVersionPolicyStatus getBomComponentVersionPolicyStatus(final String policyStatusUrl) throws IntegrationException {
         BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus;
-        bomComponentVersionPolicyStatus = getBomVersionPolicyService().getItem(policyStatusUrl);
+        bomComponentVersionPolicyStatus = getHubResponseService().getItem(policyStatusUrl, BomComponentVersionPolicyStatus.class);
 
         return bomComponentVersionPolicyStatus;
     }

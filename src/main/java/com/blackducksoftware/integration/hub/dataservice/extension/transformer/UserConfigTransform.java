@@ -51,7 +51,7 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
 
     @Override
     public List<UserConfigItem> transform(final UserOptionLinkItem item) throws IntegrationException {
-        final UserItem user = userRequestService.getItem(item.getUser());
+        final UserItem user = userRequestService.getItem(item.getUser(), UserItem.class);
         if (!user.isActive()) {
             return Collections.emptyList();
         } else {

@@ -71,7 +71,7 @@ public class BuildToolHelper {
         final BomImportRequestService bomImportRequestService = services.createBomImportRequestService();
         bomImportRequestService.importBomFile(file, BDIO_FILE_MEDIA_TYPE);
 
-        logger.info(String.format(UPLOAD_FILE_MESSAGE, file, bomImportRequestService.getRestConnection().getHubBaseUrl()));
+        logger.info(String.format(UPLOAD_FILE_MESSAGE, file, bomImportRequestService.getHubBaseUrl()));
     }
 
     public void waitForHub(final HubServicesFactory services, final String hubProjectName,

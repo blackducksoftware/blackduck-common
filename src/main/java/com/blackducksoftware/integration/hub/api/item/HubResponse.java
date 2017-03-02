@@ -21,22 +21,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.vulnerability;
+package com.blackducksoftware.integration.hub.api.item;
 
-import java.util.List;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+public class HubResponse {
+    private String json;
 
-public class VulnerabilityRequestService extends HubResponseService {
-    public VulnerabilityRequestService(final RestConnection restConnection) {
-        super(restConnection);
+    public String getJson() {
+        return json;
     }
 
-    public List<VulnerabilityItem> getComponentVersionVulnerabilities(final String vulnerabilitiesUrl) throws IntegrationException {
-        final List<VulnerabilityItem> allItems = getAllItems(vulnerabilitiesUrl, VulnerabilityItem.class);
-        return allItems;
+    public void setJson(final String json) {
+        this.json = json;
     }
 
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
+    }
+
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
+    }
 }

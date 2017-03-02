@@ -27,15 +27,20 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_REGISTRATIONS;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.google.gson.JsonObject;
 
-public class HubRegistrationRequestService extends HubRequestService {
+import okhttp3.Response;
+
+public class HubRegistrationRequestService extends HubResponseService {
     private static final List<String> REGISTRATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_REGISTRATIONS);
 
     public HubRegistrationRequestService(final RestConnection restConnection) {
@@ -43,10 +48,15 @@ public class HubRegistrationRequestService extends HubRequestService {
     }
 
     public String getRegistrationId() throws IntegrationException {
-        final JsonObject jsonObject = getJsonObject(REGISTRATION_SEGMENTS);
-
-        final String registrationId = jsonObject.get("registrationId").getAsString();
-        return registrationId;
+        final HubRequest request = getHubRequestFactory().createRequest(REGISTRATION_SEGMENTS);
+        try (Response response = request.executeGet()) {
+            final String jsonResponse = response.body().string();
+            final JsonObject jsonObject = getJsonParser().parse(jsonResponse).getAsJsonObject();
+            final String registrationId = jsonObject.get("registrationId").getAsString();
+            return registrationId;
+        } catch (final IOException e) {
+            throw new HubIntegrationException(e);
+        }
     }
 
 }

@@ -29,36 +29,49 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CUR
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CURRENT_VERSION_COMPARISON;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.version.VersionComparison;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 
-public class HubVersionRequestService extends HubParameterizedRequestService<VersionComparison> {
+import okhttp3.Response;
+
+public class HubVersionRequestService extends HubResponseService {
     private static final List<String> CURRENT_VERSION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION);
 
     private static final List<String> CURRENT_VERSION_COMPARISON_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON);
 
     public HubVersionRequestService(final RestConnection restConnection) {
-        super(restConnection, VersionComparison.class);
+        super(restConnection);
     }
 
     public String getHubVersion() throws IntegrationException {
-        final String hubVersionWithPossibleSurroundingQuotes = getString(CURRENT_VERSION_SEGMENTS);
-        final String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
-
-        return hubVersion;
+        final HubRequest request = getHubRequestFactory().createRequest(CURRENT_VERSION_SEGMENTS);
+        try (Response response = request.executeGet()) {
+            final String hubVersionWithPossibleSurroundingQuotes = response.body().string();
+            final String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
+            return hubVersion;
+        } catch (final IOException e) {
+            throw new HubIntegrationException(e);
+        }
     }
 
     public VersionComparison getHubVersionComparison(final String consumerVersion) throws IntegrationException {
         final HubRequest hubVersionRequest = getHubRequestFactory().createRequest(CURRENT_VERSION_COMPARISON_SEGMENTS).addQueryParameter(QUERY_VERSION,
                 consumerVersion);
-        final VersionComparison versionComparison = getItem(hubVersionRequest);
-        return versionComparison;
+        try (Response response = hubVersionRequest.executeGet()) {
+            final String jsonResponse = response.body().string();
+            final VersionComparison versionComparison = getItemAs(jsonResponse, VersionComparison.class);
+            return versionComparison;
+        } catch (final IOException e) {
+            throw new HubIntegrationException(e);
+        }
     }
 
     public boolean isConsumerVersionLessThanOrEqualToServerVersion(final String consumerVersion) throws IntegrationException {
