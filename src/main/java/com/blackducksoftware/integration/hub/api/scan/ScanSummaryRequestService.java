@@ -27,15 +27,15 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 
-public class ScanSummaryRequestService extends HubParameterizedRequestService<ScanSummaryItem> {
+public class ScanSummaryRequestService extends HubResponseService {
     public ScanSummaryRequestService(final RestConnection restConnection) {
-        super(restConnection, ScanSummaryItem.class);
+        super(restConnection);
     }
 
     public List<ScanSummaryItem> getAllScanSummaryItems(final String scanSummaryUrl) throws IntegrationException {
-        final List<ScanSummaryItem> allScanSummaryItems = getAllItems(scanSummaryUrl);
+        final List<ScanSummaryItem> allScanSummaryItems = getAllItems(scanSummaryUrl, ScanSummaryItem.class);
         return allScanSummaryItems;
     }
 

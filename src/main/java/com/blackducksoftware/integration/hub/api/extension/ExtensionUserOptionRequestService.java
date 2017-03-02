@@ -27,16 +27,16 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 
-public class ExtensionUserOptionRequestService extends HubParameterizedRequestService<UserOptionLinkItem> {
+public class ExtensionUserOptionRequestService extends HubResponseService {
     public ExtensionUserOptionRequestService(final RestConnection restConnection) {
-        super(restConnection, UserOptionLinkItem.class);
+        super(restConnection);
     }
 
     public List<UserOptionLinkItem> getUserOptions(final String userOptionsUrl)
             throws IntegrationException {
-        final List<UserOptionLinkItem> allItems = getAllItems(userOptionsUrl);
+        final List<UserOptionLinkItem> allItems = getAllItems(userOptionsUrl, UserOptionLinkItem.class);
         return allItems;
     }
 

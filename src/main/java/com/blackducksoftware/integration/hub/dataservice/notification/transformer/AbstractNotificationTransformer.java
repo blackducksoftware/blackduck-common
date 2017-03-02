@@ -35,18 +35,19 @@ import com.blackducksoftware.integration.hub.api.notification.NotificationReques
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
-import com.blackducksoftware.integration.hub.api.version.VersionBomPolicyRequestService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public abstract class AbstractNotificationTransformer
         implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
+    private final HubResponseService hubResponseService;
+
     private final IntLogger logger;
 
     private final NotificationRequestService notificationService;
@@ -55,37 +56,33 @@ public abstract class AbstractNotificationTransformer
 
     private final PolicyRequestService policyService;
 
-    private final VersionBomPolicyRequestService bomVersionPolicyService;
-
-    private final HubRequestService hubRequestService;
-
     private final MetaService metaService;
 
-    public AbstractNotificationTransformer(final NotificationRequestService notificationService,
+    public AbstractNotificationTransformer(final HubResponseService hubResponseService, final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
-            final VersionBomPolicyRequestService bomVersionPolicyService, final HubRequestService hubRequestService,
             final MetaService metaService) {
+        this.hubResponseService = hubResponseService;
         this.logger = new IntBufferedLogger();
         this.notificationService = notificationService;
         this.projectVersionService = projectVersionService;
         this.policyService = policyService;
-        this.bomVersionPolicyService = bomVersionPolicyService;
-        this.hubRequestService = hubRequestService;
         this.metaService = metaService;
     }
 
-    public AbstractNotificationTransformer(final IntLogger logger,
+    public AbstractNotificationTransformer(final HubResponseService hubResponseService, final IntLogger logger,
             final NotificationRequestService notificationService,
             final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
-            final VersionBomPolicyRequestService bomVersionPolicyService, final HubRequestService hubRequestService,
             final MetaService metaService) {
+        this.hubResponseService = hubResponseService;
         this.logger = logger;
         this.notificationService = notificationService;
         this.projectVersionService = projectVersionService;
         this.policyService = policyService;
-        this.bomVersionPolicyService = bomVersionPolicyService;
-        this.hubRequestService = hubRequestService;
         this.metaService = metaService;
+    }
+
+    public HubResponseService getHubResponseService() {
+        return hubResponseService;
     }
 
     protected IntLogger getLogger() {
@@ -104,14 +101,6 @@ public abstract class AbstractNotificationTransformer
         return policyService;
     }
 
-    public VersionBomPolicyRequestService getBomVersionPolicyService() {
-        return bomVersionPolicyService;
-    }
-
-    public HubRequestService getHubRequestService() {
-        return hubRequestService;
-    }
-
     @Override
     public abstract List<NotificationContentItem> transform(NotificationItem item) throws HubItemTransformException;
 
@@ -119,7 +108,7 @@ public abstract class AbstractNotificationTransformer
             throws IntegrationException {
         ProjectVersionItem item;
         try {
-            item = getHubRequestService().getItem(projectVersionUrl, ProjectVersionItem.class);
+            item = hubResponseService.getItem(projectVersionUrl, ProjectVersionItem.class);
         } catch (final HubIntegrationException e) {
             final String msg = "Error getting the full ProjectVersion for this affected project version URL: "
                     + projectVersionUrl + ": " + e.getMessage();
@@ -155,7 +144,7 @@ public abstract class AbstractNotificationTransformer
     protected ComponentVersion getComponentVersion(final String componentVersionLink) throws IntegrationException {
         ComponentVersion componentVersion = null;
         if (!StringUtils.isBlank(componentVersionLink)) {
-            componentVersion = getHubRequestService().getItem(componentVersionLink, ComponentVersion.class);
+            componentVersion = hubResponseService.getItem(componentVersionLink, ComponentVersion.class);
         }
         return componentVersion;
     }

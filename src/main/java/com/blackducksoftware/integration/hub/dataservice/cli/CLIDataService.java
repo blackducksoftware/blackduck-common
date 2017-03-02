@@ -43,14 +43,15 @@ import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
-import com.blackducksoftware.integration.hub.service.HubRequestService;
 import com.blackducksoftware.integration.hub.util.HostnameHelper;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import com.google.gson.Gson;
 
-public class CLIDataService extends HubRequestService {
+public class CLIDataService {
+    private final Gson gson;
+
     private final IntLogger logger;
 
     private final CIEnvironmentVariables ciEnvironmentVariables;
@@ -69,12 +70,12 @@ public class CLIDataService extends HubRequestService {
 
     private final MetaService metaService;
 
-    public CLIDataService(final IntLogger logger, final RestConnection restConnection, final CIEnvironmentVariables ciEnvironmentVariables,
+    public CLIDataService(final IntLogger logger, final Gson gson, final CIEnvironmentVariables ciEnvironmentVariables,
             final HubVersionRequestService hubVersionRequestService,
             final CLIDownloadService cliDownloadService, final PhoneHomeDataService phoneHomeDataService,
             final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
             final CodeLocationRequestService codeLocationRequestService, final MetaService metaService) {
-        super(restConnection);
+        this.gson = gson;
         this.logger = logger;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
         this.hubVersionRequestService = hubVersionRequestService;
@@ -101,7 +102,7 @@ public class CLIDataService extends HubRequestService {
 
         final HubSupportHelper hubSupportHelper = new HubSupportHelper();
         hubSupportHelper.checkHubSupport(hubVersionRequestService, logger);
-        final SimpleScanService simpleScanService = new SimpleScanService(logger, getRestConnection(), hubServerConfig, hubSupportHelper,
+        final SimpleScanService simpleScanService = new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper,
                 ciEnvironmentVariables, hubScanConfig);
         simpleScanService.setupAndExecuteScan();
 
@@ -151,7 +152,7 @@ public class CLIDataService extends HubRequestService {
         final List<CodeLocationItem> codeLocations = new ArrayList<>();
         for (final ScanSummaryItem scan : scans) {
             final CodeLocationItem codeLocation = codeLocationRequestService
-                    .getItem(metaService.getFirstLink(scan, MetaService.CODE_LOCATION_BOM_STATUS_LINK));
+                    .getItem(metaService.getFirstLink(scan, MetaService.CODE_LOCATION_BOM_STATUS_LINK), CodeLocationItem.class);
             codeLocations.add(codeLocation);
         }
         return codeLocations;

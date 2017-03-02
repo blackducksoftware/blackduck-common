@@ -36,22 +36,22 @@ import com.blackducksoftware.integration.hub.model.type.CodeLocationEnum;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubParameterizedRequestService;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-public class CodeLocationRequestService extends HubParameterizedRequestService<CodeLocationItem> {
+public class CodeLocationRequestService extends HubResponseService {
     private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
 
     private final MetaService metaService;
 
     public CodeLocationRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, CodeLocationItem.class);
+        super(restConnection);
         this.metaService = metaService;
     }
 
     public List<CodeLocationItem> getAllCodeLocations() throws IntegrationException {
-        final List<CodeLocationItem> allCodeLocations = getAllItems(CODE_LOCATION_SEGMENTS);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(CODE_LOCATION_SEGMENTS);
+        final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest, CodeLocationItem.class);
         return allCodeLocations;
     }
 
@@ -59,15 +59,15 @@ public class CodeLocationRequestService extends HubParameterizedRequestService<C
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType",
                 codeLocationType.toString());
 
-        final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest);
+        final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest, CodeLocationItem.class);
         return allCodeLocations;
     }
 
     public List<CodeLocationItem> getAllCodeLocationsForProjectVersion(final ProjectVersionItem version) throws IntegrationException {
-        final String codeLocationUrls = metaService.getFirstLink(version, MetaService.CODE_LOCATION_LINK);
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(codeLocationUrls);
+        final String codeLocationUrl = metaService.getFirstLink(version, MetaService.CODE_LOCATION_LINK);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(codeLocationUrl);
 
-        final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest);
+        final List<CodeLocationItem> allCodeLocations = getAllItems(hubPagedRequest, CodeLocationItem.class);
         return allCodeLocations;
     }
 
@@ -79,11 +79,10 @@ public class CodeLocationRequestService extends HubParameterizedRequestService<C
 
     public void unmapCodeLocation(final CodeLocationItem codeLocationItem) throws IntegrationException {
         final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
-        final JsonParser jsonParser = getRestConnection().getJsonParser();
-        final JsonObject codeLocationItemJson = jsonParser.parse(codeLocationItem.getJson()).getAsJsonObject();
+        final JsonObject codeLocationItemJson = getJsonParser().parse(codeLocationItem.getJson()).getAsJsonObject();
         codeLocationItemJson.remove("mappedProjectVersion");
         codeLocationItemJson.addProperty("mappedProjectVersion", "");
-        unmapCodeLocation(codeLocationItemUrl, getRestConnection().getGson().toJson(codeLocationItemJson));
+        unmapCodeLocation(codeLocationItemUrl, getGson().toJson(codeLocationItemJson));
     }
 
     public void unmapCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws IntegrationException {
