@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.api.component.id;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.type.ComponentSourceEnum;
 
 public class ComponentIdItem extends HubItem {
     private String description;

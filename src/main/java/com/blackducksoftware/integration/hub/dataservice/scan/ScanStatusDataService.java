@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationItem;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationTypeEnum;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
@@ -40,6 +39,7 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
+import com.blackducksoftware.integration.hub.model.type.CodeLocationEnum;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ScanStatusDataService {
@@ -170,7 +170,7 @@ public class ScanStatusDataService {
             final String projectVersionUrl = metaService.getHref(projectVersionItem);
 
             final List<CodeLocationItem> allCodeLocations = codeLocationRequestService
-                    .getAllCodeLocationsForCodeLocationType(CodeLocationTypeEnum.BOM_IMPORT);
+                    .getAllCodeLocationsForCodeLocationType(CodeLocationEnum.BOM_IMPORT);
 
             final List<String> allScanSummariesLinks = new ArrayList<>();
             for (final CodeLocationItem codeLocationItem : allCodeLocations) {

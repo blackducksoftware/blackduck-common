@@ -29,9 +29,9 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseItem;
-import com.blackducksoftware.integration.hub.api.component.version.SourceEnum;
-import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
-import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
+import com.blackducksoftware.integration.hub.model.type.ProjectVersionDistributionEnum;
+import com.blackducksoftware.integration.hub.model.type.ProjectVersionPhaseEnum;
+import com.blackducksoftware.integration.hub.model.type.ProjectVersionSourceEnum;
 
 public class ProjectVersionModel {
     private String projectName;
@@ -40,20 +40,20 @@ public class ProjectVersionModel {
 
     private String url;
 
-    private DistributionEnum distribution;
+    private ProjectVersionDistributionEnum distribution;
 
     private ComplexLicenseItem license;
 
     private String nickname;
 
-    private PhaseEnum phase;
+    private ProjectVersionPhaseEnum phase;
 
     private String releaseComments;
 
     private Date releasedOn;
 
     // description from Hub API: "Read-Only; No matter the value it will always default to 'CUSTOM'",
-    private SourceEnum source;
+    private ProjectVersionSourceEnum source;
 
     private String versionName;
 
@@ -95,11 +95,11 @@ public class ProjectVersionModel {
         this.url = url;
     }
 
-    public DistributionEnum getDistribution() {
+    public ProjectVersionDistributionEnum getDistribution() {
         return distribution;
     }
 
-    public void setDistribution(final DistributionEnum distribution) {
+    public void setDistribution(final ProjectVersionDistributionEnum distribution) {
         this.distribution = distribution;
     }
 
@@ -119,11 +119,11 @@ public class ProjectVersionModel {
         this.nickname = nickname;
     }
 
-    public PhaseEnum getPhase() {
+    public ProjectVersionPhaseEnum getPhase() {
         return phase;
     }
 
-    public void setPhase(final PhaseEnum phase) {
+    public void setPhase(final ProjectVersionPhaseEnum phase) {
         this.phase = phase;
     }
 
@@ -143,11 +143,11 @@ public class ProjectVersionModel {
         this.releasedOn = releasedOn;
     }
 
-    public SourceEnum getSource() {
+    public ProjectVersionSourceEnum getSource() {
         return source;
     }
 
-    public void setSource(final SourceEnum source) {
+    public void setSource(final ProjectVersionSourceEnum source) {
         this.source = source;
     }
 

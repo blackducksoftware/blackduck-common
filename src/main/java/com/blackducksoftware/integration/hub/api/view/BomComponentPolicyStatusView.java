@@ -24,16 +24,16 @@
 package com.blackducksoftware.integration.hub.api.view;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatusEnum;
+import com.blackducksoftware.integration.hub.model.type.VersionBomPolicyStatusOverallStatusEnum;
 
 public class BomComponentPolicyStatusView extends HubItem {
-    private PolicyStatusEnum approvalStatus;
+    private VersionBomPolicyStatusOverallStatusEnum approvalStatus;
 
-    public PolicyStatusEnum getApprovalStatus() {
+    public VersionBomPolicyStatusOverallStatusEnum getApprovalStatus() {
         return approvalStatus;
     }
 
-    public void setApprovalStatus(final PolicyStatusEnum approvalStatus) {
+    public void setApprovalStatus(final VersionBomPolicyStatusOverallStatusEnum approvalStatus) {
         this.approvalStatus = approvalStatus;
     }
 

@@ -30,9 +30,9 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.ProjectItem;
-import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
-import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
+import com.blackducksoftware.integration.hub.model.type.ProjectVersionDistributionEnum;
+import com.blackducksoftware.integration.hub.model.type.ProjectVersionPhaseEnum;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -76,7 +76,8 @@ public class ProjectVersionRequestService extends HubResponseService {
         return allProjectVersionItems;
     }
 
-    public String createHubVersion(final ProjectItem project, final String versionName, final PhaseEnum phase, final DistributionEnum dist)
+    public String createHubVersion(final ProjectItem project, final String versionName, final ProjectVersionPhaseEnum phase,
+            final ProjectVersionDistributionEnum dist)
             throws IntegrationException {
         final JsonObject json = new JsonObject();
         json.addProperty("versionName", versionName);

@@ -29,9 +29,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.type.VersionBomPolicyStatusOverallStatusEnum;
 
 public class PolicyStatusItem extends HubItem {
-    private PolicyStatusEnum overallStatus;
+    private VersionBomPolicyStatusOverallStatusEnum overallStatus;
 
     private String updatedAt;
 
@@ -41,8 +42,8 @@ public class PolicyStatusItem extends HubItem {
         if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
             return null;
         }
-        for (ComponentVersionStatusCount count : componentVersionStatusCounts) {
-            if (PolicyStatusEnum.IN_VIOLATION == count.getName()) {
+        for (final ComponentVersionStatusCount count : componentVersionStatusCounts) {
+            if (VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION == count.getName()) {
                 return count;
             }
         }
@@ -53,8 +54,8 @@ public class PolicyStatusItem extends HubItem {
         if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
             return null;
         }
-        for (ComponentVersionStatusCount count : componentVersionStatusCounts) {
-            if (PolicyStatusEnum.NOT_IN_VIOLATION == count.getName()) {
+        for (final ComponentVersionStatusCount count : componentVersionStatusCounts) {
+            if (VersionBomPolicyStatusOverallStatusEnum.NOT_IN_VIOLATION == count.getName()) {
                 return count;
             }
         }
@@ -65,8 +66,8 @@ public class PolicyStatusItem extends HubItem {
         if (componentVersionStatusCounts == null || componentVersionStatusCounts.isEmpty()) {
             return null;
         }
-        for (ComponentVersionStatusCount count : componentVersionStatusCounts) {
-            if (PolicyStatusEnum.IN_VIOLATION_OVERRIDDEN == count.getName()) {
+        for (final ComponentVersionStatusCount count : componentVersionStatusCounts) {
+            if (VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION_OVERRIDDEN == count.getName()) {
                 return count;
             }
         }
@@ -79,12 +80,12 @@ public class PolicyStatusItem extends HubItem {
         }
         try {
             return new DateTime(updatedAt);
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             return null;
         }
     }
 
-    public PolicyStatusEnum getOverallStatus() {
+    public VersionBomPolicyStatusOverallStatusEnum getOverallStatus() {
         return overallStatus;
     }
 

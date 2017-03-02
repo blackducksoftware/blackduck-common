@@ -26,30 +26,30 @@ package com.blackducksoftware.integration.hub.api.project.version;
 import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseItem;
-import com.blackducksoftware.integration.hub.api.component.version.SourceEnum;
 import com.blackducksoftware.integration.hub.api.item.HubItem;
-import com.blackducksoftware.integration.hub.api.version.DistributionEnum;
-import com.blackducksoftware.integration.hub.api.version.PhaseEnum;
+import com.blackducksoftware.integration.hub.model.type.ProjectVersionDistributionEnum;
+import com.blackducksoftware.integration.hub.model.type.ProjectVersionPhaseEnum;
+import com.blackducksoftware.integration.hub.model.type.ProjectVersionSourceEnum;
 
 public class ProjectVersionItem extends HubItem {
-    private DistributionEnum distribution;
+    private ProjectVersionDistributionEnum distribution;
 
     private ComplexLicenseItem license;
 
     private String nickname;
 
-    private PhaseEnum phase;
+    private ProjectVersionPhaseEnum phase;
 
     private String releaseComments;
 
     private Date releasedOn;
 
     // description from Hub API: "Read-Only; No matter the value it will always default to 'CUSTOM'",
-    private SourceEnum source;
+    private ProjectVersionSourceEnum source;
 
     private String versionName;
 
-    public DistributionEnum getDistribution() {
+    public ProjectVersionDistributionEnum getDistribution() {
         return distribution;
     }
 
@@ -61,7 +61,7 @@ public class ProjectVersionItem extends HubItem {
         return nickname;
     }
 
-    public PhaseEnum getPhase() {
+    public ProjectVersionPhaseEnum getPhase() {
         return phase;
     }
 
@@ -73,7 +73,7 @@ public class ProjectVersionItem extends HubItem {
         return releasedOn;
     }
 
-    public SourceEnum getSource() {
+    public ProjectVersionSourceEnum getSource() {
         return source;
     }
 

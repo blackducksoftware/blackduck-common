@@ -24,15 +24,17 @@
 package com.blackducksoftware.integration.hub.api.component.version;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.type.LicenseCodeSharingEnum;
+import com.blackducksoftware.integration.hub.model.type.LicenseOwnershipEnum;
 
 public class LicenseItem extends HubItem {
-    private CodeSharingEnum codeSharing;
+    private LicenseCodeSharingEnum codeSharing;
 
     private String name;
 
-    private OwnershipEnum ownership;
+    private LicenseOwnershipEnum ownership;
 
-    public CodeSharingEnum getCodeSharing() {
+    public LicenseCodeSharingEnum getCodeSharing() {
         return codeSharing;
     }
 
@@ -40,7 +42,7 @@ public class LicenseItem extends HubItem {
         return name;
     }
 
-    public OwnershipEnum getOwnership() {
+    public LicenseOwnershipEnum getOwnership() {
         return ownership;
     }
 }

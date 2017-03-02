@@ -26,13 +26,14 @@ package com.blackducksoftware.integration.hub.api.component.version;
 import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.type.ComponentVersionSourceEnum;
 
 public class ComponentVersion extends HubItem {
     private ComplexLicenseItem license;
 
     private Date releasedOn;
 
-    private SourceEnum source;
+    private ComponentVersionSourceEnum source;
 
     private String versionName;
 
@@ -44,7 +45,7 @@ public class ComponentVersion extends HubItem {
         return releasedOn;
     }
 
-    public SourceEnum getSource() {
+    public ComponentVersionSourceEnum getSource() {
         return source;
     }
 

@@ -26,11 +26,12 @@ package com.blackducksoftware.integration.hub.api.notification;
 import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.type.NotificationEnum;
 
 public class NotificationItem extends HubItem {
     public String contentType;
 
-    public NotificationType type;
+    public NotificationEnum type;
 
     public Date createdAt;
 
@@ -38,7 +39,7 @@ public class NotificationItem extends HubItem {
         return contentType;
     }
 
-    public NotificationType getType() {
+    public NotificationEnum getType() {
         return type;
     }
 
