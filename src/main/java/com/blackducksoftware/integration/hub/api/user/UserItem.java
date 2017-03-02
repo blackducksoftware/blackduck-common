@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.api.user;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.type.UserGroupCreatedFromEnum;
 
 public class UserItem extends HubItem {
 
@@ -35,7 +36,7 @@ public class UserItem extends HubItem {
 
     private String email;
 
-    private UserType type;
+    private UserGroupCreatedFromEnum type;
 
     private Boolean active;
 
@@ -55,7 +56,7 @@ public class UserItem extends HubItem {
         return email;
     }
 
-    public UserType getType() {
+    public UserGroupCreatedFromEnum getType() {
         return type;
     }
 

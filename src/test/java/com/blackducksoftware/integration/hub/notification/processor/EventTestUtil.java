@@ -34,7 +34,6 @@ import org.mockito.Mockito;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
-import com.blackducksoftware.integration.hub.api.vulnerability.SeverityEnum;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityItem;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
@@ -42,6 +41,7 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Poli
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.VulnerabilityContentItem;
 import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
+import com.blackducksoftware.integration.hub.model.type.VulnerabilitySeverityEnum;
 
 public class EventTestUtil {
     public static final String DESCRIPTION = "description";
@@ -124,20 +124,22 @@ public class EventTestUtil {
         final List<VulnerabilityItem> vulnerabilityList = new ArrayList<>(vulnSourceList.size());
         for (final VulnerabilitySourceQualifiedId vulnSource : vulnSourceList) {
             final String vulnId = vulnSource.getVulnerabilityId();
-            SeverityEnum severity = SeverityEnum.UNKNOWN;
+            VulnerabilitySeverityEnum severity = null;
             if (vulnId.startsWith(HIGH_VULN_PREFIX)) {
-                severity = SeverityEnum.HIGH;
+                severity = VulnerabilitySeverityEnum.HIGH;
             } else if (vulnId.startsWith(MEDIUM_VULN_PREFIX)) {
-                severity = SeverityEnum.MEDIUM;
+                severity = VulnerabilitySeverityEnum.MEDIUM;
             } else if (vulnId.startsWith(LOW_VULN_PREFIX)) {
-                severity = SeverityEnum.LOW;
+                severity = VulnerabilitySeverityEnum.LOW;
             }
-            vulnerabilityList.add(createVulnerability(vulnId, severity));
+            if (severity != null) {
+                vulnerabilityList.add(createVulnerability(vulnId, severity));
+            }
         }
         return vulnerabilityList;
     }
 
-    public VulnerabilityItem createVulnerability(final String vulnId, final SeverityEnum severity) {
+    public VulnerabilityItem createVulnerability(final String vulnId, final VulnerabilitySeverityEnum severity) {
         final VulnerabilityItem item = Mockito.mock(VulnerabilityItem.class);
         Mockito.when(item.getVulnerabilityName()).thenReturn(vulnId);
         Mockito.when(item.getDescription()).thenReturn("A vulnerability");
