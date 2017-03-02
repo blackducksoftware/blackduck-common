@@ -24,7 +24,9 @@
 package com.blackducksoftware.integration.hub.dataservice.scan;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -40,6 +42,7 @@ import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
 import com.blackducksoftware.integration.hub.model.type.CodeLocationEnum;
+import com.blackducksoftware.integration.hub.model.type.ScanSummaryStatusEnum;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ScanStatusDataService {
@@ -188,7 +191,7 @@ public class ScanStatusDataService {
 
             pendingScans = new ArrayList<>();
             for (final ScanSummaryItem scanSummaryItem : allScanSummaries) {
-                if (scanSummaryItem.getStatus().isPending()) {
+                if (isPending(scanSummaryItem.getStatus())) {
                     pendingScans.add(scanSummaryItem);
                 }
             }
@@ -206,15 +209,41 @@ public class ScanStatusDataService {
         for (final ScanSummaryItem scanSummaryItem : scanSummaries) {
             final String scanSummaryLink = metaService.getHref(scanSummaryItem);
             final ScanSummaryItem currentScanSummaryItem = scanSummaryRequestService.getItem(scanSummaryLink, ScanSummaryItem.class);
-            if (currentScanSummaryItem.getStatus().isPending()) {
+            if (isPending(currentScanSummaryItem.getStatus())) {
                 pendingScans.add(currentScanSummaryItem);
-            } else if (currentScanSummaryItem.getStatus().isError()) {
+            } else if (isError(currentScanSummaryItem.getStatus())) {
                 throw new HubIntegrationException("There was a problem in the Hub processing the scan(s). Error Status : "
                         + currentScanSummaryItem.getStatus().toString() + ", " + currentScanSummaryItem.getStatusMessage());
             }
         }
 
         return pendingScans;
+    }
+
+    private static final Set<ScanSummaryStatusEnum> PENDING_STATES = EnumSet.of(ScanSummaryStatusEnum.UNSTARTED, ScanSummaryStatusEnum.SCANNING,
+            ScanSummaryStatusEnum.SAVING_SCAN_DATA,
+            ScanSummaryStatusEnum.SCAN_DATA_SAVE_COMPLETE, ScanSummaryStatusEnum.REQUESTED_MATCH_JOB, ScanSummaryStatusEnum.MATCHING,
+            ScanSummaryStatusEnum.BOM_VERSION_CHECK, ScanSummaryStatusEnum.BUILDING_BOM);
+
+    private static final Set<ScanSummaryStatusEnum> DONE_STATES = EnumSet.of(ScanSummaryStatusEnum.COMPLETE, ScanSummaryStatusEnum.CANCELLED,
+            ScanSummaryStatusEnum.CLONED, ScanSummaryStatusEnum.ERROR_SCANNING,
+            ScanSummaryStatusEnum.ERROR_SAVING_SCAN_DATA, ScanSummaryStatusEnum.ERROR_MATCHING, ScanSummaryStatusEnum.ERROR_BUILDING_BOM,
+            ScanSummaryStatusEnum.ERROR);
+
+    private static final Set<ScanSummaryStatusEnum> ERROR_STATES = EnumSet.of(ScanSummaryStatusEnum.CANCELLED, ScanSummaryStatusEnum.ERROR_SCANNING,
+            ScanSummaryStatusEnum.ERROR_SAVING_SCAN_DATA,
+            ScanSummaryStatusEnum.ERROR_MATCHING, ScanSummaryStatusEnum.ERROR_BUILDING_BOM, ScanSummaryStatusEnum.ERROR);
+
+    public boolean isPending(final ScanSummaryStatusEnum statusEnum) {
+        return PENDING_STATES.contains(statusEnum);
+    }
+
+    public boolean isDone(final ScanSummaryStatusEnum statusEnum) {
+        return DONE_STATES.contains(statusEnum);
+    }
+
+    public boolean isError(final ScanSummaryStatusEnum statusEnum) {
+        return ERROR_STATES.contains(statusEnum);
     }
 
 }

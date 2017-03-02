@@ -26,11 +26,12 @@ package com.blackducksoftware.integration.hub.api.extension;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.type.ExternalExtensionConfigValueOptionEnum;
 
 public class ConfigurationItem extends HubItem {
     private String name;
 
-    private OptionTypeEnum optionType;
+    private ExternalExtensionConfigValueOptionEnum optionType;
 
     private String title;
 
@@ -48,7 +49,7 @@ public class ConfigurationItem extends HubItem {
         return name;
     }
 
-    public OptionTypeEnum getOptionType() {
+    public ExternalExtensionConfigValueOptionEnum getOptionType() {
         return optionType;
     }
 
