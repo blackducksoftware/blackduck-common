@@ -53,7 +53,7 @@ public class ProjectVersionRequestService extends HubResponseService {
         final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, versionsUrl);
         if (StringUtils.isNotBlank(projectVersionName)) {
-            hubPagedRequest.setQ(String.format("versionName:%s", projectVersionName));
+            hubPagedRequest.q = String.format("versionName:%s", projectVersionName);
         }
 
         final List<ProjectVersionItem> allProjectVersionMatchingItems = getAllItems(hubPagedRequest, ProjectVersionItem.class);

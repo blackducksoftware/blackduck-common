@@ -57,7 +57,7 @@ public class ProjectRequestService extends HubResponseService {
     public List<ProjectItem> getAllProjectMatches(final String projectName) throws IntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, PROJECTS_SEGMENTS);
         if (StringUtils.isNotBlank(projectName)) {
-            hubPagedRequest.setQ("name:" + projectName);
+            hubPagedRequest.q = "name:" + projectName;
         }
 
         final List<ProjectItem> allProjectItems = getAllItems(hubPagedRequest, ProjectItem.class);
@@ -67,7 +67,7 @@ public class ProjectRequestService extends HubResponseService {
     public List<ProjectItem> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(limit, PROJECTS_SEGMENTS);
         if (StringUtils.isNotBlank(projectName)) {
-            hubPagedRequest.setQ("name:" + projectName);
+            hubPagedRequest.q = "name:" + projectName;
         }
 
         final List<ProjectItem> projectItems = getItems(hubPagedRequest, ProjectItem.class);

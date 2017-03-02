@@ -55,9 +55,9 @@ public class HubResponseService {
 
     public HubResponseService(final RestConnection restConnection) {
         this.hubRequestFactory = new HubRequestFactory(restConnection);
-        this.hubBaseUrl = restConnection.getHubBaseUrl();
-        this.jsonParser = restConnection.getJsonParser();
-        this.gson = restConnection.getGson();
+        this.hubBaseUrl = restConnection.hubBaseUrl;
+        this.jsonParser = restConnection.jsonParser;
+        this.gson = restConnection.gson;
     }
 
     public URL getHubBaseUrl() {
@@ -147,7 +147,7 @@ public class HubResponseService {
     public <T extends HubResponse> List<T> getAllItems(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
         final List<T> allItems = new LinkedList<>();
         int totalCount = 0;
-        int currentOffset = hubPagedRequest.getOffset();
+        int currentOffset = hubPagedRequest.offset;
         try (Response response = hubPagedRequest.executeGet()) {
             final String jsonResponse = response.body().string();
 
@@ -155,8 +155,8 @@ public class HubResponseService {
             totalCount = jsonObject.get("totalCount").getAsInt();
             allItems.addAll(getItems(jsonObject, clazz));
             while (allItems.size() < totalCount && currentOffset < totalCount) {
-                currentOffset += hubPagedRequest.getLimit();
-                hubPagedRequest.setOffset(currentOffset);
+                currentOffset += hubPagedRequest.limit;
+                hubPagedRequest.offset = currentOffset;
                 allItems.addAll(getItems(hubPagedRequest, clazz));
             }
         } catch (final IOException e) {

@@ -87,7 +87,7 @@ public class HubServicesFactory {
     }
 
     public CLIDataService createCLIDataService(final IntLogger logger) {
-        return new CLIDataService(logger, restConnection.getGson(), ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
+        return new CLIDataService(logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
                 createPhoneHomeDataService(logger), createProjectRequestService(), createProjectVersionRequestService(logger),
                 createCodeLocationRequestService(logger), createMetaService(logger));
     }
@@ -207,7 +207,7 @@ public class HubServicesFactory {
             final HubSupportHelper hubSupportHelper,
             final File directoryToInstallTo, final int scanMemory, final boolean dryRun, final String project,
             final String version, final Set<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
-        return new SimpleScanService(logger, restConnection.getGson(), hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo,
+        return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo,
                 scanMemory,
                 dryRun, project, version, scanTargetPaths, workingDirectory, excludePatterns);
     }
@@ -225,7 +225,7 @@ public class HubServicesFactory {
     }
 
     public MetaService createMetaService(final IntLogger logger) {
-        return new MetaService(logger, restConnection.getJsonParser());
+        return new MetaService(logger, restConnection.jsonParser);
     }
 
     public BomRequestService createBomRequestService() {

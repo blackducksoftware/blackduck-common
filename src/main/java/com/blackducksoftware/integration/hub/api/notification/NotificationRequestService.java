@@ -67,8 +67,8 @@ public class NotificationRequestService {
 
     public NotificationRequestService(final IntLogger logger, final RestConnection restConnection, final MetaService metaService) {
         this.hubRequestFactory = new HubRequestFactory(restConnection);
-        this.jsonParser = restConnection.getJsonParser();
-        this.gson = restConnection.getGson();
+        this.jsonParser = restConnection.jsonParser;
+        this.gson = restConnection.gson;
         this.metaService = metaService;
         typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);
         typeMap.put("RULE_VIOLATION", RuleViolationNotificationItem.class);
@@ -147,7 +147,7 @@ public class NotificationRequestService {
     public List<NotificationItem> getAllItems(final HubPagedRequest hubPagedRequest) throws IntegrationException {
         final LinkedList<NotificationItem> allItems = new LinkedList<>();
         int totalCount = 0;
-        int currentOffset = hubPagedRequest.getOffset();
+        int currentOffset = hubPagedRequest.offset;
         try (Response response = hubPagedRequest.executeGet()) {
             final String jsonResponse = response.body().string();
 
@@ -155,8 +155,8 @@ public class NotificationRequestService {
             totalCount = jsonObject.get("totalCount").getAsInt();
             allItems.addAll(getItems(jsonObject));
             while (currentOffset < totalCount) {
-                currentOffset = currentOffset + hubPagedRequest.getLimit();
-                hubPagedRequest.setOffset(currentOffset);
+                currentOffset = currentOffset + hubPagedRequest.limit;
+                hubPagedRequest.offset = currentOffset;
                 allItems.addAll(getItems(hubPagedRequest));
             }
         } catch (final IOException e) {
