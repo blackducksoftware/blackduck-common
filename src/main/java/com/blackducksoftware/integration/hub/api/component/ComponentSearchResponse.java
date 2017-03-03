@@ -28,7 +28,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.hub.model.response.HubResponse;
 
-public class Component extends HubResponse {
+public class ComponentSearchResponse extends HubResponse {
     // ****URL**** //
     private final String component;
 
@@ -41,7 +41,7 @@ public class Component extends HubResponse {
 
     private final String versionName;
 
-    public Component(String component, String componentName, String originId, String version, String versionName) {
+    public ComponentSearchResponse(String component, String componentName, String originId, String version, String versionName) {
         this.component = component;
         this.componentName = componentName;
         this.originId = originId;

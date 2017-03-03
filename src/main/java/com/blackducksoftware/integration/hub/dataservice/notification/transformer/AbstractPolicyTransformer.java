@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.NotificationView;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
@@ -71,7 +71,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     public abstract void handleNotification(final List<ComponentVersionStatus> componentVersionList,
-            final ProjectVersionModel projectVersion, final NotificationItem item,
+            final ProjectVersionModel projectVersion, final NotificationView item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException;
 
     protected List<PolicyRule> getRulesFromUrls(final List<String> ruleUrlsViolated) throws IntegrationException {
@@ -162,7 +162,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     public abstract void createContents(final ProjectVersionModel projectVersion, final String componentName,
-            final ComponentVersion componentVersion, String componentUrl, final String componentVersionUrl,
+            final ComponentVersionView componentVersion, String componentUrl, final String componentVersionUrl,
             List<PolicyRule> policyRuleList,
-            NotificationItem item, List<NotificationContentItem> templateData) throws URISyntaxException;
+            NotificationView item, List<NotificationContentItem> templateData) throws URISyntaxException;
 }

@@ -23,28 +23,11 @@
  */
 package com.blackducksoftware.integration.hub.api.notification;
 
-import java.util.Date;
+public class RuleViolationNotificationView extends NotificationView {
+    public RuleViolationNotificationContent content;
 
-import com.blackducksoftware.integration.hub.model.type.NotificationEnum;
-import com.blackducksoftware.integration.hub.model.view.HubView;
-
-public class NotificationItem extends HubView {
-    public String contentType;
-
-    public NotificationEnum type;
-
-    public Date createdAt;
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public NotificationEnum getType() {
-        return type;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
+    public RuleViolationNotificationContent getContent() {
+        return content;
     }
 
 }

@@ -21,33 +21,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.extension;
+package com.blackducksoftware.integration.hub.api.notification;
 
-import com.blackducksoftware.integration.hub.model.view.HubView;
+public class RuleViolationClearedNotificationView extends NotificationView {
+    public RuleViolationClearedNotificationContent content;
 
-public class ExtensionItem extends HubView {
-
-    private String name;
-
-    private String description;
-
-    private String infoUrl;
-
-    private Boolean authenticated;
-
-    public String getName() {
-        return name;
+    public RuleViolationClearedNotificationContent getContent() {
+        return content;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public String getInfoUrl() {
-        return infoUrl;
-    }
-
-    public boolean isAuthenticated() {
-        return authenticated;
-    }
 }

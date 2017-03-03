@@ -55,7 +55,7 @@ import okhttp3.Response;
 public class NotificationRequestService {
     private static final List<String> NOTIFICATIONS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_NOTIFICATIONS);
 
-    private final Map<String, Class<? extends NotificationItem>> typeMap = new HashMap<>();
+    private final Map<String, Class<? extends NotificationView>> typeMap = new HashMap<>();
 
     private final MetaService metaService;
 
@@ -70,13 +70,13 @@ public class NotificationRequestService {
         this.jsonParser = restConnection.jsonParser;
         this.gson = restConnection.gson;
         this.metaService = metaService;
-        typeMap.put("VULNERABILITY", VulnerabilityNotificationItem.class);
-        typeMap.put("RULE_VIOLATION", RuleViolationNotificationItem.class);
-        typeMap.put("POLICY_OVERRIDE", PolicyOverrideNotificationItem.class);
-        typeMap.put("RULE_VIOLATION_CLEARED", RuleViolationClearedNotificationItem.class);
+        typeMap.put("VULNERABILITY", VulnerabilityNotificationView.class);
+        typeMap.put("RULE_VIOLATION", RuleViolationNotificationView.class);
+        typeMap.put("POLICY_OVERRIDE", PolicyOverrideNotificationView.class);
+        typeMap.put("RULE_VIOLATION_CLEARED", RuleViolationClearedNotificationView.class);
     }
 
-    public List<NotificationItem> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
+    public List<NotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
@@ -86,11 +86,11 @@ public class NotificationRequestService {
         hubPagedRequest.addQueryParameter("startDate", startDateString);
         hubPagedRequest.addQueryParameter("endDate", endDateString);
 
-        final List<NotificationItem> allNotificationItems = getAllItems(hubPagedRequest);
+        final List<NotificationView> allNotificationItems = getAllItems(hubPagedRequest);
         return allNotificationItems;
     }
 
-    public List<NotificationItem> getUserNotifications(final Date startDate, final Date endDate, final UserItem user) throws IntegrationException {
+    public List<NotificationView> getUserNotifications(final Date startDate, final Date endDate, final UserItem user) throws IntegrationException {
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
@@ -101,27 +101,27 @@ public class NotificationRequestService {
         hubPagedRequest.addQueryParameter("startDate", startDateString);
         hubPagedRequest.addQueryParameter("endDate", endDateString);
 
-        final List<NotificationItem> allNotificationItems = getAllItems(hubPagedRequest);
+        final List<NotificationView> allNotificationItems = getAllItems(hubPagedRequest);
         return allNotificationItems;
     }
 
-    public <T extends NotificationItem> T getItemAs(final JsonElement item, final Class<T> clazz) {
+    public <T extends NotificationView> T getItemAs(final JsonElement item, final Class<T> clazz) {
         final T hubItem = gson.fromJson(item, clazz);
         hubItem.json = item.getAsString();
         return hubItem;
     }
 
-    public List<NotificationItem> getItems(final JsonObject jsonObject) throws IntegrationException {
-        final LinkedList<NotificationItem> itemList = new LinkedList<>();
+    public List<NotificationView> getItems(final JsonObject jsonObject) throws IntegrationException {
+        final LinkedList<NotificationView> itemList = new LinkedList<>();
         final JsonElement itemsElement = jsonObject.get("items");
         final JsonArray itemsArray = itemsElement.getAsJsonArray();
         for (final JsonElement element : itemsArray) {
             final String type = element.getAsJsonObject().get("type").getAsString();
-            Class<? extends NotificationItem> notificationClass = NotificationItem.class;
+            Class<? extends NotificationView> notificationClass = NotificationView.class;
             if (typeMap.containsKey(type)) {
                 notificationClass = typeMap.get(type);
             }
-            final NotificationItem item = getItemAs(element, notificationClass);
+            final NotificationView item = getItemAs(element, notificationClass);
             itemList.add(item);
         }
         return itemList;
@@ -130,7 +130,7 @@ public class NotificationRequestService {
     /**
      * Will NOT make further paged requests to get the full list of items
      */
-    public List<NotificationItem> getItems(final HubPagedRequest hubPagedRequest) throws IntegrationException {
+    public List<NotificationView> getItems(final HubPagedRequest hubPagedRequest) throws IntegrationException {
         try (Response response = hubPagedRequest.executeGet()) {
             final String jsonResponse = response.body().string();
 
@@ -144,8 +144,8 @@ public class NotificationRequestService {
     /**
      * Will make further paged requests to get the full list of items
      */
-    public List<NotificationItem> getAllItems(final HubPagedRequest hubPagedRequest) throws IntegrationException {
-        final LinkedList<NotificationItem> allItems = new LinkedList<>();
+    public List<NotificationView> getAllItems(final HubPagedRequest hubPagedRequest) throws IntegrationException {
+        final LinkedList<NotificationView> allItems = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = hubPagedRequest.offset;
         try (Response response = hubPagedRequest.executeGet()) {

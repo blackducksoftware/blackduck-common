@@ -42,7 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityItem;
@@ -78,7 +78,7 @@ public class NotificationProcessorTest {
     }
 
     public MockProcessor createMockedNotificationProcessor(final List<VulnerabilityItem> vulnerabilityList) throws Exception {
-        final ComponentVersion compVersion = Mockito.mock(ComponentVersion.class);
+        final ComponentVersionView compVersion = Mockito.mock(ComponentVersionView.class);
         compVersion.json = createComponentJson();
         final VulnerabilityRequestService vulnerabilityRequestService = Mockito.mock(VulnerabilityRequestService.class);
         Mockito.when(vulnerabilityRequestService.getComponentVersionVulnerabilities(Mockito.anyString())).thenReturn(vulnerabilityList);

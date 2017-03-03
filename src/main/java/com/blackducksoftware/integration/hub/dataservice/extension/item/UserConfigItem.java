@@ -25,15 +25,15 @@ package com.blackducksoftware.integration.hub.dataservice.extension.item;
 
 import java.util.Map;
 
-import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
+import com.blackducksoftware.integration.hub.api.extension.ConfigurationView;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
 
 public class UserConfigItem {
     private final UserItem user;
 
-    private final Map<String, ConfigurationItem> configMap;
+    private final Map<String, ConfigurationView> configMap;
 
-    public UserConfigItem(final UserItem user, final Map<String, ConfigurationItem> configItems) {
+    public UserConfigItem(final UserItem user, final Map<String, ConfigurationView> configItems) {
         this.user = user;
         this.configMap = configItems;
     }
@@ -42,7 +42,7 @@ public class UserConfigItem {
         return user;
     }
 
-    public Map<String, ConfigurationItem> getConfigMap() {
+    public Map<String, ConfigurationView> getConfigMap() {
         return configMap;
     }
 }

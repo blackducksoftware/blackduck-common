@@ -29,7 +29,7 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationItem;
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
@@ -37,7 +37,7 @@ import com.blackducksoftware.integration.hub.api.project.ProjectItem;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
-import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryView;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
@@ -87,7 +87,7 @@ public class CLIDataService {
         this.metaService = metaService;
     }
 
-    public List<ScanSummaryItem> installAndRunScan(final HubServerConfig hubServerConfig,
+    public List<ScanSummaryView> installAndRunScan(final HubServerConfig hubServerConfig,
             final HubScanConfig hubScanConfig, final IntegrationInfo integrationInfo)
             throws IntegrationException {
         final String localHostName = HostnameHelper.getMyHostname();
@@ -109,7 +109,7 @@ public class CLIDataService {
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
             cleanUpLogFiles(simpleScanService);
         }
-        final List<ScanSummaryItem> scanSummaries = simpleScanService.getScanSummaryItems();
+        final List<ScanSummaryView> scanSummaries = simpleScanService.getScanSummaryItems();
         cleanupCodeLocations(scanSummaries, hubScanConfig);
         return scanSummaries;
     }
@@ -133,13 +133,13 @@ public class CLIDataService {
         }
     }
 
-    private void cleanupCodeLocations(final List<ScanSummaryItem> scans, final HubScanConfig hubScanConfig) throws IntegrationException {
+    private void cleanupCodeLocations(final List<ScanSummaryView> scans, final HubScanConfig hubScanConfig) throws IntegrationException {
         if (hubScanConfig.isDeletePreviousCodeLocations() || hubScanConfig.isUnmapPreviousCodeLocations()) {
             final ProjectItem project = projectRequestService.getProjectByName(hubScanConfig.getProjectName());
             final ProjectVersionItem version = projectVersionRequestService.getProjectVersion(project, hubScanConfig.getVersion());
-            final List<CodeLocationItem> codeLocationsFromCurentScan = getCodeLocationsFromScanSummaries(scans);
+            final List<CodeLocationView> codeLocationsFromCurentScan = getCodeLocationsFromScanSummaries(scans);
 
-            final List<CodeLocationItem> codeLocationsNotJustScanned = getCodeLocationsNotJustScanned(version, codeLocationsFromCurentScan);
+            final List<CodeLocationView> codeLocationsNotJustScanned = getCodeLocationsNotJustScanned(version, codeLocationsFromCurentScan);
             if (hubScanConfig.isDeletePreviousCodeLocations()) {
                 codeLocationRequestService.deleteCodeLocations(codeLocationsNotJustScanned);
             } else if (hubScanConfig.isUnmapPreviousCodeLocations()) {
@@ -148,28 +148,28 @@ public class CLIDataService {
         }
     }
 
-    private List<CodeLocationItem> getCodeLocationsFromScanSummaries(final List<ScanSummaryItem> scans) throws IntegrationException {
-        final List<CodeLocationItem> codeLocations = new ArrayList<>();
-        for (final ScanSummaryItem scan : scans) {
-            final CodeLocationItem codeLocation = codeLocationRequestService
-                    .getItem(metaService.getFirstLink(scan, MetaService.CODE_LOCATION_BOM_STATUS_LINK), CodeLocationItem.class);
+    private List<CodeLocationView> getCodeLocationsFromScanSummaries(final List<ScanSummaryView> scans) throws IntegrationException {
+        final List<CodeLocationView> codeLocations = new ArrayList<>();
+        for (final ScanSummaryView scan : scans) {
+            final CodeLocationView codeLocation = codeLocationRequestService
+                    .getItem(metaService.getFirstLink(scan, MetaService.CODE_LOCATION_BOM_STATUS_LINK), CodeLocationView.class);
             codeLocations.add(codeLocation);
         }
         return codeLocations;
     }
 
-    private List<CodeLocationItem> getCodeLocationsNotJustScanned(final ProjectVersionItem version,
-            final List<CodeLocationItem> codeLocationsFromCurentScan) throws IntegrationException {
-        final List<CodeLocationItem> codeLocationsMappedToVersion = codeLocationRequestService.getAllCodeLocationsForProjectVersion(version);
+    private List<CodeLocationView> getCodeLocationsNotJustScanned(final ProjectVersionItem version,
+            final List<CodeLocationView> codeLocationsFromCurentScan) throws IntegrationException {
+        final List<CodeLocationView> codeLocationsMappedToVersion = codeLocationRequestService.getAllCodeLocationsForProjectVersion(version);
         return getCodeLocationsNotJustScanned(codeLocationsMappedToVersion, codeLocationsFromCurentScan);
     }
 
-    private List<CodeLocationItem> getCodeLocationsNotJustScanned(final List<CodeLocationItem> codeLocationsMappedToVersion,
-            final List<CodeLocationItem> codeLocationsFromCurentScan) {
-        final List<CodeLocationItem> codeLocationsNotJustScanned = new ArrayList<>();
-        for (final CodeLocationItem codeLocationItemMappedToVersion : codeLocationsMappedToVersion) {
+    private List<CodeLocationView> getCodeLocationsNotJustScanned(final List<CodeLocationView> codeLocationsMappedToVersion,
+            final List<CodeLocationView> codeLocationsFromCurentScan) {
+        final List<CodeLocationView> codeLocationsNotJustScanned = new ArrayList<>();
+        for (final CodeLocationView codeLocationItemMappedToVersion : codeLocationsMappedToVersion) {
             boolean partOfCurrentScan = false;
-            for (final CodeLocationItem codeLocationFromCurentScan : codeLocationsFromCurentScan) {
+            for (final CodeLocationView codeLocationFromCurentScan : codeLocationsFromCurentScan) {
                 if (codeLocationItemMappedToVersion.getUrl().equals(codeLocationFromCurentScan.getUrl())) {
                     partOfCurrentScan = true;
                     break;

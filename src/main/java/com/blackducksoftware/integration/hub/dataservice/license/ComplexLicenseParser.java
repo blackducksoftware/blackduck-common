@@ -23,16 +23,16 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.license;
 
-import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseItem;
+import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseView;
 import com.blackducksoftware.integration.hub.model.type.ComplexLicenseEnum;
 
 public class ComplexLicenseParser {
 
-    private final ComplexLicenseItem complexLicense;
+    private final ComplexLicenseView complexLicense;
 
     private String licenseString;
 
-    public ComplexLicenseParser(final ComplexLicenseItem complexLicense) {
+    public ComplexLicenseParser(final ComplexLicenseView complexLicense) {
         this.complexLicense = complexLicense;
     }
 
@@ -43,7 +43,7 @@ public class ComplexLicenseParser {
         return licenseString;
     }
 
-    private String parse(final ComplexLicenseItem complexLicense) {
+    private String parse(final ComplexLicenseView complexLicense) {
 
         if (complexLicense.getLicenses() != null && complexLicense.getLicenses().isEmpty()) {
             return complexLicense.getName();
@@ -51,7 +51,7 @@ public class ComplexLicenseParser {
             final String operator = complexLicense.getType() == ComplexLicenseEnum.CONJUNCTIVE ? " AND " : " OR ";
             final StringBuilder licenseText = new StringBuilder();
             int i = 1;
-            for (final ComplexLicenseItem childLicense : complexLicense.getLicenses()) {
+            for (final ComplexLicenseView childLicense : complexLicense.getLicenses()) {
                 licenseText.append(this.parse(childLicense));
                 if (i < complexLicense.getLicenses().size()) licenseText.append(operator);
                 i++;

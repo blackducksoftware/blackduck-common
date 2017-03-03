@@ -30,12 +30,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.NotificationView;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
-import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationView;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
@@ -67,9 +67,9 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     }
 
     @Override
-    public List<NotificationContentItem> transform(final NotificationItem item) throws HubItemTransformException {
+    public List<NotificationContentItem> transform(final NotificationView item) throws HubItemTransformException {
         final List<NotificationContentItem> templateData = new ArrayList<>();
-        final RuleViolationNotificationItem policyViolation = (RuleViolationNotificationItem) item;
+        final RuleViolationNotificationView policyViolation = (RuleViolationNotificationView) item;
         final String projectName = policyViolation.getContent().getProjectName();
         final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent()
                 .getComponentVersionStatuses();
@@ -95,7 +95,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 
     @Override
     public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
-            final ProjectVersionModel projectVersion, final NotificationItem item,
+            final ProjectVersionModel projectVersion, final NotificationView item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException {
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
             try {
@@ -112,7 +112,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
                 }
 
                 final String componentVersionLink = componentVersion.getComponentVersionLink();
-                final ComponentVersion fullComponentVersion = getComponentVersion(componentVersionLink);
+                final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
                 if ((componentVersion.getPolicies() == null) || (componentVersion.getPolicies().size() == 0)) {
                     throw new HubItemTransformException("The polices list in the component version status is null or empty");
                 }
@@ -142,8 +142,8 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 
     @Override
     public void createContents(final ProjectVersionModel projectVersion, final String componentName,
-            final ComponentVersion componentVersion, final String componentUrl, final String componentVersionUrl,
-            final List<PolicyRule> policyRuleList, final NotificationItem item,
+            final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
+            final List<PolicyRule> policyRuleList, final NotificationView item,
             final List<NotificationContentItem> templateData) throws URISyntaxException {
         templateData.add(new PolicyViolationContentItem(item.getCreatedAt(), projectVersion, componentName,
                 componentVersion, componentUrl, componentVersionUrl, policyRuleList));

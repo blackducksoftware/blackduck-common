@@ -30,10 +30,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.UrlConstants;
-import com.blackducksoftware.integration.hub.api.component.Component;
+import com.blackducksoftware.integration.hub.api.component.ComponentSearchResponse;
+import com.blackducksoftware.integration.hub.api.component.ComponentView;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
-import com.blackducksoftware.integration.hub.api.component.id.ComponentIdItem;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -53,9 +53,9 @@ public class ComponentDataService {
         this.metaService = metaService;
     }
 
-    public ComponentVersion getExactComponentVersionFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
+    public ComponentVersionView getExactComponentVersionFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
             throws IntegrationException {
-        for (final ComponentVersion componentVersion : this.getAllComponentVersionsFromComponent(namespace, groupId, artifactId, version)) {
+        for (final ComponentVersionView componentVersion : this.getAllComponentVersionsFromComponent(namespace, groupId, artifactId, version)) {
             if (componentVersion.getVersionName().equals(version)) {
                 return componentVersion;
             }
@@ -65,17 +65,17 @@ public class ComponentDataService {
         throw new HubIntegrationException(errMsg);
     }
 
-    public List<ComponentVersion> getAllComponentVersionsFromComponent(final String namespace, final String groupId, final String artifactId,
+    public List<ComponentVersionView> getAllComponentVersionsFromComponent(final String namespace, final String groupId, final String artifactId,
             final String version)
             throws IntegrationException {
-        final Component component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
+        final ComponentSearchResponse component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
         component.getComponent();
 
-        final ComponentIdItem componentItem = componentRequestService.getItem(component.getComponent(), ComponentIdItem.class);
+        final ComponentView componentItem = componentRequestService.getItem(component.getComponent(), ComponentView.class);
         final String versionsURL = metaService.getFirstLinkSafely(componentItem, UrlConstants.SEGMENT_VERSIONS);
-        List<ComponentVersion> versions = new ArrayList<>();
+        List<ComponentVersionView> versions = new ArrayList<>();
         if (versionsURL != null) {
-            versions = componentRequestService.getAllItems(versionsURL, ComponentVersion.class);
+            versions = componentRequestService.getAllItems(versionsURL, ComponentVersionView.class);
         }
         return versions;
     }

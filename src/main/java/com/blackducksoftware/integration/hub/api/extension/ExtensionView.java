@@ -21,36 +21,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.scan;
+package com.blackducksoftware.integration.hub.api.extension;
 
-import java.util.Date;
-
-import com.blackducksoftware.integration.hub.model.type.ScanSummaryStatusEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ScanSummaryItem extends HubView {
-    private ScanSummaryStatusEnum status;
+public class ExtensionView extends HubView {
 
-    private String statusMessage;
+    private String name;
 
-    private Date createdAt;
+    private String description;
 
-    private Date updatedAt;
+    private String infoUrl;
 
-    public ScanSummaryStatusEnum getStatus() {
-        return status;
+    private Boolean authenticated;
+
+    public String getName() {
+        return name;
     }
 
-    public String getStatusMessage() {
-        return statusMessage;
+    public String getDescription() {
+        return description;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public String getInfoUrl() {
+        return infoUrl;
     }
 
-    public Date getUpdatedAt() {
-        return updatedAt;
+    public boolean isAuthenticated() {
+        return authenticated;
     }
-
 }

@@ -21,20 +21,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.extension;
+package com.blackducksoftware.integration.hub.api.notification;
 
-import com.blackducksoftware.integration.hub.model.view.HubView;
+public class PolicyOverrideNotificationView extends NotificationView {
+    private PolicyOverrideNotificationContent content;
 
-public class UserOptionLinkItem extends HubView {
-    private String user;
-
-    private String extensionOptions;
-
-    public String getUser() {
-        return user;
+    public PolicyOverrideNotificationContent getContent() {
+        return content;
     }
 
-    public String getExtensionOptions() {
-        return extensionOptions;
-    }
 }

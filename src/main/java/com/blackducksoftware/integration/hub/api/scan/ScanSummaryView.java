@@ -21,13 +21,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.notification;
+package com.blackducksoftware.integration.hub.api.scan;
 
-public class RuleViolationClearedNotificationItem extends NotificationItem {
-    public RuleViolationClearedNotificationContent content;
+import java.util.Date;
 
-    public RuleViolationClearedNotificationContent getContent() {
-        return content;
+import com.blackducksoftware.integration.hub.model.type.ScanSummaryStatusEnum;
+import com.blackducksoftware.integration.hub.model.view.HubView;
+
+public class ScanSummaryView extends HubView {
+    private ScanSummaryStatusEnum status;
+
+    private String statusMessage;
+
+    private Date createdAt;
+
+    private Date updatedAt;
+
+    public ScanSummaryStatusEnum getStatus() {
+        return status;
+    }
+
+    public String getStatusMessage() {
+        return statusMessage;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
 }

@@ -21,13 +21,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.notification;
+package com.blackducksoftware.integration.hub.api.extension;
 
-public class VulnerabilityNotificationItem extends NotificationItem {
-    public VulnerabilityNotificationContent content;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-    public VulnerabilityNotificationContent getContent() {
-        return content;
+public class UserOptionLinkView extends HubView {
+    private String user;
+
+    private String extensionOptions;
+
+    public String getUser() {
+        return user;
     }
 
+    public String getExtensionOptions() {
+        return extensionOptions;
+    }
 }

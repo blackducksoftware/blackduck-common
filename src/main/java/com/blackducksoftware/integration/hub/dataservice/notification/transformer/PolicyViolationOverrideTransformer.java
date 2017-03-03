@@ -30,12 +30,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.NotificationView;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
-import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationView;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
@@ -67,10 +67,10 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
     }
 
     @Override
-    public List<NotificationContentItem> transform(final NotificationItem item) throws HubItemTransformException {
+    public List<NotificationContentItem> transform(final NotificationView item) throws HubItemTransformException {
         final List<NotificationContentItem> templateData = new ArrayList<>();
         final ProjectVersionItem releaseItem;
-        final PolicyOverrideNotificationItem policyOverride = (PolicyOverrideNotificationItem) item;
+        final PolicyOverrideNotificationView policyOverride = (PolicyOverrideNotificationView) item;
         final String projectName = policyOverride.getContent().getProjectName();
         final List<ComponentVersionStatus> componentVersionList = new ArrayList<>();
         final ComponentVersionStatus componentStatus = new ComponentVersionStatus();
@@ -99,15 +99,15 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 
     @Override
     public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
-            final ProjectVersionModel projectVersion, final NotificationItem item,
+            final ProjectVersionModel projectVersion, final NotificationView item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException {
 
-        final PolicyOverrideNotificationItem policyOverrideItem = (PolicyOverrideNotificationItem) item;
+        final PolicyOverrideNotificationView policyOverrideItem = (PolicyOverrideNotificationView) item;
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
             try {
                 final String componentLink = policyOverrideItem.getContent().getComponentLink();
                 final String componentVersionLink = policyOverrideItem.getContent().getComponentVersionLink();
-                final ComponentVersion fullComponentVersion = getComponentVersion(componentVersionLink);
+                final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
 
                 final String bomComponentVersionPolicyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
                 if (StringUtils.isBlank(bomComponentVersionPolicyStatusUrl)) {
@@ -139,10 +139,10 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 
     @Override
     public void createContents(final ProjectVersionModel projectVersion, final String componentName,
-            final ComponentVersion componentVersion, final String componentUrl, final String componentVersionUrl,
-            final List<PolicyRule> policyRuleList, final NotificationItem item,
+            final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
+            final List<PolicyRule> policyRuleList, final NotificationView item,
             final List<NotificationContentItem> templateData) throws URISyntaxException {
-        final PolicyOverrideNotificationItem policyOverride = (PolicyOverrideNotificationItem) item;
+        final PolicyOverrideNotificationView policyOverride = (PolicyOverrideNotificationView) item;
 
         templateData.add(new PolicyOverrideContentItem(item.getCreatedAt(), projectVersion, componentName,
                 componentVersion, componentUrl, componentVersionUrl, policyRuleList,

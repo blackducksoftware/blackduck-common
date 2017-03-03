@@ -42,19 +42,19 @@ public class ComponentRequestService extends HubResponseService {
         super(restConnection);
     }
 
-    public List<Component> getAllComponents(final String namespace, final String groupId, final String artifactId, final String version)
+    public List<ComponentSearchResponse> getAllComponents(final String namespace, final String groupId, final String artifactId, final String version)
             throws IntegrationException {
         final String componentQuery = String.format("id:%s|%s|%s|%s", namespace, groupId, artifactId, version);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(COMPONENT_SEGMENTS, componentQuery);
 
-        final List<Component> allComponents = getAllItems(hubPagedRequest, Component.class);
+        final List<ComponentSearchResponse> allComponents = getAllItems(hubPagedRequest, ComponentSearchResponse.class);
         return allComponents;
     }
 
-    public Component getExactComponentMatch(final String namespace, final String groupId, final String artifactId, final String version)
+    public ComponentSearchResponse getExactComponentMatch(final String namespace, final String groupId, final String artifactId, final String version)
             throws IntegrationException {
-        final List<Component> allComponents = getAllComponents(namespace, groupId, artifactId, version);
-        for (final Component componentItem : allComponents) {
+        final List<ComponentSearchResponse> allComponents = getAllComponents(namespace, groupId, artifactId, version);
+        for (final ComponentSearchResponse componentItem : allComponents) {
             if (componentItem.getOriginId() != null) {
                 final String exactMatch = String.format("%s:%s:%s", groupId, artifactId, version);
                 if (componentItem.getOriginId().equals(exactMatch)) {

@@ -30,12 +30,12 @@ import java.util.TreeSet;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.NotificationView;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
-import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.RuleViolationClearedNotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationItem;
-import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationView;
+import com.blackducksoftware.integration.hub.api.notification.RuleViolationClearedNotificationView;
+import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationView;
+import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationView;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
@@ -61,7 +61,7 @@ public class NotificationDataService {
 
     private final PolicyNotificationFilter policyNotificationFilter;
 
-    private final ParallelResourceProcessor<NotificationContentItem, NotificationItem> parallelProcessor;
+    private final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor;
 
     private final MetaService metaService;
 
@@ -88,18 +88,18 @@ public class NotificationDataService {
     }
 
     private void populateTransformerMap(final IntLogger logger) {
-        parallelProcessor.addTransform(RuleViolationNotificationItem.class,
+        parallelProcessor.addTransform(RuleViolationNotificationView.class,
                 new PolicyViolationTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService, policyRequestService,
                         policyNotificationFilter, metaService));
-        parallelProcessor.addTransform(PolicyOverrideNotificationItem.class,
+        parallelProcessor.addTransform(PolicyOverrideNotificationView.class,
                 new PolicyViolationOverrideTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService,
                         policyRequestService,
                         policyNotificationFilter, metaService));
-        parallelProcessor.addTransform(VulnerabilityNotificationItem.class,
+        parallelProcessor.addTransform(VulnerabilityNotificationView.class,
                 new VulnerabilityTransformer(hubResponseService, notificationRequestService, projectVersionRequestService, policyRequestService,
                         metaService,
                         logger));
-        parallelProcessor.addTransform(RuleViolationClearedNotificationItem.class,
+        parallelProcessor.addTransform(RuleViolationClearedNotificationView.class,
                 new PolicyViolationClearedTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService,
                         policyRequestService,
                         policyNotificationFilter, metaService));
@@ -107,7 +107,7 @@ public class NotificationDataService {
 
     public NotificationResults getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
-        final List<NotificationItem> itemList = notificationRequestService.getAllNotifications(startDate, endDate);
+        final List<NotificationView> itemList = notificationRequestService.getAllNotifications(startDate, endDate);
         final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
         contentList.addAll(processorResults.getResults());
         final NotificationResults results = new NotificationResults(contentList, processorResults.getExceptions());
@@ -117,7 +117,7 @@ public class NotificationDataService {
     public NotificationResults getUserNotifications(final Date startDate, final Date endDate, final UserItem user)
             throws IntegrationException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
-        final List<NotificationItem> itemList = notificationRequestService.getUserNotifications(startDate, endDate, user);
+        final List<NotificationView> itemList = notificationRequestService.getUserNotifications(startDate, endDate, user);
         final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
         contentList.addAll(processorResults.getResults());
         final NotificationResults results = new NotificationResults(contentList, processorResults.getExceptions());

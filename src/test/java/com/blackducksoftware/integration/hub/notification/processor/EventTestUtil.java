@@ -31,7 +31,7 @@ import java.util.List;
 
 import org.mockito.Mockito;
 
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityItem;
@@ -182,7 +182,7 @@ public class EventTestUtil {
     public PolicyOverrideContentItem createPolicyOverride(final Date createdTime, final String projectName,
             final String projectVersionName, final String componentName, final String componentVersion)
             throws URISyntaxException {
-        final ComponentVersion fullComponentVersion = createComponentVersionMock(componentVersion);
+        final ComponentVersionView fullComponentVersion = createComponentVersionMock(componentVersion);
         final String projectVersionUrl = PROJECT_VERSION_URL_PREFIX + projectName + PROJECT_VERSION_URL_SEGMENT + projectVersionName;
         final ProjectVersionModel projectVersion = new ProjectVersionModel();
         projectVersion.setProjectName(projectName);
@@ -199,9 +199,9 @@ public class EventTestUtil {
         return item;
     }
 
-    private ComponentVersion createComponentVersionMock(final String componentVersion) {
-        ComponentVersion fullComponentVersion;
-        fullComponentVersion = Mockito.mock(ComponentVersion.class);
+    private ComponentVersionView createComponentVersionMock(final String componentVersion) {
+        ComponentVersionView fullComponentVersion;
+        fullComponentVersion = Mockito.mock(ComponentVersionView.class);
         Mockito.when(fullComponentVersion.getVersionName()).thenReturn(componentVersion);
         return fullComponentVersion;
     }
@@ -209,7 +209,7 @@ public class EventTestUtil {
     public PolicyViolationClearedContentItem createPolicyCleared(final Date createdTime, final String projectName,
             final String projectVersionName, final String componentName, final String componentVersion)
             throws URISyntaxException {
-        final ComponentVersion fullComponentVersion = createComponentVersionMock(componentVersion);
+        final ComponentVersionView fullComponentVersion = createComponentVersionMock(componentVersion);
         final String projectVersionUrl = PROJECT_VERSION_URL_PREFIX + projectName + PROJECT_VERSION_URL_SEGMENT + projectVersionName;
         final ProjectVersionModel projectVersion = new ProjectVersionModel();
         projectVersion.setProjectName(projectName);
@@ -229,7 +229,7 @@ public class EventTestUtil {
     public PolicyViolationContentItem createPolicyViolation(final Date createdTime, final String projectName,
             final String projectVersionName, final String componentName, final String componentVersion)
             throws URISyntaxException {
-        final ComponentVersion fullComponentVersion = createComponentVersionMock(componentVersion);
+        final ComponentVersionView fullComponentVersion = createComponentVersionMock(componentVersion);
         final String projectVersionUrl = PROJECT_VERSION_URL_PREFIX + projectName + PROJECT_VERSION_URL_SEGMENT + projectVersionName;
         final ProjectVersionModel projectVersion = new ProjectVersionModel();
         projectVersion.setProjectName(projectName);
@@ -250,7 +250,7 @@ public class EventTestUtil {
             final String projectVersionName, final String componentName, final String componentVersion,
             final List<VulnerabilitySourceQualifiedId> added, final List<VulnerabilitySourceQualifiedId> updated,
             final List<VulnerabilitySourceQualifiedId> deleted) throws URISyntaxException {
-        final ComponentVersion fullComponentVersion = createComponentVersionMock(componentVersion);
+        final ComponentVersionView fullComponentVersion = createComponentVersionMock(componentVersion);
         final String projectVersionUrl = PROJECT_VERSION_URL_PREFIX + projectName + PROJECT_VERSION_URL_SEGMENT + projectVersionName;
         final ProjectVersionModel projectVersion = new ProjectVersionModel();
         projectVersion.setProjectName(projectName);

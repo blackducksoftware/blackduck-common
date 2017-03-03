@@ -47,7 +47,7 @@ import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.ScannerSplitStream;
 import com.blackducksoftware.integration.hub.StreamRedirectThread;
-import com.blackducksoftware.integration.hub.api.scan.ScanSummaryItem;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryView;
 import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ScanFailedException;
@@ -323,7 +323,7 @@ public class SimpleScanService {
     /**
      * For all error cases, return an empty list. If all goes well, return a list of scan summary urls.
      */
-    public List<ScanSummaryItem> getScanSummaryItems() {
+    public List<ScanSummaryView> getScanSummaryItems() {
         if (logDirectory == null || !logDirectory.exists()) {
             return Collections.emptyList();
         }
@@ -338,7 +338,7 @@ public class SimpleScanService {
             return Collections.emptyList();
         }
 
-        final List<ScanSummaryItem> scanSummaryItems = new ArrayList<>();
+        final List<ScanSummaryView> scanSummaryItems = new ArrayList<>();
         for (final File currentStatusFile : statusFiles) {
             String fileContent;
             try {
@@ -347,7 +347,7 @@ public class SimpleScanService {
                 logger.error(String.format("There was an exception reading the status file: %s", e.getMessage(), e));
                 return Collections.emptyList();
             }
-            final ScanSummaryItem scanSummaryItem = gson.fromJson(fileContent, ScanSummaryItem.class);
+            final ScanSummaryView scanSummaryItem = gson.fromJson(fileContent, ScanSummaryView.class);
             scanSummaryItem.json = fileContent;
             scanSummaryItems.add(scanSummaryItem);
         }

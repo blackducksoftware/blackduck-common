@@ -34,9 +34,9 @@ public class ExtensionUserOptionRequestService extends HubResponseService {
         super(restConnection);
     }
 
-    public List<UserOptionLinkItem> getUserOptions(final String userOptionsUrl)
+    public List<UserOptionLinkView> getUserOptions(final String userOptionsUrl)
             throws IntegrationException {
-        final List<UserOptionLinkItem> allItems = getAllItems(userOptionsUrl, UserOptionLinkItem.class);
+        final List<UserOptionLinkView> allItems = getAllItems(userOptionsUrl, UserOptionLinkView.class);
         return allItems;
     }
 

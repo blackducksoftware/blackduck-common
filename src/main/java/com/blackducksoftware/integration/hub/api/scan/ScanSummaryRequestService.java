@@ -34,8 +34,8 @@ public class ScanSummaryRequestService extends HubResponseService {
         super(restConnection);
     }
 
-    public List<ScanSummaryItem> getAllScanSummaryItems(final String scanSummaryUrl) throws IntegrationException {
-        final List<ScanSummaryItem> allScanSummaryItems = getAllItems(scanSummaryUrl, ScanSummaryItem.class);
+    public List<ScanSummaryView> getAllScanSummaryItems(final String scanSummaryUrl) throws IntegrationException {
+        final List<ScanSummaryView> allScanSummaryItems = getAllItems(scanSummaryUrl, ScanSummaryView.class);
         return allScanSummaryItems;
     }
 

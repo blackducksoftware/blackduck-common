@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
+import com.blackducksoftware.integration.hub.api.extension.ConfigurationView;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionItem;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionView;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
-import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkItem;
+import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkView;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
@@ -51,7 +51,7 @@ public class ExtensionConfigDataService extends HubResponseService {
 
     private final ExtensionUserOptionRequestService extensionUserOptionRequestService;
 
-    private final ParallelResourceProcessor<UserConfigItem, UserOptionLinkItem> parallelProcessor;
+    private final ParallelResourceProcessor<UserConfigItem, UserOptionLinkView> parallelProcessor;
 
     private final MetaService metaService;
 
@@ -64,13 +64,13 @@ public class ExtensionConfigDataService extends HubResponseService {
         this.metaService = metaService;
         userConfigTransform = new UserConfigTransform(userRequestService, extensionConfigRequestService);
         parallelProcessor = new ParallelResourceProcessor<>(logger);
-        parallelProcessor.addTransform(UserOptionLinkItem.class, userConfigTransform);
+        parallelProcessor.addTransform(UserOptionLinkView.class, userConfigTransform);
 
     }
 
-    public Map<String, ConfigurationItem> getGlobalConfigMap(final String extensionUrl) throws IntegrationException {
-        Map<String, ConfigurationItem> globalConfigMap = new HashMap<>();
-        final ExtensionItem extension = getItem(extensionUrl, ExtensionItem.class);
+    public Map<String, ConfigurationView> getGlobalConfigMap(final String extensionUrl) throws IntegrationException {
+        Map<String, ConfigurationView> globalConfigMap = new HashMap<>();
+        final ExtensionView extension = getItem(extensionUrl, ExtensionView.class);
         final String globalOptionsLink = metaService.getFirstLink(extension, MetaService.GLOBAL_OPTIONS_LINK);
         globalConfigMap = createGlobalConfigMap(globalOptionsLink);
         return globalConfigMap;
@@ -78,23 +78,23 @@ public class ExtensionConfigDataService extends HubResponseService {
 
     public ParallelResourceProcessorResults<UserConfigItem> getUserConfigList(final String extensionUrl) throws IntegrationException {
 
-        final ExtensionItem extension = getItem(extensionUrl, ExtensionItem.class);
+        final ExtensionView extension = getItem(extensionUrl, ExtensionView.class);
         final String userOptionsLink = metaService.getFirstLink(extension, MetaService.USER_OPTIONS_LINK);
-        final List<UserOptionLinkItem> userOptionList = extensionUserOptionRequestService
+        final List<UserOptionLinkView> userOptionList = extensionUserOptionRequestService
                 .getUserOptions(userOptionsLink);
         final ParallelResourceProcessorResults<UserConfigItem> itemList = parallelProcessor.process(userOptionList);
         return itemList;
     }
 
-    private Map<String, ConfigurationItem> createGlobalConfigMap(final String globalConfigUrl) throws IntegrationException {
-        final List<ConfigurationItem> itemList = extensionConfigRequestService.getGlobalOptions(globalConfigUrl);
-        final Map<String, ConfigurationItem> itemMap = createConfigMap(itemList);
+    private Map<String, ConfigurationView> createGlobalConfigMap(final String globalConfigUrl) throws IntegrationException {
+        final List<ConfigurationView> itemList = extensionConfigRequestService.getGlobalOptions(globalConfigUrl);
+        final Map<String, ConfigurationView> itemMap = createConfigMap(itemList);
         return itemMap;
     }
 
-    private Map<String, ConfigurationItem> createConfigMap(final List<ConfigurationItem> itemList) {
-        final Map<String, ConfigurationItem> itemMap = new HashMap<>(itemList.size());
-        for (final ConfigurationItem item : itemList) {
+    private Map<String, ConfigurationView> createConfigMap(final List<ConfigurationView> itemList) {
+        final Map<String, ConfigurationView> itemMap = new HashMap<>(itemList.size());
+        for (final ConfigurationView item : itemList) {
             itemMap.put(item.getName(), item);
         }
         return itemMap;

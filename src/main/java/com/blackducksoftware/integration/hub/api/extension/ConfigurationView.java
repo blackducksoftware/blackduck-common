@@ -21,53 +21,60 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.codelocation;
+package com.blackducksoftware.integration.hub.api.extension;
 
-import java.util.Date;
+import java.util.List;
 
-import com.blackducksoftware.integration.hub.model.type.CodeLocationEnum;
+import com.blackducksoftware.integration.hub.model.type.ExternalExtensionConfigValueOptionEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class CodeLocationItem extends HubView {
-    private CodeLocationEnum type;
-
-    private String url;
-
-    // Since Hub 3.5
+public class ConfigurationView extends HubView {
     private String name;
 
-    private String mappedProjectVersion;
+    private ExternalExtensionConfigValueOptionEnum optionType;
 
-    private Date createdAt;
+    private String title;
 
-    private Date updatedAt;
+    private boolean required;
 
-    public CodeLocationEnum getType() {
-        return type;
-    }
+    private boolean singleValue;
 
-    public String getUrl() {
-        return url;
-    }
+    private String description;
+
+    private List<OptionItem> options;
+
+    private List<String> value;
 
     public String getName() {
         return name;
     }
 
-    public String getMappedProjectVersion() {
-        return mappedProjectVersion;
+    public ExternalExtensionConfigValueOptionEnum getOptionType() {
+        return optionType;
     }
 
-    public void setMappedProjectVersion(final String mappedProjectVersion) {
-        this.mappedProjectVersion = mappedProjectVersion;
+    public String getTitle() {
+        return title;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public boolean isRequired() {
+        return required;
     }
 
-    public Date getUpdatedAt() {
-        return updatedAt;
+    public boolean isSingleValue() {
+        return singleValue;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<OptionItem> getOptions() {
+        return options;
+    }
+
+    public List<String> getValue() {
+        return value;
     }
 
 }

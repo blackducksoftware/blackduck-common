@@ -21,36 +21,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.component.version;
+package com.blackducksoftware.integration.hub.api.notification;
 
 import java.util.Date;
 
-import com.blackducksoftware.integration.hub.model.type.ComponentVersionSourceEnum;
+import com.blackducksoftware.integration.hub.model.type.NotificationEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ComponentVersion extends HubView {
-    private ComplexLicenseItem license;
+public class NotificationView extends HubView {
+    public String contentType;
 
-    private Date releasedOn;
+    public NotificationEnum type;
 
-    private ComponentVersionSourceEnum source;
+    public Date createdAt;
 
-    private String versionName;
-
-    public ComplexLicenseItem getLicense() {
-        return license;
+    public String getContentType() {
+        return contentType;
     }
 
-    public Date getReleasedOn() {
-        return releasedOn;
+    public NotificationEnum getType() {
+        return type;
     }
 
-    public ComponentVersionSourceEnum getSource() {
-        return source;
-    }
-
-    public String getVersionName() {
-        return versionName;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
 }

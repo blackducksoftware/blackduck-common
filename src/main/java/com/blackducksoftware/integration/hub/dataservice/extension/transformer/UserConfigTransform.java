@@ -30,15 +30,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.extension.ConfigurationItem;
+import com.blackducksoftware.integration.hub.api.extension.ConfigurationView;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
-import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkItem;
+import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkView;
 import com.blackducksoftware.integration.hub.api.user.UserItem;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
 
-public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, UserOptionLinkItem> {
+public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, UserOptionLinkView> {
     private final UserRequestService userRequestService;
 
     private final ExtensionConfigRequestService extensionConfigRequestService;
@@ -50,27 +50,27 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
     }
 
     @Override
-    public List<UserConfigItem> transform(final UserOptionLinkItem item) throws IntegrationException {
+    public List<UserConfigItem> transform(final UserOptionLinkView item) throws IntegrationException {
         final UserItem user = userRequestService.getItem(item.getUser(), UserItem.class);
         if (!user.isActive()) {
             return Collections.emptyList();
         } else {
-            final Map<String, ConfigurationItem> configItems = getUserConfigOptions(item.getExtensionOptions());
+            final Map<String, ConfigurationView> configItems = getUserConfigOptions(item.getExtensionOptions());
             final List<UserConfigItem> itemList = new ArrayList<>(configItems.size());
             itemList.add(new UserConfigItem(user, configItems));
             return itemList;
         }
     }
 
-    private Map<String, ConfigurationItem> getUserConfigOptions(final String userConfigUrl) throws IntegrationException {
-        final List<ConfigurationItem> userItemList = extensionConfigRequestService.getUserConfiguration(userConfigUrl);
-        final Map<String, ConfigurationItem> itemMap = createConfigMap(userItemList);
+    private Map<String, ConfigurationView> getUserConfigOptions(final String userConfigUrl) throws IntegrationException {
+        final List<ConfigurationView> userItemList = extensionConfigRequestService.getUserConfiguration(userConfigUrl);
+        final Map<String, ConfigurationView> itemMap = createConfigMap(userItemList);
         return itemMap;
     }
 
-    private Map<String, ConfigurationItem> createConfigMap(final List<ConfigurationItem> itemList) {
-        final Map<String, ConfigurationItem> itemMap = new HashMap<>(itemList.size());
-        for (final ConfigurationItem item : itemList) {
+    private Map<String, ConfigurationView> createConfigMap(final List<ConfigurationView> itemList) {
+        final Map<String, ConfigurationView> itemMap = new HashMap<>(itemList.size());
+        for (final ConfigurationView item : itemList) {
             itemMap.put(item.getName(), item);
         }
         return itemMap;

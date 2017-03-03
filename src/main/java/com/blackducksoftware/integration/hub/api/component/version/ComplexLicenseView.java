@@ -21,60 +21,49 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.extension;
+package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.model.type.ExternalExtensionConfigValueOptionEnum;
+import com.blackducksoftware.integration.hub.model.type.ComplexLicenseCodeSharingEnum;
+import com.blackducksoftware.integration.hub.model.type.ComplexLicenseEnum;
+import com.blackducksoftware.integration.hub.model.type.ComplexLicenseOwnershipEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ConfigurationItem extends HubView {
+public class ComplexLicenseView extends HubView {
+    private ComplexLicenseCodeSharingEnum codeSharing;
+
+    private String license;
+
     private String name;
 
-    private ExternalExtensionConfigValueOptionEnum optionType;
+    private ComplexLicenseOwnershipEnum ownership;
 
-    private String title;
+    private ComplexLicenseEnum type;
 
-    private boolean required;
+    private List<ComplexLicenseView> licenses;
 
-    private boolean singleValue;
+    public ComplexLicenseCodeSharingEnum getCodeSharing() {
+        return codeSharing;
+    }
 
-    private String description;
+    public String getLicense() {
+        return license;
+    }
 
-    private List<OptionItem> options;
-
-    private List<String> value;
+    public List<ComplexLicenseView> getLicenses() {
+        return licenses;
+    }
 
     public String getName() {
         return name;
     }
 
-    public ExternalExtensionConfigValueOptionEnum getOptionType() {
-        return optionType;
+    public ComplexLicenseOwnershipEnum getOwnership() {
+        return ownership;
     }
 
-    public String getTitle() {
-        return title;
+    public ComplexLicenseEnum getType() {
+        return type;
     }
-
-    public boolean isRequired() {
-        return required;
-    }
-
-    public boolean isSingleValue() {
-        return singleValue;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public List<OptionItem> getOptions() {
-        return options;
-    }
-
-    public List<String> getValue() {
-        return value;
-    }
-
 }

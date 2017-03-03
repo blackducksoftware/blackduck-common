@@ -28,9 +28,9 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationItem;
+import com.blackducksoftware.integration.hub.api.notification.NotificationView;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
@@ -45,7 +45,7 @@ import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public abstract class AbstractNotificationTransformer
-        implements ItemTransform<List<NotificationContentItem>, NotificationItem> {
+        implements ItemTransform<List<NotificationContentItem>, NotificationView> {
     private final HubResponseService hubResponseService;
 
     private final IntLogger logger;
@@ -102,7 +102,7 @@ public abstract class AbstractNotificationTransformer
     }
 
     @Override
-    public abstract List<NotificationContentItem> transform(NotificationItem item) throws HubItemTransformException;
+    public abstract List<NotificationContentItem> transform(NotificationView item) throws HubItemTransformException;
 
     protected ProjectVersionModel createFullProjectVersion(final String projectVersionUrl, final String projectName, final String versionName)
             throws IntegrationException {
@@ -141,10 +141,10 @@ public abstract class AbstractNotificationTransformer
         return metaService;
     }
 
-    protected ComponentVersion getComponentVersion(final String componentVersionLink) throws IntegrationException {
-        ComponentVersion componentVersion = null;
+    protected ComponentVersionView getComponentVersion(final String componentVersionLink) throws IntegrationException {
+        ComponentVersionView componentVersion = null;
         if (!StringUtils.isBlank(componentVersionLink)) {
-            componentVersion = hubResponseService.getItem(componentVersionLink, ComponentVersion.class);
+            componentVersion = hubResponseService.getItem(componentVersionLink, ComponentVersionView.class);
         }
         return componentVersion;
     }
@@ -152,7 +152,7 @@ public abstract class AbstractNotificationTransformer
     protected String getComponentVersionName(final String componentVersionLink) throws IntegrationException {
         String componentVersionName = "";
         if (!StringUtils.isBlank(componentVersionLink)) {
-            final ComponentVersion compVersion = getComponentVersion(componentVersionLink);
+            final ComponentVersionView compVersion = getComponentVersion(componentVersionLink);
             if (compVersion != null) {
                 componentVersionName = compVersion.getVersionName();
             }

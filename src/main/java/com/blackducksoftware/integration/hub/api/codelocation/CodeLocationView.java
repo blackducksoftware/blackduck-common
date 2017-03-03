@@ -21,28 +21,53 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.component.id;
+package com.blackducksoftware.integration.hub.api.codelocation;
 
-import com.blackducksoftware.integration.hub.model.type.ComponentSourceEnum;
+import java.util.Date;
+
+import com.blackducksoftware.integration.hub.model.type.CodeLocationEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ComponentIdItem extends HubView {
-    private String description;
+public class CodeLocationView extends HubView {
+    private CodeLocationEnum type;
 
+    private String url;
+
+    // Since Hub 3.5
     private String name;
 
-    private ComponentSourceEnum source;
+    private String mappedProjectVersion;
 
-    public String getDescription() {
-        return description;
+    private Date createdAt;
+
+    private Date updatedAt;
+
+    public CodeLocationEnum getType() {
+        return type;
+    }
+
+    public String getUrl() {
+        return url;
     }
 
     public String getName() {
         return name;
     }
 
-    public ComponentSourceEnum getSource() {
-        return source;
+    public String getMappedProjectVersion() {
+        return mappedProjectVersion;
+    }
+
+    public void setMappedProjectVersion(final String mappedProjectVersion) {
+        this.mappedProjectVersion = mappedProjectVersion;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
 }

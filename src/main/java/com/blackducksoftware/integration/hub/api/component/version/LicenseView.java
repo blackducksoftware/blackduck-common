@@ -21,13 +21,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.notification;
+package com.blackducksoftware.integration.hub.api.component.version;
 
-public class RuleViolationNotificationItem extends NotificationItem {
-    public RuleViolationNotificationContent content;
+import com.blackducksoftware.integration.hub.model.type.LicenseCodeSharingEnum;
+import com.blackducksoftware.integration.hub.model.type.LicenseOwnershipEnum;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-    public RuleViolationNotificationContent getContent() {
-        return content;
+public class LicenseView extends HubView {
+    private LicenseCodeSharingEnum codeSharing;
+
+    private String name;
+
+    private LicenseOwnershipEnum ownership;
+
+    public LicenseCodeSharingEnum getCodeSharing() {
+        return codeSharing;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public LicenseOwnershipEnum getOwnership() {
+        return ownership;
+    }
 }

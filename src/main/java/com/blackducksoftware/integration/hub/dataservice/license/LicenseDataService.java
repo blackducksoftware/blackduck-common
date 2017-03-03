@@ -24,10 +24,10 @@
 package com.blackducksoftware.integration.hub.dataservice.license;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.component.Component;
+import com.blackducksoftware.integration.hub.api.component.ComponentSearchResponse;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
-import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseItem;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseView;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
 
 public class LicenseDataService {
 
@@ -38,11 +38,11 @@ public class LicenseDataService {
         this.componentRequestService = componentRequestService;
     }
 
-    public ComplexLicenseItem getComplexLicenseItemFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
+    public ComplexLicenseView getComplexLicenseItemFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
             throws IntegrationException {
-        final Component component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
+        final ComponentSearchResponse component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
         final String versionUrl = component.getVersion();
-        final ComponentVersion componentVersion = componentRequestService.getItem(versionUrl, ComponentVersion.class);
+        final ComponentVersionView componentVersion = componentRequestService.getItem(versionUrl, ComponentVersionView.class);
         return componentVersion.getLicense();
     }
 

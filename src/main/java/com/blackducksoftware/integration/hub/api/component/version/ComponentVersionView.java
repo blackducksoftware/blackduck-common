@@ -23,47 +23,34 @@
  */
 package com.blackducksoftware.integration.hub.api.component.version;
 
-import java.util.List;
+import java.util.Date;
 
-import com.blackducksoftware.integration.hub.model.type.ComplexLicenseCodeSharingEnum;
-import com.blackducksoftware.integration.hub.model.type.ComplexLicenseEnum;
-import com.blackducksoftware.integration.hub.model.type.ComplexLicenseOwnershipEnum;
+import com.blackducksoftware.integration.hub.model.type.ComponentVersionSourceEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ComplexLicenseItem extends HubView {
-    private ComplexLicenseCodeSharingEnum codeSharing;
+public class ComponentVersionView extends HubView {
+    private ComplexLicenseView license;
 
-    private String license;
+    private Date releasedOn;
 
-    private String name;
+    private ComponentVersionSourceEnum source;
 
-    private ComplexLicenseOwnershipEnum ownership;
+    private String versionName;
 
-    private ComplexLicenseEnum type;
-
-    private List<ComplexLicenseItem> licenses;
-
-    public ComplexLicenseCodeSharingEnum getCodeSharing() {
-        return codeSharing;
-    }
-
-    public String getLicense() {
+    public ComplexLicenseView getLicense() {
         return license;
     }
 
-    public List<ComplexLicenseItem> getLicenses() {
-        return licenses;
+    public Date getReleasedOn() {
+        return releasedOn;
     }
 
-    public String getName() {
-        return name;
+    public ComponentVersionSourceEnum getSource() {
+        return source;
     }
 
-    public ComplexLicenseOwnershipEnum getOwnership() {
-        return ownership;
+    public String getVersionName() {
+        return versionName;
     }
 
-    public ComplexLicenseEnum getType() {
-        return type;
-    }
 }

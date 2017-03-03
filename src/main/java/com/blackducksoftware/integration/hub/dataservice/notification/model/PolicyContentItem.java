@@ -25,14 +25,14 @@ package com.blackducksoftware.integration.hub.dataservice.notification.model;
 
 import java.util.Date;
 
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersion;
+import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 
 public class PolicyContentItem extends NotificationContentItem {
     private final String componentUrl;
 
     public PolicyContentItem(final Date createdAt, final ProjectVersionModel projectVersion, final String componentName,
-            final ComponentVersion componentVersion, final String componentUrl, final String componentVersionUrl) {
+            final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl) {
         super(createdAt, projectVersion, componentName, componentVersion, componentVersionUrl);
         this.componentUrl = componentUrl;
     }

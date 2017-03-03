@@ -21,13 +21,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.notification;
+package com.blackducksoftware.integration.hub.api.component;
 
-public class PolicyOverrideNotificationItem extends NotificationItem {
-    private PolicyOverrideNotificationContent content;
+import com.blackducksoftware.integration.hub.model.type.ComponentSourceEnum;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-    public PolicyOverrideNotificationContent getContent() {
-        return content;
+public class ComponentView extends HubView {
+    private String description;
+
+    private String name;
+
+    private ComponentSourceEnum source;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ComponentSourceEnum getSource() {
+        return source;
     }
 
 }
