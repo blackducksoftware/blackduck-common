@@ -26,7 +26,6 @@ package com.blackducksoftware.integration.hub.api.extension;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
 public class ExtensionView extends HubView {
-
     private String name;
 
     private String description;
