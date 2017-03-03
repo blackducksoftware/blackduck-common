@@ -59,7 +59,6 @@ import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class NotificationProcessorTest {
-
     private final EventTestUtil testUtil = new EventTestUtil();
 
     private MetaService metaService;
@@ -80,7 +79,7 @@ public class NotificationProcessorTest {
 
     public MockProcessor createMockedNotificationProcessor(final List<VulnerabilityItem> vulnerabilityList) throws Exception {
         final ComponentVersion compVersion = Mockito.mock(ComponentVersion.class);
-        Mockito.when(compVersion.json).thenReturn(createComponentJson());
+        compVersion.json = createComponentJson();
         final VulnerabilityRequestService vulnerabilityRequestService = Mockito.mock(VulnerabilityRequestService.class);
         Mockito.when(vulnerabilityRequestService.getComponentVersionVulnerabilities(Mockito.anyString())).thenReturn(vulnerabilityList);
         final MockProcessor processor = new MockProcessor(vulnerabilityRequestService, metaService);

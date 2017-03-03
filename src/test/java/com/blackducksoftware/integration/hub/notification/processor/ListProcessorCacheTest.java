@@ -39,14 +39,12 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Poli
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
 public class ListProcessorCacheTest {
-
     private final EventTestUtil testUtil = new EventTestUtil();
 
     @Test
     public void testEventAdd() throws Exception {
         final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
-                EventTestUtil.COMPONENT,
-                EventTestUtil.VERSION);
+                EventTestUtil.COMPONENT, EventTestUtil.VERSION);
         final PolicyRule policyRule = item.getPolicyRuleList().get(0);
         final Map<String, Object> dataSet = new HashMap<>();
         dataSet.put("policyRule", policyRule);

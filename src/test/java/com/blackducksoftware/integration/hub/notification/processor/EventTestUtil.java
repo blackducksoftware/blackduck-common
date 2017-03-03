@@ -162,6 +162,7 @@ public class EventTestUtil {
 
     public PolicyRule createPolicyRule(final String name, final String description, final String createdBy, final String updatedBy, final String href) {
         final PolicyRule rule = Mockito.mock(PolicyRule.class);
+        rule.json = createPolicyRuleJSon(href);
         Mockito.when(rule.getName()).thenReturn(name);
         Mockito.when(rule.getDescription()).thenReturn(description);
         Mockito.when(rule.getEnabled()).thenReturn(true);
@@ -171,7 +172,6 @@ public class EventTestUtil {
         Mockito.when(rule.getCreatedBy()).thenReturn(createdBy);
         Mockito.when(rule.getUpdatedAt()).thenReturn(new Date());
         Mockito.when(rule.getUpdatedBy()).thenReturn(updatedBy);
-        Mockito.when(rule.json).thenReturn(createPolicyRuleJSon(href));
         return rule;
     }
 
