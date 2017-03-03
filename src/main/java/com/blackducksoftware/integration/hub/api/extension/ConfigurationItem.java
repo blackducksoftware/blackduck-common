@@ -25,10 +25,10 @@ package com.blackducksoftware.integration.hub.api.extension;
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.model.type.ExternalExtensionConfigValueOptionEnum;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ConfigurationItem extends HubItem {
+public class ConfigurationItem extends HubView {
     private String name;
 
     private ExternalExtensionConfigValueOptionEnum optionType;

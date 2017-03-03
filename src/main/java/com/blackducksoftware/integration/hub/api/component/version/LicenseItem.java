@@ -23,11 +23,11 @@
  */
 package com.blackducksoftware.integration.hub.api.component.version;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.model.type.LicenseCodeSharingEnum;
 import com.blackducksoftware.integration.hub.model.type.LicenseOwnershipEnum;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class LicenseItem extends HubItem {
+public class LicenseItem extends HubView {
     private LicenseCodeSharingEnum codeSharing;
 
     private String name;

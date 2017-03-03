@@ -42,13 +42,13 @@ import java.util.List;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 import com.google.gson.annotations.SerializedName;
 
 /**
  * VersionBomComponentView
  */
-public class VersionBomComponentView extends HubItem {
+public class VersionBomComponentView extends HubView {
     @SerializedName("activityData")
     private ActivityDataView activityData = null;
 

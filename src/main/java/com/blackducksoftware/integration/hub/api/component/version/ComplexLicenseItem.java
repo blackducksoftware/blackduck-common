@@ -25,12 +25,12 @@ package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.model.type.ComplexLicenseCodeSharingEnum;
 import com.blackducksoftware.integration.hub.model.type.ComplexLicenseEnum;
 import com.blackducksoftware.integration.hub.model.type.ComplexLicenseOwnershipEnum;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ComplexLicenseItem extends HubItem {
+public class ComplexLicenseItem extends HubView {
     private ComplexLicenseCodeSharingEnum codeSharing;
 
     private String license;

@@ -25,10 +25,10 @@ package com.blackducksoftware.integration.hub.api.notification;
 
 import java.util.Date;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.model.type.NotificationEnum;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class NotificationItem extends HubItem {
+public class NotificationItem extends HubView {
     public String contentType;
 
     public NotificationEnum type;

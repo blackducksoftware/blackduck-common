@@ -80,7 +80,7 @@ public class NotificationProcessorTest {
 
     public MockProcessor createMockedNotificationProcessor(final List<VulnerabilityItem> vulnerabilityList) throws Exception {
         final ComponentVersion compVersion = Mockito.mock(ComponentVersion.class);
-        Mockito.when(compVersion.getJson()).thenReturn(createComponentJson());
+        Mockito.when(compVersion.json).thenReturn(createComponentJson());
         final VulnerabilityRequestService vulnerabilityRequestService = Mockito.mock(VulnerabilityRequestService.class);
         Mockito.when(vulnerabilityRequestService.getComponentVersionVulnerabilities(Mockito.anyString())).thenReturn(vulnerabilityList);
         final MockProcessor processor = new MockProcessor(vulnerabilityRequestService, metaService);

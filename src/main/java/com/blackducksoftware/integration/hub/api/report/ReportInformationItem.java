@@ -25,9 +25,9 @@ package com.blackducksoftware.integration.hub.api.report;
 
 import java.util.Date;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ReportInformationItem extends HubItem {
+public class ReportInformationItem extends HubView {
     private String reportFormat;
 
     private String locale;

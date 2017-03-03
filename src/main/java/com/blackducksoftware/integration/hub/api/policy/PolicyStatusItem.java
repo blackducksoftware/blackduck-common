@@ -28,10 +28,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.model.type.VersionBomPolicyStatusOverallStatusEnum;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class PolicyStatusItem extends HubItem {
+public class PolicyStatusItem extends HubView {
     private VersionBomPolicyStatusOverallStatusEnum overallStatus;
 
     private String updatedAt;

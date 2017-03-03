@@ -26,7 +26,7 @@ package com.blackducksoftware.integration.hub.api.version;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.api.item.HubResponse;
+import com.blackducksoftware.integration.hub.model.response.HubResponse;
 
 public class VersionComparison extends HubResponse {
     private final String consumerVersion;

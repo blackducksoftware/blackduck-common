@@ -25,9 +25,9 @@ package com.blackducksoftware.integration.hub.api.policy;
 
 import java.util.Date;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class PolicyRule extends HubItem {
+public class PolicyRule extends HubView {
     private String name;
 
     private String description;

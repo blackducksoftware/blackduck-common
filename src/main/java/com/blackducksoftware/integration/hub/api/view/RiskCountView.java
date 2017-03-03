@@ -38,7 +38,7 @@ package com.blackducksoftware.integration.hub.api.view;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.blackducksoftware.integration.hub.model.type.RiskCountCountEnum;
+import com.blackducksoftware.integration.hub.model.type.RiskCountEnum;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -49,7 +49,7 @@ public class RiskCountView {
     private Integer count = null;
 
     @SerializedName("countType")
-    private RiskCountCountEnum countType = null;
+    private RiskCountEnum countType = null;
 
     public RiskCountView count(final Integer count) {
         this.count = count;
@@ -69,7 +69,7 @@ public class RiskCountView {
         this.count = count;
     }
 
-    public RiskCountView countType(final RiskCountCountEnum countType) {
+    public RiskCountView countType(final RiskCountEnum countType) {
         this.countType = countType;
         return this;
     }
@@ -79,11 +79,11 @@ public class RiskCountView {
      *
      * @return countType
      **/
-    public RiskCountCountEnum getCountType() {
+    public RiskCountEnum getCountType() {
         return countType;
     }
 
-    public void setCountType(final RiskCountCountEnum countType) {
+    public void setCountType(final RiskCountEnum countType) {
         this.countType = countType;
     }
 

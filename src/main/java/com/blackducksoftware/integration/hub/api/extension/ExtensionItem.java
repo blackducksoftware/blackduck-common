@@ -23,9 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.api.extension;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ExtensionItem extends HubItem {
+public class ExtensionItem extends HubView {
 
     private String name;
 

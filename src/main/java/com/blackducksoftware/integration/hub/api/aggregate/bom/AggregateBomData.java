@@ -30,7 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.api.view.RiskCountView;
 import com.blackducksoftware.integration.hub.api.view.VersionBomComponentView;
-import com.blackducksoftware.integration.hub.model.type.RiskCountCountEnum;
+import com.blackducksoftware.integration.hub.model.type.RiskCountEnum;
 
 public class AggregateBomData {
     private List<VersionBomComponentView> components;
@@ -81,11 +81,11 @@ public class AggregateBomData {
                 if (component.getSecurityRiskProfile() != null && component.getSecurityRiskProfile().getCounts() != null
                         && !component.getSecurityRiskProfile().getCounts().isEmpty()) {
                     for (final RiskCountView count : component.getSecurityRiskProfile().getCounts()) {
-                        if (count.getCountType() == RiskCountCountEnum.HIGH && count.getCount() > 0) {
+                        if (count.getCountType() == RiskCountEnum.HIGH && count.getCount() > 0) {
                             vulnerabilityRiskHighCount++;
-                        } else if (count.getCountType() == RiskCountCountEnum.MEDIUM && count.getCount() > 0) {
+                        } else if (count.getCountType() == RiskCountEnum.MEDIUM && count.getCount() > 0) {
                             vulnerabilityRiskMediumCount++;
-                        } else if (count.getCountType() == RiskCountCountEnum.LOW && count.getCount() > 0) {
+                        } else if (count.getCountType() == RiskCountEnum.LOW && count.getCount() > 0) {
                             vulnerabilityRiskLowCount++;
                         }
                     }
@@ -93,11 +93,11 @@ public class AggregateBomData {
                 if (component.getLicenseRiskProfile() != null && component.getLicenseRiskProfile().getCounts() != null
                         && !component.getLicenseRiskProfile().getCounts().isEmpty()) {
                     for (final RiskCountView count : component.getLicenseRiskProfile().getCounts()) {
-                        if (count.getCountType() == RiskCountCountEnum.HIGH && count.getCount() > 0) {
+                        if (count.getCountType() == RiskCountEnum.HIGH && count.getCount() > 0) {
                             licenseRiskHighCount++;
-                        } else if (count.getCountType() == RiskCountCountEnum.MEDIUM && count.getCount() > 0) {
+                        } else if (count.getCountType() == RiskCountEnum.MEDIUM && count.getCount() > 0) {
                             licenseRiskMediumCount++;
-                        } else if (count.getCountType() == RiskCountCountEnum.LOW && count.getCount() > 0) {
+                        } else if (count.getCountType() == RiskCountEnum.LOW && count.getCount() > 0) {
                             licenseRiskLowCount++;
                         }
                     }
@@ -105,11 +105,11 @@ public class AggregateBomData {
                 if (component.getOperationalRiskProfile() != null && component.getOperationalRiskProfile().getCounts() != null
                         && !component.getOperationalRiskProfile().getCounts().isEmpty()) {
                     for (final RiskCountView count : component.getOperationalRiskProfile().getCounts()) {
-                        if (count.getCountType() == RiskCountCountEnum.HIGH && count.getCount() > 0) {
+                        if (count.getCountType() == RiskCountEnum.HIGH && count.getCount() > 0) {
                             operationalRiskHighCount++;
-                        } else if (count.getCountType() == RiskCountCountEnum.MEDIUM && count.getCount() > 0) {
+                        } else if (count.getCountType() == RiskCountEnum.MEDIUM && count.getCount() > 0) {
                             operationalRiskMediumCount++;
-                        } else if (count.getCountType() == RiskCountCountEnum.LOW && count.getCount() > 0) {
+                        } else if (count.getCountType() == RiskCountEnum.LOW && count.getCount() > 0) {
                             operationalRiskLowCount++;
                         }
                     }

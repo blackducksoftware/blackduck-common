@@ -25,10 +25,10 @@ package com.blackducksoftware.integration.hub.api.component.version;
 
 import java.util.Date;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.model.type.ComponentVersionSourceEnum;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ComponentVersion extends HubItem {
+public class ComponentVersion extends HubView {
     private ComplexLicenseItem license;
 
     private Date releasedOn;

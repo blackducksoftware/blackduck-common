@@ -23,10 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.api.vulnerablebomcomponent;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 import com.google.gson.annotations.SerializedName;
 
-public class VulnerableBomComponentItem extends HubItem {
+public class VulnerableBomComponentItem extends HubView {
     private String componentName;
 
     private String componentVersionName;

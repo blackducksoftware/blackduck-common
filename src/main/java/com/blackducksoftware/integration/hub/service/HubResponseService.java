@@ -29,8 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.HubResponse;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.model.response.HubResponse;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
@@ -44,7 +44,6 @@ import com.google.gson.JsonParser;
 import okhttp3.Response;
 
 public class HubResponseService {
-
     private final HubRequestFactory hubRequestFactory;
 
     private final URL hubBaseUrl;
@@ -78,13 +77,13 @@ public class HubResponseService {
 
     public <T extends HubResponse> T getItemAs(final JsonElement item, final Class<T> clazz) {
         final T hubItem = gson.fromJson(item, clazz);
-        hubItem.setJson(gson.toJson(item));
+        hubItem.json = gson.toJson(item);
         return hubItem;
     }
 
     public <T extends HubResponse> T getItemAs(final String item, final Class<T> clazz) {
         final T hubItem = gson.fromJson(item, clazz);
-        hubItem.setJson(item);
+        hubItem.json = item;
         return hubItem;
     }
 

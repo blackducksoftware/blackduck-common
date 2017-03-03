@@ -23,10 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.api.project;
 
-import com.blackducksoftware.integration.hub.api.item.HubItem;
 import com.blackducksoftware.integration.hub.model.type.ProjectSourceEnum;
+import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ProjectItem extends HubItem {
+public class ProjectItem extends HubView {
     // description from Hub API: "The general identifier of the project"
     private String name;
 
