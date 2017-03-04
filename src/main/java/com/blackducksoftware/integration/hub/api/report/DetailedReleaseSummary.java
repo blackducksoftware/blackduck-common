@@ -32,8 +32,8 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 
-import com.blackducksoftware.integration.hub.model.type.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.type.ProjectVersionPhaseEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
 
 /**
  * Detailed release summary.

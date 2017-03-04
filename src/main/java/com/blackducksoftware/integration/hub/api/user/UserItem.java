@@ -23,7 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.api.user;
 
-import com.blackducksoftware.integration.hub.model.type.UserGroupCreatedFromEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.UserGroupCreatedFromEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
 public class UserItem extends HubView {

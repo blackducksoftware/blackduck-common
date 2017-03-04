@@ -29,9 +29,9 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseView;
-import com.blackducksoftware.integration.hub.model.type.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.type.ProjectVersionPhaseEnum;
-import com.blackducksoftware.integration.hub.model.type.ProjectVersionSourceEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionSourceEnum;
 
 public class ProjectVersionModel {
     private String projectName;

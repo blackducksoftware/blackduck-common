@@ -23,7 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.api.component;
 
-import com.blackducksoftware.integration.hub.model.type.ComponentSourceEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ComponentSourceEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
 public class ComponentView extends HubView {

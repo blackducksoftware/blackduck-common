@@ -40,7 +40,7 @@ import java.util.Date;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.blackducksoftware.integration.hub.model.type.ActivityDataTrendingEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ActivityDataTrendingEnum;
 import com.google.gson.annotations.SerializedName;
 
 /**

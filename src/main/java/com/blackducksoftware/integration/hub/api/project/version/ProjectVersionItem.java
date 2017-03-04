@@ -26,9 +26,9 @@ package com.blackducksoftware.integration.hub.api.project.version;
 import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseView;
-import com.blackducksoftware.integration.hub.model.type.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.type.ProjectVersionPhaseEnum;
-import com.blackducksoftware.integration.hub.model.type.ProjectVersionSourceEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionSourceEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
 public class ProjectVersionItem extends HubView {

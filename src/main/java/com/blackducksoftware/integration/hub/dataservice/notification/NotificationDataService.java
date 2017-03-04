@@ -30,8 +30,8 @@ import java.util.TreeSet;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationView;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
+import com.blackducksoftware.integration.hub.api.notification.NotificationView;
 import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationView;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationClearedNotificationView;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationView;

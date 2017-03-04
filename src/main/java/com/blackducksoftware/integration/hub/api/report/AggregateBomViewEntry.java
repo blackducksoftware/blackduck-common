@@ -34,7 +34,7 @@ import org.joda.time.DateTime;
 
 import com.blackducksoftware.integration.hub.api.report.risk.RiskCounts;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskProfile;
-import com.blackducksoftware.integration.hub.model.type.VersionBomPolicyStatusOverallStatusEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum;
 
 /**
  * This is a view of an aggregation of BomEntries.

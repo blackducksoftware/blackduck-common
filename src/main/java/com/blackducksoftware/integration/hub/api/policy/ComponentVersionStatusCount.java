@@ -26,7 +26,7 @@ package com.blackducksoftware.integration.hub.api.policy;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.model.type.VersionBomPolicyStatusOverallStatusEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum;
 
 public class ComponentVersionStatusCount {
     private final VersionBomPolicyStatusOverallStatusEnum name;

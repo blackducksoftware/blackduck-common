@@ -25,7 +25,7 @@ package com.blackducksoftware.integration.hub.api.scan;
 
 import java.util.Date;
 
-import com.blackducksoftware.integration.hub.model.type.ScanSummaryStatusEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ScanSummaryStatusEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
 public class ScanSummaryView extends HubView {

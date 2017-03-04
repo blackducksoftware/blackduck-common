@@ -25,7 +25,7 @@ package com.blackducksoftware.integration.hub.api.codelocation;
 
 import java.util.Date;
 
-import com.blackducksoftware.integration.hub.model.type.CodeLocationEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.CodeLocationEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
 public class CodeLocationView extends HubView {

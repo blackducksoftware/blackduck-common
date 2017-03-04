@@ -41,7 +41,7 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Poli
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.VulnerabilityContentItem;
 import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
-import com.blackducksoftware.integration.hub.model.type.VulnerabilitySeverityEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.VulnerabilitySeverityEnum;
 
 public class EventTestUtil {
     public static final String DESCRIPTION = "description";

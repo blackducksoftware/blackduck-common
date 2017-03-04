@@ -41,7 +41,7 @@ import java.util.List;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.blackducksoftware.integration.hub.model.type.ComplexLicenseEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ComplexLicenseEnum;
 import com.google.gson.annotations.SerializedName;
 
 /**

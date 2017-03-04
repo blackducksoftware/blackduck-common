@@ -23,8 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.api.component.version;
 
-import com.blackducksoftware.integration.hub.model.type.LicenseCodeSharingEnum;
-import com.blackducksoftware.integration.hub.model.type.LicenseOwnershipEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.LicenseCodeSharingEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.LicenseOwnershipEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
 public class LicenseView extends HubView {

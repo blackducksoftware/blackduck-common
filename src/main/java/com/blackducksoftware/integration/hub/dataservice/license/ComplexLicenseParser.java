@@ -24,7 +24,7 @@
 package com.blackducksoftware.integration.hub.dataservice.license;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseView;
-import com.blackducksoftware.integration.hub.model.type.ComplexLicenseEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ComplexLicenseEnum;
 
 public class ComplexLicenseParser {
 

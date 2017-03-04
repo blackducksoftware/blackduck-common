@@ -38,7 +38,7 @@ package com.blackducksoftware.integration.hub.api.view;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.blackducksoftware.integration.hub.model.type.RiskCountEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.RiskCountEnum;
 import com.google.gson.annotations.SerializedName;
 
 /**

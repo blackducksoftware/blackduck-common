@@ -25,7 +25,7 @@ package com.blackducksoftware.integration.hub.api.extension;
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.model.type.ExternalExtensionConfigValueOptionEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ExternalExtensionConfigValueOptionEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
 public class ConfigurationView extends HubView {
