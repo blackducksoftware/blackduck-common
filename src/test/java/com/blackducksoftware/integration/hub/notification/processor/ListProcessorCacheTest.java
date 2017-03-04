@@ -34,7 +34,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRuleView;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 
@@ -45,7 +45,7 @@ public class ListProcessorCacheTest {
     public void testEventAdd() throws Exception {
         final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
                 EventTestUtil.COMPONENT, EventTestUtil.VERSION);
-        final PolicyRule policyRule = item.getPolicyRuleList().get(0);
+        final PolicyRuleView policyRule = item.getPolicyRuleList().get(0);
         final Map<String, Object> dataSet = new HashMap<>();
         dataSet.put("policyRule", policyRule);
         final NotificationEvent event = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,
@@ -73,7 +73,7 @@ public class ListProcessorCacheTest {
         final PolicyViolationContentItem item = testUtil.createPolicyViolation(new Date(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME,
                 EventTestUtil.COMPONENT,
                 EventTestUtil.VERSION);
-        final PolicyRule policyRule = item.getPolicyRuleList().get(0);
+        final PolicyRuleView policyRule = item.getPolicyRuleList().get(0);
         final Map<String, Object> dataSet = new HashMap<>();
         dataSet.put("policyRule", policyRule);
         final NotificationEvent event = new NotificationEvent("1", NotificationCategoryEnum.POLICY_VIOLATION,

@@ -34,9 +34,9 @@ import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationView;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
-import com.blackducksoftware.integration.hub.api.version.BomComponentVersionPolicyStatus;
+import com.blackducksoftware.integration.hub.api.view.BomComponentPolicyStatusView;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
@@ -74,22 +74,22 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
             final ProjectVersionModel projectVersion, final NotificationView item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException;
 
-    protected List<PolicyRule> getRulesFromUrls(final List<String> ruleUrlsViolated) throws IntegrationException {
+    protected List<PolicyRuleView> getRulesFromUrls(final List<String> ruleUrlsViolated) throws IntegrationException {
         if (ruleUrlsViolated == null || ruleUrlsViolated.isEmpty()) {
             return null;
         }
-        final List<PolicyRule> rules = new ArrayList<>();
+        final List<PolicyRuleView> rules = new ArrayList<>();
         for (final String ruleUrlViolated : ruleUrlsViolated) {
-            final PolicyRule ruleViolated = getPolicyService().getItem(ruleUrlViolated, PolicyRule.class);
+            final PolicyRuleView ruleViolated = getPolicyService().getItem(ruleUrlViolated, PolicyRuleView.class);
             rules.add(ruleViolated);
         }
         return rules;
     }
 
-    protected List<PolicyRule> getMatchingRules(final List<PolicyRule> rulesViolated) throws IntegrationException {
-        final List<PolicyRule> filteredRules = new ArrayList<>();
+    protected List<PolicyRuleView> getMatchingRules(final List<PolicyRuleView> rulesViolated) throws IntegrationException {
+        final List<PolicyRuleView> filteredRules = new ArrayList<>();
         if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null) {
-            for (final PolicyRule ruleViolated : rulesViolated) {
+            for (final PolicyRuleView ruleViolated : rulesViolated) {
                 final String ruleHref = getMetaService().getHref(ruleViolated);
                 if (policyFilter.getRuleLinksToInclude().contains(ruleHref)) {
                     filteredRules.add(ruleViolated);
@@ -105,8 +105,8 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         return policyFilter;
     }
 
-    protected PolicyRule getPolicyRule(final String ruleUrl) throws IntegrationException {
-        final PolicyRule rule = getPolicyService().getItem(ruleUrl, PolicyRule.class);
+    protected PolicyRuleView getPolicyRule(final String ruleUrl) throws IntegrationException {
+        final PolicyRuleView rule = getPolicyService().getItem(ruleUrl, PolicyRuleView.class);
         return rule;
     }
 
@@ -154,15 +154,15 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         return fixedRuleUrl;
     }
 
-    protected BomComponentVersionPolicyStatus getBomComponentVersionPolicyStatus(final String policyStatusUrl) throws IntegrationException {
-        BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus;
-        bomComponentVersionPolicyStatus = getHubResponseService().getItem(policyStatusUrl, BomComponentVersionPolicyStatus.class);
+    protected BomComponentPolicyStatusView getBomComponentVersionPolicyStatus(final String policyStatusUrl) throws IntegrationException {
+        BomComponentPolicyStatusView bomComponentVersionPolicyStatus;
+        bomComponentVersionPolicyStatus = getHubResponseService().getItem(policyStatusUrl, BomComponentPolicyStatusView.class);
 
         return bomComponentVersionPolicyStatus;
     }
 
     public abstract void createContents(final ProjectVersionModel projectVersion, final String componentName,
             final ComponentVersionView componentVersion, String componentUrl, final String componentVersionUrl,
-            List<PolicyRule> policyRuleList,
+            List<PolicyRuleView> policyRuleList,
             NotificationView item, List<NotificationContentItem> templateData) throws URISyntaxException;
 }

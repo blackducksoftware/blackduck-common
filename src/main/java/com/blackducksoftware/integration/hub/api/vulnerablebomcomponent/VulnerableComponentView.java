@@ -26,7 +26,7 @@ package com.blackducksoftware.integration.hub.api.vulnerablebomcomponent;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 import com.google.gson.annotations.SerializedName;
 
-public class VulnerableBomComponentItem extends HubView {
+public class VulnerableComponentView extends HubView {
     private String componentName;
 
     private String componentVersionName;
@@ -34,7 +34,7 @@ public class VulnerableBomComponentItem extends HubView {
     @SerializedName("componentVersion")
     private String componentVersionLink;
 
-    private VulnerabilityWithRemediation vulnerabilityWithRemediation;
+    private VulnerabilityWithRemediationView vulnerabilityWithRemediation;
 
     // Also in Hub's response: License
 
@@ -62,11 +62,11 @@ public class VulnerableBomComponentItem extends HubView {
         this.componentVersionLink = componentVersionLink;
     }
 
-    public VulnerabilityWithRemediation getVulnerabilityWithRemediation() {
+    public VulnerabilityWithRemediationView getVulnerabilityWithRemediation() {
         return vulnerabilityWithRemediation;
     }
 
-    public void setVulnerabilityWithRemediation(final VulnerabilityWithRemediation vulnerabilityWithRemediation) {
+    public void setVulnerabilityWithRemediation(final VulnerabilityWithRemediationView vulnerabilityWithRemediation) {
         this.vulnerabilityWithRemediation = vulnerabilityWithRemediation;
     }
 

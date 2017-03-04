@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.project.ProjectView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
@@ -49,15 +49,15 @@ public class ProjectVersionRequestService extends HubResponseService {
         this.metaService = metaService;
     }
 
-    public ProjectVersionItem getProjectVersion(final ProjectItem project, final String projectVersionName) throws IntegrationException {
+    public ProjectVersionView getProjectVersion(final ProjectView project, final String projectVersionName) throws IntegrationException {
         final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, versionsUrl);
         if (StringUtils.isNotBlank(projectVersionName)) {
             hubPagedRequest.q = String.format("versionName:%s", projectVersionName);
         }
 
-        final List<ProjectVersionItem> allProjectVersionMatchingItems = getAllItems(hubPagedRequest, ProjectVersionItem.class);
-        for (final ProjectVersionItem projectVersion : allProjectVersionMatchingItems) {
+        final List<ProjectVersionView> allProjectVersionMatchingItems = getAllItems(hubPagedRequest, ProjectVersionView.class);
+        for (final ProjectVersionView projectVersion : allProjectVersionMatchingItems) {
             if (projectVersionName.equals(projectVersion.getVersionName())) {
                 return projectVersion;
             }
@@ -66,17 +66,17 @@ public class ProjectVersionRequestService extends HubResponseService {
         throw new DoesNotExistException(String.format("Could not find the version: %s for project: %s", projectVersionName, project.getName()));
     }
 
-    public List<ProjectVersionItem> getAllProjectVersions(final ProjectItem project) throws IntegrationException {
+    public List<ProjectVersionView> getAllProjectVersions(final ProjectView project) throws IntegrationException {
         final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
         return getAllProjectVersions(versionsUrl);
     }
 
-    public List<ProjectVersionItem> getAllProjectVersions(final String versionsUrl) throws IntegrationException {
-        final List<ProjectVersionItem> allProjectVersionItems = getAllItems(versionsUrl, ProjectVersionItem.class);
+    public List<ProjectVersionView> getAllProjectVersions(final String versionsUrl) throws IntegrationException {
+        final List<ProjectVersionView> allProjectVersionItems = getAllItems(versionsUrl, ProjectVersionView.class);
         return allProjectVersionItems;
     }
 
-    public String createHubVersion(final ProjectItem project, final String versionName, final ProjectVersionPhaseEnum phase,
+    public String createHubVersion(final ProjectView project, final String versionName, final ProjectVersionPhaseEnum phase,
             final ProjectVersionDistributionEnum dist)
             throws IntegrationException {
         final JsonObject json = new JsonObject();

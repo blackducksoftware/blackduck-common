@@ -31,7 +31,7 @@ import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPha
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionSourceEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ProjectVersionItem extends HubView {
+public class ProjectVersionView extends HubView {
     private ProjectVersionDistributionEnum distribution;
 
     private ComplexLicenseView license;

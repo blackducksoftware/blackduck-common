@@ -26,12 +26,12 @@ package com.blackducksoftware.integration.hub.api.policy;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-public class PolicyValue {
+public class PolicyRuleExpressionValue {
     private final String label;
 
     private final String value;
 
-    public PolicyValue(final String label, final String value) {
+    public PolicyRuleExpressionValue(final String label, final String value) {
         this.label = label;
         this.value = value;
     }
@@ -61,10 +61,10 @@ public class PolicyValue {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof PolicyValue)) {
+        if (!(obj instanceof PolicyRuleExpressionValue)) {
             return false;
         }
-        final PolicyValue other = (PolicyValue) obj;
+        final PolicyRuleExpressionValue other = (PolicyRuleExpressionValue) obj;
         if (label == null) {
             if (other.label != null) {
                 return false;

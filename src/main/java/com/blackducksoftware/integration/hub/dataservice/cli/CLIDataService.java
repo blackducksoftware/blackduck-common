@@ -33,9 +33,9 @@ import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationReques
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.project.ProjectView;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryView;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
@@ -135,8 +135,8 @@ public class CLIDataService {
 
     private void cleanupCodeLocations(final List<ScanSummaryView> scans, final HubScanConfig hubScanConfig) throws IntegrationException {
         if (hubScanConfig.isDeletePreviousCodeLocations() || hubScanConfig.isUnmapPreviousCodeLocations()) {
-            final ProjectItem project = projectRequestService.getProjectByName(hubScanConfig.getProjectName());
-            final ProjectVersionItem version = projectVersionRequestService.getProjectVersion(project, hubScanConfig.getVersion());
+            final ProjectView project = projectRequestService.getProjectByName(hubScanConfig.getProjectName());
+            final ProjectVersionView version = projectVersionRequestService.getProjectVersion(project, hubScanConfig.getVersion());
             final List<CodeLocationView> codeLocationsFromCurentScan = getCodeLocationsFromScanSummaries(scans);
 
             final List<CodeLocationView> codeLocationsNotJustScanned = getCodeLocationsNotJustScanned(version, codeLocationsFromCurentScan);
@@ -158,7 +158,7 @@ public class CLIDataService {
         return codeLocations;
     }
 
-    private List<CodeLocationView> getCodeLocationsNotJustScanned(final ProjectVersionItem version,
+    private List<CodeLocationView> getCodeLocationsNotJustScanned(final ProjectVersionView version,
             final List<CodeLocationView> codeLocationsFromCurentScan) throws IntegrationException {
         final List<CodeLocationView> codeLocationsMappedToVersion = codeLocationRequestService.getAllCodeLocationsForProjectVersion(version);
         return getCodeLocationsNotJustScanned(codeLocationsMappedToVersion, codeLocationsFromCurentScan);

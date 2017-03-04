@@ -21,60 +21,65 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.extension;
+package com.blackducksoftware.integration.hub.api.policy;
 
-import java.util.List;
+import java.util.Date;
 
-import com.blackducksoftware.integration.hub.model.enumeration.ExternalExtensionConfigValueOptionEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ConfigurationView extends HubView {
+public class PolicyRuleView extends HubView {
     private String name;
-
-    private ExternalExtensionConfigValueOptionEnum optionType;
-
-    private String title;
-
-    private boolean required;
-
-    private boolean singleValue;
 
     private String description;
 
-    private List<OptionItem> options;
+    private Boolean enabled;
 
-    private List<String> value;
+    private Boolean overridable;
+
+    private PolicyRuleExpressionSet expression;
+
+    private Date createdAt;
+
+    private String createdBy;
+
+    private Date updatedAt;
+
+    private String updatedBy;
 
     public String getName() {
         return name;
-    }
-
-    public ExternalExtensionConfigValueOptionEnum getOptionType() {
-        return optionType;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public boolean isRequired() {
-        return required;
-    }
-
-    public boolean isSingleValue() {
-        return singleValue;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public List<OptionItem> getOptions() {
-        return options;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public List<String> getValue() {
-        return value;
+    public Boolean getOverridable() {
+        return overridable;
+    }
+
+    public PolicyRuleExpressionSet getExpression() {
+        return expression;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
     }
 
 }

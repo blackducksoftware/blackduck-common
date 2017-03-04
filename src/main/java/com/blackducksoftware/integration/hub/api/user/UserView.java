@@ -21,65 +21,46 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.policy;
+package com.blackducksoftware.integration.hub.api.user;
 
-import java.util.Date;
-
+import com.blackducksoftware.integration.hub.model.enumeration.UserGroupCreatedFromEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class PolicyRule extends HubView {
-    private String name;
+public class UserView extends HubView {
+    private String userName;
 
-    private String description;
+    private String firstName;
 
-    private Boolean enabled;
+    private String lastName;
 
-    private Boolean overridable;
+    private String email;
 
-    private PolicyExpressions expression;
+    private UserGroupCreatedFromEnum type;
 
-    private Date createdAt;
+    private Boolean active;
 
-    private String createdBy;
-
-    private Date updatedAt;
-
-    private String updatedBy;
-
-    public String getName() {
-        return name;
+    public String getUserName() {
+        return userName;
     }
 
-    public String getDescription() {
-        return description;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public Boolean getEnabled() {
-        return enabled;
+    public String getLastName() {
+        return lastName;
     }
 
-    public Boolean getOverridable() {
-        return overridable;
+    public String getEmail() {
+        return email;
     }
 
-    public PolicyExpressions getExpression() {
-        return expression;
+    public UserGroupCreatedFromEnum getType() {
+        return type;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
+    public boolean isActive() {
+        return active;
     }
 
 }

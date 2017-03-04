@@ -37,10 +37,10 @@ import com.blackducksoftware.integration.hub.api.notification.NotificationReques
 import com.blackducksoftware.integration.hub.api.notification.NotificationView;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationView;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
-import com.blackducksoftware.integration.hub.api.version.BomComponentVersionPolicyStatus;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.view.BomComponentPolicyStatusView;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
@@ -74,7 +74,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
         final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent()
                 .getComponentVersionStatuses();
         final String projectVersionLink = policyViolation.getContent().getProjectVersionLink();
-        ProjectVersionItem releaseItem;
+        ProjectVersionView releaseItem;
         try {
             releaseItem = getReleaseItem(projectVersionLink);
         } catch (final IntegrationException e) {
@@ -105,7 +105,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
                             componentVersion.getComponentName()));
                     continue;
                 }
-                final BomComponentVersionPolicyStatus bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(bomComponentVersionPolicyStatusUrl);
+                final BomComponentPolicyStatusView bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(bomComponentVersionPolicyStatusUrl);
                 if (bomComponentVersionPolicyStatus.getApprovalStatus() != VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION) {
                     getLogger().debug(String.format("Component %s is not in violation; skipping it", componentVersion.getComponentName()));
                     continue;
@@ -118,9 +118,9 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
                 }
                 final List<String> ruleList = getMatchingRuleUrls(componentVersion.getPolicies());
                 if (ruleList != null && !ruleList.isEmpty()) {
-                    final List<PolicyRule> policyRuleList = new ArrayList<>();
+                    final List<PolicyRuleView> policyRuleList = new ArrayList<>();
                     for (final String ruleUrl : ruleList) {
-                        final PolicyRule rule = getPolicyRule(ruleUrl);
+                        final PolicyRuleView rule = getPolicyRule(ruleUrl);
                         policyRuleList.add(rule);
                     }
                     createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
@@ -135,15 +135,15 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
         }
     }
 
-    private ProjectVersionItem getReleaseItem(final String projectVersionLink) throws IntegrationException {
-        final ProjectVersionItem releaseItem = getProjectVersionService().getItem(projectVersionLink, ProjectVersionItem.class);
+    private ProjectVersionView getReleaseItem(final String projectVersionLink) throws IntegrationException {
+        final ProjectVersionView releaseItem = getProjectVersionService().getItem(projectVersionLink, ProjectVersionView.class);
         return releaseItem;
     }
 
     @Override
     public void createContents(final ProjectVersionModel projectVersion, final String componentName,
             final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
-            final List<PolicyRule> policyRuleList, final NotificationView item,
+            final List<PolicyRuleView> policyRuleList, final NotificationView item,
             final List<NotificationContentItem> templateData) throws URISyntaxException {
         templateData.add(new PolicyViolationContentItem(item.getCreatedAt(), projectVersion, componentName,
                 componentVersion, componentUrl, componentVersionUrl, policyRuleList));

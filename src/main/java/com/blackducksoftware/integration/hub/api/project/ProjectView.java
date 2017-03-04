@@ -21,18 +21,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.extension;
+package com.blackducksoftware.integration.hub.api.project;
 
+import com.blackducksoftware.integration.hub.model.enumeration.ProjectSourceEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ExtensionView extends HubView {
+public class ProjectView extends HubView {
+    // description from Hub API: "The general identifier of the project"
     private String name;
 
+    // description from Hub API: "Summary of what the project represents in terms of functionality and use"
     private String description;
 
-    private String infoUrl;
+    // description from Hub API: "Whether BOM level adjustments are applied at the project level (to all releases)"
+    private boolean projectLevelAdjustments;
 
-    private Boolean authenticated;
+    // description from Hub API: "Allowed values : [1,2,3,4,5]"
+    private int projectTier;
+
+    private ProjectSourceEnum source;
 
     public String getName() {
         return name;
@@ -42,11 +49,16 @@ public class ExtensionView extends HubView {
         return description;
     }
 
-    public String getInfoUrl() {
-        return infoUrl;
+    public boolean isProjectLevelAdjustments() {
+        return projectLevelAdjustments;
     }
 
-    public boolean isAuthenticated() {
-        return authenticated;
+    public int getProjectTier() {
+        return projectTier;
     }
+
+    public ProjectSourceEnum getSource() {
+        return source;
+    }
+
 }

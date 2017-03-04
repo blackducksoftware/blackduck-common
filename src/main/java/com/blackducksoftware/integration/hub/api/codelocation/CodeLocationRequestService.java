@@ -31,7 +31,7 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.enumeration.CodeLocationEnum;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
@@ -63,7 +63,7 @@ public class CodeLocationRequestService extends HubResponseService {
         return allCodeLocations;
     }
 
-    public List<CodeLocationView> getAllCodeLocationsForProjectVersion(final ProjectVersionItem version) throws IntegrationException {
+    public List<CodeLocationView> getAllCodeLocationsForProjectVersion(final ProjectVersionView version) throws IntegrationException {
         final String codeLocationUrl = metaService.getFirstLink(version, MetaService.CODE_LOCATION_LINK);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(codeLocationUrl);
 

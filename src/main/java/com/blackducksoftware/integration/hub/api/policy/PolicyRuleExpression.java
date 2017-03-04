@@ -28,14 +28,14 @@ import java.util.List;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-public class PolicyExpression {
+public class PolicyRuleExpression {
     private final String name;
 
     private final String operation;
 
-    private final List<PolicyValue> values;
+    private final List<PolicyRuleExpressionValue> values;
 
-    public PolicyExpression(final String name, final String operation, final List<PolicyValue> values) {
+    public PolicyRuleExpression(final String name, final String operation, final List<PolicyRuleExpressionValue> values) {
         this.name = name;
         this.operation = operation;
         this.values = values;
@@ -53,7 +53,7 @@ public class PolicyExpression {
         return operation;
     }
 
-    public List<PolicyValue> getValues() {
+    public List<PolicyRuleExpressionValue> getValues() {
         return values;
     }
 
@@ -75,10 +75,10 @@ public class PolicyExpression {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof PolicyExpression)) {
+        if (!(obj instanceof PolicyRuleExpression)) {
             return false;
         }
-        final PolicyExpression other = (PolicyExpression) obj;
+        final PolicyRuleExpression other = (PolicyRuleExpression) obj;
         if (name == null) {
             if (other.name != null) {
                 return false;

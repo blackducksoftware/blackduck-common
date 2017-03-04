@@ -31,7 +31,7 @@ import org.joda.time.DateTime;
 import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class PolicyStatusItem extends HubView {
+public class VersionBomPolicyStatusView extends HubView {
     private VersionBomPolicyStatusOverallStatusEnum overallStatus;
 
     private String updatedAt;

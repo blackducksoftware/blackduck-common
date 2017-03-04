@@ -30,15 +30,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.extension.ConfigurationView;
+import com.blackducksoftware.integration.hub.api.extension.ExternalExtensionConfigValueView;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
-import com.blackducksoftware.integration.hub.api.extension.UserOptionLinkView;
-import com.blackducksoftware.integration.hub.api.user.UserItem;
+import com.blackducksoftware.integration.hub.api.extension.ExternalExtensionUserView;
+import com.blackducksoftware.integration.hub.api.user.UserView;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
 
-public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, UserOptionLinkView> {
+public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, ExternalExtensionUserView> {
     private final UserRequestService userRequestService;
 
     private final ExtensionConfigRequestService extensionConfigRequestService;
@@ -50,27 +50,27 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
     }
 
     @Override
-    public List<UserConfigItem> transform(final UserOptionLinkView item) throws IntegrationException {
-        final UserItem user = userRequestService.getItem(item.getUser(), UserItem.class);
+    public List<UserConfigItem> transform(final ExternalExtensionUserView item) throws IntegrationException {
+        final UserView user = userRequestService.getItem(item.getUser(), UserView.class);
         if (!user.isActive()) {
             return Collections.emptyList();
         } else {
-            final Map<String, ConfigurationView> configItems = getUserConfigOptions(item.getExtensionOptions());
+            final Map<String, ExternalExtensionConfigValueView> configItems = getUserConfigOptions(item.getExtensionOptions());
             final List<UserConfigItem> itemList = new ArrayList<>(configItems.size());
             itemList.add(new UserConfigItem(user, configItems));
             return itemList;
         }
     }
 
-    private Map<String, ConfigurationView> getUserConfigOptions(final String userConfigUrl) throws IntegrationException {
-        final List<ConfigurationView> userItemList = extensionConfigRequestService.getUserConfiguration(userConfigUrl);
-        final Map<String, ConfigurationView> itemMap = createConfigMap(userItemList);
+    private Map<String, ExternalExtensionConfigValueView> getUserConfigOptions(final String userConfigUrl) throws IntegrationException {
+        final List<ExternalExtensionConfigValueView> userItemList = extensionConfigRequestService.getUserConfiguration(userConfigUrl);
+        final Map<String, ExternalExtensionConfigValueView> itemMap = createConfigMap(userItemList);
         return itemMap;
     }
 
-    private Map<String, ConfigurationView> createConfigMap(final List<ConfigurationView> itemList) {
-        final Map<String, ConfigurationView> itemMap = new HashMap<>(itemList.size());
-        for (final ConfigurationView item : itemList) {
+    private Map<String, ExternalExtensionConfigValueView> createConfigMap(final List<ExternalExtensionConfigValueView> itemList) {
+        final Map<String, ExternalExtensionConfigValueView> itemMap = new HashMap<>(itemList.size());
+        for (final ExternalExtensionConfigValueView item : itemList) {
             itemMap.put(item.getName(), item);
         }
         return itemMap;

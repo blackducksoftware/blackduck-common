@@ -35,11 +35,11 @@ public class VulnerableBomComponentRequestService extends HubResponseService {
         super(restConnection);
     }
 
-    public List<VulnerableBomComponentItem> getVulnerableComponentsMatchingComponentName(
+    public List<VulnerableComponentView> getVulnerableComponentsMatchingComponentName(
             final String vulnerableBomComponentsUrl, final String componentName) throws IntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(vulnerableBomComponentsUrl, componentName);
 
-        final List<VulnerableBomComponentItem> allItems = getAllItems(hubPagedRequest, VulnerableBomComponentItem.class);
+        final List<VulnerableComponentView> allItems = getAllItems(hubPagedRequest, VulnerableComponentView.class);
         return allItems;
     }
 

@@ -35,8 +35,8 @@ import com.blackducksoftware.integration.hub.api.notification.NotificationReques
 import com.blackducksoftware.integration.hub.api.notification.NotificationView;
 import com.blackducksoftware.integration.hub.api.notification.RuleViolationClearedNotificationView;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
@@ -71,7 +71,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent()
                 .getComponentVersionStatuses();
         final String projectVersionLink = policyViolation.getContent().getProjectVersionLink();
-        ProjectVersionItem releaseItem;
+        ProjectVersionView releaseItem;
         try {
             releaseItem = getReleaseItem(projectVersionLink);
         } catch (final IntegrationException e1) {
@@ -104,12 +104,12 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
                 final List<String> policyUrls = getMatchingRuleUrls(componentVersion.getPolicies());
 
                 if (policyUrls != null) {
-                    List<PolicyRule> ruleList = getRulesFromUrls(policyUrls);
+                    List<PolicyRuleView> ruleList = getRulesFromUrls(policyUrls);
 
                     ruleList = getMatchingRules(ruleList);
                     if (ruleList != null && !ruleList.isEmpty()) {
-                        final List<PolicyRule> policyRuleList = new ArrayList<>();
-                        for (final PolicyRule rule : ruleList) {
+                        final List<PolicyRuleView> policyRuleList = new ArrayList<>();
+                        for (final PolicyRuleView rule : ruleList) {
                             policyRuleList.add(rule);
                         }
                         createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
@@ -124,15 +124,15 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         }
     }
 
-    private ProjectVersionItem getReleaseItem(final String projectVersionLink) throws IntegrationException {
-        final ProjectVersionItem releaseItem = getProjectVersionService().getItem(projectVersionLink, ProjectVersionItem.class);
+    private ProjectVersionView getReleaseItem(final String projectVersionLink) throws IntegrationException {
+        final ProjectVersionView releaseItem = getProjectVersionService().getItem(projectVersionLink, ProjectVersionView.class);
         return releaseItem;
     }
 
     @Override
     public void createContents(final ProjectVersionModel projectVersion, final String componentName,
             final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
-            final List<PolicyRule> policyRuleList, final NotificationView item,
+            final List<PolicyRuleView> policyRuleList, final NotificationView item,
             final List<NotificationContentItem> templateData) throws URISyntaxException {
         final PolicyViolationClearedContentItem contentItem = new PolicyViolationClearedContentItem(item.getCreatedAt(),
                 projectVersion, componentName, componentVersion, componentUrl,

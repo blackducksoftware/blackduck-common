@@ -34,18 +34,18 @@ public class ExtensionConfigRequestService extends HubResponseService {
         super(restConnection);
     }
 
-    public List<ConfigurationView> getGlobalOptions(final String globalConfigUrl) throws IntegrationException {
-        final List<ConfigurationView> allItems = getAllItems(globalConfigUrl, ConfigurationView.class);
+    public List<ExternalExtensionConfigValueView> getGlobalOptions(final String globalConfigUrl) throws IntegrationException {
+        final List<ExternalExtensionConfigValueView> allItems = getAllItems(globalConfigUrl, ExternalExtensionConfigValueView.class);
         return allItems;
     }
 
-    public List<ConfigurationView> getCurrentUserOptions(final String currentUserConfigUrl) throws IntegrationException {
-        final List<ConfigurationView> allItems = getAllItems(currentUserConfigUrl, ConfigurationView.class);
+    public List<ExternalExtensionConfigValueView> getCurrentUserOptions(final String currentUserConfigUrl) throws IntegrationException {
+        final List<ExternalExtensionConfigValueView> allItems = getAllItems(currentUserConfigUrl, ExternalExtensionConfigValueView.class);
         return allItems;
     }
 
-    public List<ConfigurationView> getUserConfiguration(final String userConfigUrl) throws IntegrationException {
-        final List<ConfigurationView> allItems = getAllItems(userConfigUrl, ConfigurationView.class);
+    public List<ExternalExtensionConfigValueView> getUserConfiguration(final String userConfigUrl) throws IntegrationException {
+        final List<ExternalExtensionConfigValueView> allItems = getAllItems(userConfigUrl, ExternalExtensionConfigValueView.class);
         return allItems;
     }
 

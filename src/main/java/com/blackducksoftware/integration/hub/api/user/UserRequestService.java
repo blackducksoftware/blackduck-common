@@ -41,9 +41,9 @@ public class UserRequestService extends HubResponseService {
         super(restConnection);
     }
 
-    public List<UserItem> getAllUsers() throws IntegrationException {
+    public List<UserView> getAllUsers() throws IntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, USERS_SEGMENTS);
-        final List<UserItem> allUserItems = getAllItems(hubPagedRequest, UserItem.class);
+        final List<UserView> allUserItems = getAllItems(hubPagedRequest, UserView.class);
         return allUserItems;
     }
 

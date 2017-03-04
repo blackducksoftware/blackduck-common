@@ -31,7 +31,7 @@ import java.io.IOException;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
+import com.blackducksoftware.integration.hub.api.policy.VersionBomPolicyStatusView;
 import com.blackducksoftware.integration.hub.buildtool.bdio.BdioDependencyWriter;
 import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataService;
@@ -87,10 +87,10 @@ public class BuildToolHelper {
         reportDataService.createReportFiles(outputDirectory, projectName, projectVersionName);
     }
 
-    public PolicyStatusItem checkPolicies(final HubServicesFactory services, final String hubProjectName,
+    public VersionBomPolicyStatusView checkPolicies(final HubServicesFactory services, final String hubProjectName,
             final String hubProjectVersion) throws IntegrationException {
         final PolicyStatusDataService policyStatusDataService = services.createPolicyStatusDataService(logger);
-        final PolicyStatusItem policyStatusItem = policyStatusDataService
+        final VersionBomPolicyStatusView policyStatusItem = policyStatusDataService
                 .getPolicyStatusForProjectAndVersion(hubProjectName, hubProjectVersion);
         return policyStatusItem;
     }

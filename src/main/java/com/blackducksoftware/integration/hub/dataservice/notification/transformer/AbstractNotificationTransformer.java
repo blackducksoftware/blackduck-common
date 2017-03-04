@@ -33,7 +33,7 @@ import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationView;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
@@ -106,9 +106,9 @@ public abstract class AbstractNotificationTransformer
 
     protected ProjectVersionModel createFullProjectVersion(final String projectVersionUrl, final String projectName, final String versionName)
             throws IntegrationException {
-        ProjectVersionItem item;
+        ProjectVersionView item;
         try {
-            item = hubResponseService.getItem(projectVersionUrl, ProjectVersionItem.class);
+            item = hubResponseService.getItem(projectVersionUrl, ProjectVersionView.class);
         } catch (final HubIntegrationException e) {
             final String msg = "Error getting the full ProjectVersion for this affected project version URL: "
                     + projectVersionUrl + ": " + e.getMessage();

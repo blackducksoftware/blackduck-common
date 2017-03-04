@@ -21,44 +21,60 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.project;
+package com.blackducksoftware.integration.hub.api.extension;
 
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectSourceEnum;
+import java.util.List;
+
+import com.blackducksoftware.integration.hub.model.enumeration.ExternalExtensionConfigValueOptionEnum;
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ProjectItem extends HubView {
-    // description from Hub API: "The general identifier of the project"
+public class ExternalExtensionConfigValueView extends HubView {
     private String name;
 
-    // description from Hub API: "Summary of what the project represents in terms of functionality and use"
+    private ExternalExtensionConfigValueOptionEnum optionType;
+
+    private String title;
+
+    private boolean required;
+
+    private boolean singleValue;
+
     private String description;
 
-    // description from Hub API: "Whether BOM level adjustments are applied at the project level (to all releases)"
-    private boolean projectLevelAdjustments;
+    private List<OptionItem> options;
 
-    // description from Hub API: "Allowed values : [1,2,3,4,5]"
-    private int projectTier;
-
-    private ProjectSourceEnum source;
+    private List<String> value;
 
     public String getName() {
         return name;
+    }
+
+    public ExternalExtensionConfigValueOptionEnum getOptionType() {
+        return optionType;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public boolean isSingleValue() {
+        return singleValue;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public boolean isProjectLevelAdjustments() {
-        return projectLevelAdjustments;
+    public List<OptionItem> getOptions() {
+        return options;
     }
 
-    public int getProjectTier() {
-        return projectTier;
-    }
-
-    public ProjectSourceEnum getSource() {
-        return source;
+    public List<String> getValue() {
+        return value;
     }
 
 }

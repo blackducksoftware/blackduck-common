@@ -38,7 +38,7 @@ import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotif
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationView;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
-import com.blackducksoftware.integration.hub.api.user.UserItem;
+import com.blackducksoftware.integration.hub.api.user.UserView;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationClearedTransformer;
@@ -114,7 +114,7 @@ public class NotificationDataService {
         return results;
     }
 
-    public NotificationResults getUserNotifications(final Date startDate, final Date endDate, final UserItem user)
+    public NotificationResults getUserNotifications(final Date startDate, final Date endDate, final UserView user)
             throws IntegrationException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
         final List<NotificationView> itemList = notificationRequestService.getUserNotifications(startDate, endDate, user);

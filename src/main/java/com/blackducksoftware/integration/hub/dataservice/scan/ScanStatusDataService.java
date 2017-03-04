@@ -33,9 +33,9 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.project.ProjectView;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryView;
@@ -168,8 +168,8 @@ public class ScanStatusDataService {
     private List<ScanSummaryView> getPendingScans(final String projectName, final String projectVersion) {
         List<ScanSummaryView> pendingScans = new ArrayList<>();
         try {
-            final ProjectItem projectItem = projectRequestService.getProjectByName(projectName);
-            final ProjectVersionItem projectVersionItem = projectVersionRequestService.getProjectVersion(projectItem, projectVersion);
+            final ProjectView projectItem = projectRequestService.getProjectByName(projectName);
+            final ProjectVersionView projectVersionItem = projectVersionRequestService.getProjectVersion(projectItem, projectVersion);
             final String projectVersionUrl = metaService.getHref(projectVersionItem);
 
             final List<CodeLocationView> allCodeLocations = codeLocationRequestService

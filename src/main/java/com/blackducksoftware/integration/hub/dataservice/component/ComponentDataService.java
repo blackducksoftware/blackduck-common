@@ -31,7 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.UrlConstants;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
-import com.blackducksoftware.integration.hub.api.component.ComponentSearchResponse;
+import com.blackducksoftware.integration.hub.api.component.ComponentSearchResultResponse;
 import com.blackducksoftware.integration.hub.api.component.ComponentView;
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
@@ -68,7 +68,7 @@ public class ComponentDataService {
     public List<ComponentVersionView> getAllComponentVersionsFromComponent(final String namespace, final String groupId, final String artifactId,
             final String version)
             throws IntegrationException {
-        final ComponentSearchResponse component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
+        final ComponentSearchResultResponse component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
         component.getComponent();
 
         final ComponentView componentItem = componentRequestService.getItem(component.getComponent(), ComponentView.class);

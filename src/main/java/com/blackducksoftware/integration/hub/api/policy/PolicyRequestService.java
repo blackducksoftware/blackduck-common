@@ -41,10 +41,10 @@ public class PolicyRequestService extends HubResponseService {
         super(restConnection);
     }
 
-    public List<PolicyRule> getAllPolicyRules() throws IntegrationException {
+    public List<PolicyRuleView> getAllPolicyRules() throws IntegrationException {
         final HubPagedRequest request = getHubRequestFactory().createPagedRequest(POLICY_RULE_SEGMENTS);
 
-        final List<PolicyRule> allPolicyRuleItems = getAllItems(request, PolicyRule.class);
+        final List<PolicyRuleView> allPolicyRuleItems = getAllItems(request, PolicyRuleView.class);
         return allPolicyRuleItems;
     }
 

@@ -24,12 +24,12 @@
 package com.blackducksoftware.integration.hub.dataservice.policystatus;
 
 import com.blackducksoftware.integration.hub.api.policy.ComponentVersionStatusCount;
-import com.blackducksoftware.integration.hub.api.policy.PolicyStatusItem;
+import com.blackducksoftware.integration.hub.api.policy.VersionBomPolicyStatusView;
 
 public class PolicyStatusDescription {
-    private final PolicyStatusItem policyStatusItem;
+    private final VersionBomPolicyStatusView policyStatusItem;
 
-    public PolicyStatusDescription(final PolicyStatusItem policyStatusItem) {
+    public PolicyStatusDescription(final VersionBomPolicyStatusView policyStatusItem) {
         this.policyStatusItem = policyStatusItem;
     }
 

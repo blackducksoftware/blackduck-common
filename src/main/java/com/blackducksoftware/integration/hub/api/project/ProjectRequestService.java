@@ -48,35 +48,35 @@ public class ProjectRequestService extends HubResponseService {
         super(restConnection);
     }
 
-    public List<ProjectItem> getAllProjects() throws IntegrationException {
+    public List<ProjectView> getAllProjects() throws IntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(PROJECTS_SEGMENTS);
-        final List<ProjectItem> allProjectItems = getAllItems(hubPagedRequest, ProjectItem.class);
+        final List<ProjectView> allProjectItems = getAllItems(hubPagedRequest, ProjectView.class);
         return allProjectItems;
     }
 
-    public List<ProjectItem> getAllProjectMatches(final String projectName) throws IntegrationException {
+    public List<ProjectView> getAllProjectMatches(final String projectName) throws IntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, PROJECTS_SEGMENTS);
         if (StringUtils.isNotBlank(projectName)) {
             hubPagedRequest.q = "name:" + projectName;
         }
 
-        final List<ProjectItem> allProjectItems = getAllItems(hubPagedRequest, ProjectItem.class);
+        final List<ProjectView> allProjectItems = getAllItems(hubPagedRequest, ProjectView.class);
         return allProjectItems;
     }
 
-    public List<ProjectItem> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
+    public List<ProjectView> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(limit, PROJECTS_SEGMENTS);
         if (StringUtils.isNotBlank(projectName)) {
             hubPagedRequest.q = "name:" + projectName;
         }
 
-        final List<ProjectItem> projectItems = getItems(hubPagedRequest, ProjectItem.class);
+        final List<ProjectView> projectItems = getItems(hubPagedRequest, ProjectView.class);
         return projectItems;
     }
 
-    public ProjectItem getProjectByName(final String projectName) throws IntegrationException {
-        final List<ProjectItem> allProjectItems = getAllProjectMatches(projectName);
-        for (final ProjectItem project : allProjectItems) {
+    public ProjectView getProjectByName(final String projectName) throws IntegrationException {
+        final List<ProjectView> allProjectItems = getAllProjectMatches(projectName);
+        for (final ProjectView project : allProjectItems) {
             if (projectName.equals(project.getName())) {
                 return project;
             }

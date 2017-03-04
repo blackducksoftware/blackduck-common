@@ -28,12 +28,12 @@ import java.util.List;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-public class PolicyExpressions {
+public class PolicyRuleExpressionSet {
     private final String operator;
 
-    private final List<PolicyExpression> expressions;
+    private final List<PolicyRuleExpression> expressions;
 
-    public PolicyExpressions(final String operator, final List<PolicyExpression> expressions) {
+    public PolicyRuleExpressionSet(final String operator, final List<PolicyRuleExpression> expressions) {
         this.operator = operator;
         this.expressions = expressions;
     }
@@ -42,14 +42,14 @@ public class PolicyExpressions {
         return operator;
     }
 
-    public List<PolicyExpression> getExpressions() {
+    public List<PolicyRuleExpression> getExpressions() {
         return expressions;
     }
 
     public boolean hasOnlyProjectLevelConditions() {
         boolean hasNonProjectLevelCondition = false;
         if (getExpressions() != null && !getExpressions().isEmpty()) {
-            for (final PolicyExpression expression : getExpressions()) {
+            for (final PolicyRuleExpression expression : getExpressions()) {
                 final PolicyRuleConditionEnum condition = expression.getNameConditionEnum();
                 if (condition == PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION) {
                     continue;
@@ -82,10 +82,10 @@ public class PolicyExpressions {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof PolicyExpressions)) {
+        if (!(obj instanceof PolicyRuleExpressionSet)) {
             return false;
         }
-        final PolicyExpressions other = (PolicyExpressions) obj;
+        final PolicyRuleExpressionSet other = (PolicyRuleExpressionSet) obj;
         if (expressions == null) {
             if (other.expressions != null) {
                 return false;

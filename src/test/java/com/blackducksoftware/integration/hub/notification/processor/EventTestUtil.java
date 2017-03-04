@@ -33,8 +33,8 @@ import org.mockito.Mockito;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
-import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityItem;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityView;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
@@ -120,8 +120,8 @@ public class EventTestUtil {
 
     public static final List<MetaAllowEnum> ALLOW_LIST = Collections.emptyList();
 
-    public List<VulnerabilityItem> createVulnerabiltyItemList(final List<VulnerabilitySourceQualifiedId> vulnSourceList) {
-        final List<VulnerabilityItem> vulnerabilityList = new ArrayList<>(vulnSourceList.size());
+    public List<VulnerabilityView> createVulnerabiltyItemList(final List<VulnerabilitySourceQualifiedId> vulnSourceList) {
+        final List<VulnerabilityView> vulnerabilityList = new ArrayList<>(vulnSourceList.size());
         for (final VulnerabilitySourceQualifiedId vulnSource : vulnSourceList) {
             final String vulnId = vulnSource.getVulnerabilityId();
             VulnerabilitySeverityEnum severity = null;
@@ -139,8 +139,8 @@ public class EventTestUtil {
         return vulnerabilityList;
     }
 
-    public VulnerabilityItem createVulnerability(final String vulnId, final VulnerabilitySeverityEnum severity) {
-        final VulnerabilityItem item = Mockito.mock(VulnerabilityItem.class);
+    public VulnerabilityView createVulnerability(final String vulnId, final VulnerabilitySeverityEnum severity) {
+        final VulnerabilityView item = Mockito.mock(VulnerabilityView.class);
         Mockito.when(item.getVulnerabilityName()).thenReturn(vulnId);
         Mockito.when(item.getDescription()).thenReturn("A vulnerability");
         Mockito.when(item.getVulnerabilityPublishedDate()).thenReturn("today");
@@ -160,8 +160,8 @@ public class EventTestUtil {
         return item;
     }
 
-    public PolicyRule createPolicyRule(final String name, final String description, final String createdBy, final String updatedBy, final String href) {
-        final PolicyRule rule = Mockito.mock(PolicyRule.class);
+    public PolicyRuleView createPolicyRule(final String name, final String description, final String createdBy, final String updatedBy, final String href) {
+        final PolicyRuleView rule = Mockito.mock(PolicyRuleView.class);
         rule.json = createPolicyRuleJSon(href);
         Mockito.when(rule.getName()).thenReturn(name);
         Mockito.when(rule.getDescription()).thenReturn(description);
@@ -191,7 +191,7 @@ public class EventTestUtil {
         final String componentUrl = COMPONENT_URL_PREFIX + componentName;
         final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT
                 + componentVersion;
-        final List<PolicyRule> policyRuleList = new ArrayList<>();
+        final List<PolicyRuleView> policyRuleList = new ArrayList<>();
         policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
         policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
         final PolicyOverrideContentItem item = new PolicyOverrideContentItem(createdTime, projectVersion, componentName,
@@ -218,7 +218,7 @@ public class EventTestUtil {
         final String componentUrl = COMPONENT_URL_PREFIX + componentName;
         final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT
                 + componentVersion;
-        final List<PolicyRule> policyRuleList = new ArrayList<>();
+        final List<PolicyRuleView> policyRuleList = new ArrayList<>();
         policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
         policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
         final PolicyViolationClearedContentItem item = new PolicyViolationClearedContentItem(createdTime,
@@ -238,7 +238,7 @@ public class EventTestUtil {
         final String componentUrl = COMPONENT_URL_PREFIX + componentName;
         final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT
                 + componentVersion;
-        final List<PolicyRule> policyRuleList = new ArrayList<>();
+        final List<PolicyRuleView> policyRuleList = new ArrayList<>();
         policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
         policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
         final PolicyViolationContentItem item = new PolicyViolationContentItem(createdTime, projectVersion,

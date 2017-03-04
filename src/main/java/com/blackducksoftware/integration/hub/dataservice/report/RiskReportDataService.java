@@ -34,9 +34,9 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.project.ProjectItem;
+import com.blackducksoftware.integration.hub.api.project.ProjectView;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
@@ -90,12 +90,12 @@ public class RiskReportDataService extends HubResponseService {
 
     public ReportData getRiskReportData(final String projectName, final String projectVersionName)
             throws IntegrationException {
-        final ProjectItem project = projectRequestService.getProjectByName(projectName);
-        final ProjectVersionItem version = projectVersionRequestService.getProjectVersion(project, projectVersionName);
+        final ProjectView project = projectRequestService.getProjectByName(projectName);
+        final ProjectVersionView version = projectVersionRequestService.getProjectVersion(project, projectVersionName);
         return getRiskReportData(project, version);
     }
 
-    public ReportData getRiskReportData(final ProjectItem project, final ProjectVersionItem version)
+    public ReportData getRiskReportData(final ProjectView project, final ProjectVersionView version)
             throws IntegrationException {
         final String originalProjectUrl = metaService.getHref(project);
         final String originalVersionUrl = metaService.getHref(version);
@@ -142,7 +142,7 @@ public class RiskReportDataService extends HubResponseService {
         createReportFiles(outputDirectory, reportData);
     }
 
-    public void createReportFiles(final File outputDirectory, final ProjectItem project, final ProjectVersionItem version) throws IntegrationException {
+    public void createReportFiles(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws IntegrationException {
         final ReportData reportData = getRiskReportData(project, version);
         createReportFiles(outputDirectory, reportData);
     }

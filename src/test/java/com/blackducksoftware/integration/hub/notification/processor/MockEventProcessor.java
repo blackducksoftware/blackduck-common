@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRuleView;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
@@ -77,7 +77,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
     }
 
     private void handlePolicyViolation(final PolicyViolationContentItem policyViolationContentItem) throws HubIntegrationException {
-        for (final PolicyRule rule : policyViolationContentItem.getPolicyRuleList()) {
+        for (final PolicyRuleView rule : policyViolationContentItem.getPolicyRuleList()) {
             final String eventKey = generatePolicyEventKey(policyViolationContentItem, rule);
             final Map<String, Object> dataSet = generatePolicyDataSet(policyViolationContentItem, rule);
             final NotificationEvent event = new NotificationEvent(eventKey, NotificationCategoryEnum.POLICY_VIOLATION, dataSet);
@@ -86,7 +86,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
     }
 
     private void handlePolicyOverride(final PolicyOverrideContentItem policyOverrideContentItem) throws HubIntegrationException {
-        for (final PolicyRule rule : policyOverrideContentItem.getPolicyRuleList()) {
+        for (final PolicyRuleView rule : policyOverrideContentItem.getPolicyRuleList()) {
             final String eventKey = generatePolicyEventKey(policyOverrideContentItem, rule);
             final Map<String, Object> dataSet = generatePolicyOverrideDataSet(policyOverrideContentItem, rule);
             final NotificationEvent event = new NotificationEvent(eventKey, NotificationCategoryEnum.POLICY_VIOLATION,
@@ -101,7 +101,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
     }
 
     private void handlePolicyCleared(final PolicyViolationClearedContentItem policyViolationCleared) throws HubIntegrationException {
-        for (final PolicyRule rule : policyViolationCleared.getPolicyRuleList()) {
+        for (final PolicyRuleView rule : policyViolationCleared.getPolicyRuleList()) {
             final String eventKey = generatePolicyEventKey(policyViolationCleared, rule);
             final Map<String, Object> dataSet = generatePolicyDataSet(policyViolationCleared, rule);
             final NotificationEvent event = new NotificationEvent(eventKey, NotificationCategoryEnum.POLICY_VIOLATION, dataSet);
@@ -148,7 +148,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
         return set;
     }
 
-    private String generatePolicyEventKey(final PolicyViolationContentItem content, final PolicyRule rule) throws HubIntegrationException {
+    private String generatePolicyEventKey(final PolicyViolationContentItem content, final PolicyRuleView rule) throws HubIntegrationException {
         final StringBuilder keyBuilder = new StringBuilder();
         keyBuilder.append(NotificationEventConstants.EVENT_KEY_ISSUE_TYPE_NAME);
         keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
@@ -202,7 +202,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
         return key;
     }
 
-    private Map<String, Object> generatePolicyDataSet(final PolicyViolationContentItem content, final PolicyRule rule) {
+    private Map<String, Object> generatePolicyDataSet(final PolicyViolationContentItem content, final PolicyRuleView rule) {
         final Map<String, Object> dataSet = new LinkedHashMap<>(4);
         dataSet.put(ItemTypeEnum.RULE.name(), rule.getName());
         dataSet.put(ItemTypeEnum.COMPONENT.name(), content.getComponentName());
@@ -210,7 +210,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
         return dataSet;
     }
 
-    private Map<String, Object> generatePolicyOverrideDataSet(final PolicyOverrideContentItem content, final PolicyRule rule) {
+    private Map<String, Object> generatePolicyOverrideDataSet(final PolicyOverrideContentItem content, final PolicyRuleView rule) {
         final Map<String, Object> dataSet = generatePolicyDataSet(content, rule);
         final String person = StringUtils.join(" ", content.getFirstName(), content.getLastName());
         dataSet.put(ItemTypeEnum.PERSON.name(), person);

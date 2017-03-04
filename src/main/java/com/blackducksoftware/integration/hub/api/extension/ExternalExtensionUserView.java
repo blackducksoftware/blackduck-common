@@ -21,59 +21,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.report;
-
-import java.util.Date;
+package com.blackducksoftware.integration.hub.api.extension;
 
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class ReportInformationItem extends HubView {
-    private String reportFormat;
+public class ExternalExtensionUserView extends HubView {
+    private String user;
 
-    private String locale;
+    private String extensionOptions;
 
-    private String fileName;
-
-    private int fileSize;
-
-    private Date createdAt;
-
-    private Date updatedAt;
-
-    private Date finishedAt;
-
-    private String createdBy;
-
-    public String getReportFormat() {
-        return reportFormat;
+    public String getUser() {
+        return user;
     }
 
-    public String getLocale() {
-        return locale;
+    public String getExtensionOptions() {
+        return extensionOptions;
     }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public int getFileSize() {
-        return fileSize;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public Date getFinishedAt() {
-        return finishedAt;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
 }

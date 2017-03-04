@@ -21,47 +21,59 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.user;
+package com.blackducksoftware.integration.hub.api.report;
 
-import com.blackducksoftware.integration.hub.model.enumeration.UserGroupCreatedFromEnum;
+import java.util.Date;
+
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class UserItem extends HubView {
+public class ReportView extends HubView {
+    private String reportFormat;
 
-    private String userName;
+    private String locale;
 
-    private String firstName;
+    private String fileName;
 
-    private String lastName;
+    private int fileSize;
 
-    private String email;
+    private Date createdAt;
 
-    private UserGroupCreatedFromEnum type;
+    private Date updatedAt;
 
-    private Boolean active;
+    private Date finishedAt;
 
-    public String getUserName() {
-        return userName;
+    private String createdBy;
+
+    public String getReportFormat() {
+        return reportFormat;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getLocale() {
+        return locale;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getFileName() {
+        return fileName;
     }
 
-    public String getEmail() {
-        return email;
+    public int getFileSize() {
+        return fileSize;
     }
 
-    public UserGroupCreatedFromEnum getType() {
-        return type;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public boolean isActive() {
-        return active;
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Date getFinishedAt() {
+        return finishedAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
     }
 
 }

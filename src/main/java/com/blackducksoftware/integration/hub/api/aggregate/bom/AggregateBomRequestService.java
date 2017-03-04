@@ -27,7 +27,7 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionItem;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -41,7 +41,7 @@ public class AggregateBomRequestService extends HubResponseService {
         this.metaService = metaService;
     }
 
-    public List<VersionBomComponentView> getBomEntries(final ProjectVersionItem projectVersion) throws IntegrationException {
+    public List<VersionBomComponentView> getBomEntries(final ProjectVersionView projectVersion) throws IntegrationException {
         final String componentURL = metaService.getFirstLink(projectVersion, MetaService.COMPONENTS_LINK);
         return getBomEntries(componentURL);
     }

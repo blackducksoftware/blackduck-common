@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRule;
+import com.blackducksoftware.integration.hub.api.policy.PolicyRuleView;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 
 public class PolicyViolationClearedContentItem extends PolicyViolationContentItem {
@@ -36,7 +36,7 @@ public class PolicyViolationClearedContentItem extends PolicyViolationContentIte
             final String componentName,
             final ComponentVersionView componentVersion, final String componentUrl,
             final String componentVersionUrl,
-            final List<PolicyRule> policyRuleList) throws URISyntaxException {
+            final List<PolicyRuleView> policyRuleList) throws URISyntaxException {
         super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl,
                 policyRuleList);
     }

@@ -23,31 +23,20 @@
  */
 package com.blackducksoftware.integration.hub.api.component;
 
-import org.apache.commons.lang3.builder.RecursiveToStringStyle;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-
 import com.blackducksoftware.integration.hub.model.response.HubResponse;
 
-public class ComponentSearchResponse extends HubResponse {
+public class ComponentSearchResultResponse extends HubResponse {
     // ****URL**** //
-    private final String component;
+    private String component;
 
-    private final String componentName;
+    private String componentName;
 
-    private final String originId;
+    private String originId;
 
     // ****URL**** //
-    private final String version;
+    private String version;
 
-    private final String versionName;
-
-    public ComponentSearchResponse(String component, String componentName, String originId, String version, String versionName) {
-        this.component = component;
-        this.componentName = componentName;
-        this.originId = originId;
-        this.version = version;
-        this.versionName = versionName;
-    }
+    private String versionName;
 
     public String getComponent() {
         return component;
@@ -67,11 +56,6 @@ public class ComponentSearchResponse extends HubResponse {
 
     public String getVersionName() {
         return versionName;
-    }
-
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }

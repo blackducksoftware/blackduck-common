@@ -25,16 +25,28 @@ package com.blackducksoftware.integration.hub.api.extension;
 
 import com.blackducksoftware.integration.hub.model.view.HubView;
 
-public class UserOptionLinkView extends HubView {
-    private String user;
+public class ExternalExtensionView extends HubView {
+    private String name;
 
-    private String extensionOptions;
+    private String description;
 
-    public String getUser() {
-        return user;
+    private String infoUrl;
+
+    private Boolean authenticated;
+
+    public String getName() {
+        return name;
     }
 
-    public String getExtensionOptions() {
-        return extensionOptions;
+    public String getDescription() {
+        return description;
+    }
+
+    public String getInfoUrl() {
+        return infoUrl;
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
     }
 }
