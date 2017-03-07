@@ -107,7 +107,7 @@ public class NotificationRequestService {
 
     public <T extends NotificationView> T getItemAs(final JsonElement item, final Class<T> clazz) {
         final T hubItem = gson.fromJson(item, clazz);
-        hubItem.json = item.getAsString();
+        hubItem.json = gson.toJson(item);
         return hubItem;
     }
 
