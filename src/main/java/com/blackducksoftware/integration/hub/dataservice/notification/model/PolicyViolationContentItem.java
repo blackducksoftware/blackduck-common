@@ -27,9 +27,9 @@ import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRuleView;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
+import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
 
 public class PolicyViolationContentItem extends PolicyContentItem {
     private final List<PolicyRuleView> policyRuleList;

@@ -30,13 +30,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.extension.ExternalExtensionConfigValueView;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
-import com.blackducksoftware.integration.hub.api.extension.ExternalExtensionUserView;
-import com.blackducksoftware.integration.hub.api.user.UserView;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
+import com.blackducksoftware.integration.hub.model.view.ExternalExtensionConfigValueView;
+import com.blackducksoftware.integration.hub.model.view.ExternalExtensionUserView;
+import com.blackducksoftware.integration.hub.model.view.UserView;
 
 public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, ExternalExtensionUserView> {
     private final UserRequestService userRequestService;

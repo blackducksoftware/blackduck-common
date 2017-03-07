@@ -31,11 +31,11 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.UrlConstants;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
-import com.blackducksoftware.integration.hub.api.component.ComponentSearchResultResponse;
-import com.blackducksoftware.integration.hub.api.component.ComponentView;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
+import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.model.view.ComponentView;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ComponentDataService {
@@ -53,7 +53,8 @@ public class ComponentDataService {
         this.metaService = metaService;
     }
 
-    public ComponentVersionView getExactComponentVersionFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
+    public ComponentVersionView getExactComponentVersionFromComponent(final String namespace, final String groupId, final String artifactId,
+            final String version)
             throws IntegrationException {
         for (final ComponentVersionView componentVersion : this.getAllComponentVersionsFromComponent(namespace, groupId, artifactId, version)) {
             if (componentVersion.getVersionName().equals(version)) {

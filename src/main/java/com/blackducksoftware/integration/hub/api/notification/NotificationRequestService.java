@@ -38,8 +38,13 @@ import java.util.TimeZone;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.user.UserView;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.model.view.NotificationView;
+import com.blackducksoftware.integration.hub.model.view.PolicyOverrideNotificationView;
+import com.blackducksoftware.integration.hub.model.view.RuleViolationClearedNotificationView;
+import com.blackducksoftware.integration.hub.model.view.RuleViolationNotificationView;
+import com.blackducksoftware.integration.hub.model.view.UserView;
+import com.blackducksoftware.integration.hub.model.view.VulnerabilityNotificationView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
