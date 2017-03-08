@@ -31,7 +31,6 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
-import com.blackducksoftware.integration.hub.api.bom.BomRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
@@ -226,10 +225,6 @@ public class HubServicesFactory {
 
     public MetaService createMetaService(final IntLogger logger) {
         return new MetaService(logger, restConnection.jsonParser);
-    }
-
-    public BomRequestService createBomRequestService() {
-        return new BomRequestService(restConnection);
     }
 
     public HubResponseService createHubResponseService() {

@@ -31,10 +31,6 @@ import java.util.List;
 
 import org.mockito.Mockito;
 
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
-import com.blackducksoftware.integration.hub.api.notification.VulnerabilitySourceQualifiedId;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRuleView;
-import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityView;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
@@ -42,6 +38,10 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Poli
 import com.blackducksoftware.integration.hub.dataservice.notification.model.VulnerabilityContentItem;
 import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.VulnerabilitySeverityEnum;
+import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.model.view.VulnerabilityView;
+import com.blackducksoftware.integration.hub.model.view.components.VulnerabilitySourceQualifiedId;
 
 public class EventTestUtil {
     public static final String DESCRIPTION = "description";
