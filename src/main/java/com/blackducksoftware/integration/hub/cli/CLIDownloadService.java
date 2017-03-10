@@ -203,12 +203,8 @@ public class CLIDownloadService {
                     .getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
             final File customCacerts = new File(customCacertsPath);
 
-            String cacertsFilename = "cacerts";
-            File cacerts = new File(securityDirectory, cacertsFilename);
-            if (!cacerts.exists()) {
-                cacertsFilename = "jssecacerts";
-                cacerts = new File(securityDirectory, cacertsFilename);
-            }
+            final String cacertsFilename = customCacerts.getName();
+            final File cacerts = new File(securityDirectory, cacertsFilename);
             final File cacertsBackup = new File(securityDirectory, cacertsFilename + System.currentTimeMillis());
 
             try {
