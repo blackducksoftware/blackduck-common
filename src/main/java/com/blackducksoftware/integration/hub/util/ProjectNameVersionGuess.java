@@ -1,10 +1,11 @@
 package com.blackducksoftware.integration.hub.util;
 
 public class ProjectNameVersionGuess {
-    private String projectName;
-    private String versionName;
+    private final String projectName;
 
-    public ProjectNameVersionGuess(String projectName, String versionName) {
+    private final String versionName;
+
+    public ProjectNameVersionGuess(final String projectName, final String versionName) {
         this.projectName = projectName;
         this.versionName = versionName;
     }
