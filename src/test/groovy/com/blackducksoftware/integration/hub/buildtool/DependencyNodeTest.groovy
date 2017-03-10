@@ -23,8 +23,6 @@
  */
 package com.blackducksoftware.integration.hub.buildtool
 
-import static org.junit.Assert.*
-
 import org.junit.Test
 
 class DependencyNodeTest {
@@ -88,7 +86,7 @@ class DependencyNodeTest {
     }
 
     void compareNode(DependencyNode expected, DependencyNode actual){
-        assertEquals(expected.gav, actual.gav)
+        assert expected.gav.equals(actual.gav)
         assert actual.children.size() == expected.children.size()
         if(actual.children.size() > 0){
             actual.children.each{ actualChild ->

@@ -25,9 +25,9 @@ package com.blackducksoftware.integration.hub.dataservice.license;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
-import com.blackducksoftware.integration.hub.api.component.ComponentSearchResultResponse;
-import com.blackducksoftware.integration.hub.api.component.version.ComplexLicenseView;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionView;
+import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
+import com.blackducksoftware.integration.hub.model.view.ComplexLicenseView;
+import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
 
 public class LicenseDataService {
 

@@ -31,14 +31,8 @@ import java.util.TreeSet;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationView;
-import com.blackducksoftware.integration.hub.api.notification.PolicyOverrideNotificationView;
-import com.blackducksoftware.integration.hub.api.notification.RuleViolationClearedNotificationView;
-import com.blackducksoftware.integration.hub.api.notification.RuleViolationNotificationView;
-import com.blackducksoftware.integration.hub.api.notification.VulnerabilityNotificationView;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
-import com.blackducksoftware.integration.hub.api.user.UserView;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationClearedTransformer;
@@ -47,6 +41,12 @@ import com.blackducksoftware.integration.hub.dataservice.notification.transforme
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
+import com.blackducksoftware.integration.hub.model.view.NotificationView;
+import com.blackducksoftware.integration.hub.model.view.PolicyOverrideNotificationView;
+import com.blackducksoftware.integration.hub.model.view.RuleViolationClearedNotificationView;
+import com.blackducksoftware.integration.hub.model.view.RuleViolationNotificationView;
+import com.blackducksoftware.integration.hub.model.view.UserView;
+import com.blackducksoftware.integration.hub.model.view.VulnerabilityNotificationView;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
 

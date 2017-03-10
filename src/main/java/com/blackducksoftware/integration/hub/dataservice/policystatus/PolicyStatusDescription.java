@@ -23,8 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.policystatus;
 
-import com.blackducksoftware.integration.hub.api.policy.ComponentVersionStatusCount;
-import com.blackducksoftware.integration.hub.api.policy.VersionBomPolicyStatusView;
+import com.blackducksoftware.integration.hub.model.view.VersionBomPolicyStatusView;
+import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionStatusCount;
 
 public class PolicyStatusDescription {
     private final VersionBomPolicyStatusView policyStatusItem;
