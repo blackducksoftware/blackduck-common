@@ -141,7 +141,8 @@ public class HubServerConfigValidator extends AbstractValidator {
         }
         if (proxyHost != null && proxyPort != null && proxyInfo == null) {
             // asserting proxy is valid if the User set the proxy information
-            assertProxyValid();
+            final ValidationResults proxyResults = assertProxyValid();
+            result.addAllResultsStrings(proxyResults.getResultMap(), proxyResults.getValidationStatus());
         }
         URL hubURL = null;
         try {
