@@ -58,6 +58,7 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class RiskReportDataService extends HubResponseService {
+
     private final IntLogger logger;
 
     private final ProjectRequestService projectRequestService;
@@ -199,7 +200,7 @@ public class RiskReportDataService extends HubResponseService {
         component.setComponentURL(getReportProjectUrl(bomEntry.getComponent()));
         component.setComponentVersion(bomEntry.getComponentVersionName());
         component.setComponentVersionURL(getReportVersionUrl(bomEntry.getComponentVersion(), true));
-
+        component.setLicense(bomEntry.getLicenses().get(0).licenseDisplay);
         if (bomEntry.getSecurityRiskProfile() != null && bomEntry.getSecurityRiskProfile().counts != null
                 && !bomEntry.getSecurityRiskProfile().counts.isEmpty()) {
             for (final RiskCountView count : bomEntry.getSecurityRiskProfile().counts) {
