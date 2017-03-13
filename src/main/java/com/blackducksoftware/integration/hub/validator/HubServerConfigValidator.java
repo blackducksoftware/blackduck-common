@@ -139,7 +139,9 @@ public class HubServerConfigValidator extends AbstractValidator {
                     new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_FOUND));
             return;
         }
-
+        if (proxyHost != null && proxyPort != null && proxyInfo == null) {
+            assertProxyValid();
+        }
         URL hubURL = null;
         try {
             hubURL = new URL(hubUrl);
@@ -151,15 +153,11 @@ public class HubServerConfigValidator extends AbstractValidator {
             result.addResult(HubServerConfigFieldEnum.HUBURL,
                     new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
         }
-
         if (hubURL == null) {
             return;
         }
-
         final HttpUrl url = HttpUrl.parse(hubUrl);
-
         final OkHttpClient.Builder builder = new OkHttpClient.Builder();
-
         builder.connectTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
         builder.writeTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
         builder.readTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
@@ -184,11 +182,9 @@ public class HubServerConfigValidator extends AbstractValidator {
 
             final Request request = new Request.Builder()
                     .url(url).get().build();
-
             Response response = null;
             try {
                 response = client.newCall(request).execute();
-
                 if (!response.isSuccessful()) {
                     if (response.code() == 407) {
                         result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
@@ -197,7 +193,6 @@ public class HubServerConfigValidator extends AbstractValidator {
                     }
                     result.addResult(HubServerConfigFieldEnum.HUBURL,
                             new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl));
-
                 }
             } finally {
                 if (response != null) {
