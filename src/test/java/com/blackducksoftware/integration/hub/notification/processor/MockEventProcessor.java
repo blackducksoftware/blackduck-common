@@ -142,7 +142,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
     private Set<String> getVulnerabilityIds(final List<VulnerabilitySourceQualifiedId> itemList) {
         final Set<String> set = new HashSet<>();
         for (final VulnerabilitySourceQualifiedId item : itemList) {
-            set.add(item.getVulnerabilityId());
+            set.add(item.vulnerabilityId);
         }
 
         return set;

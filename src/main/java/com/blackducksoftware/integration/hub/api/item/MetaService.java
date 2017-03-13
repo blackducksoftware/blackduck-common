@@ -28,7 +28,7 @@ import java.util.List;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
-import com.blackducksoftware.integration.hub.model.view.HubView;
+import com.blackducksoftware.integration.hub.model.HubView;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

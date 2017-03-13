@@ -30,7 +30,7 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.response.HubResponse;
+import com.blackducksoftware.integration.hub.model.HubResponse;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;

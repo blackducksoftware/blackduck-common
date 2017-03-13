@@ -58,7 +58,6 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class RiskReportDataService extends HubResponseService {
-
     private final IntLogger logger;
 
     private final ProjectRequestService projectRequestService;
@@ -201,39 +200,39 @@ public class RiskReportDataService extends HubResponseService {
         component.setComponentVersion(bomEntry.getComponentVersionName());
         component.setComponentVersionURL(getReportVersionUrl(bomEntry.getComponentVersion(), true));
 
-        if (bomEntry.getSecurityRiskProfile() != null && bomEntry.getSecurityRiskProfile().getCounts() != null
-                && !bomEntry.getSecurityRiskProfile().getCounts().isEmpty()) {
-            for (final RiskCountView count : bomEntry.getSecurityRiskProfile().getCounts()) {
-                if (count.getCountType() == RiskCountEnum.HIGH && count.getCount() > 0) {
-                    component.setSecurityRiskHighCount(count.getCount());
-                } else if (count.getCountType() == RiskCountEnum.MEDIUM && count.getCount() > 0) {
-                    component.setSecurityRiskMediumCount(count.getCount());
-                } else if (count.getCountType() == RiskCountEnum.LOW && count.getCount() > 0) {
-                    component.setSecurityRiskLowCount(count.getCount());
+        if (bomEntry.getSecurityRiskProfile() != null && bomEntry.getSecurityRiskProfile().counts != null
+                && !bomEntry.getSecurityRiskProfile().counts.isEmpty()) {
+            for (final RiskCountView count : bomEntry.getSecurityRiskProfile().counts) {
+                if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
+                    component.setSecurityRiskHighCount(count.count);
+                } else if (count.countType == RiskCountEnum.MEDIUM && count.count > 0) {
+                    component.setSecurityRiskMediumCount(count.count);
+                } else if (count.countType == RiskCountEnum.LOW && count.count > 0) {
+                    component.setSecurityRiskLowCount(count.count);
                 }
             }
         }
-        if (bomEntry.getLicenseRiskProfile() != null && bomEntry.getLicenseRiskProfile().getCounts() != null
-                && !bomEntry.getLicenseRiskProfile().getCounts().isEmpty()) {
-            for (final RiskCountView count : bomEntry.getLicenseRiskProfile().getCounts()) {
-                if (count.getCountType() == RiskCountEnum.HIGH && count.getCount() > 0) {
-                    component.setLicenseRiskHighCount(count.getCount());
-                } else if (count.getCountType() == RiskCountEnum.MEDIUM && count.getCount() > 0) {
-                    component.setLicenseRiskMediumCount(count.getCount());
-                } else if (count.getCountType() == RiskCountEnum.LOW && count.getCount() > 0) {
-                    component.setLicenseRiskLowCount(count.getCount());
+        if (bomEntry.getLicenseRiskProfile() != null && bomEntry.getLicenseRiskProfile().counts != null
+                && !bomEntry.getLicenseRiskProfile().counts.isEmpty()) {
+            for (final RiskCountView count : bomEntry.getLicenseRiskProfile().counts) {
+                if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
+                    component.setLicenseRiskHighCount(count.count);
+                } else if (count.countType == RiskCountEnum.MEDIUM && count.count > 0) {
+                    component.setLicenseRiskMediumCount(count.count);
+                } else if (count.countType == RiskCountEnum.LOW && count.count > 0) {
+                    component.setLicenseRiskLowCount(count.count);
                 }
             }
         }
-        if (bomEntry.getOperationalRiskProfile() != null && bomEntry.getOperationalRiskProfile().getCounts() != null
-                && !bomEntry.getOperationalRiskProfile().getCounts().isEmpty()) {
-            for (final RiskCountView count : bomEntry.getOperationalRiskProfile().getCounts()) {
-                if (count.getCountType() == RiskCountEnum.HIGH && count.getCount() > 0) {
-                    component.setOperationalRiskHighCount(count.getCount());
-                } else if (count.getCountType() == RiskCountEnum.MEDIUM && count.getCount() > 0) {
-                    component.setOperationalRiskMediumCount(count.getCount());
-                } else if (count.getCountType() == RiskCountEnum.LOW && count.getCount() > 0) {
-                    component.setOperationalRiskLowCount(count.getCount());
+        if (bomEntry.getOperationalRiskProfile() != null && bomEntry.getOperationalRiskProfile().counts != null
+                && !bomEntry.getOperationalRiskProfile().counts.isEmpty()) {
+            for (final RiskCountView count : bomEntry.getOperationalRiskProfile().counts) {
+                if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
+                    component.setOperationalRiskHighCount(count.count);
+                } else if (count.countType == RiskCountEnum.MEDIUM && count.count > 0) {
+                    component.setOperationalRiskMediumCount(count.count);
+                } else if (count.countType == RiskCountEnum.LOW && count.count > 0) {
+                    component.setOperationalRiskLowCount(count.count);
                 }
             }
         }

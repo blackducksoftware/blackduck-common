@@ -28,7 +28,7 @@ import java.util.List;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
-import com.blackducksoftware.integration.hub.model.view.HubView;
+import com.blackducksoftware.integration.hub.model.HubView;
 
 public class HubViewFilter<T extends HubView> {
     public List<T> getAccessibleItems(final MetaService metaService, final List<T> hubItems) throws HubIntegrationException {

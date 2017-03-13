@@ -42,9 +42,9 @@ public class PolicyStatusDescription {
         final ComponentVersionStatusCount inViolationOverridden = policyStatusItem.getCountInViolationOverridden();
         final ComponentVersionStatusCount notInViolation = policyStatusItem.getCountNotInViolation();
 
-        final int inViolationCount = inViolation == null ? 0 : inViolation.getValue();
-        final int inViolationOverriddenCount = inViolationOverridden == null ? 0 : inViolationOverridden.getValue();
-        final int notInViolationCount = notInViolation == null ? 0 : notInViolation.getValue();
+        final int inViolationCount = inViolation == null ? 0 : inViolation.value;
+        final int inViolationOverriddenCount = inViolationOverridden == null ? 0 : inViolationOverridden.value;
+        final int notInViolationCount = notInViolation == null ? 0 : notInViolation.value;
 
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("The Hub found: ");

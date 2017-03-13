@@ -252,9 +252,9 @@ public class NotificationProcessorTest {
     public void testVulnerabilityAdded() throws Exception {
         final SortedSet<NotificationContentItem> notifications = new TreeSet<>();
         final List<VulnerabilitySourceQualifiedId> vulnerabilities = new LinkedList<>();
-        vulnerabilities.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
-        vulnerabilities.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
-        vulnerabilities.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
+        vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
+        vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
+        vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
         final List<VulnerabilityView> vulnerabilityList = testUtil.createVulnerabiltyItemList(vulnerabilities);
         final DateTime dateTime = new DateTime();
         final List<VulnerabilitySourceQualifiedId> emptyVulnSourceList = Collections.emptyList();
@@ -280,9 +280,9 @@ public class NotificationProcessorTest {
     public void testVulnerabilityUpdated() throws Exception {
         final SortedSet<NotificationContentItem> notifications = new TreeSet<>();
         final List<VulnerabilitySourceQualifiedId> vulnerabilities = new LinkedList<>();
-        vulnerabilities.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
-        vulnerabilities.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
-        vulnerabilities.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
+        vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
+        vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
+        vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
         final List<VulnerabilityView> vulnerabilityList = testUtil.createVulnerabiltyItemList(vulnerabilities);
 
         final DateTime dateTime = new DateTime();
@@ -309,9 +309,9 @@ public class NotificationProcessorTest {
     public void testVulnerabilityDeleted() throws Exception {
         final SortedSet<NotificationContentItem> notifications = new TreeSet<>();
         final List<VulnerabilitySourceQualifiedId> vulnerabilities = new LinkedList<>();
-        vulnerabilities.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
-        vulnerabilities.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
-        vulnerabilities.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
+        vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
+        vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
+        vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
 
         final DateTime dateTime = new DateTime();
         final List<VulnerabilitySourceQualifiedId> emptyVulnSourceList = Collections.emptyList();
@@ -328,9 +328,9 @@ public class NotificationProcessorTest {
     public void testVulnAddedAndDeleted() throws Exception {
         final SortedSet<NotificationContentItem> notifications = new TreeSet<>();
         final List<VulnerabilitySourceQualifiedId> vulnerabilities = new LinkedList<>();
-        vulnerabilities.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
-        vulnerabilities.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
-        vulnerabilities.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
+        vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
+        vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
+        vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
 
         final DateTime dateTime = new DateTime();
         final List<VulnerabilitySourceQualifiedId> emptyVulnSourceList = Collections.emptyList();
@@ -348,20 +348,20 @@ public class NotificationProcessorTest {
         DateTime dateTime = new DateTime();
 
         final List<VulnerabilitySourceQualifiedId> resultVulnList = new ArrayList<>(2);
-        resultVulnList.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
-        resultVulnList.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
+        resultVulnList.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
+        resultVulnList.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
         final List<VulnerabilityView> vulnerabilityList = testUtil.createVulnerabiltyItemList(resultVulnList);
 
         final List<VulnerabilitySourceQualifiedId> added = new ArrayList<>(3);
-        added.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
-        added.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
-        added.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
+        added.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
+        added.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
+        added.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
 
         final List<VulnerabilitySourceQualifiedId> updated = new ArrayList<>(4);
-        updated.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
-        updated.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID2));
-        updated.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID2));
-        updated.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID1));
+        updated.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
+        updated.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID2));
+        updated.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID2));
+        updated.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID1));
 
         final List<VulnerabilitySourceQualifiedId> deleted = Collections.emptyList();
         dateTime = dateTime.plusSeconds(1);
@@ -389,20 +389,20 @@ public class NotificationProcessorTest {
         DateTime dateTime = new DateTime();
 
         final List<VulnerabilitySourceQualifiedId> resultVulnList = new ArrayList<>(2);
-        resultVulnList.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
-        resultVulnList.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
+        resultVulnList.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
+        resultVulnList.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
         final List<VulnerabilityView> vulnerabilityList = testUtil.createVulnerabiltyItemList(resultVulnList);
 
         final List<VulnerabilitySourceQualifiedId> added1 = new LinkedList<>();
-        added1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
-        added1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
-        added1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
+        added1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
+        added1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
+        added1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
 
         final List<VulnerabilitySourceQualifiedId> updated1 = new LinkedList<>();
-        updated1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
-        updated1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID2));
-        updated1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID2));
-        updated1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID1));
+        updated1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
+        updated1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID2));
+        updated1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID2));
+        updated1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID1));
 
         final List<VulnerabilitySourceQualifiedId> deleted1 = Collections.emptyList();
         dateTime = dateTime.plusSeconds(1);
@@ -411,15 +411,15 @@ public class NotificationProcessorTest {
         notifications.add(vulnerability);
 
         final List<VulnerabilitySourceQualifiedId> added2 = new LinkedList<>();
-        added1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
-        added1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
-        added1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
+        added1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
+        added1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
+        added1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
 
         final List<VulnerabilitySourceQualifiedId> updated2 = new LinkedList<>();
-        updated1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
-        updated1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID2));
-        updated1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID2));
-        updated1.add(new VulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID1));
+        updated1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
+        updated1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID2));
+        updated1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID2));
+        updated1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID1));
 
         final List<VulnerabilitySourceQualifiedId> deleted2 = Collections.emptyList();
         dateTime = dateTime.plusSeconds(1);
@@ -440,4 +440,12 @@ public class NotificationProcessorTest {
             assertEquals(EventTestUtil.VERSION, dataSet.get(versionKey));
         }
     }
+
+    private VulnerabilitySourceQualifiedId createVulnerabilitySourceQualifiedId(final String source, final String id) {
+        final VulnerabilitySourceQualifiedId vulnerabilitySourceQualifiedId = new VulnerabilitySourceQualifiedId();
+        vulnerabilitySourceQualifiedId.source = source;
+        vulnerabilitySourceQualifiedId.vulnerabilityId = id;
+        return vulnerabilitySourceQualifiedId;
+    }
+
 }

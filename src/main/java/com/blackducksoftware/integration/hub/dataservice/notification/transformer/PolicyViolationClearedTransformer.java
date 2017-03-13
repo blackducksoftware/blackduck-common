@@ -67,10 +67,9 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         final List<NotificationContentItem> templateData = new ArrayList<>();
 
         final RuleViolationClearedNotificationView policyViolation = (RuleViolationClearedNotificationView) item;
-        final String projectName = policyViolation.getContent().getProjectName();
-        final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent()
-                .getComponentVersionStatuses();
-        final String projectVersionLink = policyViolation.getContent().getProjectVersionLink();
+        final String projectName = policyViolation.getContent().projectName;
+        final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent().componentVersionStatuses;
+        final String projectVersionLink = policyViolation.getContent().projectVersionLink;
         ProjectVersionView releaseItem;
         try {
             releaseItem = getReleaseItem(projectVersionLink);
@@ -99,9 +98,9 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
             final List<NotificationContentItem> templateData) throws HubItemTransformException {
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
             try {
-                final String componentVersionLink = componentVersion.getComponentVersionLink();
+                final String componentVersionLink = componentVersion.componentVersionLink;
                 final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
-                final List<String> policyUrls = getMatchingRuleUrls(componentVersion.getPolicies());
+                final List<String> policyUrls = getMatchingRuleUrls(componentVersion.policies);
 
                 if (policyUrls != null) {
                     List<PolicyRuleView> ruleList = getRulesFromUrls(policyUrls);
@@ -112,9 +111,9 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
                         for (final PolicyRuleView rule : ruleList) {
                             policyRuleList.add(rule);
                         }
-                        createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
-                                componentVersion.getComponentLink(),
-                                componentVersion.getComponentVersionLink(),
+                        createContents(projectVersion, componentVersion.componentName, fullComponentVersion,
+                                componentVersion.componentLink,
+                                componentVersion.componentVersionLink,
                                 policyRuleList, item, templateData);
                     }
                 }

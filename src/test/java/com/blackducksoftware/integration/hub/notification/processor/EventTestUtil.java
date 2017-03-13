@@ -123,7 +123,7 @@ public class EventTestUtil {
     public List<VulnerabilityView> createVulnerabiltyItemList(final List<VulnerabilitySourceQualifiedId> vulnSourceList) {
         final List<VulnerabilityView> vulnerabilityList = new ArrayList<>(vulnSourceList.size());
         for (final VulnerabilitySourceQualifiedId vulnSource : vulnSourceList) {
-            final String vulnId = vulnSource.getVulnerabilityId();
+            final String vulnId = vulnSource.vulnerabilityId;
             VulnerabilitySeverityEnum severity = null;
             if (vulnId.startsWith(HIGH_VULN_PREFIX)) {
                 severity = VulnerabilitySeverityEnum.HIGH;
