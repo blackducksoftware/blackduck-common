@@ -27,7 +27,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
-import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
@@ -62,7 +61,6 @@ import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataSe
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
-import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
@@ -71,12 +69,6 @@ public class HubServicesFactory {
     private final CIEnvironmentVariables ciEnvironmentVariables;
 
     private final RestConnection restConnection;
-
-    public HubServicesFactory(final IntLogger logger, final HubServerConfig hubServerConfig) throws EncryptionException {
-        this(new CredentialsRestConnection(logger, hubServerConfig.getHubUrl(),
-                hubServerConfig.getGlobalCredentials().getUsername(), hubServerConfig.getGlobalCredentials().getDecryptedPassword(),
-                hubServerConfig.getTimeout()));
-    }
 
     public HubServicesFactory(final RestConnection restConnection) {
         this.ciEnvironmentVariables = new CIEnvironmentVariables();

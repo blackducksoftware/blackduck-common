@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>hub-common</artifactId>
-  <version>8.1.1-SNAPSHOT</version>
+  <version>8.2.0-SNAPSHOT</version>
 
   <name>Hub Common</name>
   <description>General Code for Hub Integration with CI systems</description>
@@ -31,7 +31,7 @@
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>hub-common-response</artifactId>
-      <version>0.0.5</version>
+      <version>0.0.6</version>
     </dependency>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>

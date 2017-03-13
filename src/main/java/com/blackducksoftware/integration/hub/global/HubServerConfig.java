@@ -28,9 +28,12 @@ import java.net.URL;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.exception.EncryptionException;
+import com.blackducksoftware.integration.hub.model.HubComponent;
+import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class HubServerConfig implements Serializable {
+public class HubServerConfig extends HubComponent implements Serializable {
     private static final long serialVersionUID = -1581638027683631935L;
 
     private final URL hubUrl;
@@ -77,69 +80,9 @@ public class HubServerConfig implements Serializable {
         }
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("HubServerConfig [hubUrl=");
-        builder.append(hubUrl);
-        builder.append(", timeout=");
-        builder.append(timeoutSeconds);
-        builder.append(", hubCredentials=");
-        builder.append(credentials);
-        builder.append(", proxyInfo=");
-        builder.append(proxyInfo);
-        builder.append("]");
-        return builder.toString();
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((credentials == null) ? 0 : credentials.hashCode());
-        result = prime * result + ((hubUrl == null) ? 0 : hubUrl.hashCode());
-        result = prime * result + ((proxyInfo == null) ? 0 : proxyInfo.hashCode());
-        result = prime * result + timeoutSeconds;
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof HubServerConfig)) {
-            return false;
-        }
-        final HubServerConfig other = (HubServerConfig) obj;
-        if (credentials == null) {
-            if (other.credentials != null) {
-                return false;
-            }
-        } else if (!credentials.equals(other.credentials)) {
-            return false;
-        }
-        if (hubUrl == null) {
-            if (other.hubUrl != null) {
-                return false;
-            }
-        } else if (!hubUrl.equals(other.hubUrl)) {
-            return false;
-        }
-        if (proxyInfo == null) {
-            if (other.proxyInfo != null) {
-                return false;
-            }
-        } else if (!proxyInfo.equals(other.proxyInfo)) {
-            return false;
-        }
-        if (timeoutSeconds != other.timeoutSeconds) {
-            return false;
-        }
-        return true;
+    public CredentialsRestConnection createCredentialsRestConnection(final IntLogger logger) throws EncryptionException {
+        return new CredentialsRestConnection(logger, getHubUrl(), getGlobalCredentials().getUsername(), getGlobalCredentials().getDecryptedPassword(),
+                getTimeout());
     }
 
     public URL getHubUrl() {
