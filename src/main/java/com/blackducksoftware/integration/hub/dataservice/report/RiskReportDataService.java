@@ -200,7 +200,7 @@ public class RiskReportDataService extends HubResponseService {
         component.setComponentURL(getReportProjectUrl(bomEntry.getComponent()));
         component.setComponentVersion(bomEntry.getComponentVersionName());
         component.setComponentVersionURL(getReportVersionUrl(bomEntry.getComponentVersion(), true));
-
+        component.setLicense(bomEntry.getLicenses().get(0).getLicenseDisplay());
         if (bomEntry.getSecurityRiskProfile() != null && bomEntry.getSecurityRiskProfile().getCounts() != null
                 && !bomEntry.getSecurityRiskProfile().getCounts().isEmpty()) {
             for (final RiskCountView count : bomEntry.getSecurityRiskProfile().getCounts()) {
