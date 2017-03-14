@@ -208,7 +208,10 @@ public class CLIDownloadService {
             final File cacertsBackup = new File(securityDirectory, cacertsFilename + System.currentTimeMillis());
 
             try {
-                FileUtils.moveFile(cacerts, cacertsBackup);
+                if (cacerts.exists()) {
+                    // only backup the cacerts if it exists
+                    FileUtils.moveFile(cacerts, cacertsBackup);
+                }
                 FileUtils.copyFile(customCacerts, cacerts);
             } catch (final IOException e) {
                 logger.error("Could not copy the custom cacerts file from: " + customCacertsPath + " to: "
