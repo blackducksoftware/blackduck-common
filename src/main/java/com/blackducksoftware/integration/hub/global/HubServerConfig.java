@@ -81,8 +81,16 @@ public class HubServerConfig extends HubComponent implements Serializable {
     }
 
     public CredentialsRestConnection createCredentialsRestConnection(final IntLogger logger) throws EncryptionException {
-        return new CredentialsRestConnection(logger, getHubUrl(), getGlobalCredentials().getUsername(), getGlobalCredentials().getDecryptedPassword(),
+        final CredentialsRestConnection restConnection = new CredentialsRestConnection(logger, getHubUrl(), getGlobalCredentials().getUsername(),
+                getGlobalCredentials().getDecryptedPassword(),
                 getTimeout());
+        restConnection.proxyHost = getProxyInfo().getHost();
+        restConnection.proxyPort = getProxyInfo().getPort();
+        restConnection.proxyNoHosts = getProxyInfo().getIgnoredProxyHosts();
+        restConnection.proxyUsername = getProxyInfo().getUsername();
+        restConnection.proxyPassword = getProxyInfo().getDecryptedPassword();
+
+        return restConnection;
     }
 
     public URL getHubUrl() {
