@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -373,6 +374,11 @@ public class SimpleScanService {
         if (!logDirectory.exists() && !logDirectory.mkdirs()) {
             throw new IOException("Could not create the HubScanLogs directory!");
         }
+        final File bdIgnoreLogsFile = new File(workingDirectory, ".bdignore");
+        if (!bdIgnoreLogsFile.createNewFile()) {
+            throw new IOException("Could not create the .bdignore file!");
+        }
+        Files.write(bdIgnoreLogsFile.toPath(), "HubScanLogs".getBytes());
     }
 
     /**
