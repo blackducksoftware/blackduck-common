@@ -367,7 +367,8 @@ public class SimpleScanService {
     }
 
     private void populateLogDirectory() throws IOException {
-        final File logsDirectory = new File(workingDirectory, "HubScanLogs");
+        final String logDirectoryName = "HubScanLogs";
+        final File logsDirectory = new File(workingDirectory, logDirectoryName);
         final String specificScanExecutionLogDirectory = getSpecificScanExecutionLogDirectory();
 
         logDirectory = new File(logsDirectory, specificScanExecutionLogDirectory);
@@ -378,7 +379,8 @@ public class SimpleScanService {
         if (!bdIgnoreLogsFile.createNewFile()) {
             throw new IOException("Could not create the .bdignore file!");
         }
-        Files.write(bdIgnoreLogsFile.toPath(), "HubScanLogs".getBytes());
+        final String exclusionPattern = "/" + logDirectoryName + "/";
+        Files.write(bdIgnoreLogsFile.toPath(), exclusionPattern.getBytes());
     }
 
     /**
