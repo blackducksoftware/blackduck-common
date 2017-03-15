@@ -376,6 +376,9 @@ public class SimpleScanService {
             throw new IOException("Could not create the HubScanLogs directory!");
         }
         final File bdIgnoreLogsFile = new File(workingDirectory, ".bdignore");
+        if (bdIgnoreLogsFile.exists()) {
+            bdIgnoreLogsFile.delete();
+        }
         if (!bdIgnoreLogsFile.createNewFile()) {
             throw new IOException("Could not create the .bdignore file!");
         }
