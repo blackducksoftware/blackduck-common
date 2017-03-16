@@ -31,6 +31,8 @@ public enum HubScanConfigFieldEnum {
     GENERATE_RISK_REPORT("shouldGenerateRiskReport"),
     DRY_RUN("dryRun"),
     CLEANUP_LOGS_ON_SUCCESS("cleanupLogsOnSuccess"),
+    UNMAP_PREVIOUS_CODE_LOCATIONS("unmapPreviousCodeLocations"),
+    DELETE_PREVIOUS_CODE_LOCATIONS("deletePreviousCodeLocations"),
     EXCLUDE_PATTERNS("excludePatterns"),
     CODE_LOCATION_ALIAS("codeLocationAlias"),
     MAX_WAIT_TIME_FOR_BOM_UPDATE("maxWaitTimeForBomUpdate"),

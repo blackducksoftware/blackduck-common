@@ -190,7 +190,6 @@ public class CLIDownloadService {
 
     private void updateJreSecurity(final IntLogger logger, final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables)
             throws IOException {
-        final String cacertsFilename = "cacerts";
         if (ciEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
             logger.trace("Found the variable : " + CIEnvironmentVariables.BDS_CACERTS_OVERRIDE + ", using value : " + ciEnvironmentVariables
                     .getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE));
@@ -204,11 +203,15 @@ public class CLIDownloadService {
                     .getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
             final File customCacerts = new File(customCacertsPath);
 
+            final String cacertsFilename = customCacerts.getName();
             final File cacerts = new File(securityDirectory, cacertsFilename);
             final File cacertsBackup = new File(securityDirectory, cacertsFilename + System.currentTimeMillis());
 
             try {
-                FileUtils.moveFile(cacerts, cacertsBackup);
+                if (cacerts.exists()) {
+                    // only backup the cacerts if it exists
+                    FileUtils.moveFile(cacerts, cacertsBackup);
+                }
                 FileUtils.copyFile(customCacerts, cacerts);
             } catch (final IOException e) {
                 logger.error("Could not copy the custom cacerts file from: " + customCacertsPath + " to: "
