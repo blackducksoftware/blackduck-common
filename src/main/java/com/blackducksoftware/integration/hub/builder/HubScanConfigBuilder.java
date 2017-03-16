@@ -38,7 +38,6 @@ import com.blackducksoftware.integration.hub.validator.HubScanConfigValidator;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 
 public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
-
     private String projectName;
 
     private String version;
