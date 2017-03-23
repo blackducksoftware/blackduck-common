@@ -96,11 +96,17 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
         // Identify same-time non-equal items as non-equal
         final String thisProjectVersionString = StringUtils.join(getProjectVersion().getProjectName(), getProjectVersion()
-                .getProjectVersionName(), getComponentVersionUrl());
+                .getProjectVersionName(), getComponentName(), getComponentVersionName(getComponentVersion()));
         final String otherProjectVersionString = StringUtils.join(o.getProjectVersion().getProjectName(), o
-                .getProjectVersion().getProjectVersionName(), o.getComponentVersionUrl());
-
+                .getProjectVersion().getProjectVersionName(), o.getComponentName(), getComponentVersionName(o.getComponentVersion()));
         return thisProjectVersionString.compareTo(otherProjectVersionString);
+    }
+
+    private String getComponentVersionName(final ComponentVersionView componentVersion) {
+        if (componentVersion == null) {
+            return "";
+        }
+        return componentVersion.getVersionName();
     }
 
     @Override
