@@ -58,7 +58,7 @@ public class BdioDependencyWriter {
         return artifactId + BuildToolConstants.BDIO_FILE_SUFFIX;
     }
 
-    public void write(final File outputDirectory, final String artifactId, final String hubProjectName,
+    public void write(final File outputDirectory, final String artifactId, final String hubProjectName, final String hubProjectVersionName,
             final DependencyNode rootNode) throws IOException {
         // if the directory doesn't exist yet, let's create it
         outputDirectory.mkdirs();
@@ -68,18 +68,17 @@ public class BdioDependencyWriter {
         logger.info(String.format("Generating file: %s", file.getCanonicalPath()));
 
         try (final OutputStream outputStream = new FileOutputStream(file)) {
-            writeProject(outputStream, hubProjectName, rootNode);
+            writeProject(outputStream, hubProjectName, hubProjectVersionName, rootNode);
         }
     }
 
-    public void writeProject(final OutputStream outputStream, final String projectName, final DependencyNode root)
+    public void writeProject(final OutputStream outputStream, final String projectName, final String projectVersionName, final DependencyNode root)
             throws IOException {
-        final BdioBillOfMaterials billOfMaterials = bdioNodeFactory.createBillOfMaterials(projectName);
+        final BdioBillOfMaterials billOfMaterials = bdioNodeFactory.createBillOfMaterials(projectName, projectVersionName);
 
-        final String projectVersion = root.getGav().getVersion();
         final String projectId = idFromGav(root.getGav());
         final BdioExternalIdentifier projectExternalIdentifier = externalIdentifierFromGav(root.getGav());
-        final BdioProject project = bdioNodeFactory.createProject(projectName, projectVersion, projectId, projectExternalIdentifier);
+        final BdioProject project = bdioNodeFactory.createProject(projectName, projectVersionName, projectId, projectExternalIdentifier);
 
         for (final DependencyNode child : root.getChildren()) {
             final BdioComponent component = componentFromDependencyNode(child);
