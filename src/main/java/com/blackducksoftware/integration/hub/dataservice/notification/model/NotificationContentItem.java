@@ -98,7 +98,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
         final String thisProjectVersionString = StringUtils.join(getProjectVersion().getProjectName(), getProjectVersion()
                 .getProjectVersionName(), getComponentVersionUrl());
         final String otherProjectVersionString = StringUtils.join(o.getProjectVersion().getProjectName(), o
-                .getProjectVersion().getProjectVersionName(), o.getComponentVersionUrl().toString());
+                .getProjectVersion().getProjectVersionName(), o.getComponentVersionUrl());
 
         return thisProjectVersionString.compareTo(otherProjectVersionString);
     }
