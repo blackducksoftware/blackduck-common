@@ -55,10 +55,11 @@ public class BuildToolHelper {
         hubProjectDetailsWriter.write(outputDirectory, hubProjectName, hubProjectVersion);
     }
 
-    public void createHubOutput(final DependencyNode rootNode, final String projectName, final String hubProjectName, final String hubProjectVersion,
+    public void createHubOutput(final DependencyNode rootNode, final String projectName, final String hubCodeLocationName, final String hubProjectName,
+            final String hubProjectVersion,
             final File outputDirectory) throws IOException {
         final BdioDependencyWriter bdioDependencyWriter = new BdioDependencyWriter();
-        bdioDependencyWriter.write(outputDirectory, projectName, hubProjectName, hubProjectVersion, rootNode);
+        bdioDependencyWriter.write(outputDirectory, projectName, hubCodeLocationName, hubProjectName, hubProjectVersion, rootNode);
 
         final HubProjectDetailsWriter hubProjectDetailsWriter = new HubProjectDetailsWriter();
         hubProjectDetailsWriter.write(outputDirectory, hubProjectName, hubProjectVersion);

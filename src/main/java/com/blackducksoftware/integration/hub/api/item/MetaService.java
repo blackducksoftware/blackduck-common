@@ -139,7 +139,6 @@ public class MetaService {
             logger.debug("Link '" + linkKey + "' not found on item");
             return null;
         }
-
     }
 
     public List<String> getLinks(final HubView item, final String linkKey) throws HubIntegrationException {

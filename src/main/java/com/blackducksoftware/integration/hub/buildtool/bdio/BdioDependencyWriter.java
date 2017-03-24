@@ -58,7 +58,8 @@ public class BdioDependencyWriter {
         return artifactId + BuildToolConstants.BDIO_FILE_SUFFIX;
     }
 
-    public void write(final File outputDirectory, final String artifactId, final String hubProjectName, final String hubProjectVersionName,
+    public void write(final File outputDirectory, final String artifactId, final String hubCodeLocationName, final String hubProjectName,
+            final String hubProjectVersionName,
             final DependencyNode rootNode) throws IOException {
         // if the directory doesn't exist yet, let's create it
         outputDirectory.mkdirs();
@@ -68,13 +69,14 @@ public class BdioDependencyWriter {
         logger.info(String.format("Generating file: %s", file.getCanonicalPath()));
 
         try (final OutputStream outputStream = new FileOutputStream(file)) {
-            writeProject(outputStream, hubProjectName, hubProjectVersionName, rootNode);
+            writeProject(outputStream, hubCodeLocationName, hubProjectName, hubProjectVersionName, rootNode);
         }
     }
 
-    public void writeProject(final OutputStream outputStream, final String projectName, final String projectVersionName, final DependencyNode root)
+    public void writeProject(final OutputStream outputStream, final String hubCodeLocationName, final String projectName, final String projectVersionName,
+            final DependencyNode root)
             throws IOException {
-        final BdioBillOfMaterials billOfMaterials = bdioNodeFactory.createBillOfMaterials(projectName, projectVersionName);
+        final BdioBillOfMaterials billOfMaterials = bdioNodeFactory.createBillOfMaterials(hubCodeLocationName, projectName, projectVersionName);
 
         final String projectId = idFromGav(root.getGav());
         final BdioExternalIdentifier projectExternalIdentifier = externalIdentifierFromGav(root.getGav());
