@@ -78,12 +78,13 @@ public class ProjectVersionRequestService extends HubResponseService {
     }
 
     public String createHubVersion(final ProjectView project, final String versionName, final ProjectVersionPhaseEnum phase,
-            final ProjectVersionDistributionEnum dist)
+            final ProjectVersionDistributionEnum dist, final String nickname)
             throws IntegrationException {
         final JsonObject json = new JsonObject();
         json.addProperty("versionName", versionName);
         json.addProperty("phase", phase.name());
         json.addProperty("distribution", dist.name());
+        json.addProperty("nickname", nickname);
 
         final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
 

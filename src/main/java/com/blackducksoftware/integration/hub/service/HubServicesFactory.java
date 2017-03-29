@@ -27,6 +27,9 @@ import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
@@ -87,7 +90,7 @@ public class HubServicesFactory {
 
     public CLIDataService createCLIDataService(final IntLogger logger) {
         return new CLIDataService(logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
-                createPhoneHomeDataService(logger), createProjectRequestService(), createProjectVersionRequestService(logger),
+                createPhoneHomeDataService(logger), createProjectRequestService(logger), createProjectVersionRequestService(logger),
                 createCodeLocationRequestService(logger), createMetaService(logger));
     }
 
@@ -97,19 +100,19 @@ public class HubServicesFactory {
 
     public RiskReportDataService createRiskReportDataService(final IntLogger logger,
             final long timeoutInMilliseconds) throws IntegrationException {
-        return new RiskReportDataService(logger, restConnection, createProjectRequestService(),
+        return new RiskReportDataService(logger, restConnection, createProjectRequestService(logger),
                 createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds), createAggregateBomRequestService(logger),
                 createMetaService(logger), createCheckedHubSupport(logger));
     }
 
     public PolicyStatusDataService createPolicyStatusDataService(final IntLogger logger) {
-        return new PolicyStatusDataService(restConnection, createProjectRequestService(),
+        return new PolicyStatusDataService(restConnection, createProjectRequestService(logger),
                 createProjectVersionRequestService(logger), createMetaService(logger));
     }
 
     public ScanStatusDataService createScanStatusDataService(final IntLogger logger,
             final long timeoutInMilliseconds) {
-        return new ScanStatusDataService(logger, createProjectRequestService(), createProjectVersionRequestService(logger),
+        return new ScanStatusDataService(logger, createProjectRequestService(logger), createProjectVersionRequestService(logger),
                 createCodeLocationRequestService(logger), createScanSummaryRequestService(), createMetaService(logger),
                 timeoutInMilliseconds);
     }
@@ -166,8 +169,8 @@ public class HubServicesFactory {
         return new PolicyRequestService(restConnection);
     }
 
-    public ProjectRequestService createProjectRequestService() {
-        return new ProjectRequestService(restConnection);
+    public ProjectRequestService createProjectRequestService(final IntLogger logger) {
+        return new ProjectRequestService(restConnection, createMetaService(logger));
     }
 
     public ProjectVersionRequestService createProjectVersionRequestService(final IntLogger logger) {
@@ -243,6 +246,11 @@ public class HubServicesFactory {
 
     public ComponentDataService createComponentDataService(final IntLogger logger) {
         return new ComponentDataService(logger, createComponentRequestService(), createMetaService(logger));
+    }
+
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
 
 }
