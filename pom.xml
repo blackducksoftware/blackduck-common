@@ -22,19 +22,6 @@
     <url>https://www.github.com/blackducksoftware/hub-common</url>
   </scm>
 
-  <distributionManagement>
-    <repository>
-      <id>nexus</id>
-      <name>Releases</name>
-      <url>http://localhost:8081/repository/maven-releases</url>
-    </repository>
-    <snapshotRepository>
-      <id>nexus</id>
-      <name>Snapshot</name>
-      <url>http://localhost:8081/repository/maven-snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
-
   <dependencies>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
