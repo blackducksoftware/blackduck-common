@@ -57,7 +57,7 @@
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>integration-bdio</artifactId>
-      <version>1.4.0</version>
+      <version>2.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
