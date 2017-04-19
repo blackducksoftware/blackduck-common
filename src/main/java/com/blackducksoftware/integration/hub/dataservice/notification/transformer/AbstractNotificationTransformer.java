@@ -104,7 +104,8 @@ public abstract class AbstractNotificationTransformer
     @Override
     public abstract List<NotificationContentItem> transform(NotificationView item) throws HubItemTransformException;
 
-    protected ProjectVersionModel createFullProjectVersion(final String projectVersionUrl, final String projectName, final String versionName)
+    protected ProjectVersionModel createFullProjectVersion(final String projectVersionUrl, final String projectName, final String versionName,
+            final String componentIssueUrl)
             throws IntegrationException {
         ProjectVersionView item;
         try {
@@ -133,7 +134,7 @@ public abstract class AbstractNotificationTransformer
         fullProjectVersion.setRiskProfileLink((metaService.getFirstLinkSafely(item, MetaService.RISK_PROFILE_LINK)));
         fullProjectVersion.setVersionReportLink((metaService.getFirstLinkSafely(item, MetaService.VERSION_REPORT_LINK)));
         fullProjectVersion.setVulnerableComponentsLink((metaService.getFirstLinkSafely(item, MetaService.VULNERABLE_COMPONENTS_LINK)));
-
+        fullProjectVersion.setComponentIssueLink(componentIssueUrl);
         return fullProjectVersion;
     }
 

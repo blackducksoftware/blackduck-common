@@ -79,25 +79,26 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
         } catch (final IntegrationException e) {
             throw new HubItemTransformException(e);
         }
-        ProjectVersionModel projectVersion;
-        try {
-            projectVersion = createFullProjectVersion(policyViolation.getContent().projectVersionLink,
-                    projectName, releaseItem.getVersionName());
-        } catch (final IntegrationException e) {
-            throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
-        }
 
-        handleNotification(componentVersionList, projectVersion, item, templateData);
+        handleNotification(componentVersionList, projectName, releaseItem, item, templateData);
 
         return templateData;
     }
 
     @Override
-    public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
-            final ProjectVersionModel projectVersion, final NotificationView item,
-            final List<NotificationContentItem> templateData) throws HubItemTransformException {
+    public void handleNotification(final List<ComponentVersionStatus> componentVersionList, final String projectName, final ProjectVersionView releaseItem,
+            final NotificationView item, final List<NotificationContentItem> templateData) throws HubItemTransformException {
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
             try {
+                final RuleViolationNotificationView policyViolation = (RuleViolationNotificationView) item;
+                ProjectVersionModel projectVersion;
+                try {
+                    projectVersion = createFullProjectVersion(policyViolation.getContent().projectVersionLink,
+                            projectName, releaseItem.getVersionName(), componentVersion.componentIssueLink);
+                } catch (final IntegrationException e) {
+                    throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
+                }
+
                 final String bomComponentVersionPolicyStatusUrl = componentVersion.bomComponentVersionPolicyStatusLink;
                 if (StringUtils.isBlank(bomComponentVersionPolicyStatusUrl)) {
                     getLogger().warn(String.format("bomComponentVersionPolicyStatus is missing for component %s; skipping it",

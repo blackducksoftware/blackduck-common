@@ -77,13 +77,9 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
             throw new HubItemTransformException("Error getting release item while transforming notification " + item
                     + "; projectVersionLink: " + projectVersionLink + ": " + e1.getMessage(), e1);
         }
-        final ProjectVersionModel projectVersion = new ProjectVersionModel();
-        projectVersion.setProjectName(projectName);
-        projectVersion.setProjectVersionName(releaseItem.getVersionName());
-        projectVersion.setUrl(projectVersionLink);
 
         try {
-            handleNotification(componentVersionList, projectVersion, item, templateData);
+            handleNotification(componentVersionList, projectName, releaseItem, item, templateData);
         } catch (final HubItemTransformException e) {
             throw new HubItemTransformException("Error in handleNotification() while transforming notification " + item
                     + "; projectVersionLink: " + projectVersionLink + ": " + e.getMessage(), e);
@@ -94,10 +90,19 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
 
     @Override
     public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
-            final ProjectVersionModel projectVersion, final NotificationView item,
+            final String projectName, final ProjectVersionView releaseItem, final NotificationView item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException {
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
             try {
+                final RuleViolationClearedNotificationView policyViolation = (RuleViolationClearedNotificationView) item;
+                final ProjectVersionModel projectVersion;
+                try {
+                    projectVersion = createFullProjectVersion(policyViolation.getContent().projectVersionLink,
+                            projectName, releaseItem.getVersionName(), componentVersion.componentIssueLink);
+                } catch (final IntegrationException e) {
+                    throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
+                }
+
                 final String componentVersionLink = componentVersion.componentVersionLink;
                 final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
                 final List<String> policyUrls = getMatchingRuleUrls(componentVersion.policies);

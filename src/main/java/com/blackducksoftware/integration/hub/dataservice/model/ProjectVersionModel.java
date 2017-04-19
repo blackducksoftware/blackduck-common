@@ -71,6 +71,8 @@ public class ProjectVersionModel {
 
     private String codeLocationsLink;
 
+    private String componentIssueLink;
+
     public String getProjectName() {
         return projectName;
     }
@@ -213,6 +215,14 @@ public class ProjectVersionModel {
 
     public void setCodeLocationsLink(final String codeLocationsLink) {
         this.codeLocationsLink = codeLocationsLink;
+    }
+
+    public String getComponentIssueLink() {
+        return componentIssueLink;
+    }
+
+    public void setComponentIssueLink(final String componentIssueLink) {
+        this.componentIssueLink = componentIssueLink;
     }
 
     @Override

@@ -86,23 +86,27 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
             throw new HubItemTransformException(e);
         }
 
-        final ProjectVersionModel projectVersion = new ProjectVersionModel();
-        projectVersion.setProjectName(projectName);
-        projectVersion.setProjectVersionName(releaseItem.getVersionName());
-        projectVersion.setUrl(policyOverride.getContent().projectVersionLink);
-
-        handleNotification(componentVersionList, projectVersion, item, templateData);
+        handleNotification(componentVersionList, projectName, releaseItem, item, templateData);
         return templateData;
     }
 
     @Override
     public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
-            final ProjectVersionModel projectVersion, final NotificationView item,
+            final String projectName, final ProjectVersionView releaseItem, final NotificationView item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException {
 
         final PolicyOverrideNotificationView policyOverrideItem = (PolicyOverrideNotificationView) item;
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
             try {
+                final PolicyOverrideNotificationView policyOverride = (PolicyOverrideNotificationView) item;
+                final ProjectVersionModel projectVersion;
+                try {
+                    projectVersion = createFullProjectVersion(policyOverride.getContent().projectVersionLink,
+                            projectName, releaseItem.getVersionName(), componentVersion.componentIssueLink);
+                } catch (final IntegrationException e) {
+                    throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
+                }
+
                 final String componentLink = policyOverrideItem.getContent().componentLink;
                 final String componentVersionLink = policyOverrideItem.getContent().componentVersionLink;
                 final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
