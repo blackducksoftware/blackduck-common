@@ -66,11 +66,15 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     private boolean deletePreviousCodeLocations;
 
+    private boolean debug;
+
+    private boolean verbose = true;
+
     @Override
     public HubScanConfig buildObject() {
         final HubScanConfig config = new HubScanConfig(projectName, version, workingDirectory,
                 NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir,
-                cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations);
+                cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations, debug, verbose);
 
         return config;
     }
@@ -163,6 +167,14 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     public void setDeletePreviousCodeLocations(final boolean deletePreviousCodeLocations) {
         this.deletePreviousCodeLocations = deletePreviousCodeLocations;
+    }
+
+    public void setDebug(final boolean debug) {
+        this.debug = debug;
+    }
+
+    public void setVerbose(final boolean verbose) {
+        this.verbose = verbose;
     }
 
 }
