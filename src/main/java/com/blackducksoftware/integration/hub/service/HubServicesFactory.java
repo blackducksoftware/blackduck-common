@@ -66,6 +66,7 @@ import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataServ
 import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
@@ -206,6 +207,10 @@ public class HubServicesFactory {
         return new CLIDownloadService(logger, restConnection);
     }
 
+    /**
+     * @deprecated You should create HubScanConfig, rather than pass in each field
+     */
+    @Deprecated
     public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
             final HubSupportHelper hubSupportHelper,
             final File directoryToInstallTo, final int scanMemory, final boolean dryRun, final String project,
@@ -213,6 +218,11 @@ public class HubServicesFactory {
         return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo,
                 scanMemory,
                 dryRun, project, version, scanTargetPaths, workingDirectory, excludePatterns);
+    }
+
+    public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
+            final HubSupportHelper hubSupportHelper, final HubScanConfig hubScanConfig) {
+        return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, hubScanConfig);
     }
 
     public HubRegistrationRequestService createHubRegistrationRequestService() {

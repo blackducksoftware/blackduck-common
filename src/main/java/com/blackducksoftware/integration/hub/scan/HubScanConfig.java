@@ -59,11 +59,23 @@ public class HubScanConfig {
 
     private final boolean deletePreviousCodeLocations;
 
+    private final boolean debug;
+
+    private final boolean verbose;
+
     public HubScanConfig(final String projectName, final String version, final File workingDirectory,
-            final int scanMemory,
-            final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir,
-            final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias, final boolean unmapPreviousCodeLocations,
-            final boolean deletePreviousCodeLocations) {
+            final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir,
+            final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias,
+            final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations) {
+        this(projectName, version, workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias,
+                unmapPreviousCodeLocations, deletePreviousCodeLocations, false, true);
+
+    }
+
+    public HubScanConfig(final String projectName, final String version, final File workingDirectory,
+            final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir,
+            final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias,
+            final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean debug, final boolean verbose) {
         this.projectName = projectName;
         this.version = version;
         this.workingDirectory = workingDirectory;
@@ -76,6 +88,8 @@ public class HubScanConfig {
         this.codeLocationAlias = codeLocationAlias;
         this.unmapPreviousCodeLocations = unmapPreviousCodeLocations;
         this.deletePreviousCodeLocations = deletePreviousCodeLocations;
+        this.debug = debug;
+        this.verbose = verbose;
     }
 
     public String getProjectName() {
@@ -124,6 +138,14 @@ public class HubScanConfig {
 
     public boolean isDeletePreviousCodeLocations() {
         return deletePreviousCodeLocations;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public boolean isVerbose() {
+        return verbose;
     }
 
     public void print(final IntLogger logger) {
