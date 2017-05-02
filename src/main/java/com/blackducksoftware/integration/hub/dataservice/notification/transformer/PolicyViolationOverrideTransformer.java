@@ -102,7 +102,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
                 final ProjectVersionModel projectVersion;
                 try {
                     projectVersion = createFullProjectVersion(policyOverride.getContent().projectVersionLink,
-                            projectName, releaseItem.getVersionName(), componentVersion.componentIssueLink);
+                            projectName, releaseItem.getVersionName());
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
                 }
@@ -131,7 +131,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
                         policyRuleList.add(rule);
                     }
                     createContents(projectVersion, componentVersion.componentName, fullComponentVersion,
-                            componentLink, componentVersionLink, policyRuleList, item, templateData);
+                            componentLink, componentVersionLink, policyRuleList, item, templateData, componentVersion.componentIssueLink);
                 }
             } catch (final Exception e) {
                 throw new HubItemTransformException(e);
@@ -143,12 +143,12 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
     public void createContents(final ProjectVersionModel projectVersion, final String componentName,
             final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
             final List<PolicyRuleView> policyRuleList, final NotificationView item,
-            final List<NotificationContentItem> templateData) throws URISyntaxException {
+            final List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException {
         final PolicyOverrideNotificationView policyOverride = (PolicyOverrideNotificationView) item;
 
         templateData.add(new PolicyOverrideContentItem(item.getCreatedAt(), projectVersion, componentName,
                 componentVersion, componentUrl, componentVersionUrl, policyRuleList,
-                policyOverride.getContent().firstName, policyOverride.getContent().lastName));
+                policyOverride.getContent().firstName, policyOverride.getContent().lastName, componentIssueUrl));
     }
 
 }

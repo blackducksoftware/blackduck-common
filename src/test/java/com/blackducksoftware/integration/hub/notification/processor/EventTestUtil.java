@@ -194,8 +194,9 @@ public class EventTestUtil {
         final List<PolicyRuleView> policyRuleList = new ArrayList<>();
         policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
         policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
+        final String componentIssueUrl = "";
         final PolicyOverrideContentItem item = new PolicyOverrideContentItem(createdTime, projectVersion, componentName,
-                fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList, FIRST_NAME, LAST_NAME);
+                fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList, FIRST_NAME, LAST_NAME, componentIssueUrl);
         return item;
     }
 
@@ -221,8 +222,9 @@ public class EventTestUtil {
         final List<PolicyRuleView> policyRuleList = new ArrayList<>();
         policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
         policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
+        final String componentIssueUrl = "";
         final PolicyViolationClearedContentItem item = new PolicyViolationClearedContentItem(createdTime,
-                projectVersion, componentName, fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList);
+                projectVersion, componentName, fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList, componentIssueUrl);
         return item;
     }
 
@@ -241,8 +243,9 @@ public class EventTestUtil {
         final List<PolicyRuleView> policyRuleList = new ArrayList<>();
         policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
         policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
+        final String componentIssueUrl = "";
         final PolicyViolationContentItem item = new PolicyViolationContentItem(createdTime, projectVersion,
-                componentName, fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList);
+                componentName, fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList, componentIssueUrl);
         return item;
     }
 
@@ -258,8 +261,9 @@ public class EventTestUtil {
         projectVersion.setUrl(projectVersionUrl);
         final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT
                 + componentVersion;
+        final String componentIssueUrl = "";
         final VulnerabilityContentItem item = new VulnerabilityContentItem(createdTime, projectVersion, componentName,
-                fullComponentVersion, componentVersionUrl, added, updated, deleted);
+                fullComponentVersion, componentVersionUrl, added, updated, deleted, componentIssueUrl);
         return item;
     }
 }

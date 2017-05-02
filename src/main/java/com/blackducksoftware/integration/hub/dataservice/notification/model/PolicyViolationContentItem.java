@@ -38,8 +38,9 @@ public class PolicyViolationContentItem extends PolicyContentItem {
             final String componentName,
             final ComponentVersionView componentVersion, final String componentUrl,
             final String componentVersionUrl,
-            final List<PolicyRuleView> policyRuleList) throws URISyntaxException {
-        super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl);
+            final List<PolicyRuleView> policyRuleList,
+            final String componentIssueUrl) throws URISyntaxException {
+        super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl, componentIssueUrl);
         this.policyRuleList = policyRuleList;
     }
 

@@ -94,7 +94,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
                 ProjectVersionModel projectVersion;
                 try {
                     projectVersion = createFullProjectVersion(policyViolation.getContent().projectVersionLink,
-                            projectName, releaseItem.getVersionName(), componentVersion.componentIssueLink);
+                            projectName, releaseItem.getVersionName());
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
                 }
@@ -126,7 +126,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
                     createContents(projectVersion, componentVersion.componentName, fullComponentVersion,
                             componentVersion.componentLink,
                             componentVersion.componentVersionLink,
-                            policyRuleList, item, templateData);
+                            policyRuleList, item, templateData, componentVersion.componentIssueLink);
                 }
 
             } catch (final Exception e) {
@@ -144,8 +144,8 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     public void createContents(final ProjectVersionModel projectVersion, final String componentName,
             final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
             final List<PolicyRuleView> policyRuleList, final NotificationView item,
-            final List<NotificationContentItem> templateData) throws URISyntaxException {
+            final List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException {
         templateData.add(new PolicyViolationContentItem(item.getCreatedAt(), projectVersion, componentName,
-                componentVersion, componentUrl, componentVersionUrl, policyRuleList));
+                componentVersion, componentUrl, componentVersionUrl, policyRuleList, componentIssueUrl));
     }
 }

@@ -167,7 +167,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     public abstract void createContents(final ProjectVersionModel projectVersion, final String componentName,
-            final ComponentVersionView componentVersion, String componentUrl, final String componentVersionUrl,
+            final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
             List<PolicyRuleView> policyRuleList,
-            NotificationView item, List<NotificationContentItem> templateData) throws URISyntaxException;
+            NotificationView item, List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException;
 }

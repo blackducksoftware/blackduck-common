@@ -55,16 +55,19 @@ public class NotificationContentItemTest {
         final ComponentVersionView componentVersion = Mockito.mock(ComponentVersionView.class);
         Mockito.when(componentVersion.getVersionName()).thenReturn("componentVersionName");
         final String componentVersionUrl = "http://some.url.com";
+        final String componentIssueUrl = "";
 
         final NotificationContentItem notif1 = new NotificationContentItem(createdAt, projectVersion,
                 componentName,
                 componentVersion,
-                componentVersionUrl);
+                componentVersionUrl,
+                componentIssueUrl);
 
         final NotificationContentItem notif2 = new NotificationContentItem(createdAt, projectVersion,
                 componentName,
                 componentVersion,
-                componentVersionUrl);
+                componentVersionUrl,
+                componentIssueUrl);
 
         assertEquals(0, notif1.compareTo(notif2));
     }
@@ -78,16 +81,19 @@ public class NotificationContentItemTest {
         final String componentName = "comp1";
         final ComponentVersionView componentVersion = null;
         final String componentVersionUrl = null;
+        final String componentIssueUrl = "";
 
         final NotificationContentItem notif1 = new NotificationContentItem(createdAt, projectVersion,
                 componentName,
                 componentVersion,
-                componentVersionUrl);
+                componentVersionUrl,
+                componentIssueUrl);
 
         final NotificationContentItem notif2 = new NotificationContentItem(createdAt, projectVersion,
                 componentName,
                 componentVersion,
-                componentVersionUrl);
+                componentVersionUrl,
+                componentIssueUrl);
 
         assertEquals(0, notif1.compareTo(notif2));
     }
@@ -104,18 +110,20 @@ public class NotificationContentItemTest {
         final String componentName = "comp1";
         final ComponentVersionView componentVersion = null;
         final String componentVersionUrl = null;
+        final String componentIssueUrl = "";
 
         final NotificationContentItem notif1 = new NotificationContentItem(createdAt, projectVersion1,
                 componentName,
                 componentVersion,
-                componentVersionUrl);
+                componentVersionUrl,
+                componentIssueUrl);
 
         final NotificationContentItem notif2 = new NotificationContentItem(createdAt, projectVersion2,
                 componentName,
                 componentVersion,
-                componentVersionUrl);
+                componentVersionUrl,
+                componentIssueUrl);
 
         assertEquals(-1, notif1.compareTo(notif2));
     }
-
 }
