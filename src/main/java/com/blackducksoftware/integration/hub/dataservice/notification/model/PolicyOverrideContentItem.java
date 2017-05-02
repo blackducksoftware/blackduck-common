@@ -41,10 +41,11 @@ public class PolicyOverrideContentItem extends PolicyViolationContentItem {
             final ComponentVersionView componentVersion, final String componentUrl,
             final String componentVersionUrl,
             final List<PolicyRuleView> policyRuleList, final String firstName,
-            final String lastName)
+            final String lastName,
+            final String componentIssueUrl)
             throws URISyntaxException {
         super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl,
-                policyRuleList);
+                policyRuleList, componentIssueUrl);
         this.firstName = firstName;
         this.lastName = lastName;
     }

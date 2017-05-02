@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>hub-common</artifactId>
-  <version>10.1.1-SNAPSHOT</version>
+  <version>10.2.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>Hub Common</name>
@@ -32,7 +32,7 @@
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>hub-common-response</artifactId>
-      <version>0.0.7</version>
+      <version>0.0.8</version>
     </dependency>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>

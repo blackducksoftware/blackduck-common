@@ -33,6 +33,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
+import com.blackducksoftware.integration.hub.api.bom.BomComponentIssueRequestService;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
@@ -256,6 +257,10 @@ public class HubServicesFactory {
 
     public ComponentDataService createComponentDataService(final IntLogger logger) {
         return new ComponentDataService(logger, createComponentRequestService(), createMetaService(logger));
+    }
+
+    public BomComponentIssueRequestService createBomComponentIssueRequestService(final IntLogger logger) {
+        return new BomComponentIssueRequestService(restConnection, createMetaService(logger));
     }
 
     @Override
