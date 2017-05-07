@@ -41,6 +41,8 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
     private final String componentVersionUrl;
 
+    private String componentIssueLink;
+
     // We need createdAt (from the enclosing notificationItem) so we can order
     // them after
     // they are collected multi-threaded
@@ -49,12 +51,13 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
     public NotificationContentItem(final Date createdAt, final ProjectVersionModel projectVersion,
             final String componentName,
             final ComponentVersionView componentVersion,
-            final String componentVersionUrl) {
+            final String componentVersionUrl, final String componentIssueUrl) {
         this.createdAt = createdAt;
         this.projectVersion = projectVersion;
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.componentVersionUrl = componentVersionUrl;
+        this.componentIssueLink = componentIssueUrl;
     }
 
     public ProjectVersionModel getProjectVersion() {
@@ -75,6 +78,14 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
 
     public Date getCreatedAt() {
         return createdAt;
+    }
+
+    public String getComponentIssueLink() {
+        return componentIssueLink;
+    }
+
+    public void setComponentIssueLink(final String componentIssueLink) {
+        this.componentIssueLink = componentIssueLink;
     }
 
     @Override
@@ -113,7 +124,10 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getComponentVersionUrl() == null) ? 0 : getComponentVersionUrl().hashCode());
+        result = prime * result + ((componentIssueLink == null) ? 0 : componentIssueLink.hashCode());
+        result = prime * result + ((componentName == null) ? 0 : componentName.hashCode());
+        result = prime * result + ((componentVersion == null) ? 0 : componentVersion.hashCode());
+        result = prime * result + ((componentVersionUrl == null) ? 0 : componentVersionUrl.hashCode());
         result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
         result = prime * result + ((projectVersion == null) ? 0 : projectVersion.hashCode());
         return result;
@@ -131,11 +145,32 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
             return false;
         }
         final NotificationContentItem other = (NotificationContentItem) obj;
-        if (getComponentVersionUrl() == null) {
-            if (other.getComponentVersionUrl() != null) {
+        if (componentIssueLink == null) {
+            if (other.componentIssueLink != null) {
                 return false;
             }
-        } else if (!getComponentVersionUrl().equals(other.getComponentVersionUrl())) {
+        } else if (!componentIssueLink.equals(other.componentIssueLink)) {
+            return false;
+        }
+        if (componentName == null) {
+            if (other.componentName != null) {
+                return false;
+            }
+        } else if (!componentName.equals(other.componentName)) {
+            return false;
+        }
+        if (componentVersion == null) {
+            if (other.componentVersion != null) {
+                return false;
+            }
+        } else if (!componentVersion.equals(other.componentVersion)) {
+            return false;
+        }
+        if (componentVersionUrl == null) {
+            if (other.componentVersionUrl != null) {
+                return false;
+            }
+        } else if (!componentVersionUrl.equals(other.componentVersionUrl)) {
             return false;
         }
         if (createdAt == null) {

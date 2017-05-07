@@ -32,8 +32,8 @@ public class PolicyContentItem extends NotificationContentItem {
     private final String componentUrl;
 
     public PolicyContentItem(final Date createdAt, final ProjectVersionModel projectVersion, final String componentName,
-            final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl) {
-        super(createdAt, projectVersion, componentName, componentVersion, componentVersionUrl);
+            final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl, final String componentIssueUrl) {
+        super(createdAt, projectVersion, componentName, componentVersion, componentVersionUrl, componentIssueUrl);
         this.componentUrl = componentUrl;
     }
 
