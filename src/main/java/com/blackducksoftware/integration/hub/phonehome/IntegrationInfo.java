@@ -41,7 +41,7 @@ public class IntegrationInfo {
     }
 
     public IntegrationInfo(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
-        this.thirdPartyName = thirdPartyName.toString();
+        this.thirdPartyName = thirdPartyName.getName();
         this.thirdPartyVersion = thirdPartyVersion;
         this.pluginVersion = pluginVersion;
     }

@@ -72,65 +72,36 @@ public class SimpleScanService {
 
     private final CIEnvironmentVariables ciEnvironmentVariables;
 
-    private final File directoryToInstallTo;
-
-    private final int scanMemory;
-
-    private final boolean dryRun;
-
-    private final String project;
-
-    private final String version;
-
-    private final Set<String> scanTargetPaths;
-
-    private final File workingDirectory;
+    private final HubScanConfig hubScanConfig;
 
     private final List<String> cmd = new ArrayList<>();
 
     private File logDirectory;
 
-    private final String[] excludePatterns;
-
-    private String codeLocationAlias;
-
     public SimpleScanService(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig,
-            final HubSupportHelper hubSupportHelper,
-            final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig) {
+            final HubSupportHelper hubSupportHelper, final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig) {
         this.gson = gson;
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
         this.hubSupportHelper = hubSupportHelper;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
-        this.directoryToInstallTo = hubScanConfig.getToolsDir();
-        this.scanMemory = hubScanConfig.getScanMemory();
-        this.dryRun = hubScanConfig.isDryRun();
-        this.project = hubScanConfig.getProjectName();
-        this.version = hubScanConfig.getVersion();
-        this.scanTargetPaths = hubScanConfig.getScanTargetPaths();
-        this.workingDirectory = hubScanConfig.getWorkingDirectory();
-        this.excludePatterns = hubScanConfig.getExcludePatterns();
-        this.codeLocationAlias = hubScanConfig.getCodeLocationAlias();
+        this.hubScanConfig = hubScanConfig;
     }
 
+    /**
+     * @deprecated You should create HubScanConfig, rather than pass in each field
+     */
+    @Deprecated
     public SimpleScanService(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig,
             final HubSupportHelper hubSupportHelper,
-            final CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo, final int scanMemory, final boolean dryRun,
-            final String project,
-            final String version, final Set<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
-        this.gson = gson;
-        this.logger = logger;
-        this.hubServerConfig = hubServerConfig;
-        this.hubSupportHelper = hubSupportHelper;
-        this.ciEnvironmentVariables = ciEnvironmentVariables;
-        this.directoryToInstallTo = directoryToInstallTo;
-        this.scanMemory = scanMemory;
-        this.dryRun = dryRun;
-        this.project = project;
-        this.version = version;
-        this.scanTargetPaths = scanTargetPaths;
-        this.workingDirectory = workingDirectory;
-        this.excludePatterns = excludePatterns;
+            final CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo,
+            final int scanMemory, final boolean dryRun, final String project, final String version, final Set<String> scanTargetPaths,
+            final File workingDirectory, final String[] excludePatterns) {
+        this(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, new HubScanConfig(project, version,
+                workingDirectory, scanMemory, scanTargetPaths, dryRun,
+                null, true, excludePatterns, null,
+                false, false));
+
     }
 
     /**
@@ -144,7 +115,7 @@ public class SimpleScanService {
      * @throws ScanFailedException
      */
     public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        final CLILocation cliLocation = new CLILocation(logger, directoryToInstallTo);
+        final CLILocation cliLocation = new CLILocation(logger, hubScanConfig.getToolsDir());
         String pathToJavaExecutable;
         String pathToOneJar;
         String pathToScanExecutable;
@@ -153,7 +124,8 @@ public class SimpleScanService {
             pathToOneJar = cliLocation.getOneJarFile().getCanonicalPath();
             pathToScanExecutable = cliLocation.getCLI(logger).getCanonicalPath();
         } catch (final IOException e) {
-            throw new HubIntegrationException(String.format("The provided directory %s did not have a Hub CLI.", directoryToInstallTo.getAbsolutePath()), e);
+            throw new HubIntegrationException(String.format("The provided directory %s did not have a Hub CLI.", hubScanConfig.getToolsDir().getAbsolutePath()),
+                    e);
         }
         logger.debug("Using this java installation : " + pathToJavaExecutable);
 
@@ -179,7 +151,7 @@ public class SimpleScanService {
             }
         }
 
-        cmd.add("-Xmx" + scanMemory + "m");
+        cmd.add("-Xmx" + hubScanConfig.getScanMemory() + "m");
         cmd.add("-jar");
         cmd.add(pathToScanExecutable);
         cmd.add("--scheme");
@@ -220,7 +192,7 @@ public class SimpleScanService {
         cmd.add("--logDir");
         cmd.add(logDirectoryPath);
 
-        if (dryRun) {
+        if (hubScanConfig.isDryRun()) {
             // The dryRunWriteDir is the same as the log directory path
             // The CLI will create a subdirectory for the json files
             cmd.add("--dryRunWriteDir");
@@ -235,20 +207,20 @@ public class SimpleScanService {
             cmd.add(logDirectoryPath);
         }
 
-        if (StringUtils.isNotBlank(project) && StringUtils.isNotBlank(version)) {
+        if (StringUtils.isNotBlank(hubScanConfig.getProjectName()) && StringUtils.isNotBlank(hubScanConfig.getVersion())) {
             cmd.add("--project");
-            cmd.add(project);
+            cmd.add(hubScanConfig.getProjectName());
             cmd.add("--release");
-            cmd.add(version);
+            cmd.add(hubScanConfig.getVersion());
         }
 
-        if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CODE_LOCATION_ALIAS) && StringUtils.isNotBlank(codeLocationAlias)) {
+        if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CODE_LOCATION_ALIAS) && StringUtils.isNotBlank(hubScanConfig.getCodeLocationAlias())) {
             cmd.add("--name");
-            cmd.add(codeLocationAlias);
+            cmd.add(hubScanConfig.getCodeLocationAlias());
         }
 
-        if (excludePatterns != null) {
-            for (final String exclusionPattern : excludePatterns) {
+        if (hubScanConfig.getExcludePatterns() != null) {
+            for (final String exclusionPattern : hubScanConfig.getExcludePatterns()) {
                 if (StringUtils.isNotBlank(exclusionPattern)) {
                     cmd.add("--exclude");
                     cmd.add(exclusionPattern);
@@ -256,7 +228,7 @@ public class SimpleScanService {
             }
         }
 
-        for (final String target : scanTargetPaths) {
+        for (final String target : hubScanConfig.getScanTargetPaths()) {
             cmd.add(target);
         }
 
@@ -335,8 +307,8 @@ public class SimpleScanService {
         }
         final File[] statusFiles = scanStatusDirectory.listFiles();
 
-        if (statusFiles.length != scanTargetPaths.size()) {
-            logger.error(String.format("There were %d scans target paths and %d status files.", scanTargetPaths.size(), statusFiles.length));
+        if (statusFiles.length != hubScanConfig.getScanTargetPaths().size()) {
+            logger.error(String.format("There were %d scans target paths and %d status files.", hubScanConfig.getScanTargetPaths().size(), statusFiles.length));
             return Collections.emptyList();
         }
 
@@ -369,14 +341,14 @@ public class SimpleScanService {
 
     private void populateLogDirectory() throws IOException {
         final String logDirectoryName = "HubScanLogs";
-        final File logsDirectory = new File(workingDirectory, logDirectoryName);
+        final File logsDirectory = new File(hubScanConfig.getWorkingDirectory(), logDirectoryName);
         final String specificScanExecutionLogDirectory = getSpecificScanExecutionLogDirectory();
 
         logDirectory = new File(logsDirectory, specificScanExecutionLogDirectory);
         if (!logDirectory.exists() && !logDirectory.mkdirs()) {
             throw new IOException("Could not create the HubScanLogs directory!");
         }
-        final File bdIgnoreLogsFile = new File(workingDirectory, ".bdignore");
+        final File bdIgnoreLogsFile = new File(hubScanConfig.getWorkingDirectory(), ".bdignore");
         if (bdIgnoreLogsFile.exists()) {
             bdIgnoreLogsFile.delete();
         }
@@ -427,8 +399,12 @@ public class SimpleScanService {
     }
 
     private void makeVerbose(final List<String> cmd) {
-        cmd.add("-v");
-        cmd.add("--debug");
+        if (hubScanConfig.isVerbose()) {
+            cmd.add("-v");
+        }
+        if (hubScanConfig.isDebug()) {
+            cmd.add("--debug");
+        }
     }
 
     public IntLogger getLogger() {
@@ -453,14 +429,6 @@ public class SimpleScanService {
 
     public File getStandardOutputFile() {
         return new File(logDirectory, "CLI_Output.txt");
-    }
-
-    public String getCodeLocationAlias() {
-        return codeLocationAlias;
-    }
-
-    public void setCodeLocationAlias(final String codeLocationAlias) {
-        this.codeLocationAlias = codeLocationAlias;
     }
 
 }
