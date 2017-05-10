@@ -25,35 +25,38 @@ package com.blackducksoftware.integration.hub.buildtool;
 
 import java.net.URL;
 
-public class FilePathGavExtractor {
-    public Gav getMavenPathGav(final URL filePath, final URL localMavenRepoPath) {
+import com.blackducksoftware.integration.hub.bdio.simple.model.Forge;
+import com.blackducksoftware.integration.hub.bdio.simple.model.externalid.MavenExternalId;
+
+public class FilePathMavenExternalIdExtractor {
+    public MavenExternalId getMavenPathMavenExternalId(final URL filePath, final URL localMavenRepoPath) {
         if (filePath == null || localMavenRepoPath == null) {
             return null;
         }
         String stringPath = filePath.getFile();
         stringPath = stringPath.replace(localMavenRepoPath.getFile(), "");
-        String[] pathArray = stringPath.split("/");
-        StringBuilder groupIdBuilder = new StringBuilder();
-        for(int i = 0; i<pathArray.length-3; i++){
-        	groupIdBuilder.append(pathArray[i]);
-        	if(i!= pathArray.length-4){
-        		groupIdBuilder.append(".");
-        	}
+        final String[] pathArray = stringPath.split("/");
+        final StringBuilder groupIdBuilder = new StringBuilder();
+        for (int i = 0; i < pathArray.length - 3; i++) {
+            groupIdBuilder.append(pathArray[i]);
+            if (i != pathArray.length - 4) {
+                groupIdBuilder.append(".");
+            }
         }
         final String groupId = groupIdBuilder.toString();
         final String artifactId = pathArray[pathArray.length - 3];
         final String version = pathArray[pathArray.length - 2];
 
-        return new Gav(groupId, artifactId, version);
+        return new MavenExternalId(Forge.maven, groupId, artifactId, version);
 
     }
 
-    public Gav getGradlePathGav(final URL filePath) {
+    public MavenExternalId getGradlePathMavenExternalId(final URL filePath) {
         if (filePath == null) {
             return null;
         }
-        String[] pathArray = filePath.getFile().split("/");
-        
+        final String[] pathArray = filePath.getFile().split("/");
+
         if (pathArray.length < 5) {
             return null;
         }
@@ -62,7 +65,7 @@ public class FilePathGavExtractor {
         final String artifactId = pathArray[pathArray.length - 4];
         final String version = pathArray[pathArray.length - 3];
 
-        return new Gav(groupId, artifactId, version);
+        return new MavenExternalId(Forge.maven, groupId, artifactId, version);
     }
 
 }

@@ -31,6 +31,7 @@ import java.io.IOException;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
+import com.blackducksoftware.integration.hub.bdio.simple.model.DependencyNode;
 import com.blackducksoftware.integration.hub.buildtool.bdio.BdioDependencyWriter;
 import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataService;
@@ -46,22 +47,20 @@ public class BuildToolHelper {
         this.logger = logger;
     }
 
-    public void createFlatOutput(final DependencyNode rootNode, final String hubProjectName, final String hubProjectVersion,
-            final File outputDirectory) throws IOException {
+    public void createFlatOutput(final DependencyNode rootNode, final File outputDirectory) throws IOException {
         final FlatDependencyListWriter flatDependencyListWriter = new FlatDependencyListWriter();
-        flatDependencyListWriter.write(outputDirectory, hubProjectName, rootNode);
+        flatDependencyListWriter.write(outputDirectory, rootNode);
 
         final HubProjectDetailsWriter hubProjectDetailsWriter = new HubProjectDetailsWriter();
-        hubProjectDetailsWriter.write(outputDirectory, hubProjectName, hubProjectVersion);
+        hubProjectDetailsWriter.write(outputDirectory, rootNode.name, rootNode.version);
     }
 
-    public void createHubOutput(final DependencyNode rootNode, final String projectName, final String hubCodeLocationName, final String hubProjectName,
-            final String hubProjectVersion, final File outputDirectory) throws IOException {
+    public void createHubOutput(final DependencyNode rootNode, final String hubCodeLocationName, final File outputDirectory) throws IOException {
         final BdioDependencyWriter bdioDependencyWriter = new BdioDependencyWriter();
-        bdioDependencyWriter.write(outputDirectory, projectName, hubCodeLocationName, hubProjectName, hubProjectVersion, rootNode);
+        bdioDependencyWriter.write(outputDirectory, hubCodeLocationName, rootNode);
 
         final HubProjectDetailsWriter hubProjectDetailsWriter = new HubProjectDetailsWriter();
-        hubProjectDetailsWriter.write(outputDirectory, hubProjectName, hubProjectVersion);
+        hubProjectDetailsWriter.write(outputDirectory, rootNode.name, rootNode.version);
     }
 
     public void deployHubOutput(final HubServicesFactory services,
