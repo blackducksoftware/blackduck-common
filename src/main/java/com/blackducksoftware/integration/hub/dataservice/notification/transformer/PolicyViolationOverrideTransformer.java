@@ -71,17 +71,17 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
         final List<NotificationContentItem> templateData = new ArrayList<>();
         final ProjectVersionView releaseItem;
         final PolicyOverrideNotificationView policyOverride = (PolicyOverrideNotificationView) item;
-        final String projectName = policyOverride.getContent().projectName;
+        final String projectName = policyOverride.content.projectName;
         final List<ComponentVersionStatus> componentVersionList = new ArrayList<>();
         final ComponentVersionStatus componentStatus = new ComponentVersionStatus();
-        componentStatus.bomComponentVersionPolicyStatusLink = policyOverride.getContent().bomComponentVersionPolicyStatusLink;
-        componentStatus.componentName = policyOverride.getContent().componentName;
-        componentStatus.componentVersionLink = policyOverride.getContent().componentVersionLink;
+        componentStatus.bomComponentVersionPolicyStatusLink = policyOverride.content.bomComponentVersionPolicyStatusLink;
+        componentStatus.componentName = policyOverride.content.componentName;
+        componentStatus.componentVersionLink = policyOverride.content.componentVersionLink;
 
         componentVersionList.add(componentStatus);
 
         try {
-            releaseItem = getProjectVersionService().getItem(policyOverride.getContent().projectVersionLink, ProjectVersionView.class);
+            releaseItem = getProjectVersionService().getItem(policyOverride.content.projectVersionLink, ProjectVersionView.class);
         } catch (final IntegrationException e) {
             throw new HubItemTransformException(e);
         }
@@ -101,14 +101,14 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
                 final PolicyOverrideNotificationView policyOverride = (PolicyOverrideNotificationView) item;
                 final ProjectVersionModel projectVersion;
                 try {
-                    projectVersion = createFullProjectVersion(policyOverride.getContent().projectVersionLink,
-                            projectName, releaseItem.getVersionName());
+                    projectVersion = createFullProjectVersion(policyOverride.content.projectVersionLink,
+                            projectName, releaseItem.versionName);
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
                 }
 
-                final String componentLink = policyOverrideItem.getContent().componentLink;
-                final String componentVersionLink = policyOverrideItem.getContent().componentVersionLink;
+                final String componentLink = policyOverrideItem.content.componentLink;
+                final String componentVersionLink = policyOverrideItem.content.componentVersionLink;
                 final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
 
                 final String bomComponentVersionPolicyStatusUrl = componentVersion.bomComponentVersionPolicyStatusLink;
@@ -119,11 +119,11 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
                 }
                 final BomComponentPolicyStatusView bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
                         bomComponentVersionPolicyStatusUrl);
-                if (bomComponentVersionPolicyStatus.getApprovalStatus() != VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION_OVERRIDDEN) {
+                if (bomComponentVersionPolicyStatus.approvalStatus != VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION_OVERRIDDEN) {
                     getLogger().debug(String.format("Component %s status is not 'violation overridden'; skipping it", componentVersion.componentName));
                     continue;
                 }
-                final List<String> ruleList = getMatchingRuleUrls(policyOverrideItem.getContent().policies);
+                final List<String> ruleList = getMatchingRuleUrls(policyOverrideItem.content.policies);
                 if (ruleList != null && !ruleList.isEmpty()) {
                     final List<PolicyRuleView> policyRuleList = new ArrayList<>();
                     for (final String ruleUrl : ruleList) {
@@ -146,9 +146,9 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
             final List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException {
         final PolicyOverrideNotificationView policyOverride = (PolicyOverrideNotificationView) item;
 
-        templateData.add(new PolicyOverrideContentItem(item.getCreatedAt(), projectVersion, componentName,
+        templateData.add(new PolicyOverrideContentItem(item.createdAt, projectVersion, componentName,
                 componentVersion, componentUrl, componentVersionUrl, policyRuleList,
-                policyOverride.getContent().firstName, policyOverride.getContent().lastName, componentIssueUrl));
+                policyOverride.content.firstName, policyOverride.content.lastName, componentIssueUrl));
     }
 
 }

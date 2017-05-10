@@ -34,7 +34,7 @@ public class PolicyStatusDescription {
     }
 
     public String getPolicyStatusMessage() {
-        if (policyStatusItem.getComponentVersionStatusCounts() == null || policyStatusItem.getComponentVersionStatusCounts().size() == 0) {
+        if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.size() == 0) {
             return "The Hub found no components.";
         }
 

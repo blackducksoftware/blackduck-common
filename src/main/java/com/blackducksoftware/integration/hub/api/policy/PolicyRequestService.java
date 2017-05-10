@@ -53,9 +53,9 @@ public class PolicyRequestService extends HubResponseService {
 
     public boolean hasOnlyProjectLevelConditions(final PolicyRuleView policyRuleView) {
         boolean hasNonProjectLevelCondition = false;
-        if (policyRuleView.getExpression() != null && policyRuleView.getExpression().expressions != null
-                && !policyRuleView.getExpression().expressions.isEmpty()) {
-            for (final PolicyRuleExpression expression : policyRuleView.getExpression().expressions) {
+        if (policyRuleView.expression != null && policyRuleView.expression.expressions != null
+                && !policyRuleView.expression.expressions.isEmpty()) {
+            for (final PolicyRuleExpression expression : policyRuleView.expression.expressions) {
                 final PolicyRuleConditionEnum condition = PolicyRuleConditionEnum.valueOf(expression.name);
                 if (condition == PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION) {
                     continue;

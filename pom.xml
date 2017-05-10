@@ -32,7 +32,7 @@
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>hub-common-response</artifactId>
-      <version>0.0.9</version>
+      <version>1.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>

@@ -100,12 +100,12 @@ public class RiskReportDataService extends HubResponseService {
         final String originalProjectUrl = metaService.getHref(project);
         final String originalVersionUrl = metaService.getHref(version);
         final ReportData reportData = new ReportData();
-        reportData.setProjectName(project.getName());
+        reportData.setProjectName(project.name);
         reportData.setProjectURL(getReportProjectUrl(originalProjectUrl));
-        reportData.setProjectVersion(version.getVersionName());
+        reportData.setProjectVersion(version.versionName);
         reportData.setProjectVersionURL(getReportVersionUrl(originalVersionUrl, false));
-        reportData.setPhase(version.getPhase().toString());
-        reportData.setDistribution(version.getDistribution().toString());
+        reportData.setPhase(version.phase.toString());
+        reportData.setDistribution(version.distribution.toString());
         final List<BomComponent> components = new ArrayList<>();
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.AGGREGATE_BOM_REST_SERVER)) {
             logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
@@ -113,14 +113,14 @@ public class RiskReportDataService extends HubResponseService {
             for (final VersionBomComponentView bomEntry : bomEntries) {
                 final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
                 String componentPolicyStatusURL = null;
-                if (!StringUtils.isBlank(bomEntry.getComponentVersion())) {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.getComponentVersion());
+                if (!StringUtils.isBlank(bomEntry.componentVersion)) {
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.componentVersion);
                 } else {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.getComponent());
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.component);
                 }
                 final BomComponentPolicyStatusView bomPolicyStatus = getItem(componentPolicyStatusURL,
                         BomComponentPolicyStatusView.class);
-                component.setPolicyStatus(bomPolicyStatus.getApprovalStatus().toString());
+                component.setPolicyStatus(bomPolicyStatus.approvalStatus.toString());
                 components.add(component);
             }
         } else {
@@ -196,14 +196,14 @@ public class RiskReportDataService extends HubResponseService {
 
     private BomComponent createBomComponentFromBomComponentView(final VersionBomComponentView bomEntry) {
         final BomComponent component = new BomComponent();
-        component.setComponentName(bomEntry.getComponentName());
-        component.setComponentURL(getReportProjectUrl(bomEntry.getComponent()));
-        component.setComponentVersion(bomEntry.getComponentVersionName());
-        component.setComponentVersionURL(getReportVersionUrl(bomEntry.getComponentVersion(), true));
-        component.setLicense(bomEntry.getLicenses().get(0).licenseDisplay);
-        if (bomEntry.getSecurityRiskProfile() != null && bomEntry.getSecurityRiskProfile().counts != null
-                && !bomEntry.getSecurityRiskProfile().counts.isEmpty()) {
-            for (final RiskCountView count : bomEntry.getSecurityRiskProfile().counts) {
+        component.setComponentName(bomEntry.componentName);
+        component.setComponentURL(getReportProjectUrl(bomEntry.component));
+        component.setComponentVersion(bomEntry.componentVersionName);
+        component.setComponentVersionURL(getReportVersionUrl(bomEntry.componentVersion, true));
+        component.setLicense(bomEntry.licenses.get(0).licenseDisplay);
+        if (bomEntry.securityRiskProfile != null && bomEntry.securityRiskProfile.counts != null
+                && !bomEntry.securityRiskProfile.counts.isEmpty()) {
+            for (final RiskCountView count : bomEntry.securityRiskProfile.counts) {
                 if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
                     component.setSecurityRiskHighCount(count.count);
                 } else if (count.countType == RiskCountEnum.MEDIUM && count.count > 0) {
@@ -213,9 +213,9 @@ public class RiskReportDataService extends HubResponseService {
                 }
             }
         }
-        if (bomEntry.getLicenseRiskProfile() != null && bomEntry.getLicenseRiskProfile().counts != null
-                && !bomEntry.getLicenseRiskProfile().counts.isEmpty()) {
-            for (final RiskCountView count : bomEntry.getLicenseRiskProfile().counts) {
+        if (bomEntry.licenseRiskProfile != null && bomEntry.licenseRiskProfile.counts != null
+                && !bomEntry.licenseRiskProfile.counts.isEmpty()) {
+            for (final RiskCountView count : bomEntry.licenseRiskProfile.counts) {
                 if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
                     component.setLicenseRiskHighCount(count.count);
                 } else if (count.countType == RiskCountEnum.MEDIUM && count.count > 0) {
@@ -225,9 +225,9 @@ public class RiskReportDataService extends HubResponseService {
                 }
             }
         }
-        if (bomEntry.getOperationalRiskProfile() != null && bomEntry.getOperationalRiskProfile().counts != null
-                && !bomEntry.getOperationalRiskProfile().counts.isEmpty()) {
-            for (final RiskCountView count : bomEntry.getOperationalRiskProfile().counts) {
+        if (bomEntry.operationalRiskProfile != null && bomEntry.operationalRiskProfile.counts != null
+                && !bomEntry.operationalRiskProfile.counts.isEmpty()) {
+            for (final RiskCountView count : bomEntry.operationalRiskProfile.counts) {
                 if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
                     component.setOperationalRiskHighCount(count.count);
                 } else if (count.countType == RiskCountEnum.MEDIUM && count.count > 0) {

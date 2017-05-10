@@ -67,9 +67,9 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         final List<NotificationContentItem> templateData = new ArrayList<>();
 
         final RuleViolationClearedNotificationView policyViolation = (RuleViolationClearedNotificationView) item;
-        final String projectName = policyViolation.getContent().projectName;
-        final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent().componentVersionStatuses;
-        final String projectVersionLink = policyViolation.getContent().projectVersionLink;
+        final String projectName = policyViolation.content.projectName;
+        final List<ComponentVersionStatus> componentVersionList = policyViolation.content.componentVersionStatuses;
+        final String projectVersionLink = policyViolation.content.projectVersionLink;
         ProjectVersionView releaseItem;
         try {
             releaseItem = getReleaseItem(projectVersionLink);
@@ -97,8 +97,8 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
                 final RuleViolationClearedNotificationView policyViolation = (RuleViolationClearedNotificationView) item;
                 final ProjectVersionModel projectVersion;
                 try {
-                    projectVersion = createFullProjectVersion(policyViolation.getContent().projectVersionLink,
-                            projectName, releaseItem.getVersionName());
+                    projectVersion = createFullProjectVersion(policyViolation.content.projectVersionLink,
+                            projectName, releaseItem.versionName);
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
                 }
@@ -138,7 +138,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
             final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
             final List<PolicyRuleView> policyRuleList, final NotificationView item,
             final List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException {
-        final PolicyViolationClearedContentItem contentItem = new PolicyViolationClearedContentItem(item.getCreatedAt(),
+        final PolicyViolationClearedContentItem contentItem = new PolicyViolationClearedContentItem(item.createdAt,
                 projectVersion, componentName, componentVersion, componentUrl,
                 componentVersionUrl,
                 policyRuleList, componentIssueUrl);

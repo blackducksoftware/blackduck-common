@@ -70,9 +70,9 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     public List<NotificationContentItem> transform(final NotificationView item) throws HubItemTransformException {
         final List<NotificationContentItem> templateData = new ArrayList<>();
         final RuleViolationNotificationView policyViolation = (RuleViolationNotificationView) item;
-        final String projectName = policyViolation.getContent().projectName;
-        final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent().componentVersionStatuses;
-        final String projectVersionLink = policyViolation.getContent().projectVersionLink;
+        final String projectName = policyViolation.content.projectName;
+        final List<ComponentVersionStatus> componentVersionList = policyViolation.content.componentVersionStatuses;
+        final String projectVersionLink = policyViolation.content.projectVersionLink;
         ProjectVersionView releaseItem;
         try {
             releaseItem = getReleaseItem(projectVersionLink);
@@ -93,8 +93,8 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
                 final RuleViolationNotificationView policyViolation = (RuleViolationNotificationView) item;
                 ProjectVersionModel projectVersion;
                 try {
-                    projectVersion = createFullProjectVersion(policyViolation.getContent().projectVersionLink,
-                            projectName, releaseItem.getVersionName());
+                    projectVersion = createFullProjectVersion(policyViolation.content.projectVersionLink,
+                            projectName, releaseItem.versionName);
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
                 }
@@ -106,7 +106,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
                     continue;
                 }
                 final BomComponentPolicyStatusView bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(bomComponentVersionPolicyStatusUrl);
-                if (bomComponentVersionPolicyStatus.getApprovalStatus() != VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION) {
+                if (bomComponentVersionPolicyStatus.approvalStatus != VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION) {
                     getLogger().debug(String.format("Component %s is not in violation; skipping it", componentVersion.componentName));
                     continue;
                 }
@@ -145,7 +145,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
             final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
             final List<PolicyRuleView> policyRuleList, final NotificationView item,
             final List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException {
-        templateData.add(new PolicyViolationContentItem(item.getCreatedAt(), projectVersion, componentName,
+        templateData.add(new PolicyViolationContentItem(item.createdAt, projectVersion, componentName,
                 componentVersion, componentUrl, componentVersionUrl, policyRuleList, componentIssueUrl));
     }
 }

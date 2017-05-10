@@ -53,7 +53,7 @@ public class NotificationContentItemTest {
         projectVersion.setProjectVersionName("projectVersionName");
         final String componentName = "comp1";
         final ComponentVersionView componentVersion = Mockito.mock(ComponentVersionView.class);
-        Mockito.when(componentVersion.getVersionName()).thenReturn("componentVersionName");
+        componentVersion.versionName = "componentVersionName";
         final String componentVersionUrl = "http://some.url.com";
         final String componentIssueUrl = "";
 

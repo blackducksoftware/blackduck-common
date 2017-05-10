@@ -141,37 +141,37 @@ public class EventTestUtil {
 
     public VulnerabilityView createVulnerability(final String vulnId, final VulnerabilitySeverityEnum severity) {
         final VulnerabilityView item = Mockito.mock(VulnerabilityView.class);
-        Mockito.when(item.getVulnerabilityName()).thenReturn(vulnId);
-        Mockito.when(item.getDescription()).thenReturn("A vulnerability");
-        Mockito.when(item.getVulnerabilityPublishedDate()).thenReturn("today");
-        Mockito.when(item.getVulnerabilityUpdatedDate()).thenReturn("a minute ago");
-        Mockito.when(item.getBaseScore()).thenReturn(10.0);
-        Mockito.when(item.getImpactSubscore()).thenReturn(5.0);
-        Mockito.when(item.getExploitabilitySubscore()).thenReturn(1.0);
-        Mockito.when(item.getSource()).thenReturn("");
-        Mockito.when(item.getSeverity()).thenReturn(severity.name());
-        Mockito.when(item.getAccessVector()).thenReturn("");
-        Mockito.when(item.getAccessComplexity()).thenReturn("");
-        Mockito.when(item.getAuthentication()).thenReturn("");
-        Mockito.when(item.getConfidentialityImpact()).thenReturn("");
-        Mockito.when(item.getIntegrityImpact()).thenReturn("");
-        Mockito.when(item.getAvailabilityImpact()).thenReturn("");
-        Mockito.when(item.getCweId()).thenReturn(vulnId);
+        item.vulnerabilityName = vulnId;
+        item.description = "A vulnerability";
+        item.vulnerabilityPublishedDate = "today";
+        item.vulnerabilityUpdatedDate = "a minute ago";
+        item.baseScore = 10.0;
+        item.impactSubscore = 5.0;
+        item.exploitabilitySubscore = 1.0;
+        item.source = "";
+        item.severity = severity.name();
+        item.accessVector = "";
+        item.accessComplexity = "";
+        item.authentication = "";
+        item.confidentialityImpact = "";
+        item.integrityImpact = "";
+        item.availabilityImpact = "";
+        item.cweId = vulnId;
         return item;
     }
 
     public PolicyRuleView createPolicyRule(final String name, final String description, final String createdBy, final String updatedBy, final String href) {
         final PolicyRuleView rule = Mockito.mock(PolicyRuleView.class);
         rule.json = createPolicyRuleJSon(href);
-        Mockito.when(rule.getName()).thenReturn(name);
-        Mockito.when(rule.getDescription()).thenReturn(description);
-        Mockito.when(rule.getEnabled()).thenReturn(true);
-        Mockito.when(rule.getOverridable()).thenReturn(true);
-        Mockito.when(rule.getExpression()).thenReturn(null);
-        Mockito.when(rule.getCreatedAt()).thenReturn(new Date());
-        Mockito.when(rule.getCreatedBy()).thenReturn(createdBy);
-        Mockito.when(rule.getUpdatedAt()).thenReturn(new Date());
-        Mockito.when(rule.getUpdatedBy()).thenReturn(updatedBy);
+        rule.name = name;
+        rule.description = description;
+        rule.enabled = true;
+        rule.overridable = true;
+        rule.expression = null;
+        rule.createdAt = new Date();
+        rule.createdBy = createdBy;
+        rule.updatedAt = new Date();
+        rule.updatedBy = updatedBy;
         return rule;
     }
 
@@ -203,7 +203,7 @@ public class EventTestUtil {
     private ComponentVersionView createComponentVersionMock(final String componentVersion) {
         ComponentVersionView fullComponentVersion;
         fullComponentVersion = Mockito.mock(ComponentVersionView.class);
-        Mockito.when(fullComponentVersion.getVersionName()).thenReturn(componentVersion);
+        fullComponentVersion.versionName = componentVersion;
         return fullComponentVersion;
     }
 
