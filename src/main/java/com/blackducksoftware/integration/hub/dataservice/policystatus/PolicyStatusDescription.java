@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.policystatus;
 
+import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum;
 import com.blackducksoftware.integration.hub.model.view.VersionBomPolicyStatusView;
 import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionStatusCount;
 
@@ -38,9 +39,9 @@ public class PolicyStatusDescription {
             return "The Hub found no components.";
         }
 
-        final ComponentVersionStatusCount inViolation = policyStatusItem.getCountInViolation();
-        final ComponentVersionStatusCount inViolationOverridden = policyStatusItem.getCountInViolationOverridden();
-        final ComponentVersionStatusCount notInViolation = policyStatusItem.getCountNotInViolation();
+        final ComponentVersionStatusCount inViolation = getCountInViolation();
+        final ComponentVersionStatusCount inViolationOverridden = getCountInViolationOverridden();
+        final ComponentVersionStatusCount notInViolation = getCountNotInViolation();
 
         final int inViolationCount = inViolation == null ? 0 : inViolation.value;
         final int inViolationOverriddenCount = inViolationOverridden == null ? 0 : inViolationOverridden.value;
@@ -55,6 +56,42 @@ public class PolicyStatusDescription {
         stringBuilder.append(notInViolationCount);
         stringBuilder.append(" components not in violation.");
         return stringBuilder.toString();
+    }
+
+    public ComponentVersionStatusCount getCountInViolation() {
+        if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.isEmpty()) {
+            return null;
+        }
+        for (final ComponentVersionStatusCount count : policyStatusItem.componentVersionStatusCounts) {
+            if (VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION == count.name) {
+                return count;
+            }
+        }
+        return null;
+    }
+
+    public ComponentVersionStatusCount getCountNotInViolation() {
+        if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.isEmpty()) {
+            return null;
+        }
+        for (final ComponentVersionStatusCount count : policyStatusItem.componentVersionStatusCounts) {
+            if (VersionBomPolicyStatusOverallStatusEnum.NOT_IN_VIOLATION == count.name) {
+                return count;
+            }
+        }
+        return null;
+    }
+
+    public ComponentVersionStatusCount getCountInViolationOverridden() {
+        if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.isEmpty()) {
+            return null;
+        }
+        for (final ComponentVersionStatusCount count : policyStatusItem.componentVersionStatusCounts) {
+            if (VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION_OVERRIDDEN == count.name) {
+                return count;
+            }
+        }
+        return null;
     }
 
 }

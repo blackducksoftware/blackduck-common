@@ -69,9 +69,9 @@ public class ComponentDataService {
     public List<ComponentVersionView> getAllComponentVersionsFromComponent(final String namespace, final String groupId, final String artifactId,
             final String version)
             throws IntegrationException {
-        final ComponentSearchResultResponse component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
+        final ComponentSearchResultResponse componentResponse = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
 
-        final ComponentView componentItem = componentRequestService.getItem(component.component, ComponentView.class);
+        final ComponentView componentItem = componentRequestService.getItem(componentResponse.component, ComponentView.class);
         final String versionsURL = metaService.getFirstLinkSafely(componentItem, UrlConstants.SEGMENT_VERSIONS);
         List<ComponentVersionView> versions = new ArrayList<>();
         if (versionsURL != null) {
