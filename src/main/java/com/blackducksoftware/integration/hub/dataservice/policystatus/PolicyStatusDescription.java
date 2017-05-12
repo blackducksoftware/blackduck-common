@@ -35,7 +35,7 @@ public class PolicyStatusDescription {
     }
 
     public String getPolicyStatusMessage() {
-        if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.size() == 0) {
+        if (policyStatusItem.getComponentVersionStatusCounts() == null || policyStatusItem.getComponentVersionStatusCounts().size() == 0) {
             return "The Hub found no components.";
         }
 
@@ -43,9 +43,9 @@ public class PolicyStatusDescription {
         final ComponentVersionStatusCount inViolationOverridden = getCountInViolationOverridden();
         final ComponentVersionStatusCount notInViolation = getCountNotInViolation();
 
-        final int inViolationCount = inViolation == null ? 0 : inViolation.value;
-        final int inViolationOverriddenCount = inViolationOverridden == null ? 0 : inViolationOverridden.value;
-        final int notInViolationCount = notInViolation == null ? 0 : notInViolation.value;
+        final int inViolationCount = inViolation == null ? 0 : inViolation.getValue();
+        final int inViolationOverriddenCount = inViolationOverridden == null ? 0 : inViolationOverridden.getValue();
+        final int notInViolationCount = notInViolation == null ? 0 : notInViolation.getValue();
 
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("The Hub found: ");
@@ -59,11 +59,11 @@ public class PolicyStatusDescription {
     }
 
     public ComponentVersionStatusCount getCountInViolation() {
-        if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.isEmpty()) {
+        if (policyStatusItem.getComponentVersionStatusCounts() == null || policyStatusItem.getComponentVersionStatusCounts().isEmpty()) {
             return null;
         }
-        for (final ComponentVersionStatusCount count : policyStatusItem.componentVersionStatusCounts) {
-            if (VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION == count.name) {
+        for (final ComponentVersionStatusCount count : policyStatusItem.getComponentVersionStatusCounts()) {
+            if (VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION == count.getName()) {
                 return count;
             }
         }
@@ -71,11 +71,11 @@ public class PolicyStatusDescription {
     }
 
     public ComponentVersionStatusCount getCountNotInViolation() {
-        if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.isEmpty()) {
+        if (policyStatusItem.getComponentVersionStatusCounts() == null || policyStatusItem.getComponentVersionStatusCounts().isEmpty()) {
             return null;
         }
-        for (final ComponentVersionStatusCount count : policyStatusItem.componentVersionStatusCounts) {
-            if (VersionBomPolicyStatusOverallStatusEnum.NOT_IN_VIOLATION == count.name) {
+        for (final ComponentVersionStatusCount count : policyStatusItem.getComponentVersionStatusCounts()) {
+            if (VersionBomPolicyStatusOverallStatusEnum.NOT_IN_VIOLATION == count.getName()) {
                 return count;
             }
         }
@@ -83,11 +83,11 @@ public class PolicyStatusDescription {
     }
 
     public ComponentVersionStatusCount getCountInViolationOverridden() {
-        if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.isEmpty()) {
+        if (policyStatusItem.getComponentVersionStatusCounts() == null || policyStatusItem.getComponentVersionStatusCounts().isEmpty()) {
             return null;
         }
-        for (final ComponentVersionStatusCount count : policyStatusItem.componentVersionStatusCounts) {
-            if (VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION_OVERRIDDEN == count.name) {
+        for (final ComponentVersionStatusCount count : policyStatusItem.getComponentVersionStatusCounts()) {
+            if (VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION_OVERRIDDEN == count.getName()) {
                 return count;
             }
         }

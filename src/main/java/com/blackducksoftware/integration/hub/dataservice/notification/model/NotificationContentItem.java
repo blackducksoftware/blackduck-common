@@ -117,7 +117,7 @@ public class NotificationContentItem implements Comparable<NotificationContentIt
         if (componentVersion == null) {
             return "";
         }
-        return componentVersion.versionName;
+        return componentVersion.getVersionName();
     }
 
     @Override

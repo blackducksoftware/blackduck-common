@@ -77,13 +77,13 @@ public class HubResponseService {
 
     public <T extends HubResponse> T getItemAs(final JsonElement item, final Class<T> clazz) {
         final T hubItem = gson.fromJson(item, clazz);
-        hubItem.json = gson.toJson(item);
+        hubItem.setJson(gson.toJson(item));
         return hubItem;
     }
 
     public <T extends HubResponse> T getItemAs(final String item, final Class<T> clazz) {
         final T hubItem = gson.fromJson(item, clazz);
-        hubItem.json = item;
+        hubItem.setJson(item);
         return hubItem;
     }
 

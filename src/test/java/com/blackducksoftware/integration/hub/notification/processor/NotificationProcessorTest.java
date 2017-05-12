@@ -79,7 +79,7 @@ public class NotificationProcessorTest {
 
     public MockProcessor createMockedNotificationProcessor(final List<VulnerabilityView> vulnerabilityList) throws Exception {
         final ComponentVersionView compVersion = Mockito.mock(ComponentVersionView.class);
-        compVersion.json = createComponentJson();
+        compVersion.setJson(createComponentJson());
         final VulnerabilityRequestService vulnerabilityRequestService = Mockito.mock(VulnerabilityRequestService.class);
         Mockito.when(vulnerabilityRequestService.getComponentVersionVulnerabilities(Mockito.anyString())).thenReturn(vulnerabilityList);
         final MockProcessor processor = new MockProcessor(vulnerabilityRequestService, metaService);
@@ -443,8 +443,8 @@ public class NotificationProcessorTest {
 
     private VulnerabilitySourceQualifiedId createVulnerabilitySourceQualifiedId(final String source, final String id) {
         final VulnerabilitySourceQualifiedId vulnerabilitySourceQualifiedId = new VulnerabilitySourceQualifiedId();
-        vulnerabilitySourceQualifiedId.source = source;
-        vulnerabilitySourceQualifiedId.vulnerabilityId = id;
+        vulnerabilitySourceQualifiedId.setSource(source);
+        vulnerabilitySourceQualifiedId.setVulnerabilityId(id);
         return vulnerabilitySourceQualifiedId;
     }
 

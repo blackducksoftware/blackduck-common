@@ -143,7 +143,7 @@ public class ReportRequestService extends HubResponseService {
             } catch (final IOException e) {
                 throw new HubIntegrationException(e);
             }
-            timeFinished = reportInfo.finishedAt;
+            timeFinished = reportInfo.getFinishedAt();
             if (timeFinished != null) {
                 break;
             }

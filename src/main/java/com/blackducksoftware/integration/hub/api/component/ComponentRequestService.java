@@ -56,9 +56,9 @@ public class ComponentRequestService extends HubResponseService {
             throws IntegrationException {
         final List<ComponentSearchResultResponse> allComponents = getAllComponents(namespace, groupId, artifactId, version);
         for (final ComponentSearchResultResponse componentItem : allComponents) {
-            if (componentItem.originId != null) {
+            if (componentItem.getOriginId() != null) {
                 final String exactMatch = String.format("%s:%s:%s", groupId, artifactId, version);
-                if (componentItem.originId.equals(exactMatch)) {
+                if (componentItem.getOriginId().equals(exactMatch)) {
                     return componentItem;
                 }
             }

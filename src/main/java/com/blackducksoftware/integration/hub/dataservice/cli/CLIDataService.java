@@ -170,7 +170,7 @@ public class CLIDataService {
         for (final CodeLocationView codeLocationItemMappedToVersion : codeLocationsMappedToVersion) {
             boolean partOfCurrentScan = false;
             for (final CodeLocationView codeLocationFromCurentScan : codeLocationsFromCurentScan) {
-                if (codeLocationItemMappedToVersion.url.equals(codeLocationFromCurentScan.url)) {
+                if (codeLocationItemMappedToVersion.getUrl().equals(codeLocationFromCurentScan.getUrl())) {
                     partOfCurrentScan = true;
                     break;
                 }

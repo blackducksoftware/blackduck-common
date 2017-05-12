@@ -177,7 +177,7 @@ public class ScanStatusDataService {
 
             final List<String> allScanSummariesLinks = new ArrayList<>();
             for (final CodeLocationView codeLocationItem : allCodeLocations) {
-                final String mappedProjectVersionUrl = codeLocationItem.mappedProjectVersion;
+                final String mappedProjectVersionUrl = codeLocationItem.getMappedProjectVersion();
                 if (projectVersionUrl.equals(mappedProjectVersionUrl)) {
                     final String scanSummariesLink = metaService.getFirstLink(codeLocationItem, MetaService.SCANS_LINK);
                     allScanSummariesLinks.add(scanSummariesLink);
@@ -191,7 +191,7 @@ public class ScanStatusDataService {
 
             pendingScans = new ArrayList<>();
             for (final ScanSummaryView scanSummaryItem : allScanSummaries) {
-                if (isPending(scanSummaryItem.status)) {
+                if (isPending(scanSummaryItem.getStatus())) {
                     pendingScans.add(scanSummaryItem);
                 }
             }
@@ -209,11 +209,11 @@ public class ScanStatusDataService {
         for (final ScanSummaryView scanSummaryItem : scanSummaries) {
             final String scanSummaryLink = metaService.getHref(scanSummaryItem);
             final ScanSummaryView currentScanSummaryItem = scanSummaryRequestService.getItem(scanSummaryLink, ScanSummaryView.class);
-            if (isPending(currentScanSummaryItem.status)) {
+            if (isPending(currentScanSummaryItem.getStatus())) {
                 pendingScans.add(currentScanSummaryItem);
-            } else if (isError(currentScanSummaryItem.status)) {
+            } else if (isError(currentScanSummaryItem.getStatus())) {
                 throw new HubIntegrationException("There was a problem in the Hub processing the scan(s). Error Status : "
-                        + currentScanSummaryItem.status.toString() + ", " + currentScanSummaryItem.statusMessage);
+                        + currentScanSummaryItem.getStatus().toString() + ", " + currentScanSummaryItem.getStatusMessage());
             }
         }
 

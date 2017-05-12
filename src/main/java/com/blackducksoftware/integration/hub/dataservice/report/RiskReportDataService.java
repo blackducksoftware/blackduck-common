@@ -100,12 +100,12 @@ public class RiskReportDataService extends HubResponseService {
         final String originalProjectUrl = metaService.getHref(project);
         final String originalVersionUrl = metaService.getHref(version);
         final ReportData reportData = new ReportData();
-        reportData.setProjectName(project.name);
+        reportData.setProjectName(project.getName());
         reportData.setProjectURL(getReportProjectUrl(originalProjectUrl));
-        reportData.setProjectVersion(version.versionName);
+        reportData.setProjectVersion(version.getVersionName());
         reportData.setProjectVersionURL(getReportVersionUrl(originalVersionUrl, false));
-        reportData.setPhase(version.phase.toString());
-        reportData.setDistribution(version.distribution.toString());
+        reportData.setPhase(version.getPhase().toString());
+        reportData.setDistribution(version.getDistribution().toString());
         final List<BomComponent> components = new ArrayList<>();
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.AGGREGATE_BOM_REST_SERVER)) {
             logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
@@ -113,14 +113,14 @@ public class RiskReportDataService extends HubResponseService {
             for (final VersionBomComponentView bomEntry : bomEntries) {
                 final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
                 String componentPolicyStatusURL = null;
-                if (!StringUtils.isBlank(bomEntry.componentVersion)) {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.componentVersion);
+                if (!StringUtils.isBlank(bomEntry.getComponentVersion())) {
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.getComponentVersion());
                 } else {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.component);
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.getComponent());
                 }
                 final BomComponentPolicyStatusView bomPolicyStatus = getItem(componentPolicyStatusURL,
                         BomComponentPolicyStatusView.class);
-                component.setPolicyStatus(bomPolicyStatus.approvalStatus.toString());
+                component.setPolicyStatus(bomPolicyStatus.getApprovalStatus().toString());
                 components.add(component);
             }
         } else {
@@ -196,44 +196,44 @@ public class RiskReportDataService extends HubResponseService {
 
     private BomComponent createBomComponentFromBomComponentView(final VersionBomComponentView bomEntry) {
         final BomComponent component = new BomComponent();
-        component.setComponentName(bomEntry.componentName);
-        component.setComponentURL(getReportProjectUrl(bomEntry.component));
-        component.setComponentVersion(bomEntry.componentVersionName);
-        component.setComponentVersionURL(getReportVersionUrl(bomEntry.componentVersion, true));
-        component.setLicense(bomEntry.licenses.get(0).licenseDisplay);
-        if (bomEntry.securityRiskProfile != null && bomEntry.securityRiskProfile.counts != null
-                && !bomEntry.securityRiskProfile.counts.isEmpty()) {
-            for (final RiskCountView count : bomEntry.securityRiskProfile.counts) {
-                if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
-                    component.setSecurityRiskHighCount(count.count);
-                } else if (count.countType == RiskCountEnum.MEDIUM && count.count > 0) {
-                    component.setSecurityRiskMediumCount(count.count);
-                } else if (count.countType == RiskCountEnum.LOW && count.count > 0) {
-                    component.setSecurityRiskLowCount(count.count);
+        component.setComponentName(bomEntry.getComponentName());
+        component.setComponentURL(getReportProjectUrl(bomEntry.getComponent()));
+        component.setComponentVersion(bomEntry.getComponentVersionName());
+        component.setComponentVersionURL(getReportVersionUrl(bomEntry.getComponentVersion(), true));
+        component.setLicense(bomEntry.getLicenses().get(0).getLicenseDisplay());
+        if (bomEntry.getSecurityRiskProfile() != null && bomEntry.getSecurityRiskProfile().getCounts() != null
+                && !bomEntry.getSecurityRiskProfile().getCounts().isEmpty()) {
+            for (final RiskCountView count : bomEntry.getSecurityRiskProfile().getCounts()) {
+                if (count.getCountType() == RiskCountEnum.HIGH && count.getCount() > 0) {
+                    component.setSecurityRiskHighCount(count.getCount());
+                } else if (count.getCountType() == RiskCountEnum.MEDIUM && count.getCount() > 0) {
+                    component.setSecurityRiskMediumCount(count.getCount());
+                } else if (count.getCountType() == RiskCountEnum.LOW && count.getCount() > 0) {
+                    component.setSecurityRiskLowCount(count.getCount());
                 }
             }
         }
-        if (bomEntry.licenseRiskProfile != null && bomEntry.licenseRiskProfile.counts != null
-                && !bomEntry.licenseRiskProfile.counts.isEmpty()) {
-            for (final RiskCountView count : bomEntry.licenseRiskProfile.counts) {
-                if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
-                    component.setLicenseRiskHighCount(count.count);
-                } else if (count.countType == RiskCountEnum.MEDIUM && count.count > 0) {
-                    component.setLicenseRiskMediumCount(count.count);
-                } else if (count.countType == RiskCountEnum.LOW && count.count > 0) {
-                    component.setLicenseRiskLowCount(count.count);
+        if (bomEntry.getLicenseRiskProfile() != null && bomEntry.getLicenseRiskProfile().getCounts() != null
+                && !bomEntry.getLicenseRiskProfile().getCounts().isEmpty()) {
+            for (final RiskCountView count : bomEntry.getLicenseRiskProfile().getCounts()) {
+                if (count.getCountType() == RiskCountEnum.HIGH && count.getCount() > 0) {
+                    component.setLicenseRiskHighCount(count.getCount());
+                } else if (count.getCountType() == RiskCountEnum.MEDIUM && count.getCount() > 0) {
+                    component.setLicenseRiskMediumCount(count.getCount());
+                } else if (count.getCountType() == RiskCountEnum.LOW && count.getCount() > 0) {
+                    component.setLicenseRiskLowCount(count.getCount());
                 }
             }
         }
-        if (bomEntry.operationalRiskProfile != null && bomEntry.operationalRiskProfile.counts != null
-                && !bomEntry.operationalRiskProfile.counts.isEmpty()) {
-            for (final RiskCountView count : bomEntry.operationalRiskProfile.counts) {
-                if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
-                    component.setOperationalRiskHighCount(count.count);
-                } else if (count.countType == RiskCountEnum.MEDIUM && count.count > 0) {
-                    component.setOperationalRiskMediumCount(count.count);
-                } else if (count.countType == RiskCountEnum.LOW && count.count > 0) {
-                    component.setOperationalRiskLowCount(count.count);
+        if (bomEntry.getOperationalRiskProfile() != null && bomEntry.getOperationalRiskProfile().getCounts() != null
+                && !bomEntry.getOperationalRiskProfile().getCounts().isEmpty()) {
+            for (final RiskCountView count : bomEntry.getOperationalRiskProfile().getCounts()) {
+                if (count.getCountType() == RiskCountEnum.HIGH && count.getCount() > 0) {
+                    component.setOperationalRiskHighCount(count.getCount());
+                } else if (count.getCountType() == RiskCountEnum.MEDIUM && count.getCount() > 0) {
+                    component.setOperationalRiskMediumCount(count.getCount());
+                } else if (count.getCountType() == RiskCountEnum.LOW && count.getCount() > 0) {
+                    component.setOperationalRiskLowCount(count.getCount());
                 }
             }
         }

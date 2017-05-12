@@ -39,13 +39,13 @@ public class PolicyRuleModel {
     }
 
     public boolean hasExpressions() {
-        return rule != null && rule.expression != null && rule.expression.expressions != null
-                && !rule.expression.expressions.isEmpty();
+        return rule != null && rule.getExpression() != null && rule.getExpression().getExpressions() != null
+                && !rule.getExpression().getExpressions().isEmpty();
     }
 
     public List<PolicyRuleExpression> getExpressionList() {
         if (hasExpressions()) {
-            return rule.expression.expressions;
+            return rule.getExpression().getExpressions();
         } else {
             return Collections.emptyList();
         }
@@ -55,7 +55,7 @@ public class PolicyRuleModel {
         boolean hasNonProjectLevelCondition = false;
 
         for (final PolicyRuleExpression expression : getExpressionList()) {
-            final PolicyRuleConditionEnum condition = PolicyRuleConditionEnum.valueOf(expression.name);
+            final PolicyRuleConditionEnum condition = PolicyRuleConditionEnum.valueOf(expression.getName());
             if (condition == PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION) {
                 continue;
             }
