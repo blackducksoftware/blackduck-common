@@ -53,7 +53,9 @@ public class ComplexLicenseParser {
             int i = 1;
             for (final ComplexLicenseView childLicense : complexLicense.getLicenses()) {
                 licenseText.append(this.parse(childLicense));
-                if (i < complexLicense.getLicenses().size()) licenseText.append(operator);
+                if (i < complexLicense.getLicenses().size()) {
+                    licenseText.append(operator);
+                }
                 i++;
             }
             return i > 2 ? "(" + licenseText.toString() + ")" : licenseText.toString();

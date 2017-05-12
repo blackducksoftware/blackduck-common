@@ -31,8 +31,6 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.model.view.components.PolicyRuleConditionEnum;
-import com.blackducksoftware.integration.hub.model.view.components.PolicyRuleExpression;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
@@ -50,25 +48,4 @@ public class PolicyRequestService extends HubResponseService {
         final List<PolicyRuleView> allPolicyRuleItems = getAllItems(request, PolicyRuleView.class);
         return allPolicyRuleItems;
     }
-
-    public boolean hasOnlyProjectLevelConditions(final PolicyRuleView policyRuleView) {
-        boolean hasNonProjectLevelCondition = false;
-        if (policyRuleView.getExpression() != null && policyRuleView.getExpression().expressions != null
-                && !policyRuleView.getExpression().expressions.isEmpty()) {
-            for (final PolicyRuleExpression expression : policyRuleView.getExpression().expressions) {
-                final PolicyRuleConditionEnum condition = PolicyRuleConditionEnum.valueOf(expression.name);
-                if (condition == PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION) {
-                    continue;
-                }
-                if (condition != PolicyRuleConditionEnum.PROJECT_TIER
-                        && condition != PolicyRuleConditionEnum.VERSION_PHASE
-                        && condition != PolicyRuleConditionEnum.VERSION_DISTRIBUTION) {
-                    hasNonProjectLevelCondition = true;
-                }
-            }
-        }
-
-        return !hasNonProjectLevelCondition;
-    }
-
 }

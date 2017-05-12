@@ -67,9 +67,9 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         final List<NotificationContentItem> templateData = new ArrayList<>();
 
         final RuleViolationClearedNotificationView policyViolation = (RuleViolationClearedNotificationView) item;
-        final String projectName = policyViolation.getContent().projectName;
-        final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent().componentVersionStatuses;
-        final String projectVersionLink = policyViolation.getContent().projectVersionLink;
+        final String projectName = policyViolation.getContent().getProjectName();
+        final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent().getComponentVersionStatuses();
+        final String projectVersionLink = policyViolation.getContent().getProjectVersionLink();
         ProjectVersionView releaseItem;
         try {
             releaseItem = getReleaseItem(projectVersionLink);
@@ -97,15 +97,15 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
                 final RuleViolationClearedNotificationView policyViolation = (RuleViolationClearedNotificationView) item;
                 final ProjectVersionModel projectVersion;
                 try {
-                    projectVersion = createFullProjectVersion(policyViolation.getContent().projectVersionLink,
+                    projectVersion = createFullProjectVersion(policyViolation.getContent().getProjectVersionLink(),
                             projectName, releaseItem.getVersionName());
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
                 }
 
-                final String componentVersionLink = componentVersion.componentVersionLink;
+                final String componentVersionLink = componentVersion.getComponentVersionLink();
                 final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
-                final List<String> policyUrls = getMatchingRuleUrls(componentVersion.policies);
+                final List<String> policyUrls = getMatchingRuleUrls(componentVersion.getPolicies());
 
                 if (policyUrls != null) {
                     List<PolicyRuleView> ruleList = getRulesFromUrls(policyUrls);
@@ -116,10 +116,10 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
                         for (final PolicyRuleView rule : ruleList) {
                             policyRuleList.add(rule);
                         }
-                        createContents(projectVersion, componentVersion.componentName, fullComponentVersion,
-                                componentVersion.componentLink,
-                                componentVersion.componentVersionLink,
-                                policyRuleList, item, templateData, componentVersion.componentIssueLink);
+                        createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
+                                componentVersion.getComponentLink(),
+                                componentVersion.getComponentVersionLink(),
+                                policyRuleList, item, templateData, componentVersion.getComponentIssueLink());
                     }
                 }
             } catch (final Exception e) {

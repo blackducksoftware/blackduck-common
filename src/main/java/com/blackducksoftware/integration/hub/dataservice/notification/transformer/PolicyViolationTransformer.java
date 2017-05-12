@@ -70,9 +70,9 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     public List<NotificationContentItem> transform(final NotificationView item) throws HubItemTransformException {
         final List<NotificationContentItem> templateData = new ArrayList<>();
         final RuleViolationNotificationView policyViolation = (RuleViolationNotificationView) item;
-        final String projectName = policyViolation.getContent().projectName;
-        final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent().componentVersionStatuses;
-        final String projectVersionLink = policyViolation.getContent().projectVersionLink;
+        final String projectName = policyViolation.getContent().getProjectName();
+        final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent().getComponentVersionStatuses();
+        final String projectVersionLink = policyViolation.getContent().getProjectVersionLink();
         ProjectVersionView releaseItem;
         try {
             releaseItem = getReleaseItem(projectVersionLink);
@@ -93,40 +93,40 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
                 final RuleViolationNotificationView policyViolation = (RuleViolationNotificationView) item;
                 ProjectVersionModel projectVersion;
                 try {
-                    projectVersion = createFullProjectVersion(policyViolation.getContent().projectVersionLink,
+                    projectVersion = createFullProjectVersion(policyViolation.getContent().getProjectVersionLink(),
                             projectName, releaseItem.getVersionName());
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
                 }
 
-                final String bomComponentVersionPolicyStatusUrl = componentVersion.bomComponentVersionPolicyStatusLink;
+                final String bomComponentVersionPolicyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
                 if (StringUtils.isBlank(bomComponentVersionPolicyStatusUrl)) {
                     getLogger().warn(String.format("bomComponentVersionPolicyStatus is missing for component %s; skipping it",
-                            componentVersion.componentName));
+                            componentVersion.getComponentName()));
                     continue;
                 }
                 final BomComponentPolicyStatusView bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(bomComponentVersionPolicyStatusUrl);
                 if (bomComponentVersionPolicyStatus.getApprovalStatus() != VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION) {
-                    getLogger().debug(String.format("Component %s is not in violation; skipping it", componentVersion.componentName));
+                    getLogger().debug(String.format("Component %s is not in violation; skipping it", componentVersion.getComponentName()));
                     continue;
                 }
 
-                final String componentVersionLink = componentVersion.componentVersionLink;
+                final String componentVersionLink = componentVersion.getComponentVersionLink();
                 final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
-                if ((componentVersion.policies == null) || (componentVersion.policies.size() == 0)) {
+                if ((componentVersion.getPolicies() == null) || (componentVersion.getPolicies().size() == 0)) {
                     throw new HubItemTransformException("The polices list in the component version status is null or empty");
                 }
-                final List<String> ruleList = getMatchingRuleUrls(componentVersion.policies);
+                final List<String> ruleList = getMatchingRuleUrls(componentVersion.getPolicies());
                 if (ruleList != null && !ruleList.isEmpty()) {
                     final List<PolicyRuleView> policyRuleList = new ArrayList<>();
                     for (final String ruleUrl : ruleList) {
                         final PolicyRuleView rule = getPolicyRule(ruleUrl);
                         policyRuleList.add(rule);
                     }
-                    createContents(projectVersion, componentVersion.componentName, fullComponentVersion,
-                            componentVersion.componentLink,
-                            componentVersion.componentVersionLink,
-                            policyRuleList, item, templateData, componentVersion.componentIssueLink);
+                    createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
+                            componentVersion.getComponentLink(),
+                            componentVersion.getComponentVersionLink(),
+                            policyRuleList, item, templateData, componentVersion.getComponentIssueLink());
                 }
 
             } catch (final Exception e) {

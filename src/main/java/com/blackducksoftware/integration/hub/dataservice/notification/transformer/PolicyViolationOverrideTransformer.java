@@ -71,17 +71,17 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
         final List<NotificationContentItem> templateData = new ArrayList<>();
         final ProjectVersionView releaseItem;
         final PolicyOverrideNotificationView policyOverride = (PolicyOverrideNotificationView) item;
-        final String projectName = policyOverride.getContent().projectName;
+        final String projectName = policyOverride.getContent().getProjectName();
         final List<ComponentVersionStatus> componentVersionList = new ArrayList<>();
         final ComponentVersionStatus componentStatus = new ComponentVersionStatus();
-        componentStatus.bomComponentVersionPolicyStatusLink = policyOverride.getContent().bomComponentVersionPolicyStatusLink;
-        componentStatus.componentName = policyOverride.getContent().componentName;
-        componentStatus.componentVersionLink = policyOverride.getContent().componentVersionLink;
+        componentStatus.setBomComponentVersionPolicyStatusLink(policyOverride.getContent().getBomComponentVersionPolicyStatusLink());
+        componentStatus.setComponentName(policyOverride.getContent().getComponentName());
+        componentStatus.setComponentVersionLink(policyOverride.getContent().getComponentVersionLink());
 
         componentVersionList.add(componentStatus);
 
         try {
-            releaseItem = getProjectVersionService().getItem(policyOverride.getContent().projectVersionLink, ProjectVersionView.class);
+            releaseItem = getProjectVersionService().getItem(policyOverride.getContent().getProjectVersionLink(), ProjectVersionView.class);
         } catch (final IntegrationException e) {
             throw new HubItemTransformException(e);
         }
@@ -101,37 +101,37 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
                 final PolicyOverrideNotificationView policyOverride = (PolicyOverrideNotificationView) item;
                 final ProjectVersionModel projectVersion;
                 try {
-                    projectVersion = createFullProjectVersion(policyOverride.getContent().projectVersionLink,
+                    projectVersion = createFullProjectVersion(policyOverride.getContent().getProjectVersionLink(),
                             projectName, releaseItem.getVersionName());
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
                 }
 
-                final String componentLink = policyOverrideItem.getContent().componentLink;
-                final String componentVersionLink = policyOverrideItem.getContent().componentVersionLink;
+                final String componentLink = policyOverrideItem.getContent().getComponentLink();
+                final String componentVersionLink = policyOverrideItem.getContent().getComponentVersionLink();
                 final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
 
-                final String bomComponentVersionPolicyStatusUrl = componentVersion.bomComponentVersionPolicyStatusLink;
+                final String bomComponentVersionPolicyStatusUrl = componentVersion.getBomComponentVersionPolicyStatusLink();
                 if (StringUtils.isBlank(bomComponentVersionPolicyStatusUrl)) {
                     getLogger().warn(String.format("bomComponentVersionPolicyStatus is missing for component %s; skipping it",
-                            componentVersion.componentName));
+                            componentVersion.getComponentName()));
                     continue;
                 }
                 final BomComponentPolicyStatusView bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
                         bomComponentVersionPolicyStatusUrl);
                 if (bomComponentVersionPolicyStatus.getApprovalStatus() != VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION_OVERRIDDEN) {
-                    getLogger().debug(String.format("Component %s status is not 'violation overridden'; skipping it", componentVersion.componentName));
+                    getLogger().debug(String.format("Component %s status is not 'violation overridden'; skipping it", componentVersion.getComponentName()));
                     continue;
                 }
-                final List<String> ruleList = getMatchingRuleUrls(policyOverrideItem.getContent().policies);
+                final List<String> ruleList = getMatchingRuleUrls(policyOverrideItem.getContent().getPolicies());
                 if (ruleList != null && !ruleList.isEmpty()) {
                     final List<PolicyRuleView> policyRuleList = new ArrayList<>();
                     for (final String ruleUrl : ruleList) {
                         final PolicyRuleView rule = getPolicyRule(ruleUrl);
                         policyRuleList.add(rule);
                     }
-                    createContents(projectVersion, componentVersion.componentName, fullComponentVersion,
-                            componentLink, componentVersionLink, policyRuleList, item, templateData, componentVersion.componentIssueLink);
+                    createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
+                            componentLink, componentVersionLink, policyRuleList, item, templateData, componentVersion.getComponentIssueLink());
                 }
             } catch (final Exception e) {
                 throw new HubItemTransformException(e);
@@ -148,7 +148,6 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 
         templateData.add(new PolicyOverrideContentItem(item.getCreatedAt(), projectVersion, componentName,
                 componentVersion, componentUrl, componentVersionUrl, policyRuleList,
-                policyOverride.getContent().firstName, policyOverride.getContent().lastName, componentIssueUrl));
+                policyOverride.getContent().getFirstName(), policyOverride.getContent().getLastName(), componentIssueUrl));
     }
-
 }

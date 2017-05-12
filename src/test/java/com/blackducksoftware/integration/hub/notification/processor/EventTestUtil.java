@@ -29,8 +29,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.mockito.Mockito;
-
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
@@ -123,7 +121,7 @@ public class EventTestUtil {
     public List<VulnerabilityView> createVulnerabiltyItemList(final List<VulnerabilitySourceQualifiedId> vulnSourceList) {
         final List<VulnerabilityView> vulnerabilityList = new ArrayList<>(vulnSourceList.size());
         for (final VulnerabilitySourceQualifiedId vulnSource : vulnSourceList) {
-            final String vulnId = vulnSource.vulnerabilityId;
+            final String vulnId = vulnSource.getVulnerabilityId();
             VulnerabilitySeverityEnum severity = null;
             if (vulnId.startsWith(HIGH_VULN_PREFIX)) {
                 severity = VulnerabilitySeverityEnum.HIGH;
@@ -140,38 +138,38 @@ public class EventTestUtil {
     }
 
     public VulnerabilityView createVulnerability(final String vulnId, final VulnerabilitySeverityEnum severity) {
-        final VulnerabilityView item = Mockito.mock(VulnerabilityView.class);
-        Mockito.when(item.getVulnerabilityName()).thenReturn(vulnId);
-        Mockito.when(item.getDescription()).thenReturn("A vulnerability");
-        Mockito.when(item.getVulnerabilityPublishedDate()).thenReturn("today");
-        Mockito.when(item.getVulnerabilityUpdatedDate()).thenReturn("a minute ago");
-        Mockito.when(item.getBaseScore()).thenReturn(10.0);
-        Mockito.when(item.getImpactSubscore()).thenReturn(5.0);
-        Mockito.when(item.getExploitabilitySubscore()).thenReturn(1.0);
-        Mockito.when(item.getSource()).thenReturn("");
-        Mockito.when(item.getSeverity()).thenReturn(severity.name());
-        Mockito.when(item.getAccessVector()).thenReturn("");
-        Mockito.when(item.getAccessComplexity()).thenReturn("");
-        Mockito.when(item.getAuthentication()).thenReturn("");
-        Mockito.when(item.getConfidentialityImpact()).thenReturn("");
-        Mockito.when(item.getIntegrityImpact()).thenReturn("");
-        Mockito.when(item.getAvailabilityImpact()).thenReturn("");
-        Mockito.when(item.getCweId()).thenReturn(vulnId);
+        final VulnerabilityView item = new VulnerabilityView();
+        item.setVulnerabilityName(vulnId);
+        item.setDescription("A vulnerability");
+        item.setVulnerabilityPublishedDate("today");
+        item.setVulnerabilityUpdatedDate("a minute ago");
+        item.setBaseScore(10.0);
+        item.setImpactSubscore(5.0);
+        item.setExploitabilitySubscore(1.0);
+        item.setSource("");
+        item.setSeverity(severity.name());
+        item.setAccessVector("");
+        item.setAccessComplexity("");
+        item.setAuthentication("");
+        item.setConfidentialityImpact("");
+        item.setIntegrityImpact("");
+        item.setAvailabilityImpact("");
+        item.setCweId(vulnId);
         return item;
     }
 
     public PolicyRuleView createPolicyRule(final String name, final String description, final String createdBy, final String updatedBy, final String href) {
-        final PolicyRuleView rule = Mockito.mock(PolicyRuleView.class);
-        rule.json = createPolicyRuleJSon(href);
-        Mockito.when(rule.getName()).thenReturn(name);
-        Mockito.when(rule.getDescription()).thenReturn(description);
-        Mockito.when(rule.getEnabled()).thenReturn(true);
-        Mockito.when(rule.getOverridable()).thenReturn(true);
-        Mockito.when(rule.getExpression()).thenReturn(null);
-        Mockito.when(rule.getCreatedAt()).thenReturn(new Date());
-        Mockito.when(rule.getCreatedBy()).thenReturn(createdBy);
-        Mockito.when(rule.getUpdatedAt()).thenReturn(new Date());
-        Mockito.when(rule.getUpdatedBy()).thenReturn(updatedBy);
+        final PolicyRuleView rule = new PolicyRuleView();
+        rule.setJson(createPolicyRuleJSon(href));
+        rule.setName(name);
+        rule.setDescription(description);
+        rule.setEnabled(true);
+        rule.setOverridable(true);
+        rule.setExpression(null);
+        rule.setCreatedAt(new Date());
+        rule.setCreatedBy(createdBy);
+        rule.setUpdatedAt(new Date());
+        rule.setUpdatedBy(updatedBy);
         return rule;
     }
 
@@ -202,8 +200,8 @@ public class EventTestUtil {
 
     private ComponentVersionView createComponentVersionMock(final String componentVersion) {
         ComponentVersionView fullComponentVersion;
-        fullComponentVersion = Mockito.mock(ComponentVersionView.class);
-        Mockito.when(fullComponentVersion.getVersionName()).thenReturn(componentVersion);
+        fullComponentVersion = new ComponentVersionView();
+        fullComponentVersion.setVersionName(componentVersion);
         return fullComponentVersion;
     }
 
