@@ -134,7 +134,7 @@ public class CLIDataService {
     }
 
     private void cleanupCodeLocations(final List<ScanSummaryView> scans, final HubScanConfig hubScanConfig) throws IntegrationException {
-        if (hubScanConfig.isDeletePreviousCodeLocations() || hubScanConfig.isUnmapPreviousCodeLocations()) {
+        if (!hubScanConfig.isDryRun() && (hubScanConfig.isDeletePreviousCodeLocations() || hubScanConfig.isUnmapPreviousCodeLocations())) {
             final ProjectView project = projectRequestService.getProjectByName(hubScanConfig.getProjectName());
             final ProjectVersionView version = projectVersionRequestService.getProjectVersion(project, hubScanConfig.getVersion());
             final List<CodeLocationView> codeLocationsFromCurentScan = getCodeLocationsFromScanSummaries(scans);
