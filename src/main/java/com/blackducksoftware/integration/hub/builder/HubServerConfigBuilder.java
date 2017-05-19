@@ -91,7 +91,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
                 final HubCertificateHandler handler = new HubCertificateHandler(getLogger());
                 try {
                     final URL url = new URL(hubUrl);
-                    if (getHubProxyInfo().getProxy(url) != Proxy.NO_PROXY) {
+                    if (getHubProxyInfo().getProxy(url) == Proxy.NO_PROXY) {
                         handler.importHttpsCertificateForHubServer(url, DEFAULT_TIMEOUT_SECONDS, keystorePassword);
                         return super.build();
                     }
