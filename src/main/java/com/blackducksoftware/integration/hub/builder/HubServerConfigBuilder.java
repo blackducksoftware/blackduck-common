@@ -102,7 +102,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
             // In case of proxy, or if autoImportHttpsCertificates == false we wont attempt to import certificates. The
             // User will have to do it on their own.
-
             throw new IntegrationCertificateException(
                     String.format("Please import the certificate for %s into your Java keystore.", hubUrl), e);
         }
