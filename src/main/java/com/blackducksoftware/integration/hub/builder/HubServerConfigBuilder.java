@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.builder;
 
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.Properties;
 
@@ -31,10 +32,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.builder.AbstractBuilder;
+import com.blackducksoftware.integration.exception.IntegrationCertificateException;
+import com.blackducksoftware.integration.hub.certificate.HubCertificateHandler;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.validator.HubServerConfigValidator;
+import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.log.LogLevel;
+import com.blackducksoftware.integration.log.PrintStreamIntLogger;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 
 public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
@@ -62,8 +68,41 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
     private String ignoredProxyHosts;
 
+    private boolean autoImportHttpsCertificates;
+
+    private String keystorePassword;
+
+    private IntLogger logger;
+
     public HubServerConfigBuilder() {
         timeoutSeconds = String.valueOf(DEFAULT_TIMEOUT_SECONDS);
+    }
+
+    @Override
+    public HubServerConfig build() throws IllegalStateException {
+        try {
+            return super.build();
+        } catch (final IllegalStateException e) {
+            if (e.getMessage().contains("SunCertPathBuilderException")) {
+                if (autoImportHttpsCertificates) {
+                    final HubCertificateHandler handler = new HubCertificateHandler(getLogger());
+                    try {
+                        if (StringUtils.isNotBlank(hubUrl)) {
+                            final URL url = new URL(hubUrl);
+                            if (getHubProxyInfo().getProxy(url) == Proxy.NO_PROXY) {
+                                handler.importHttpsCertificateForHubServer(url, DEFAULT_TIMEOUT_SECONDS, keystorePassword);
+                                return super.build();
+                            }
+                        }
+                    } catch (final Exception e1) {
+                        throw new IntegrationCertificateException(e.getMessage());
+                    }
+                }
+                throw new IntegrationCertificateException(
+                        String.format("Please import the certificate for %s into your Java keystore.", hubUrl), e);
+            }
+            throw e;
+        }
     }
 
     @Override
@@ -80,41 +119,48 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         } catch (final MalformedURLException e) {
         }
 
-        final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder();
-        credentialsBuilder.setUsername(getUsername());
-        credentialsBuilder.setPassword(getPassword());
-        credentialsBuilder.setPasswordLength(getPasswordLength());
-        final HubCredentials credentials = credentialsBuilder.build();
-
-        final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
-        proxyBuilder.setHost(getProxyHost());
-        proxyBuilder.setPort(getProxyPort());
-        proxyBuilder.setIgnoredProxyHosts(getIgnoredProxyHosts());
-        proxyBuilder.setUsername(getProxyUsername());
-        proxyBuilder.setPassword(getProxyPassword());
-        proxyBuilder.setPasswordLength(getProxyPasswordLength());
-        final HubProxyInfo proxyInfo = proxyBuilder.build();
+        final HubCredentials credentials = getHubCredentials();
+        final HubProxyInfo proxyInfo = getHubProxyInfo();
         final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo);
         return config;
+    }
+
+    private HubCredentials getHubCredentials() {
+        final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder();
+        credentialsBuilder.setUsername(username);
+        credentialsBuilder.setPassword(password);
+        credentialsBuilder.setPasswordLength(passwordLength);
+        return credentialsBuilder.buildObject();
+    }
+
+    private HubProxyInfo getHubProxyInfo() {
+        final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
+        proxyBuilder.setHost(proxyHost);
+        proxyBuilder.setPort(proxyPort);
+        proxyBuilder.setIgnoredProxyHosts(ignoredProxyHosts);
+        proxyBuilder.setUsername(proxyUsername);
+        proxyBuilder.setPassword(proxyPassword);
+        proxyBuilder.setPasswordLength(proxyPasswordLength);
+        return proxyBuilder.buildObject();
     }
 
     @Override
     public AbstractValidator createValidator() {
         final HubServerConfigValidator validator = new HubServerConfigValidator();
-        validator.setHubUrl(getHubUrl());
-        validator.setUsername(getUsername());
-        validator.setPassword(getPassword());
-        validator.setTimeout(getTimeout());
-        validator.setProxyHost(getProxyHost());
-        validator.setProxyPort(getProxyPort());
-        validator.setIgnoredProxyHosts(getIgnoredProxyHosts());
-        validator.setProxyUsername(getProxyUsername());
-        validator.setProxyPassword(getProxyPassword());
-        validator.setProxyPasswordLength(getProxyPasswordLength());
+        validator.setHubUrl(hubUrl);
+        validator.setUsername(username);
+        validator.setPassword(password);
+        validator.setTimeout(timeoutSeconds);
+        validator.setProxyHost(proxyHost);
+        validator.setProxyPort(proxyPort);
+        validator.setIgnoredProxyHosts(ignoredProxyHosts);
+        validator.setProxyUsername(proxyUsername);
+        validator.setProxyPassword(proxyPassword);
+        validator.setProxyPasswordLength(proxyPasswordLength);
         return validator;
     }
 
-    public void setFromProperties(Properties properties) {
+    public void setFromProperties(final Properties properties) {
         final String hubUrl = properties.getProperty("hub.url");
         final String hubUsername = properties.getProperty("hub.username");
         final String hubPassword = properties.getProperty("hub.password");
@@ -144,36 +190,16 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         this.timeoutSeconds = timeoutSeconds;
     }
 
-    public String getTimeout() {
-        return timeoutSeconds;
-    }
-
     public void setTimeout(final int timeoutSeconds) {
         setTimeout(String.valueOf(timeoutSeconds));
-    }
-
-    public String getHubUrl() {
-        return hubUrl;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public void setUsername(final String username) {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public void setPassword(final String password) {
         this.password = password;
-    }
-
-    public int getPasswordLength() {
-        return passwordLength;
     }
 
     /**
@@ -184,16 +210,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         this.passwordLength = passwordLength;
     }
 
-    public String getProxyHost() {
-        return proxyHost;
-    }
-
     public void setProxyHost(final String proxyHost) {
         this.proxyHost = proxyHost;
-    }
-
-    public String getProxyPort() {
-        return proxyPort;
     }
 
     public void setProxyPort(final int proxyPort) {
@@ -204,24 +222,12 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         this.proxyPort = proxyPort;
     }
 
-    public String getProxyUsername() {
-        return proxyUsername;
-    }
-
     public void setProxyUsername(final String proxyUsername) {
         this.proxyUsername = proxyUsername;
     }
 
-    public String getProxyPassword() {
-        return proxyPassword;
-    }
-
     public void setProxyPassword(final String proxyPassword) {
         this.proxyPassword = proxyPassword;
-    }
-
-    public int getProxyPasswordLength() {
-        return proxyPasswordLength;
     }
 
     /**
@@ -232,11 +238,26 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         this.proxyPasswordLength = proxyPasswordLength;
     }
 
-    public String getIgnoredProxyHosts() {
-        return ignoredProxyHosts;
-    }
-
     public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
         this.ignoredProxyHosts = ignoredProxyHosts;
+    }
+
+    public void setAutoImportHttpsCertificates(final boolean autoImportHttpsCertificates) {
+        this.autoImportHttpsCertificates = autoImportHttpsCertificates;
+    }
+
+    public void setKeystorePassword(final String keystorePassword) {
+        this.keystorePassword = keystorePassword;
+    }
+
+    public IntLogger getLogger() {
+        if (logger == null) {
+            logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
+        }
+        return logger;
+    }
+
+    public void setLogger(final IntLogger logger) {
+        this.logger = logger;
     }
 }

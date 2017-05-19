@@ -86,8 +86,8 @@ public class HubServerConfigValidator extends AbstractValidator {
         final ValidationResults proxyResult = assertProxyValid();
         final ValidationResults credentialResult = assertCredentialsValid();
         final ValidationResults result = new ValidationResults();
-        result.addAllResultsStrings(proxyResult.getResultMap(), proxyResult.getValidationStatus());
-        result.addAllResultsStrings(credentialResult.getResultMap(), credentialResult.getValidationStatus());
+        result.addAllResults(proxyResult.getResultMap());
+        result.addAllResults(credentialResult.getResultMap());
         validateHubUrl(result);
         validateTimeout(result, null);
         return result;
@@ -142,7 +142,7 @@ public class HubServerConfigValidator extends AbstractValidator {
         if (proxyHost != null && proxyPort != null && proxyInfo == null) {
             // asserting proxy is valid if the User set the proxy information
             final ValidationResults proxyResults = assertProxyValid();
-            result.addAllResultsStrings(proxyResults.getResultMap(), proxyResults.getValidationStatus());
+            result.addAllResults(proxyResults.getResultMap());
         }
         URL hubURL = null;
         try {
@@ -151,11 +151,10 @@ public class HubServerConfigValidator extends AbstractValidator {
         } catch (final MalformedURLException e) {
             result.addResult(HubServerConfigFieldEnum.HUBURL,
                     new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
+            return;
         } catch (final URISyntaxException e) {
             result.addResult(HubServerConfigFieldEnum.HUBURL,
                     new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
-        }
-        if (hubURL == null) {
             return;
         }
         final HttpUrl url = HttpUrl.parse(hubUrl);
