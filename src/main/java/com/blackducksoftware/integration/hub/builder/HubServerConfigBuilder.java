@@ -83,25 +83,28 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         try {
             return super.build();
         } catch (final IllegalStateException e) {
-            if (e.getMessage().contains("SunCertPathBuilderException")) {
-                if (autoImportHttpsCertificates) {
-                    final HubCertificateHandler handler = new HubCertificateHandler(getLogger());
-                    try {
-                        final URL url = new URL(hubUrl);
-                        // In case of proxy we wont attempt to import certificates.
-                        // The User will have to do it on their own
-                        if (getHubProxyInfo().getProxy(url) == Proxy.NO_PROXY) {
-                            handler.importHttpsCertificateForHubServer(url, DEFAULT_TIMEOUT_SECONDS, keystorePassword);
-                            return super.build();
-                        }
-                    } catch (final Exception e1) {
-                        throw new IntegrationCertificateException(e.getMessage());
-                    }
-                }
-                throw new IntegrationCertificateException(
-                        String.format("Please import the certificate for %s into your Java keystore.", hubUrl), e);
+            if (!e.getMessage().contains("SunCertPathBuilderException")) {
+                throw e;
             }
-            throw e;
+
+            if (autoImportHttpsCertificates) {
+                final HubCertificateHandler handler = new HubCertificateHandler(getLogger());
+                try {
+                    final URL url = new URL(hubUrl);
+                    if (getHubProxyInfo().getProxy(url) != Proxy.NO_PROXY) {
+                        handler.importHttpsCertificateForHubServer(url, DEFAULT_TIMEOUT_SECONDS, keystorePassword);
+                        return super.build();
+                    }
+                } catch (final Exception e1) {
+                    throw new IntegrationCertificateException(e.getMessage());
+                }
+            }
+
+            // In case of proxy, or if autoImportHttpsCertificates == false we wont attempt to import certificates. The
+            // User will have to do it on their own.
+
+            throw new IntegrationCertificateException(
+                    String.format("Please import the certificate for %s into your Java keystore.", hubUrl), e);
         }
     }
 
