@@ -97,10 +97,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         return validator;
     }
 
-    public String getCodeLocationAlias() {
-        return codeLocationAlias;
-    }
-
     public void setCodeLocationAlias(final String codeLocationAlias) {
         this.codeLocationAlias = codeLocationAlias;
     }
