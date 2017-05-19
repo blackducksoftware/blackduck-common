@@ -49,11 +49,13 @@ public class HubCertificateHandler {
     public void importHttpsCertificateForHubServer(final URL hubUrl, final int timeout, final String keystorePassword) throws IntegrationException {
         handler.retrieveAndImportHttpsCertificate(hubUrl, keystorePassword);
         if (!isHubServer(hubUrl, timeout)) {
+            // If we imported a certificate for a non Hub server we want to remove it again
             handler.removeHttpsCertificate(hubUrl, keystorePassword);
         }
     }
 
     private boolean isHubServer(final URL hubUrl, final int timeout) {
+        // We assume that a successful connection to the CLI download end point means this is a Hub Server
         final HttpUrl.Builder urlBuilder = HttpUrl.get(hubUrl).newBuilder();
         urlBuilder.addPathSegment("download");
         urlBuilder.addPathSegment(CLILocation.DEFAULT_CLI_DOWNLOAD);
@@ -70,10 +72,6 @@ public class HubCertificateHandler {
             try {
                 response = client.newCall(request).execute();
                 if (!response.isSuccessful()) {
-                    if (response.code() == 407) {
-                        logger.error(response.message());
-                        return false;
-                    }
                     return false;
                 }
                 return true;

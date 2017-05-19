@@ -89,6 +89,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
                     try {
                         if (StringUtils.isNotBlank(hubUrl)) {
                             final URL url = new URL(hubUrl);
+                            // In case of proxy we wont attempt to import certificates.
+                            // The User will have to do it on their own
                             if (getHubProxyInfo().getProxy(url) == Proxy.NO_PROXY) {
                                 handler.importHttpsCertificateForHubServer(url, DEFAULT_TIMEOUT_SECONDS, keystorePassword);
                                 return super.build();
