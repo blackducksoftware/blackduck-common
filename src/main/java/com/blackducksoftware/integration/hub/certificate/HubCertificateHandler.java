@@ -41,16 +41,16 @@ public class HubCertificateHandler {
 
     private final CertificateHandler handler;
 
-    public HubCertificateHandler(final IntLogger logger) {
+    public HubCertificateHandler(final IntLogger logger, final String keyStoreType, final String keyStorePass) {
         this.logger = logger;
-        handler = new CertificateHandler(logger);
+        handler = new CertificateHandler(logger, keyStoreType, keyStorePass);
     }
 
-    public void importHttpsCertificateForHubServer(final URL hubUrl, final int timeout, final String keystorePassword) throws IntegrationException {
-        handler.retrieveAndImportHttpsCertificate(hubUrl, keystorePassword);
+    public void importHttpsCertificateForHubServer(final URL hubUrl, final int timeout) throws IntegrationException {
+        handler.retrieveAndImportHttpsCertificate(hubUrl);
         if (!isHubServer(hubUrl, timeout)) {
             // If we imported a certificate for a non Hub server we want to remove it again
-            handler.removeHttpsCertificate(hubUrl, keystorePassword);
+            handler.removeHttpsCertificate(hubUrl);
         }
     }
 
