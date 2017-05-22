@@ -45,15 +45,15 @@ public class ComplexLicenseParser {
 
     private String parse(final ComplexLicenseView complexLicense) {
 
-        if (complexLicense.getLicenses() != null && complexLicense.getLicenses().isEmpty()) {
-            return complexLicense.getName();
+        if (complexLicense.licenses != null && complexLicense.licenses.isEmpty()) {
+            return complexLicense.name;
         } else {
-            final String operator = complexLicense.getType() == ComplexLicenseEnum.CONJUNCTIVE ? " AND " : " OR ";
+            final String operator = complexLicense.type == ComplexLicenseEnum.CONJUNCTIVE ? " AND " : " OR ";
             final StringBuilder licenseText = new StringBuilder();
             int i = 1;
-            for (final ComplexLicenseView childLicense : complexLicense.getLicenses()) {
+            for (final ComplexLicenseView childLicense : complexLicense.licenses) {
                 licenseText.append(this.parse(childLicense));
-                if (i < complexLicense.getLicenses().size()) {
+                if (i < complexLicense.licenses.size()) {
                     licenseText.append(operator);
                 }
                 i++;

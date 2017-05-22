@@ -41,9 +41,9 @@ public class LicenseDataService {
     public ComplexLicenseView getComplexLicenseItemFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
             throws IntegrationException {
         final ComponentSearchResultResponse component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
-        final String versionUrl = component.getVersion();
+        final String versionUrl = component.version;
         final ComponentVersionView componentVersion = componentRequestService.getItem(versionUrl, ComponentVersionView.class);
-        return componentVersion.getLicense();
+        return componentVersion.license;
     }
 
 }

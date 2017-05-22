@@ -59,12 +59,12 @@ public class ProjectVersionRequestService extends HubResponseService {
 
         final List<ProjectVersionView> allProjectVersionMatchingItems = getAllItems(hubPagedRequest, ProjectVersionView.class);
         for (final ProjectVersionView projectVersion : allProjectVersionMatchingItems) {
-            if (projectVersionName.equals(projectVersion.getVersionName())) {
+            if (projectVersionName.equals(projectVersion.versionName)) {
                 return projectVersion;
             }
         }
 
-        throw new DoesNotExistException(String.format("Could not find the version: %s for project: %s", projectVersionName, project.getName()));
+        throw new DoesNotExistException(String.format("Could not find the version: %s for project: %s", projectVersionName, project.name));
     }
 
     public List<ProjectVersionView> getAllProjectVersions(final ProjectView project) throws IntegrationException {

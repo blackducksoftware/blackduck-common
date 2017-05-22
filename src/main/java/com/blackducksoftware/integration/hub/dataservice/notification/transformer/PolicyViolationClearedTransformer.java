@@ -67,9 +67,9 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         final List<NotificationContentItem> templateData = new ArrayList<>();
 
         final RuleViolationClearedNotificationView policyViolation = (RuleViolationClearedNotificationView) item;
-        final String projectName = policyViolation.getContent().getProjectName();
-        final List<ComponentVersionStatus> componentVersionList = policyViolation.getContent().getComponentVersionStatuses();
-        final String projectVersionLink = policyViolation.getContent().getProjectVersionLink();
+        final String projectName = policyViolation.content.projectName;
+        final List<ComponentVersionStatus> componentVersionList = policyViolation.content.componentVersionStatuses;
+        final String projectVersionLink = policyViolation.content.projectVersionLink;
         ProjectVersionView releaseItem;
         try {
             releaseItem = getReleaseItem(projectVersionLink);
@@ -97,15 +97,15 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
                 final RuleViolationClearedNotificationView policyViolation = (RuleViolationClearedNotificationView) item;
                 final ProjectVersionModel projectVersion;
                 try {
-                    projectVersion = createFullProjectVersion(policyViolation.getContent().getProjectVersionLink(),
-                            projectName, releaseItem.getVersionName());
+                    projectVersion = createFullProjectVersion(policyViolation.content.projectVersionLink,
+                            projectName, releaseItem.versionName);
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
                 }
 
-                final String componentVersionLink = componentVersion.getComponentVersionLink();
+                final String componentVersionLink = componentVersion.componentVersionLink;
                 final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
-                final List<String> policyUrls = getMatchingRuleUrls(componentVersion.getPolicies());
+                final List<String> policyUrls = getMatchingRuleUrls(componentVersion.policies);
 
                 if (policyUrls != null) {
                     List<PolicyRuleView> ruleList = getRulesFromUrls(policyUrls);
@@ -116,10 +116,10 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
                         for (final PolicyRuleView rule : ruleList) {
                             policyRuleList.add(rule);
                         }
-                        createContents(projectVersion, componentVersion.getComponentName(), fullComponentVersion,
-                                componentVersion.getComponentLink(),
-                                componentVersion.getComponentVersionLink(),
-                                policyRuleList, item, templateData, componentVersion.getComponentIssueLink());
+                        createContents(projectVersion, componentVersion.componentName, fullComponentVersion,
+                                componentVersion.componentLink,
+                                componentVersion.componentVersionLink,
+                                policyRuleList, item, templateData, componentVersion.componentIssueLink);
                     }
                 }
             } catch (final Exception e) {
@@ -138,7 +138,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
             final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
             final List<PolicyRuleView> policyRuleList, final NotificationView item,
             final List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException {
-        final PolicyViolationClearedContentItem contentItem = new PolicyViolationClearedContentItem(item.getCreatedAt(),
+        final PolicyViolationClearedContentItem contentItem = new PolicyViolationClearedContentItem(item.createdAt,
                 projectVersion, componentName, componentVersion, componentUrl,
                 componentVersionUrl,
                 policyRuleList, componentIssueUrl);

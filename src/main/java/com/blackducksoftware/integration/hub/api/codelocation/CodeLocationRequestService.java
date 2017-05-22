@@ -80,7 +80,7 @@ public class CodeLocationRequestService extends HubResponseService {
 
     public void unmapCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
         final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
-        final JsonObject codeLocationItemJson = getJsonParser().parse(codeLocationItem.getJson()).getAsJsonObject();
+        final JsonObject codeLocationItemJson = getJsonParser().parse(codeLocationItem.json).getAsJsonObject();
         codeLocationItemJson.remove("mappedProjectVersion");
         codeLocationItemJson.addProperty("mappedProjectVersion", "");
         unmapCodeLocation(codeLocationItemUrl, getGson().toJson(codeLocationItemJson));

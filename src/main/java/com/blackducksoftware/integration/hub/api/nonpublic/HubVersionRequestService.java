@@ -76,7 +76,7 @@ public class HubVersionRequestService extends HubResponseService {
 
     public boolean isConsumerVersionLessThanOrEqualToServerVersion(final String consumerVersion) throws IntegrationException {
         final VersionComparison versionComparison = getHubVersionComparison(consumerVersion);
-        if (versionComparison.getNumericResult() <= 0) {
+        if (versionComparison.numericResult <= 0) {
             return true;
         } else {
             return false;

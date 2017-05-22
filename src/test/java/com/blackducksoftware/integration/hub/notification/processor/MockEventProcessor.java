@@ -142,7 +142,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
     private Set<String> getVulnerabilityIds(final List<VulnerabilitySourceQualifiedId> itemList) {
         final Set<String> set = new HashSet<>();
         for (final VulnerabilitySourceQualifiedId item : itemList) {
-            set.add(item.getVulnerabilityId());
+            set.add(item.vulnerabilityId);
         }
 
         return set;
@@ -204,9 +204,9 @@ public class MockEventProcessor extends NotificationSubProcessor {
 
     private Map<String, Object> generatePolicyDataSet(final PolicyViolationContentItem content, final PolicyRuleView rule) {
         final Map<String, Object> dataSet = new LinkedHashMap<>(4);
-        dataSet.put(ItemTypeEnum.RULE.name(), rule.getName());
+        dataSet.put(ItemTypeEnum.RULE.name(), rule.name);
         dataSet.put(ItemTypeEnum.COMPONENT.name(), content.getComponentName());
-        dataSet.put(ItemTypeEnum.VERSION.name(), content.getComponentVersion().getVersionName());
+        dataSet.put(ItemTypeEnum.VERSION.name(), content.getComponentVersion().versionName);
         return dataSet;
     }
 
@@ -221,7 +221,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
     private Map<String, Object> generateVulnerabilityDataSet(final VulnerabilityContentItem vulnerabilityContent) {
         final Map<String, Object> dataSet = new LinkedHashMap<>();
         dataSet.put(ItemTypeEnum.COMPONENT.name(), vulnerabilityContent.getComponentName());
-        dataSet.put(ItemTypeEnum.VERSION.name(), vulnerabilityContent.getComponentVersion().getVersionName());
+        dataSet.put(ItemTypeEnum.VERSION.name(), vulnerabilityContent.getComponentVersion().versionName);
         return dataSet;
     }
 

@@ -121,7 +121,7 @@ public class EventTestUtil {
     public List<VulnerabilityView> createVulnerabiltyItemList(final List<VulnerabilitySourceQualifiedId> vulnSourceList) {
         final List<VulnerabilityView> vulnerabilityList = new ArrayList<>(vulnSourceList.size());
         for (final VulnerabilitySourceQualifiedId vulnSource : vulnSourceList) {
-            final String vulnId = vulnSource.getVulnerabilityId();
+            final String vulnId = vulnSource.vulnerabilityId;
             VulnerabilitySeverityEnum severity = null;
             if (vulnId.startsWith(HIGH_VULN_PREFIX)) {
                 severity = VulnerabilitySeverityEnum.HIGH;
@@ -139,37 +139,37 @@ public class EventTestUtil {
 
     public VulnerabilityView createVulnerability(final String vulnId, final VulnerabilitySeverityEnum severity) {
         final VulnerabilityView item = new VulnerabilityView();
-        item.setVulnerabilityName(vulnId);
-        item.setDescription("A vulnerability");
-        item.setVulnerabilityPublishedDate("today");
-        item.setVulnerabilityUpdatedDate("a minute ago");
-        item.setBaseScore(10.0);
-        item.setImpactSubscore(5.0);
-        item.setExploitabilitySubscore(1.0);
-        item.setSource("");
-        item.setSeverity(severity.name());
-        item.setAccessVector("");
-        item.setAccessComplexity("");
-        item.setAuthentication("");
-        item.setConfidentialityImpact("");
-        item.setIntegrityImpact("");
-        item.setAvailabilityImpact("");
-        item.setCweId(vulnId);
+        item.vulnerabilityName = vulnId;
+        item.description = "A vulnerability";
+        item.vulnerabilityPublishedDate = "today";
+        item.vulnerabilityUpdatedDate = "a minute ago";
+        item.baseScore = 10.0;
+        item.impactSubscore = 5.0;
+        item.exploitabilitySubscore = 1.0;
+        item.source = "";
+        item.severity = severity.name();
+        item.accessVector = "";
+        item.accessComplexity = "";
+        item.authentication = "";
+        item.confidentialityImpact = "";
+        item.integrityImpact = "";
+        item.availabilityImpact = "";
+        item.cweId = vulnId;
         return item;
     }
 
     public PolicyRuleView createPolicyRule(final String name, final String description, final String createdBy, final String updatedBy, final String href) {
         final PolicyRuleView rule = new PolicyRuleView();
-        rule.setJson(createPolicyRuleJSon(href));
-        rule.setName(name);
-        rule.setDescription(description);
-        rule.setEnabled(true);
-        rule.setOverridable(true);
-        rule.setExpression(null);
-        rule.setCreatedAt(new Date());
-        rule.setCreatedBy(createdBy);
-        rule.setUpdatedAt(new Date());
-        rule.setUpdatedBy(updatedBy);
+        rule.json = createPolicyRuleJSon(href);
+        rule.name = name;
+        rule.description = description;
+        rule.enabled = true;
+        rule.overridable = true;
+        rule.expression = null;
+        rule.createdAt = new Date();
+        rule.createdBy = createdBy;
+        rule.updatedAt = new Date();
+        rule.updatedBy = updatedBy;
         return rule;
     }
 
@@ -201,7 +201,7 @@ public class EventTestUtil {
     private ComponentVersionView createComponentVersionMock(final String componentVersion) {
         ComponentVersionView fullComponentVersion;
         fullComponentVersion = new ComponentVersionView();
-        fullComponentVersion.setVersionName(componentVersion);
+        fullComponentVersion.versionName = componentVersion;
         return fullComponentVersion;
     }
 

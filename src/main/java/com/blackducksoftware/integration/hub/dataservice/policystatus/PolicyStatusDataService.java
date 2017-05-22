@@ -70,7 +70,7 @@ public class PolicyStatusDataService extends HubResponseService {
     private String findPolicyStatusUrlFromVersions(final List<ProjectVersionView> projectVersions, final String projectVersionName)
             throws HubIntegrationException {
         for (final ProjectVersionView version : projectVersions) {
-            if (projectVersionName.equals(version.getVersionName())) {
+            if (projectVersionName.equals(version.versionName)) {
                 final String policyStatusLink = metaService.getFirstLink(version, MetaService.POLICY_STATUS_LINK);
                 return policyStatusLink;
             }

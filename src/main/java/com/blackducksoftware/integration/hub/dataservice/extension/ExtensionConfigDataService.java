@@ -95,7 +95,7 @@ public class ExtensionConfigDataService extends HubResponseService {
     private Map<String, ExternalExtensionConfigValueView> createConfigMap(final List<ExternalExtensionConfigValueView> itemList) {
         final Map<String, ExternalExtensionConfigValueView> itemMap = new HashMap<>(itemList.size());
         for (final ExternalExtensionConfigValueView item : itemList) {
-            itemMap.put(item.getName(), item);
+            itemMap.put(item.name, item);
         }
         return itemMap;
     }

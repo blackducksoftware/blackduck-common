@@ -117,13 +117,13 @@ public abstract class AbstractNotificationTransformer
         final ProjectVersionModel fullProjectVersion = new ProjectVersionModel();
         fullProjectVersion.setProjectName(projectName);
         fullProjectVersion.setProjectVersionName(versionName);
-        fullProjectVersion.setDistribution(item.getDistribution());
-        fullProjectVersion.setLicense(item.getLicense());
-        fullProjectVersion.setNickname(item.getNickname());
-        fullProjectVersion.setPhase(item.getPhase());
-        fullProjectVersion.setReleaseComments(item.getReleaseComments());
-        fullProjectVersion.setReleasedOn(item.getReleasedOn());
-        fullProjectVersion.setSource(item.getSource());
+        fullProjectVersion.setDistribution(item.distribution);
+        fullProjectVersion.setLicense(item.license);
+        fullProjectVersion.setNickname(item.nickname);
+        fullProjectVersion.setPhase(item.phase);
+        fullProjectVersion.setReleaseComments(item.releaseComments);
+        fullProjectVersion.setReleasedOn(item.releasedOn);
+        fullProjectVersion.setSource(item.source);
 
         fullProjectVersion.setUrl(metaService.getHref(item));
         fullProjectVersion.setCodeLocationsLink((metaService.getFirstLinkSafely(item, MetaService.CODE_LOCATION_LINK)));
@@ -153,7 +153,7 @@ public abstract class AbstractNotificationTransformer
         if (!StringUtils.isBlank(componentVersionLink)) {
             final ComponentVersionView compVersion = getComponentVersion(componentVersionLink);
             if (compVersion != null) {
-                componentVersionName = compVersion.getVersionName();
+                componentVersionName = compVersion.versionName;
             }
         }
         return componentVersionName;

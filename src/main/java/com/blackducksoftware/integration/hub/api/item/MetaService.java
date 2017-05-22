@@ -109,7 +109,7 @@ public class MetaService {
     public String getFirstLink(final HubView item, final String linkKey) throws HubIntegrationException {
         final JsonArray linksArray = getLinks(item);
         if (linksArray == null) {
-            throw new HubIntegrationException("Could not find any links for this item : " + item.getJson());
+            throw new HubIntegrationException("Could not find any links for this item : " + item.json);
         }
 
         final StringBuilder linksAvailable = new StringBuilder();
@@ -144,7 +144,7 @@ public class MetaService {
     public List<String> getLinks(final HubView item, final String linkKey) throws HubIntegrationException {
         final JsonArray linksArray = getLinks(item);
         if (linksArray == null) {
-            throw new HubIntegrationException("Could not find any links for this item : " + item.getJson());
+            throw new HubIntegrationException("Could not find any links for this item : " + item.json);
         }
 
         final List<String> links = new ArrayList<>();
@@ -176,7 +176,7 @@ public class MetaService {
         final JsonElement linksElement = metaJson.get("links");
         if (linksElement == null) {
             if (logger != null) {
-                logger.error("Hub Item has no links : " + item.getJson());
+                logger.error("Hub Item has no links : " + item.json);
             }
             throw new HubIntegrationException("This Hub item does not have any link information.");
         }
@@ -189,7 +189,7 @@ public class MetaService {
         final JsonElement allowElement = metaJson.get("allow");
         if (allowElement == null) {
             if (logger != null) {
-                logger.error("Hub Item has no allow : " + item.getJson());
+                logger.error("Hub Item has no allow : " + item.json);
             }
             throw new HubIntegrationException("This Hub item does not have any allow information.");
         }
@@ -206,7 +206,7 @@ public class MetaService {
         final JsonElement hrefElement = metaJson.get("href");
         if (hrefElement == null) {
             if (logger != null) {
-                logger.error("Hub Item has no href : " + item.getJson());
+                logger.error("Hub Item has no href : " + item.json);
             }
             throw new HubIntegrationException("This Hub item does not have any href information.");
         }
@@ -214,13 +214,13 @@ public class MetaService {
     }
 
     private JsonObject getMeta(final HubView item) throws HubIntegrationException {
-        final String json = item.getJson();
+        final String json = item.json;
         final JsonElement element = jsonParser.parse(json);
         final JsonObject jsonObject = element.getAsJsonObject();
         final JsonElement metaElement = jsonObject.get("_meta");
         if (metaElement == null) {
             if (logger != null) {
-                logger.error("Hub Item has no meta : " + item.getJson());
+                logger.error("Hub Item has no meta : " + item.json);
             }
             throw new HubIntegrationException("This Hub item does not have meta information.");
         }

@@ -51,11 +51,11 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
 
     @Override
     public List<UserConfigItem> transform(final ExternalExtensionUserView item) throws IntegrationException {
-        final UserView user = userRequestService.getItem(item.getUser(), UserView.class);
-        if (!user.getActive()) {
+        final UserView user = userRequestService.getItem(item.user, UserView.class);
+        if (!user.active) {
             return Collections.emptyList();
         } else {
-            final Map<String, ExternalExtensionConfigValueView> configItems = getUserConfigOptions(item.getExtensionOptions());
+            final Map<String, ExternalExtensionConfigValueView> configItems = getUserConfigOptions(item.extensionOptions);
             final List<UserConfigItem> itemList = new ArrayList<>(configItems.size());
             itemList.add(new UserConfigItem(user, configItems));
             return itemList;
@@ -71,7 +71,7 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
     private Map<String, ExternalExtensionConfigValueView> createConfigMap(final List<ExternalExtensionConfigValueView> itemList) {
         final Map<String, ExternalExtensionConfigValueView> itemMap = new HashMap<>(itemList.size());
         for (final ExternalExtensionConfigValueView item : itemList) {
-            itemMap.put(item.getName(), item);
+            itemMap.put(item.name, item);
         }
         return itemMap;
     }

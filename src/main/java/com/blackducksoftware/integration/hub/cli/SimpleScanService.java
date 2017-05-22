@@ -322,7 +322,7 @@ public class SimpleScanService {
                 return Collections.emptyList();
             }
             final ScanSummaryView scanSummaryItem = gson.fromJson(fileContent, ScanSummaryView.class);
-            scanSummaryItem.setJson(fileContent);
+            scanSummaryItem.json = fileContent;
             scanSummaryItems.add(scanSummaryItem);
         }
 
