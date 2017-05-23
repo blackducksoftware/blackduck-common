@@ -23,7 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.global;
 
-public enum HubCredentialsFieldEnum implements GlobalFieldKey {
+import com.blackducksoftware.integration.validator.FieldEnum;
+
+public enum HubCredentialsFieldEnum implements FieldEnum {
     USERNAME("hubUsername"), PASSWORD("hubPassword");
 
     private String key;

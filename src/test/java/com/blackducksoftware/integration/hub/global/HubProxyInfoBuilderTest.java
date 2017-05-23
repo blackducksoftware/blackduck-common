@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,6 +43,8 @@ import org.junit.rules.ExpectedException;
 
 import com.blackducksoftware.integration.hub.builder.HubProxyInfoBuilder;
 import com.blackducksoftware.integration.hub.validator.HubProxyValidator;
+import com.blackducksoftware.integration.validator.FieldEnum;
+import com.blackducksoftware.integration.validator.ValidationResult;
 import com.blackducksoftware.integration.validator.ValidationResults;
 
 public class HubProxyInfoBuilderTest {
@@ -96,13 +97,13 @@ public class HubProxyInfoBuilderTest {
 
     private List<String> getMessages(final ValidationResults result) {
         final List<String> messageList = new ArrayList<>();
-        final Map<Object, Set<String>> resultMap = result.getResultMap();
+        final Map<FieldEnum, Set<ValidationResult>> resultMap = result.getResultMap();
         for (final Object key : resultMap.keySet()) {
-            final Set<String> resultList = resultMap.get(key);
+            final Set<ValidationResult> resultList = resultMap.get(key);
 
-            for (final String item : resultList) {
-                if (StringUtils.isNotBlank(item)) {
-                    messageList.add(item);
+            for (final ValidationResult item : resultList) {
+                if (item != null) {
+                    messageList.add(item.toString());
                 }
             }
         }

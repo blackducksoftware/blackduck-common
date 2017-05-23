@@ -23,7 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.global;
 
-public enum HubServerConfigFieldEnum implements GlobalFieldKey {
+import com.blackducksoftware.integration.validator.FieldEnum;
+
+public enum HubServerConfigFieldEnum implements FieldEnum {
     HUBURL("hubUrl"), CREDENTIALS("hubCredentials"), PROXYINFO("hubProxyInfo"), HUBTIMEOUT("hubTimeout");
 
     private String key;

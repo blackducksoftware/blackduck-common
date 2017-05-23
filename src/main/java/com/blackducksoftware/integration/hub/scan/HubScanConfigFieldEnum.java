@@ -23,7 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.scan;
 
-public enum HubScanConfigFieldEnum {
+import com.blackducksoftware.integration.validator.FieldEnum;
+
+public enum HubScanConfigFieldEnum implements FieldEnum{
     PROJECT("hubProject"),
     VERSION("hubVersion"),
     PHASE("hubPhase"),
