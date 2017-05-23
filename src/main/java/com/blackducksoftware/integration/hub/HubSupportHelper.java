@@ -57,6 +57,8 @@ public class HubSupportHelper implements Serializable {
         try {
             if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.7.0")) {
                 setHub3_7Support();
+            } else if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.6.0")) {
+                setHub3_6Support();
             } else if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.5.0")) {
                 setHub3_5Support();
             } else if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.4.0")) {
@@ -108,8 +110,13 @@ public class HubSupportHelper implements Serializable {
         capabilities.add(HubCapabilitiesEnum.CODE_LOCATION_ALIAS);
     }
 
-    private void setHub3_7Support() {
+    private void setHub3_6Support() {
         setHub3_5Support();
+        capabilities.add(HubCapabilitiesEnum.CLI_INSECURE_OPTION);
+    }
+
+    private void setHub3_7Support() {
+        setHub3_6Support();
         capabilities.add(HubCapabilitiesEnum.ISSUE_TRACKER);
     }
 

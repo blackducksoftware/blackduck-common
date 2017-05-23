@@ -70,10 +70,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
     private boolean autoImportHttpsCertificates;
 
-    private String keyStoreType;
-
-    private String keyStorePassword;
-
     private IntLogger logger;
 
     public HubServerConfigBuilder() {
@@ -90,7 +86,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
             }
 
             if (autoImportHttpsCertificates) {
-                final HubCertificateHandler handler = new HubCertificateHandler(getLogger(), keyStoreType, keyStorePassword);
+                final HubCertificateHandler handler = new HubCertificateHandler(getLogger());
                 try {
                     final URL url = new URL(hubUrl);
                     if (getHubProxyInfo().getProxy(url) == Proxy.NO_PROXY) {
@@ -125,7 +121,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
         final HubCredentials credentials = getHubCredentials();
         final HubProxyInfo proxyInfo = getHubProxyInfo();
-        final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo);
+        final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, autoImportHttpsCertificates);
         return config;
     }
 
@@ -248,14 +244,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
     public void setAutoImportHttpsCertificates(final boolean autoImportHttpsCertificates) {
         this.autoImportHttpsCertificates = autoImportHttpsCertificates;
-    }
-
-    public void setKeyStoreType(final String keyStoreType) {
-        this.keyStoreType = keyStoreType;
-    }
-
-    public void setKeyStorePassword(final String keyStorePassword) {
-        this.keyStorePassword = keyStorePassword;
     }
 
     public IntLogger getLogger() {

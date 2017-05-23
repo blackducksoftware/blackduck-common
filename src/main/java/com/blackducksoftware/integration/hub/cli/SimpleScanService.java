@@ -159,6 +159,13 @@ public class SimpleScanService {
         cmd.add("--host");
         cmd.add(hubServerConfig.getHubUrl().getHost());
         logger.debug("Using this Hub hostname : '" + hubServerConfig.getHubUrl().getHost() + "'");
+        if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_INSECURE_OPTION)) {
+            if (hubServerConfig.isAutoImportHttpsCertificates()) {
+                cmd.add("--insecure");
+            }
+            cmd.add("--no-prompt");
+        }
+
         cmd.add("--username");
         cmd.add(hubServerConfig.getGlobalCredentials().getUsername());
         if (!hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_PASSWORD_ENVIRONMENT_VARIABLE)) {

@@ -41,9 +41,9 @@ public class HubCertificateHandler {
 
     private final CertificateHandler handler;
 
-    public HubCertificateHandler(final IntLogger logger, final String keyStoreType, final String keyStorePass) {
+    public HubCertificateHandler(final IntLogger logger) {
         this.logger = logger;
-        handler = new CertificateHandler(logger, keyStoreType, keyStorePass);
+        handler = new CertificateHandler(logger);
     }
 
     public void importHttpsCertificateForHubServer(final URL hubUrl, final int timeout) throws IntegrationException {

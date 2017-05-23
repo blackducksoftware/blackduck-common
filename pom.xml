@@ -27,7 +27,7 @@
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>hub-common-rest</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>

@@ -44,12 +44,15 @@ public class HubServerConfig extends HubComponent implements Serializable {
 
     private final HubProxyInfo proxyInfo;
 
+    private final boolean autoImportHttpsCertificates;
+
     public HubServerConfig(final URL url, final int timeoutSeconds, final HubCredentials credentials,
-            final HubProxyInfo proxyInfo) {
+            final HubProxyInfo proxyInfo, final boolean autoImportHttpsCertificates) {
         this.hubUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.credentials = credentials;
         this.proxyInfo = proxyInfo;
+        this.autoImportHttpsCertificates = autoImportHttpsCertificates;
     }
 
     public boolean shouldUseProxyForHub() {
@@ -63,7 +66,9 @@ public class HubServerConfig extends HubComponent implements Serializable {
         if (StringUtils.isNotBlank(getGlobalCredentials().getUsername())) {
             logger.alwaysLog("--> Hub User : " + getGlobalCredentials().getUsername());
         }
-
+        if (autoImportHttpsCertificates) {
+            logger.alwaysLog("--> Trust Hub certificate : " + isAutoImportHttpsCertificates());
+        }
         if (proxyInfo != null) {
             if (StringUtils.isNotBlank(proxyInfo.getHost())) {
                 logger.alwaysLog("--> Proxy Host : " + proxyInfo.getHost());
@@ -107,6 +112,10 @@ public class HubServerConfig extends HubComponent implements Serializable {
 
     public int getTimeout() {
         return timeoutSeconds;
+    }
+
+    public boolean isAutoImportHttpsCertificates() {
+        return autoImportHttpsCertificates;
     }
 
 }
