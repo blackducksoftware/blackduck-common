@@ -47,7 +47,7 @@ public class FilePathMavenExternalIdExtractor {
         final String artifactId = pathArray[pathArray.length - 3];
         final String version = pathArray[pathArray.length - 2];
 
-        return new MavenExternalId(Forge.maven, groupId, artifactId, version);
+        return new MavenExternalId(Forge.MAVEN, groupId, artifactId, version);
 
     }
 
@@ -65,7 +65,7 @@ public class FilePathMavenExternalIdExtractor {
         final String artifactId = pathArray[pathArray.length - 4];
         final String version = pathArray[pathArray.length - 3];
 
-        return new MavenExternalId(Forge.maven, groupId, artifactId, version);
+        return new MavenExternalId(Forge.MAVEN, groupId, artifactId, version);
     }
 
 }
