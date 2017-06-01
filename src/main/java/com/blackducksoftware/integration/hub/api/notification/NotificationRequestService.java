@@ -136,13 +136,19 @@ public class NotificationRequestService {
      * Will NOT make further paged requests to get the full list of items
      */
     public List<NotificationView> getItems(final HubPagedRequest hubPagedRequest) throws IntegrationException {
-        try (Response response = hubPagedRequest.executeGet()) {
+        Response response = null;
+        try {
+            response = hubPagedRequest.executeGet();
             final String jsonResponse = response.body().string();
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
             return getItems(jsonObject);
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
@@ -153,7 +159,9 @@ public class NotificationRequestService {
         final LinkedList<NotificationView> allItems = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = hubPagedRequest.offset;
-        try (Response response = hubPagedRequest.executeGet()) {
+        Response response = null;
+        try {
+            response = hubPagedRequest.executeGet();
             final String jsonResponse = response.body().string();
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
@@ -166,7 +174,12 @@ public class NotificationRequestService {
             }
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
+
         return allItems;
     }
 

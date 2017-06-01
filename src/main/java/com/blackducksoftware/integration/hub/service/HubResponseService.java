@@ -88,13 +88,20 @@ public class HubResponseService {
     }
 
     public <T extends HubResponse> T getItem(final HubRequest request, final Class<T> clazz) throws IntegrationException {
-        try (Response response = request.executeGet()) {
+        Response response = null;
+        try {
+            response = request.executeGet();
+            // the string method closes the body
             final String jsonResponse = response.body().string();
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
             return getItemAs(jsonObject, clazz);
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
@@ -130,13 +137,19 @@ public class HubResponseService {
      * Will NOT make further paged requests to get the full list of items
      */
     public <T extends HubResponse> List<T> getItems(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
-        try (Response response = hubPagedRequest.executeGet()) {
+        Response response = null;
+        try {
+            response = hubPagedRequest.executeGet();
             final String jsonResponse = response.body().string();
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
             return getItems(jsonObject, clazz);
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
@@ -147,7 +160,9 @@ public class HubResponseService {
         final List<T> allItems = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = hubPagedRequest.offset;
-        try (Response response = hubPagedRequest.executeGet()) {
+        Response response = null;
+        try {
+            response = hubPagedRequest.executeGet();
             final String jsonResponse = response.body().string();
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
@@ -160,6 +175,10 @@ public class HubResponseService {
             }
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
         return allItems;
     }

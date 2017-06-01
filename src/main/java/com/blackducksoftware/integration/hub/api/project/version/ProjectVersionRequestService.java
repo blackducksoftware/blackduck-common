@@ -96,8 +96,14 @@ public class ProjectVersionRequestService extends HubResponseService {
         final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
 
         final HubRequest hubRequest = getHubRequestFactory().createRequest(versionsUrl);
-        try (Response response = hubRequest.executePost(getGson().toJson(json))) {
+        Response response = null;
+        try {
+            response = hubRequest.executePost(getGson().toJson(json));
             return response.header("location");
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 

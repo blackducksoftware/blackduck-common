@@ -172,6 +172,8 @@ public class CLIDownloadService {
                 } catch (final IOException e) {
                     throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", archive,
                             cis.getByteCount(), responseBody.contentLength()), e);
+                } finally {
+                    cis.close();
                 }
             } finally {
                 if (cliStream != null) {

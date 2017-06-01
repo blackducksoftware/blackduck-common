@@ -43,15 +43,26 @@ public class BomComponentIssueRequestService extends HubResponseService {
 
     public String createIssue(final IssueView issueItem, final String url) throws IntegrationException {
         final HubRequest request = getHubRequestFactory().createRequest(url);
-        try (Response response = request.executePost(getGson().toJson(issueItem))) {
+        Response response = null;
+        try {
+            response = request.executePost(getGson().toJson(issueItem));
             return response.header("location");
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
     public void updateIssue(final IssueView issueItem, final String url) throws IntegrationException {
         final HubRequest request = getHubRequestFactory().createRequest(url);
-        try (Response response = request.executePut(getGson().toJson(issueItem))) {
-
+        Response response = null;
+        try {
+            response = request.executePut(getGson().toJson(issueItem));
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 

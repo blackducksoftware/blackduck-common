@@ -89,9 +89,14 @@ public class ReportRequestService extends HubResponseService {
         }
 
         final HubRequest hubRequest = getHubRequestFactory().createRequest(getVersionReportLink(version));
-
-        try (Response response = hubRequest.executePost(getGson().toJson(json))) {
+        Response response = null;
+        try {
+            response = hubRequest.executePost(getGson().toJson(json));
             return response.header("location");
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
@@ -107,8 +112,9 @@ public class ReportRequestService extends HubResponseService {
      */
     public VersionReport getReportContent(final String reportContentUrl) throws IntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createRequest(reportContentUrl);
-
-        try (Response response = hubRequest.executeGet()) {
+        Response response = null;
+        try {
+            response = hubRequest.executeGet();
             final String jsonResponse = response.body().string();
 
             final JsonObject json = getJsonParser().parse(jsonResponse).getAsJsonObject();
@@ -119,6 +125,10 @@ public class ReportRequestService extends HubResponseService {
             return report;
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
@@ -137,11 +147,17 @@ public class ReportRequestService extends HubResponseService {
 
         while (timeFinished == null) {
             final HubRequest hubRequest = getHubRequestFactory().createRequest(reportUrl);
-            try (Response response = hubRequest.executeGet()) {
+            Response response = null;
+            try {
+                response = hubRequest.executeGet();
                 final String jsonResponse = response.body().string();
                 reportInfo = getItemAs(jsonResponse, ReportView.class);
             } catch (final IOException e) {
                 throw new HubIntegrationException(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
             timeFinished = reportInfo.finishedAt;
             if (timeFinished != null) {

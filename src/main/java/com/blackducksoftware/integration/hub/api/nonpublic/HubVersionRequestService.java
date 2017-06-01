@@ -53,24 +53,36 @@ public class HubVersionRequestService extends HubResponseService {
 
     public String getHubVersion() throws IntegrationException {
         final HubRequest request = getHubRequestFactory().createRequest(CURRENT_VERSION_SEGMENTS);
-        try (Response response = request.executeGet()) {
+        Response response = null;
+        try {
+            response = request.executeGet();
             final String hubVersionWithPossibleSurroundingQuotes = response.body().string();
             final String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
             return hubVersion;
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
     public VersionComparison getHubVersionComparison(final String consumerVersion) throws IntegrationException {
         final HubRequest hubVersionRequest = getHubRequestFactory().createRequest(CURRENT_VERSION_COMPARISON_SEGMENTS).addQueryParameter(QUERY_VERSION,
                 consumerVersion);
-        try (Response response = hubVersionRequest.executeGet()) {
+        Response response = null;
+        try {
+            response = hubVersionRequest.executeGet();
             final String jsonResponse = response.body().string();
             final VersionComparison versionComparison = getItemAs(jsonResponse, VersionComparison.class);
             return versionComparison;
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 

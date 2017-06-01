@@ -49,13 +49,19 @@ public class HubRegistrationRequestService extends HubResponseService {
 
     public String getRegistrationId() throws IntegrationException {
         final HubRequest request = getHubRequestFactory().createRequest(REGISTRATION_SEGMENTS);
-        try (Response response = request.executeGet()) {
+        Response response = null;
+        try {
+            response = request.executeGet();
             final String jsonResponse = response.body().string();
             final JsonObject jsonObject = getJsonParser().parse(jsonResponse).getAsJsonObject();
             final String registrationId = jsonObject.get("registrationId").getAsString();
             return registrationId;
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 

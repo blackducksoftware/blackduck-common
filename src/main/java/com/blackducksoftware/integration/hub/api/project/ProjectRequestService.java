@@ -93,9 +93,14 @@ public class ProjectRequestService extends HubResponseService {
         final HubRequest projectItemRequest = getHubRequestFactory().createRequest(PROJECTS_SEGMENTS);
         final JsonObject json = new JsonObject();
         json.addProperty("name", projectName);
-
-        try (Response response = projectItemRequest.executePost(getGson().toJson(json))) {
+        Response response = null;
+        try {
+            response = projectItemRequest.executePost(getGson().toJson(json));
             return response.header("location");
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
