@@ -1,0 +1,31 @@
+[ {
+  "@id" : "uuid:eaa5424c-73b5-4c1d-8b47-c42cbe8cbec4",
+  "@type" : "BillOfMaterials",
+  "specVersion" : "1.1.0",
+  "spdx:name" : "CITestReportProject Black Duck I/O Export",
+  "creationInfo" : {
+    "spdx:creator" : "Tool: Launcher",
+    "spdx:created" : "2016-11-02T22:07:42.000Z"
+  }
+}, {
+  "@id" : "mvn:simple-pom/CITestReportProject/1",
+  "@type" : "Project",
+  "name" : "CITestReportProject",
+  "revision" : "1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "simple-pom:CITestReportProject:1"
+  },
+  "relationship" : {
+    "related" : "mvn:commons-fileupload/commons-fileupload/1.2.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:commons-fileupload/commons-fileupload/1.2.1",
+  "@type" : "Component",
+  "revision" : "1.2.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "commons-fileupload:commons-fileupload:1.2.1"
+  }
+} ]
