@@ -83,10 +83,15 @@ public class CodeLocationRequestService extends HubResponseService {
         final JsonObject codeLocationItemJson = getJsonParser().parse(codeLocationItem.json).getAsJsonObject();
         codeLocationItemJson.remove("mappedProjectVersion");
         codeLocationItemJson.addProperty("mappedProjectVersion", "");
-        unmapCodeLocation(codeLocationItemUrl, getGson().toJson(codeLocationItemJson));
+        updateCodeLocation(codeLocationItemUrl, getGson().toJson(codeLocationItemJson));
     }
 
-    public void unmapCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws IntegrationException {
+    public void updateCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
+        final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
+        updateCodeLocation(codeLocationItemUrl, getGson().toJson(codeLocationItem));
+    }
+
+    public void updateCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws IntegrationException {
         final HubRequest request = getHubRequestFactory().createRequest(codeLocationItemUrl);
         request.executePut(codeLocationItemJson);
     }
