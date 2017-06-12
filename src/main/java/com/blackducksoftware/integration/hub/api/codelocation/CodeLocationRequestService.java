@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.api.codelocation;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CODE_LOCATIONS;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,7 +39,6 @@ import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
-import com.google.gson.JsonObject;
 
 public class CodeLocationRequestService extends HubResponseService {
     private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
@@ -80,10 +80,16 @@ public class CodeLocationRequestService extends HubResponseService {
 
     public void unmapCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
         final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
-        final JsonObject codeLocationItemJson = getJsonParser().parse(codeLocationItem.json).getAsJsonObject();
-        codeLocationItemJson.remove("mappedProjectVersion");
-        codeLocationItemJson.addProperty("mappedProjectVersion", "");
-        updateCodeLocation(codeLocationItemUrl, getGson().toJson(codeLocationItemJson));
+        codeLocationItem.json = null;
+        codeLocationItem.mappedProjectVersion = "";
+        updateCodeLocation(codeLocationItemUrl, getGson().toJson(codeLocationItem));
+    }
+
+    public void mapCodeLocation(final CodeLocationView codeLocationItem, final String versionUrl) throws IntegrationException {
+        final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
+        codeLocationItem.json = null;
+        codeLocationItem.mappedProjectVersion = versionUrl;
+        updateCodeLocation(codeLocationItemUrl, getGson().toJson(codeLocationItem));
     }
 
     public void updateCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
@@ -110,6 +116,13 @@ public class CodeLocationRequestService extends HubResponseService {
     public void deleteCodeLocation(final String codeLocationItemUrl) throws IntegrationException {
         final HubRequest request = getHubRequestFactory().createRequest(codeLocationItemUrl);
         request.executeDelete();
+    }
+
+    public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {
+        final List<String> segments = new ArrayList<>(CODE_LOCATION_SEGMENTS);
+        segments.add(codeLocationId);
+        final HubRequest request = getHubRequestFactory().createRequest(segments);
+        return getItem(request, CodeLocationView.class);
     }
 
 }
