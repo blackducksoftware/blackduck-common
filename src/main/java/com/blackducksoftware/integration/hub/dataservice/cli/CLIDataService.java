@@ -34,6 +34,7 @@ import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.scan.DryRunUploadRequestService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
@@ -66,6 +67,8 @@ public class CLIDataService {
 
     private final ProjectVersionRequestService projectVersionRequestService;
 
+    private final DryRunUploadRequestService dryRunUploadRequestService;
+
     private final CodeLocationRequestService codeLocationRequestService;
 
     private final MetaService metaService;
@@ -74,7 +77,8 @@ public class CLIDataService {
             final HubVersionRequestService hubVersionRequestService,
             final CLIDownloadService cliDownloadService, final PhoneHomeDataService phoneHomeDataService,
             final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
-            final CodeLocationRequestService codeLocationRequestService, final MetaService metaService) {
+            final DryRunUploadRequestService dryRunUploadRequestService, final CodeLocationRequestService codeLocationRequestService,
+            final MetaService metaService) {
         this.gson = gson;
         this.logger = logger;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
@@ -83,6 +87,7 @@ public class CLIDataService {
         this.phoneHomeDataService = phoneHomeDataService;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
+        this.dryRunUploadRequestService = dryRunUploadRequestService;
         this.codeLocationRequestService = codeLocationRequestService;
         this.metaService = metaService;
     }
@@ -97,26 +102,32 @@ public class CLIDataService {
         cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables,
                 hubServerConfig.getHubUrl().toString(),
                 hubVersion, localHostName);
-
         phoneHomeDataService.phoneHome(hubServerConfig, integrationInfo, hubVersion);
 
         final HubSupportHelper hubSupportHelper = new HubSupportHelper();
         hubSupportHelper.checkHubSupport(hubVersionRequestService, logger);
+        return runControlledScan(hubSupportHelper, hubServerConfig, hubScanConfig);
+    }
+
+    private void printConfiguration(final HubScanConfig hubScanConfig) {
+        logger.alwaysLog("--> Log Level : " + logger.getLogLevel().name());
+        hubScanConfig.print(logger);
+    }
+
+    private List<ScanSummaryView> runControlledScan(final HubSupportHelper hubSupportHelper, final HubServerConfig hubServerConfig,
+            final HubScanConfig hubScanConfig) throws IntegrationException {
+        // TODO check/create Hub Project and Version
+        // TODO pass trimmed scanConfig to simpleScanService
         final SimpleScanService simpleScanService = new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper,
                 ciEnvironmentVariables, hubScanConfig);
         simpleScanService.setupAndExecuteScan();
-
+        // TODO get dry run file and upload, map new code location(s) to version
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
             cleanUpLogFiles(simpleScanService);
         }
         final List<ScanSummaryView> scanSummaries = simpleScanService.getScanSummaryItems();
         cleanupCodeLocations(scanSummaries, hubScanConfig);
         return scanSummaries;
-    }
-
-    public void printConfiguration(final HubScanConfig hubScanConfig) {
-        logger.alwaysLog("--> Log Level : " + logger.getLogLevel().name());
-        hubScanConfig.print(logger);
     }
 
     private void cleanUpLogFiles(final SimpleScanService simpleScanService) {
