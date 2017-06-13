@@ -94,7 +94,7 @@ public class HubServicesFactory {
     public CLIDataService createCLIDataService(final IntLogger logger) {
         return new CLIDataService(logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
                 createPhoneHomeDataService(logger), createProjectRequestService(logger), createProjectVersionRequestService(logger),
-                createDryRunUploadRequestService(), createCodeLocationRequestService(logger), createMetaService(logger));
+                createDryRunUploadRequestService(), createCodeLocationRequestService(logger));
     }
 
     public PhoneHomeDataService createPhoneHomeDataService(final IntLogger logger) {
@@ -226,8 +226,9 @@ public class HubServicesFactory {
     }
 
     public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
-            final HubSupportHelper hubSupportHelper, final HubScanConfig hubScanConfig) {
-        return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, hubScanConfig);
+            final HubSupportHelper hubSupportHelper, final HubScanConfig hubScanConfig, final String projectName, final String versionName) {
+        return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, hubScanConfig, projectName,
+                versionName);
     }
 
     public HubRegistrationRequestService createHubRegistrationRequestService() {

@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.builder.AbstractBuilder;
@@ -38,10 +37,6 @@ import com.blackducksoftware.integration.hub.validator.HubScanConfigValidator;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 
 public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
-    private String projectName;
-
-    private String version;
-
     private File workingDirectory;
 
     private String scanMemory;
@@ -72,7 +67,7 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     @Override
     public HubScanConfig buildObject() {
-        final HubScanConfig config = new HubScanConfig(projectName, version, workingDirectory,
+        final HubScanConfig config = new HubScanConfig(workingDirectory,
                 NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir,
                 cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations, debug, verbose);
 
@@ -82,8 +77,6 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
     @Override
     public AbstractValidator createValidator() {
         final HubScanConfigValidator validator = new HubScanConfigValidator();
-        validator.setProjectName(projectName);
-        validator.setVersion(version);
         validator.setScanMemory(scanMemory);
         validator.setWorkingDirectory(workingDirectory);
         validator.addAllScanTargetPaths(scanTargetPaths);
@@ -105,12 +98,12 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         this.toolsDir = toolsDir;
     }
 
-    public void setProjectName(final String projectName) {
-        this.projectName = StringUtils.trimToNull(projectName);
+    public void setDisableScanTargetPathExistenceCheck(final boolean disableScanTargetPathExistenceCheck) {
+        this.disableScanTargetPathExistenceCheck = disableScanTargetPathExistenceCheck;
     }
 
-    public void setVersion(final String version) {
-        this.version = StringUtils.trimToNull(version);
+    public void setEnableScanTargetPathsWithinWorkingDirectoryCheck(final boolean enableScanTargetPathsWithinWorkingDirectoryCheck) {
+        this.enableScanTargetPathsWithinWorkingDirectoryCheck = enableScanTargetPathsWithinWorkingDirectoryCheck;
     }
 
     public void setScanMemory(final int scanMemory) {

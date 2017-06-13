@@ -35,10 +35,6 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class HubScanConfig {
-    private final String projectName;
-
-    private final String version;
-
     private final File workingDirectory;
 
     private final int scanMemory;
@@ -63,21 +59,20 @@ public class HubScanConfig {
 
     private final boolean verbose;
 
-    public HubScanConfig(final String projectName, final String version, final File workingDirectory,
+    public HubScanConfig(final File workingDirectory,
             final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir,
             final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias,
             final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations) {
-        this(projectName, version, workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias,
+        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns,
+                codeLocationAlias,
                 unmapPreviousCodeLocations, deletePreviousCodeLocations, false, true);
 
     }
 
-    public HubScanConfig(final String projectName, final String version, final File workingDirectory,
+    public HubScanConfig(final File workingDirectory,
             final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir,
             final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias,
             final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean debug, final boolean verbose) {
-        this.projectName = projectName;
-        this.version = version;
         this.workingDirectory = workingDirectory;
         this.scanMemory = scanMemory;
         this.scanTargetPaths = scanTargetPaths;
@@ -90,14 +85,6 @@ public class HubScanConfig {
         this.deletePreviousCodeLocations = deletePreviousCodeLocations;
         this.debug = debug;
         this.verbose = verbose;
-    }
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public String getVersion() {
-        return version;
     }
 
     public File getWorkingDirectory() {
@@ -154,9 +141,6 @@ public class HubScanConfig {
         } catch (final IOException e) {
             logger.alwaysLog("Extremely unlikely exception getting the canonical path: " + e.getMessage());
         }
-        logger.alwaysLog(
-                "--> Using Hub Project Name : " + getProjectName() + ", Version : " + getVersion());
-
         logger.alwaysLog("--> Scanning the following targets  : ");
         if (scanTargetPaths != null) {
             for (final String target : scanTargetPaths) {

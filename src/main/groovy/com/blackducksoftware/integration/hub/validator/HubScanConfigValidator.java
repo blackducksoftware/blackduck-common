@@ -43,10 +43,6 @@ public class HubScanConfigValidator extends AbstractValidator {
 
     public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
-    private String projectName;
-
-    private String version;
-
     private File workingDirectory;
 
     private String scanMemory;
@@ -63,8 +59,6 @@ public class HubScanConfigValidator extends AbstractValidator {
     public ValidationResults assertValid() {
         final ValidationResults result = new ValidationResults();
 
-        validateProjectAndVersion(result);
-
         validateScanMemory(result, DEFAULT_MEMORY_IN_MEGABYTES);
 
         validateScanTargetPaths(result, workingDirectory);
@@ -72,25 +66,6 @@ public class HubScanConfigValidator extends AbstractValidator {
         validateExcludePatterns(result);
 
         return result;
-    }
-
-    public void validateProjectAndVersion(final ValidationResults result) {
-        validateProject(result);
-        validateVersion(result);
-    }
-
-    public void validateProject(final ValidationResults result) {
-        if (projectName == null) {
-            result.addResult(HubScanConfigFieldEnum.PROJECT,
-                    new ValidationResult(ValidationResultEnum.ERROR, "No Project name was found."));
-        }
-    }
-
-    public void validateVersion(final ValidationResults result) {
-        if (version == null) {
-            result.addResult(HubScanConfigFieldEnum.VERSION,
-                    new ValidationResult(ValidationResultEnum.ERROR, "No Version was found."));
-        }
     }
 
     public void validateScanMemory(final ValidationResults result) {
@@ -210,14 +185,6 @@ public class HubScanConfigValidator extends AbstractValidator {
                         new ValidationResult(ValidationResultEnum.WARN, " The exclusion pattern : " + excludePattern + " can not contain **."));
             }
         }
-    }
-
-    public void setProjectName(final String projectName) {
-        this.projectName = StringUtils.trimToNull(projectName);
-    }
-
-    public void setVersion(final String version) {
-        this.version = StringUtils.trimToNull(version);
     }
 
     public void setScanMemory(final int scanMemory) {

@@ -90,6 +90,10 @@ public class CodeLocationRequestService extends HubResponseService {
         updateCodeLocation(codeLocationItemUrl, getGson().toJson(requestCodeLocationView));
     }
 
+    public void mapCodeLocation(final CodeLocationView codeLocationItem, final ProjectVersionView version) throws IntegrationException {
+        mapCodeLocation(codeLocationItem, metaService.getHref(version));
+    }
+
     public void mapCodeLocation(final CodeLocationView codeLocationItem, final String versionUrl) throws IntegrationException {
         final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
         final CodeLocationView requestCodeLocationView = new CodeLocationView();

@@ -30,7 +30,6 @@ import java.util.List;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
@@ -40,10 +39,10 @@ import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
+import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
+import com.blackducksoftware.integration.hub.model.response.DryRunUploadResponse;
 import com.blackducksoftware.integration.hub.model.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
-import com.blackducksoftware.integration.hub.model.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.util.HostnameHelper;
@@ -72,16 +71,15 @@ public class CLIDataService {
 
     private final CodeLocationRequestService codeLocationRequestService;
 
-    private final MetaService metaService;
-
     private HubSupportHelper hubSupportHelper;
+
+    private ProjectVersionView version;
 
     public CLIDataService(final IntLogger logger, final Gson gson, final CIEnvironmentVariables ciEnvironmentVariables,
             final HubVersionRequestService hubVersionRequestService,
             final CLIDownloadService cliDownloadService, final PhoneHomeDataService phoneHomeDataService,
             final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
-            final DryRunUploadRequestService dryRunUploadRequestService, final CodeLocationRequestService codeLocationRequestService,
-            final MetaService metaService) {
+            final DryRunUploadRequestService dryRunUploadRequestService, final CodeLocationRequestService codeLocationRequestService) {
         this.gson = gson;
         this.logger = logger;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
@@ -92,34 +90,30 @@ public class CLIDataService {
         this.projectVersionRequestService = projectVersionRequestService;
         this.dryRunUploadRequestService = dryRunUploadRequestService;
         this.codeLocationRequestService = codeLocationRequestService;
-        this.metaService = metaService;
-    }
-
-    public List<ScanSummaryView> installAndRunScan(final HubServerConfig hubServerConfig,
-            final HubScanConfig hubScanConfig, final IntegrationInfo integrationInfo)
-            throws IntegrationException {
-        preScan(hubServerConfig, hubScanConfig, integrationInfo);
-        return runScan(hubServerConfig, hubScanConfig);
     }
 
     public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig,
-            final HubScanConfig hubScanConfig, final IntegrationInfo integrationInfo)
+            final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final IntegrationInfo integrationInfo)
             throws IntegrationException {
-        preScan(hubServerConfig, hubScanConfig, integrationInfo);
+        preScan(hubServerConfig, hubScanConfig, projectRequest, integrationInfo);
         final File[] dryRunFiles = runControlledScan(hubServerConfig, hubScanConfig);
-        return postScan(hubScanConfig, dryRunFiles);
+        postScan(hubScanConfig, dryRunFiles, projectRequest);
+        return null;
     }
 
-    private void printConfiguration(final HubScanConfig hubScanConfig) {
+    private void printConfiguration(final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
         logger.alwaysLog("--> Log Level : " + logger.getLogLevel().name());
+        logger.alwaysLog(String.format("--> Using Hub Project Name : %s, Version : %s, Phase : %s, Distribution : %s", projectRequest.getName(),
+                projectRequest.getVersionRequest().getVersionName(),
+                projectRequest.getVersionRequest().getPhase(), projectRequest.getVersionRequest().getDistribution()));
         hubScanConfig.print(logger);
     }
 
     private void preScan(final HubServerConfig hubServerConfig,
-            final HubScanConfig hubScanConfig, final IntegrationInfo integrationInfo) throws IntegrationException {
+            final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final IntegrationInfo integrationInfo) throws IntegrationException {
         final String localHostName = HostnameHelper.getMyHostname();
         logger.info("Running on machine : " + localHostName);
-        printConfiguration(hubScanConfig);
+        printConfiguration(hubScanConfig, projectRequest);
         final String hubVersion = hubVersionRequestService.getHubVersion();
         cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables,
                 hubServerConfig.getHubUrl().toString(),
@@ -129,32 +123,32 @@ public class CLIDataService {
         hubSupportHelper = new HubSupportHelper();
         hubSupportHelper.checkHubSupport(hubVersionRequestService, logger);
 
-        // TODO check/create Hub Project and Version
-    }
-
-    private ProjectVersionView postScan(final HubScanConfig hubScanConfig, final File[] dryRunFiles) {
-        // TODO get dry run file and upload, map new code location(s) to version
-        // cleanupCodeLocations(scanSummaries, hubScanConfig);
-        return null;
-    }
-
-    private List<ScanSummaryView> runScan(final HubServerConfig hubServerConfig,
-            final HubScanConfig hubScanConfig) throws IntegrationException {
-        final SimpleScanService simpleScanService = new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper,
-                ciEnvironmentVariables, hubScanConfig);
-        simpleScanService.setupAndExecuteScan();
-        if (hubScanConfig.isCleanupLogsOnSuccess()) {
-            cleanUpLogFiles(simpleScanService);
+        if (!hubScanConfig.isDryRun()) {
+            // TODO check/create Hub Project and Version
         }
-        final List<ScanSummaryView> scanSummaries = simpleScanService.getScanSummaryItems();
-        cleanupCodeLocations(scanSummaries, hubScanConfig);
-        return scanSummaries;
+    }
+
+    private void postScan(final HubScanConfig hubScanConfig, final File[] dryRunFiles, final ProjectRequest projectRequest)
+            throws IntegrationException {
+        if (!hubScanConfig.isDryRun()) {
+            // TODO get dry run file and upload, map new code location(s) to version
+            final List<CodeLocationView> codeLocationViews = new ArrayList<>();
+            for (final File dryRunFile : dryRunFiles) {
+                final DryRunUploadResponse uploadResponse = dryRunUploadRequestService.uploadDryRunFile(dryRunFile);
+                if (uploadResponse != null && uploadResponse.scanGroup != null && uploadResponse.scanGroup.codeLocationKey != null) {
+                    final CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(uploadResponse.scanGroup.codeLocationKey.entityId);
+                    codeLocationViews.add(codeLocationView);
+                    codeLocationRequestService.mapCodeLocation(codeLocationView, version);
+                }
+            }
+            cleanupCodeLocations(codeLocationViews, hubScanConfig);
+        }
     }
 
     private File[] runControlledScan(final HubServerConfig hubServerConfig,
             final HubScanConfig hubScanConfig) throws IntegrationException {
         final SimpleScanService simpleScanService = new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper,
-                ciEnvironmentVariables, getControlledScanConfig(hubScanConfig));
+                ciEnvironmentVariables, getControlledScanConfig(hubScanConfig), null, null);
         simpleScanService.setupAndExecuteScan();
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
             cleanUpLogFiles(simpleScanService);
@@ -188,12 +182,8 @@ public class CLIDataService {
         }
     }
 
-    private void cleanupCodeLocations(final List<ScanSummaryView> scans, final HubScanConfig hubScanConfig) throws IntegrationException {
-        if (!hubScanConfig.isDryRun() && (hubScanConfig.isDeletePreviousCodeLocations() || hubScanConfig.isUnmapPreviousCodeLocations())) {
-            final ProjectView project = projectRequestService.getProjectByName(hubScanConfig.getProjectName());
-            final ProjectVersionView version = projectVersionRequestService.getProjectVersion(project, hubScanConfig.getVersion());
-            final List<CodeLocationView> codeLocationsFromCurentScan = getCodeLocationsFromScanSummaries(scans);
-
+    private void cleanupCodeLocations(final List<CodeLocationView> codeLocationsFromCurentScan, final HubScanConfig hubScanConfig) throws IntegrationException {
+        if (hubScanConfig.isDeletePreviousCodeLocations() || hubScanConfig.isUnmapPreviousCodeLocations()) {
             final List<CodeLocationView> codeLocationsNotJustScanned = getCodeLocationsNotJustScanned(version, codeLocationsFromCurentScan);
             if (hubScanConfig.isDeletePreviousCodeLocations()) {
                 codeLocationRequestService.deleteCodeLocations(codeLocationsNotJustScanned);
@@ -201,16 +191,6 @@ public class CLIDataService {
                 codeLocationRequestService.unmapCodeLocations(codeLocationsNotJustScanned);
             }
         }
-    }
-
-    private List<CodeLocationView> getCodeLocationsFromScanSummaries(final List<ScanSummaryView> scans) throws IntegrationException {
-        final List<CodeLocationView> codeLocations = new ArrayList<>();
-        for (final ScanSummaryView scan : scans) {
-            final CodeLocationView codeLocation = codeLocationRequestService
-                    .getItem(metaService.getFirstLink(scan, MetaService.CODE_LOCATION_BOM_STATUS_LINK), CodeLocationView.class);
-            codeLocations.add(codeLocation);
-        }
-        return codeLocations;
     }
 
     private List<CodeLocationView> getCodeLocationsNotJustScanned(final ProjectVersionView version,
@@ -235,5 +215,17 @@ public class CLIDataService {
             }
         }
         return codeLocationsNotJustScanned;
+    }
+
+    private void getProjectVersion(final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
+        // TODO
+        // try{
+        // final ProjectView project = projectRequestService.getProjectByName(hubScanConfig.getProjectName());
+        // } catch (final DoesNotExistException e){
+        //
+        // projectRequestService.createHubProject(project)
+        // }
+        // version = projectVersionRequestService.getProjectVersion(project, hubScanConfig.getVersion());
+
     }
 }
