@@ -1,0 +1,1022 @@
+[ {
+  "@id" : "uuid:4db941e8-982f-4ff2-ae60-d4a5c504287f",
+  "@type" : "BillOfMaterials",
+  "specVersion" : "1.1.0",
+  "spdx:name" : "ek_mtglist Black Duck I/O Export",
+  "creationInfo" : {
+    "spdx:creator" : "Tool: Gradle-2.13",
+    "spdx:created" : "2016-09-15T19:43:14.000Z"
+  }
+}, {
+  "@id" : "mvn:com.kingofnerds/ek_mtglist/0.0.1",
+  "@type" : "Project",
+  "name" : "ek_mtglist",
+  "revision" : "0.0.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.kingofnerds:ek_mtglist:0.0.1"
+  },
+  "relationship" : [ {
+    "related" : "mvn:log4j/log4j/1.2.17",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.apache.commons/commons-lang3/3.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:commons-collections/commons-collections/3.2.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:commons-io/commons-io/2.4",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:commons-net/commons-net/3.3",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-context/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-beans/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-jdbc/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-orm/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-tx/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-aop/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-core/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:cglib/cglib/3.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:asm/asm-commons/3.3.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:javax.mail/mail/1.4.7",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-java/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.xerial/sqlite-jdbc/3.8.11",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:c3p0/c3p0/0.9.1.2",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.jsoup/jsoup/1.8.2",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.apache.poi/poi/3.9",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.apache.poi/poi-ooxml/3.9",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:net.sf.opencsv/opencsv/2.3",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.fasterxml.jackson.core/jackson-databind/2.6.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.json/json/20141113",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.projectlombok/lombok/1.16.6",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.kingofnerds/googledrive/1.0.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:log4j/log4j/1.2.17",
+  "@type" : "Component",
+  "revision" : "1.2.17",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "log4j:log4j:1.2.17"
+  }
+}, {
+  "@id" : "mvn:org.apache.commons/commons-lang3/3.1",
+  "@type" : "Component",
+  "revision" : "3.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.apache.commons:commons-lang3:3.1"
+  }
+}, {
+  "@id" : "mvn:commons-collections/commons-collections/3.2.1",
+  "@type" : "Component",
+  "revision" : "3.2.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "commons-collections:commons-collections:3.2.1"
+  }
+}, {
+  "@id" : "mvn:commons-io/commons-io/2.4",
+  "@type" : "Component",
+  "revision" : "2.4",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "commons-io:commons-io:2.4"
+  }
+}, {
+  "@id" : "mvn:commons-net/commons-net/3.3",
+  "@type" : "Component",
+  "revision" : "3.3",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "commons-net:commons-net:3.3"
+  }
+}, {
+  "@id" : "mvn:org.springframework/spring-context/4.2.1.RELEASE",
+  "@type" : "Component",
+  "revision" : "4.2.1.RELEASE",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.springframework:spring-context:4.2.1.RELEASE"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.springframework/spring-aop/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-beans/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-core/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-expression/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.springframework/spring-aop/4.2.1.RELEASE",
+  "@type" : "Component",
+  "revision" : "4.2.1.RELEASE",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.springframework:spring-aop:4.2.1.RELEASE"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.springframework/spring-beans/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-core/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:aopalliance/aopalliance/1.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.springframework/spring-beans/4.2.1.RELEASE",
+  "@type" : "Component",
+  "revision" : "4.2.1.RELEASE",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.springframework:spring-beans:4.2.1.RELEASE"
+  },
+  "relationship" : {
+    "related" : "mvn:org.springframework/spring-core/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:org.springframework/spring-core/4.2.1.RELEASE",
+  "@type" : "Component",
+  "revision" : "4.2.1.RELEASE",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.springframework:spring-core:4.2.1.RELEASE"
+  },
+  "relationship" : {
+    "related" : "mvn:commons-logging/commons-logging/1.2",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:commons-logging/commons-logging/1.2",
+  "@type" : "Component",
+  "revision" : "1.2",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "commons-logging:commons-logging:1.2"
+  }
+}, {
+  "@id" : "mvn:aopalliance/aopalliance/1.0",
+  "@type" : "Component",
+  "revision" : "1.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "aopalliance:aopalliance:1.0"
+  }
+}, {
+  "@id" : "mvn:org.springframework/spring-expression/4.2.1.RELEASE",
+  "@type" : "Component",
+  "revision" : "4.2.1.RELEASE",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.springframework:spring-expression:4.2.1.RELEASE"
+  },
+  "relationship" : {
+    "related" : "mvn:org.springframework/spring-core/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:org.springframework/spring-jdbc/4.2.1.RELEASE",
+  "@type" : "Component",
+  "revision" : "4.2.1.RELEASE",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.springframework:spring-jdbc:4.2.1.RELEASE"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.springframework/spring-beans/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-core/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-tx/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.springframework/spring-tx/4.2.1.RELEASE",
+  "@type" : "Component",
+  "revision" : "4.2.1.RELEASE",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.springframework:spring-tx:4.2.1.RELEASE"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.springframework/spring-beans/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-core/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.springframework/spring-orm/4.2.1.RELEASE",
+  "@type" : "Component",
+  "revision" : "4.2.1.RELEASE",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.springframework:spring-orm:4.2.1.RELEASE"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.springframework/spring-beans/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-core/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-tx/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.springframework/spring-jdbc/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:cglib/cglib/3.1",
+  "@type" : "Component",
+  "revision" : "3.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "cglib:cglib:3.1"
+  },
+  "relationship" : {
+    "related" : "mvn:org.ow2.asm/asm/4.2",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:org.ow2.asm/asm/4.2",
+  "@type" : "Component",
+  "revision" : "4.2",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.ow2.asm:asm:4.2"
+  }
+}, {
+  "@id" : "mvn:asm/asm-commons/3.3.1",
+  "@type" : "Component",
+  "revision" : "3.3.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "asm:asm-commons:3.3.1"
+  },
+  "relationship" : {
+    "related" : "mvn:asm/asm-tree/3.3.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:asm/asm-tree/3.3.1",
+  "@type" : "Component",
+  "revision" : "3.3.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "asm:asm-tree:3.3.1"
+  },
+  "relationship" : {
+    "related" : "mvn:asm/asm/3.3.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:asm/asm/3.3.1",
+  "@type" : "Component",
+  "revision" : "3.3.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "asm:asm:3.3.1"
+  }
+}, {
+  "@id" : "mvn:javax.mail/mail/1.4.7",
+  "@type" : "Component",
+  "revision" : "1.4.7",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "javax.mail:mail:1.4.7"
+  },
+  "relationship" : {
+    "related" : "mvn:javax.activation/activation/1.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:javax.activation/activation/1.1",
+  "@type" : "Component",
+  "revision" : "1.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "javax.activation:activation:1.1"
+  }
+}, {
+  "@id" : "mvn:org.seleniumhq.selenium/selenium-java/2.53.0",
+  "@type" : "Component",
+  "revision" : "2.53.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.seleniumhq.selenium:selenium-java:2.53.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-chrome-driver/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-edge-driver/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-firefox-driver/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-ie-driver/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-safari-driver/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-support/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-leg-rc/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.seleniumhq.selenium/selenium-chrome-driver/2.53.0",
+  "@type" : "Component",
+  "revision" : "2.53.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.seleniumhq.selenium:selenium-chrome-driver:2.53.0"
+  },
+  "relationship" : {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-remote-driver/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:org.seleniumhq.selenium/selenium-remote-driver/2.53.0",
+  "@type" : "Component",
+  "revision" : "2.53.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.seleniumhq.selenium:selenium-remote-driver:2.53.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.apache.commons/commons-exec/1.3",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:net.java.dev.jna/jna/4.1.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:net.java.dev.jna/jna-platform/4.1.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:cglib/cglib-nodep/2.1_3",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.code.gson/gson/2.3.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-api/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.apache.httpcomponents/httpclient/4.5.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.guava/guava/19.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.apache.commons/commons-exec/1.3",
+  "@type" : "Component",
+  "revision" : "1.3",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.apache.commons:commons-exec:1.3"
+  }
+}, {
+  "@id" : "mvn:net.java.dev.jna/jna/4.1.0",
+  "@type" : "Component",
+  "revision" : "4.1.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "net.java.dev.jna:jna:4.1.0"
+  }
+}, {
+  "@id" : "mvn:net.java.dev.jna/jna-platform/4.1.0",
+  "@type" : "Component",
+  "revision" : "4.1.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "net.java.dev.jna:jna-platform:4.1.0"
+  },
+  "relationship" : {
+    "related" : "mvn:net.java.dev.jna/jna/4.1.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:cglib/cglib-nodep/2.1_3",
+  "@type" : "Component",
+  "revision" : "2.1_3",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "cglib:cglib-nodep:2.1_3"
+  }
+}, {
+  "@id" : "mvn:com.google.code.gson/gson/2.3.1",
+  "@type" : "Component",
+  "revision" : "2.3.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.code.gson:gson:2.3.1"
+  }
+}, {
+  "@id" : "mvn:org.seleniumhq.selenium/selenium-api/2.53.0",
+  "@type" : "Component",
+  "revision" : "2.53.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.seleniumhq.selenium:selenium-api:2.53.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:com.google.code.gson/gson/2.3.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.guava/guava/19.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:com.google.guava/guava/19.0",
+  "@type" : "Component",
+  "revision" : "19.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.guava:guava:19.0"
+  }
+}, {
+  "@id" : "mvn:org.apache.httpcomponents/httpclient/4.5.1",
+  "@type" : "Component",
+  "revision" : "4.5.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.apache.httpcomponents:httpclient:4.5.1"
+  },
+  "relationship" : [ {
+    "related" : "mvn:commons-logging/commons-logging/1.2",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.apache.httpcomponents/httpcore/4.4.3",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:commons-codec/commons-codec/1.9",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.apache.httpcomponents/httpcore/4.4.3",
+  "@type" : "Component",
+  "revision" : "4.4.3",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.apache.httpcomponents:httpcore:4.4.3"
+  }
+}, {
+  "@id" : "mvn:commons-codec/commons-codec/1.9",
+  "@type" : "Component",
+  "revision" : "1.9",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "commons-codec:commons-codec:1.9"
+  }
+}, {
+  "@id" : "mvn:org.seleniumhq.selenium/selenium-edge-driver/2.53.0",
+  "@type" : "Component",
+  "revision" : "2.53.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.seleniumhq.selenium:selenium-edge-driver:2.53.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:commons-io/commons-io/2.4",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-remote-driver/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.apache.commons/commons-exec/1.3",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.seleniumhq.selenium/selenium-firefox-driver/2.53.0",
+  "@type" : "Component",
+  "revision" : "2.53.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.seleniumhq.selenium:selenium-firefox-driver:2.53.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:commons-io/commons-io/2.4",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-remote-driver/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.apache.commons/commons-exec/1.3",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.seleniumhq.selenium/selenium-ie-driver/2.53.0",
+  "@type" : "Component",
+  "revision" : "2.53.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.seleniumhq.selenium:selenium-ie-driver:2.53.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-remote-driver/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:net.java.dev.jna/jna/4.1.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:net.java.dev.jna/jna-platform/4.1.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.seleniumhq.selenium/selenium-safari-driver/2.53.0",
+  "@type" : "Component",
+  "revision" : "2.53.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.seleniumhq.selenium:selenium-safari-driver:2.53.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-remote-driver/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:io.netty/netty/3.5.7.Final",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:io.netty/netty/3.5.7.Final",
+  "@type" : "Component",
+  "revision" : "3.5.7.Final",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "io.netty:netty:3.5.7.Final"
+  }
+}, {
+  "@id" : "mvn:org.seleniumhq.selenium/selenium-support/2.53.0",
+  "@type" : "Component",
+  "revision" : "2.53.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.seleniumhq.selenium:selenium-support:2.53.0"
+  },
+  "relationship" : {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-remote-driver/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:org.seleniumhq.selenium/selenium-leg-rc/2.53.0",
+  "@type" : "Component",
+  "revision" : "2.53.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.seleniumhq.selenium:selenium-leg-rc:2.53.0"
+  },
+  "relationship" : {
+    "related" : "mvn:org.seleniumhq.selenium/selenium-remote-driver/2.53.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:org.xerial/sqlite-jdbc/3.8.11",
+  "@type" : "Component",
+  "revision" : "3.8.11",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.xerial:sqlite-jdbc:3.8.11"
+  }
+}, {
+  "@id" : "mvn:c3p0/c3p0/0.9.1.2",
+  "@type" : "Component",
+  "revision" : "0.9.1.2",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "c3p0:c3p0:0.9.1.2"
+  }
+}, {
+  "@id" : "mvn:org.jsoup/jsoup/1.8.2",
+  "@type" : "Component",
+  "revision" : "1.8.2",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.jsoup:jsoup:1.8.2"
+  }
+}, {
+  "@id" : "mvn:org.apache.poi/poi/3.9",
+  "@type" : "Component",
+  "revision" : "3.9",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.apache.poi:poi:3.9"
+  },
+  "relationship" : {
+    "related" : "mvn:commons-codec/commons-codec/1.9",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:org.apache.poi/poi-ooxml/3.9",
+  "@type" : "Component",
+  "revision" : "3.9",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.apache.poi:poi-ooxml:3.9"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.apache.poi/poi/3.9",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.apache.poi/poi-ooxml-schemas/3.9",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:dom4j/dom4j/1.6.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.apache.poi/poi-ooxml-schemas/3.9",
+  "@type" : "Component",
+  "revision" : "3.9",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.apache.poi:poi-ooxml-schemas:3.9"
+  },
+  "relationship" : {
+    "related" : "mvn:org.apache.xmlbeans/xmlbeans/2.3.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:org.apache.xmlbeans/xmlbeans/2.3.0",
+  "@type" : "Component",
+  "revision" : "2.3.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.apache.xmlbeans:xmlbeans:2.3.0"
+  },
+  "relationship" : {
+    "related" : "mvn:stax/stax-api/1.0.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:stax/stax-api/1.0.1",
+  "@type" : "Component",
+  "revision" : "1.0.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "stax:stax-api:1.0.1"
+  }
+}, {
+  "@id" : "mvn:dom4j/dom4j/1.6.1",
+  "@type" : "Component",
+  "revision" : "1.6.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "dom4j:dom4j:1.6.1"
+  },
+  "relationship" : {
+    "related" : "mvn:xml-apis/xml-apis/1.0.b2",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:xml-apis/xml-apis/1.0.b2",
+  "@type" : "Component",
+  "revision" : "1.0.b2",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "xml-apis:xml-apis:1.0.b2"
+  }
+}, {
+  "@id" : "mvn:net.sf.opencsv/opencsv/2.3",
+  "@type" : "Component",
+  "revision" : "2.3",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "net.sf.opencsv:opencsv:2.3"
+  }
+}, {
+  "@id" : "mvn:com.fasterxml.jackson.core/jackson-databind/2.6.1",
+  "@type" : "Component",
+  "revision" : "2.6.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.fasterxml.jackson.core:jackson-databind:2.6.1"
+  },
+  "relationship" : [ {
+    "related" : "mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.fasterxml.jackson.core/jackson-core/2.6.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.0",
+  "@type" : "Component",
+  "revision" : "2.6.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.fasterxml.jackson.core:jackson-annotations:2.6.0"
+  }
+}, {
+  "@id" : "mvn:com.fasterxml.jackson.core/jackson-core/2.6.1",
+  "@type" : "Component",
+  "revision" : "2.6.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.fasterxml.jackson.core:jackson-core:2.6.1"
+  }
+}, {
+  "@id" : "mvn:org.json/json/20141113",
+  "@type" : "Component",
+  "revision" : "20141113",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.json:json:20141113"
+  }
+}, {
+  "@id" : "mvn:org.projectlombok/lombok/1.16.6",
+  "@type" : "Component",
+  "revision" : "1.16.6",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.projectlombok:lombok:1.16.6"
+  }
+}, {
+  "@id" : "mvn:com.kingofnerds/googledrive/1.0.0",
+  "@type" : "Component",
+  "revision" : "1.0.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.kingofnerds:googledrive:1.0.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.springframework/spring-context/4.2.1.RELEASE",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.projectlombok/lombok/1.16.6",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.gdata/core/1.47.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:commons-io/commons-io/2.4",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.apis/google-api-services-drive/v2-rev197-1.21.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.json/json/20141113",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:log4j/log4j/1.2.17",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.http-client/google-http-client-jackson/1.20.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.apache.httpcomponents/httpclient/4.5.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:com.google.gdata/core/1.47.1",
+  "@type" : "Component",
+  "revision" : "1.47.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.gdata:core:1.47.1"
+  },
+  "relationship" : [ {
+    "related" : "mvn:com.google.oauth-client/google-oauth-client-jetty/1.11.0-beta",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:javax.mail/mail/1.4.7",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.guava/guava/19.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.code.findbugs/jsr305/1.3.9",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:com.google.oauth-client/google-oauth-client-jetty/1.11.0-beta",
+  "@type" : "Component",
+  "revision" : "1.11.0-beta",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.oauth-client:google-oauth-client-jetty:1.11.0-beta"
+  },
+  "relationship" : [ {
+    "related" : "mvn:com.google.oauth-client/google-oauth-client-java6/1.11.0-beta",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.mortbay.jetty/jetty/6.1.26",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:com.google.oauth-client/google-oauth-client-java6/1.11.0-beta",
+  "@type" : "Component",
+  "revision" : "1.11.0-beta",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.oauth-client:google-oauth-client-java6:1.11.0-beta"
+  },
+  "relationship" : {
+    "related" : "mvn:com.google.oauth-client/google-oauth-client/1.21.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:com.google.oauth-client/google-oauth-client/1.21.0",
+  "@type" : "Component",
+  "revision" : "1.21.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.oauth-client:google-oauth-client:1.21.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:com.google.code.findbugs/jsr305/1.3.9",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.http-client/google-http-client/1.21.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:com.google.code.findbugs/jsr305/1.3.9",
+  "@type" : "Component",
+  "revision" : "1.3.9",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.code.findbugs:jsr305:1.3.9"
+  }
+}, {
+  "@id" : "mvn:com.google.http-client/google-http-client/1.21.0",
+  "@type" : "Component",
+  "revision" : "1.21.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.http-client:google-http-client:1.21.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.apache.httpcomponents/httpclient/4.5.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.code.findbugs/jsr305/1.3.9",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.mortbay.jetty/jetty/6.1.26",
+  "@type" : "Component",
+  "revision" : "6.1.26",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.mortbay.jetty:jetty:6.1.26"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.mortbay.jetty/jetty-util/6.1.26",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:org.mortbay.jetty/servlet-api/2.5-20081211",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.mortbay.jetty/jetty-util/6.1.26",
+  "@type" : "Component",
+  "revision" : "6.1.26",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.mortbay.jetty:jetty-util:6.1.26"
+  }
+}, {
+  "@id" : "mvn:org.mortbay.jetty/servlet-api/2.5-20081211",
+  "@type" : "Component",
+  "revision" : "2.5-20081211",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.mortbay.jetty:servlet-api:2.5-20081211"
+  }
+}, {
+  "@id" : "mvn:com.google.apis/google-api-services-drive/v2-rev197-1.21.0",
+  "@type" : "Component",
+  "revision" : "v2-rev197-1.21.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.apis:google-api-services-drive:v2-rev197-1.21.0"
+  },
+  "relationship" : {
+    "related" : "mvn:com.google.api-client/google-api-client/1.21.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }
+}, {
+  "@id" : "mvn:com.google.api-client/google-api-client/1.21.0",
+  "@type" : "Component",
+  "revision" : "1.21.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.api-client:google-api-client:1.21.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:com.google.oauth-client/google-oauth-client/1.21.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.http-client/google-http-client-jackson2/1.21.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.guava/guava-jdk5/17.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:com.google.http-client/google-http-client-jackson2/1.21.0",
+  "@type" : "Component",
+  "revision" : "1.21.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.http-client:google-http-client-jackson2:1.21.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:com.fasterxml.jackson.core/jackson-core/2.6.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.http-client/google-http-client/1.21.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:com.google.guava/guava-jdk5/17.0",
+  "@type" : "Component",
+  "revision" : "17.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.guava:guava-jdk5:17.0"
+  }
+}, {
+  "@id" : "mvn:com.google.http-client/google-http-client-jackson/1.20.0",
+  "@type" : "Component",
+  "revision" : "1.20.0",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "com.google.http-client:google-http-client-jackson:1.20.0"
+  },
+  "relationship" : [ {
+    "related" : "mvn:org.codehaus.jackson/jackson-core-asl/1.9.11",
+    "relationshipType" : "DYNAMIC_LINK"
+  }, {
+    "related" : "mvn:com.google.http-client/google-http-client/1.21.0",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.codehaus.jackson/jackson-core-asl/1.9.11",
+  "@type" : "Component",
+  "revision" : "1.9.11",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.codehaus.jackson:jackson-core-asl:1.9.11"
+  }
+} ]
