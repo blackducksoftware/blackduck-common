@@ -35,6 +35,7 @@ import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestServ
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.scan.DryRunUploadRequestService;
+import com.blackducksoftware.integration.hub.builder.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
 import com.blackducksoftware.integration.hub.cli.SimpleScanService;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
@@ -73,6 +74,8 @@ public class CLIDataService {
 
     private final MetaService metaService;
 
+    private HubSupportHelper hubSupportHelper;
+
     public CLIDataService(final IntLogger logger, final Gson gson, final CIEnvironmentVariables ciEnvironmentVariables,
             final HubVersionRequestService hubVersionRequestService,
             final CLIDownloadService cliDownloadService, final PhoneHomeDataService phoneHomeDataService,
@@ -95,6 +98,25 @@ public class CLIDataService {
     public List<ScanSummaryView> installAndRunScan(final HubServerConfig hubServerConfig,
             final HubScanConfig hubScanConfig, final IntegrationInfo integrationInfo)
             throws IntegrationException {
+        preScan(hubServerConfig, hubScanConfig, integrationInfo);
+        return runScan(hubServerConfig, hubScanConfig);
+    }
+
+    public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig,
+            final HubScanConfig hubScanConfig, final IntegrationInfo integrationInfo)
+            throws IntegrationException {
+        preScan(hubServerConfig, hubScanConfig, integrationInfo);
+        final File[] dryRunFiles = runControlledScan(hubServerConfig, hubScanConfig);
+        return postScan(hubScanConfig, dryRunFiles);
+    }
+
+    private void printConfiguration(final HubScanConfig hubScanConfig) {
+        logger.alwaysLog("--> Log Level : " + logger.getLogLevel().name());
+        hubScanConfig.print(logger);
+    }
+
+    private void preScan(final HubServerConfig hubServerConfig,
+            final HubScanConfig hubScanConfig, final IntegrationInfo integrationInfo) throws IntegrationException {
         final String localHostName = HostnameHelper.getMyHostname();
         logger.info("Running on machine : " + localHostName);
         printConfiguration(hubScanConfig);
@@ -104,30 +126,52 @@ public class CLIDataService {
                 hubVersion, localHostName);
         phoneHomeDataService.phoneHome(hubServerConfig, integrationInfo, hubVersion);
 
-        final HubSupportHelper hubSupportHelper = new HubSupportHelper();
+        hubSupportHelper = new HubSupportHelper();
         hubSupportHelper.checkHubSupport(hubVersionRequestService, logger);
-        return runControlledScan(hubSupportHelper, hubServerConfig, hubScanConfig);
-    }
 
-    private void printConfiguration(final HubScanConfig hubScanConfig) {
-        logger.alwaysLog("--> Log Level : " + logger.getLogLevel().name());
-        hubScanConfig.print(logger);
-    }
-
-    private List<ScanSummaryView> runControlledScan(final HubSupportHelper hubSupportHelper, final HubServerConfig hubServerConfig,
-            final HubScanConfig hubScanConfig) throws IntegrationException {
         // TODO check/create Hub Project and Version
-        // TODO pass trimmed scanConfig to simpleScanService
+    }
+
+    private ProjectVersionView postScan(final HubScanConfig hubScanConfig, final File[] dryRunFiles) {
+        // TODO get dry run file and upload, map new code location(s) to version
+        // cleanupCodeLocations(scanSummaries, hubScanConfig);
+        return null;
+    }
+
+    private List<ScanSummaryView> runScan(final HubServerConfig hubServerConfig,
+            final HubScanConfig hubScanConfig) throws IntegrationException {
         final SimpleScanService simpleScanService = new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper,
                 ciEnvironmentVariables, hubScanConfig);
         simpleScanService.setupAndExecuteScan();
-        // TODO get dry run file and upload, map new code location(s) to version
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
             cleanUpLogFiles(simpleScanService);
         }
         final List<ScanSummaryView> scanSummaries = simpleScanService.getScanSummaryItems();
         cleanupCodeLocations(scanSummaries, hubScanConfig);
         return scanSummaries;
+    }
+
+    private File[] runControlledScan(final HubServerConfig hubServerConfig,
+            final HubScanConfig hubScanConfig) throws IntegrationException {
+        final SimpleScanService simpleScanService = new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper,
+                ciEnvironmentVariables, getControlledScanConfig(hubScanConfig));
+        simpleScanService.setupAndExecuteScan();
+        if (hubScanConfig.isCleanupLogsOnSuccess()) {
+            cleanUpLogFiles(simpleScanService);
+        }
+        return simpleScanService.getDryRunFiles();
+    }
+
+    private HubScanConfig getControlledScanConfig(final HubScanConfig originalHubScanConfig) {
+        final HubScanConfigBuilder builder = new HubScanConfigBuilder();
+        builder.setCodeLocationAlias(originalHubScanConfig.getCodeLocationAlias());
+        builder.setVerbose(originalHubScanConfig.isVerbose());
+        builder.setDryRun(true);
+        builder.setExcludePatterns(originalHubScanConfig.getExcludePatterns());
+        builder.setScanMemory(originalHubScanConfig.getScanMemory());
+        builder.setToolsDir(originalHubScanConfig.getToolsDir());
+        builder.setWorkingDirectory(originalHubScanConfig.getWorkingDirectory());
+        return builder.build();
     }
 
     private void cleanUpLogFiles(final SimpleScanService simpleScanService) {

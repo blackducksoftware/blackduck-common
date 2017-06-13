@@ -438,4 +438,9 @@ public class SimpleScanService {
         return new File(logDirectory, "CLI_Output.txt");
     }
 
+    public File[] getDryRunFiles() {
+        final File dataDirectory = new File(logDirectory, "data");
+        return dataDirectory.listFiles();
+    }
+
 }
