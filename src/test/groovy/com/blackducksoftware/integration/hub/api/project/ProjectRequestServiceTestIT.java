@@ -36,6 +36,8 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
+import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
+import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
@@ -82,25 +84,25 @@ public class ProjectRequestServiceTestIT {
         final String testProjectVersion2Name = "2";
         final String testProjectVersion3Name = "3";
 
-        final String projectUrl = projectRequestService.createHubProject(testProjectName);
+        final String projectUrl = projectRequestService.createHubProject(new ProjectRequest(testProjectName));
         System.out.println("projectUrl: " + projectUrl);
 
         project = projectRequestService.getItem(projectUrl, ProjectView.class);
-        projectVersionRequestService.createHubVersion(project, testProjectVersion1Name, ProjectVersionPhaseEnum.DEVELOPMENT,
-                ProjectVersionDistributionEnum.INTERNAL, PROJECT_VERSION_NICKNAME);
-        projectVersionRequestService.createHubVersion(project, testProjectVersion2Name, ProjectVersionPhaseEnum.DEVELOPMENT,
-                ProjectVersionDistributionEnum.INTERNAL, null);
-        projectVersionRequestService.createHubVersion(project, testProjectVersion3Name, ProjectVersionPhaseEnum.DEVELOPMENT,
-                ProjectVersionDistributionEnum.INTERNAL);
+        projectVersionRequestService.createHubVersion(project,
+                new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion1Name));
+        projectVersionRequestService.createHubVersion(project,
+                new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion2Name));
+        projectVersionRequestService.createHubVersion(project,
+                new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion3Name));
 
         final ProjectVersionView projectVersion1 = projectVersionRequestService.getProjectVersion(project, testProjectVersion1Name);
-        assertEquals(PROJECT_VERSION_NICKNAME, projectVersion1.nickname);
+        assertEquals(testProjectVersion1Name, projectVersion1.versionName);
 
         final ProjectVersionView projectVersion2 = projectVersionRequestService.getProjectVersion(project, testProjectVersion2Name);
-        assertEquals(null, projectVersion2.nickname);
+        assertEquals(testProjectVersion2Name, projectVersion2.versionName);
 
         final ProjectVersionView projectVersion3 = projectVersionRequestService.getProjectVersion(project, testProjectVersion3Name);
-        assertEquals("", projectVersion3.nickname);
+        assertEquals(testProjectVersion3Name, projectVersion3.versionName);
 
         projectRequestService.deleteHubProject(project);
         project = null;

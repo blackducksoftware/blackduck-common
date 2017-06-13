@@ -53,6 +53,8 @@ import com.blackducksoftware.integration.hub.model.enumeration.CodeLocationEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum;
+import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
+import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.model.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
@@ -102,7 +104,7 @@ public class ComprehensiveCookbookTestIT {
         final int projectCount = projectRequestService.getAllProjects().size();
 
         // create the project
-        final String projectUrl = projectRequestService.createHubProject(testProjectName);
+        final String projectUrl = projectRequestService.createHubProject(new ProjectRequest(testProjectName));
         final ProjectView projectItem = projectRequestService.getItem(projectUrl, ProjectView.class);
         final ProjectView projectItemFromName = projectRequestService.getProjectByName(testProjectName);
         // should return the same project
@@ -113,8 +115,8 @@ public class ComprehensiveCookbookTestIT {
 
         final int projectVersionCount = projectVersionRequestService.getAllProjectVersions(projectItem).size();
 
-        final String projectVersionUrl = projectVersionRequestService.createHubVersion(projectItem, "RestConnectionTest", ProjectVersionPhaseEnum.DEVELOPMENT,
-                ProjectVersionDistributionEnum.INTERNAL, "");
+        final String projectVersionUrl = projectVersionRequestService.createHubVersion(projectItem,
+                new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, "RestConnectionTest"));
         final ProjectVersionView projectVersionItem = projectVersionRequestService.getItem(projectVersionUrl, ProjectVersionView.class);
         final ProjectVersionView projectVersionItemFromName = projectVersionRequestService.getProjectVersion(projectItem, "RestConnectionTest");
         // should return the same project version

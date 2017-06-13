@@ -75,6 +75,11 @@ public class ProjectVersionRequestService extends HubResponseService {
         return allProjectVersionItems;
     }
 
+    public String createHubVersion(final ProjectView project, final ProjectVersionRequest version)
+            throws IntegrationException {
+        return createHubVersion(metaService.getFirstLink(project, MetaService.VERSIONS_LINK), version);
+    }
+
     public String createHubVersion(final String versionsUrl, final ProjectVersionRequest version)
             throws IntegrationException {
 
