@@ -27,6 +27,7 @@ import static java.lang.ProcessBuilder.Redirect.PIPE;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -447,7 +449,12 @@ public class SimpleScanService {
 
     public File[] getDryRunFiles() {
         final File dataDirectory = new File(logDirectory, "data");
-        return dataDirectory.listFiles();
+        return dataDirectory.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(final File dir, final String name) {
+                return FilenameUtils.wildcardMatchOnSystem(name, "*.json");
+            }
+        });
     }
 
 }

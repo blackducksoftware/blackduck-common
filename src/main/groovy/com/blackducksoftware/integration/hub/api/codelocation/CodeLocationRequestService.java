@@ -103,7 +103,7 @@ public class CodeLocationRequestService extends HubResponseService {
         requestCodeLocationView.type = codeLocationItem.type;
         requestCodeLocationView.updatedAt = codeLocationItem.updatedAt;
         requestCodeLocationView.url = codeLocationItem.url;
-        updateCodeLocation(codeLocationItemUrl, getGson().toJson(codeLocationItem));
+        updateCodeLocation(codeLocationItemUrl, getGson().toJson(requestCodeLocationView));
     }
 
     public void updateCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {

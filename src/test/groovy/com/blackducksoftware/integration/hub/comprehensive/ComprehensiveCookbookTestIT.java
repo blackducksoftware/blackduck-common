@@ -58,12 +58,12 @@ import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest
 import com.blackducksoftware.integration.hub.model.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
-import com.blackducksoftware.integration.hub.model.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomPolicyStatusView;
 import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
+import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
@@ -217,9 +217,7 @@ public class ComprehensiveCookbookTestIT {
         final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService(logger);
         final MetaService metaService = hubServicesFactory.createMetaService(logger);
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
-        final CLIDataService cliDataService = hubServicesFactory.createCLIDataService(logger);
-        final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(logger,
-                TWENTY_MINUTES);
+        final CLIDataService cliDataService = hubServicesFactory.createCLIDataService(logger, TWENTY_MINUTES);
         final PolicyStatusDataService policyStatusDataService = hubServicesFactory
                 .createPolicyStatusDataService(logger);
 
@@ -250,29 +248,25 @@ public class ComprehensiveCookbookTestIT {
         // download the cli to where ever the file is just for convenience
         hubScanConfigBuilder.setToolsDir(workingDirectory);
         hubScanConfigBuilder.setWorkingDirectory(workingDirectory);
-        hubScanConfigBuilder.setProjectName(projectName);
-        hubScanConfigBuilder.setVersion(versionName);
         // always use the canonical path since we validate the paths by string matching
         hubScanConfigBuilder.addScanTargetPath(scanTarget.getCanonicalPath());
 
         final HubScanConfig hubScanConfig = hubScanConfigBuilder.build();
-        final List<ScanSummaryView> scanSummaryItems = cliDataService.installAndRunScan(hubServerConfig, hubScanConfig, IntegrationInfo.DO_NOT_PHONE_HOME);
-        assertEquals(1, scanSummaryItems.size());
 
-        scanStatusDataService.assertBomImportScansFinished(scanSummaryItems);
+        final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
+        projectRequestBuilder.setProjectName(projectName);
+        projectRequestBuilder.setVersionName(versionName);
 
-        ProjectView projectItem = null;
-        try {
-            projectItem = projectRequestService.getProjectByName(projectName);
-        } catch (final HubIntegrationException e) {
-            fail("The project should NOW exist.");
-        }
+        final ProjectRequest projectRequest = projectRequestBuilder.build();
 
-        assertNotNull(projectItem);
+        final ProjectVersionView version = cliDataService.installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, true,
+                IntegrationInfo.DO_NOT_PHONE_HOME);
+
+        assertNotNull(version);
 
         // verify the policy
         final VersionBomPolicyStatusView policyStatusItem = policyStatusDataService
-                .getPolicyStatusForProjectAndVersion(projectName, versionName);
+                .getPolicyStatusForVersion(version);
         assertEquals(VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION, policyStatusItem.overallStatus);
         System.out.println(policyStatusItem);
     }
