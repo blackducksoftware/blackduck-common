@@ -95,7 +95,7 @@ class CodeLocationRequestServiceTestIT {
             codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
             Assert.fail('This should have thrown an exception')
         } catch (IntegrationRestException e){
-            Assert.assertEquals(404, e.getHttpStatusCode)
+            Assert.assertEquals(404, e.getHttpStatusCode())
         }
     }
 
