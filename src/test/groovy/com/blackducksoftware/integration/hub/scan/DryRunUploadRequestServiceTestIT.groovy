@@ -27,16 +27,19 @@ import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
 
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService
 import com.blackducksoftware.integration.hub.api.scan.DryRunUploadRequestService
-import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder
-import com.blackducksoftware.integration.hub.global.HubServerConfig
 import com.blackducksoftware.integration.hub.model.response.DryRunUploadResponse
-import com.blackducksoftware.integration.hub.rest.RestConnection
+import com.blackducksoftware.integration.hub.model.view.CodeLocationView
+import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
+import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
 import com.blackducksoftware.integration.log.PrintStreamIntLogger
 
-class DryRunUploadRequestServiceTest {
+class DryRunUploadRequestServiceTestIT {
+
+    private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
     private IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO)
 
@@ -45,25 +48,18 @@ class DryRunUploadRequestServiceTest {
     @BeforeClass
     public static void init(){
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader()
-        dryRunFile = new File(classLoader.getResource('pcm-jrichard-1-target-2017-06-08T213314.753Z.json').getFile())
+        dryRunFile = new File(classLoader.getResource('dryRun.json').getFile())
     }
 
     @Test
     public void testDryRunUpload(){
-        HubServerConfig config = getHubServerConfig()
-        RestConnection restConnection = config.createCredentialsRestConnection(logger)
-        DryRunUploadRequestService service = new DryRunUploadRequestService(restConnection)
-        DryRunUploadResponse response = service.uploadDryRunFile(dryRunFile)
+        HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
+        DryRunUploadRequestService dryRunUploadRequestService = services.createDryRunUploadRequestService()
+        DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
-        println response.toString()
-    }
 
-    private HubServerConfig getHubServerConfig(){
-        HubServerConfigBuilder builder = new HubServerConfigBuilder()
-        builder.setHubUrl('http://int-hub01.dc1.lan:8080')
-        builder.setUsername('sysadmin')
-        builder.setPassword('blackduck')
-        builder.setTimeout(120)
-        builder.build()
+        CodeLocationRequestService codeLocationRequestService = services.createCodeLocationRequestService(logger)
+        CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
+        Assert.assertNotNull(codeLocationView)
     }
 }
