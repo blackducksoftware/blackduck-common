@@ -80,13 +80,7 @@ public class CodeLocationRequestService extends HubResponseService {
 
     public void unmapCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
         final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
-        final CodeLocationView requestCodeLocationView = new CodeLocationView();
-        requestCodeLocationView.createdAt = codeLocationItem.createdAt;
-        requestCodeLocationView.mappedProjectVersion = "";
-        requestCodeLocationView.name = codeLocationItem.name;
-        requestCodeLocationView.type = codeLocationItem.type;
-        requestCodeLocationView.updatedAt = codeLocationItem.updatedAt;
-        requestCodeLocationView.url = codeLocationItem.url;
+        final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationItem, "");
         updateCodeLocation(codeLocationItemUrl, getGson().toJson(requestCodeLocationView));
     }
 
@@ -96,13 +90,7 @@ public class CodeLocationRequestService extends HubResponseService {
 
     public void mapCodeLocation(final CodeLocationView codeLocationItem, final String versionUrl) throws IntegrationException {
         final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
-        final CodeLocationView requestCodeLocationView = new CodeLocationView();
-        requestCodeLocationView.createdAt = codeLocationItem.createdAt;
-        requestCodeLocationView.mappedProjectVersion = versionUrl;
-        requestCodeLocationView.name = codeLocationItem.name;
-        requestCodeLocationView.type = codeLocationItem.type;
-        requestCodeLocationView.updatedAt = codeLocationItem.updatedAt;
-        requestCodeLocationView.url = codeLocationItem.url;
+        final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationItem, versionUrl);
         updateCodeLocation(codeLocationItemUrl, getGson().toJson(requestCodeLocationView));
     }
 
@@ -137,6 +125,17 @@ public class CodeLocationRequestService extends HubResponseService {
         segments.add(codeLocationId);
         final HubRequest request = getHubRequestFactory().createRequest(segments);
         return getItem(request, CodeLocationView.class);
+    }
+
+    private CodeLocationView createRequestCodeLocationView(final CodeLocationView codeLocationItem, final String versionUrl) {
+        final CodeLocationView requestCodeLocationView = new CodeLocationView();
+        requestCodeLocationView.createdAt = codeLocationItem.createdAt;
+        requestCodeLocationView.mappedProjectVersion = versionUrl;
+        requestCodeLocationView.name = codeLocationItem.name;
+        requestCodeLocationView.type = codeLocationItem.type;
+        requestCodeLocationView.updatedAt = codeLocationItem.updatedAt;
+        requestCodeLocationView.url = codeLocationItem.url;
+        return requestCodeLocationView;
     }
 
 }
