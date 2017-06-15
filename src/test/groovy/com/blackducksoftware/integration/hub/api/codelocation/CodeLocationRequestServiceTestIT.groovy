@@ -39,6 +39,7 @@ import com.blackducksoftware.integration.hub.model.view.ProjectVersionView
 import com.blackducksoftware.integration.hub.model.view.ProjectView
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
+import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
@@ -87,6 +88,15 @@ class CodeLocationRequestServiceTestIT {
         codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
+
+        codeLocationRequestService.deleteCodeLocation(codeLocationView)
+
+        try{
+            codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
+            Assert.fail('This should have thrown an exception')
+        } catch (IntegrationRestException e){
+            Assert.assertEquals(404, e.getHttpStatusCode)
+        }
     }
 
     private ProjectVersionView getProjectVersion(ProjectRequestService projectRequestService, ProjectVersionRequestService projectVersionRequestService,  final ProjectRequest projectRequest) throws IntegrationException {

@@ -32,6 +32,7 @@ import com.blackducksoftware.integration.hub.api.scan.DryRunUploadRequestService
 import com.blackducksoftware.integration.hub.model.response.DryRunUploadResponse
 import com.blackducksoftware.integration.hub.model.view.CodeLocationView
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
+import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
@@ -61,5 +62,14 @@ class DryRunUploadRequestServiceTestIT {
         CodeLocationRequestService codeLocationRequestService = services.createCodeLocationRequestService(logger)
         CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
         Assert.assertNotNull(codeLocationView)
+
+        //cleanup
+        codeLocationRequestService.deleteCodeLocation(codeLocationView)
+        try{
+            codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
+            Assert.fail('This should have thrown an exception')
+        } catch (IntegrationRestException e){
+            Assert.assertEquals(404, e.getHttpStatusCode)
+        }
     }
 }
