@@ -60,8 +60,8 @@ class CodeLocationRequestServiceTestIT {
 
     @Test
     public void testDryRunUpload(){
-        final String projectName = restConnectionTestHelper.getProperty("TEST_SCAN_PROJECT");
-        final String versionName = restConnectionTestHelper.getProperty("TEST_SCAN_VERSION");
+        final String projectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
+        final String versionName = restConnectionTestHelper.getProperty("TEST_VERSION");
 
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         DryRunUploadRequestService dryRunUploadRequestService = services.createDryRunUploadRequestService()
