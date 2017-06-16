@@ -63,14 +63,14 @@ class CodeLocationRequestServiceTestIT {
     public void testCleanup(){
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         ProjectRequestService projectRequestService = services.createProjectRequestService(logger)
-        ProjectView project = projectRequestService.getProjectByName(restConnectionTestHelper.getProperty("TEST_PROJECT"))
+        ProjectView project = projectRequestService.getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
         projectRequestService.deleteHubProject(project)
     }
 
     @Test
     public void testDryRunUpload(){
-        final String projectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
-        final String versionName = restConnectionTestHelper.getProperty("TEST_VERSION");
+        final String projectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
+        final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         DryRunUploadRequestService dryRunUploadRequestService = services.createDryRunUploadRequestService()

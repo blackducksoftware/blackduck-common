@@ -117,8 +117,16 @@ class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
         this.distribution = distribution;
     }
 
+    public void setDistribution(ProjectVersionDistributionEnum distribution) {
+        this.distribution = distribution.name();
+    }
+
     public void setPhase(String phase) {
         this.phase = phase;
+    }
+
+    public void setPhase(ProjectVersionPhaseEnum phase) {
+        this.phase = phase.name();
     }
 
     public void setVersionName(String versionName) {
