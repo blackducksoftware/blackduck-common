@@ -27,6 +27,7 @@ import static java.lang.ProcessBuilder.Redirect.PIPE;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -74,18 +76,25 @@ public class SimpleScanService {
 
     private final HubScanConfig hubScanConfig;
 
+    private final String project;
+
+    private final String version;
+
     private final List<String> cmd = new ArrayList<>();
 
     private File logDirectory;
 
     public SimpleScanService(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig,
-            final HubSupportHelper hubSupportHelper, final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig) {
+            final HubSupportHelper hubSupportHelper, final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig,
+            final String project, final String version) {
         this.gson = gson;
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
         this.hubSupportHelper = hubSupportHelper;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
         this.hubScanConfig = hubScanConfig;
+        this.project = project;
+        this.version = version;
     }
 
     /**
@@ -97,10 +106,10 @@ public class SimpleScanService {
             final CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo,
             final int scanMemory, final boolean dryRun, final String project, final String version, final Set<String> scanTargetPaths,
             final File workingDirectory, final String[] excludePatterns) {
-        this(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, new HubScanConfig(project, version,
+        this(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, new HubScanConfig(
                 workingDirectory, scanMemory, scanTargetPaths, dryRun,
                 null, true, excludePatterns, null,
-                false, false));
+                false, false), project, version);
 
     }
 
@@ -214,11 +223,11 @@ public class SimpleScanService {
             cmd.add(logDirectoryPath);
         }
 
-        if (StringUtils.isNotBlank(hubScanConfig.getProjectName()) && StringUtils.isNotBlank(hubScanConfig.getVersion())) {
+        if (StringUtils.isNotBlank(project) && StringUtils.isNotBlank(version)) {
             cmd.add("--project");
-            cmd.add(hubScanConfig.getProjectName());
+            cmd.add(project);
             cmd.add("--release");
-            cmd.add(hubScanConfig.getVersion());
+            cmd.add(version);
         }
 
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CODE_LOCATION_ALIAS) && StringUtils.isNotBlank(hubScanConfig.getCodeLocationAlias())) {
@@ -436,6 +445,16 @@ public class SimpleScanService {
 
     public File getStandardOutputFile() {
         return new File(logDirectory, "CLI_Output.txt");
+    }
+
+    public File[] getDryRunFiles() {
+        final File dataDirectory = new File(logDirectory, "data");
+        return dataDirectory.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(final File dir, final String name) {
+                return FilenameUtils.wildcardMatchOnSystem(name, "*.json");
+            }
+        });
     }
 
 }

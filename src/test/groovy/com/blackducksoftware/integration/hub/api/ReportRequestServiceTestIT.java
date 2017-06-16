@@ -43,6 +43,8 @@ import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataServ
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ReportFormatEnum;
+import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
+import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
@@ -100,7 +102,7 @@ public class ReportRequestServiceTestIT {
             project = projectService.getProjectByName(projectName);
         } catch (final IntegrationException e) {
             try {
-                final String projectUrl = projectService.createHubProject(projectName);
+                final String projectUrl = projectService.createHubProject(new ProjectRequest(projectName));
                 project = projectService.getItem(projectUrl, ProjectView.class);
             } catch (final IntegrationException e1) {
                 throw new RuntimeException(e1);
@@ -115,8 +117,8 @@ public class ReportRequestServiceTestIT {
             version = versionService.getProjectVersion(project, versionName);
         } catch (final IntegrationException e) {
             try {
-                final String versionUrl = versionService.createHubVersion(project, versionName, ProjectVersionPhaseEnum.DEVELOPMENT,
-                        ProjectVersionDistributionEnum.INTERNAL, "");
+                final String versionUrl = versionService.createHubVersion(project,
+                        new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, versionName));
                 version = versionService.getItem(versionUrl, ProjectVersionView.class);
             } catch (final IntegrationException e1) {
                 throw new RuntimeException(e1);

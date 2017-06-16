@@ -34,12 +34,12 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
+import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
-import com.google.gson.JsonObject;
 
 import okhttp3.Response;
 
@@ -89,13 +89,11 @@ public class ProjectRequestService extends HubResponseService {
         throw new DoesNotExistException("This Project does not exist. Project : " + projectName);
     }
 
-    public String createHubProject(final String projectName) throws IntegrationException {
+    public String createHubProject(final ProjectRequest project) throws IntegrationException {
         final HubRequest projectItemRequest = getHubRequestFactory().createRequest(PROJECTS_SEGMENTS);
-        final JsonObject json = new JsonObject();
-        json.addProperty("name", projectName);
         Response response = null;
         try {
-            response = projectItemRequest.executePost(getGson().toJson(json));
+            response = projectItemRequest.executePost(getGson().toJson(project));
             return response.header("location");
         } finally {
             if (response != null) {

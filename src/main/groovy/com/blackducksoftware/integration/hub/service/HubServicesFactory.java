@@ -47,6 +47,7 @@ import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
+import com.blackducksoftware.integration.hub.api.scan.DryRunUploadRequestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
@@ -90,10 +91,11 @@ public class HubServicesFactory {
         ciEnvironmentVariables.putAll(environmentVariables);
     }
 
-    public CLIDataService createCLIDataService(final IntLogger logger) {
+    public CLIDataService createCLIDataService(final IntLogger logger, final long timeoutInMilliseconds) {
         return new CLIDataService(logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
                 createPhoneHomeDataService(logger), createProjectRequestService(logger), createProjectVersionRequestService(logger),
-                createCodeLocationRequestService(logger), createMetaService(logger));
+                createDryRunUploadRequestService(), createCodeLocationRequestService(logger), createScanSummaryRequestService(),
+                createScanStatusDataService(logger, timeoutInMilliseconds));
     }
 
     public PhoneHomeDataService createPhoneHomeDataService(final IntLogger logger) {
@@ -149,6 +151,10 @@ public class HubServicesFactory {
 
     public BomImportRequestService createBomImportRequestService() {
         return new BomImportRequestService(restConnection);
+    }
+
+    public DryRunUploadRequestService createDryRunUploadRequestService() {
+        return new DryRunUploadRequestService(restConnection);
     }
 
     public CodeLocationRequestService createCodeLocationRequestService(final IntLogger logger) {
@@ -221,8 +227,9 @@ public class HubServicesFactory {
     }
 
     public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
-            final HubSupportHelper hubSupportHelper, final HubScanConfig hubScanConfig) {
-        return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, hubScanConfig);
+            final HubSupportHelper hubSupportHelper, final HubScanConfig hubScanConfig, final String projectName, final String versionName) {
+        return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, hubScanConfig, projectName,
+                versionName);
     }
 
     public HubRegistrationRequestService createHubRegistrationRequestService() {

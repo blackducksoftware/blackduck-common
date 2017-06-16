@@ -30,15 +30,13 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
+import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
-import com.google.gson.JsonObject;
 
 import okhttp3.Response;
 
@@ -77,28 +75,18 @@ public class ProjectVersionRequestService extends HubResponseService {
         return allProjectVersionItems;
     }
 
-    public String createHubVersion(final ProjectView project, final String versionName, final ProjectVersionPhaseEnum phase,
-            final ProjectVersionDistributionEnum dist)
+    public String createHubVersion(final ProjectView project, final ProjectVersionRequest version)
             throws IntegrationException {
-        return createHubVersion(project, versionName, phase,
-                dist, "");
+        return createHubVersion(metaService.getFirstLink(project, MetaService.VERSIONS_LINK), version);
     }
 
-    public String createHubVersion(final ProjectView project, final String versionName, final ProjectVersionPhaseEnum phase,
-            final ProjectVersionDistributionEnum dist, final String nickname)
+    public String createHubVersion(final String versionsUrl, final ProjectVersionRequest version)
             throws IntegrationException {
-        final JsonObject json = new JsonObject();
-        json.addProperty("versionName", versionName);
-        json.addProperty("phase", phase.name());
-        json.addProperty("distribution", dist.name());
-        json.addProperty("nickname", nickname);
-
-        final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
 
         final HubRequest hubRequest = getHubRequestFactory().createRequest(versionsUrl);
         Response response = null;
         try {
-            response = hubRequest.executePost(getGson().toJson(json));
+            response = hubRequest.executePost(getGson().toJson(version));
             return response.header("location");
         } finally {
             if (response != null) {
