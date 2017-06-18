@@ -40,6 +40,8 @@ import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
+import okhttp3.Response;
+
 public class BomImportRequestService extends HubResponseService {
     private static final List<String> BOM_IMPORT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_BOM_IMPORT);
 
@@ -50,7 +52,8 @@ public class BomImportRequestService extends HubResponseService {
     public void importBomFile(final File file, final String mediaType) throws IntegrationException {
         try {
             final HubRequest hubRequest = getHubRequestFactory().createRequest(BOM_IMPORT_SEGMENTS);
-            hubRequest.executePost(mediaType, FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+            try (Response response = hubRequest.executePost(mediaType, FileUtils.readFileToString(file, StandardCharsets.UTF_8))) {
+            }
         } catch (final IOException e) {
             throw new HubIntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub with Error : " + e.getMessage(), e);
         }

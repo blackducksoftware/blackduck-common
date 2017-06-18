@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.api.codelocation
 import org.apache.commons.lang3.StringUtils
+import org.junit.After
 import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
@@ -58,10 +59,18 @@ class CodeLocationRequestServiceTestIT {
         dryRunFile = new File(classLoader.getResource('dryRun.json').getFile())
     }
 
+    @After
+    public void testCleanup(){
+        HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
+        ProjectRequestService projectRequestService = services.createProjectRequestService(logger)
+        ProjectView project = projectRequestService.getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
+        projectRequestService.deleteHubProject(project)
+    }
+
     @Test
     public void testDryRunUpload(){
-        final String projectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
-        final String versionName = restConnectionTestHelper.getProperty("TEST_VERSION");
+        final String projectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
+        final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         DryRunUploadRequestService dryRunUploadRequestService = services.createDryRunUploadRequestService()

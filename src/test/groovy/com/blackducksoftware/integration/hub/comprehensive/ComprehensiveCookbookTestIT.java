@@ -126,6 +126,58 @@ public class ComprehensiveCookbookTestIT {
     }
 
     @Test
+    public void createProjectVersionSingleCall() throws Exception {
+        final String testProjectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
+
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService(hubServicesFactory.getRestConnection().logger);
+        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory
+                .createProjectVersionRequestService(logger);
+        final MetaService metaService = hubServicesFactory.createMetaService(logger);
+        final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
+
+        // delete the project, if it exists
+        try {
+            final ProjectView projectItem = projectRequestService.getProjectByName(testProjectName);
+            final HubRequest deleteRequest = hubRequestFactory.createRequest(metaService.getHref(projectItem));
+            deleteRequest.executeDelete();
+        } catch (final HubIntegrationException e) {
+            logger.warn("Project didn't exist");
+        }
+
+        // get the count of all projects now
+        final int projectCount = projectRequestService.getAllProjects().size();
+
+        final String versionName = "RestConnectionTest";
+        final ProjectVersionDistributionEnum distribution = ProjectVersionDistributionEnum.INTERNAL;
+        final ProjectVersionPhaseEnum phase = ProjectVersionPhaseEnum.DEVELOPMENT;
+        final ProjectRequestBuilder projectBuilder = new ProjectRequestBuilder();
+        projectBuilder.setProjectName(testProjectName);
+        projectBuilder.setVersionName(versionName);
+        projectBuilder.setPhase(phase);
+        projectBuilder.setDistribution(distribution);
+
+        final ProjectRequest projectRequest = projectBuilder.build();
+
+        // create the project
+        final String projectUrl = projectRequestService.createHubProject(projectRequest);
+        final ProjectView projectItem = projectRequestService.getItem(projectUrl, ProjectView.class);
+        final ProjectView projectItemFromName = projectRequestService.getProjectByName(testProjectName);
+        // should return the same project
+        assertEquals(projectItem.toString(), projectItemFromName.toString());
+
+        final int projectCountAfterCreate = projectRequestService.getAllProjects().size();
+        assertTrue(projectCountAfterCreate > projectCount);
+
+        final ProjectVersionView projectVersionItem = projectVersionRequestService.getProjectVersion(projectItem, versionName);
+
+        assertNotNull(projectVersionItem);
+        assertEquals(versionName, projectVersionItem.versionName);
+
+    }
+
+    @Test
     public void testPolicyStatusFromBdioImport() throws Exception {
         final Date startDate = new Date();
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
