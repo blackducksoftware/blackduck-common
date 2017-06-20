@@ -22,6 +22,10 @@
     <url>https://www.github.com/blackducksoftware/hub-common</url>
   </scm>
 
+  <properties>
+    <skipITTests>true</skipITTests>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
@@ -103,6 +107,9 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <skipITs>${skipITTests}</skipITs>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-remote-resources-plugin</artifactId>
