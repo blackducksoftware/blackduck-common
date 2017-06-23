@@ -156,6 +156,7 @@ public class CLIDataService {
                 scanSummaryIds.each{
                     pendingScans.add(scanSummaryRequestService.getScanSummaryViewById(it))
                 }
+                logger.debug("Waiting for the Bom to be updated.");
                 scanStatusDataService.assertBomImportScansFinished(pendingScans)
             }
         }
