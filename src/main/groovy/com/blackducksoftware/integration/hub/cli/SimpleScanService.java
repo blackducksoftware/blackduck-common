@@ -362,14 +362,14 @@ public class SimpleScanService {
 
         logDirectory = new File(logsDirectory, specificScanExecutionLogDirectory);
         if (!logDirectory.exists() && !logDirectory.mkdirs()) {
-            throw new IOException("Could not create the HubScanLogs directory!");
+            throw new IOException(String.format("Could not create the %s directory!", logDirectory.getAbsolutePath()));
         }
         final File bdIgnoreLogsFile = new File(hubScanConfig.getWorkingDirectory(), ".bdignore");
         if (bdIgnoreLogsFile.exists()) {
             bdIgnoreLogsFile.delete();
         }
         if (!bdIgnoreLogsFile.createNewFile()) {
-            throw new IOException("Could not create the .bdignore file!");
+            throw new IOException(String.format("Could not create the %s file!", bdIgnoreLogsFile.getAbsolutePath()));
         }
         final String exclusionPattern = "/" + logDirectoryName + "/";
         Files.write(bdIgnoreLogsFile.toPath(), exclusionPattern.getBytes());
