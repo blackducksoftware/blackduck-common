@@ -40,6 +40,8 @@ import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
+import okhttp3.Response;
+
 public class CodeLocationRequestService extends HubResponseService {
     private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
 
@@ -101,7 +103,9 @@ public class CodeLocationRequestService extends HubResponseService {
 
     public void updateCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws IntegrationException {
         final HubRequest request = getHubRequestFactory().createRequest(codeLocationItemUrl);
-        request.executePut(codeLocationItemJson);
+        try (Response response = request.executePut(codeLocationItemJson)) {
+
+        }
     }
 
     public void deleteCodeLocations(final List<CodeLocationView> codeLocationItems) throws IntegrationException {
