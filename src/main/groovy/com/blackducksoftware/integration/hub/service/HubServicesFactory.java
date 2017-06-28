@@ -91,6 +91,10 @@ public class HubServicesFactory {
         ciEnvironmentVariables.putAll(environmentVariables);
     }
 
+    public CLIDataService createCLIDataService(final IntLogger logger) {
+        return createCLIDataService(logger, 120000l);
+    }
+
     public CLIDataService createCLIDataService(final IntLogger logger, final long timeoutInMilliseconds) {
         return new CLIDataService(logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
                 createPhoneHomeDataService(logger), createProjectRequestService(logger), createProjectVersionRequestService(logger),
