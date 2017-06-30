@@ -26,12 +26,10 @@ package com.blackducksoftware.integration.hub.rest;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,7 +51,7 @@ public class RestConnectionTestHelper {
 
     public RestConnectionTestHelper() {
         initProperties();
-        hubServerUrl = testProperties.getProperty("TEST_HUB_SERVER_URL");
+        this.hubServerUrl = getProperty(TestingPropertyKey.TEST_HUB_SERVER_URL);
     }
 
     public RestConnectionTestHelper(final String hubServerUrlPropertyName) {
@@ -68,30 +66,23 @@ public class RestConnectionTestHelper {
         final InputStream is = classLoader.getResourceAsStream("test.properties");
         try {
             testProperties.load(is);
-            loadOverrideProperties(testProperties.stringPropertyNames());
-            loadOverridePropertiesFromExternalFile();
+            loadOverrideProperties(TestingPropertyKey.values());
         } catch (final IOException e) {
             System.err.println("reading test.properties failed!");
         }
     }
 
-    private void loadOverrideProperties(final Set<String> keys) {
-        for (final String key : keys) {
-            final String prop = System.getenv(key);
+    private void loadOverrideProperties(final TestingPropertyKey[] keys) {
+        for (final TestingPropertyKey key : keys) {
+            final String prop = System.getenv(key.toString());
             if (prop != null && !prop.isEmpty()) {
-                testProperties.setProperty(key, prop);
+                testProperties.setProperty(key.toString(), prop);
             }
         }
     }
 
-    private void loadOverridePropertiesFromExternalFile() {
-        try {
-            final String externalFilePath = System.getenv("HUB_COMMON_TEST_PROPERTIES_PATH");
-            final FileInputStream fileInputStream = new FileInputStream(externalFilePath);
-            testProperties.load(fileInputStream);
-        } catch (final Exception e) {
-            System.out.println("Couldn't load properties from an external file: " + e.getMessage());
-        }
+    public String getProperty(final TestingPropertyKey key) {
+        return getProperty(key.toString());
     }
 
     public String getProperty(final String key) {
@@ -101,24 +92,24 @@ public class RestConnectionTestHelper {
     public HubServerConfig getHubServerConfig() {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         builder.setHubUrl(hubServerUrl);
-        builder.setUsername(testProperties.getProperty("TEST_USERNAME"));
-        builder.setPassword(testProperties.getProperty("TEST_PASSWORD"));
-        builder.setTimeout(testProperties.getProperty("TEST_HUB_TIMEOUT"));
-        builder.setAutoImportHttpsCertificates(Boolean.getBoolean(testProperties.getProperty("TEST_AUTO_IMPORT_HTTPS_CERT")));
+        builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
+        builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
+        builder.setTimeout(getProperty(TestingPropertyKey.TEST_HUB_TIMEOUT));
+        builder.setAutoImportHttpsCertificates(Boolean.getBoolean(getProperty(TestingPropertyKey.TEST_AUTO_IMPORT_HTTPS_CERT)));
 
         return builder.build();
     }
 
     public String getIntegrationHubServerUrl() {
-        return testProperties.getProperty("TEST_HUB_SERVER_URL");
+        return getProperty(TestingPropertyKey.TEST_HUB_SERVER_URL);
     }
 
     public String getTestUsername() {
-        return testProperties.getProperty("TEST_USERNAME");
+        return getProperty(TestingPropertyKey.TEST_USERNAME);
     }
 
     public String getTestPassword() {
-        return testProperties.getProperty("TEST_PASSWORD");
+        return getProperty(TestingPropertyKey.TEST_PASSWORD);
     }
 
     public CredentialsRestConnection getIntegrationHubRestConnection() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
