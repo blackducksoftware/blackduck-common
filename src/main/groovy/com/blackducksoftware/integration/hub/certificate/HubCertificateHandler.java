@@ -47,6 +47,9 @@ public class HubCertificateHandler {
     }
 
     public void importHttpsCertificateForHubServer(final URL hubUrl, final int timeout) throws IntegrationException {
+        if (handler.isCertificateInTrustStore(hubUrl)) {
+            return;
+        }
         handler.retrieveAndImportHttpsCertificate(hubUrl);
         if (!isHubServer(hubUrl, timeout)) {
             // If we imported a certificate for a non Hub server we want to remove it again
