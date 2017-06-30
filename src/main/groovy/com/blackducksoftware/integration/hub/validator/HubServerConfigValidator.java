@@ -54,6 +54,8 @@ public class HubServerConfigValidator extends AbstractValidator {
 
     public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
 
+    public static final String ERROR_MSG_UNREACHABLE_CAUSE = ", because: ";
+
     public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
 
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
@@ -190,13 +192,18 @@ public class HubServerConfigValidator extends AbstractValidator {
             try {
                 response = client.newCall(request).execute();
                 if (!response.isSuccessful()) {
-                    if (response.code() == 407) {
+                    final int responseCode = response.code();
+                    if (responseCode == 407) {
                         result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
                                 new ValidationResult(ValidationResultEnum.ERROR, response.message()));
                         return;
+                    } else if (responseCode != 401 && responseCode != 403) {
+                        // if a 401 or 403 is returned it is ok. The server is reachable just not authenticated or
+                        // authorized. This object isn't responsible for that.
+                        result.addResult(HubServerConfigFieldEnum.HUBURL,
+                                new ValidationResult(ValidationResultEnum.ERROR,
+                                        ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ERROR_MSG_UNREACHABLE_CAUSE + response.message()));
                     }
-                    result.addResult(HubServerConfigFieldEnum.HUBURL,
-                            new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl));
                 }
             } finally {
                 if (response != null) {

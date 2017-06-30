@@ -49,7 +49,8 @@ public class HubServerConfigBuilderTestIT {
         setBuilderProxyDefaults(builder);
         final HubServerConfig config = builder.build();
 
-        assertEquals(new URL("https://google.com"), config.getHubUrl());
+        final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
+        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
         assertEquals("User", config.getGlobalCredentials().getUsername());
         assertEquals("Pass", config.getGlobalCredentials().getDecryptedPassword());
         assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"),
@@ -60,20 +61,22 @@ public class HubServerConfigBuilderTestIT {
 
     @Test
     public void testValidConfigWithProxiesNoProxy() throws Exception {
+        final String ignoreProxyHost = ".*eng-hub-docker-valid02.*";
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         setBuilderDefaults(builder);
         setBuilderProxyDefaults(builder);
-        builder.setIgnoredProxyHosts(".*google.*");
+        builder.setIgnoredProxyHosts(ignoreProxyHost);
         final HubServerConfig config = builder.build();
 
-        assertEquals(new URL("https://google.com"), config.getHubUrl());
+        final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
+        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
         assertEquals("User", config.getGlobalCredentials().getUsername());
         assertEquals("Pass", config.getGlobalCredentials().getDecryptedPassword());
         assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"),
                 config.getProxyInfo().getHost());
         assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")),
                 config.getProxyInfo().getPort());
-        assertEquals(".*google.*", config.getProxyInfo().getIgnoredProxyHosts());
+        assertEquals(ignoreProxyHost, config.getProxyInfo().getIgnoredProxyHosts());
         assertFalse(config.getProxyInfo().shouldUseProxyForUrl(config.getHubUrl()));
     }
 
@@ -99,7 +102,8 @@ public class HubServerConfigBuilderTestIT {
     }
 
     private void setBuilderDefaults(final HubServerConfigBuilder builder) throws Exception {
-        builder.setHubUrl("https://google.com");
+        final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
+        builder.setHubUrl(hubServer);
         builder.setTimeout("100");
         builder.setUsername("User");
         builder.setPassword("Pass");
