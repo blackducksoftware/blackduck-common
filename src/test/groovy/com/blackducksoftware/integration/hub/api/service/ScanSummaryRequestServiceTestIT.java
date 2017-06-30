@@ -35,7 +35,7 @@ import com.blackducksoftware.integration.test.TestLogger;
 
 public class ScanSummaryRequestServiceTestIT {
 
-    private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper("TEST_HUB_SERVER_URL");
+    private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
     private static final IntLogger logger = new TestLogger();
 
