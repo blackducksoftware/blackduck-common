@@ -47,15 +47,13 @@ import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.test.TestLogger;
 
 public class ProjectRequestServiceTestIT {
-    private static final String PROJECT_VERSION_NICKNAME = "Test Project Version Nickname";
-
     private static HubServicesFactory hubServices;
 
     private static ProjectRequestService projectRequestService;
 
     private static ProjectVersionRequestService projectVersionRequestService;
 
-    private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper("TEST_HUB_SERVER_URL");
+    private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
     private static final IntLogger logger = new TestLogger();
 
