@@ -52,6 +52,13 @@ public class AggregateBomRequestServiceTestIT {
     public void test() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final AggregateBomRequestService aggregateBomRequestService = hubServicesFactory.createAggregateBomRequestService(logger);
+        
+        
+        
+        
+        
+        
+        
     }
 
 }
