@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.rest;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -68,6 +69,7 @@ public class RestConnectionTestHelper {
         try {
             testProperties.load(is);
             loadOverrideProperties(testProperties.stringPropertyNames());
+            loadOverridePropertiesFromExternalFile();
         } catch (final IOException e) {
             System.err.println("reading test.properties failed!");
         }
@@ -79,6 +81,16 @@ public class RestConnectionTestHelper {
             if (prop != null && !prop.isEmpty()) {
                 testProperties.setProperty(key, prop);
             }
+        }
+    }
+
+    private void loadOverridePropertiesFromExternalFile() {
+        try {
+            final String externalFilePath = System.getenv("HUB_COMMON_TEST_PROPERTIES_PATH");
+            final FileInputStream fileInputStream = new FileInputStream(externalFilePath);
+            testProperties.load(fileInputStream);
+        } catch (final Exception e) {
+            System.out.println("Couldn't load properties from an external file: " + e.getMessage());
         }
     }
 

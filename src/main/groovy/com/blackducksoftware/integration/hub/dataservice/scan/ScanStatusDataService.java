@@ -50,6 +50,8 @@ public class ScanStatusDataService {
 
     private static final long DEFAULT_TIMEOUT = 300000l;
 
+    private final IntLogger logger;
+
     private final ProjectRequestService projectRequestService;
 
     private final ProjectVersionRequestService projectVersionRequestService;
@@ -67,6 +69,7 @@ public class ScanStatusDataService {
             final CodeLocationRequestService codeLocationRequestService,
             final ScanSummaryRequestService scanSummaryRequestService, final MetaService metaService,
             final long timeoutInMilliseconds) {
+        this.logger = logger;
         this.metaService = metaService;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
@@ -74,7 +77,7 @@ public class ScanStatusDataService {
         this.scanSummaryRequestService = scanSummaryRequestService;
 
         long timeout = timeoutInMilliseconds;
-        if (timeoutInMilliseconds <= 0l) {
+        if (timeoutInMilliseconds <= 0L) {
             timeout = DEFAULT_TIMEOUT;
             logger.alwaysLog(timeoutInMilliseconds + "ms is not a valid BOM wait time, using : " + timeout + "ms instead");
         }
@@ -196,9 +199,10 @@ public class ScanStatusDataService {
                 }
             }
         } catch (final Exception e) {
-            pendingScans = new ArrayList<>();
             // ignore, since we might not have found a project or version, etc
             // so just keep waiting until the timeout
+            pendingScans = new ArrayList<>();
+            logger.debug("Not able to get pending scans: " + e.getMessage());
         }
 
         return pendingScans;
