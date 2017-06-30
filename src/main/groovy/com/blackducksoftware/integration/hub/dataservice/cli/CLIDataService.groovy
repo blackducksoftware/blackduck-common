@@ -44,10 +44,10 @@ import com.blackducksoftware.integration.hub.model.view.CodeLocationView
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView
 import com.blackducksoftware.integration.hub.model.view.ProjectView
 import com.blackducksoftware.integration.hub.model.view.ScanSummaryView
-import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo
 import com.blackducksoftware.integration.hub.scan.HubScanConfig
 import com.blackducksoftware.integration.hub.util.HostnameHelper
 import com.blackducksoftware.integration.log.IntLogger
+import com.blackducksoftware.integration.phone.home.IntegrationInfo
 import com.blackducksoftware.integration.util.CIEnvironmentVariables
 import com.google.gson.Gson
 

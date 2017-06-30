@@ -60,7 +60,6 @@ import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomPolicyStatusView;
-import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
@@ -68,6 +67,7 @@ import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.phone.home.IntegrationInfo;
 
 public class ComprehensiveCookbookTestIT {
     private static final long FIVE_MINUTES = 5 * 60 * 1000;

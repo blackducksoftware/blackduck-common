@@ -69,6 +69,7 @@ import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.phone.home.PhoneHomeClient;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class HubServicesFactory {
@@ -103,7 +104,11 @@ public class HubServicesFactory {
     }
 
     public PhoneHomeDataService createPhoneHomeDataService(final IntLogger logger) {
-        return new PhoneHomeDataService(logger, restConnection, createHubRegistrationRequestService(), createHubVersionRequestService());
+        return new PhoneHomeDataService(logger, restConnection, createPhoneHomeClient(logger), createHubRegistrationRequestService());
+    }
+
+    public PhoneHomeClient createPhoneHomeClient(final IntLogger logger){
+        return new PhoneHomeClient(logger);
     }
 
     public RiskReportDataService createRiskReportDataService(final IntLogger logger,
