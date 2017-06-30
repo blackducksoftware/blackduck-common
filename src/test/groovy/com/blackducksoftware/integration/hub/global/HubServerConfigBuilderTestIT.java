@@ -26,6 +26,8 @@ package com.blackducksoftware.integration.hub.global;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.net.URL;
 
@@ -41,6 +43,20 @@ import com.blackducksoftware.integration.log.PrintStreamIntLogger;
 
 public class HubServerConfigBuilderTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
+
+    private static final String VALID_TIMEOUT_STRING = "120";
+
+    private static final String VALID_USERNAME_STRING = "username";
+
+    private static final String VALID_PASSWORD_STRING = "password";
+
+    private static final int VALID_TIMEOUT_INTEGER = 120;
+
+    private static final int VALID_PROXY_PORT = 2303;
+
+    private static final String VALID_PROXY_HOST = "just need a non-empty string";
+
+    private static final String VALID_IGNORE_HOST_LIST = ".*eng-hub-docker-valid02.*";
 
     @Test
     public void testValidConfigWithProxies() throws Exception {
@@ -61,11 +77,10 @@ public class HubServerConfigBuilderTestIT {
 
     @Test
     public void testValidConfigWithProxiesNoProxy() throws Exception {
-        final String ignoreProxyHost = ".*eng-hub-docker-valid02.*";
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         setBuilderDefaults(builder);
         setBuilderProxyDefaults(builder);
-        builder.setIgnoredProxyHosts(ignoreProxyHost);
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
         final HubServerConfig config = builder.build();
 
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
@@ -76,7 +91,7 @@ public class HubServerConfigBuilderTestIT {
                 config.getProxyInfo().getHost());
         assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")),
                 config.getProxyInfo().getPort());
-        assertEquals(ignoreProxyHost, config.getProxyInfo().getIgnoredProxyHosts());
+        assertEquals(VALID_IGNORE_HOST_LIST, config.getProxyInfo().getIgnoredProxyHosts());
         assertFalse(config.getProxyInfo().shouldUseProxyForUrl(config.getHubUrl()));
     }
 
@@ -99,6 +114,115 @@ public class HubServerConfigBuilderTestIT {
         builder.setAutoImportHttpsCertificates(true);
         final HubServerConfig config = builder.build();
         assertNotNull(config);
+    }
+
+    @Test
+    public void testValidBuild() throws Exception {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
+        builder.setHubUrl(hubServer);
+        builder.setTimeout(VALID_TIMEOUT_INTEGER);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
+        final HubServerConfig config = builder.build();
+        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
+        assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
+        assertEquals(VALID_USERNAME_STRING, config.getGlobalCredentials().getUsername());
+        assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
+    }
+
+    @Test
+    public void testValidBuildTimeoutString() throws Exception {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
+        builder.setHubUrl(hubServer);
+        builder.setTimeout(VALID_TIMEOUT_STRING);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
+        final HubServerConfig config = builder.build();
+        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
+        assertEquals(120, config.getTimeout());
+        assertEquals(VALID_USERNAME_STRING, config.getGlobalCredentials().getUsername());
+        assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
+    }
+
+    @Test
+    public void testValidBuildWithProxy() throws Exception {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
+        builder.setHubUrl(hubServer);
+        builder.setTimeout(VALID_TIMEOUT_STRING);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
+        builder.setProxyHost(VALID_PROXY_HOST);
+        builder.setProxyPort(VALID_PROXY_PORT);
+        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
+        final HubServerConfig config = builder.build();
+
+        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
+        assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
+        assertEquals(VALID_USERNAME_STRING, config.getGlobalCredentials().getUsername());
+        assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
+        assertEquals(VALID_PROXY_HOST, config.getProxyInfo().getHost());
+        assertEquals(VALID_PROXY_PORT, config.getProxyInfo().getPort());
+        assertEquals(VALID_IGNORE_HOST_LIST, config.getProxyInfo().getIgnoredProxyHosts());
+    }
+
+    @Test
+    public void testUrlwithTrailingSlash() throws Exception {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
+        builder.setHubUrl(hubServer);
+        builder.setTimeout(VALID_TIMEOUT_STRING);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
+        final HubServerConfig config = builder.build();
+        assertFalse(config.getHubUrl().toString().endsWith("/"));
+        assertEquals("https", config.getHubUrl().getProtocol());
+        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
+        assertEquals(-1, config.getHubUrl().getPort());
+    }
+
+    @Test
+    public void testUrlwithTrailingPath() throws Exception {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
+        builder.setHubUrl(hubServer + "api");
+        builder.setTimeout(VALID_TIMEOUT_STRING);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
+        final HubServerConfig config = builder.build();
+        assertFalse(config.getHubUrl().toString().endsWith("/"));
+        assertEquals("https", config.getHubUrl().getProtocol());
+        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
+        assertEquals("/api", config.getHubUrl().getPath());
+    }
+
+    @Test
+    public void testValidBuildWithProxyPortZero() throws Exception {
+        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
+        builder.setHubUrl(hubServer);
+        builder.setPassword(VALID_PASSWORD_STRING);
+        builder.setUsername(VALID_USERNAME_STRING);
+        HubServerConfig config = builder.build();
+        assertFalse(config.shouldUseProxyForHub());
+
+        builder.setProxyPort(0);
+        config = builder.build();
+        assertFalse(config.shouldUseProxyForHub());
+
+        builder.setProxyPort("0");
+        config = builder.build();
+        assertFalse(config.shouldUseProxyForHub());
+
+        builder.setProxyPort(1);
+        try {
+            config = builder.build();
+            fail("Should have thrown an IllegalStateException with invalid proxy state");
+        } catch (final IllegalStateException e) {
+            assertTrue(e.getMessage().contains("proxy"));
+        }
     }
 
     private void setBuilderDefaults(final HubServerConfigBuilder builder) throws Exception {
