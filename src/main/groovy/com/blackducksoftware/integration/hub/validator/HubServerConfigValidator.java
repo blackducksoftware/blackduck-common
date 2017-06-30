@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
+import com.blackducksoftware.integration.hub.cli.CLILocation;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubProxyInfoFieldEnum;
@@ -106,21 +107,22 @@ public class HubServerConfigValidator extends AbstractValidator {
 
         final ValidationResults results = validator.assertValid();
         if (results.isSuccess()) {
-            final int port = NumberUtils.toInt(proxyPort);
-            if (validator.hasAuthenticatedProxySettings()) {
+            if (validator.hasProxySettings()) {
+                final int port = NumberUtils.toInt(proxyPort);
+                if (validator.hasAuthenticatedProxySettings()) {
+                    final HubCredentialsBuilder credBuilder = new HubCredentialsBuilder();
+                    credBuilder.setUsername(proxyUsername);
+                    credBuilder.setPassword(proxyPassword);
+                    credBuilder.setPasswordLength(proxyPasswordLength);
+                    final HubCredentials credResult = credBuilder.build();
 
-                final HubCredentialsBuilder credBuilder = new HubCredentialsBuilder();
-                credBuilder.setUsername(proxyUsername);
-                credBuilder.setPassword(proxyPassword);
-                credBuilder.setPasswordLength(proxyPasswordLength);
-                final HubCredentials credResult = credBuilder.build();
+                    proxyInfo = new HubProxyInfo(proxyHost, port, credResult, ignoredProxyHosts);
 
-                proxyInfo = new HubProxyInfo(proxyHost, port, credResult, ignoredProxyHosts);
-
-            } else {
-                // password is blank or already encrypted so we just pass in the
-                // values given to us
-                proxyInfo = new HubProxyInfo(proxyHost, port, null, ignoredProxyHosts);
+                } else {
+                    // password is blank or already encrypted so we just pass in the
+                    // values given to us
+                    proxyInfo = new HubProxyInfo(proxyHost, port, null, ignoredProxyHosts);
+                }
             }
         }
         return results;
@@ -139,11 +141,7 @@ public class HubServerConfigValidator extends AbstractValidator {
                     new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_FOUND));
             return;
         }
-        if (proxyHost != null && proxyPort != null && proxyInfo == null) {
-            // asserting proxy is valid if the User set the proxy information
-            final ValidationResults proxyResults = assertProxyValid();
-            result.addAllResults(proxyResults.getResultMap());
-        }
+
         URL hubURL = null;
         try {
             hubURL = new URL(hubUrl);
@@ -157,7 +155,6 @@ public class HubServerConfigValidator extends AbstractValidator {
                     new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
             return;
         }
-        final HttpUrl url = HttpUrl.parse(hubUrl);
         final OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.connectTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
         builder.writeTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
@@ -181,8 +178,14 @@ public class HubServerConfigValidator extends AbstractValidator {
         try {
             final OkHttpClient client = builder.build();
 
+            final HttpUrl.Builder urlBuilder = HttpUrl.parse(hubUrl).newBuilder();
+            urlBuilder.addPathSegment("download");
+            urlBuilder.addPathSegment(CLILocation.DEFAULT_CLI_DOWNLOAD);
+            final HttpUrl downLoadUrl = urlBuilder.build();
+
             final Request request = new Request.Builder()
-                    .url(url).get().build();
+                    .url(downLoadUrl).get().build();
+
             Response response = null;
             try {
                 response = client.newCall(request).execute();
