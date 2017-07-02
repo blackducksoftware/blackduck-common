@@ -43,7 +43,7 @@ import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.test.TestLogger;
 
 public class AggregateBomRequestServiceTestIT {
-    private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper("TEST_HUB_SERVER_URL");
+    private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
     private final IntLogger logger = new TestLogger();
 
