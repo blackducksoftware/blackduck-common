@@ -27,6 +27,7 @@ class ScanStatusDataServiceTestIT {
         String version = '4.2.0-SNAPSHOT'
         String alteredContents = contents.replace('"name": "rest-backend",', "\"name\": \"${uniqueName}\",")
         File uniquelyNamedBdio = File.createTempFile('uniquebdio', '.jsonld')
+        uniquelyNamedBdio << alteredContents
 
         bomImportRequestService.importBomFile(uniquelyNamedBdio, 'application/ld+json');
         // wait for the scan to start/finish
