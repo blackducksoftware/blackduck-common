@@ -28,6 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -35,7 +36,7 @@ import com.blackducksoftware.integration.test.TestLogger;
 
 public class BomImportRequestServiceTestIT {
 
-    private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
+    private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper("TEST_HUB_SERVER_URL");
 
     private static final IntLogger logger = new TestLogger();
 
@@ -50,6 +51,7 @@ public class BomImportRequestServiceTestIT {
     @Test
     public void test() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final BomImportRequestService bomImportRequestService = hubServicesFactory.createBomImportRequestService();
     }
 
 }

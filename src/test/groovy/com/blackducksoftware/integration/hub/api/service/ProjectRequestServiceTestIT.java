@@ -23,12 +23,16 @@
  */
 package com.blackducksoftware.integration.hub.api.service;
 
+import static org.junit.Assert.*;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
+import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
+import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -40,21 +44,78 @@ public class ProjectRequestServiceTestIT {
 
     private static final IntLogger logger = new TestLogger();
 
+    private static HubServicesFactory hubServicesFactory;
+
+    private static ProjectRequestService projectRequestService;
+
+    final static String[] projectTestNames = {"ServiceTest1", "ServiceTest2", "ServiceTest3", "ServiceTest4"};
+
+    private static ProjectView[] activeProjects = new ProjectView[projectTestNames.length];
+
+    private static String currName;
+
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+      hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+      projectRequestService = hubServicesFactory.createProjectRequestService(logger);
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
+      for (ProjectView project : activeProjects){
+        if (project != null){
+          projectRequestService.deleteHubProject(project);
+        }
+      }
     }
 
     @Test
-    public void test() throws IllegalArgumentException, IntegrationException {
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService(logger);
+    public void testCreateAndDelete() throws IllegalArgumentException, IntegrationException {
+    	
+    	//Test creation and getProjectByName
+        try {
+          for (int i = 0; i < projectTestNames.length; i++){
+            currName = projectTestNames[i];
+            projectRequestService.createHubProject(new ProjectRequest(currName));
+            activeProjects[i] = projectRequestService.getProjectByName(currName);
+          }
+        }
+        catch (com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException e){
+          fail(currName + " already exists");
+        }
+        catch (com.blackducksoftware.integration.hub.exception.DoesNotExistException e){
+          fail(currName + " should have been created but was not.");
+        }
         
-        System.out.println(projectRequestService.getGson());
-
+        //Test methods for getting project Matches
+        try{
+        	int numProjectsFound = projectRequestService.getAllProjectMatches("ServiceTest").size();
+        	if (numProjectsFound != projectTestNames.length){
+        		fail("getAllProjectMatches did not find the correct number of projects");
+        	}
+        	
+        	int limit = 2;
+        	int numProjectsFoundLimit = projectRequestService.getProjectMatches("ServiceTest", limit).size();
+        	if (numProjectsFoundLimit != limit){
+        		fail("getProjectMatches did not find the correct number of projects");
+        	}     
+        }
+        catch (Exception e){
+        	fail("Error when retrieving project matches");
+        }
+        
+        //Test Deletion
+        try {
+          for (int i = 0; i < projectTestNames.length; i++){
+            currName = projectTestNames[i];
+            projectRequestService.deleteHubProject(activeProjects[i]);
+            activeProjects[i] = null;
+          }
+        }
+        catch (com.blackducksoftware.integration.hub.exception.DoesNotExistException e){
+          fail("Error while deleting " + currName);
+        }
     }
 
 }
