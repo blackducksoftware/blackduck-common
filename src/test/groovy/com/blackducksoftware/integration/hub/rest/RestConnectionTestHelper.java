@@ -26,7 +26,6 @@ package com.blackducksoftware.integration.hub.rest;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
@@ -51,7 +50,7 @@ public class RestConnectionTestHelper {
 
     public RestConnectionTestHelper() {
         initProperties();
-        hubServerUrl = testProperties.getProperty(TestingPropertyKey.TEST_HUB_SERVER_URL.toString());
+        this.hubServerUrl = getProperty(TestingPropertyKey.TEST_HUB_SERVER_URL);
     }
 
     public RestConnectionTestHelper(final String hubServerUrlPropertyName) {
@@ -63,12 +62,18 @@ public class RestConnectionTestHelper {
         Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         testProperties = new Properties();
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        final InputStream is = classLoader.getResourceAsStream("test.properties");
-        try {
+        try (final InputStream is = classLoader.getResourceAsStream("test.properties")) {
             testProperties.load(is);
-            loadOverrideProperties(TestingPropertyKey.values());
-        } catch (final IOException e) {
+        } catch (final Exception e) {
             System.err.println("reading test.properties failed!");
+        }
+
+        if (testProperties.isEmpty()) {
+            try {
+                loadOverrideProperties(TestingPropertyKey.values());
+            } catch (final Exception e) {
+                System.err.println("reading properties from the environment failed");
+            }
         }
     }
 

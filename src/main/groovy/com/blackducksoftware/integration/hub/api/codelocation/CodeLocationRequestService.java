@@ -30,8 +30,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.enumeration.CodeLocationEnum;
 import com.blackducksoftware.integration.hub.model.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
@@ -122,6 +125,21 @@ public class CodeLocationRequestService extends HubResponseService {
     public void deleteCodeLocation(final String codeLocationItemUrl) throws IntegrationException {
         final HubRequest request = getHubRequestFactory().createRequest(codeLocationItemUrl);
         request.executeDelete();
+    }
+
+    public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
+        if (StringUtils.isNotBlank(codeLocationName)) {
+            final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(CODE_LOCATION_SEGMENTS);
+            hubPagedRequest.q = "name:" + codeLocationName;
+            final List<CodeLocationView> codeLocations = getAllItems(hubPagedRequest, CodeLocationView.class);
+            for (final CodeLocationView codeLocation : codeLocations) {
+                if (codeLocationName.equals(codeLocation.name)) {
+                    return codeLocation;
+                }
+            }
+        }
+
+        throw new DoesNotExistException("This Code Location does not exist. Code Location: " + codeLocationName);
     }
 
     public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {

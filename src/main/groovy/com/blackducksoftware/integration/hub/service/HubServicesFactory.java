@@ -62,6 +62,7 @@ import com.blackducksoftware.integration.hub.dataservice.notification.Notificati
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
 import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStatusDataService;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
@@ -272,6 +273,10 @@ public class HubServicesFactory {
 
     public BomComponentIssueRequestService createBomComponentIssueRequestService(final IntLogger logger) {
         return new BomComponentIssueRequestService(restConnection, createMetaService(logger));
+    }
+
+    public ProjectDataService createProjectDataService(final IntLogger logger) {
+        return new ProjectDataService(createProjectRequestService(logger), createProjectVersionRequestService(logger));
     }
 
     @Override
