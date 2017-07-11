@@ -23,13 +23,21 @@
  */
 package com.blackducksoftware.integration.hub.api.service;
 
+import static org.junit.Assert.*;
+
+import java.io.File;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.scan.DryRunUploadRequestService;
+import com.blackducksoftware.integration.hub.model.response.DryRunUploadResponse;
+import com.blackducksoftware.integration.hub.model.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
+import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.test.TestLogger;
@@ -40,8 +48,12 @@ public class DryRunUploadRequestServiceTestIT {
 
     private static final IntLogger logger = new TestLogger();
 
+    private static File dryRunFile;
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+      final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+      dryRunFile = new File(classLoader.getResource("dryRun.json").getFile());
     }
 
     @AfterClass
@@ -52,7 +64,22 @@ public class DryRunUploadRequestServiceTestIT {
     public void test() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final DryRunUploadRequestService dryRunUploadRequestService = hubServicesFactory.createDryRunUploadRequestService();
+
+        DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile);
+        assertNotNull(response);
         
+        CodeLocationRequestService codeLocationRequestService = hubServicesFactory.createCodeLocationRequestService(logger);
+        CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId);
+        assertNotNull(codeLocationView);
+        
+        codeLocationRequestService.deleteCodeLocation(codeLocationView);
+        try{
+            codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId);
+            fail("This should have thrown an exception");
+        } catch (IntegrationRestException e){
+            assertEquals(404, e.getHttpStatusCode());
+        }
+
     }
 
 }

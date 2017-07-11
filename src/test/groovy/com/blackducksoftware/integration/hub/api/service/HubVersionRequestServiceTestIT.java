@@ -23,6 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.api.service;
 
+import static org.junit.Assert.*;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,8 +53,16 @@ public class HubVersionRequestServiceTestIT {
     @Test
     public void test() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final HubVersionRequestService HubVersionRequest = hubServicesFactory.createHubVersionRequestService();
-        
+        final HubVersionRequestService hubVersionRequestService = hubServicesFactory.createHubVersionRequestService();
+        final String hubVersion = hubVersionRequestService.getHubVersion();
+        assertNotNull(hubVersion);
+        System.out.println(hubVersion);
+
+        final boolean isOlder = hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("1.0.0");
+        assertTrue(isOlder);
+        final boolean isNewer = hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("10.0.0");
+        assertFalse(isNewer);
+
     }
 
 }

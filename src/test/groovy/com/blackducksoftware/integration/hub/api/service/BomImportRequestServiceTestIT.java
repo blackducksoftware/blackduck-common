@@ -23,6 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.api.service;
 
+import java.io.File;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,6 +41,9 @@ public class BomImportRequestServiceTestIT {
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper("TEST_HUB_SERVER_URL");
 
     private static final IntLogger logger = new TestLogger();
+    
+    private static File BomFile;
+    
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -52,6 +57,12 @@ public class BomImportRequestServiceTestIT {
     public void test() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final BomImportRequestService bomImportRequestService = hubServicesFactory.createBomImportRequestService();
+        
+        // No idea how to import file
+        final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        BomFile = new File(classLoader.getResource("Bom.json").getFile());
+        
+        bomImportRequestService.importBomFile(BomFile, "CSV");
     }
 
 }

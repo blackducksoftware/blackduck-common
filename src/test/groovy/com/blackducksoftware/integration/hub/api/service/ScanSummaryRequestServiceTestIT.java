@@ -1,5 +1,5 @@
 /**
- * Hub Common
+ * Hub Commons
  *
  * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -28,6 +28,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
+import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
+import com.blackducksoftware.integration.hub.model.view.CodeLocationView;
+import com.blackducksoftware.integration.hub.model.view.ProjectView;
+import com.blackducksoftware.integration.hub.model.view.ScanSummaryView;
+import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -50,6 +59,20 @@ public class ScanSummaryRequestServiceTestIT {
     @Test
     public void test() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final ScanSummaryRequestService scanSummaryRequestService = hubServicesFactory.createScanSummaryRequestService();
+        final CodeLocationRequestService codeLocationRequestService = hubServicesFactory.createCodeLocationRequestService(logger);
+        CodeLocationView codeLocationView = codeLocationRequestService.getAllCodeLocations().get(0);
+        System.out.println(codeLocationView.mappedProjectVersion);
+        
+        //where to get scan summary ID and scan summary URL?
+        ScanSummaryView scanSummaryView = scanSummaryRequestService.getScanSummaryViewById("f9cdafed-fc46-43c8-b103-ca431ff97bd5");
+        final MetaService metaService = hubServicesFactory.createMetaService(logger);
+        
+        String scanSummaryURL = metaService.getFirstLink(scanSummaryView, MetaService.VERSIONS_LINK);
+        scanSummaryRequestService.getAllScanSummaryItems(scanSummaryURL);
+        
+        
+        
     }
 
 }

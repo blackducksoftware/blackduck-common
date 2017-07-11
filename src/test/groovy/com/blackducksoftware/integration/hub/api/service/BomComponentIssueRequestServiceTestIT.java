@@ -28,7 +28,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
 import com.blackducksoftware.integration.hub.api.bom.BomComponentIssueRequestService;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
+import com.blackducksoftware.integration.hub.model.view.IssueView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -51,7 +55,13 @@ public class BomComponentIssueRequestServiceTestIT {
     @Test
     public void test() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final BomComponentIssueRequestService bomCompnentIssueRequestService = hubServicesFactory.createBomComponentIssueRequestService(logger);
+        final BomComponentIssueRequestService bomComponentIssueRequestService = hubServicesFactory.createBomComponentIssueRequestService(logger);
+        final MetaService metaService = hubServicesFactory.createMetaService(logger);
+        
+        
+        String bomURL = bomComponentIssueRequestService.createIssue(issueItem, metaService.getFirstLink(item, MetaService.));
+        bomComponentIssueRequestService.deleteIssue(bomURL);
+        
         
     }
 

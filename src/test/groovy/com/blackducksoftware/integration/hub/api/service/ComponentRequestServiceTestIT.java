@@ -23,12 +23,17 @@
  */
 package com.blackducksoftware.integration.hub.api.service;
 
+import static org.junit.Assert.*;
+
+import java.util.List;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
+import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -50,8 +55,15 @@ public class ComponentRequestServiceTestIT {
 
     @Test
     public void test() throws IllegalArgumentException, IntegrationException {
+        
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final ComponentRequestService componentRequestService = hubServicesFactory.createComponentRequestService();
+        final ComponentSearchResultResponse componentItem = componentRequestService.getExactComponentMatch("maven", "com.blackducksoftware.integration",
+                "hub-common",
+                "2.1.0");
+        assertNotNull(componentItem);
+
+
         
     }
 

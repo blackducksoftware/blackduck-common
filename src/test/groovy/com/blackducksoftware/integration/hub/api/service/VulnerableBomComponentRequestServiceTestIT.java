@@ -23,11 +23,20 @@
  */
 package com.blackducksoftware.integration.hub.api.service;
 
+import static org.junit.Assert.*;
+
+import java.util.List;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
+import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.VulnerableBomComponentRequestService;
+import com.blackducksoftware.integration.hub.model.view.VulnerabilityView;
+import com.blackducksoftware.integration.hub.model.view.VulnerableComponentView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -50,6 +59,19 @@ public class VulnerableBomComponentRequestServiceTestIT {
     @Test
     public void test() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final VulnerableBomComponentRequestService vulnerableBomComponentRequestService = hubServicesFactory.createVulnerableBomComponentRequestService();
+        final MetaService metaService = hubServicesFactory.createMetaService(logger);
+        
+        
+        
+        // where to get vulnerabilitiesURL ?
+        List<VulnerableComponentView> vulnerableComponents = vulnerableBomComponentRequestService.getVulnerableComponentsMatchingComponentName(vulnerableBomComponentsUrl);
+        assertNotNull(vulnerableComponents);
+        assertFalse(vulnerableComponents.isEmpty());
+        
+        List<VulnerableComponentView> vulnerableComponentViews = vulnerableBomComponentRequestService.getVulnerableComponentsMatchingComponentName(vulnerableBomComponentsUrl, componentName);
+        assertNotNull(vulnerableComponentViews);
+        assertFalse(vulnerableComponentViews.isEmpty());
     }
 
 }

@@ -23,11 +23,17 @@
  */
 package com.blackducksoftware.integration.hub.api.service;
 
+import static org.junit.Assert.*;
+
+import java.util.List;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.user.UserRequestService;
+import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -50,6 +56,11 @@ public class UserRequestServiceTestIT {
     @Test
     public void test() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final UserRequestService userRequestService = hubServicesFactory.createUserRequestService();
+        
+        List<UserView> Users = userRequestService.getAllUsers();
+        assertNotNull(Users);
+        assertFalse(Users.isEmpty());
     }
 
 }
