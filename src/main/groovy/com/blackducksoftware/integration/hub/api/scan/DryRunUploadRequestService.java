@@ -63,7 +63,9 @@ public class DryRunUploadRequestService extends HubResponseService {
             } catch (final IOException e) {
                 throw new IntegrationException(e);
             }
-            return getGson().fromJson(responseString, DryRunUploadResponse.class);
+            final DryRunUploadResponse uploadResponse = getGson().fromJson(responseString, DryRunUploadResponse.class);
+            uploadResponse.json = responseString;
+            return uploadResponse;
         }
     }
 }

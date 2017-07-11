@@ -99,8 +99,8 @@ public class HubServicesFactory {
     public CLIDataService createCLIDataService(final IntLogger logger, final long timeoutInMilliseconds) {
         return new CLIDataService(logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
                 createPhoneHomeDataService(logger), createProjectRequestService(logger), createProjectVersionRequestService(logger),
-                createDryRunUploadRequestService(), createCodeLocationRequestService(logger), createScanSummaryRequestService(),
-                createScanStatusDataService(logger, timeoutInMilliseconds));
+                createCodeLocationRequestService(logger), createScanSummaryRequestService(),
+                createScanStatusDataService(logger, timeoutInMilliseconds), createMetaService(logger));
     }
 
     public PhoneHomeDataService createPhoneHomeDataService(final IntLogger logger) {
