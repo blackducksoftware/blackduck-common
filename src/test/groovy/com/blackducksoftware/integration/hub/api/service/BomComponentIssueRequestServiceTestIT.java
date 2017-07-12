@@ -64,6 +64,7 @@ public class BomComponentIssueRequestServiceTestIT {
         ProjectVersionWrapper projectVersionWrapper = projectDataService.getProjectVersion(restConnectionTestHelper.getProperty("TEST_PROJECT"), restConnectionTestHelper.getProperty("TEST_VERSION_VULNERABLE"));
 
         
+        bomComponentIssueRequestService.createIssue(projectVersionWrapper.getProjectView(), url);
         
     }
 

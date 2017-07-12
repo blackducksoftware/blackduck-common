@@ -81,6 +81,7 @@ public class ProjectVersionRequestServiceTestIT {
     public static void tearDownAfterClass() throws Exception {
     	if (project != null){
     		projectRequestService.deleteHubProject(project);
+    		project = null;
     	}
     }
 
