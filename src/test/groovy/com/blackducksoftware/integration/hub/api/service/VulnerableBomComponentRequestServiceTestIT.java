@@ -35,6 +35,8 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
 import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.VulnerableBomComponentRequestService;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.model.view.VulnerabilityView;
 import com.blackducksoftware.integration.hub.model.view.VulnerableComponentView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
@@ -62,14 +64,21 @@ public class VulnerableBomComponentRequestServiceTestIT {
         final VulnerableBomComponentRequestService vulnerableBomComponentRequestService = hubServicesFactory.createVulnerableBomComponentRequestService();
         final MetaService metaService = hubServicesFactory.createMetaService(logger);
         
+        final ProjectDataService projectDataService = hubServicesFactory.createProjectDataService(logger);
+        ProjectVersionWrapper projectVersionWrapper = projectDataService.getProjectVersion(restConnectionTestHelper.getProperty("TEST_PROJECT"), restConnectionTestHelper.getProperty("TEST_VERSION_VULNERABLE"));
         
-        
-        // where to get vulnerabilitiesURL ?
-        List<VulnerableComponentView> vulnerableComponents = vulnerableBomComponentRequestService.getVulnerableComponentsMatchingComponentName(vulnerableBomComponentsUrl);
+        String vulnerableComponentsURL = metaService.getFirstLinkSafely(projectVersionWrapper.getProjectVersionView(), MetaService.VULNERABLE_COMPONENTS_LINK);
+
+        List<VulnerableComponentView> vulnerableComponents = vulnerableBomComponentRequestService.getVulnerableComponentsMatchingComponentName(vulnerableComponentsURL);
         assertNotNull(vulnerableComponents);
         assertFalse(vulnerableComponents.isEmpty());
         
-        List<VulnerableComponentView> vulnerableComponentViews = vulnerableBomComponentRequestService.getVulnerableComponentsMatchingComponentName(vulnerableBomComponentsUrl, componentName);
+        for(VulnerableComponentView vc: vulnerableComponents){
+        	System.out.println(vc);
+        	assertNotNull(vc);
+        }
+        
+        List<VulnerableComponentView> vulnerableComponentViews = vulnerableBomComponentRequestService.getVulnerableComponentsMatchingComponentName(vulnerableComponentsURL, "Apache Commons FileUpload");
         assertNotNull(vulnerableComponentViews);
         assertFalse(vulnerableComponentViews.isEmpty());
     }

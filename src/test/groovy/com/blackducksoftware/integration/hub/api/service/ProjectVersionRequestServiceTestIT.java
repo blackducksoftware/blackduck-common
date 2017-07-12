@@ -58,18 +58,12 @@ public class ProjectVersionRequestServiceTestIT {
 
     private static ProjectVersionRequestService projectVersionRequestService;
 
-    private static String TestName1 = "ProjectVersionServiceTest1";
+    private static String TestName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
 
-    private static String TestName2 = "ProjectVersionServiceTest2";
+    private static String testProjectVersion = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");;
 
-    private static String testProjectVersion1 = "1";
-
-    private static String testProjectVersion2 = "2";
-
-    private static ProjectView project1;
-
-    private static ProjectView project2;
-
+    private static ProjectView project;
+    
     private static String TestURL;
 
 
@@ -79,60 +73,52 @@ public class ProjectVersionRequestServiceTestIT {
       projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService(logger);
       projectRequestService = hubServicesFactory.createProjectRequestService(logger);
 
-      TestURL = projectRequestService.createHubProject(new ProjectRequest(TestName2));
-      project2 = projectRequestService.getProjectByName(TestName2);
-
-      projectRequestService.createHubProject(new ProjectRequest(TestName1));
-      project1 = projectRequestService.getProjectByName(TestName1);
-
+      TestURL = projectRequestService.createHubProject(new ProjectRequest(TestName));
+      project = projectRequestService.getProjectByName(TestName);
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-    	if (project1 != null){
-    		projectRequestService.deleteHubProject(project1);
-    	}
-    	if (project2 != null){
-    		projectRequestService.deleteHubProject(project2);
+    	if (project != null){
+    		projectRequestService.deleteHubProject(project);
     	}
     }
 
     @Test
     public void test() throws IllegalArgumentException, IntegrationException {
-
-
+    	
       	try{
-      		projectVersionRequestService.createHubVersion(project1,
-          		new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion1));
+      		projectVersionRequestService.createHubVersion(project,
+          		new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion));
       	} catch (Exception e){
       		fail("error when creating hub version");
       	}
 
-      	final ProjectVersionView projectVersion = projectVersionRequestService.getProjectVersion(project1, testProjectVersion1);
-      	assertEquals(testProjectVersion1, projectVersion.versionName);
+      	final ProjectVersionView projectVersion = projectVersionRequestService.getProjectVersion(project, testProjectVersion);
+      	assertEquals(testProjectVersion, projectVersion.versionName);
 
-      	final List<ProjectVersionView> projectVersionAll = projectVersionRequestService.getAllProjectVersions(project1);
+      	final List<ProjectVersionView> projectVersionAll = projectVersionRequestService.getAllProjectVersions(project);
       	assertNotNull(projectVersionAll);
       	System.out.println(projectVersionAll.size());
-      	System.out.println(projectVersionRequestService.getAllProjectVersions(project1));
+      	System.out.println(projectVersionRequestService.getAllProjectVersions(project));
 
-        projectRequestService.deleteHubProject(projectRequestService.getProjectByName(TestName1));
-        project1 = null;
+        projectRequestService.deleteHubProject(projectRequestService.getProjectByName(TestName));
+        project = null;
     }
 
     @Test
     public void testWithURL() throws IllegalArgumentException, IntegrationException {
 
-      ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion2);
+    	ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion);
   		assertNotNull(projectVersionRequest);
 
   		final MetaService metaService = hubServicesFactory.createMetaService(logger);
-  		final String versionURL = metaService.getFirstLink(project2, MetaService.VERSIONS_LINK);
+  		final String versionURL = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
 
   		try{
   			projectVersionRequestService.createHubVersion(versionURL, projectVersionRequest);
   		}
-  		catch (Exception e){
+  		catch (IntegrationException e){
   			fail("Error creating Hub Version with versionURL");
   		}
 
@@ -140,8 +126,8 @@ public class ProjectVersionRequestServiceTestIT {
     	assertNotNull(projectVersionAll);
     	System.out.println("Num Project Versions:" + projectVersionAll.size());
 
-    	projectRequestService.deleteHubProject(projectRequestService.getProjectByName(TestName2));
-    	project2 = null;
+    	projectRequestService.deleteHubProject(projectRequestService.getProjectByName(TestName));
+    	project = null;
     }
 
 }

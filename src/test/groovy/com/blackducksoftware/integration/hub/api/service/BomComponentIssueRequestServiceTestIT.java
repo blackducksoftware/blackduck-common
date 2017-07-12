@@ -31,6 +31,8 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
 import com.blackducksoftware.integration.hub.api.bom.BomComponentIssueRequestService;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
 import com.blackducksoftware.integration.hub.model.view.IssueView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
@@ -58,9 +60,9 @@ public class BomComponentIssueRequestServiceTestIT {
         final BomComponentIssueRequestService bomComponentIssueRequestService = hubServicesFactory.createBomComponentIssueRequestService(logger);
         final MetaService metaService = hubServicesFactory.createMetaService(logger);
         
-        
-        String bomURL = bomComponentIssueRequestService.createIssue(issueItem, metaService.getFirstLink(item, MetaService.));
-        bomComponentIssueRequestService.deleteIssue(bomURL);
+        final ProjectDataService projectDataService = hubServicesFactory.createProjectDataService(logger);
+        ProjectVersionWrapper projectVersionWrapper = projectDataService.getProjectVersion(restConnectionTestHelper.getProperty("TEST_PROJECT"), restConnectionTestHelper.getProperty("TEST_VERSION_VULNERABLE"));
+
         
         
     }

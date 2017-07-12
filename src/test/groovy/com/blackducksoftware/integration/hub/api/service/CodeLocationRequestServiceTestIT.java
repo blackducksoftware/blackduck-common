@@ -111,6 +111,7 @@ public class CodeLocationRequestServiceTestIT {
     private ProjectVersionView getProjectVersion(ProjectRequestService projectRequestService, ProjectVersionRequestService projectVersionRequestService,  final String projectName, final String versionName) throws IntegrationException {
         ProjectView project = null;
         ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, versionName);
+        
         try {
             project = projectRequestService.getProjectByName(projectName);
         } catch (final DoesNotExistException e) {
@@ -120,6 +121,7 @@ public class CodeLocationRequestServiceTestIT {
             project = projectRequestService.getItem(projectURL, ProjectView.class);
         }
         ProjectVersionView version = null;
+        
         try {
             version = projectVersionRequestService.getProjectVersion(project, versionName);
         } catch (final DoesNotExistException e) {

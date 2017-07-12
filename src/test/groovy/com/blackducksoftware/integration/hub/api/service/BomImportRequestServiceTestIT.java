@@ -23,6 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.api.service;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 
 import org.junit.AfterClass;
@@ -31,6 +33,7 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
+import com.blackducksoftware.integration.hub.buildtool.BuildToolConstants;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -47,6 +50,8 @@ public class BomImportRequestServiceTestIT {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+    	final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        BomFile = new File(classLoader.getResource("MAVEN_simple_4_0_0_bdio.jsonld").getFile());
     }
 
     @AfterClass
@@ -58,11 +63,12 @@ public class BomImportRequestServiceTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final BomImportRequestService bomImportRequestService = hubServicesFactory.createBomImportRequestService();
         
-        // No idea how to import file
-        final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        BomFile = new File(classLoader.getResource("Bom.json").getFile());
-        
-        bomImportRequestService.importBomFile(BomFile, "CSV");
+        try{
+        	bomImportRequestService.importBomFile(BomFile, BuildToolConstants.BDIO_FILE_MEDIA_TYPE);
+        }
+        catch (IntegrationException e){     
+        	fail(e.toString());
+        }
     }
 
 }

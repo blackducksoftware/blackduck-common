@@ -58,9 +58,11 @@ public class ComponentRequestServiceTestIT {
         
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final ComponentRequestService componentRequestService = hubServicesFactory.createComponentRequestService();
-        final ComponentSearchResultResponse componentItem = componentRequestService.getExactComponentMatch("maven", "com.blackducksoftware.integration",
-                "hub-common",
-                "2.1.0");
+//        final ComponentSearchResultResponse componentItem = componentRequestService.getExactComponentMatch("maven", "com.blackducksoftware.integration",
+//                "hub-common",
+//                "2.1.0");
+        
+        final ComponentSearchResultResponse componentItem = componentRequestService.getExactComponentMatch("Apache Struts", "com.blackducksoftware.integration", "hub-common", "10");
         assertNotNull(componentItem);
 
 

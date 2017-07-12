@@ -1,5 +1,5 @@
 /**
- * Hub Commons
+ * Hub Common
  *
  * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -23,6 +23,13 @@
  */
 package com.blackducksoftware.integration.hub.api.service;
 
+import static org.junit.Assert.*;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,12 +38,21 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.scan.DryRunUploadRequestService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectVersionWrapper;
+import com.blackducksoftware.integration.hub.model.enumeration.CodeLocationEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
 import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
+import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest;
+import com.blackducksoftware.integration.hub.model.response.DryRunUploadResponse;
 import com.blackducksoftware.integration.hub.model.view.CodeLocationView;
+import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.ScanSummaryView;
-import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -61,18 +77,41 @@ public class ScanSummaryRequestServiceTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final ScanSummaryRequestService scanSummaryRequestService = hubServicesFactory.createScanSummaryRequestService();
         final CodeLocationRequestService codeLocationRequestService = hubServicesFactory.createCodeLocationRequestService(logger);
-        CodeLocationView codeLocationView = codeLocationRequestService.getAllCodeLocations().get(0);
-        System.out.println(codeLocationView.mappedProjectVersion);
-        
-        //where to get scan summary ID and scan summary URL?
-        ScanSummaryView scanSummaryView = scanSummaryRequestService.getScanSummaryViewById("f9cdafed-fc46-43c8-b103-ca431ff97bd5");
+        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService(logger);
+        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService(logger);
         final MetaService metaService = hubServicesFactory.createMetaService(logger);
-        
-        String scanSummaryURL = metaService.getFirstLink(scanSummaryView, MetaService.VERSIONS_LINK);
-        scanSummaryRequestService.getAllScanSummaryItems(scanSummaryURL);
-        
-        
-        
-    }
+      
+        try {
+            final ProjectView projectItem = projectRequestService.getProjectByName(restConnectionTestHelper.getProperty("TEST_PROJECT"));
+            final ProjectVersionView projectVersionItem = projectVersionRequestService.getProjectVersion(projectItem, restConnectionTestHelper.getProperty("TEST_VERSION"));
+            final String projectVersionUrl = metaService.getHref(projectVersionItem);
 
+            final List<CodeLocationView> allCodeLocations = codeLocationRequestService
+                    .getAllCodeLocationsForCodeLocationType(CodeLocationEnum.BOM_IMPORT);
+            assertNotNull(allCodeLocations);
+
+            final List<String> allScanSummariesLinks = new ArrayList<>();
+            for (final CodeLocationView codeLocationItem : allCodeLocations) {
+                logger.debug("Checking codeLocation: " + codeLocationItem.name);
+                final String mappedProjectVersionUrl = codeLocationItem.mappedProjectVersion;
+                if (projectVersionUrl.equals(mappedProjectVersionUrl)) {
+                    final String scanSummariesLink = metaService.getFirstLink(codeLocationItem, MetaService.SCANS_LINK);
+                    allScanSummariesLinks.add(scanSummariesLink);
+                }
+            }
+            assertNotNull(allScanSummariesLinks);
+
+            final List<ScanSummaryView> allScanSummaries = new ArrayList<>();
+            for (final String scanSummaryLink : allScanSummariesLinks) {
+                allScanSummaries.addAll(scanSummaryRequestService.getAllScanSummaryItems(scanSummaryLink));
+            }
+        
+            assertNotNull(allScanSummaries);
+        
+        }
+        catch (Exception e){
+        	fail();
+        }
+
+    }
 }
