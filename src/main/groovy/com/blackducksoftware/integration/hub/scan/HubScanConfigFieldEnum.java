@@ -30,6 +30,7 @@ public enum HubScanConfigFieldEnum implements FieldEnum {
     VERSION("hubVersion"),
     PHASE("hubPhase"),
     DISTRIBUTION("hubDistribution"),
+    PROJECT_LEVEL_ADJUSTMENTS("projectLevelAdjustments"),
     GENERATE_RISK_REPORT("shouldGenerateRiskReport"),
     DRY_RUN("dryRun"),
     CLEANUP_LOGS_ON_SUCCESS("cleanupLogsOnSuccess"),
@@ -48,6 +49,7 @@ public enum HubScanConfigFieldEnum implements FieldEnum {
         this.key = key;
     }
 
+    @Override
     public String getKey() {
         return key;
     }

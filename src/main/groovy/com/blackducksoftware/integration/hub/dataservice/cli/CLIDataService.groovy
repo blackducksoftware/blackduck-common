@@ -26,10 +26,10 @@ package com.blackducksoftware.integration.hub.dataservice.cli
 import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.HubSupportHelper
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService
+import com.blackducksoftware.integration.hub.api.item.MetaService
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadRequestService
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService
 import com.blackducksoftware.integration.hub.builder.HubScanConfigBuilder
 import com.blackducksoftware.integration.hub.cli.CLIDownloadService
@@ -39,7 +39,6 @@ import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataServ
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException
 import com.blackducksoftware.integration.hub.global.HubServerConfig
 import com.blackducksoftware.integration.hub.model.request.ProjectRequest
-import com.blackducksoftware.integration.hub.model.response.DryRunUploadResponse
 import com.blackducksoftware.integration.hub.model.view.CodeLocationView
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView
 import com.blackducksoftware.integration.hub.model.view.ProjectView
@@ -68,13 +67,13 @@ public class CLIDataService {
 
     private final ProjectVersionRequestService projectVersionRequestService
 
-    private final DryRunUploadRequestService dryRunUploadRequestService
-
     private final CodeLocationRequestService codeLocationRequestService
 
     private final ScanSummaryRequestService scanSummaryRequestService
 
     private final ScanStatusDataService scanStatusDataService
+
+    private final MetaService metaService
 
     private HubSupportHelper hubSupportHelper
 
@@ -84,8 +83,8 @@ public class CLIDataService {
     final HubVersionRequestService hubVersionRequestService,
     final CLIDownloadService cliDownloadService, final PhoneHomeDataService phoneHomeDataService,
     final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
-    final DryRunUploadRequestService dryRunUploadRequestService, final CodeLocationRequestService codeLocationRequestService,
-    final ScanSummaryRequestService scanSummaryRequestService, final ScanStatusDataService scanStatusDataService) {
+    final CodeLocationRequestService codeLocationRequestService, final ScanSummaryRequestService scanSummaryRequestService,
+    final ScanStatusDataService scanStatusDataService, final MetaService metaService) {
         this.gson = gson
         this.logger = logger
         this.ciEnvironmentVariables = ciEnvironmentVariables
@@ -94,18 +93,18 @@ public class CLIDataService {
         this.phoneHomeDataService = phoneHomeDataService
         this.projectRequestService = projectRequestService
         this.projectVersionRequestService = projectVersionRequestService
-        this.dryRunUploadRequestService = dryRunUploadRequestService
         this.codeLocationRequestService = codeLocationRequestService
         this.scanSummaryRequestService = scanSummaryRequestService
         this.scanStatusDataService = scanStatusDataService
+        this.metaService = metaService
     }
 
     public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig,
             final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished, final IntegrationInfo integrationInfo)
     throws IntegrationException {
         preScan(hubServerConfig, hubScanConfig, projectRequest, integrationInfo)
-        final File[] dryRunFiles = runControlledScan(hubServerConfig, hubScanConfig)
-        postScan(hubScanConfig, dryRunFiles, projectRequest, shouldWaitForScansFinished)
+        final File[] scanSummaryFiles = runControlledScan(hubServerConfig, hubScanConfig)
+        postScan(hubScanConfig, scanSummaryFiles, projectRequest, shouldWaitForScansFinished)
         return version
     }
 
@@ -134,32 +133,35 @@ public class CLIDataService {
         }
     }
 
-    private void postScan(final HubScanConfig hubScanConfig, final File[] dryRunFiles, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished)
+    private void postScan(final HubScanConfig hubScanConfig, final File[] scanSummaryFiles, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished)
     throws IntegrationException {
+        logger.trace("Scan is dry run ${hubScanConfig.isDryRun()}");
         if (!hubScanConfig.isDryRun()) {
             final List<CodeLocationView> codeLocationViews = new ArrayList<>()
-            final List<String> scanSummaryIds = new ArrayList<>();
-            dryRunFiles.each{ dryRunFile ->
-                final DryRunUploadResponse uploadResponse = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
-                if (uploadResponse != null && uploadResponse?.id != null ) {
-                    scanSummaryIds.add(uploadResponse.id.toString())
-                }
-                if (uploadResponse != null && uploadResponse?.scanGroup != null && uploadResponse?.scanGroup?.codeLocationKey != null) {
-                    final CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(uploadResponse.scanGroup.codeLocationKey.entityId)
-                    codeLocationViews.add(codeLocationView)
-                    codeLocationRequestService.mapCodeLocation(codeLocationView, version)
-                }
+            final List<ScanSummaryView> scanSummaries = new ArrayList<>();
+            logger.trace("Found ${scanSummaryFiles.length} scan summary files");
+            for(File scanSummaryFile : scanSummaryFiles) {
+                ScanSummaryView scanSummary = getScanSummaryFromFile(scanSummaryFile)
+                scanSummaries.add(scanSummary)
+                String codeLocationUrl = metaService.getFirstLinkSafely(scanSummary, MetaService.CODE_LOCATION_BOM_STATUS_LINK)
+
+                final CodeLocationView codeLocationView = codeLocationRequestService.getItem(codeLocationUrl, CodeLocationView.class)
+                codeLocationViews.add(codeLocationView)
+                codeLocationRequestService.mapCodeLocation(codeLocationView, version)
             }
             cleanupCodeLocations(codeLocationViews, hubScanConfig)
             if (shouldWaitForScansFinished) {
-                final List<ScanSummaryView> pendingScans = new ArrayList<>()
-                scanSummaryIds.each{
-                    pendingScans.add(scanSummaryRequestService.getScanSummaryViewById(it))
-                }
                 logger.debug("Waiting for the Bom to be updated.");
-                scanStatusDataService.assertBomImportScansFinished(pendingScans)
+                scanStatusDataService.assertBomImportScansFinished(scanSummaries)
             }
         }
+    }
+
+    private ScanSummaryView getScanSummaryFromFile(File scanSummaryFile) {
+        String scanSummaryJson = scanSummaryFile.text
+        ScanSummaryView scanSummaryView = gson.fromJson(scanSummaryJson, ScanSummaryView.class)
+        scanSummaryView.json = scanSummaryJson
+        return scanSummaryView
     }
 
     private File[] runControlledScan(final HubServerConfig hubServerConfig,
@@ -170,14 +172,14 @@ public class CLIDataService {
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
             cleanUpLogFiles(simpleScanService)
         }
-        return simpleScanService.getDryRunFiles()
+        return simpleScanService.getScanSummaryFiles()
     }
 
     private HubScanConfig getControlledScanConfig(final HubScanConfig originalHubScanConfig) {
         final HubScanConfigBuilder builder = new HubScanConfigBuilder()
         builder.setCodeLocationAlias(originalHubScanConfig.getCodeLocationAlias())
         builder.setVerbose(originalHubScanConfig.isVerbose())
-        builder.setDryRun(true)
+        builder.setDryRun(originalHubScanConfig.isDryRun())
         builder.setExcludePatterns(originalHubScanConfig.getExcludePatterns())
         builder.setScanMemory(originalHubScanConfig.getScanMemory())
         builder.setToolsDir(originalHubScanConfig.getToolsDir())

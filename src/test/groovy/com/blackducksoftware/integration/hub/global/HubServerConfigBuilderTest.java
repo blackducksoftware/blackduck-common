@@ -26,7 +26,6 @@ package com.blackducksoftware.integration.hub.global;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +34,9 @@ import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.validator.HubServerConfigValidator;
 import com.blackducksoftware.integration.validator.FieldEnum;
 import com.blackducksoftware.integration.validator.ValidationResult;
@@ -157,6 +156,7 @@ public class HubServerConfigBuilderTest {
         actualMessages = getMessages(result);
     }
 
+    @Ignore
     @Test
     public void testValidateHubURL() throws Exception {
         final HubServerConfigValidator validator = new HubServerConfigValidator();
@@ -226,110 +226,4 @@ public class HubServerConfigBuilderTest {
 
         actualMessages = getMessages(result);
     }
-
-    @Test
-    public void testValidBuild() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl(VALID_URL);
-        builder.setTimeout(VALID_TIMEOUT_INTEGER);
-        builder.setPassword(VALID_PASSWORD_STRING);
-        builder.setUsername(VALID_USERNAME_STRING);
-        final HubServerConfig config = builder.build();
-        assertEquals(VALID_URL, config.getHubUrl().toString());
-        assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
-        assertEquals(VALID_USERNAME_STRING, config.getGlobalCredentials().getUsername());
-        assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
-    }
-
-    @Test
-    public void testValidBuildTimeoutString() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl(VALID_URL);
-        builder.setTimeout(VALID_TIMEOUT_STRING);
-        builder.setPassword(VALID_PASSWORD_STRING);
-        builder.setUsername(VALID_USERNAME_STRING);
-        final HubServerConfig config = builder.build();
-
-        assertEquals(VALID_URL, config.getHubUrl().toString());
-        assertEquals(120, config.getTimeout());
-        assertEquals(VALID_USERNAME_STRING, config.getGlobalCredentials().getUsername());
-        assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
-    }
-
-    @Test
-    public void testValidBuildWithProxy() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl(VALID_URL);
-        builder.setTimeout(VALID_TIMEOUT_STRING);
-        builder.setPassword(VALID_PASSWORD_STRING);
-        builder.setUsername(VALID_USERNAME_STRING);
-        builder.setProxyHost(VALID_PROXY_HOST);
-        builder.setProxyPort(VALID_PROXY_PORT);
-        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
-        final HubServerConfig config = builder.build();
-
-        assertEquals(VALID_URL, config.getHubUrl().toString());
-        assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
-        assertEquals(VALID_USERNAME_STRING, config.getGlobalCredentials().getUsername());
-        assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
-        assertEquals(VALID_PROXY_HOST, config.getProxyInfo().getHost());
-        assertEquals(VALID_PROXY_PORT, config.getProxyInfo().getPort());
-        assertEquals(VALID_IGNORE_HOST_LIST, config.getProxyInfo().getIgnoredProxyHosts());
-    }
-
-    @Test
-    public void testUrlwithTrailingSlash() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl("https://www.google.com:443/");
-        builder.setTimeout(VALID_TIMEOUT_STRING);
-        builder.setPassword(VALID_PASSWORD_STRING);
-        builder.setUsername(VALID_USERNAME_STRING);
-        final HubServerConfig config = builder.build();
-        assertFalse(config.getHubUrl().toString().endsWith("/"));
-        assertEquals("https", config.getHubUrl().getProtocol());
-        assertEquals("www.google.com", config.getHubUrl().getHost());
-        assertEquals(443, config.getHubUrl().getPort());
-    }
-
-    @Test
-    public void testUrlwithTrailingPath() {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl("https://github.com:443/blackducksoftware");
-        builder.setTimeout(VALID_TIMEOUT_STRING);
-        builder.setPassword(VALID_PASSWORD_STRING);
-        builder.setUsername(VALID_USERNAME_STRING);
-        final HubServerConfig config = builder.build();
-        assertFalse(config.getHubUrl().toString().endsWith("/"));
-        assertEquals("https", config.getHubUrl().getProtocol());
-        assertEquals("github.com", config.getHubUrl().getHost());
-        assertEquals(443, config.getHubUrl().getPort());
-        assertEquals("/blackducksoftware", config.getHubUrl().getPath());
-    }
-
-    @Test
-    public void testValidBuildWithProxyPortZero() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl(VALID_URL);
-        builder.setPassword(VALID_PASSWORD_STRING);
-        builder.setUsername(VALID_USERNAME_STRING);
-        HubServerConfig config = builder.build();
-        assertFalse(config.shouldUseProxyForHub());
-
-        builder.setProxyPort(0);
-        config = builder.build();
-        assertFalse(config.shouldUseProxyForHub());
-
-        builder.setProxyPort("0");
-        config = builder.build();
-        assertFalse(config.shouldUseProxyForHub());
-
-        builder.setProxyPort(1);
-        try {
-            config = builder.build();
-            fail("Should have thrown an IllegalStateException with invalid proxy state");
-        } catch (final IllegalStateException e) {
-            assertTrue(e.getMessage().contains("proxy"));
-        }
-    }
-
 }

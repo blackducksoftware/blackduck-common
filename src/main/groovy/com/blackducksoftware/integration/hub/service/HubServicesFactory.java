@@ -62,6 +62,7 @@ import com.blackducksoftware.integration.hub.dataservice.notification.Notificati
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
 import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStatusDataService;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
@@ -99,8 +100,8 @@ public class HubServicesFactory {
     public CLIDataService createCLIDataService(final IntLogger logger, final long timeoutInMilliseconds) {
         return new CLIDataService(logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
                 createPhoneHomeDataService(logger), createProjectRequestService(logger), createProjectVersionRequestService(logger),
-                createDryRunUploadRequestService(), createCodeLocationRequestService(logger), createScanSummaryRequestService(),
-                createScanStatusDataService(logger, timeoutInMilliseconds));
+                createCodeLocationRequestService(logger), createScanSummaryRequestService(),
+                createScanStatusDataService(logger, timeoutInMilliseconds), createMetaService(logger));
     }
 
     public PhoneHomeDataService createPhoneHomeDataService(final IntLogger logger) {
@@ -277,6 +278,10 @@ public class HubServicesFactory {
 
     public BomComponentIssueRequestService createBomComponentIssueRequestService(final IntLogger logger) {
         return new BomComponentIssueRequestService(restConnection, createMetaService(logger));
+    }
+
+    public ProjectDataService createProjectDataService(final IntLogger logger) {
+        return new ProjectDataService(createProjectRequestService(logger), createProjectVersionRequestService(logger));
     }
 
     @Override
