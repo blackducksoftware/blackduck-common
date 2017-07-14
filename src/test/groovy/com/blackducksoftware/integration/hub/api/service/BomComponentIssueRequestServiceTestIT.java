@@ -108,13 +108,11 @@ public class BomComponentIssueRequestServiceTestIT {
         
         String componentURL = metaService.getFirstLink(projectVersion, MetaService.COMPONENTS_LINK);
        
-		System.out.println(componentURL);
 		Gson gson = hubServicesFactory.getRestConnection().gson;
 		HubResponseService componentResponseService = new HubResponseService(hubServicesFactory.getRestConnection());
 		List<VersionBomComponentView> bomComponentViews = aggregateBomRequestService.getBomEntries(projectVersion);
 		VersionBomComponentView bomComponentView = bomComponentViews.get(0);
 		String issuesURL = metaService.getFirstLink(bomComponentView, MetaService.COMPONENT_ISSUES);
-		System.out.println(issuesURL);
 		 
 		IssueView issueView = new IssueView();
 		issueView.issueDescription = "IT Service Test Description";
