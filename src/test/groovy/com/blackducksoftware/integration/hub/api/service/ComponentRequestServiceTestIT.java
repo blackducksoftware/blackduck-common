@@ -25,8 +25,6 @@ package com.blackducksoftware.integration.hub.api.service;
 
 import static org.junit.Assert.*;
 
-import java.util.List;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

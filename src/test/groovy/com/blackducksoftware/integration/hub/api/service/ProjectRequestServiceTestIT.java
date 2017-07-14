@@ -96,9 +96,7 @@ public class ProjectRequestServiceTestIT {
 
         	int limit = 2;
         	int numProjectsFoundLimit = projectRequestService.getProjectMatches("ProjectRequestServiceTest", limit).size();
-        	if (numProjectsFoundLimit != limit){
-        		fail("getProjectMatches did not find the correct number of projects");
-        	}
+        	assertEquals(numProjectsFoundLimit, limit);
 
         } catch (Exception e){
         	fail("Error when retrieving project matches");
