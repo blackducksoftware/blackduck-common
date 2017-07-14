@@ -29,19 +29,16 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.phone.home.PhoneHomeClient;
-import com.blackducksoftware.integration.phone.home.PhoneHomeRequestBody;
-import com.blackducksoftware.integration.phone.home.PhoneHomeRequestBodyBuilder;
-import com.blackducksoftware.integration.phone.home.enums.BlackDuckName;
-import com.blackducksoftware.integration.phone.home.enums.PhoneHomeSource;
+import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
+import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;
+import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder;
+import com.blackducksoftware.integration.phonehome.enums.BlackDuckName;
+import com.blackducksoftware.integration.phonehome.enums.PhoneHomeSource;
 
 public class PhoneHomeDataService {
     private final IntLogger logger;
-
     private final HubRegistrationRequestService hubRegistrationRequestService;
-
     private final HubVersionRequestService hubVersionRequestService;
-
     private final PhoneHomeClient phoneHomeClient;
 
     public PhoneHomeDataService(final IntLogger logger, final PhoneHomeClient phoneHomeClient, final HubRegistrationRequestService hubRegistrationRequestService, final HubVersionRequestService hubVersionRequestService) {

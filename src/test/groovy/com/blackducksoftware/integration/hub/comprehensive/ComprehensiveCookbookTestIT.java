@@ -67,7 +67,6 @@ import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.phone.home.IntegrationInfo;
 
 public class ComprehensiveCookbookTestIT {
     private static final long FIVE_MINUTES = 5 * 60 * 1000;
@@ -312,7 +311,7 @@ public class ComprehensiveCookbookTestIT {
         final ProjectRequest projectRequest = projectRequestBuilder.build();
 
         final ProjectVersionView version = cliDataService.installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, true,
-                IntegrationInfo.DO_NOT_PHONE_HOME);
+                null, null, null);
 
         assertNotNull(version);
 

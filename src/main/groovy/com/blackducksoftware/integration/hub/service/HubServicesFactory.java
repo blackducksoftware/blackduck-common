@@ -70,7 +70,7 @@ import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.phone.home.PhoneHomeClient;
+import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class HubServicesFactory {
