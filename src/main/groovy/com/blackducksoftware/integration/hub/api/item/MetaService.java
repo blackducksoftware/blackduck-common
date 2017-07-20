@@ -81,6 +81,8 @@ public class MetaService {
     public static final String USER_OPTIONS_LINK = "user-options";
 
     public static final String TEXT_LINK = "text";
+    
+    public static final String COMPONENT_ISSUES = "component-issues";
 
     private final IntLogger logger;
 
