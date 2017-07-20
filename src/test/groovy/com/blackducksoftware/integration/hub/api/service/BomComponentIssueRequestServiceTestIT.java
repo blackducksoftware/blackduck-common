@@ -23,19 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.api.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import org.junit.AfterClass;
@@ -47,38 +37,26 @@ import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomReque
 import com.blackducksoftware.integration.hub.api.bom.BomComponentIssueRequestService;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.dataservice.project.ProjectVersionWrapper;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
-import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
-import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest;
-import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
-import com.blackducksoftware.integration.hub.model.view.ComponentView;
 import com.blackducksoftware.integration.hub.model.view.IssueView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
-import com.blackducksoftware.integration.hub.model.view.VulnerableComponentView;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
-import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.test.TestLogger;
-import com.google.gson.Gson;
 
 public class BomComponentIssueRequestServiceTestIT {
 
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper("TEST_HUB_SERVER_URL");
 
     private static final IntLogger logger = new TestLogger();
-    
+
     private static final String projectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
-    
+
     private static final String projectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION");
 
     @BeforeClass
@@ -91,47 +69,45 @@ public class BomComponentIssueRequestServiceTestIT {
 
     @Test
     public void test() throws Exception {
-    	// TODO: Version 3.7+ needed for "component-issues", upgrade  http://int-hub01.dc1.lan/ from 3.6 to 3.7.
-    	
+        // TODO: Version 3.7+ needed for "component-issues"
+
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final BomComponentIssueRequestService bomComponentIssueRequestService = hubServicesFactory.createBomComponentIssueRequestService(logger);
         final MetaService metaService = hubServicesFactory.createMetaService(logger);
         final ComponentRequestService componentRequestService = hubServicesFactory.createComponentRequestService();
         final AggregateBomRequestService aggregateBomRequestService = hubServicesFactory.createAggregateBomRequestService(logger);
-              
-        final ProjectDataService projectDataService = hubServicesFactory.createProjectDataService(logger);
-        ProjectVersionWrapper projectVersionWrapper = projectDataService.getProjectVersion(
-        		restConnectionTestHelper.getProperty("TEST_PROJECT"), restConnectionTestHelper.getProperty("TEST_VERSION"));
-        
-        ProjectView project = projectVersionWrapper.getProjectView();
-        ProjectVersionView projectVersion = projectVersionWrapper.getProjectVersionView();
-        
-        String componentURL = metaService.getFirstLink(projectVersion, MetaService.COMPONENTS_LINK);
-       
-		HubResponseService componentResponseService = new HubResponseService(hubServicesFactory.getRestConnection());
-		List<VersionBomComponentView> bomComponentViews = aggregateBomRequestService.getBomEntries(projectVersion);
-		VersionBomComponentView bomComponentView = bomComponentViews.get(0);
-		String issuesURL = metaService.getFirstLink(bomComponentView, MetaService.COMPONENT_ISSUES);
-		 
-		IssueView issueView = new IssueView();
-		issueView.issueDescription = "IT Service Test Description";
-		issueView.issueId = "IT Service Test ID";
-		issueView.issueAssignee = "IT Service Test Assignee";
-		issueView.issueLink = "IT Service Test Link";
-		issueView.issueStatus = "IT Service Test Status";
-		issueView.issueCreatedAt = "IT Service Test CreatedAt";
-		issueView.issueUpdatedAt = "IT Service Test UpdatedAt";
-		  
-		String issueItemURL = bomComponentIssueRequestService.createIssue(issueView, issuesURL);
-		assertNotNull(issueItemURL);
 
-		try{
-			bomComponentIssueRequestService.deleteIssue(issueItemURL);
-		}
-		catch (IntegrationException e){
-			fail("could not find issue to delete");
-		}
+        final ProjectDataService projectDataService = hubServicesFactory.createProjectDataService(logger);
+        final ProjectVersionWrapper projectVersionWrapper = projectDataService.getProjectVersion(restConnectionTestHelper.getProperty("TEST_PROJECT"), restConnectionTestHelper.getProperty("TEST_VERSION"));
+
+        final ProjectView project = projectVersionWrapper.getProjectView();
+        final ProjectVersionView projectVersion = projectVersionWrapper.getProjectVersionView();
+
+        final String componentURL = metaService.getFirstLink(projectVersion, MetaService.COMPONENTS_LINK);
+
+        final HubResponseService componentResponseService = new HubResponseService(hubServicesFactory.getRestConnection());
+        final List<VersionBomComponentView> bomComponentViews = aggregateBomRequestService.getBomEntries(projectVersion);
+        final VersionBomComponentView bomComponentView = bomComponentViews.get(0);
+        final String issuesURL = metaService.getFirstLink(bomComponentView, MetaService.COMPONENT_ISSUES);
+
+        final IssueView issueView = new IssueView();
+        issueView.issueDescription = "IT Service Test Description";
+        issueView.issueId = "IT Service Test ID";
+        issueView.issueAssignee = "IT Service Test Assignee";
+        issueView.issueLink = "IT Service Test Link";
+        issueView.issueStatus = "IT Service Test Status";
+        issueView.issueCreatedAt = "IT Service Test CreatedAt";
+        issueView.issueUpdatedAt = "IT Service Test UpdatedAt";
+
+        final String issueItemURL = bomComponentIssueRequestService.createIssue(issueView, issuesURL);
+        assertNotNull(issueItemURL);
+
+        try {
+            bomComponentIssueRequestService.deleteIssue(issueItemURL);
+        } catch (final IntegrationException e) {
+            fail("could not find issue to delete");
+        }
 
     }
-    
+
 }
