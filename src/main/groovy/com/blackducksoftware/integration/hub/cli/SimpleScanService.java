@@ -439,6 +439,10 @@ public class SimpleScanService {
         return new File(logDirectory, "status");
     }
 
+    public File getDataDirectory() {
+        return new File(logDirectory, "data");
+    }
+
     public File getCLILogDirectory() {
         return new File(logDirectory, "log");
     }
@@ -447,8 +451,18 @@ public class SimpleScanService {
         return new File(logDirectory, "CLI_Output.txt");
     }
 
+    public File[] getScanSummaryFiles() {
+        final File scanStatusDirectory = getStatusDirectory();
+        return scanStatusDirectory.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(final File dir, final String name) {
+                return FilenameUtils.wildcardMatchOnSystem(name, "*.json");
+            }
+        });
+    }
+
     public File[] getDryRunFiles() {
-        final File dataDirectory = new File(logDirectory, "data");
+        final File dataDirectory = getDataDirectory();
         return dataDirectory.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(final File dir, final String name) {
