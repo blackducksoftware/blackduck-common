@@ -53,6 +53,7 @@ import com.blackducksoftware.integration.hub.report.RiskReportWriter;
 import com.blackducksoftware.integration.hub.report.api.BomComponent;
 import com.blackducksoftware.integration.hub.report.api.ReportData;
 import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
+import com.blackducksoftware.integration.hub.report.pdf.RiskReportPDFWriter;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -73,10 +74,8 @@ public class RiskReportDataService extends HubResponseService {
 
     private final HubSupportHelper hubSupportHelper;
 
-    public RiskReportDataService(final IntLogger logger, final RestConnection restConnection, final ProjectRequestService projectRequestService,
-            final ProjectVersionRequestService projectVersionRequestService, final ReportRequestService reportRequestService,
-            final AggregateBomRequestService bomRequestService,
-            final MetaService metaService, final HubSupportHelper hubSupportHelper) {
+    public RiskReportDataService(final IntLogger logger, final RestConnection restConnection, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
+            final ReportRequestService reportRequestService, final AggregateBomRequestService bomRequestService, final MetaService metaService, final HubSupportHelper hubSupportHelper) {
         super(restConnection);
         this.logger = logger;
         this.projectRequestService = projectRequestService;
@@ -88,15 +87,13 @@ public class RiskReportDataService extends HubResponseService {
 
     }
 
-    public ReportData getRiskReportData(final String projectName, final String projectVersionName)
-            throws IntegrationException {
+    public ReportData getRiskReportData(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView project = projectRequestService.getProjectByName(projectName);
         final ProjectVersionView version = projectVersionRequestService.getProjectVersion(project, projectVersionName);
         return getRiskReportData(project, version);
     }
 
-    public ReportData getRiskReportData(final ProjectView project, final ProjectVersionView version)
-            throws IntegrationException {
+    public ReportData getRiskReportData(final ProjectView project, final ProjectVersionView version) throws IntegrationException {
         final String originalProjectUrl = metaService.getHref(project);
         final String originalVersionUrl = metaService.getHref(version);
         final ReportData reportData = new ReportData();
@@ -118,8 +115,7 @@ public class RiskReportDataService extends HubResponseService {
                 } else {
                     componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.component);
                 }
-                final BomComponentPolicyStatusView bomPolicyStatus = getItem(componentPolicyStatusURL,
-                        BomComponentPolicyStatusView.class);
+                final BomComponentPolicyStatusView bomPolicyStatus = getItem(componentPolicyStatusURL, BomComponentPolicyStatusView.class);
                 component.setPolicyStatus(bomPolicyStatus.approvalStatus.toString());
                 components.add(component);
             }
@@ -157,9 +153,30 @@ public class RiskReportDataService extends HubResponseService {
         }
     }
 
+    public File createReportPdfFile(final File outputDirectory, final String projectName, final String projectVersionName) throws IntegrationException {
+        final ReportData reportData = getRiskReportData(projectName, projectVersionName);
+        return createReportPdfFile(outputDirectory, reportData);
+    }
+
+    public File createReportPdfFile(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws IntegrationException {
+        final ReportData reportData = getRiskReportData(project, version);
+        return createReportPdfFile(outputDirectory, reportData);
+    }
+
+    public File createReportPdfFile(final File outputDirectory, final ReportData reportData) throws HubIntegrationException {
+        try {
+            logger.trace("Creating Risk Report Pdf in : " + outputDirectory.getCanonicalPath());
+            final RiskReportPDFWriter writer = new RiskReportPDFWriter();
+            final File pdfFile = writer.createPDFReportFile(outputDirectory, reportData);
+            logger.trace("Created Risk Report Pdf : " + pdfFile.getCanonicalPath());
+            return pdfFile;
+        } catch (final RiskReportException | IOException e) {
+            throw new HubIntegrationException(e.getMessage(), e);
+        }
+    }
+
     private String getComponentPolicyURL(final String versionURL, final String componentURL) {
-        final String componentVersionSegments = componentURL
-                .substring(componentURL.indexOf(MetaService.COMPONENTS_LINK));
+        final String componentVersionSegments = componentURL.substring(componentURL.indexOf(MetaService.COMPONENTS_LINK));
         return versionURL + "/" + componentVersionSegments + "/" + MetaService.POLICY_STATUS_LINK;
     }
 
@@ -201,8 +218,7 @@ public class RiskReportDataService extends HubResponseService {
         component.setComponentVersion(bomEntry.componentVersionName);
         component.setComponentVersionURL(getReportVersionUrl(bomEntry.componentVersion, true));
         component.setLicense(bomEntry.licenses.get(0).licenseDisplay);
-        if (bomEntry.securityRiskProfile != null && bomEntry.securityRiskProfile.counts != null
-                && !bomEntry.securityRiskProfile.counts.isEmpty()) {
+        if (bomEntry.securityRiskProfile != null && bomEntry.securityRiskProfile.counts != null && !bomEntry.securityRiskProfile.counts.isEmpty()) {
             for (final RiskCountView count : bomEntry.securityRiskProfile.counts) {
                 if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
                     component.setSecurityRiskHighCount(count.count);
@@ -213,8 +229,7 @@ public class RiskReportDataService extends HubResponseService {
                 }
             }
         }
-        if (bomEntry.licenseRiskProfile != null && bomEntry.licenseRiskProfile.counts != null
-                && !bomEntry.licenseRiskProfile.counts.isEmpty()) {
+        if (bomEntry.licenseRiskProfile != null && bomEntry.licenseRiskProfile.counts != null && !bomEntry.licenseRiskProfile.counts.isEmpty()) {
             for (final RiskCountView count : bomEntry.licenseRiskProfile.counts) {
                 if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
                     component.setLicenseRiskHighCount(count.count);
@@ -225,8 +240,7 @@ public class RiskReportDataService extends HubResponseService {
                 }
             }
         }
-        if (bomEntry.operationalRiskProfile != null && bomEntry.operationalRiskProfile.counts != null
-                && !bomEntry.operationalRiskProfile.counts.isEmpty()) {
+        if (bomEntry.operationalRiskProfile != null && bomEntry.operationalRiskProfile.counts != null && !bomEntry.operationalRiskProfile.counts.isEmpty()) {
             for (final RiskCountView count : bomEntry.operationalRiskProfile.counts) {
                 if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
                     component.setOperationalRiskHighCount(count.count);
