@@ -177,9 +177,7 @@ public class EventTestUtil {
         return "{ \"_meta\": { \"href\": \"" + href + "\" }}";
     }
 
-    public PolicyOverrideContentItem createPolicyOverride(final Date createdTime, final String projectName,
-            final String projectVersionName, final String componentName, final String componentVersion)
-            throws URISyntaxException {
+    public PolicyOverrideContentItem createPolicyOverride(final Date createdTime, final String projectName, final String projectVersionName, final String componentName, final String componentVersion) throws URISyntaxException {
         final ComponentVersionView fullComponentVersion = createComponentVersionMock(componentVersion);
         final String projectVersionUrl = PROJECT_VERSION_URL_PREFIX + projectName + PROJECT_VERSION_URL_SEGMENT + projectVersionName;
         final ProjectVersionModel projectVersion = new ProjectVersionModel();
@@ -187,14 +185,12 @@ public class EventTestUtil {
         projectVersion.setProjectVersionName(projectVersionName);
         projectVersion.setUrl(projectVersionUrl);
         final String componentUrl = COMPONENT_URL_PREFIX + componentName;
-        final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT
-                + componentVersion;
+        final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT + componentVersion;
         final List<PolicyRuleView> policyRuleList = new ArrayList<>();
         policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
         policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
         final String componentIssueUrl = "";
-        final PolicyOverrideContentItem item = new PolicyOverrideContentItem(createdTime, projectVersion, componentName,
-                fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList, FIRST_NAME, LAST_NAME, componentIssueUrl);
+        final PolicyOverrideContentItem item = new PolicyOverrideContentItem(createdTime, projectVersion, componentName, fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList, FIRST_NAME, LAST_NAME, componentIssueUrl);
         return item;
     }
 
@@ -205,9 +201,7 @@ public class EventTestUtil {
         return fullComponentVersion;
     }
 
-    public PolicyViolationClearedContentItem createPolicyCleared(final Date createdTime, final String projectName,
-            final String projectVersionName, final String componentName, final String componentVersion)
-            throws URISyntaxException {
+    public PolicyViolationClearedContentItem createPolicyCleared(final Date createdTime, final String projectName, final String projectVersionName, final String componentName, final String componentVersion) throws URISyntaxException {
         final ComponentVersionView fullComponentVersion = createComponentVersionMock(componentVersion);
         final String projectVersionUrl = PROJECT_VERSION_URL_PREFIX + projectName + PROJECT_VERSION_URL_SEGMENT + projectVersionName;
         final ProjectVersionModel projectVersion = new ProjectVersionModel();
@@ -215,20 +209,16 @@ public class EventTestUtil {
         projectVersion.setProjectVersionName(projectVersionName);
         projectVersion.setUrl(projectVersionUrl);
         final String componentUrl = COMPONENT_URL_PREFIX + componentName;
-        final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT
-                + componentVersion;
+        final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT + componentVersion;
         final List<PolicyRuleView> policyRuleList = new ArrayList<>();
         policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
         policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
         final String componentIssueUrl = "";
-        final PolicyViolationClearedContentItem item = new PolicyViolationClearedContentItem(createdTime,
-                projectVersion, componentName, fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList, componentIssueUrl);
+        final PolicyViolationClearedContentItem item = new PolicyViolationClearedContentItem(createdTime, projectVersion, componentName, fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList, componentIssueUrl);
         return item;
     }
 
-    public PolicyViolationContentItem createPolicyViolation(final Date createdTime, final String projectName,
-            final String projectVersionName, final String componentName, final String componentVersion)
-            throws URISyntaxException {
+    public PolicyViolationContentItem createPolicyViolation(final Date createdTime, final String projectName, final String projectVersionName, final String componentName, final String componentVersion) throws URISyntaxException {
         final ComponentVersionView fullComponentVersion = createComponentVersionMock(componentVersion);
         final String projectVersionUrl = PROJECT_VERSION_URL_PREFIX + projectName + PROJECT_VERSION_URL_SEGMENT + projectVersionName;
         final ProjectVersionModel projectVersion = new ProjectVersionModel();
@@ -236,32 +226,26 @@ public class EventTestUtil {
         projectVersion.setProjectVersionName(projectVersionName);
         projectVersion.setUrl(projectVersionUrl);
         final String componentUrl = COMPONENT_URL_PREFIX + componentName;
-        final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT
-                + componentVersion;
+        final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT + componentVersion;
         final List<PolicyRuleView> policyRuleList = new ArrayList<>();
         policyRuleList.add(createPolicyRule(RULE_NAME_1, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_1_HREF_URL));
         policyRuleList.add(createPolicyRule(RULE_NAME_2, DESCRIPTION, CREATED_BY, UPDATED_BY, POLICY_RULE_2_HREF_URL));
         final String componentIssueUrl = "";
-        final PolicyViolationContentItem item = new PolicyViolationContentItem(createdTime, projectVersion,
-                componentName, fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList, componentIssueUrl);
+        final PolicyViolationContentItem item = new PolicyViolationContentItem(createdTime, projectVersion, componentName, fullComponentVersion, componentUrl, componentVersionUrl, policyRuleList, componentIssueUrl);
         return item;
     }
 
-    public VulnerabilityContentItem createVulnerability(final Date createdTime, final String projectName,
-            final String projectVersionName, final String componentName, final String componentVersion,
-            final List<VulnerabilitySourceQualifiedId> added, final List<VulnerabilitySourceQualifiedId> updated,
-            final List<VulnerabilitySourceQualifiedId> deleted) throws URISyntaxException {
+    public VulnerabilityContentItem createVulnerability(final Date createdTime, final String projectName, final String projectVersionName, final String componentName, final String componentVersion,
+            final List<VulnerabilitySourceQualifiedId> added, final List<VulnerabilitySourceQualifiedId> updated, final List<VulnerabilitySourceQualifiedId> deleted) throws URISyntaxException {
         final ComponentVersionView fullComponentVersion = createComponentVersionMock(componentVersion);
         final String projectVersionUrl = PROJECT_VERSION_URL_PREFIX + projectName + PROJECT_VERSION_URL_SEGMENT + projectVersionName;
         final ProjectVersionModel projectVersion = new ProjectVersionModel();
         projectVersion.setProjectName(projectName);
         projectVersion.setProjectVersionName(projectVersionName);
         projectVersion.setUrl(projectVersionUrl);
-        final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT
-                + componentVersion;
+        final String componentVersionUrl = COMPONENT_URL_PREFIX + componentName + VERSIONS_URL_SEGMENT + componentVersion;
         final String componentIssueUrl = "";
-        final VulnerabilityContentItem item = new VulnerabilityContentItem(createdTime, projectVersion, componentName,
-                fullComponentVersion, componentVersionUrl, added, updated, deleted, componentIssueUrl);
+        final VulnerabilityContentItem item = new VulnerabilityContentItem(createdTime, projectVersion, componentName, fullComponentVersion, componentVersionUrl, added, updated, deleted, componentIssueUrl);
         return item;
     }
 }
