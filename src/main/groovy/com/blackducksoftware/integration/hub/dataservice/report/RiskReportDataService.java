@@ -42,9 +42,11 @@ import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.model.enumeration.BomComponentPolicyStatusApprovalStatusEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.RiskCountEnum;
 import com.blackducksoftware.integration.hub.model.view.BomComponentPolicyStatusView;
+import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
@@ -109,14 +111,19 @@ public class RiskReportDataService extends HubResponseService {
             final List<VersionBomComponentView> bomEntries = bomRequestService.getBomEntries(version);
             for (final VersionBomComponentView bomEntry : bomEntries) {
                 final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
-                String componentPolicyStatusURL = null;
-                if (!StringUtils.isBlank(bomEntry.componentVersion)) {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.componentVersion);
-                } else {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.component);
+                String policyStatus = bomEntry.approvalStatus;
+                if (StringUtils.isBlank(policyStatus)) {
+                    String componentPolicyStatusURL = null;
+                    if (!StringUtils.isBlank(bomEntry.componentVersion)) {
+                        componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.componentVersion);
+                    } else {
+                        componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.component);
+                    }
+                    final BomComponentPolicyStatusView bomPolicyStatus = getItem(componentPolicyStatusURL, BomComponentPolicyStatusView.class);
+                    policyStatus = bomPolicyStatus.approvalStatus.toString();
                 }
-                final BomComponentPolicyStatusView bomPolicyStatus = getItem(componentPolicyStatusURL, BomComponentPolicyStatusView.class);
-                component.setPolicyStatus(bomPolicyStatus.approvalStatus.toString());
+                component.setPolicyStatus(policyStatus);
+                addPolicyRuleInfo(component, bomEntry);
                 components.add(component);
             }
         } else {
@@ -252,6 +259,16 @@ public class RiskReportDataService extends HubResponseService {
             }
         }
         return component;
+    }
+
+    public void addPolicyRuleInfo(final BomComponent component, final VersionBomComponentView bomEntry) throws IntegrationException {
+        final BomComponentPolicyStatusApprovalStatusEnum status = BomComponentPolicyStatusApprovalStatusEnum.valueOf(bomEntry.approvalStatus);
+        if (status == BomComponentPolicyStatusApprovalStatusEnum.IN_VIOLATION) {
+            final String policyRuleLink = metaService.getFirstLink(bomEntry, MetaService.POLICY_RULES_LINK);
+            final PolicyRuleView policyRuleView = getItem(policyRuleLink, PolicyRuleView.class);
+            component.setPolicyRuleName(policyRuleView.name);
+            component.setPolicyRuleDescription(policyRuleView.description);
+        }
     }
 
     private String getBaseUrl() {

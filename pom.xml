@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>hub-common</artifactId>
-  <version>13.1.3-SNAPSHOT</version>
+  <version>13.2.0-SNAPSHOT</version>
 
   <name>Hub Common</name>
   <description>General Code for Hub Integration with CI systems</description>
