@@ -82,7 +82,7 @@ public class ProjectRequestService extends HubResponseService {
     public ProjectView getProjectByName(final String projectName) throws IntegrationException {
         final List<ProjectView> allProjectItems = getAllProjectMatches(projectName);
         for (final ProjectView project : allProjectItems) {
-            if (projectName.equals(project.name)) {
+            if (projectName.equalsIgnoreCase(project.name)) {
                 return project;
             }
         }
