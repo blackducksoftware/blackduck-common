@@ -31,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -38,12 +39,9 @@ import com.blackducksoftware.integration.hub.model.HubView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 
-public class MetaServiceTestIT {
+public class MetaServiceTest {
     private static final Gson gson = new Gson();
-
-    private static final JsonParser jsonParser = new JsonParser();
 
     private IntBufferedLogger logger;
 
@@ -56,7 +54,7 @@ public class MetaServiceTestIT {
 
     public MetaService getMetaService() {
         logger = new IntBufferedLogger();
-        final MetaService metaService = new MetaService(logger, jsonParser);
+        final MetaService metaService = new MetaService(logger);
         return metaService;
     }
 
@@ -85,8 +83,7 @@ public class MetaServiceTestIT {
         try {
             metaService.getFirstLink(hubItem, MetaService.USERS_LINK);
         } catch (final HubIntegrationException e) {
-            assertTrue(e.getMessage().contains(
-                    "Could not find the link '" + MetaService.USERS_LINK + "', these are the available links : '" + MetaService.CANONICAL_VERSION_LINK + "'"));
+            assertTrue(e.getMessage().contains("Could not find the link '" + MetaService.USERS_LINK + "', these are the available links : '" + MetaService.CANONICAL_VERSION_LINK + "'"));
         }
         final String linkValue = metaService.getFirstLink(hubItem, MetaService.CANONICAL_VERSION_LINK);
         assertTrue(linkValue.startsWith("http"));
@@ -99,9 +96,9 @@ public class MetaServiceTestIT {
 
         try {
             metaService.getLinks(hubItem, MetaService.USERS_LINK);
+            Assert.fail("Should have thrown an exception");
         } catch (final HubIntegrationException e) {
-            assertTrue(e.getMessage().contains(
-                    "Could not find the link '" + MetaService.USERS_LINK + "', these are the available links : '" + MetaService.CANONICAL_VERSION_LINK + "'"));
+            assertTrue(e.getMessage().contains("Could not find the link '" + MetaService.USERS_LINK + "', these are the available links : '" + MetaService.CANONICAL_VERSION_LINK + "'"));
         }
 
         final List<String> links = metaService.getLinks(hubItem, MetaService.CANONICAL_VERSION_LINK);
