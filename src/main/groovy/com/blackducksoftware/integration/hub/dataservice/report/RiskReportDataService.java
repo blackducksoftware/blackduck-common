@@ -53,6 +53,7 @@ import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.model.view.components.RiskCountView;
 import com.blackducksoftware.integration.hub.report.RiskReportWriter;
 import com.blackducksoftware.integration.hub.report.api.BomComponent;
+import com.blackducksoftware.integration.hub.report.api.PolicyRule;
 import com.blackducksoftware.integration.hub.report.api.ReportData;
 import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
 import com.blackducksoftware.integration.hub.report.pdf.RiskReportPDFWriter;
@@ -265,9 +266,15 @@ public class RiskReportDataService extends HubResponseService {
         final BomComponentPolicyStatusApprovalStatusEnum status = BomComponentPolicyStatusApprovalStatusEnum.valueOf(bomEntry.approvalStatus);
         if (status == BomComponentPolicyStatusApprovalStatusEnum.IN_VIOLATION) {
             final String policyRuleLink = metaService.getFirstLink(bomEntry, MetaService.POLICY_RULES_LINK);
-            final PolicyRuleView policyRuleView = getItem(policyRuleLink, PolicyRuleView.class);
-            component.setPolicyRuleName(policyRuleView.name);
-            component.setPolicyRuleDescription(policyRuleView.description);
+            final List<PolicyRuleView> rules = getAllItems(policyRuleLink, PolicyRuleView.class);
+            final List<PolicyRule> rulesViolated = new ArrayList<>();
+            for (final PolicyRuleView policyRuleView : rules) {
+                final PolicyRule ruleViolated = new PolicyRule();
+                ruleViolated.setName(policyRuleView.name);
+                ruleViolated.setDescription(policyRuleView.description);
+                rulesViolated.add(ruleViolated);
+            }
+            component.setPolicyRulesViolated(rulesViolated);
         }
     }
 
