@@ -85,8 +85,7 @@ public class MetaServiceTestIT {
         try {
             metaService.getFirstLink(hubItem, MetaService.USERS_LINK);
         } catch (final HubIntegrationException e) {
-            assertTrue(e.getMessage().contains(
-                    "Could not find the link '" + MetaService.USERS_LINK + "', these are the available links : '" + MetaService.CANONICAL_VERSION_LINK + "'"));
+            assertTrue(e.getMessage().contains("Could not find the link '" + MetaService.USERS_LINK + "', these are the available links : '" + MetaService.CANONICAL_VERSION_LINK + "'"));
         }
         final String linkValue = metaService.getFirstLink(hubItem, MetaService.CANONICAL_VERSION_LINK);
         assertTrue(linkValue.startsWith("http"));
@@ -100,8 +99,7 @@ public class MetaServiceTestIT {
         try {
             metaService.getLinks(hubItem, MetaService.USERS_LINK);
         } catch (final HubIntegrationException e) {
-            assertTrue(e.getMessage().contains(
-                    "Could not find the link '" + MetaService.USERS_LINK + "', these are the available links : '" + MetaService.CANONICAL_VERSION_LINK + "'"));
+            assertTrue(e.getMessage().contains("Could not find the link '" + MetaService.USERS_LINK + "', these are the available links : '" + MetaService.CANONICAL_VERSION_LINK + "'"));
         }
 
         final List<String> links = metaService.getLinks(hubItem, MetaService.CANONICAL_VERSION_LINK);

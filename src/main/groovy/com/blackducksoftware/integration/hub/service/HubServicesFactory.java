@@ -98,10 +98,8 @@ public class HubServicesFactory {
     }
 
     public CLIDataService createCLIDataService(final IntLogger logger, final long timeoutInMilliseconds) {
-        return new CLIDataService(logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger),
-                createPhoneHomeDataService(logger), createProjectRequestService(logger), createProjectVersionRequestService(logger),
-                createCodeLocationRequestService(logger), createScanSummaryRequestService(),
-                createScanStatusDataService(logger, timeoutInMilliseconds), createMetaService(logger));
+        return new CLIDataService(logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger), createPhoneHomeDataService(logger), createProjectRequestService(logger),
+                createProjectVersionRequestService(logger), createCodeLocationRequestService(logger), createScanSummaryRequestService(), createScanStatusDataService(logger, timeoutInMilliseconds), createMetaService(logger));
     }
 
     public PhoneHomeDataService createPhoneHomeDataService(final IntLogger logger) {
@@ -112,47 +110,35 @@ public class HubServicesFactory {
         return new PhoneHomeClient(logger, restConnection);
     }
 
-    public RiskReportDataService createRiskReportDataService(final IntLogger logger,
-            final long timeoutInMilliseconds) throws IntegrationException {
-        return new RiskReportDataService(logger, restConnection, createProjectRequestService(logger),
-                createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds), createAggregateBomRequestService(logger),
-                createMetaService(logger), createCheckedHubSupport(logger));
+    public RiskReportDataService createRiskReportDataService(final IntLogger logger, final long timeoutInMilliseconds) throws IntegrationException {
+        return new RiskReportDataService(logger, restConnection, createProjectRequestService(logger), createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds),
+                createAggregateBomRequestService(logger), createMetaService(logger), createCheckedHubSupport(logger));
     }
 
     public PolicyStatusDataService createPolicyStatusDataService(final IntLogger logger) {
-        return new PolicyStatusDataService(restConnection, createProjectRequestService(logger),
-                createProjectVersionRequestService(logger), createMetaService(logger));
+        return new PolicyStatusDataService(restConnection, createProjectRequestService(logger), createProjectVersionRequestService(logger), createMetaService(logger));
     }
 
-    public ScanStatusDataService createScanStatusDataService(final IntLogger logger,
-            final long timeoutInMilliseconds) {
-        return new ScanStatusDataService(logger, createProjectRequestService(logger), createProjectVersionRequestService(logger),
-                createCodeLocationRequestService(logger), createScanSummaryRequestService(), createMetaService(logger),
+    public ScanStatusDataService createScanStatusDataService(final IntLogger logger, final long timeoutInMilliseconds) {
+        return new ScanStatusDataService(logger, createProjectRequestService(logger), createProjectVersionRequestService(logger), createCodeLocationRequestService(logger), createScanSummaryRequestService(), createMetaService(logger),
                 timeoutInMilliseconds);
     }
 
     public NotificationDataService createNotificationDataService(final IntLogger logger) {
-        return new NotificationDataService(logger, createHubResponseService(), createNotificationRequestService(logger),
-                createProjectVersionRequestService(logger),
-                createPolicyRequestService(), createMetaService(logger));
+        return new NotificationDataService(logger, createHubResponseService(), createNotificationRequestService(logger), createProjectVersionRequestService(logger), createPolicyRequestService(), createMetaService(logger));
     }
 
-    public NotificationDataService createNotificationDataService(final IntLogger logger,
-            final PolicyNotificationFilter policyNotificationFilter) {
-        return new NotificationDataService(logger, createHubResponseService(), createNotificationRequestService(logger),
-                createProjectVersionRequestService(logger),
-                createPolicyRequestService(), policyNotificationFilter,
+    public NotificationDataService createNotificationDataService(final IntLogger logger, final PolicyNotificationFilter policyNotificationFilter) {
+        return new NotificationDataService(logger, createHubResponseService(), createNotificationRequestService(logger), createProjectVersionRequestService(logger), createPolicyRequestService(), policyNotificationFilter,
                 createMetaService(logger));
     }
 
     public ExtensionConfigDataService createExtensionConfigDataService(final IntLogger logger) {
-        return new ExtensionConfigDataService(logger, restConnection, createUserRequestService(),
-                createExtensionConfigRequestService(), createExtensionUserOptionRequestService(), createMetaService(logger));
+        return new ExtensionConfigDataService(logger, restConnection, createUserRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService(), createMetaService(logger));
     }
 
     public VulnerabilityDataService createVulnerabilityDataService(final IntLogger logger) {
-        return new VulnerabilityDataService(restConnection, createComponentRequestService(),
-                createVulnerabilityRequestService(), createMetaService(logger));
+        return new VulnerabilityDataService(restConnection, createComponentRequestService(), createVulnerabilityRequestService(), createMetaService(logger));
     }
 
     public LicenseDataService createLicenseDataService() {
@@ -227,19 +213,14 @@ public class HubServicesFactory {
      * @deprecated You should create HubScanConfig, rather than pass in each field
      */
     @Deprecated
-    public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
-            final HubSupportHelper hubSupportHelper,
-            final File directoryToInstallTo, final int scanMemory, final boolean dryRun, final String project,
-            final String version, final Set<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
-        return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo,
-                scanMemory,
-                dryRun, project, version, scanTargetPaths, workingDirectory, excludePatterns);
+    public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final File directoryToInstallTo,
+            final int scanMemory, final boolean dryRun, final String project, final String version, final Set<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
+        return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo, scanMemory, dryRun, project, version, scanTargetPaths, workingDirectory, excludePatterns);
     }
 
-    public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig,
-            final HubSupportHelper hubSupportHelper, final HubScanConfig hubScanConfig, final String projectName, final String versionName) {
-        return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, hubScanConfig, projectName,
-                versionName);
+    public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final HubScanConfig hubScanConfig,
+            final String projectName, final String versionName) {
+        return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
     }
 
     public HubRegistrationRequestService createHubRegistrationRequestService() {
