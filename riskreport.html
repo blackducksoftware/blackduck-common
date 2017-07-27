@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	   <meta charset="UTF-8">
+	   <title>Hub Risk Report</title>
+	   <link rel="stylesheet" type="text/css" href="css/HubBomReport.css"/>
+	   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	   <script src="js/jquery-3.1.1.min.js"></script>
+	   <script src="js/HubBomReportFunctions.js"></script>
+	   <script src="js/HubRiskReport.js"></script>
+	   <script src="js/Sortable.js"></script>
+	   <script type="text/javascript">
+	   var myJQuery = jQuery.noConflict();
+	   myJQuery(document).ready(function () {
+           console.log("Risk Report Document ready.");
+           var data = {"projectName":"CITestProject","projectURL":"http://int-auto01.dc1.lan:9000#projects/id:2eaa15e3-690a-4313-9a88-6f6789d68d26","projectVersion":"CITestVersion1","projectVersionURL":"http://int-auto01.dc1.lan:9000#versions/id:f6924b2e-e795-411b-9954-c5d1917141e3/view:bom","phase":"PLANNING","distribution":"INTERNAL","components":[{"policyStatus":"IN_VIOLATION","componentName":"Apache Struts","componentURL":"http://int-auto01.dc1.lan:9000#projects/id:f1ffceeb-42b8-43c6-88c2-853299cba899","componentVersion":"10","componentVersionURL":"http://int-auto01.dc1.lan:9000#versions/id:755d2a23-a4eb-4b9a-ad96-2886aa7f698e","license":"Apache License 2.0","securityRiskHighCount":0,"securityRiskMediumCount":0,"securityRiskLowCount":0,"licenseRiskHighCount":0,"licenseRiskMediumCount":0,"licenseRiskLowCount":0,"operationalRiskHighCount":0,"operationalRiskMediumCount":0,"operationalRiskLowCount":1}],"totalComponents":1,"vulnerabilityRiskHighCount":0,"vulnerabilityRiskMediumCount":0,"vulnerabilityRiskLowCount":0,"vulnerabilityRiskNoneCount":1,"licenseRiskHighCount":0,"licenseRiskMediumCount":0,"licenseRiskLowCount":0,"licenseRiskNoneCount":1,"operationalRiskHighCount":0,"operationalRiskMediumCount":0,"operationalRiskLowCount":1,"operationalRiskNoneCount":0};
+           var riskReport = new RiskReport(myJQuery,data);
+           riskReport.createReport();
+	   });
+	   </script>
+	</head>
+	<body>
+	    <div id="riskReportDiv"></div>
+	</body>
+</html>
