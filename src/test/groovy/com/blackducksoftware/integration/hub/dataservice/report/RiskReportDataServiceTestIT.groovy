@@ -23,8 +23,6 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.report
 
-import java.util.zip.Adler32
-
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
@@ -42,41 +40,38 @@ class RiskReportDataServiceTestIT {
 
     @Test
     public void createReportPdfFileTest(){
-//        final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
-//        final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
-		final String testProjectName = "ReportingProject"
-		final String testProjectVersionName = "1"
+        final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
+        final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
         RiskReportDataService riskReportDataService = hubServicesFactory.createRiskReportDataService(logger, 30000)
-        //File folderForReport = folderForReport.getRoot()
-        File folderForReport = new File('.')
+        File folderForReport = folderForReport.getRoot()
         File pdfFile = riskReportDataService.createReportPdfFile(folderForReport, testProjectName, testProjectVersionName)
         Assert.assertNotNull(pdfFile)
         Assert.assertTrue(pdfFile.exists())
     }
 
-//    @Test
-//    public void createReportFilesTest(){
-//        final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
-//        final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
-//
-//        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
-//        final IntLogger logger = hubServicesFactory.getRestConnection().logger
-//        RiskReportDataService riskReportDataService = hubServicesFactory.createRiskReportDataService(logger, 30000)
-//        File folderForReport = folderForReport.getRoot()
-//        riskReportDataService.createReportFiles(folderForReport, testProjectName, testProjectVersionName)
-//
-//        File[] reportFiles = folderForReport.listFiles();
-//        Assert.assertNotNull(reportFiles)
-//        Assert.assertTrue(reportFiles.size() > 0)
-//        Map<String, File> reportFileMap = reportFiles.collectEntries{
-//            [it.getName(), it]
-//        }
-//        Assert.assertNotNull(reportFileMap.get('js'))
-//        Assert.assertNotNull(reportFileMap.get('css'))
-//        Assert.assertNotNull(reportFileMap.get('images'))
-//        Assert.assertNotNull(reportFileMap.get('riskreport.html'))
-//    }
+    @Test
+    public void createReportFilesTest(){
+        final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
+        final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
+
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
+        final IntLogger logger = hubServicesFactory.getRestConnection().logger
+        RiskReportDataService riskReportDataService = hubServicesFactory.createRiskReportDataService(logger, 30000)
+        File folderForReport = folderForReport.getRoot()
+        riskReportDataService.createReportFiles(folderForReport, testProjectName, testProjectVersionName)
+
+        File[] reportFiles = folderForReport.listFiles();
+        Assert.assertNotNull(reportFiles)
+        Assert.assertTrue(reportFiles.size() > 0)
+        Map<String, File> reportFileMap = reportFiles.collectEntries{
+            [it.getName(), it]
+        }
+        Assert.assertNotNull(reportFileMap.get('js'))
+        Assert.assertNotNull(reportFileMap.get('css'))
+        Assert.assertNotNull(reportFileMap.get('images'))
+        Assert.assertNotNull(reportFileMap.get('riskreport.html'))
+    }
 }
