@@ -31,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -39,7 +40,7 @@ import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.google.gson.Gson;
 
-public class MetaServiceTestIT {
+public class MetaServiceTest {
     private static final Gson gson = new Gson();
 
     private IntBufferedLogger logger;
@@ -95,6 +96,7 @@ public class MetaServiceTestIT {
 
         try {
             metaService.getLinks(hubItem, MetaService.USERS_LINK);
+            Assert.fail("Should have thrown an exception");
         } catch (final HubIntegrationException e) {
             assertTrue(e.getMessage().contains("Could not find the link '" + MetaService.USERS_LINK + "', these are the available links : '" + MetaService.CANONICAL_VERSION_LINK + "'"));
         }

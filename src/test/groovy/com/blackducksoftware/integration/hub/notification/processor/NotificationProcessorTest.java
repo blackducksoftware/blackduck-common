@@ -51,6 +51,8 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Poli
 import com.blackducksoftware.integration.hub.dataservice.notification.model.VulnerabilityContentItem;
 import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.model.view.VulnerabilityView;
+import com.blackducksoftware.integration.hub.model.view.components.LinkView;
+import com.blackducksoftware.integration.hub.model.view.components.MetaView;
 import com.blackducksoftware.integration.hub.model.view.components.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -80,6 +82,7 @@ public class NotificationProcessorTest {
     public MockProcessor createMockedNotificationProcessor(final List<VulnerabilityView> vulnerabilityList) throws Exception {
         final ComponentVersionView compVersion = Mockito.mock(ComponentVersionView.class);
         compVersion.json = createComponentJson();
+        compVersion.meta = createComponentMeta();
         final VulnerabilityRequestService vulnerabilityRequestService = Mockito.mock(VulnerabilityRequestService.class);
         Mockito.when(vulnerabilityRequestService.getComponentVersionVulnerabilities(Mockito.anyString())).thenReturn(vulnerabilityList);
         final MockProcessor processor = new MockProcessor(vulnerabilityRequestService, metaService);
@@ -89,6 +92,27 @@ public class NotificationProcessorTest {
     private String createComponentJson() {
         return "{ \"_meta\": { \"href\": \"" + EventTestUtil.COMPONENT_VERSION_URL + "\"," + "\"links\": [ {" + "\"rel\": \"vulnerabilities\"," + "\"href\": \"" + EventTestUtil.COMPONENT_VERSION_URL + "\"},{"
                 + "\"rel\":\"vulnerable-components\"," + "\"href\": \"" + EventTestUtil.COMPONENT_VERSION_URL + "\"" + "}]}}";
+    }
+
+    private MetaView createComponentMeta() {
+        final MetaView meta = new MetaView();
+        meta.href = EventTestUtil.COMPONENT_VERSION_URL;
+
+        final LinkView vulnerabilityLink = new LinkView();
+        vulnerabilityLink.rel = "vulnerabilities";
+        vulnerabilityLink.href = EventTestUtil.COMPONENT_VERSION_URL;
+
+        final LinkView vulnerableComponentLink = new LinkView();
+        vulnerableComponentLink.rel = "vulnerable-components";
+        vulnerableComponentLink.href = EventTestUtil.COMPONENT_VERSION_URL;
+
+        final List<LinkView> links = new ArrayList<>();
+        links.add(vulnerableComponentLink);
+        links.add(vulnerabilityLink);
+
+        meta.links = links;
+
+        return meta;
     }
 
     private void assertPolicyDataValid(final Collection<NotificationEvent> eventList, final NotificationCategoryEnum categoryType) {

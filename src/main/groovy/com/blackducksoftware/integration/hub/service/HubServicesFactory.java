@@ -231,7 +231,7 @@ public class HubServicesFactory {
     }
 
     public MetaService createMetaService(final IntLogger logger) {
-        return new MetaService(logger, restConnection.jsonParser);
+        return new MetaService(logger);
     }
 
     public HubResponseService createHubResponseService() {
