@@ -34,11 +34,12 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Poli
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.VulnerabilityContentItem;
-import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.AllowEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.VulnerabilitySeverityEnum;
 import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.model.view.VulnerabilityView;
+import com.blackducksoftware.integration.hub.model.view.components.MetaView;
 import com.blackducksoftware.integration.hub.model.view.components.VulnerabilitySourceQualifiedId;
 
 public class EventTestUtil {
@@ -116,7 +117,7 @@ public class EventTestUtil {
 
     public static final String COMPONENT_VERSION_ID = "component_version_id";
 
-    public static final List<MetaAllowEnum> ALLOW_LIST = Collections.emptyList();
+    public static final List<AllowEnum> ALLOW_LIST = Collections.emptyList();
 
     public List<VulnerabilityView> createVulnerabiltyItemList(final List<VulnerabilitySourceQualifiedId> vulnSourceList) {
         final List<VulnerabilityView> vulnerabilityList = new ArrayList<>(vulnSourceList.size());
@@ -161,6 +162,7 @@ public class EventTestUtil {
     public PolicyRuleView createPolicyRule(final String name, final String description, final String createdBy, final String updatedBy, final String href) {
         final PolicyRuleView rule = new PolicyRuleView();
         rule.json = createPolicyRuleJSon(href);
+        rule.meta = createPolicyRuleMeta(href);
         rule.name = name;
         rule.description = description;
         rule.enabled = true;
@@ -175,6 +177,12 @@ public class EventTestUtil {
 
     public String createPolicyRuleJSon(final String href) {
         return "{ \"_meta\": { \"href\": \"" + href + "\" }}";
+    }
+
+    public MetaView createPolicyRuleMeta(final String href) {
+        final MetaView meta = new MetaView();
+        meta.href = href;
+        return meta;
     }
 
     public PolicyOverrideContentItem createPolicyOverride(final Date createdTime, final String projectName, final String projectVersionName, final String componentName, final String componentVersion) throws URISyntaxException {

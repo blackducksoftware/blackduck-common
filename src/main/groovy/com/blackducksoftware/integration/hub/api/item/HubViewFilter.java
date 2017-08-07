@@ -27,16 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.meta.MetaAllowEnum;
 import com.blackducksoftware.integration.hub.model.HubView;
+import com.blackducksoftware.integration.hub.model.enumeration.AllowEnum;
 
 public class HubViewFilter<T extends HubView> {
     public List<T> getAccessibleItems(final MetaService metaService, final List<T> hubItems) throws HubIntegrationException {
         final List<T> accessibleItems = new ArrayList<>();
         for (final T hubItem : hubItems) {
-            final List<MetaAllowEnum> allow = metaService.getAllowedMethods(hubItem);
-            if (allow != null && !allow.isEmpty() && allow.contains(MetaAllowEnum.GET)
-                    && allow.contains(MetaAllowEnum.PUT)) {
+            final List<AllowEnum> allow = metaService.getAllowedMethods(hubItem);
+            if (allow != null && !allow.isEmpty() && allow.contains(AllowEnum.GET) && allow.contains(AllowEnum.PUT)) {
                 accessibleItems.add(hubItem);
             }
         }
