@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.model.request.UserRequest;
 import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
@@ -52,8 +51,8 @@ public class UserRequestService extends HubResponseService {
         return allUserItems;
     }
 
-    public String createUser(UserView user) throws IntegrationException{
-    	final HubRequest UserItemRequest = getHubRequestFactory().createRequest(USERS_SEGMENTS);
+    public String createUser(final UserView user) throws IntegrationException {
+        final HubRequest UserItemRequest = getHubRequestFactory().createRequest(USERS_SEGMENTS);
         Response response = null;
         try {
             response = UserItemRequest.executePost(getGson().toJson(user));
