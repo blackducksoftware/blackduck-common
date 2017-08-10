@@ -60,6 +60,8 @@ public class MetaService {
 
     public static final String VULNERABLE_COMPONENTS_LINK = "vulnerable-components";
 
+    public static final String MATCHED_FILES_LINK = "matched-files";
+
     public static final String CONTENT_LINK = "content";
 
     public static final String DOWNLOAD_LINK = "download";
