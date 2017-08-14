@@ -56,7 +56,7 @@ import com.blackducksoftware.integration.hub.report.api.BomComponent;
 import com.blackducksoftware.integration.hub.report.api.PolicyRule;
 import com.blackducksoftware.integration.hub.report.api.ReportData;
 import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
-import com.blackducksoftware.integration.hub.report.pdf.RiskReportPDFWriter;
+import com.blackducksoftware.integration.hub.report.pdf.PDFBoxWriter;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -187,7 +187,7 @@ public class RiskReportDataService extends HubResponseService {
     public File createReportPdfFile(final File outputDirectory, final ReportData reportData) throws HubIntegrationException {
         try {
             logger.trace("Creating Risk Report Pdf in : " + outputDirectory.getCanonicalPath());
-            final RiskReportPDFWriter writer = new RiskReportPDFWriter();
+            final PDFBoxWriter writer = new PDFBoxWriter(logger);
             final File pdfFile = writer.createPDFReportFile(outputDirectory, reportData);
             logger.trace("Created Risk Report Pdf : " + pdfFile.getCanonicalPath());
             return pdfFile;
