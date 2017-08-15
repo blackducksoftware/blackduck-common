@@ -40,6 +40,7 @@ import com.blackducksoftware.integration.hub.api.component.ComponentRequestServi
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.matchedfiles.MatchedFilesRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
@@ -203,6 +204,10 @@ public class HubServicesFactory {
 
     public VulnerableBomComponentRequestService createVulnerableBomComponentRequestService() {
         return new VulnerableBomComponentRequestService(restConnection);
+    }
+
+    public MatchedFilesRequestService createMatchedFilesRequestService() {
+        return new MatchedFilesRequestService(restConnection);
     }
 
     public CLIDownloadService createCliDownloadService(final IntLogger logger) {

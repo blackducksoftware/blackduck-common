@@ -80,9 +80,9 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     public HubServerConfig build() throws IllegalStateException {
         try {
             return super.build();
-        } catch (final IllegalStateException e) {
-            if (!e.getMessage().contains("SunCertPathBuilderException")) {
-                throw e;
+        } catch (final IllegalStateException stateException) {
+            if (!stateException.getMessage().contains("SunCertPathBuilderException")) {
+                throw stateException;
             }
 
             if (autoImportHttpsCertificates) {
@@ -93,15 +93,15 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
                         handler.importHttpsCertificateForHubServer(url, DEFAULT_TIMEOUT_SECONDS);
                         return super.build();
                     }
-                } catch (final Exception e1) {
-                    throw new IntegrationCertificateException(e.getMessage());
+                } catch (final Exception certificateException) {
+                    throw new IntegrationCertificateException(certificateException.getMessage());
                 }
             }
 
-            // In case of proxy, or if autoImportHttpsCertificates == false we wont attempt to import certificates. The
+            // In case of proxy, or if autoImportHttpsCertificates == false we
+            // wont attempt to import certificates. The
             // User will have to do it on their own.
-            throw new IntegrationCertificateException(
-                    String.format("Please import the certificate for %s into your Java keystore.", hubUrl), e);
+            throw new IntegrationCertificateException(String.format("Please import the certificate for %s into your Java keystore.", hubUrl), stateException);
         }
     }
 
