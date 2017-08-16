@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.dataservice.report;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +89,40 @@ public class RiskReportDataService extends HubResponseService {
         this.metaService = metaService;
         this.hubSupportHelper = hubSupportHelper;
 
+    }
+
+    public String getNoticesReportData(final String projectName, final String projectVersionName) throws IntegrationException {
+        final ProjectView project = projectRequestService.getProjectByName(projectName);
+        final ProjectVersionView version = projectVersionRequestService.getProjectVersion(project, projectVersionName);
+        return getNoticesReportData(project, version);
+    }
+
+    public String getNoticesReportData(final ProjectView project, final ProjectVersionView version) throws IntegrationException {
+        logger.trace("Getting the Notices Report Contents using the Report Rest Server");
+        return reportRequestService.generateHubNoticesReport(version, ReportFormatEnum.TEXT);
+    }
+
+    public File createNoticesReportFile(final File outputDirectory, final String projectName, final String projectVersionName) throws IntegrationException {
+        return createNoticesReportFile(outputDirectory, getNoticesReportData(projectName, projectVersionName));
+    }
+
+    public File createNoticesReportFile(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws IntegrationException {
+        return createNoticesReportFile(outputDirectory, getNoticesReportData(project, version));
+    }
+
+    private File createNoticesReportFile(final File outputDirectory, final String noticesReportContent) throws HubIntegrationException {
+        final File noticesReportFile = new File(outputDirectory, "Hub_Notices_Report.txt");
+        if (noticesReportFile.exists()) {
+            noticesReportFile.delete();
+        }
+        try (FileWriter writer = new FileWriter(noticesReportFile)) {
+            logger.trace("Creating Notices Report in : " + outputDirectory.getCanonicalPath());
+            writer.write(noticesReportContent);
+            logger.trace("Created Notices Report : " + noticesReportFile.getCanonicalPath());
+            return noticesReportFile;
+        } catch (final IOException e) {
+            throw new HubIntegrationException(e.getMessage(), e);
+        }
     }
 
     public ReportData getRiskReportData(final String projectName, final String projectVersionName) throws IntegrationException {
