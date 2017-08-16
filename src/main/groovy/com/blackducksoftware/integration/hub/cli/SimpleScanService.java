@@ -47,10 +47,12 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.ScannerSplitStream;
 import com.blackducksoftware.integration.hub.StreamRedirectThread;
 import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
+import com.blackducksoftware.integration.hub.certificate.HubCertificateHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ScanFailedException;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
@@ -65,27 +67,18 @@ public class SimpleScanService {
     public static final int DEFAULT_MEMORY = 4096;
 
     private final Gson gson;
-
     private final IntLogger logger;
-
     private final HubServerConfig hubServerConfig;
-
     private final HubSupportHelper hubSupportHelper;
-
     private final CIEnvironmentVariables ciEnvironmentVariables;
-
     private final HubScanConfig hubScanConfig;
-
     private final String project;
-
     private final String version;
-
     private final List<String> cmd = new ArrayList<>();
 
     private File logDirectory;
 
-    public SimpleScanService(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig,
-            final HubSupportHelper hubSupportHelper, final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig,
+    public SimpleScanService(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig,
             final String project, final String version) {
         this.gson = gson;
         this.logger = logger;
@@ -98,24 +91,20 @@ public class SimpleScanService {
     }
 
     /**
-     * @deprecated You should create HubScanConfig, rather than pass in each field
+     * @deprecated You should create HubScanConfig, rather than pass in each
+     *             field
      */
     @Deprecated
-    public SimpleScanService(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig,
-            final HubSupportHelper hubSupportHelper,
-            final CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo,
-            final int scanMemory, final boolean dryRun, final String project, final String version, final Set<String> scanTargetPaths,
-            final File workingDirectory, final String[] excludePatterns) {
-        this(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, new HubScanConfig(
-                workingDirectory, scanMemory, scanTargetPaths, dryRun,
-                null, true, excludePatterns, null,
-                false, false), project, version);
+    public SimpleScanService(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo,
+            final int scanMemory, final boolean dryRun, final String project, final String version, final Set<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
+        this(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, new HubScanConfig(workingDirectory, scanMemory, scanTargetPaths, dryRun, null, true, excludePatterns, null, false, false), project, version);
 
     }
 
     /**
-     * This will setup the command-line invocation of the Hub scanner. The workingDirectoryPath is the parent folder of
-     * the scan logs and other scan artifacts.
+     * This will setup the command-line invocation of the Hub scanner. The
+     * workingDirectoryPath is the parent folder of the scan logs and other scan
+     * artifacts.
      *
      * @throws EncryptionException
      * @throws IllegalArgumentException
@@ -133,10 +122,18 @@ public class SimpleScanService {
             pathToOneJar = cliLocation.getOneJarFile().getCanonicalPath();
             pathToScanExecutable = cliLocation.getCLI(logger).getCanonicalPath();
         } catch (final IOException e) {
-            throw new HubIntegrationException(String.format("The provided directory %s did not have a Hub CLI.", hubScanConfig.getToolsDir().getAbsolutePath()),
-                    e);
+            throw new HubIntegrationException(String.format("The provided directory %s did not have a Hub CLI.", hubScanConfig.getToolsDir().getAbsolutePath()), e);
         }
         logger.debug("Using this java installation : " + pathToJavaExecutable);
+
+        if (hubServerConfig.isAutoImportHttpsCertificates()) {
+            try {
+                final HubCertificateHandler hubCertificateHandler = new HubCertificateHandler(logger, cliLocation.getJavaHome());
+                hubCertificateHandler.importHttpsCertificateForHubServer(hubServerConfig.getHubUrl(), hubServerConfig.getTimeout());
+            } catch (IOException | IntegrationException e) {
+                logger.error("Could not automatically import the certificate to the CLI: " + e.getMessage());
+            }
+        }
 
         cmd.add(pathToJavaExecutable);
         cmd.add("-Done-jar.silent=true");
@@ -154,7 +151,8 @@ public class SimpleScanService {
                 cmd.add("-Dhttp.proxyUser=" + proxyUsername);
                 cmd.add("-Dhttp.proxyPassword=" + proxyPassword);
             } else {
-                // CLI will ignore the proxy host and port if there are no credentials
+                // CLI will ignore the proxy host and port if there are no
+                // credentials
                 cmd.add("-Dhttp.proxyUser=user");
                 cmd.add("-Dhttp.proxyPassword=password");
             }
@@ -168,10 +166,8 @@ public class SimpleScanService {
         cmd.add("--host");
         cmd.add(hubServerConfig.getHubUrl().getHost());
         logger.debug("Using this Hub hostname : '" + hubServerConfig.getHubUrl().getHost() + "'");
+
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_INSECURE_OPTION)) {
-            if (hubServerConfig.isAutoImportHttpsCertificates()) {
-                cmd.add("--insecure");
-            }
             cmd.add("--no-prompt");
         }
 
@@ -216,7 +212,8 @@ public class SimpleScanService {
         }
 
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
-            // Only add the statusWriteDir option if the Hub supports the statusWriteDir option
+            // Only add the statusWriteDir option if the Hub supports the
+            // statusWriteDir option
             // The scanStatusDirectoryPath is the same as the log directory path
             // The CLI will create a subdirectory for the status files
             cmd.add("--statusWriteDir");
@@ -256,14 +253,14 @@ public class SimpleScanService {
     }
 
     /**
-     * If running in an environment that handles process creation, this method should be overridden to construct a
-     * process to execute the scan in the environment-specific way.
+     * If running in an environment that handles process creation, this method
+     * should be overridden to construct a process to execute the scan in the
+     * environment-specific way.
      *
      * @throws IOException
      * @throws HubIntegrationException
      */
-    private void executeScan()
-            throws IllegalArgumentException, EncryptionException, IOException, HubIntegrationException {
+    private void executeScan() throws IllegalArgumentException, EncryptionException, IOException, HubIntegrationException {
         printCommand();
 
         final File standardOutFile = getStandardOutputFile();
@@ -290,8 +287,10 @@ public class SimpleScanService {
             try {
                 returnCode = hubCliProcess.waitFor();
 
-                // the join method on the redirect thread will wait until the thread is dead
-                // the thread will die when it reaches the end of stream and the run method is finished
+                // the join method on the redirect thread will wait until the
+                // thread is dead
+                // the thread will die when it reaches the end of stream and the
+                // run method is finished
                 redirectThread.join();
             } catch (final InterruptedException e) {
                 throw new HubIntegrationException("The thread waiting for the cli to complete was interrupted: " + e.getMessage(), e);
@@ -311,7 +310,8 @@ public class SimpleScanService {
     }
 
     /**
-     * For all error cases, return an empty list. If all goes well, return a list of scan summary urls.
+     * For all error cases, return an empty list. If all goes well, return a
+     * list of scan summary urls.
      */
     public List<ScanSummaryView> getScanSummaryItems() {
         if (logDirectory == null || !logDirectory.exists()) {
@@ -346,8 +346,8 @@ public class SimpleScanService {
     }
 
     /**
-     * This method can be overridden to provide a more appropriate directory name for the logs of a specific scan
-     * execution.
+     * This method can be overridden to provide a more appropriate directory
+     * name for the logs of a specific scan execution.
      */
     public String getSpecificScanExecutionLogDirectory() {
         final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZoneUTC();

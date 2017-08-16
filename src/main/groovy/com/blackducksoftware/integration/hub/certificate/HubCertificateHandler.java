@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.certificate;
 
+import java.io.File;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
@@ -38,12 +39,16 @@ import okhttp3.Response;
 
 public class HubCertificateHandler {
     private final IntLogger logger;
-
     private final CertificateHandler handler;
 
     public HubCertificateHandler(final IntLogger logger) {
         this.logger = logger;
         handler = new CertificateHandler(logger);
+    }
+
+    public HubCertificateHandler(final IntLogger logger, final File javaHomeOverride) {
+        this.logger = logger;
+        handler = new CertificateHandler(logger, javaHomeOverride);
     }
 
     public void importHttpsCertificateForHubServer(final URL hubUrl, final int timeout) throws IntegrationException {
@@ -52,13 +57,15 @@ public class HubCertificateHandler {
         }
         handler.retrieveAndImportHttpsCertificate(hubUrl);
         if (!isHubServer(hubUrl, timeout)) {
-            // If we imported a certificate for a non Hub server we want to remove it again
+            // If we imported a certificate for a non Hub server we want to
+            // remove it again
             handler.removeHttpsCertificate(hubUrl);
         }
     }
 
     private boolean isHubServer(final URL hubUrl, final int timeout) {
-        // We assume that a successful connection to the CLI download end point means this is a Hub Server
+        // We assume that a successful connection to the CLI download end point
+        // means this is a Hub Server
         final HttpUrl.Builder urlBuilder = HttpUrl.get(hubUrl).newBuilder();
         urlBuilder.addPathSegment("download");
         urlBuilder.addPathSegment(CLILocation.DEFAULT_CLI_DOWNLOAD);
@@ -69,8 +76,7 @@ public class HubCertificateHandler {
         builder.readTimeout(timeout, TimeUnit.SECONDS);
         try {
             final OkHttpClient client = builder.build();
-            final Request request = new Request.Builder()
-                    .url(url).get().build();
+            final Request request = new Request.Builder().url(url).get().build();
             Response response = null;
             try {
                 response = client.newCall(request).execute();
