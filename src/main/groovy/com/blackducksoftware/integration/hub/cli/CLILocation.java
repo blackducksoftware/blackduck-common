@@ -122,7 +122,7 @@ public class CLILocation {
         }
         if (installDirFiles.length > 1) {
             for (final File currentFile : installDirFiles) {
-                if (!currentFile.getName().contains("windows")) {
+                if (!currentFile.getName().contains("windows") && !currentFile.isHidden()) {
                     return currentFile;
                 }
             }

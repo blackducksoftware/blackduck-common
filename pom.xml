@@ -37,7 +37,7 @@
       <artifactId>hub-common-response</artifactId>
       <version>3.3.0</version>
     </dependency>
-    <dependency>  
+    <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>hub-common-reporting</artifactId>
       <version>2.2.0</version>
