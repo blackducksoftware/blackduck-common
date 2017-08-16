@@ -128,11 +128,7 @@ public class RiskReportDataService extends HubResponseService {
                             policyStatus = bomPolicyStatus.approvalStatus.toString();
                         } catch (final IntegrationException e) {
                             policyFailure = true;
-                            if (StringUtils.isBlank(bomEntry.componentVersionName)) {
-                                logger.debug(String.format("Could not retrieve policy status of component : %s ", bomEntry.componentName));
-                            } else {
-                                logger.debug(String.format("Could not retrieve policy status of component : %s , version : %s", bomEntry.componentName, bomEntry.componentVersionName));
-                            }
+                            logger.debug("Could not get the component policy status, the Hub policy module is not enabled");
                         }
                     }
                 }
