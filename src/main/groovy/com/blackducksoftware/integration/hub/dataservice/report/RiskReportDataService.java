@@ -61,6 +61,7 @@ import com.blackducksoftware.integration.hub.report.pdf.PDFBoxWriter;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 
 public class RiskReportDataService extends HubResponseService {
 
@@ -103,15 +104,18 @@ public class RiskReportDataService extends HubResponseService {
     }
 
     public File createNoticesReportFile(final File outputDirectory, final String projectName, final String projectVersionName) throws IntegrationException {
-        return createNoticesReportFile(outputDirectory, getNoticesReportData(projectName, projectVersionName));
+        return createNoticesReportFile(outputDirectory, getNoticesReportData(projectName, projectVersionName), projectName, projectVersionName);
     }
 
     public File createNoticesReportFile(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws IntegrationException {
-        return createNoticesReportFile(outputDirectory, getNoticesReportData(project, version));
+        return createNoticesReportFile(outputDirectory, getNoticesReportData(project, version), project.name, version.versionName);
     }
 
-    private File createNoticesReportFile(final File outputDirectory, final String noticesReportContent) throws HubIntegrationException {
-        final File noticesReportFile = new File(outputDirectory, "Hub_Notices_Report.txt");
+    private File createNoticesReportFile(final File outputDirectory, final String noticesReportContent, final String projectName, final String projectVersionName) throws HubIntegrationException {
+        final IntegrationEscapeUtil escapeUtil = new IntegrationEscapeUtil();
+        final String escapedProjectName = escapeUtil.escapeForUri(projectName);
+        final String escapedProjectVersionName = escapeUtil.escapeForUri(projectVersionName);
+        final File noticesReportFile = new File(outputDirectory, escapedProjectName + "_" + escapedProjectVersionName + "_Hub_Notices_Report.txt");
         if (noticesReportFile.exists()) {
             noticesReportFile.delete();
         }
