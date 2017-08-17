@@ -108,6 +108,22 @@ public class CLIDataService {
         return version
     }
 
+    /**
+     * This should only be invoked directly when dryRun == true. Otherwise, installAndRunControlledScan should be used.
+     */
+    public File[] runControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig) throws IntegrationException {
+        HubScanConfig controlledConfig = getControlledScanConfig(hubScanConfig)
+        final SimpleScanService simpleScanService = new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, null, null)
+        simpleScanService.setupAndExecuteScan()
+
+        if (hubScanConfig.isCleanupLogsOnSuccess()) {
+            cleanUpLogFiles(simpleScanService)
+        }
+
+        File[] scanSummaryFiles = simpleScanService.getScanSummaryFiles()
+        scanSummaryFiles
+    }
+
     private void printConfiguration(final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
         logger.alwaysLog("--> Log Level : ${logger.getLogLevel().name()}")
         logger.alwaysLog("--> Using Hub Project Name : ${projectRequest?.getName()}, Version : ${projectRequest?.getVersionRequest()?.getVersionName()}, Phase : ${projectRequest?.getVersionRequest()?.getPhase()}, Distribution : ${projectRequest?.getVersionRequest()?.getDistribution()}")
@@ -120,9 +136,7 @@ public class CLIDataService {
         logger.info("Running on machine : " + localHostName)
         printConfiguration(hubScanConfig, projectRequest)
         final String hubVersion = hubVersionRequestService.getHubVersion()
-        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables,
-                hubServerConfig.getHubUrl().toString(),
-                hubVersion, localHostName)
+        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), hubVersion, localHostName)
         phoneHomeDataService.phoneHome(hubServerConfig, integrationInfo, hubVersion)
 
         hubSupportHelper = new HubSupportHelper()
@@ -162,17 +176,6 @@ public class CLIDataService {
         ScanSummaryView scanSummaryView = gson.fromJson(scanSummaryJson, ScanSummaryView.class)
         scanSummaryView.json = scanSummaryJson
         return scanSummaryView
-    }
-
-    private File[] runControlledScan(final HubServerConfig hubServerConfig,
-            final HubScanConfig hubScanConfig) throws IntegrationException {
-        final SimpleScanService simpleScanService = new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper,
-                ciEnvironmentVariables, getControlledScanConfig(hubScanConfig), null, null)
-        simpleScanService.setupAndExecuteScan()
-        if (hubScanConfig.isCleanupLogsOnSuccess()) {
-            cleanUpLogFiles(simpleScanService)
-        }
-        return simpleScanService.getScanSummaryFiles()
     }
 
     private HubScanConfig getControlledScanConfig(final HubScanConfig originalHubScanConfig) {

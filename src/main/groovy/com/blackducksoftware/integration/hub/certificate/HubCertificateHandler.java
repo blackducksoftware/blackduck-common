@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.certificate;
 
+import java.io.File;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
@@ -38,12 +39,16 @@ import okhttp3.Response;
 
 public class HubCertificateHandler {
     private final IntLogger logger;
-
     private final CertificateHandler handler;
 
     public HubCertificateHandler(final IntLogger logger) {
         this.logger = logger;
         handler = new CertificateHandler(logger);
+    }
+
+    public HubCertificateHandler(final IntLogger logger, final File javaHomeOverride) {
+        this.logger = logger;
+        handler = new CertificateHandler(logger, javaHomeOverride);
     }
 
     public void importHttpsCertificateForHubServer(final URL hubUrl, final int timeout) throws IntegrationException {
@@ -69,8 +74,7 @@ public class HubCertificateHandler {
         builder.readTimeout(timeout, TimeUnit.SECONDS);
         try {
             final OkHttpClient client = builder.build();
-            final Request request = new Request.Builder()
-                    .url(url).get().build();
+            final Request request = new Request.Builder().url(url).get().build();
             Response response = null;
             try {
                 response = client.newCall(request).execute();
