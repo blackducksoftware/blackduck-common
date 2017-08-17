@@ -70,26 +70,14 @@ public class ReportRequestService extends HubResponseService {
         this.timeoutInMilliseconds = timeout;
     }
 
-    /**
-     * Generates a new Hub report for the specified version.
-     *
-     */
     public String startGeneratingHubReport(final ProjectVersionView version, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
         return startGeneratingHubReport(metaService.getFirstLink(version, MetaService.VERSION_REPORT_LINK), ReportTypeEnum.VERSION, reportFormat, categories);
     }
 
-    /**
-     * Generates a new Hub report for the specified version.
-     *
-     */
     public String startGeneratingHubNoticesReport(final ProjectVersionView version, final ReportFormatEnum reportFormat) throws IntegrationException {
         return startGeneratingHubReport(metaService.getFirstLink(version, MetaService.VERSION_NOTICES_REPORT_LINK), ReportTypeEnum.VERSION_LICENSE, reportFormat, null);
     }
 
-    /**
-     * Generates a new Hub report for the specified version.
-     *
-     */
     private String startGeneratingHubReport(final String reportUrl, final ReportTypeEnum reportType, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
         final JsonObject json = new JsonObject();
         json.addProperty("reportFormat", reportFormat.toString());
@@ -120,32 +108,17 @@ public class ReportRequestService extends HubResponseService {
         hubRequest.executeDelete();
     }
 
-    /**
-     * Gets the content of the report
-     *
-     * @throws HubIntegrationException
-     */
     public VersionReport getReportContent(final String reportContentUrl) throws IntegrationException {
         final JsonElement fileContent = getReportContentJson(reportContentUrl);
         final VersionReport report = getGson().fromJson(fileContent, VersionReport.class);
         return report;
     }
 
-    /**
-     * Gets the content of the report
-     *
-     * @throws HubIntegrationException
-     */
     public String getNoticesReportContent(final String reportContentUrl) throws IntegrationException {
         final JsonElement fileContent = getReportContentJson(reportContentUrl);
         return fileContent.getAsString();
     }
 
-    /**
-     * Gets the content of the report
-     *
-     * @throws HubIntegrationException
-     */
     private JsonElement getReportContentJson(final String reportContentUrl) throws IntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createRequest(reportContentUrl);
         Response response = null;
