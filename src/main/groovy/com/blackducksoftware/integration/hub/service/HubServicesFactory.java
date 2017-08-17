@@ -71,6 +71,7 @@ import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 
@@ -104,7 +105,11 @@ public class HubServicesFactory {
     }
 
     public PhoneHomeDataService createPhoneHomeDataService(final IntLogger logger) {
-        return new PhoneHomeDataService(logger, restConnection, createHubRegistrationRequestService(), createHubVersionRequestService());
+        return new PhoneHomeDataService(logger, createPhoneHomeClient(logger), createHubRegistrationRequestService(), createHubVersionRequestService());
+    }
+
+    public PhoneHomeClient createPhoneHomeClient(final IntLogger logger){
+        return new PhoneHomeClient(logger, restConnection);
     }
 
     public RiskReportDataService createRiskReportDataService(final IntLogger logger, final long timeoutInMilliseconds) throws IntegrationException {

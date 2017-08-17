@@ -60,7 +60,6 @@ import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomPolicyStatusView;
-import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
@@ -312,7 +311,7 @@ public class ComprehensiveCookbookTestIT {
         final ProjectRequest projectRequest = projectRequestBuilder.build();
 
         final ProjectVersionView version = cliDataService.installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, true,
-                IntegrationInfo.DO_NOT_PHONE_HOME);
+                null, null, null);
 
         assertNotNull(version);
 

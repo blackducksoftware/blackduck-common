@@ -43,10 +43,12 @@ import com.blackducksoftware.integration.hub.model.view.CodeLocationView
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView
 import com.blackducksoftware.integration.hub.model.view.ProjectView
 import com.blackducksoftware.integration.hub.model.view.ScanSummaryView
-import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo
 import com.blackducksoftware.integration.hub.scan.HubScanConfig
 import com.blackducksoftware.integration.hub.util.HostnameHelper
 import com.blackducksoftware.integration.log.IntLogger
+import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody
+import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder
+import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName
 import com.blackducksoftware.integration.util.CIEnvironmentVariables
 import com.google.gson.Gson
 
@@ -100,9 +102,19 @@ public class CLIDataService {
     }
 
     public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig,
-            final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished, final IntegrationInfo integrationInfo)
+            final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished, final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion)
     throws IntegrationException {
-        preScan(hubServerConfig, hubScanConfig, projectRequest, integrationInfo)
+        PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = phoneHomeDataService.createInitialPhoneHomeRequestBodyBuilder()
+        phoneHomeRequestBodyBuilder.setThirdPartyName(thirdPartyName)
+        phoneHomeRequestBodyBuilder.setThirdPartyVersion(thirdPartyVersion)
+        phoneHomeRequestBodyBuilder.setPluginVersion(pluginVersion)
+        PhoneHomeRequestBody phoneHomeRequestBody = PhoneHomeRequestBody.DO_NOT_PHONE_HOME
+        try {
+            phoneHomeRequestBody = phoneHomeRequestBodyBuilder.build()
+        } catch(Exception e) {
+            logger.debug(e.getMessage())
+        }
+        preScan(hubServerConfig, hubScanConfig, projectRequest, phoneHomeRequestBody)
         final File[] scanSummaryFiles = runControlledScan(hubServerConfig, hubScanConfig)
         postScan(hubScanConfig, scanSummaryFiles, projectRequest, shouldWaitForScansFinished)
         return version
@@ -131,13 +143,13 @@ public class CLIDataService {
     }
 
     private void preScan(final HubServerConfig hubServerConfig,
-            final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final IntegrationInfo integrationInfo) throws IntegrationException {
+            final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final PhoneHomeRequestBody phoneHomeRequestBody) throws IntegrationException {
         final String localHostName = HostnameHelper.getMyHostname()
         logger.info("Running on machine : " + localHostName)
         printConfiguration(hubScanConfig, projectRequest)
         final String hubVersion = hubVersionRequestService.getHubVersion()
         cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), hubVersion, localHostName)
-        phoneHomeDataService.phoneHome(hubServerConfig, integrationInfo, hubVersion)
+        phoneHomeDataService.phoneHome(phoneHomeRequestBody)
 
         hubSupportHelper = new HubSupportHelper()
         hubSupportHelper.checkHubSupport(hubVersionRequestService, logger)
@@ -149,11 +161,11 @@ public class CLIDataService {
 
     private void postScan(final HubScanConfig hubScanConfig, final File[] scanSummaryFiles, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished)
     throws IntegrationException {
-        logger.trace("Scan is dry run ${hubScanConfig.isDryRun()}");
+        logger.trace("Scan is dry run ${hubScanConfig.isDryRun()}")
         if (!hubScanConfig.isDryRun()) {
             final List<CodeLocationView> codeLocationViews = new ArrayList<>()
-            final List<ScanSummaryView> scanSummaries = new ArrayList<>();
-            logger.trace("Found ${scanSummaryFiles.length} scan summary files");
+            final List<ScanSummaryView> scanSummaries = new ArrayList<>()
+            logger.trace("Found ${scanSummaryFiles.length} scan summary files")
             for(File scanSummaryFile : scanSummaryFiles) {
                 ScanSummaryView scanSummary = getScanSummaryFromFile(scanSummaryFile)
                 scanSummaries.add(scanSummary)
@@ -165,7 +177,7 @@ public class CLIDataService {
             }
             cleanupCodeLocations(codeLocationViews, hubScanConfig)
             if (shouldWaitForScansFinished) {
-                logger.debug("Waiting for the Bom to be updated.");
+                logger.debug("Waiting for the Bom to be updated.")
                 scanStatusDataService.assertBomImportScansFinished(scanSummaries)
             }
         }

@@ -28,83 +28,49 @@ import java.net.URL;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
-import com.blackducksoftware.integration.hub.global.HubServerConfig;
-import com.blackducksoftware.integration.hub.phonehome.IntegrationInfo;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.phone.home.PhoneHomeClient;
-import com.blackducksoftware.integration.phone.home.enums.BlackDuckName;
-import com.blackducksoftware.integration.phone.home.exception.PhoneHomeArgumentException;
-import com.blackducksoftware.integration.phone.home.exception.PhoneHomeConnectionException;
+import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
+import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;
+import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder;
+import com.blackducksoftware.integration.phonehome.enums.BlackDuckName;
+import com.blackducksoftware.integration.phonehome.enums.PhoneHomeSource;
 
-public class PhoneHomeDataService extends HubResponseService {
+public class PhoneHomeDataService {
     private final IntLogger logger;
-
     private final HubRegistrationRequestService hubRegistrationRequestService;
-
     private final HubVersionRequestService hubVersionRequestService;
+    private final PhoneHomeClient phoneHomeClient;
 
-    public PhoneHomeDataService(final IntLogger logger, final RestConnection restConnection,
-            final HubRegistrationRequestService hubRegistrationRequestService, final HubVersionRequestService hubVersionRequestService) {
-        super(restConnection);
+    public PhoneHomeDataService(final IntLogger logger, final PhoneHomeClient phoneHomeClient, final HubRegistrationRequestService hubRegistrationRequestService, final HubVersionRequestService hubVersionRequestService) {
         this.logger = logger;
         this.hubRegistrationRequestService = hubRegistrationRequestService;
         this.hubVersionRequestService = hubVersionRequestService;
+        this.phoneHomeClient = phoneHomeClient;
     }
 
-    public void phoneHome(final HubServerConfig hubServerConfig, final IntegrationInfo integrationInfo) throws IntegrationException {
-        if (IntegrationInfo.DO_NOT_PHONE_HOME == integrationInfo) {
+    public void phoneHome(final PhoneHomeRequestBody phoneHomeRequestBody){
+        if (phoneHomeRequestBody == PhoneHomeRequestBody.DO_NOT_PHONE_HOME) {
             logger.debug("Skipping phone-home");
         } else {
-            final String hubVersion = hubVersionRequestService.getHubVersion();
-            phoneHome(hubServerConfig, integrationInfo.getThirdPartyName(), integrationInfo.getThirdPartyVersion(),
-                    integrationInfo.getPluginVersion(),
-                    hubVersion);
+            try {
+                phoneHomeClient.postPhoneHomeRequest(phoneHomeRequestBody);
+            } catch(final Exception e) {
+                logger.debug("Problem with phone-home : " + e.getMessage(), e);
+            }
         }
     }
 
-    public void phoneHome(final HubServerConfig hubServerConfig, final IntegrationInfo integrationInfo, final String hubVersion) {
-        if (IntegrationInfo.DO_NOT_PHONE_HOME == integrationInfo) {
-            logger.debug("Skipping phone-home");
-        } else {
-            phoneHome(hubServerConfig, integrationInfo.getThirdPartyName(), integrationInfo.getThirdPartyVersion(),
-                    integrationInfo.getPluginVersion(),
-                    hubVersion);
-        }
-    }
-
-    private void phoneHome(final HubServerConfig hubServerConfig, final String thirdPartyName, final String thirdPartyVersion,
-            final String pluginVersion, final String hubVersion) {
-        try {
-            String registrationId = null;
-            try {
-                registrationId = hubRegistrationRequestService.getRegistrationId();
-            } catch (final Exception e) {
-                logger.debug("Could not get the Hub registration Id.");
-            }
-
-            String hubHostName = null;
-            try {
-                final URL url = hubServerConfig.getHubUrl();
-                hubHostName = url.getHost();
-            } catch (final Exception e) {
-                logger.debug("Could not get the Hub Host name.");
-            }
-            final PhoneHomeClient phClient = new PhoneHomeClient(logger);
-            phClient.setTimeout(hubServerConfig.getTimeout());
-            phClient.setProxyProperties(hubServerConfig.getProxyInfo().getHost(), hubServerConfig.getProxyInfo().getPort(),
-                    hubServerConfig.getProxyInfo().getUsername(), hubServerConfig.getProxyInfo().getDecryptedPassword(),
-                    hubServerConfig.getProxyInfo().getIgnoredProxyHosts());
-            phClient.callHomeIntegrations(registrationId, hubHostName, BlackDuckName.HUB.getName(), hubVersion, thirdPartyName,
-                    thirdPartyVersion, pluginVersion);
-        } catch (final PhoneHomeArgumentException e) {
-            logger.debug(e.getMessage(), e);
-        } catch (final PhoneHomeConnectionException e) {
-            logger.debug("Problem with phone-home connection : " + e.getMessage(), e);
-        } catch (final Exception e) {
-            logger.debug("Problem with phone-home : " + e.getMessage(), e);
-        }
+    public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder() throws IntegrationException{
+        final String hubVersion = hubVersionRequestService.getHubVersion();
+        final String registrationId = hubRegistrationRequestService.getRegistrationId();
+        final URL hubHostName = hubRegistrationRequestService.getHubBaseUrl();
+        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = new PhoneHomeRequestBodyBuilder();
+        phoneHomeRequestBodyBuilder.setRegistrationId(registrationId);
+        phoneHomeRequestBodyBuilder.setHostName(hubHostName.toString());
+        phoneHomeRequestBodyBuilder.setBlackDuckName(BlackDuckName.HUB);
+        phoneHomeRequestBodyBuilder.setBlackDuckVersion(hubVersion);
+        phoneHomeRequestBodyBuilder.setSource(PhoneHomeSource.INTEGRATIONS);
+        return phoneHomeRequestBodyBuilder;
     }
 
 }
