@@ -74,4 +74,18 @@ class RiskReportDataServiceTestIT {
         Assert.assertNotNull(reportFileMap.get('images'))
         Assert.assertNotNull(reportFileMap.get('riskreport.html'))
     }
+
+    @Test
+    public void createNoticesReportFileTest(){
+        final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
+        final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
+
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
+        final IntLogger logger = hubServicesFactory.getRestConnection().logger
+        RiskReportDataService riskReportDataService = hubServicesFactory.createRiskReportDataService(logger, 30000)
+        File folderForReport = folderForReport.getRoot()
+        File noticeReportFile = riskReportDataService.createNoticesReportFile(folderForReport, testProjectName, testProjectVersionName);
+        Assert.assertNotNull(noticeReportFile)
+        Assert.assertTrue(noticeReportFile.exists())
+    }
 }

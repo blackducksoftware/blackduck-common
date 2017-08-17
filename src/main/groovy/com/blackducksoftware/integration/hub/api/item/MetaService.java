@@ -46,6 +46,8 @@ public class MetaService {
 
     public static final String VERSION_REPORT_LINK = "versionReport";
 
+    public static final String VERSION_NOTICES_REPORT_LINK = "licenseReports";
+
     public static final String COMPONENTS_LINK = "components";
 
     public static final String POLICY_RULES_LINK = "policy-rules";

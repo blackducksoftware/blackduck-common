@@ -31,6 +31,7 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.enumeration.ReportFormatEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.ReportTypeEnum;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ReportView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
@@ -69,16 +70,18 @@ public class ReportRequestService extends HubResponseService {
         this.timeoutInMilliseconds = timeout;
     }
 
-    /**
-     * Generates a new Hub report for the specified version.
-     *
-     * @return the Report URL
-     * @throws HubIntegrationException
-     */
-    public String startGeneratingHubReport(final ProjectVersionView version, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories)
-            throws IntegrationException {
+    public String startGeneratingHubReport(final ProjectVersionView version, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
+        return startGeneratingHubReport(metaService.getFirstLink(version, MetaService.VERSION_REPORT_LINK), ReportTypeEnum.VERSION, reportFormat, categories);
+    }
+
+    public String startGeneratingHubNoticesReport(final ProjectVersionView version, final ReportFormatEnum reportFormat) throws IntegrationException {
+        return startGeneratingHubReport(metaService.getFirstLink(version, MetaService.VERSION_NOTICES_REPORT_LINK), ReportTypeEnum.VERSION_LICENSE, reportFormat, null);
+    }
+
+    private String startGeneratingHubReport(final String reportUrl, final ReportTypeEnum reportType, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
         final JsonObject json = new JsonObject();
-        json.addProperty("reportFormat", reportFormat.name());
+        json.addProperty("reportFormat", reportFormat.toString());
+        json.addProperty("reportType", reportType.toString());
 
         if (categories != null) {
             final JsonArray categoriesJson = new JsonArray();
@@ -88,7 +91,7 @@ public class ReportRequestService extends HubResponseService {
             json.add("categories", categoriesJson);
         }
 
-        final HubRequest hubRequest = getHubRequestFactory().createRequest(getVersionReportLink(version));
+        final HubRequest hubRequest = getHubRequestFactory().createRequest(reportUrl);
         Response response = null;
         try {
             response = hubRequest.executePost(getGson().toJson(json));
@@ -105,12 +108,18 @@ public class ReportRequestService extends HubResponseService {
         hubRequest.executeDelete();
     }
 
-    /**
-     * Gets the content of the report
-     *
-     * @throws HubIntegrationException
-     */
     public VersionReport getReportContent(final String reportContentUrl) throws IntegrationException {
+        final JsonElement fileContent = getReportContentJson(reportContentUrl);
+        final VersionReport report = getGson().fromJson(fileContent, VersionReport.class);
+        return report;
+    }
+
+    public String getNoticesReportContent(final String reportContentUrl) throws IntegrationException {
+        final JsonElement fileContent = getReportContentJson(reportContentUrl);
+        return fileContent.getAsString();
+    }
+
+    private JsonElement getReportContentJson(final String reportContentUrl) throws IntegrationException {
         final HubRequest hubRequest = getHubRequestFactory().createRequest(reportContentUrl);
         Response response = null;
         try {
@@ -121,8 +130,7 @@ public class ReportRequestService extends HubResponseService {
             final JsonElement content = json.get("reportContent");
             final JsonArray reportConentArray = content.getAsJsonArray();
             final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
-            final VersionReport report = getGson().fromJson(reportFile.get("fileContent"), VersionReport.class);
-            return report;
+            return reportFile.get("fileContent");
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
         } finally {
@@ -133,13 +141,9 @@ public class ReportRequestService extends HubResponseService {
     }
 
     /**
-     * Checks the report URL every 5 seconds until the report has a finished
-     * time available, then we know it is done being generated. Throws
-     * HubIntegrationException after 30 minutes if the report has not been
-     * generated yet.
+     * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done being generated. Throws HubIntegrationException after 30 minutes if the report has not been generated yet.
      */
-    public ReportView isReportFinishedGenerating(final String reportUrl)
-            throws IntegrationException {
+    public ReportView isReportFinishedGenerating(final String reportUrl) throws IntegrationException {
         final long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         Date timeFinished = null;
@@ -181,10 +185,8 @@ public class ReportRequestService extends HubResponseService {
     /**
      * Assumes the BOM has already been updated
      *
-     * @throws HubIntegrationException
      */
-    public VersionReport generateHubReport(final ProjectVersionView version, final ReportFormatEnum reportFormat,
-            final ReportCategoriesEnum[] categories) throws IntegrationException {
+    public VersionReport generateHubReport(final ProjectVersionView version, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
         logger.debug("Starting the Report generation.");
         final String reportUrl = startGeneratingHubReport(version, reportFormat, categories);
 
@@ -202,13 +204,32 @@ public class ReportRequestService extends HubResponseService {
         logger.debug("Finished retrieving the Report.");
         logger.debug("Cleaning up the Report on the server.");
         deleteHubReport(reportUrl);
-
         return report;
     }
 
-    private String getVersionReportLink(final ProjectVersionView version) throws HubIntegrationException {
-        final String versionLink = metaService.getFirstLink(version, MetaService.VERSION_REPORT_LINK);
-        return versionLink;
+    /**
+     * Assumes the BOM has already been updated
+     *
+     */
+    public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatEnum reportFormat) throws IntegrationException {
+        logger.debug("Starting the Notices Report generation.");
+        final String reportUrl = startGeneratingHubNoticesReport(version, reportFormat);
+
+        logger.debug("Waiting for the Notices Report to complete.");
+        final ReportView reportInfo = isReportFinishedGenerating(reportUrl);
+
+        final String contentLink = metaService.getFirstLink(reportInfo, MetaService.CONTENT_LINK);
+
+        if (contentLink == null) {
+            throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
+        }
+
+        logger.debug("Getting the Notices Report content.");
+        final String noticesReport = getNoticesReportContent(contentLink);
+        logger.debug("Finished retrieving the Notices Report.");
+        logger.debug("Cleaning up the Notices Report on the server.");
+        deleteHubReport(reportUrl);
+        return noticesReport;
     }
 
 }
