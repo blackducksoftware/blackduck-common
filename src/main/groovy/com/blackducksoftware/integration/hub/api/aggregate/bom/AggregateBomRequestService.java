@@ -44,10 +44,10 @@ public class AggregateBomRequestService extends HubResponseService {
 
     public List<VersionBomComponentView> getBomEntries(final ProjectVersionView projectVersion) throws IntegrationException {
         if (metaService.hasLink(projectVersion, MetaService.COMPONENTS_LINK)) {
-            // In some versions of the Hub, if the BOM is empty the version wil not have the components link
             final String componentURL = metaService.getFirstLink(projectVersion, MetaService.COMPONENTS_LINK);
             return getBomEntries(componentURL);
         } else {
+            // In some versions of the Hub, if the BOM is empty the version will not have the components link
             return new ArrayList<>();
         }
     }
