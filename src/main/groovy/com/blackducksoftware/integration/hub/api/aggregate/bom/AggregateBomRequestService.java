@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.api.aggregate.bom;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -42,8 +43,13 @@ public class AggregateBomRequestService extends HubResponseService {
     }
 
     public List<VersionBomComponentView> getBomEntries(final ProjectVersionView projectVersion) throws IntegrationException {
-        final String componentURL = metaService.getFirstLink(projectVersion, MetaService.COMPONENTS_LINK);
-        return getBomEntries(componentURL);
+        if (metaService.hasLink(projectVersion, MetaService.COMPONENTS_LINK)) {
+            final String componentURL = metaService.getFirstLink(projectVersion, MetaService.COMPONENTS_LINK);
+            return getBomEntries(componentURL);
+        } else {
+            // In some versions of the Hub, if the BOM is empty the version will not have the components link
+            return new ArrayList<>();
+        }
     }
 
     public List<VersionBomComponentView> getBomEntries(final String componentsUrl) throws IntegrationException {

@@ -61,24 +61,11 @@ public class CLILocation {
     }
 
     public File getJreSecurityDirectory() throws IOException {
-        final File cliHomeFile = getCLIHome();
-        if (cliHomeFile == null) {
-            logger.error("Could not find the CLI home directory");
-            return null;
-        }
+        final File javaHome = getJavaHome();
+        File jreSecurityDirectory = new File(javaHome, "lib");
+        jreSecurityDirectory = new File(jreSecurityDirectory, "security");
 
-        final File[] files = cliHomeFile.listFiles();
-        final File jreFolder = findFileByName(files, "jre");
-        if (jreFolder == null) {
-            logger.error("Could not find the JRE directory in : " + cliHomeFile.getCanonicalPath());
-            return null;
-        }
-
-        File jreContents = getJreContentsDirectory(jreFolder);
-        jreContents = new File(jreContents, "lib");
-        jreContents = new File(jreContents, "security");
-
-        return jreContents;
+        return jreSecurityDirectory;
     }
 
     public String getCLIDownloadUrl(final IntLogger logger, final String hubUrl) {
@@ -108,8 +95,7 @@ public class CLILocation {
 
     public File createHubVersionFile() throws HubIntegrationException, IOException {
         if (!directoryToInstallTo.exists() && !directoryToInstallTo.mkdirs()) {
-            throw new HubIntegrationException(
-                    "Could not create the directory : " + directoryToInstallTo.getCanonicalPath());
+            throw new HubIntegrationException("Could not create the directory : " + directoryToInstallTo.getCanonicalPath());
         }
 
         return new File(directoryToInstallTo, VERSION_FILE_NAME);
@@ -136,7 +122,7 @@ public class CLILocation {
         }
         if (installDirFiles.length > 1) {
             for (final File currentFile : installDirFiles) {
-                if (!currentFile.getName().contains("windows")) {
+                if (!currentFile.getName().contains("windows") && !currentFile.isHidden()) {
                     return currentFile;
                 }
             }
@@ -150,6 +136,23 @@ public class CLILocation {
     }
 
     public File getProvidedJavaExec() throws IOException {
+        final File javaHome = getJavaHome();
+        File javaExec = new File(javaHome, "bin");
+        if (SystemUtils.IS_OS_WINDOWS) {
+            javaExec = new File(javaExec, "java.exe");
+        } else {
+            javaExec = new File(javaExec, "java");
+        }
+        if (!javaExec.exists()) {
+            logger.error("The java executable does not exist at : " + javaExec.getCanonicalPath());
+            return null;
+        }
+
+        javaExec.setExecutable(true);
+        return javaExec;
+    }
+
+    public File getJavaHome() throws IOException {
         final File cliHomeFile = getCLIHome();
         if (cliHomeFile == null) {
             logger.error("Could not find the CLI home directory");
@@ -163,20 +166,8 @@ public class CLILocation {
             return null;
         }
 
-        final File jreContents = getJreContentsDirectory(jreFolder);
-        File javaExec = new File(jreContents, "bin");
-        if (SystemUtils.IS_OS_WINDOWS) {
-            javaExec = new File(javaExec, "java.exe");
-        } else {
-            javaExec = new File(javaExec, "java");
-        }
-        if (!javaExec.exists()) {
-            logger.error("The java executable does not exist at : " + javaExec.getCanonicalPath());
-            return null;
-        }
-
-        javaExec.setExecutable(true);
-        return javaExec;
+        final File javaHome = getJreContentsDirectory(jreFolder);
+        return javaHome;
     }
 
     public boolean getCLIExists(final IntLogger logger) throws IOException {
