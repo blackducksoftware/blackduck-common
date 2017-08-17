@@ -114,6 +114,9 @@ public class RiskReportDataService extends HubResponseService {
     }
 
     private File createNoticesReportFile(final File outputDirectory, final String noticesReportContent, final String projectName, final String projectVersionName) throws HubIntegrationException {
+        if (noticesReportContent == null) {
+            return null;
+        }
         final String escapedProjectName = escapeUtil.escapeForUri(projectName);
         final String escapedProjectVersionName = escapeUtil.escapeForUri(projectVersionName);
         final File noticesReportFile = new File(outputDirectory, escapedProjectName + "_" + escapedProjectVersionName + "_Hub_Notices_Report.txt");
