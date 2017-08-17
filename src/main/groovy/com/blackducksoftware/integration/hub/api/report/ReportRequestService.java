@@ -36,6 +36,7 @@ import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ReportView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.google.gson.JsonArray;
@@ -213,24 +214,34 @@ public class ReportRequestService extends HubResponseService {
      */
     public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatEnum reportFormat) throws IntegrationException {
         if (metaService.hasLink(version, MetaService.VERSION_NOTICES_REPORT_LINK)) {
-            logger.debug("Starting the Notices Report generation.");
-            final String reportUrl = startGeneratingHubNoticesReport(version, reportFormat);
+            try {
+                logger.alwaysLog("Found the licenseReportsLink");
+                logger.debug("Starting the Notices Report generation.");
+                final String reportUrl = startGeneratingHubNoticesReport(version, reportFormat);
 
-            logger.debug("Waiting for the Notices Report to complete.");
-            final ReportView reportInfo = isReportFinishedGenerating(reportUrl);
+                logger.debug("Waiting for the Notices Report to complete.");
+                final ReportView reportInfo = isReportFinishedGenerating(reportUrl);
 
-            final String contentLink = metaService.getFirstLink(reportInfo, MetaService.CONTENT_LINK);
+                final String contentLink = metaService.getFirstLink(reportInfo, MetaService.CONTENT_LINK);
 
-            if (contentLink == null) {
-                throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
+                if (contentLink == null) {
+                    throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
+                }
+
+                logger.debug("Getting the Notices Report content.");
+                final String noticesReport = getNoticesReportContent(contentLink);
+                logger.debug("Finished retrieving the Notices Report.");
+                logger.debug("Cleaning up the Notices Report on the server.");
+                deleteHubReport(reportUrl);
+                return noticesReport;
+            } catch (final IntegrationRestException e) {
+                if (e.getHttpStatusCode() == 402) {
+                    // unlike the policy module, the licenseReports link is still present when the module is not enabled
+                    logger.warn("Can not create the notice report, the Hub notice module is not enabled.");
+                } else {
+                    throw e;
+                }
             }
-
-            logger.debug("Getting the Notices Report content.");
-            final String noticesReport = getNoticesReportContent(contentLink);
-            logger.debug("Finished retrieving the Notices Report.");
-            logger.debug("Cleaning up the Notices Report on the server.");
-            deleteHubReport(reportUrl);
-            return noticesReport;
         } else {
             logger.warn("Can not create the notice report, the Hub notice module is not enabled.");
         }
