@@ -54,7 +54,7 @@ public class PhoneHomeDataService {
         } else {
             try {
                 phoneHomeClient.postPhoneHomeRequest(phoneHomeRequestBody);
-            }catch(final Exception e){
+            } catch(final Exception e) {
                 logger.debug("Problem with phone-home : " + e.getMessage(), e);
             }
         }

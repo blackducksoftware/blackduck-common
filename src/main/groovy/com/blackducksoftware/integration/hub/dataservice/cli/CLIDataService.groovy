@@ -109,9 +109,9 @@ public class CLIDataService {
         phoneHomeRequestBodyBuilder.setThirdPartyVersion(thirdPartyVersion)
         phoneHomeRequestBodyBuilder.setPluginVersion(pluginVersion)
         PhoneHomeRequestBody phoneHomeRequestBody = PhoneHomeRequestBody.DO_NOT_PHONE_HOME
-        try{
+        try {
             phoneHomeRequestBody = phoneHomeRequestBodyBuilder.build()
-        }catch(Exception e){
+        } catch(Exception e) {
             logger.debug(e.getMessage())
         }
         preScan(hubServerConfig, hubScanConfig, projectRequest, phoneHomeRequestBody)
@@ -148,9 +148,7 @@ public class CLIDataService {
         logger.info("Running on machine : " + localHostName)
         printConfiguration(hubScanConfig, projectRequest)
         final String hubVersion = hubVersionRequestService.getHubVersion()
-        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables,
-                hubServerConfig.getHubUrl().toString(),
-                hubVersion, localHostName)
+        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), hubVersion, localHostName)
         phoneHomeDataService.phoneHome(phoneHomeRequestBody)
 
         hubSupportHelper = new HubSupportHelper()
