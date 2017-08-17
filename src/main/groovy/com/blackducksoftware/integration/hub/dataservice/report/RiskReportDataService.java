@@ -79,8 +79,10 @@ public class RiskReportDataService extends HubResponseService {
 
     private final HubSupportHelper hubSupportHelper;
 
+    private final IntegrationEscapeUtil escapeUtil;
+
     public RiskReportDataService(final IntLogger logger, final RestConnection restConnection, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
-            final ReportRequestService reportRequestService, final AggregateBomRequestService bomRequestService, final MetaService metaService, final HubSupportHelper hubSupportHelper) {
+            final ReportRequestService reportRequestService, final AggregateBomRequestService bomRequestService, final MetaService metaService, final HubSupportHelper hubSupportHelper, final IntegrationEscapeUtil escapeUtil) {
         super(restConnection);
         this.logger = logger;
         this.projectRequestService = projectRequestService;
@@ -89,7 +91,7 @@ public class RiskReportDataService extends HubResponseService {
         this.bomRequestService = bomRequestService;
         this.metaService = metaService;
         this.hubSupportHelper = hubSupportHelper;
-
+        this.escapeUtil = escapeUtil;
     }
 
     public String getNoticesReportData(final String projectName, final String projectVersionName) throws IntegrationException {
@@ -112,7 +114,6 @@ public class RiskReportDataService extends HubResponseService {
     }
 
     private File createNoticesReportFile(final File outputDirectory, final String noticesReportContent, final String projectName, final String projectVersionName) throws HubIntegrationException {
-        final IntegrationEscapeUtil escapeUtil = new IntegrationEscapeUtil();
         final String escapedProjectName = escapeUtil.escapeForUri(projectName);
         final String escapedProjectVersionName = escapeUtil.escapeForUri(projectVersionName);
         final File noticesReportFile = new File(outputDirectory, escapedProjectName + "_" + escapedProjectVersionName + "_Hub_Notices_Report.txt");

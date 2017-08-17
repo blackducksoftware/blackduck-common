@@ -72,6 +72,7 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 
 public class HubServicesFactory {
     private final CIEnvironmentVariables ciEnvironmentVariables;
@@ -108,7 +109,7 @@ public class HubServicesFactory {
 
     public RiskReportDataService createRiskReportDataService(final IntLogger logger, final long timeoutInMilliseconds) throws IntegrationException {
         return new RiskReportDataService(logger, restConnection, createProjectRequestService(logger), createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds),
-                createAggregateBomRequestService(logger), createMetaService(logger), createCheckedHubSupport(logger));
+                createAggregateBomRequestService(logger), createMetaService(logger), createCheckedHubSupport(logger), createIntegrationEscapeUtil());
     }
 
     public PolicyStatusDataService createPolicyStatusDataService(final IntLogger logger) {
@@ -207,6 +208,10 @@ public class HubServicesFactory {
 
     public CLIDownloadService createCliDownloadService(final IntLogger logger) {
         return new CLIDownloadService(logger, restConnection);
+    }
+
+    public IntegrationEscapeUtil createIntegrationEscapeUtil() {
+        return new IntegrationEscapeUtil();
     }
 
     /**
