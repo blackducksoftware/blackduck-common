@@ -91,20 +91,16 @@ public class SimpleScanService {
     }
 
     /**
-     * @deprecated You should create HubScanConfig, rather than pass in each
-     *             field
+     * @deprecated You should create HubScanConfig, rather than pass in each field
      */
     @Deprecated
     public SimpleScanService(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo,
             final int scanMemory, final boolean dryRun, final String project, final String version, final Set<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
         this(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, new HubScanConfig(workingDirectory, scanMemory, scanTargetPaths, dryRun, null, true, excludePatterns, null, false, false), project, version);
-
     }
 
     /**
-     * This will setup the command-line invocation of the Hub scanner. The
-     * workingDirectoryPath is the parent folder of the scan logs and other scan
-     * artifacts.
+     * This will setup the command-line invocation of the Hub scanner. The workingDirectoryPath is the parent folder of the scan logs and other scan artifacts.
      *
      * @throws EncryptionException
      * @throws IllegalArgumentException
@@ -151,8 +147,7 @@ public class SimpleScanService {
                 cmd.add("-Dhttp.proxyUser=" + proxyUsername);
                 cmd.add("-Dhttp.proxyPassword=" + proxyPassword);
             } else {
-                // CLI will ignore the proxy host and port if there are no
-                // credentials
+                // CLI will ignore the proxy host and port if there are no credentials
                 cmd.add("-Dhttp.proxyUser=user");
                 cmd.add("-Dhttp.proxyPassword=password");
             }
@@ -212,8 +207,7 @@ public class SimpleScanService {
         }
 
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
-            // Only add the statusWriteDir option if the Hub supports the
-            // statusWriteDir option
+            // Only add the statusWriteDir option if the Hub supports the statusWriteDir option
             // The scanStatusDirectoryPath is the same as the log directory path
             // The CLI will create a subdirectory for the status files
             cmd.add("--statusWriteDir");
@@ -253,9 +247,7 @@ public class SimpleScanService {
     }
 
     /**
-     * If running in an environment that handles process creation, this method
-     * should be overridden to construct a process to execute the scan in the
-     * environment-specific way.
+     * If running in an environment that handles process creation, this method should be overridden to construct a process to execute the scan in the environment-specific way.
      *
      * @throws IOException
      * @throws HubIntegrationException
@@ -287,10 +279,8 @@ public class SimpleScanService {
             try {
                 returnCode = hubCliProcess.waitFor();
 
-                // the join method on the redirect thread will wait until the
-                // thread is dead
-                // the thread will die when it reaches the end of stream and the
-                // run method is finished
+                // the join method on the redirect thread will wait until the thread is dead
+                // the thread will die when it reaches the end of stream and the run method is finished
                 redirectThread.join();
             } catch (final InterruptedException e) {
                 throw new HubIntegrationException("The thread waiting for the cli to complete was interrupted: " + e.getMessage(), e);
@@ -310,8 +300,7 @@ public class SimpleScanService {
     }
 
     /**
-     * For all error cases, return an empty list. If all goes well, return a
-     * list of scan summary urls.
+     * For all error cases, return an empty list. If all goes well, return a list of scan summary urls.
      */
     public List<ScanSummaryView> getScanSummaryItems() {
         if (logDirectory == null || !logDirectory.exists()) {
@@ -346,8 +335,7 @@ public class SimpleScanService {
     }
 
     /**
-     * This method can be overridden to provide a more appropriate directory
-     * name for the logs of a specific scan execution.
+     * This method can be overridden to provide a more appropriate directory name for the logs of a specific scan execution.
      */
     public String getSpecificScanExecutionLogDirectory() {
         final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZoneUTC();
