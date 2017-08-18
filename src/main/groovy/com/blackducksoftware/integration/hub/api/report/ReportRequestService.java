@@ -215,7 +215,6 @@ public class ReportRequestService extends HubResponseService {
     public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatEnum reportFormat) throws IntegrationException {
         if (metaService.hasLink(version, MetaService.VERSION_NOTICES_REPORT_LINK)) {
             try {
-                logger.alwaysLog("Found the licenseReportsLink");
                 logger.debug("Starting the Notices Report generation.");
                 final String reportUrl = startGeneratingHubNoticesReport(version, reportFormat);
 
