@@ -85,8 +85,7 @@ public class ComprehensiveCookbookTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService(hubServicesFactory.getRestConnection().logger);
-        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory
-                .createProjectVersionRequestService(logger);
+        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService(logger);
         final MetaService metaService = hubServicesFactory.createMetaService(logger);
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
 
@@ -114,8 +113,7 @@ public class ComprehensiveCookbookTestIT {
 
         final int projectVersionCount = projectVersionRequestService.getAllProjectVersions(projectItem).size();
 
-        final String projectVersionUrl = projectVersionRequestService.createHubVersion(projectItem,
-                new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, "RestConnectionTest"));
+        final String projectVersionUrl = projectVersionRequestService.createHubVersion(projectItem, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, "RestConnectionTest"));
         final ProjectVersionView projectVersionItem = projectVersionRequestService.getItem(projectVersionUrl, ProjectVersionView.class);
         final ProjectVersionView projectVersionItemFromName = projectVersionRequestService.getProjectVersion(projectItem, "RestConnectionTest");
         // should return the same project version
@@ -131,8 +129,7 @@ public class ComprehensiveCookbookTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService(hubServicesFactory.getRestConnection().logger);
-        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory
-                .createProjectVersionRequestService(logger);
+        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService(logger);
         final MetaService metaService = hubServicesFactory.createMetaService(logger);
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
 
@@ -186,12 +183,9 @@ public class ComprehensiveCookbookTestIT {
         final MetaService metaService = hubServicesFactory.createMetaService(logger);
         final BomImportRequestService bomImportRequestService = hubServicesFactory.createBomImportRequestService();
         final CodeLocationRequestService codeLocationRequestService = hubServicesFactory.createCodeLocationRequestService(logger);
-        final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(logger,
-                FIVE_MINUTES);
-        final PolicyStatusDataService policyStatusDataService = hubServicesFactory
-                .createPolicyStatusDataService(logger);
-        final NotificationRequestService notificationRequestService = hubServicesFactory
-                .createNotificationRequestService(logger);
+        final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(logger, FIVE_MINUTES);
+        final PolicyStatusDataService policyStatusDataService = hubServicesFactory.createPolicyStatusDataService(logger);
+        final NotificationRequestService notificationRequestService = hubServicesFactory.createNotificationRequestService(logger);
 
         // delete the project, if it exists
         try {
@@ -228,8 +222,7 @@ public class ComprehensiveCookbookTestIT {
         }
 
         // verify the policy
-        final VersionBomPolicyStatusView policyStatusItem = policyStatusDataService
-                .getPolicyStatusForProjectAndVersion("ek_mtglist", "0.0.1");
+        final VersionBomPolicyStatusView policyStatusItem = policyStatusDataService.getPolicyStatusForProjectAndVersion("ek_mtglist", "0.0.1");
         assertEquals(VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION, policyStatusItem.overallStatus);
         System.out.println(policyStatusItem);
 
@@ -269,8 +262,7 @@ public class ComprehensiveCookbookTestIT {
         final MetaService metaService = hubServicesFactory.createMetaService(logger);
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
         final CLIDataService cliDataService = hubServicesFactory.createCLIDataService(logger, TWENTY_MINUTES);
-        final PolicyStatusDataService policyStatusDataService = hubServicesFactory
-                .createPolicyStatusDataService(logger);
+        final PolicyStatusDataService policyStatusDataService = hubServicesFactory.createPolicyStatusDataService(logger);
 
         // delete the project, if it exists
         try {
@@ -310,14 +302,12 @@ public class ComprehensiveCookbookTestIT {
 
         final ProjectRequest projectRequest = projectRequestBuilder.build();
 
-        final ProjectVersionView version = cliDataService.installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, true,
-                null, null, null);
+        final ProjectVersionView version = cliDataService.installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, true, (String) null, null, null);
 
         assertNotNull(version);
 
         // verify the policy
-        final VersionBomPolicyStatusView policyStatusItem = policyStatusDataService
-                .getPolicyStatusForVersion(version);
+        final VersionBomPolicyStatusView policyStatusItem = policyStatusDataService.getPolicyStatusForVersion(version);
         assertEquals(VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION, policyStatusItem.overallStatus);
         System.out.println(policyStatusItem);
     }
@@ -327,8 +317,7 @@ public class ComprehensiveCookbookTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService(logger);
-        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory
-                .createProjectVersionRequestService(logger);
+        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService(logger);
 
         final List<ProjectView> allProjects = projectRequestService.getAllProjects();
         System.out.println(String.format("project count: %d", allProjects.size()));
