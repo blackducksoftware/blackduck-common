@@ -47,7 +47,6 @@ import com.blackducksoftware.integration.hub.scan.HubScanConfig
 import com.blackducksoftware.integration.hub.util.HostnameHelper
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody
-import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder
 import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName
 import com.blackducksoftware.integration.util.CIEnvironmentVariables
 import com.google.gson.Gson
@@ -101,16 +100,14 @@ public class CLIDataService {
         this.metaService = metaService
     }
 
-    public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig,
-            final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished, final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion)
-    throws IntegrationException {
-        PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = phoneHomeDataService.createInitialPhoneHomeRequestBodyBuilder()
-        phoneHomeRequestBodyBuilder.setThirdPartyName(thirdPartyName)
-        phoneHomeRequestBodyBuilder.setThirdPartyVersion(thirdPartyVersion)
-        phoneHomeRequestBodyBuilder.setPluginVersion(pluginVersion)
+    public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished, final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
+        installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, shouldWaitForScansFinished, thirdPartyName.toString(), thirdPartyVersion, pluginVersion);
+    }
+
+    public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished, final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
         PhoneHomeRequestBody phoneHomeRequestBody = PhoneHomeRequestBody.DO_NOT_PHONE_HOME
         try {
-            phoneHomeRequestBody = phoneHomeRequestBodyBuilder.build()
+            phoneHomeRequestBody = phoneHomeDataService.buildPhoneHomeRequestBody(thirdPartyName, thirdPartyVersion, pluginVersion)
         } catch(Exception e) {
             logger.debug(e.getMessage())
         }

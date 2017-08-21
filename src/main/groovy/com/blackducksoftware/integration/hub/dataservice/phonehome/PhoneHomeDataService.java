@@ -33,7 +33,9 @@ import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder;
 import com.blackducksoftware.integration.phonehome.enums.BlackDuckName;
+import com.blackducksoftware.integration.phonehome.enums.PhoneHomeRequestFieldEnum;
 import com.blackducksoftware.integration.phonehome.enums.PhoneHomeSource;
+import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName;
 
 public class PhoneHomeDataService {
     private final IntLogger logger;
@@ -48,19 +50,40 @@ public class PhoneHomeDataService {
         this.phoneHomeClient = phoneHomeClient;
     }
 
-    public void phoneHome(final PhoneHomeRequestBody phoneHomeRequestBody){
+    public void phoneHome(final PhoneHomeRequestBody phoneHomeRequestBody) {
         if (phoneHomeRequestBody == PhoneHomeRequestBody.DO_NOT_PHONE_HOME) {
             logger.debug("Skipping phone-home");
         } else {
             try {
                 phoneHomeClient.postPhoneHomeRequest(phoneHomeRequestBody);
-            } catch(final Exception e) {
+            } catch (final Exception e) {
                 logger.debug("Problem with phone-home : " + e.getMessage(), e);
             }
         }
     }
 
-    public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder() throws IntegrationException{
+    public PhoneHomeRequestBody buildPhoneHomeRequestBody(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
+        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
+        phoneHomeRequestBodyBuilder.setThirdPartyName(thirdPartyName);
+
+        final PhoneHomeRequestBody phoneHomeRequestBody = phoneHomeRequestBodyBuilder.buildObject();
+        phoneHomeRequestBody.getInfoMap().put(PhoneHomeRequestFieldEnum.THIRDPARTYVERSION.getKey(), thirdPartyVersion);
+        phoneHomeRequestBody.getInfoMap().put(PhoneHomeRequestFieldEnum.PLUGINVERSION.getKey(), pluginVersion);
+        return phoneHomeRequestBody;
+    }
+
+    public PhoneHomeRequestBody buildPhoneHomeRequestBody(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
+        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
+        phoneHomeRequestBodyBuilder.setThirdPartyName(ThirdPartyName.BLANK);
+
+        final PhoneHomeRequestBody phoneHomeRequestBody = phoneHomeRequestBodyBuilder.buildObject();
+        phoneHomeRequestBody.getInfoMap().put(PhoneHomeRequestFieldEnum.THIRDPARTYNAME.getKey(), thirdPartyName);
+        phoneHomeRequestBody.getInfoMap().put(PhoneHomeRequestFieldEnum.THIRDPARTYVERSION.getKey(), thirdPartyVersion);
+        phoneHomeRequestBody.getInfoMap().put(PhoneHomeRequestFieldEnum.PLUGINVERSION.getKey(), pluginVersion);
+        return phoneHomeRequestBody;
+    }
+
+    public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder() throws IntegrationException {
         final String hubVersion = hubVersionRequestService.getHubVersion();
         final String registrationId = hubRegistrationRequestService.getRegistrationId();
         final URL hubHostName = hubRegistrationRequestService.getHubBaseUrl();
