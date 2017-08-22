@@ -62,18 +62,19 @@ public class PhoneHomeDataService {
         }
     }
 
-    public PhoneHomeRequestBody buildPhoneHomeRequestBody(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
-        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
-        phoneHomeRequestBodyBuilder.setThirdPartyName(thirdPartyName);
-
-        final PhoneHomeRequestBody phoneHomeRequestBody = phoneHomeRequestBodyBuilder.buildObject();
-        phoneHomeRequestBody.getInfoMap().put(PhoneHomeRequestFieldEnum.THIRDPARTYVERSION.getKey(), thirdPartyVersion);
-        phoneHomeRequestBody.getInfoMap().put(PhoneHomeRequestFieldEnum.PLUGINVERSION.getKey(), pluginVersion);
-        return phoneHomeRequestBody;
+    public PhoneHomeRequestBody buildPhoneHomeRequestBody(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
+        return buildPhoneHomeRequestBody(thirdPartyName.toString(), thirdPartyVersion, pluginVersion);
     }
 
-    public PhoneHomeRequestBody buildPhoneHomeRequestBody(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
-        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
+    public PhoneHomeRequestBody buildPhoneHomeRequestBody(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
+        PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder;
+        try {
+            phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
+        } catch (final IntegrationException e) {
+            logger.debug("Couldn't build initial phone home builder: " + e.getMessage());
+            return PhoneHomeRequestBody.DO_NOT_PHONE_HOME;
+        }
+
         phoneHomeRequestBodyBuilder.setThirdPartyName(ThirdPartyName.BLANK);
 
         final PhoneHomeRequestBody phoneHomeRequestBody = phoneHomeRequestBodyBuilder.buildObject();
