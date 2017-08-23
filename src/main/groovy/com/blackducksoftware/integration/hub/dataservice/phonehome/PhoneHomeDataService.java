@@ -33,7 +33,6 @@ import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder;
 import com.blackducksoftware.integration.phonehome.enums.BlackDuckName;
-import com.blackducksoftware.integration.phonehome.enums.PhoneHomeRequestFieldEnum;
 import com.blackducksoftware.integration.phonehome.enums.PhoneHomeSource;
 import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName;
 
@@ -63,24 +62,21 @@ public class PhoneHomeDataService {
     }
 
     public PhoneHomeRequestBody buildPhoneHomeRequestBody(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
-        return buildPhoneHomeRequestBody(thirdPartyName.toString(), thirdPartyVersion, pluginVersion);
+        return buildPhoneHomeRequestBody(thirdPartyName.getName(), thirdPartyVersion, pluginVersion);
     }
 
     public PhoneHomeRequestBody buildPhoneHomeRequestBody(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
-        PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder;
+        PhoneHomeRequestBody phoneHomeRequestBody = PhoneHomeRequestBody.DO_NOT_PHONE_HOME;
         try {
-            phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
+            final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
+            phoneHomeRequestBodyBuilder.setThirdPartyName(thirdPartyName);
+            phoneHomeRequestBodyBuilder.setThirdPartyVersion(thirdPartyVersion);
+            phoneHomeRequestBodyBuilder.setPluginVersion(pluginVersion);
+
+            phoneHomeRequestBody = phoneHomeRequestBodyBuilder.build();
         } catch (final IntegrationException e) {
-            logger.debug("Couldn't build initial phone home builder: " + e.getMessage());
-            return PhoneHomeRequestBody.DO_NOT_PHONE_HOME;
+            logger.debug("Couldn't build phone home request body: " + e.getMessage());
         }
-
-        phoneHomeRequestBodyBuilder.setThirdPartyName(ThirdPartyName.BLANK);
-
-        final PhoneHomeRequestBody phoneHomeRequestBody = phoneHomeRequestBodyBuilder.buildObject();
-        phoneHomeRequestBody.getInfoMap().put(PhoneHomeRequestFieldEnum.THIRDPARTYNAME.getKey(), thirdPartyName);
-        phoneHomeRequestBody.getInfoMap().put(PhoneHomeRequestFieldEnum.THIRDPARTYVERSION.getKey(), thirdPartyVersion);
-        phoneHomeRequestBody.getInfoMap().put(PhoneHomeRequestFieldEnum.PLUGINVERSION.getKey(), pluginVersion);
         return phoneHomeRequestBody;
     }
 
