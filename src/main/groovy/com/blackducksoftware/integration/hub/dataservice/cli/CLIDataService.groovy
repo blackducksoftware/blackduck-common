@@ -112,23 +112,32 @@ public class CLIDataService {
             logger.debug(e.getMessage())
         }
         preScan(hubServerConfig, hubScanConfig, projectRequest, phoneHomeRequestBody)
-        final File[] scanSummaryFiles = runControlledScan(hubServerConfig, hubScanConfig)
-        postScan(hubScanConfig, scanSummaryFiles, projectRequest, shouldWaitForScansFinished)
+        SimpleScanService simpleScanService = createScanService(hubServerConfig, hubScanConfig)
+        final File[] scanSummaryFiles = runScan(simpleScanService)
+        postScan(hubScanConfig, scanSummaryFiles, projectRequest, shouldWaitForScansFinished, simpleScanService)
         return version
+    }
+
+    private SimpleScanService createScanService(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig) {
+        HubScanConfig controlledConfig = getControlledScanConfig(hubScanConfig)
+        final SimpleScanService simpleScanService = new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, null, null)
+        simpleScanService
     }
 
     /**
      * This should only be invoked directly when dryRun == true. Otherwise, installAndRunControlledScan should be used.
      */
     public File[] runControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig) throws IntegrationException {
-        HubScanConfig controlledConfig = getControlledScanConfig(hubScanConfig)
-        final SimpleScanService simpleScanService = new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, null, null)
-        simpleScanService.setupAndExecuteScan()
-
-        if (hubScanConfig.isCleanupLogsOnSuccess()) {
+        final SimpleScanService simpleScanService = createScanService(hubServerConfig, hubScanConfig)
+        File [] scamSummaryFiles = runScan(simpleScanService)
+        if(hubScanConfig.isCleanupLogsOnSuccess()) {
             cleanUpLogFiles(simpleScanService)
         }
+        scanSummaryFiles
+    }
 
+    private File[] runScan(final SimpleScanService simpleScanService) {
+        simpleScanService.setupAndExecuteScan()
         File[] scanSummaryFiles = simpleScanService.getScanSummaryFiles()
         scanSummaryFiles
     }
@@ -156,9 +165,13 @@ public class CLIDataService {
         }
     }
 
-    private void postScan(final HubScanConfig hubScanConfig, final File[] scanSummaryFiles, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished)
+    private void postScan(final HubScanConfig hubScanConfig, final File[] scanSummaryFiles, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished, final SimpleScanService simpleScanService)
     throws IntegrationException {
         logger.trace("Scan is dry run ${hubScanConfig.isDryRun()}")
+        if(hubScanConfig.isCleanupLogsOnSuccess()) {
+            cleanUpLogFiles(simpleScanService)
+        }
+
         if (!hubScanConfig.isDryRun()) {
             final List<CodeLocationView> codeLocationViews = new ArrayList<>()
             final List<ScanSummaryView> scanSummaries = new ArrayList<>()
@@ -166,12 +179,15 @@ public class CLIDataService {
             for(File scanSummaryFile : scanSummaryFiles) {
                 ScanSummaryView scanSummary = getScanSummaryFromFile(scanSummaryFile)
                 scanSummaries.add(scanSummary)
+                scanSummaryFile.delete()
                 String codeLocationUrl = metaService.getFirstLinkSafely(scanSummary, MetaService.CODE_LOCATION_BOM_STATUS_LINK)
 
                 final CodeLocationView codeLocationView = codeLocationRequestService.getItem(codeLocationUrl, CodeLocationView.class)
                 codeLocationViews.add(codeLocationView)
                 codeLocationRequestService.mapCodeLocation(codeLocationView, version)
             }
+            simpleScanService.getStatusDirectory().deleteDir()
+
             cleanupCodeLocations(codeLocationViews, hubScanConfig)
             if (shouldWaitForScansFinished) {
                 logger.debug("Waiting for the Bom to be updated.")
@@ -262,6 +278,16 @@ public class CLIDataService {
         } catch (final DoesNotExistException e) {
             final String versionURL = projectVersionRequestService.createHubVersion(project, projectRequest.getVersionRequest())
             version = projectVersionRequestService.getItem(versionURL, ProjectVersionView.class)
+        }
+    }
+
+    private void cleanupScanSummaryFile(File scanSummaryFile) {
+        scanSummaryFile.delete()
+        File parentDirectory = scanSummaryFile.getParentFile()
+        File [] fileList = parentDirectory.listFiles();
+
+        if(fileList != null && fileList.length == 0) {
+            parentDirectory.deleteDir()
         }
     }
 }
