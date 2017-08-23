@@ -138,6 +138,12 @@ public class ScanStatusDataService {
         waitForScansToComplete(pendingScans, timeoutInMilliseconds);
     }
 
+    public void assertScansFinished(final String projectName, final String projectVersion) throws IntegrationException {
+        final ProjectView projectItem = projectRequestService.getProjectByName(projectName);
+        final ProjectVersionView projectVersionView = projectVersionRequestService.getProjectVersion(projectItem, projectVersion);
+        assertScansFinished(projectVersionView);
+    }
+
     public void assertScansFinished(final ProjectVersionView projectVersionView) throws HubTimeoutExceededException, IntegrationException {
         final List<CodeLocationView> allCodeLocations = codeLocationRequestService.getAllCodeLocationsForProjectVersion(projectVersionView);
         final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
