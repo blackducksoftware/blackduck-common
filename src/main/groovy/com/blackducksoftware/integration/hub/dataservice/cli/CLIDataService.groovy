@@ -168,7 +168,7 @@ public class CLIDataService {
     private void postScan(final HubScanConfig hubScanConfig, final File[] scanSummaryFiles, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished, final SimpleScanService simpleScanService)
     throws IntegrationException {
         logger.trace("Scan is dry run ${hubScanConfig.isDryRun()}")
-        if(hubScanConfig.isCleanupLogsOnSuccess()) {
+        if (hubScanConfig.isCleanupLogsOnSuccess()) {
             cleanUpLogFiles(simpleScanService)
         }
 
@@ -176,7 +176,7 @@ public class CLIDataService {
             final List<CodeLocationView> codeLocationViews = new ArrayList<>()
             final List<ScanSummaryView> scanSummaries = new ArrayList<>()
             logger.trace("Found ${scanSummaryFiles.length} scan summary files")
-            for(File scanSummaryFile : scanSummaryFiles) {
+            for (File scanSummaryFile : scanSummaryFiles) {
                 ScanSummaryView scanSummary = getScanSummaryFromFile(scanSummaryFile)
                 scanSummaries.add(scanSummary)
                 scanSummaryFile.delete()
@@ -286,7 +286,7 @@ public class CLIDataService {
         File parentDirectory = scanSummaryFile.getParentFile()
         File [] fileList = parentDirectory.listFiles();
 
-        if(fileList != null && fileList.length == 0) {
+        if (fileList != null && fileList.length == 0) {
             parentDirectory.deleteDir()
         }
     }
