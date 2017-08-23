@@ -122,7 +122,7 @@ public class SimpleScanService {
         }
         logger.debug("Using this java installation : " + pathToJavaExecutable);
 
-        if (hubServerConfig.isAutoImportHttpsCertificates()) {
+        if (hubServerConfig.isAutoImportHttpsCertificates() && !hubScanConfig.isDryRun()) {
             try {
                 final HubCertificateHandler hubCertificateHandler = new HubCertificateHandler(logger, cliLocation.getJavaHome());
                 hubCertificateHandler.importHttpsCertificateForHubServer(hubServerConfig.getHubUrl(), hubServerConfig.getTimeout());
@@ -135,7 +135,7 @@ public class SimpleScanService {
         cmd.add("-Done-jar.silent=true");
         cmd.add("-Done-jar.jar.path=" + pathToOneJar);
 
-        if (hubServerConfig.shouldUseProxyForHub()) {
+        if (hubServerConfig.shouldUseProxyForHub() && !hubScanConfig.isDryRun()) {
             final HubProxyInfo hubProxyInfo = hubServerConfig.getProxyInfo();
             final String proxyHost = hubProxyInfo.getHost();
             final int proxyPort = hubProxyInfo.getPort();
@@ -156,34 +156,37 @@ public class SimpleScanService {
         cmd.add("-Xmx" + hubScanConfig.getScanMemory() + "m");
         cmd.add("-jar");
         cmd.add(pathToScanExecutable);
-        cmd.add("--scheme");
-        cmd.add(hubServerConfig.getHubUrl().getProtocol());
-        cmd.add("--host");
-        cmd.add(hubServerConfig.getHubUrl().getHost());
-        logger.debug("Using this Hub hostname : '" + hubServerConfig.getHubUrl().getHost() + "'");
 
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_INSECURE_OPTION)) {
             cmd.add("--no-prompt");
         }
 
-        cmd.add("--username");
-        cmd.add(hubServerConfig.getGlobalCredentials().getUsername());
-        if (!hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_PASSWORD_ENVIRONMENT_VARIABLE)) {
-            cmd.add("--password");
-            cmd.add(hubServerConfig.getGlobalCredentials().getDecryptedPassword());
-        }
+        if (!hubScanConfig.isDryRun()) {
+            cmd.add("--scheme");
+            cmd.add(hubServerConfig.getHubUrl().getProtocol());
+            cmd.add("--host");
+            cmd.add(hubServerConfig.getHubUrl().getHost());
+            logger.debug("Using this Hub hostname : '" + hubServerConfig.getHubUrl().getHost() + "'");
 
-        final int hubPort = hubServerConfig.getHubUrl().getPort();
-        if (hubPort > 0) {
-            cmd.add("--port");
-            cmd.add(Integer.toString(hubPort));
-        } else {
-            final int defaultPort = hubServerConfig.getHubUrl().getDefaultPort();
-            if (defaultPort > 0) {
+            cmd.add("--username");
+            cmd.add(hubServerConfig.getGlobalCredentials().getUsername());
+            if (!hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_PASSWORD_ENVIRONMENT_VARIABLE)) {
+                cmd.add("--password");
+                cmd.add(hubServerConfig.getGlobalCredentials().getDecryptedPassword());
+            }
+
+            final int hubPort = hubServerConfig.getHubUrl().getPort();
+            if (hubPort > 0) {
                 cmd.add("--port");
-                cmd.add(Integer.toString(defaultPort));
+                cmd.add(Integer.toString(hubPort));
             } else {
-                logger.warn("Could not find a port to use for the Server.");
+                final int defaultPort = hubServerConfig.getHubUrl().getDefaultPort();
+                if (defaultPort > 0) {
+                    cmd.add("--port");
+                    cmd.add(Integer.toString(defaultPort));
+                } else {
+                    logger.warn("Could not find a port to use for the Server.");
+                }
             }
         }
 
