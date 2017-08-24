@@ -264,7 +264,9 @@ public class SimpleScanService {
             final ScannerSplitStream splitOutputStream = new ScannerSplitStream(logger, outputFileStream);
             final ProcessBuilder processBuilder = new ProcessBuilder(cmd).redirectError(PIPE).redirectOutput(PIPE);
 
-            processBuilder.environment().put("BD_HUB_PASSWORD", hubServerConfig.getGlobalCredentials().getDecryptedPassword());
+            if (!hubScanConfig.isDryRun()) {
+                processBuilder.environment().put("BD_HUB_PASSWORD", hubServerConfig.getGlobalCredentials().getDecryptedPassword());
+            }
             processBuilder.environment().put("BD_HUB_NO_PROMPT", "true");
 
             final String bdioEnvVar = ciEnvironmentVariables.getValue("BD_HUB_DECLARED_COMPONENTS");
