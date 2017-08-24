@@ -25,7 +25,6 @@ package com.blackducksoftware.integration.hub.dataservice.phonehome;
 
 import java.net.URL;
 
-import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -49,6 +48,25 @@ public class PhoneHomeDataService {
         this.phoneHomeClient = phoneHomeClient;
     }
 
+    public void phoneHome(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion){
+        phoneHome(thirdPartyName.getName(), thirdPartyVersion, pluginVersion);
+    }
+
+
+    public void phoneHome(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion){
+        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder(thirdPartyName, thirdPartyVersion, pluginVersion);
+        phoneHome(phoneHomeRequestBodyBuilder);
+    }
+
+    public void phoneHome(final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder){
+        try {
+            final PhoneHomeRequestBody phoneHomeRequestBody = phoneHomeRequestBodyBuilder.build();
+            phoneHome(phoneHomeRequestBody);
+        } catch (final Exception e) {
+            logger.debug("Could not build phone home body" + e.getMessage(), e);
+        }
+    }
+
     public void phoneHome(final PhoneHomeRequestBody phoneHomeRequestBody) {
         if (phoneHomeRequestBody == PhoneHomeRequestBody.DO_NOT_PHONE_HOME) {
             logger.debug("Skipping phone-home");
@@ -61,10 +79,12 @@ public class PhoneHomeDataService {
         }
     }
 
+    @Deprecated
     public PhoneHomeRequestBody buildPhoneHomeRequestBody(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
         return buildPhoneHomeRequestBody(thirdPartyName.getName(), thirdPartyVersion, pluginVersion);
     }
 
+    @Deprecated
     public PhoneHomeRequestBody buildPhoneHomeRequestBody(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
         PhoneHomeRequestBody phoneHomeRequestBody = PhoneHomeRequestBody.DO_NOT_PHONE_HOME;
         try {
@@ -74,23 +94,40 @@ public class PhoneHomeDataService {
             phoneHomeRequestBodyBuilder.setPluginVersion(pluginVersion);
 
             phoneHomeRequestBody = phoneHomeRequestBodyBuilder.build();
-        } catch (final IntegrationException e) {
+        } catch (final Exception e) {
             logger.debug("Couldn't build phone home request body: " + e.getMessage());
         }
         return phoneHomeRequestBody;
     }
 
-    public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder() throws IntegrationException {
-        final String hubVersion = hubVersionRequestService.getHubVersion();
-        final String registrationId = hubRegistrationRequestService.getRegistrationId();
-        final URL hubHostName = hubRegistrationRequestService.getHubBaseUrl();
-        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = new PhoneHomeRequestBodyBuilder();
-        phoneHomeRequestBodyBuilder.setRegistrationId(registrationId);
-        phoneHomeRequestBodyBuilder.setHostName(hubHostName.toString());
-        phoneHomeRequestBodyBuilder.setBlackDuckName(BlackDuckName.HUB);
-        phoneHomeRequestBodyBuilder.setBlackDuckVersion(hubVersion);
-        phoneHomeRequestBodyBuilder.setSource(PhoneHomeSource.INTEGRATIONS);
+    public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
+        return createInitialPhoneHomeRequestBodyBuilder(thirdPartyName.getName(), thirdPartyVersion, pluginVersion);
+    }
+
+    public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
+        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
+        phoneHomeRequestBodyBuilder.setThirdPartyName(thirdPartyName);
+        phoneHomeRequestBodyBuilder.setThirdPartyName(thirdPartyVersion);
+        phoneHomeRequestBodyBuilder.setThirdPartyName(pluginVersion);
         return phoneHomeRequestBodyBuilder;
     }
+
+    public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder() {
+        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = new PhoneHomeRequestBodyBuilder();
+        try{
+            final String hubVersion = hubVersionRequestService.getHubVersion();
+            final String registrationId = hubRegistrationRequestService.getRegistrationId();
+            final URL hubHostName = hubRegistrationRequestService.getHubBaseUrl();
+            phoneHomeRequestBodyBuilder.setRegistrationId(registrationId);
+            phoneHomeRequestBodyBuilder.setHostName(hubHostName.toString());
+            phoneHomeRequestBodyBuilder.setBlackDuckName(BlackDuckName.HUB);
+            phoneHomeRequestBodyBuilder.setBlackDuckVersion(hubVersion);
+            phoneHomeRequestBodyBuilder.setSource(PhoneHomeSource.INTEGRATIONS);
+        }catch(final Exception e){
+            logger.debug("Couldn't detail phone home request builder: " + e.getMessage());
+        }
+        return phoneHomeRequestBodyBuilder;
+    }
+
 
 }
