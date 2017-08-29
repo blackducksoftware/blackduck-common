@@ -99,6 +99,11 @@ public class SimpleScanService {
         this(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, new HubScanConfig(workingDirectory, scanMemory, scanTargetPaths, dryRun, null, true, excludePatterns, null, false, false), project, version);
     }
 
+    public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+        final CLILocation cliLocation = new CLILocation(logger, hubScanConfig.getToolsDir());
+        setupAndExecuteScan(cliLocation);
+    }
+
     /**
      * This will setup the command-line invocation of the Hub scanner. The workingDirectoryPath is the parent folder of the scan logs and other scan artifacts.
      *
@@ -108,8 +113,7 @@ public class SimpleScanService {
      *
      * @throws ScanFailedException
      */
-    public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        final CLILocation cliLocation = new CLILocation(logger, hubScanConfig.getToolsDir());
+    public void setupAndExecuteScan(final CLILocation cliLocation) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         String pathToJavaExecutable;
         String pathToOneJar;
         String pathToScanExecutable;
