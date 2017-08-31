@@ -107,8 +107,8 @@ public class PhoneHomeDataService {
     public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
         final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
         phoneHomeRequestBodyBuilder.setThirdPartyName(thirdPartyName);
-        phoneHomeRequestBodyBuilder.setThirdPartyName(thirdPartyVersion);
-        phoneHomeRequestBodyBuilder.setThirdPartyName(pluginVersion);
+        phoneHomeRequestBodyBuilder.setThirdPartyVersion(thirdPartyVersion);
+        phoneHomeRequestBodyBuilder.setPluginVersion(pluginVersion);
         return phoneHomeRequestBodyBuilder;
     }
 
