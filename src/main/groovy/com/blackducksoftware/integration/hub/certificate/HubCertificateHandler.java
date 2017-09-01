@@ -52,6 +52,9 @@ public class HubCertificateHandler {
     }
 
     public void importHttpsCertificateForHubServer(final URL hubUrl, final int timeout) throws IntegrationException {
+        if (hubUrl == null || !hubUrl.getProtocol().startsWith("https")) {
+            return;
+        }
         if (handler.isCertificateInTrustStore(hubUrl)) {
             return;
         }
