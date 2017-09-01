@@ -157,13 +157,19 @@ public class HubServerConfigValidator extends AbstractValidator {
             return;
         }
 
+        final UnauthenticatedRestConnection restConnection = new UnauthenticatedRestConnection(new PrintStreamIntLogger(System.out, LogLevel.INFO), hubURL, NumberUtils.toInt(timeoutSeconds, 120));
+        restConnection.proxyHost = proxyInfo.getHost();
+        restConnection.proxyPort = proxyInfo.getPort();
+        restConnection.proxyNoHosts = proxyInfo.getIgnoredProxyHosts();
+        restConnection.proxyUsername = proxyInfo.getUsername();
         try {
-            final UnauthenticatedRestConnection restConnection = new UnauthenticatedRestConnection(new PrintStreamIntLogger(System.out, LogLevel.INFO), hubURL, NumberUtils.toInt(timeoutSeconds, 120));
-            restConnection.proxyHost = proxyInfo.getHost();
-            restConnection.proxyPort = proxyInfo.getPort();
-            restConnection.proxyNoHosts = proxyInfo.getIgnoredProxyHosts();
-            restConnection.proxyUsername = proxyInfo.getUsername();
             restConnection.proxyPassword = proxyInfo.getDecryptedPassword();
+        } catch (final Exception e) {
+            result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD, new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
+            return;
+        }
+
+        try {
 
             HttpUrl httpUrl = restConnection.createHttpUrl();
             Request request = restConnection.createGetRequest(httpUrl);
