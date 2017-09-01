@@ -26,7 +26,8 @@ package com.blackducksoftware.integration.hub.validator;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -37,15 +38,17 @@ import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubProxyInfoFieldEnum;
 import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
+import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnection;
+import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
+import com.blackducksoftware.integration.log.LogLevel;
+import com.blackducksoftware.integration.log.PrintStreamIntLogger;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 import com.blackducksoftware.integration.validator.ValidationResult;
 import com.blackducksoftware.integration.validator.ValidationResultEnum;
 import com.blackducksoftware.integration.validator.ValidationResults;
 
 import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 
 public class HubServerConfigValidator extends AbstractValidator {
     public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
@@ -57,6 +60,8 @@ public class HubServerConfigValidator extends AbstractValidator {
     public static final String ERROR_MSG_UNREACHABLE_CAUSE = ", because: ";
 
     public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
+
+    public static final String ERROR_MSG_URL_NOT_HUB_PREFIX = "The Url does not appear to be a Hub server :";
 
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
 
@@ -139,8 +144,7 @@ public class HubServerConfigValidator extends AbstractValidator {
 
     public void validateHubUrl(final ValidationResults result) {
         if (hubUrl == null) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL,
-                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_FOUND));
+            result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_FOUND));
             return;
         }
 
@@ -149,82 +153,48 @@ public class HubServerConfigValidator extends AbstractValidator {
             hubURL = new URL(hubUrl);
             hubURL.toURI();
         } catch (final MalformedURLException e) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL,
-                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
+            result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
             return;
         } catch (final URISyntaxException e) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL,
-                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
+            result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
             return;
         }
-        final OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.connectTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
-        builder.writeTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
-        builder.readTimeout(stringToNonNegativeInteger(timeoutSeconds), TimeUnit.SECONDS);
-        if (proxyInfo != null) {
-            builder.proxy(proxyInfo.getProxy(hubURL));
-            String password = null;
+
+        final UnauthenticatedRestConnection restConnection = new UnauthenticatedRestConnection(new PrintStreamIntLogger(System.out, LogLevel.INFO), hubURL, NumberUtils.toInt(timeoutSeconds, 120));
+        try {
+            HttpUrl httpUrl = restConnection.createHttpUrl();
+            Request request = restConnection.createGetRequest(httpUrl);
+
             try {
-                password = proxyInfo.getDecryptedPassword();
-            } catch (final Exception e) {
-                result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD,
-                        new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
+                restConnection.handleExecuteClientCall(request);
+            } catch (final IntegrationRestException e) {
+                if (e.getHttpStatusCode() == 407) {
+                    result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.ERROR, e.getHttpStatusMessage()));
+                } else if (e.getHttpStatusCode() != 401 && e.getHttpStatusCode() != 403) {
+                    result.addResult(HubServerConfigFieldEnum.HUBURL,
+                            new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + httpUrl.uri().toString() + ERROR_MSG_UNREACHABLE_CAUSE + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage()));
+                }
                 return;
             }
-            if (StringUtils.isNotBlank(proxyInfo.getUsername()) && StringUtils.isNotBlank(password)) {
-                builder.proxyAuthenticator(
-                        new com.blackducksoftware.integration.hub.proxy.OkAuthenticator(proxyInfo.getUsername(),
-                                password));
-            }
-        }
-        try {
-            final OkHttpClient client = builder.build();
+            final List<String> urlSegments = new ArrayList<>();
+            urlSegments.add("download");
+            urlSegments.add(CLILocation.DEFAULT_CLI_DOWNLOAD);
+            httpUrl = restConnection.createHttpUrl(urlSegments);
+            request = restConnection.createGetRequest(httpUrl);
 
-            final HttpUrl.Builder urlBuilder = HttpUrl.parse(hubUrl).newBuilder();
-            urlBuilder.addPathSegment("download");
-            urlBuilder.addPathSegment(CLILocation.DEFAULT_CLI_DOWNLOAD);
-            final HttpUrl downLoadUrl = urlBuilder.build();
-
-            final Request request = new Request.Builder()
-                    .url(downLoadUrl).get().build();
-
-            Response response = null;
             try {
-                response = client.newCall(request).execute();
-                if (!response.isSuccessful()) {
-                    final int responseCode = response.code();
-                    if (responseCode == 407) {
-                        result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME,
-                                new ValidationResult(ValidationResultEnum.ERROR, response.message()));
-                        return;
-                    } else if (responseCode != 401 && responseCode != 403) {
-                        // if a 401 or 403 is returned it is ok. The server is reachable just not authenticated or
-                        // authorized. This object isn't responsible for that.
-                        result.addResult(HubServerConfigFieldEnum.HUBURL,
-                                new ValidationResult(ValidationResultEnum.ERROR,
-                                        ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ERROR_MSG_UNREACHABLE_CAUSE + response.message()));
-                    }
-                }
-            } finally {
-                if (response != null) {
-                    response.close();
+                restConnection.handleExecuteClientCall(request);
+            } catch (final IntegrationRestException e) {
+                if (e.getHttpStatusCode() == 407) {
+                    result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.ERROR, e.getHttpStatusMessage()));
+                } else {
+                    result.addResult(HubServerConfigFieldEnum.HUBURL,
+                            new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_HUB_PREFIX + httpUrl.uri().toString() + ERROR_MSG_UNREACHABLE_CAUSE + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage()));
                 }
             }
-        } catch (final Exception e) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL,
-                    new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, e));
-        }
-    }
 
-    private int stringToNonNegativeInteger(final String intString) {
-        try {
-            final int intValue = stringToInteger(intString);
-            if (intValue < 0) {
-                return 0;
-            }
-            return intValue;
         } catch (final Exception e) {
-            return 0;
+            result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, e));
         }
     }
 
@@ -232,24 +202,20 @@ public class HubServerConfigValidator extends AbstractValidator {
         validateTimeout(result, null);
     }
 
-    private void validateTimeout(final ValidationResults result,
-            final Integer defaultTimeoutSeconds) {
+    private void validateTimeout(final ValidationResults result, final Integer defaultTimeoutSeconds) {
         if (StringUtils.isBlank(timeoutSeconds)) {
-            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
-                    new ValidationResult(ValidationResultEnum.ERROR, "No Hub Timeout was found."));
+            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT, new ValidationResult(ValidationResultEnum.ERROR, "No Hub Timeout was found."));
             return;
         }
         int timeoutToValidate = 0;
         try {
             timeoutToValidate = stringToInteger(timeoutSeconds);
         } catch (final IllegalArgumentException e) {
-            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
-                    new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
+            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT, new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
             return;
         }
         if (timeoutToValidate <= 0) {
-            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT,
-                    new ValidationResult(ValidationResultEnum.ERROR, "The Timeout must be greater than 0."));
+            result.addResult(HubServerConfigFieldEnum.HUBTIMEOUT, new ValidationResult(ValidationResultEnum.ERROR, "The Timeout must be greater than 0."));
         }
     }
 
@@ -294,8 +260,7 @@ public class HubServerConfigValidator extends AbstractValidator {
     }
 
     /**
-     * IMPORTANT : The password length should only be set if the password is
-     * already encrypted
+     * IMPORTANT : The password length should only be set if the password is already encrypted
      */
     public void setPasswordLength(final int passwordLength) {
         this.passwordLength = passwordLength;
@@ -342,8 +307,7 @@ public class HubServerConfigValidator extends AbstractValidator {
     }
 
     /**
-     * IMPORTANT : The proxy password length should only be set if the proxy
-     * password is already encrypted
+     * IMPORTANT : The proxy password length should only be set if the proxy password is already encrypted
      */
     public void setProxyPasswordLength(final int proxyPasswordLength) {
         this.proxyPasswordLength = proxyPasswordLength;

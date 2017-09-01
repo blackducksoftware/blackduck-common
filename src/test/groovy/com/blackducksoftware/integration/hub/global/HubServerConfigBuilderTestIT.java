@@ -69,10 +69,8 @@ public class HubServerConfigBuilderTestIT {
         assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
         assertEquals("User", config.getGlobalCredentials().getUsername());
         assertEquals("Pass", config.getGlobalCredentials().getDecryptedPassword());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"),
-                config.getProxyInfo().getHost());
-        assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")),
-                config.getProxyInfo().getPort());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost());
+        assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")), config.getProxyInfo().getPort());
     }
 
     @Test
@@ -87,10 +85,8 @@ public class HubServerConfigBuilderTestIT {
         assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
         assertEquals("User", config.getGlobalCredentials().getUsername());
         assertEquals("Pass", config.getGlobalCredentials().getDecryptedPassword());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"),
-                config.getProxyInfo().getHost());
-        assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")),
-                config.getProxyInfo().getPort());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost());
+        assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")), config.getProxyInfo().getPort());
         assertEquals(VALID_IGNORE_HOST_LIST, config.getProxyInfo().getIgnoredProxyHosts());
         assertFalse(config.getProxyInfo().shouldUseProxyForUrl(config.getHubUrl()));
     }
