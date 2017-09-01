@@ -152,10 +152,7 @@ public class HubServerConfigValidator extends AbstractValidator {
         try {
             hubURL = new URL(hubUrl);
             hubURL.toURI();
-        } catch (final MalformedURLException e) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
-            return;
-        } catch (final URISyntaxException e) {
+        } catch (final MalformedURLException | URISyntaxException e) {
             result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_VALID));
             return;
         }
