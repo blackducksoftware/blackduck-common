@@ -30,7 +30,6 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class OfflineCLILocation extends CLILocation {
-
     public OfflineCLILocation(final IntLogger logger, final File cliUnzippedDirectory) {
         super(logger, cliUnzippedDirectory);
     }
