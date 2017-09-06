@@ -86,13 +86,19 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
             }
 
             if (autoImportHttpsCertificates) {
-                final HubCertificateHandler handler = new HubCertificateHandler(getLogger());
+                final HubCertificateHandler hubCertificateHandler = new HubCertificateHandler(getLogger());
+                final int timeout = NumberUtils.toInt(timeoutSeconds, DEFAULT_TIMEOUT_SECONDS);
+                hubCertificateHandler.setTimeout(timeout);
                 try {
                     final URL url = new URL(hubUrl);
-                    if (getHubProxyInfo().getProxy(url) == Proxy.NO_PROXY) {
-                        handler.importHttpsCertificateForHubServer(url, DEFAULT_TIMEOUT_SECONDS);
-                        return super.build();
+                    if (getHubProxyInfo().getProxy(url) != Proxy.NO_PROXY) {
+                        hubCertificateHandler.setProxyHost(proxyHost);
+                        hubCertificateHandler.setProxyPort(NumberUtils.toInt(proxyPort));
+                        hubCertificateHandler.setProxyUsername(proxyUsername);
+                        hubCertificateHandler.setProxyPassword(proxyPassword);
                     }
+                    hubCertificateHandler.importHttpsCertificateForHubServer(url);
+                    return super.build();
                 } catch (final Exception certificateException) {
                     throw new IntegrationCertificateException(certificateException.getMessage());
                 }
@@ -203,8 +209,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     }
 
     /**
-     * IMPORTANT : The password length should only be set if the password is
-     * already encrypted
+     * IMPORTANT : The password length should only be set if the password is already encrypted
      */
     public void setPasswordLength(final int passwordLength) {
         this.passwordLength = passwordLength;
@@ -231,8 +236,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     }
 
     /**
-     * IMPORTANT : The proxy password length should only be set if the proxy
-     * password is already encrypted
+     * IMPORTANT : The proxy password length should only be set if the proxy password is already encrypted
      */
     public void setProxyPasswordLength(final int proxyPasswordLength) {
         this.proxyPasswordLength = proxyPasswordLength;

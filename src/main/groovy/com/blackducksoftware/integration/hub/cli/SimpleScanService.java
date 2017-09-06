@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -129,7 +130,14 @@ public class SimpleScanService {
         if (hubServerConfig.isAutoImportHttpsCertificates() && !hubScanConfig.isDryRun()) {
             try {
                 final HubCertificateHandler hubCertificateHandler = new HubCertificateHandler(logger, cliLocation.getJavaHome());
-                hubCertificateHandler.importHttpsCertificateForHubServer(hubServerConfig.getHubUrl(), hubServerConfig.getTimeout());
+                hubCertificateHandler.setTimeout(hubServerConfig.getTimeout());
+                if (hubServerConfig.getProxyInfo().getProxy(hubServerConfig.getHubUrl()) != Proxy.NO_PROXY) {
+                    hubCertificateHandler.setProxyHost(hubServerConfig.getProxyInfo().getHost());
+                    hubCertificateHandler.setProxyPort(hubServerConfig.getProxyInfo().getPort());
+                    hubCertificateHandler.setProxyUsername(hubServerConfig.getProxyInfo().getUsername());
+                    hubCertificateHandler.setProxyPassword(hubServerConfig.getProxyInfo().getDecryptedPassword());
+                }
+                hubCertificateHandler.importHttpsCertificateForHubServer(hubServerConfig.getHubUrl());
             } catch (IOException | IntegrationException e) {
                 logger.error("Could not automatically import the certificate to the CLI: " + e.getMessage());
             }
