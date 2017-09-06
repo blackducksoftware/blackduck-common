@@ -34,8 +34,8 @@ import java.net.URL;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.certificate.CertificateHandler;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
+import com.blackducksoftware.integration.hub.certificate.CertificateHandler;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
