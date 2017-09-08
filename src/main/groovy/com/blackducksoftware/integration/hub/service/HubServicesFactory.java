@@ -66,6 +66,7 @@ import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStat
 import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
+import com.blackducksoftware.integration.hub.dataservice.versionbomcomponent.VersionBomComponentDataservice;
 import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -95,10 +96,12 @@ public class HubServicesFactory {
         ciEnvironmentVariables.putAll(environmentVariables);
     }
 
+    @Deprecated
     public CLIDataService createCLIDataService(final IntLogger logger) {
         return createCLIDataService(logger, 120000l);
     }
 
+    @Deprecated
     public CLIDataService createCLIDataService(final IntLogger logger, final long timeoutInMilliseconds) {
         return new CLIDataService(logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(logger), createPhoneHomeDataService(logger), createProjectRequestService(logger),
                 createProjectVersionRequestService(logger), createCodeLocationRequestService(logger), createScanSummaryRequestService(), createScanStatusDataService(logger, timeoutInMilliseconds), createMetaService(logger));
@@ -113,6 +116,7 @@ public class HubServicesFactory {
                 createProjectVersionRequestService(), createCodeLocationRequestService(), createScanSummaryRequestService(), createScanStatusDataService(timeoutInMilliseconds), createMetaService());
     }
 
+    @Deprecated
     public PhoneHomeDataService createPhoneHomeDataService(final IntLogger logger) {
         return new PhoneHomeDataService(logger, createPhoneHomeClient(logger), createHubRegistrationRequestService(), createHubVersionRequestService());
     }
@@ -121,6 +125,7 @@ public class HubServicesFactory {
         return new PhoneHomeDataService(restConnection.logger, createPhoneHomeClient(restConnection.logger), createHubRegistrationRequestService(), createHubVersionRequestService());
     }
 
+    @Deprecated
     public PhoneHomeClient createPhoneHomeClient(final IntLogger logger) {
         return new PhoneHomeClient(logger, restConnection);
     }
@@ -129,6 +134,7 @@ public class HubServicesFactory {
         return new PhoneHomeClient(restConnection.logger, restConnection);
     }
 
+    @Deprecated
     public RiskReportDataService createRiskReportDataService(final IntLogger logger, final long timeoutInMilliseconds) throws IntegrationException {
         return new RiskReportDataService(logger, restConnection, createProjectRequestService(logger), createProjectVersionRequestService(logger), createReportRequestService(logger, timeoutInMilliseconds),
                 createAggregateBomRequestService(logger), createMetaService(logger), createCheckedHubSupport(logger), createIntegrationEscapeUtil());
@@ -139,6 +145,7 @@ public class HubServicesFactory {
                 createMetaService(), createCheckedHubSupport(), createIntegrationEscapeUtil());
     }
 
+    @Deprecated
     public PolicyStatusDataService createPolicyStatusDataService(final IntLogger logger) {
         return new PolicyStatusDataService(restConnection, createProjectRequestService(logger), createProjectVersionRequestService(logger), createMetaService(logger));
     }
@@ -147,6 +154,7 @@ public class HubServicesFactory {
         return new PolicyStatusDataService(restConnection, createProjectRequestService(), createProjectVersionRequestService(), createMetaService());
     }
 
+    @Deprecated
     public ScanStatusDataService createScanStatusDataService(final IntLogger logger, final long timeoutInMilliseconds) {
         return new ScanStatusDataService(logger, createProjectRequestService(logger), createProjectVersionRequestService(logger), createCodeLocationRequestService(logger), createScanSummaryRequestService(), createMetaService(logger),
                 timeoutInMilliseconds);
@@ -157,6 +165,7 @@ public class HubServicesFactory {
                 timeoutInMilliseconds);
     }
 
+    @Deprecated
     public NotificationDataService createNotificationDataService(final IntLogger logger) {
         return new NotificationDataService(logger, createHubResponseService(), createNotificationRequestService(logger), createProjectVersionRequestService(logger), createPolicyRequestService(), createMetaService(logger));
     }
@@ -165,6 +174,7 @@ public class HubServicesFactory {
         return new NotificationDataService(restConnection.logger, createHubResponseService(), createNotificationRequestService(), createProjectVersionRequestService(), createPolicyRequestService(), createMetaService());
     }
 
+    @Deprecated
     public NotificationDataService createNotificationDataService(final IntLogger logger, final PolicyNotificationFilter policyNotificationFilter) {
         return new NotificationDataService(logger, createHubResponseService(), createNotificationRequestService(logger), createProjectVersionRequestService(logger), createPolicyRequestService(), policyNotificationFilter,
                 createMetaService(logger));
@@ -175,6 +185,7 @@ public class HubServicesFactory {
                 createMetaService());
     }
 
+    @Deprecated
     public ExtensionConfigDataService createExtensionConfigDataService(final IntLogger logger) {
         return new ExtensionConfigDataService(logger, restConnection, createUserRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService(), createMetaService(logger));
     }
@@ -183,6 +194,7 @@ public class HubServicesFactory {
         return new ExtensionConfigDataService(restConnection.logger, restConnection, createUserRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService(), createMetaService());
     }
 
+    @Deprecated
     public VulnerabilityDataService createVulnerabilityDataService(final IntLogger logger) {
         return new VulnerabilityDataService(restConnection, createComponentRequestService(), createVulnerabilityRequestService(), createMetaService(logger));
     }
@@ -203,6 +215,7 @@ public class HubServicesFactory {
         return new DryRunUploadRequestService(restConnection);
     }
 
+    @Deprecated
     public CodeLocationRequestService createCodeLocationRequestService(final IntLogger logger) {
         return new CodeLocationRequestService(restConnection, createMetaService(logger));
     }
@@ -219,6 +232,7 @@ public class HubServicesFactory {
         return new HubVersionRequestService(restConnection);
     }
 
+    @Deprecated
     public NotificationRequestService createNotificationRequestService(final IntLogger logger) {
         return new NotificationRequestService(logger, restConnection, createMetaService(logger));
     }
@@ -231,6 +245,7 @@ public class HubServicesFactory {
         return new PolicyRequestService(restConnection);
     }
 
+    @Deprecated
     public ProjectRequestService createProjectRequestService(final IntLogger logger) {
         return new ProjectRequestService(restConnection, createMetaService(logger));
     }
@@ -239,6 +254,7 @@ public class HubServicesFactory {
         return new ProjectRequestService(restConnection, createMetaService());
     }
 
+    @Deprecated
     public ProjectVersionRequestService createProjectVersionRequestService(final IntLogger logger) {
         return new ProjectVersionRequestService(restConnection, createMetaService(logger));
     }
@@ -275,6 +291,7 @@ public class HubServicesFactory {
         return new MatchedFilesRequestService(restConnection);
     }
 
+    @Deprecated
     public CLIDownloadService createCliDownloadService(final IntLogger logger) {
         return new CLIDownloadService(logger, restConnection);
     }
@@ -296,6 +313,7 @@ public class HubServicesFactory {
         return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, directoryToInstallTo, scanMemory, dryRun, project, version, scanTargetPaths, workingDirectory, excludePatterns);
     }
 
+    @Deprecated
     public SimpleScanService createSimpleScanService(final IntLogger logger, final RestConnection restConnection, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final HubScanConfig hubScanConfig,
             final String projectName, final String versionName) {
         return new SimpleScanService(logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
@@ -310,6 +328,7 @@ public class HubServicesFactory {
         return new HubRegistrationRequestService(restConnection);
     }
 
+    @Deprecated
     public ReportRequestService createReportRequestService(final IntLogger logger, final long timeoutInMilliseconds) {
         return new ReportRequestService(restConnection, logger, createMetaService(logger), timeoutInMilliseconds);
     }
@@ -318,6 +337,7 @@ public class HubServicesFactory {
         return new ReportRequestService(restConnection, restConnection.logger, createMetaService(), timeoutInMilliseconds);
     }
 
+    @Deprecated
     public AggregateBomRequestService createAggregateBomRequestService(final IntLogger logger) {
         return new AggregateBomRequestService(restConnection, createMetaService(logger));
     }
@@ -326,6 +346,7 @@ public class HubServicesFactory {
         return new AggregateBomRequestService(restConnection, createMetaService());
     }
 
+    @Deprecated
     public MetaService createMetaService(final IntLogger logger) {
         return new MetaService(logger);
     }
@@ -342,6 +363,7 @@ public class HubServicesFactory {
         return restConnection;
     }
 
+    @Deprecated
     public HubSupportHelper createCheckedHubSupport(final IntLogger logger) throws IntegrationException {
         final HubSupportHelper supportHelper = new HubSupportHelper();
         supportHelper.checkHubSupport(createHubVersionRequestService(), logger);
@@ -354,6 +376,7 @@ public class HubServicesFactory {
         return supportHelper;
     }
 
+    @Deprecated
     public ComponentDataService createComponentDataService(final IntLogger logger) {
         return new ComponentDataService(logger, createComponentRequestService(), createMetaService(logger));
     }
@@ -362,6 +385,7 @@ public class HubServicesFactory {
         return new ComponentDataService(restConnection.logger, createComponentRequestService(), createMetaService());
     }
 
+    @Deprecated
     public BomComponentIssueRequestService createBomComponentIssueRequestService(final IntLogger logger) {
         return new BomComponentIssueRequestService(restConnection, createMetaService(logger));
     }
@@ -370,12 +394,17 @@ public class HubServicesFactory {
         return new BomComponentIssueRequestService(restConnection, createMetaService());
     }
 
+    @Deprecated
     public ProjectDataService createProjectDataService(final IntLogger logger) {
         return new ProjectDataService(createProjectRequestService(logger), createProjectVersionRequestService(logger));
     }
 
     public ProjectDataService createProjectDataService() {
         return new ProjectDataService(createProjectRequestService(), createProjectVersionRequestService());
+    }
+
+    public VersionBomComponentDataservice createVersionBomComponentDataservice() {
+        return new VersionBomComponentDataservice(createProjectRequestService(), createProjectVersionRequestService(), createAggregateBomRequestService(), createMatchedFilesRequestService(), createMetaService());
     }
 
     @Override
