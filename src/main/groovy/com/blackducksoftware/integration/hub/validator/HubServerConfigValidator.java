@@ -87,6 +87,8 @@ public class HubServerConfigValidator extends AbstractValidator {
 
     private String ignoredProxyHosts;
 
+    private boolean alwaysTrustServerCertificate;
+
     private HubProxyInfo proxyInfo;
 
     @Override
@@ -158,6 +160,7 @@ public class HubServerConfigValidator extends AbstractValidator {
         }
 
         final UnauthenticatedRestConnection restConnection = new UnauthenticatedRestConnection(new PrintStreamIntLogger(System.out, LogLevel.INFO), hubURL, NumberUtils.toInt(timeoutSeconds, 120));
+        restConnection.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
         if (proxyInfo != null) {
             restConnection.proxyHost = proxyInfo.getHost();
             restConnection.proxyPort = proxyInfo.getPort();
@@ -331,4 +334,13 @@ public class HubServerConfigValidator extends AbstractValidator {
     public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
         this.ignoredProxyHosts = ignoredProxyHosts;
     }
+
+    public boolean isAlwaysTrustServerCertificate() {
+        return alwaysTrustServerCertificate;
+    }
+
+    public void setAlwaysTrustServerCertificate(final boolean alwaysTrustServerCertificate) {
+        this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
+    }
+
 }

@@ -43,6 +43,7 @@ import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestServ
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
+import com.blackducksoftware.integration.hub.rest.TestingPropertyKey;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.test.TestLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
@@ -511,7 +512,7 @@ public class CLIInstallerTestIT {
         builder.setTimeout(restConnectionTestHelper.getProperty("TEST_HUB_TIMEOUT"));
         builder.setProxyHost(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
         builder.setProxyPort(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"));
-        builder.setAutoImportHttpsCertificates(Boolean.getBoolean(restConnectionTestHelper.getProperty("TEST_AUTO_IMPORT_HTTPS_CERT")));
+        builder.setAlwaysTrustServerCertificate(Boolean.getBoolean(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
         final CredentialsRestConnection restConnection = restConnectionTestHelper.getRestConnection(builder.build());
         restConnection.logger = logger;
@@ -554,7 +555,7 @@ public class CLIInstallerTestIT {
         builder.setProxyPort(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_BASIC"));
         builder.setProxyUsername(restConnectionTestHelper.getProperty("TEST_PROXY_USER_BASIC"));
         builder.setProxyPassword(restConnectionTestHelper.getProperty("TEST_PROXY_PASSWORD_BASIC"));
-        builder.setAutoImportHttpsCertificates(Boolean.getBoolean(restConnectionTestHelper.getProperty("TEST_AUTO_IMPORT_HTTPS_CERT")));
+        builder.setAlwaysTrustServerCertificate(Boolean.getBoolean(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
         final CredentialsRestConnection restConnection = restConnectionTestHelper.getRestConnection(builder.build());
         restConnection.logger = logger;

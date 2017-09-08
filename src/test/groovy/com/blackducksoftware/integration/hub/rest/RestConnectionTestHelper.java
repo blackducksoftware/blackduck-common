@@ -100,7 +100,7 @@ public class RestConnectionTestHelper {
         builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
         builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
         builder.setTimeout(getProperty(TestingPropertyKey.TEST_HUB_TIMEOUT));
-        builder.setAutoImportHttpsCertificates(Boolean.getBoolean(getProperty(TestingPropertyKey.TEST_AUTO_IMPORT_HTTPS_CERT)));
+        builder.setAlwaysTrustServerCertificate(Boolean.getBoolean(getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
         return builder.build();
     }
@@ -121,24 +121,12 @@ public class RestConnectionTestHelper {
         return getRestConnection(getHubServerConfig());
     }
 
-    public CredentialsRestConnection getRestConnection(final HubServerConfig serverConfig)
-            throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+    public CredentialsRestConnection getRestConnection(final HubServerConfig serverConfig) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         return getRestConnection(serverConfig, LogLevel.TRACE);
     }
 
-    public CredentialsRestConnection getRestConnection(final HubServerConfig serverConfig, final LogLevel logLevel)
-            throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-
-        final CredentialsRestConnection restConnection = new CredentialsRestConnection(new PrintStreamIntLogger(System.out, logLevel),
-                serverConfig.getHubUrl(), serverConfig.getGlobalCredentials().getUsername(), serverConfig.getGlobalCredentials().getDecryptedPassword(),
-                serverConfig.getTimeout());
-        restConnection.proxyHost = serverConfig.getProxyInfo().getHost();
-        restConnection.proxyPort = serverConfig.getProxyInfo().getPort();
-        restConnection.proxyNoHosts = serverConfig.getProxyInfo().getIgnoredProxyHosts();
-        restConnection.proxyUsername = serverConfig.getProxyInfo().getUsername();
-        restConnection.proxyPassword = serverConfig.getProxyInfo().getDecryptedPassword();
-
-        return restConnection;
+    public CredentialsRestConnection getRestConnection(final HubServerConfig serverConfig, final LogLevel logLevel) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+        return serverConfig.createCredentialsRestConnection(new PrintStreamIntLogger(System.out, logLevel));
     }
 
     public HubServicesFactory createHubServicesFactory() throws IllegalArgumentException, EncryptionException, HubIntegrationException {

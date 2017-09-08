@@ -25,7 +25,6 @@ package com.blackducksoftware.integration.hub.certificate;
 
 import java.io.File;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
@@ -39,8 +38,6 @@ import okhttp3.Response;
 public class HubCertificateHandler {
     private final IntLogger logger;
     private final CertificateHandler handler;
-
-    private int timeout;
 
     public HubCertificateHandler(final IntLogger logger) {
         this.logger = logger;
@@ -72,12 +69,8 @@ public class HubCertificateHandler {
         urlBuilder.addPathSegment("download");
         urlBuilder.addPathSegment(CLILocation.DEFAULT_CLI_DOWNLOAD);
         final HttpUrl url = urlBuilder.build();
-        final OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.connectTimeout(timeout, TimeUnit.SECONDS);
-        builder.writeTimeout(timeout, TimeUnit.SECONDS);
-        builder.readTimeout(timeout, TimeUnit.SECONDS);
         try {
-            final OkHttpClient client = builder.build();
+            final OkHttpClient client = handler.getOkHttpClient(hubUrl);
             final Request request = new Request.Builder().url(url).get().build();
             Response response = null;
             try {
@@ -98,7 +91,6 @@ public class HubCertificateHandler {
     }
 
     public void setTimeout(final int timeout) {
-        this.timeout = timeout;
         handler.timeout = timeout;
     }
 

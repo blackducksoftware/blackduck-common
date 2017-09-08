@@ -127,7 +127,7 @@ public class SimpleScanService {
         }
         logger.debug("Using this java installation : " + pathToJavaExecutable);
 
-        if (hubServerConfig.isAutoImportHttpsCertificates() && !hubScanConfig.isDryRun()) {
+        if (hubServerConfig.isAlwaysTrustServerCertificate() && !hubScanConfig.isDryRun()) {
             try {
                 final HubCertificateHandler hubCertificateHandler = new HubCertificateHandler(logger, cliLocation.getJavaHome());
                 hubCertificateHandler.setTimeout(hubServerConfig.getTimeout());
