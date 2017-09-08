@@ -26,29 +26,21 @@ package com.blackducksoftware.integration.hub.validator;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
-import com.blackducksoftware.integration.hub.cli.CLILocation;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubProxyInfoFieldEnum;
 import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
-import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnection;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
-import com.blackducksoftware.integration.log.LogLevel;
-import com.blackducksoftware.integration.log.PrintStreamIntLogger;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 import com.blackducksoftware.integration.validator.ValidationResult;
 import com.blackducksoftware.integration.validator.ValidationResultEnum;
 import com.blackducksoftware.integration.validator.ValidationResults;
-
-import okhttp3.HttpUrl;
-import okhttp3.Request;
 
 public class HubServerConfigValidator extends AbstractValidator {
     public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
@@ -86,6 +78,8 @@ public class HubServerConfigValidator extends AbstractValidator {
     private int proxyPasswordLength;
 
     private String ignoredProxyHosts;
+
+    private boolean alwaysTrustServerCertificate;
 
     private HubProxyInfo proxyInfo;
 
@@ -157,55 +151,19 @@ public class HubServerConfigValidator extends AbstractValidator {
             return;
         }
 
-        final UnauthenticatedRestConnection restConnection = new UnauthenticatedRestConnection(new PrintStreamIntLogger(System.out, LogLevel.INFO), hubURL, NumberUtils.toInt(timeoutSeconds, 120));
-        if (proxyInfo != null) {
-            restConnection.proxyHost = proxyInfo.getHost();
-            restConnection.proxyPort = proxyInfo.getPort();
-            restConnection.proxyNoHosts = proxyInfo.getIgnoredProxyHosts();
-            restConnection.proxyUsername = proxyInfo.getUsername();
-            try {
-                restConnection.proxyPassword = proxyInfo.getDecryptedPassword();
-            } catch (final Exception e) {
-                result.addResult(HubProxyInfoFieldEnum.PROXYPASSWORD, new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
-                return;
-            }
-        }
-
         try {
+            final HubServerVerifier hubServerVerifier = new HubServerVerifier(hubURL, proxyInfo, alwaysTrustServerCertificate, NumberUtils.toInt(timeoutSeconds, 120));
+            hubServerVerifier.verifyIsHubServer();
 
-            HttpUrl httpUrl = restConnection.createHttpUrl();
-            Request request = restConnection.createGetRequest(httpUrl);
-
-            try {
-                restConnection.handleExecuteClientCall(request);
-            } catch (final IntegrationRestException e) {
-                if (e.getHttpStatusCode() == 407) {
-                    result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.ERROR, e.getHttpStatusMessage()));
-                } else if (e.getHttpStatusCode() != 401 && e.getHttpStatusCode() != 403) {
-                    result.addResult(HubServerConfigFieldEnum.HUBURL,
-                            new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + httpUrl.uri().toString() + ERROR_MSG_UNREACHABLE_CAUSE + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage()));
-                }
-                return;
+        } catch (final IntegrationRestException e) {
+            if (e.getHttpStatusCode() == 407) {
+                result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.ERROR, e.getHttpStatusMessage()));
+            } else {
+                result.addResult(HubServerConfigFieldEnum.HUBURL,
+                        new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ERROR_MSG_UNREACHABLE_CAUSE + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e));
             }
-            final List<String> urlSegments = new ArrayList<>();
-            urlSegments.add("download");
-            urlSegments.add(CLILocation.DEFAULT_CLI_DOWNLOAD);
-            httpUrl = restConnection.createHttpUrl(urlSegments);
-            request = restConnection.createGetRequest(httpUrl);
-
-            try {
-                restConnection.handleExecuteClientCall(request);
-            } catch (final IntegrationRestException e) {
-                if (e.getHttpStatusCode() == 407) {
-                    result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.ERROR, e.getHttpStatusMessage()));
-                } else {
-                    result.addResult(HubServerConfigFieldEnum.HUBURL,
-                            new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_URL_NOT_HUB_PREFIX + httpUrl.uri().toString() + ERROR_MSG_UNREACHABLE_CAUSE + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage()));
-                }
-            }
-
-        } catch (final Exception e) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, e));
+        } catch (final IntegrationException e) {
+            result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ERROR_MSG_UNREACHABLE_CAUSE + e.getMessage(), e));
         }
     }
 
@@ -331,4 +289,13 @@ public class HubServerConfigValidator extends AbstractValidator {
     public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
         this.ignoredProxyHosts = ignoredProxyHosts;
     }
+
+    public boolean isAlwaysTrustServerCertificate() {
+        return alwaysTrustServerCertificate;
+    }
+
+    public void setAlwaysTrustServerCertificate(final boolean alwaysTrustServerCertificate) {
+        this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
+    }
+
 }

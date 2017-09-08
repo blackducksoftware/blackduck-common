@@ -84,9 +84,9 @@ public class ComprehensiveCookbookTestIT {
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService(hubServicesFactory.getRestConnection().logger);
-        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService(logger);
-        final MetaService metaService = hubServicesFactory.createMetaService(logger);
+        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService();
+        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService();
+        final MetaService metaService = hubServicesFactory.createMetaService();
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
 
         // delete the project, if it exists
@@ -128,9 +128,9 @@ public class ComprehensiveCookbookTestIT {
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService(hubServicesFactory.getRestConnection().logger);
-        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService(logger);
-        final MetaService metaService = hubServicesFactory.createMetaService(logger);
+        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService();
+        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService();
+        final MetaService metaService = hubServicesFactory.createMetaService();
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
 
         // delete the project, if it exists
@@ -178,14 +178,14 @@ public class ComprehensiveCookbookTestIT {
         final Date startDate = new Date();
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService(logger);
+        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService();
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
-        final MetaService metaService = hubServicesFactory.createMetaService(logger);
+        final MetaService metaService = hubServicesFactory.createMetaService();
         final BomImportRequestService bomImportRequestService = hubServicesFactory.createBomImportRequestService();
-        final CodeLocationRequestService codeLocationRequestService = hubServicesFactory.createCodeLocationRequestService(logger);
-        final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(logger, FIVE_MINUTES);
-        final PolicyStatusDataService policyStatusDataService = hubServicesFactory.createPolicyStatusDataService(logger);
-        final NotificationRequestService notificationRequestService = hubServicesFactory.createNotificationRequestService(logger);
+        final CodeLocationRequestService codeLocationRequestService = hubServicesFactory.createCodeLocationRequestService();
+        final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(FIVE_MINUTES);
+        final PolicyStatusDataService policyStatusDataService = hubServicesFactory.createPolicyStatusDataService();
+        final NotificationRequestService notificationRequestService = hubServicesFactory.createNotificationRequestService();
 
         // delete the project, if it exists
         try {
@@ -258,11 +258,11 @@ public class ComprehensiveCookbookTestIT {
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService(logger);
-        final MetaService metaService = hubServicesFactory.createMetaService(logger);
+        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService();
+        final MetaService metaService = hubServicesFactory.createMetaService();
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
-        final CLIDataService cliDataService = hubServicesFactory.createCLIDataService(logger, TWENTY_MINUTES);
-        final PolicyStatusDataService policyStatusDataService = hubServicesFactory.createPolicyStatusDataService(logger);
+        final CLIDataService cliDataService = hubServicesFactory.createCLIDataService(TWENTY_MINUTES);
+        final PolicyStatusDataService policyStatusDataService = hubServicesFactory.createPolicyStatusDataService();
 
         // delete the project, if it exists
         try {
@@ -316,8 +316,8 @@ public class ComprehensiveCookbookTestIT {
     public void testGettingAllProjectsAndVersions() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService(logger);
-        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService(logger);
+        final ProjectRequestService projectRequestService = hubServicesFactory.createProjectRequestService();
+        final ProjectVersionRequestService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService();
 
         final List<ProjectView> allProjects = projectRequestService.getAllProjects();
         System.out.println(String.format("project count: %d", allProjects.size()));
@@ -337,7 +337,7 @@ public class ComprehensiveCookbookTestIT {
     public void testGettingAllCodeLocations() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final CodeLocationRequestService codeLocationRequestService = hubServicesFactory.createCodeLocationRequestService(logger);
+        final CodeLocationRequestService codeLocationRequestService = hubServicesFactory.createCodeLocationRequestService();
 
         final List<CodeLocationView> allCodeLocations = codeLocationRequestService.getAllCodeLocations();
         System.out.println(String.format("code location count: %d", allCodeLocations.size()));

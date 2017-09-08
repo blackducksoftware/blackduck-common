@@ -24,7 +24,6 @@
 package com.blackducksoftware.integration.hub.builder;
 
 import java.net.MalformedURLException;
-import java.net.Proxy;
 import java.net.URL;
 import java.util.Properties;
 
@@ -33,7 +32,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.builder.AbstractBuilder;
 import com.blackducksoftware.integration.exception.IntegrationCertificateException;
-import com.blackducksoftware.integration.hub.certificate.HubCertificateHandler;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
@@ -68,7 +66,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
     private String ignoredProxyHosts;
 
-    private boolean autoImportHttpsCertificates;
+    private boolean alwaysTrustServerCertificate;
 
     private IntLogger logger;
 
@@ -84,29 +82,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
             if (!stateException.getMessage().contains("SunCertPathBuilderException")) {
                 throw stateException;
             }
-
-            if (autoImportHttpsCertificates) {
-                final HubCertificateHandler hubCertificateHandler = new HubCertificateHandler(getLogger());
-                final int timeout = NumberUtils.toInt(timeoutSeconds, DEFAULT_TIMEOUT_SECONDS);
-                hubCertificateHandler.setTimeout(timeout);
-                try {
-                    final URL url = new URL(hubUrl);
-                    if (getHubProxyInfo().getProxy(url) != Proxy.NO_PROXY) {
-                        hubCertificateHandler.setProxyHost(proxyHost);
-                        hubCertificateHandler.setProxyPort(NumberUtils.toInt(proxyPort));
-                        hubCertificateHandler.setProxyUsername(proxyUsername);
-                        hubCertificateHandler.setProxyPassword(proxyPassword);
-                    }
-                    hubCertificateHandler.importHttpsCertificateForHubServer(url);
-                    return super.build();
-                } catch (final Exception certificateException) {
-                    throw new IntegrationCertificateException(certificateException.getMessage());
-                }
-            }
-
-            // In case of proxy, or if autoImportHttpsCertificates == false we
-            // wont attempt to import certificates. The
-            // User will have to do it on their own.
             throw new IntegrationCertificateException(String.format("Please import the certificate for %s into your Java keystore.", hubUrl), stateException);
         }
     }
@@ -127,7 +102,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
         final HubCredentials credentials = getHubCredentials();
         final HubProxyInfo proxyInfo = getHubProxyInfo();
-        final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, autoImportHttpsCertificates);
+        final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, alwaysTrustServerCertificate);
         return config;
     }
 
@@ -163,6 +138,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         validator.setProxyUsername(proxyUsername);
         validator.setProxyPassword(proxyPassword);
         validator.setProxyPasswordLength(proxyPasswordLength);
+        validator.setAlwaysTrustServerCertificate(alwaysTrustServerCertificate);
         return validator;
     }
 
@@ -246,8 +222,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         this.ignoredProxyHosts = ignoredProxyHosts;
     }
 
-    public void setAutoImportHttpsCertificates(final boolean autoImportHttpsCertificates) {
-        this.autoImportHttpsCertificates = autoImportHttpsCertificates;
+    public void setAlwaysTrustServerCertificate(final boolean alwaysTrustServerCertificate) {
+        this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
     }
 
     public IntLogger getLogger() {

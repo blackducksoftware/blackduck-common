@@ -70,7 +70,7 @@ public class NotificationProcessorTest {
         final RestConnection restConnection = new MockRestConnection();
         final HubServicesFactory factory = new HubServicesFactory(restConnection);
         final IntLogger logger = new IntBufferedLogger();
-        metaService = factory.createMetaService(logger);
+        metaService = factory.createMetaService();
     }
 
     public MockProcessor createMockedNotificationProcessor() {

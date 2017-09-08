@@ -24,23 +24,14 @@
 package com.blackducksoftware.integration.hub.certificate;
 
 import java.io.File;
-import java.net.URL;
-import java.util.concurrent.TimeUnit;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.cli.CLILocation;
+import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.log.IntLogger;
-
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class HubCertificateHandler {
     private final IntLogger logger;
     private final CertificateHandler handler;
-
-    private int timeout;
 
     public HubCertificateHandler(final IntLogger logger) {
         this.logger = logger;
@@ -52,73 +43,22 @@ public class HubCertificateHandler {
         handler = new CertificateHandler(logger, javaHomeOverride);
     }
 
-    public void importHttpsCertificateForHubServer(final URL hubUrl) throws IntegrationException {
-        if (hubUrl == null || !hubUrl.getProtocol().startsWith("https")) {
+    public void importHttpsCertificateForHubServer(final HubServerConfig hubServerConfig) throws IntegrationException {
+        if (hubServerConfig == null || hubServerConfig.getHubUrl() == null || !hubServerConfig.getHubUrl().getProtocol().startsWith("https")) {
             return;
         }
-        if (handler.isCertificateInTrustStore(hubUrl)) {
+        handler.timeout = hubServerConfig.getTimeout();
+        if (hubServerConfig.getProxyInfo() != null) {
+            handler.proxyHost = hubServerConfig.getProxyInfo().getHost();
+            handler.proxyPort = hubServerConfig.getProxyInfo().getPort();
+            handler.proxyNoHosts = hubServerConfig.getProxyInfo().getIgnoredProxyHosts();
+            handler.proxyUsername = hubServerConfig.getProxyInfo().getUsername();
+            handler.proxyPassword = hubServerConfig.getProxyInfo().getDecryptedPassword();
+        }
+
+        if (handler.isCertificateInTrustStore(hubServerConfig.getHubUrl())) {
             return;
         }
-        handler.retrieveAndImportHttpsCertificate(hubUrl);
-        if (!isHubServer(hubUrl)) {
-            // If we imported a certificate for a non Hub server we want to remove it again
-            handler.removeHttpsCertificate(hubUrl);
-        }
-    }
-
-    private boolean isHubServer(final URL hubUrl) {
-        // We assume that a successful connection to the CLI download end point means this is a Hub Server
-        final HttpUrl.Builder urlBuilder = HttpUrl.get(hubUrl).newBuilder();
-        urlBuilder.addPathSegment("download");
-        urlBuilder.addPathSegment(CLILocation.DEFAULT_CLI_DOWNLOAD);
-        final HttpUrl url = urlBuilder.build();
-        final OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.connectTimeout(timeout, TimeUnit.SECONDS);
-        builder.writeTimeout(timeout, TimeUnit.SECONDS);
-        builder.readTimeout(timeout, TimeUnit.SECONDS);
-        try {
-            final OkHttpClient client = builder.build();
-            final Request request = new Request.Builder().url(url).get().build();
-            Response response = null;
-            try {
-                response = client.newCall(request).execute();
-                if (!response.isSuccessful()) {
-                    return false;
-                }
-                return true;
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
-            }
-        } catch (final Exception e) {
-            logger.error(e.getMessage());
-            return false;
-        }
-    }
-
-    public void setTimeout(final int timeout) {
-        this.timeout = timeout;
-        handler.timeout = timeout;
-    }
-
-    public void setProxyHost(final String proxyHost) {
-        handler.proxyHost = proxyHost;
-    }
-
-    public void setProxyPort(final int proxyPort) {
-        handler.proxyPort = proxyPort;
-    }
-
-    public void setProxyNoHosts(final String proxyNoHosts) {
-        handler.proxyNoHosts = proxyNoHosts;
-    }
-
-    public void setProxyUsername(final String proxyUsername) {
-        handler.proxyUsername = proxyUsername;
-    }
-
-    public void setProxyPassword(final String proxyPassword) {
-        handler.proxyPassword = proxyPassword;
+        handler.retrieveAndImportHttpsCertificate(hubServerConfig.getHubUrl());
     }
 }

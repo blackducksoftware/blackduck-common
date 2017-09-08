@@ -121,14 +121,6 @@ public class ScanStatusDataService {
     }
 
     /**
-     * @deprecated Use the better named 'assertScansFinished' instead.
-     */
-    @Deprecated
-    public void assertBomImportScansFinished(final List<ScanSummaryView> pendingScans) throws HubTimeoutExceededException, IntegrationException {
-        waitForScansToComplete(pendingScans, timeoutInMilliseconds);
-    }
-
-    /**
      * For the given pendingScans, wait at most timeoutInMilliseconds for the scans to complete.
      *
      * If the timeout is exceeded, a HubTimeoutExceededException will be thrown.

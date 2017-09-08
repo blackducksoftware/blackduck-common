@@ -58,19 +58,16 @@ public class ReportRequestServiceTestIT {
     @Test
     public void testGenerateReport() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final ProjectRequestService projectService = hubServicesFactory.createProjectRequestService(hubServicesFactory.getRestConnection().logger);
-        final ProjectVersionRequestService projectVersionService = hubServicesFactory
-                .createProjectVersionRequestService(hubServicesFactory.getRestConnection().logger);
+        final ProjectRequestService projectService = hubServicesFactory.createProjectRequestService();
+        final ProjectVersionRequestService projectVersionService = hubServicesFactory.createProjectVersionRequestService();
         final BomImportRequestService importService = hubServicesFactory.createBomImportRequestService();
-        final ReportRequestService reportservice = hubServicesFactory.createReportRequestService(hubServicesFactory.getRestConnection().logger,
-                120 * 1000);
+        final ReportRequestService reportservice = hubServicesFactory.createReportRequestService(120 * 1000);
 
         final ProjectView project = getProject(projectService, restConnectionTestHelper.getProperty("TEST_REPORT_PROJECT"));
         final ProjectVersionView version = getVersion(projectVersionService, project, restConnectionTestHelper.getProperty("TEST_REPORT_VERSION"));
         try {
             importService.importBomFile(getBDIOSingleDependency(), BuildToolConstants.BDIO_FILE_MEDIA_TYPE);
-            waitForHub(hubServicesFactory.createScanStatusDataService(hubServicesFactory.getRestConnection().logger, 120 * 1000), project.name,
-                    version.versionName, hubServicesFactory.getRestConnection().logger);
+            waitForHub(hubServicesFactory.createScanStatusDataService(120 * 1000), project.name, version.versionName, hubServicesFactory.getRestConnection().logger);
 
             final ReportCategoriesEnum[] categories = new ReportCategoriesEnum[2];
             categories[0] = ReportCategoriesEnum.VERSION;
@@ -81,14 +78,13 @@ public class ReportRequestServiceTestIT {
             assertNotNull(report.getAggregateBomViewEntries());
             assertTrue(!report.getAggregateBomViewEntries().isEmpty());
         } finally {
-            final MetaService metaService = hubServicesFactory.createMetaService(hubServicesFactory.getRestConnection().logger);
+            final MetaService metaService = hubServicesFactory.createMetaService();
             final HubRequest hubRequest = projectService.getHubRequestFactory().createRequest(metaService.getHref(project));
             hubRequest.executeDelete();
         }
     }
 
-    public void waitForHub(final ScanStatusDataService scanStatusDataService, final String hubProjectName,
-            final String hubProjectVersion, final IntLogger logger) {
+    public void waitForHub(final ScanStatusDataService scanStatusDataService, final String hubProjectName, final String hubProjectVersion, final IntLogger logger) {
         try {
             scanStatusDataService.assertBomImportScanStartedThenFinished(hubProjectName, hubProjectVersion);
         } catch (final IntegrationException e) {
@@ -117,8 +113,7 @@ public class ReportRequestServiceTestIT {
             version = versionService.getProjectVersion(project, versionName);
         } catch (final IntegrationException e) {
             try {
-                final String versionUrl = versionService.createHubVersion(project,
-                        new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, versionName));
+                final String versionUrl = versionService.createHubVersion(project, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, versionName));
                 version = versionService.getItem(versionUrl, ProjectVersionView.class);
             } catch (final IntegrationException e1) {
                 throw new RuntimeException(e1);

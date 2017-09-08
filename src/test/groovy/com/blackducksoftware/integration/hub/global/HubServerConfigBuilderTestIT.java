@@ -107,7 +107,7 @@ public class HubServerConfigBuilderTestIT {
         builder.setTimeout(120);
         builder.setPassword("blackduck");
         builder.setUsername("sysadmin");
-        builder.setAutoImportHttpsCertificates(true);
+        builder.setAlwaysTrustServerCertificate(true);
         final HubServerConfig config = builder.build();
         assertNotNull(config);
     }

@@ -44,15 +44,14 @@ public class HubServerConfig extends HubComponent implements Serializable {
 
     private final HubProxyInfo proxyInfo;
 
-    private final boolean autoImportHttpsCertificates;
+    private final boolean alwaysTrustServerCertificate;
 
-    public HubServerConfig(final URL url, final int timeoutSeconds, final HubCredentials credentials,
-            final HubProxyInfo proxyInfo, final boolean autoImportHttpsCertificates) {
+    public HubServerConfig(final URL url, final int timeoutSeconds, final HubCredentials credentials, final HubProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
         this.hubUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.credentials = credentials;
         this.proxyInfo = proxyInfo;
-        this.autoImportHttpsCertificates = autoImportHttpsCertificates;
+        this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
     }
 
     public boolean shouldUseProxyForHub() {
@@ -66,8 +65,8 @@ public class HubServerConfig extends HubComponent implements Serializable {
         if (StringUtils.isNotBlank(getGlobalCredentials().getUsername())) {
             logger.alwaysLog("--> Hub User : " + getGlobalCredentials().getUsername());
         }
-        if (autoImportHttpsCertificates) {
-            logger.alwaysLog("--> Trust Hub certificate : " + isAutoImportHttpsCertificates());
+        if (alwaysTrustServerCertificate) {
+            logger.alwaysLog("--> Trust Hub certificate : " + isAlwaysTrustServerCertificate());
         }
         if (proxyInfo != null) {
             if (StringUtils.isNotBlank(proxyInfo.getHost())) {
@@ -86,15 +85,13 @@ public class HubServerConfig extends HubComponent implements Serializable {
     }
 
     public CredentialsRestConnection createCredentialsRestConnection(final IntLogger logger) throws EncryptionException {
-        final CredentialsRestConnection restConnection = new CredentialsRestConnection(logger, getHubUrl(), getGlobalCredentials().getUsername(),
-                getGlobalCredentials().getDecryptedPassword(),
-                getTimeout());
+        final CredentialsRestConnection restConnection = new CredentialsRestConnection(logger, getHubUrl(), getGlobalCredentials().getUsername(), getGlobalCredentials().getDecryptedPassword(), getTimeout());
         restConnection.proxyHost = getProxyInfo().getHost();
         restConnection.proxyPort = getProxyInfo().getPort();
         restConnection.proxyNoHosts = getProxyInfo().getIgnoredProxyHosts();
         restConnection.proxyUsername = getProxyInfo().getUsername();
         restConnection.proxyPassword = getProxyInfo().getDecryptedPassword();
-
+        restConnection.alwaysTrustServerCertificate = isAlwaysTrustServerCertificate();
         return restConnection;
     }
 
@@ -114,8 +111,8 @@ public class HubServerConfig extends HubComponent implements Serializable {
         return timeoutSeconds;
     }
 
-    public boolean isAutoImportHttpsCertificates() {
-        return autoImportHttpsCertificates;
+    public boolean isAlwaysTrustServerCertificate() {
+        return alwaysTrustServerCertificate;
     }
 
 }
