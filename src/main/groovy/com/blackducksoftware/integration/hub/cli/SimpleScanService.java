@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -99,6 +100,11 @@ public class SimpleScanService {
         this(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, new HubScanConfig(workingDirectory, scanMemory, scanTargetPaths, dryRun, null, true, excludePatterns, null, false, false), project, version);
     }
 
+    public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+        final CLILocation cliLocation = new CLILocation(logger, hubScanConfig.getToolsDir());
+        setupAndExecuteScan(cliLocation);
+    }
+
     /**
      * This will setup the command-line invocation of the Hub scanner. The workingDirectoryPath is the parent folder of the scan logs and other scan artifacts.
      *
@@ -108,8 +114,7 @@ public class SimpleScanService {
      *
      * @throws ScanFailedException
      */
-    public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        final CLILocation cliLocation = new CLILocation(logger, hubScanConfig.getToolsDir());
+    public void setupAndExecuteScan(final CLILocation cliLocation) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         String pathToJavaExecutable;
         String pathToOneJar;
         String pathToScanExecutable;
@@ -125,7 +130,14 @@ public class SimpleScanService {
         if (hubServerConfig.isAutoImportHttpsCertificates() && !hubScanConfig.isDryRun()) {
             try {
                 final HubCertificateHandler hubCertificateHandler = new HubCertificateHandler(logger, cliLocation.getJavaHome());
-                hubCertificateHandler.importHttpsCertificateForHubServer(hubServerConfig.getHubUrl(), hubServerConfig.getTimeout());
+                hubCertificateHandler.setTimeout(hubServerConfig.getTimeout());
+                if (hubServerConfig.getProxyInfo().getProxy(hubServerConfig.getHubUrl()) != Proxy.NO_PROXY) {
+                    hubCertificateHandler.setProxyHost(hubServerConfig.getProxyInfo().getHost());
+                    hubCertificateHandler.setProxyPort(hubServerConfig.getProxyInfo().getPort());
+                    hubCertificateHandler.setProxyUsername(hubServerConfig.getProxyInfo().getUsername());
+                    hubCertificateHandler.setProxyPassword(hubServerConfig.getProxyInfo().getDecryptedPassword());
+                }
+                hubCertificateHandler.importHttpsCertificateForHubServer(hubServerConfig.getHubUrl());
             } catch (IOException | IntegrationException e) {
                 logger.error("Could not automatically import the certificate to the CLI: " + e.getMessage());
             }

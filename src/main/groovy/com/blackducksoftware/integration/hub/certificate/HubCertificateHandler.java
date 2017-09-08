@@ -27,7 +27,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-import com.blackducksoftware.integration.certificate.CertificateHandler;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -41,6 +40,8 @@ public class HubCertificateHandler {
     private final IntLogger logger;
     private final CertificateHandler handler;
 
+    private int timeout;
+
     public HubCertificateHandler(final IntLogger logger) {
         this.logger = logger;
         handler = new CertificateHandler(logger);
@@ -51,18 +52,21 @@ public class HubCertificateHandler {
         handler = new CertificateHandler(logger, javaHomeOverride);
     }
 
-    public void importHttpsCertificateForHubServer(final URL hubUrl, final int timeout) throws IntegrationException {
+    public void importHttpsCertificateForHubServer(final URL hubUrl) throws IntegrationException {
+        if (hubUrl == null || !hubUrl.getProtocol().startsWith("https")) {
+            return;
+        }
         if (handler.isCertificateInTrustStore(hubUrl)) {
             return;
         }
         handler.retrieveAndImportHttpsCertificate(hubUrl);
-        if (!isHubServer(hubUrl, timeout)) {
+        if (!isHubServer(hubUrl)) {
             // If we imported a certificate for a non Hub server we want to remove it again
             handler.removeHttpsCertificate(hubUrl);
         }
     }
 
-    private boolean isHubServer(final URL hubUrl, final int timeout) {
+    private boolean isHubServer(final URL hubUrl) {
         // We assume that a successful connection to the CLI download end point means this is a Hub Server
         final HttpUrl.Builder urlBuilder = HttpUrl.get(hubUrl).newBuilder();
         urlBuilder.addPathSegment("download");
@@ -93,4 +97,28 @@ public class HubCertificateHandler {
         }
     }
 
+    public void setTimeout(final int timeout) {
+        this.timeout = timeout;
+        handler.timeout = timeout;
+    }
+
+    public void setProxyHost(final String proxyHost) {
+        handler.proxyHost = proxyHost;
+    }
+
+    public void setProxyPort(final int proxyPort) {
+        handler.proxyPort = proxyPort;
+    }
+
+    public void setProxyNoHosts(final String proxyNoHosts) {
+        handler.proxyNoHosts = proxyNoHosts;
+    }
+
+    public void setProxyUsername(final String proxyUsername) {
+        handler.proxyUsername = proxyUsername;
+    }
+
+    public void setProxyPassword(final String proxyPassword) {
+        handler.proxyPassword = proxyPassword;
+    }
 }
