@@ -63,8 +63,7 @@ public class BuildToolHelper {
         hubProjectDetailsWriter.write(outputDirectory, rootNode.name, rootNode.version);
     }
 
-    public void deployHubOutput(final HubServicesFactory services,
-            final File outputDirectory, final String hubProjectName) throws IntegrationException {
+    public void deployHubOutput(final HubServicesFactory services, final File outputDirectory, final String hubProjectName) throws IntegrationException {
         final String filename = BdioDependencyWriter.getFilename(hubProjectName);
         final File file = new File(outputDirectory, filename);
         final BomImportRequestService bomImportRequestService = services.createBomImportRequestService();
@@ -73,24 +72,19 @@ public class BuildToolHelper {
         logger.info(String.format(UPLOAD_FILE_MESSAGE, file, bomImportRequestService.getHubBaseUrl()));
     }
 
-    public void waitForHub(final HubServicesFactory services, final String hubProjectName,
-            final String hubProjectVersion, final long timeoutInSeconds) throws IntegrationException {
-        final ScanStatusDataService scanStatusDataService = services.createScanStatusDataService(logger, timeoutInSeconds * 1000);
+    public void waitForHub(final HubServicesFactory services, final String hubProjectName, final String hubProjectVersion, final long timeoutInSeconds) throws IntegrationException {
+        final ScanStatusDataService scanStatusDataService = services.createScanStatusDataService(timeoutInSeconds * 1000);
         scanStatusDataService.assertBomImportScanStartedThenFinished(hubProjectName, hubProjectVersion);
     }
 
-    public void createRiskReport(final HubServicesFactory services,
-            final File outputDirectory, final String projectName, final String projectVersionName, final long timeoutInSeconds)
-            throws IntegrationException {
-        final RiskReportDataService reportDataService = services.createRiskReportDataService(logger, timeoutInSeconds * 1000);
+    public void createRiskReport(final HubServicesFactory services, final File outputDirectory, final String projectName, final String projectVersionName, final long timeoutInSeconds) throws IntegrationException {
+        final RiskReportDataService reportDataService = services.createRiskReportDataService(timeoutInSeconds * 1000);
         reportDataService.createReportFiles(outputDirectory, projectName, projectVersionName);
     }
 
-    public VersionBomPolicyStatusView checkPolicies(final HubServicesFactory services, final String hubProjectName,
-            final String hubProjectVersion) throws IntegrationException {
-        final PolicyStatusDataService policyStatusDataService = services.createPolicyStatusDataService(logger);
-        final VersionBomPolicyStatusView policyStatusItem = policyStatusDataService
-                .getPolicyStatusForProjectAndVersion(hubProjectName, hubProjectVersion);
+    public VersionBomPolicyStatusView checkPolicies(final HubServicesFactory services, final String hubProjectName, final String hubProjectVersion) throws IntegrationException {
+        final PolicyStatusDataService policyStatusDataService = services.createPolicyStatusDataService();
+        final VersionBomPolicyStatusView policyStatusItem = policyStatusDataService.getPolicyStatusForProjectAndVersion(hubProjectName, hubProjectVersion);
         return policyStatusItem;
     }
 }

@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -89,15 +88,6 @@ public class SimpleScanService {
         this.hubScanConfig = hubScanConfig;
         this.project = project;
         this.version = version;
-    }
-
-    /**
-     * @deprecated You should create HubScanConfig, rather than pass in each field
-     */
-    @Deprecated
-    public SimpleScanService(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final CIEnvironmentVariables ciEnvironmentVariables, final File directoryToInstallTo,
-            final int scanMemory, final boolean dryRun, final String project, final String version, final Set<String> scanTargetPaths, final File workingDirectory, final String[] excludePatterns) {
-        this(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, new HubScanConfig(workingDirectory, scanMemory, scanTargetPaths, dryRun, null, true, excludePatterns, null, false, false), project, version);
     }
 
     public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, HubIntegrationException {

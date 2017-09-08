@@ -450,7 +450,7 @@ public class CLIInstallerTestIT {
         final URL hubUrl = hubServicesFactory.getRestConnection().hubBaseUrl;
 
         final HubVersionRequestService hubVersionRequestService = hubServicesFactory.createHubVersionRequestService();
-        final CLIDownloadService cliDownloadService = hubServicesFactory.createCliDownloadService(logger);
+        final CLIDownloadService cliDownloadService = hubServicesFactory.createCliDownloadService();
         final String hubVersion = hubVersionRequestService.getHubVersion();
 
         cliDownloadService.performInstallation(installDir, ciEnvironmentVariables, hubUrl.toString(), hubVersion, null);
@@ -465,7 +465,7 @@ public class CLIInstallerTestIT {
         final URL hubUrl = hubServicesFactory.getRestConnection().hubBaseUrl;
 
         final HubVersionRequestService hubVersionRequestService = hubServicesFactory.createHubVersionRequestService();
-        final CLIDownloadService cliDownloadService = hubServicesFactory.createCliDownloadService(hubServicesFactory.getRestConnection().logger);
+        final CLIDownloadService cliDownloadService = hubServicesFactory.createCliDownloadService();
         final String hubVersion = hubVersionRequestService.getHubVersion();
 
         cliDownloadService.performInstallation(installDir, ciEnvironmentVariables, hubUrl.toString(), hubVersion, "");
@@ -480,7 +480,7 @@ public class CLIInstallerTestIT {
         final URL hubUrl = hubServicesFactory.getRestConnection().hubBaseUrl;
 
         final HubVersionRequestService hubVersionRequestService = hubServicesFactory.createHubVersionRequestService();
-        final CLIDownloadService cliDownloadService = hubServicesFactory.createCliDownloadService(hubServicesFactory.getRestConnection().logger);
+        final CLIDownloadService cliDownloadService = hubServicesFactory.createCliDownloadService();
         final String hubVersion = hubVersionRequestService.getHubVersion();
         cliDownloadService.performInstallation(installDir, ciEnvironmentVariables, hubUrl.toString(), hubVersion, "TestHost");
 
@@ -523,7 +523,7 @@ public class CLIInstallerTestIT {
         final HubVersionRequestService hubVersionRequestService = hubServicesFactory.createHubVersionRequestService();
         final String hubVersion = hubVersionRequestService.getHubVersion();
 
-        final CLIDownloadService cliDownloadService = hubServicesFactory.createCliDownloadService(logger);
+        final CLIDownloadService cliDownloadService = hubServicesFactory.createCliDownloadService();
         cliDownloadService.performInstallation(installDir, ciEnvironmentVariables, hubUrl.toString(), hubVersion, "TestHost");
 
         final File file = new File(installDir, CLILocation.VERSION_FILE_NAME);
@@ -566,7 +566,7 @@ public class CLIInstallerTestIT {
         final HubVersionRequestService hubVersionRequestService = hubServicesFactory.createHubVersionRequestService();
         final String hubVersion = hubVersionRequestService.getHubVersion();
 
-        final CLIDownloadService cliDownloadService = hubServicesFactory.createCliDownloadService(logger);
+        final CLIDownloadService cliDownloadService = hubServicesFactory.createCliDownloadService();
         cliDownloadService.performInstallation(installDir, ciEnvironmentVariables, hubUrl.toString(), hubVersion, "TestHost");
 
         final File file = new File(installDir, CLILocation.VERSION_FILE_NAME);
