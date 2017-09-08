@@ -38,14 +38,14 @@ import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
 
-public class VersionBomComponentDataservice {
+public class VersionBomComponentDataService {
     private final ProjectRequestService projectRequestService;
     private final ProjectVersionRequestService projectVersionRequestService;
     private final AggregateBomRequestService aggregateBomRequestService;
     private final MatchedFilesRequestService matchedFilesRequestService;
     private final MetaService metaService;
 
-    public VersionBomComponentDataservice(final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService, final AggregateBomRequestService aggregateBomRequestService,
+    public VersionBomComponentDataService(final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService, final AggregateBomRequestService aggregateBomRequestService,
             final MatchedFilesRequestService matchedFilesRequestService, final MetaService metaService) {
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;

@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.dataservice.model.RiskProfileCountsModel;
+import com.blackducksoftware.integration.hub.dataservice.model.RiskProfileCounts;
 import com.blackducksoftware.integration.hub.model.enumeration.MatchTypeEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.MatchedFileUsageEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ReviewStatusEnum;
@@ -51,8 +51,8 @@ public class VersionBomComponentModel {
         return component.activityData;
     }
 
-    public RiskProfileCountsModel getActivityRiskProfile() {
-        return new RiskProfileCountsModel(component.activityRiskProfile);
+    public RiskProfileCounts getActivityRiskProfile() {
+        return new RiskProfileCounts(component.activityRiskProfile);
     }
 
     public String getComponent() {
@@ -71,16 +71,16 @@ public class VersionBomComponentModel {
         return component.componentVersionName;
     }
 
-    public RiskProfileCountsModel getLicenseRiskProfile() {
-        return new RiskProfileCountsModel(component.licenseRiskProfile);
+    public RiskProfileCounts getLicenseRiskProfile() {
+        return new RiskProfileCounts(component.licenseRiskProfile);
     }
 
     public List<VersionBomLicenseView> getLicenses() {
         return component.licenses;
     }
 
-    public RiskProfileCountsModel getOperationalRiskProfile() {
-        return new RiskProfileCountsModel(component.operationalRiskProfile);
+    public RiskProfileCounts getOperationalRiskProfile() {
+        return new RiskProfileCounts(component.operationalRiskProfile);
     }
 
     public List<OriginView> getOrigins() {
@@ -95,16 +95,16 @@ public class VersionBomComponentModel {
         return component.releasedOn;
     }
 
-    public RiskProfileCountsModel getSecurityRiskProfile() {
-        return new RiskProfileCountsModel(component.securityRiskProfile);
+    public RiskProfileCounts getSecurityRiskProfile() {
+        return new RiskProfileCounts(component.securityRiskProfile);
     }
 
     public List<MatchedFileUsageEnum> getUsages() {
         return component.usages;
     }
 
-    public RiskProfileCountsModel getVersionRiskProfile() {
-        return new RiskProfileCountsModel(component.versionRiskProfile);
+    public RiskProfileCounts getVersionRiskProfile() {
+        return new RiskProfileCounts(component.versionRiskProfile);
     }
 
     public ReviewStatusEnum getReviewStatus() {

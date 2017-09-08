@@ -30,36 +30,22 @@ import com.blackducksoftware.integration.hub.model.enumeration.RiskCountEnum;
 import com.blackducksoftware.integration.hub.model.view.components.RiskCountView;
 import com.blackducksoftware.integration.hub.model.view.components.RiskProfileView;
 
-public class RiskProfileCountsModel {
-    private Map<RiskCountEnum, Integer> countsMap;
+public class RiskProfileCounts {
+    private final Map<RiskCountEnum, Integer> countsMap;
 
-    public RiskProfileCountsModel(final RiskProfileView view) {
-        initCountsMap();
+    public RiskProfileCounts(final RiskProfileView view) {
+        countsMap = new HashMap<>();
+        for (final RiskCountEnum value : RiskCountEnum.values()) {
+            countsMap.put(value, 0);
+        }
         if (view != null) {
             for (final RiskCountView count : view.counts) {
-                if (count.countType == RiskCountEnum.HIGH) {
-                    countsMap.put(RiskCountEnum.HIGH, count.count);
-                } else if (count.countType == RiskCountEnum.MEDIUM) {
-                    countsMap.put(RiskCountEnum.MEDIUM, count.count);
-                } else if (count.countType == RiskCountEnum.LOW) {
-                    countsMap.put(RiskCountEnum.LOW, count.count);
-                } else if (count.countType == RiskCountEnum.OK) {
-                    countsMap.put(RiskCountEnum.OK, count.count);
-                } else if (count.countType == RiskCountEnum.UNKNOWN) {
-                    countsMap.put(RiskCountEnum.UNKNOWN, count.count);
-                }
+                countsMap.put(count.countType, count.count);
             }
         }
     }
 
     public int getCount(final RiskCountEnum level) {
         return countsMap.get(level);
-    }
-
-    private void initCountsMap() {
-        countsMap = new HashMap<>();
-        for (final RiskCountEnum value : RiskCountEnum.values()) {
-            countsMap.put(value, 0);
-        }
     }
 }
