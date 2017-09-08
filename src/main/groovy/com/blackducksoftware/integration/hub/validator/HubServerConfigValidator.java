@@ -30,7 +30,6 @@ import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
 import com.blackducksoftware.integration.hub.global.HubCredentials;
 import com.blackducksoftware.integration.hub.global.HubProxyInfo;
@@ -162,12 +161,8 @@ public class HubServerConfigValidator extends AbstractValidator {
                 result.addResult(HubServerConfigFieldEnum.HUBURL,
                         new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ERROR_MSG_UNREACHABLE_CAUSE + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e));
             }
-
-        } catch (final IntegrationException e) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
-
         } catch (final Exception e) {
-            result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl, e));
+            result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ERROR_MSG_UNREACHABLE_CAUSE + e.getMessage(), e));
         }
     }
 
