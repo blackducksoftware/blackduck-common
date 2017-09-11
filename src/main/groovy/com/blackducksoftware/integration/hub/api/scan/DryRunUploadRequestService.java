@@ -56,7 +56,9 @@ public class DryRunUploadRequestService extends HubResponseService {
     public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws IntegrationException {
         final HttpUrl httpUrl = restConnection.createHttpUrl(DRY_RUN_UPLOAD_SEGMENTS);
         final Request request = restConnection.createPostRequest(httpUrl, RequestBody.create(MediaType.parse("application/json"), dryRunFile));
-        try (Response response = restConnection.handleExecuteClientCall(request)) {
+        Response response = null;
+        try {
+            response = restConnection.handleExecuteClientCall(request);
             String responseString;
             try {
                 responseString = response.body().string();
@@ -66,6 +68,10 @@ public class DryRunUploadRequestService extends HubResponseService {
             final DryRunUploadResponse uploadResponse = getGson().fromJson(responseString, DryRunUploadResponse.class);
             uploadResponse.json = responseString;
             return uploadResponse;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 }

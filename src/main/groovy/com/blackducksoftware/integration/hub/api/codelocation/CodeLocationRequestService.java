@@ -62,8 +62,7 @@ public class CodeLocationRequestService extends HubResponseService {
     }
 
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationEnum codeLocationType) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType",
-                codeLocationType.toString());
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType", codeLocationType.toString());
 
         final List<CodeLocationView> allCodeLocations = getAllItems(hubPagedRequest, CodeLocationView.class);
         return allCodeLocations;
@@ -106,9 +105,15 @@ public class CodeLocationRequestService extends HubResponseService {
 
     public void updateCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws IntegrationException {
         final HubRequest request = getHubRequestFactory().createRequest(codeLocationItemUrl);
-        try (Response response = request.executePut(codeLocationItemJson)) {
-
+        Response response = null;
+        try {
+            response = request.executePut(codeLocationItemJson);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
+
     }
 
     public void deleteCodeLocations(final List<CodeLocationView> codeLocationItems) throws IntegrationException {

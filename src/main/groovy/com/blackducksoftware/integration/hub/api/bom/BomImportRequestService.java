@@ -50,12 +50,17 @@ public class BomImportRequestService extends HubResponseService {
     }
 
     public void importBomFile(final File file, final String mediaType) throws IntegrationException {
+        Response response = null;
         try {
             final HubRequest hubRequest = getHubRequestFactory().createRequest(BOM_IMPORT_SEGMENTS);
-            try (Response response = hubRequest.executePost(mediaType, FileUtils.readFileToString(file, StandardCharsets.UTF_8))) {
-            }
+            response = hubRequest.executePost(mediaType, FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+
         } catch (final IOException e) {
             throw new HubIntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub with Error : " + e.getMessage(), e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
