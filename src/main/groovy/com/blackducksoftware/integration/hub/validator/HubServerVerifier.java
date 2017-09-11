@@ -38,6 +38,7 @@ import com.blackducksoftware.integration.log.PrintStreamIntLogger;
 
 import okhttp3.HttpUrl;
 import okhttp3.Request;
+import okhttp3.Response;
 
 public class HubServerVerifier {
 
@@ -69,13 +70,18 @@ public class HubServerVerifier {
 
         HttpUrl httpUrl = restConnection.createHttpUrl();
         Request request = restConnection.createGetRequest(httpUrl);
+        Response response = null;
         try {
-            restConnection.handleExecuteClientCall(request);
+            response = restConnection.handleExecuteClientCall(request);
         } catch (final IntegrationRestException e) {
             if (e.getHttpStatusCode() == 401 && e.getHttpStatusCode() == 403) {
                 // This could be a Hub server
             } else {
                 throw e;
+            }
+        } finally {
+            if (response != null) {
+                response.close();
             }
         }
         final List<String> urlSegments = new ArrayList<>();
@@ -84,11 +90,15 @@ public class HubServerVerifier {
         httpUrl = restConnection.createHttpUrl(urlSegments);
         request = restConnection.createGetRequest(httpUrl);
         try {
-            restConnection.handleExecuteClientCall(request);
+            response = restConnection.handleExecuteClientCall(request);
         } catch (final IntegrationRestException e) {
             throw new HubIntegrationException("The Url does not appear to be a Hub server :" + httpUrl.uri().toString() + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
         } catch (final IntegrationException e) {
             throw new HubIntegrationException("The Url does not appear to be a Hub server :" + httpUrl.uri().toString() + ", because: " + e.getMessage(), e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
