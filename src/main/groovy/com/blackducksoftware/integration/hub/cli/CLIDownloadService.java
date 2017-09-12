@@ -192,30 +192,30 @@ public class CLIDownloadService {
         if (securityDirectory == null || !securityDirectory.isDirectory()) {
             // the cli might not have the jre included
             logger.warn("CLI location : " + cliLocation.getCanonicalPath());
-            logger.warn("Can not copy the cacerts into the CLI JRE. Can not find the CLI JRE.");
+            logger.warn("Can not copy the trust store into the CLI JRE. Can not find the CLI JRE.");
             return;
         }
-        File cacertsFile = null;
+        File trustStoreFile = null;
         if (ciEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
             logger.trace("Found the variable : " + CIEnvironmentVariables.BDS_CACERTS_OVERRIDE + ", using value : " + ciEnvironmentVariables.getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE));
-            final String cacertsPath = ciEnvironmentVariables.getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
-            cacertsFile = new File(cacertsPath);
+            final String trustStorePath = ciEnvironmentVariables.getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
+            trustStoreFile = new File(trustStorePath);
         } else {
-            logger.trace("Did not find the variable : " + CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
             final CertificateHandler certificateHandler = new CertificateHandler(logger);
-            cacertsFile = certificateHandler.getTrustStore();
+            trustStoreFile = certificateHandler.getTrustStore();
         }
-        final String cacertsFilename = cacertsFile.getName();
-        final File cacerts = new File(securityDirectory, cacertsFilename);
-        final File cacertsBackup = new File(securityDirectory, cacertsFilename + System.currentTimeMillis());
+        logger.trace("Copying the trust store from : " + trustStoreFile.getAbsolutePath());
+        final String trustStoreFilename = trustStoreFile.getName();
+        final File trustStore = new File(securityDirectory, trustStoreFilename);
+        final File trustStoreBackup = new File(securityDirectory, trustStoreFilename + System.currentTimeMillis());
         try {
-            if (cacerts.exists()) {
+            if (trustStore.exists()) {
                 // only backup the cacerts if it exists
-                FileUtils.moveFile(cacerts, cacertsBackup);
+                FileUtils.moveFile(trustStore, trustStoreBackup);
             }
-            FileUtils.copyFile(cacertsFile, cacerts);
+            FileUtils.copyFile(trustStoreFile, trustStore);
         } catch (final IOException e) {
-            logger.error("Could not copy the cacerts file from: " + cacertsFile.getAbsolutePath() + " to: " + cacerts.getAbsolutePath() + " msg: " + e.getMessage());
+            logger.error("Could not copy the trust store file from: " + trustStoreFile.getAbsolutePath() + " to: " + trustStore.getAbsolutePath() + " msg: " + e.getMessage());
             throw e;
         }
     }
