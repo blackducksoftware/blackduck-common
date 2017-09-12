@@ -45,6 +45,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.certificate.CertificateHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -65,8 +66,8 @@ public class CLIDownloadService {
         this.restConnection = restConnection;
     }
 
-    public void performInstallation(final File directoryToInstallTo, final CIEnvironmentVariables ciEnvironmentVariables,
-            final String hubUrl, final String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
+    public void performInstallation(final File directoryToInstallTo, final CIEnvironmentVariables ciEnvironmentVariables, final String hubUrl, final String hubVersion, final String localHostName)
+            throws HubIntegrationException, EncryptionException {
         if (StringUtils.isBlank(localHostName)) {
             throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
         }
@@ -84,8 +85,7 @@ public class CLIDownloadService {
         }
     }
 
-    public void customInstall(final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables, final URL archive,
-            final String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
+    public void customInstall(final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables, final URL archive, final String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
         String directoryToInstallTo;
         try {
             directoryToInstallTo = cliLocation.getCanonicalPath();
@@ -129,8 +129,7 @@ public class CLIDownloadService {
                     final Request request = restConnection.createGetRequest(httpUrl, headers);
                     response = restConnection.handleExecuteClientCall(request);
                 } catch (final IntegrationException e) {
-                    logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo + ": "
-                            + e.toString());
+                    logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo + ": " + e.toString());
                     return;
                 }
                 if (response.code() == 304) {
@@ -160,8 +159,7 @@ public class CLIDownloadService {
                 logger.debug("Updating the Hub CLI.");
                 hubVersionFile.setLastModified(lastModifiedLong);
 
-                logger.info("Unpacking " + archive.toString() + " to " + directoryToInstallTo + " on "
-                        + localHostName);
+                logger.info("Unpacking " + archive.toString() + " to " + directoryToInstallTo + " on " + localHostName);
 
                 final ResponseBody responseBody = response.body();
                 cliStream = responseBody.byteStream();
@@ -170,8 +168,7 @@ public class CLIDownloadService {
                     unzip(cliInstallDirectory, cis, logger);
                     updateJreSecurity(logger, cliLocation, ciEnvironmentVariables);
                 } catch (final IOException e) {
-                    throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", archive,
-                            cis.getByteCount(), responseBody.contentLength()), e);
+                    throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", archive, cis.getByteCount(), responseBody.contentLength()), e);
                 } finally {
                     cis.close();
                 }
@@ -190,45 +187,42 @@ public class CLIDownloadService {
         }
     }
 
-    private void updateJreSecurity(final IntLogger logger, final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables)
-            throws IOException {
+    private void updateJreSecurity(final IntLogger logger, final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables) throws IOException {
+        final File securityDirectory = cliLocation.getJreSecurityDirectory();
+        if (securityDirectory == null || !securityDirectory.isDirectory()) {
+            // the cli might not have the jre included
+            logger.debug("CLI location : " + cliLocation.getCanonicalPath());
+            logger.debug("Can not copy the cacerts into the CLI JRE. Can not find the CLI JRE.");
+            return;
+        }
+        File cacertsFile = null;
         if (ciEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
-            logger.trace("Found the variable : " + CIEnvironmentVariables.BDS_CACERTS_OVERRIDE + ", using value : " + ciEnvironmentVariables
-                    .getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE));
-            final File securityDirectory = cliLocation.getJreSecurityDirectory();
-            if (securityDirectory == null) {
-                // the cli might not have the jre included
-                logger.trace("Can not copy the cacerts into the CLI JRE. Can not find the CLI JRE.");
-                return;
-            }
-            final String customCacertsPath = ciEnvironmentVariables
-                    .getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
-            final File customCacerts = new File(customCacertsPath);
-
-            final String cacertsFilename = customCacerts.getName();
-            final File cacerts = new File(securityDirectory, cacertsFilename);
-            final File cacertsBackup = new File(securityDirectory, cacertsFilename + System.currentTimeMillis());
-
-            try {
-                if (cacerts.exists()) {
-                    // only backup the cacerts if it exists
-                    FileUtils.moveFile(cacerts, cacertsBackup);
-                }
-                FileUtils.copyFile(customCacerts, cacerts);
-            } catch (final IOException e) {
-                logger.error("Could not copy the custom cacerts file from: " + customCacertsPath + " to: "
-                        + cacerts.getAbsolutePath() + " msg: " + e.getMessage());
-                throw e;
-            }
+            logger.trace("Found the variable : " + CIEnvironmentVariables.BDS_CACERTS_OVERRIDE + ", using value : " + ciEnvironmentVariables.getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE));
+            final String cacertsPath = ciEnvironmentVariables.getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
+            cacertsFile = new File(cacertsPath);
         } else {
             logger.trace("Did not find the variable : " + CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
+            final CertificateHandler certificateHandler = new CertificateHandler(logger);
+            cacertsFile = certificateHandler.getTrustStore();
+        }
+        final String cacertsFilename = cacertsFile.getName();
+        final File cacerts = new File(securityDirectory, cacertsFilename);
+        final File cacertsBackup = new File(securityDirectory, cacertsFilename + System.currentTimeMillis());
+        try {
+            if (cacerts.exists()) {
+                // only backup the cacerts if it exists
+                FileUtils.moveFile(cacerts, cacertsBackup);
+            }
+            FileUtils.copyFile(cacertsFile, cacerts);
+        } catch (final IOException e) {
+            logger.error("Could not copy the cacerts file from: " + cacertsFile.getAbsolutePath() + " to: " + cacerts.getAbsolutePath() + " msg: " + e.getMessage());
+            throw e;
         }
     }
 
     private void unzip(final File dir, final InputStream in, final IntLogger logger) throws IOException {
         // uses java.io.tmpdir
         final File tmpFile = File.createTempFile("tmpzip", null);
-
         try {
             copyInputStreamToFile(in, tmpFile);
             unzip(dir, tmpFile, logger);
