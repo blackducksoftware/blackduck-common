@@ -191,7 +191,7 @@ public class CLIDataService {
             cleanupCodeLocations(codeLocationViews, hubScanConfig)
             if (shouldWaitForScansFinished) {
                 logger.debug("Waiting for the Bom to be updated.")
-                scanStatusDataService.assertBomImportScansFinished(scanSummaries)
+                scanStatusDataService.assertScansFinished(scanSummaries)
             }
         }
     }

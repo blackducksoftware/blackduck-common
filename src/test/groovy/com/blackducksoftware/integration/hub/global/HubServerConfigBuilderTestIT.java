@@ -46,10 +46,6 @@ public class HubServerConfigBuilderTestIT {
 
     private static final String VALID_TIMEOUT_STRING = "120";
 
-    private static final String VALID_USERNAME_STRING = "username";
-
-    private static final String VALID_PASSWORD_STRING = "password";
-
     private static final int VALID_TIMEOUT_INTEGER = 120;
 
     private static final int VALID_PROXY_PORT = 2303;
@@ -118,13 +114,13 @@ public class HubServerConfigBuilderTestIT {
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setHubUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_INTEGER);
-        builder.setPassword(VALID_PASSWORD_STRING);
-        builder.setUsername(VALID_USERNAME_STRING);
+        builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
+        builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         final HubServerConfig config = builder.build();
         assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
         assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
-        assertEquals(VALID_USERNAME_STRING, config.getGlobalCredentials().getUsername());
-        assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getGlobalCredentials().getUsername());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getGlobalCredentials().getDecryptedPassword());
     }
 
     @Test
@@ -133,13 +129,13 @@ public class HubServerConfigBuilderTestIT {
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setHubUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_STRING);
-        builder.setPassword(VALID_PASSWORD_STRING);
-        builder.setUsername(VALID_USERNAME_STRING);
+        builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
+        builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         final HubServerConfig config = builder.build();
         assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
         assertEquals(120, config.getTimeout());
-        assertEquals(VALID_USERNAME_STRING, config.getGlobalCredentials().getUsername());
-        assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getGlobalCredentials().getUsername());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getGlobalCredentials().getDecryptedPassword());
     }
 
     @Test
@@ -148,8 +144,8 @@ public class HubServerConfigBuilderTestIT {
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setHubUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_STRING);
-        builder.setPassword(VALID_PASSWORD_STRING);
-        builder.setUsername(VALID_USERNAME_STRING);
+        builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
+        builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         builder.setProxyHost(VALID_PROXY_HOST);
         builder.setProxyPort(VALID_PROXY_PORT);
         builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
@@ -157,8 +153,8 @@ public class HubServerConfigBuilderTestIT {
 
         assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
         assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
-        assertEquals(VALID_USERNAME_STRING, config.getGlobalCredentials().getUsername());
-        assertEquals(VALID_PASSWORD_STRING, config.getGlobalCredentials().getDecryptedPassword());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getGlobalCredentials().getUsername());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getGlobalCredentials().getDecryptedPassword());
         assertEquals(VALID_PROXY_HOST, config.getProxyInfo().getHost());
         assertEquals(VALID_PROXY_PORT, config.getProxyInfo().getPort());
         assertEquals(VALID_IGNORE_HOST_LIST, config.getProxyInfo().getIgnoredProxyHosts());
@@ -170,8 +166,8 @@ public class HubServerConfigBuilderTestIT {
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setHubUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_STRING);
-        builder.setPassword(VALID_PASSWORD_STRING);
-        builder.setUsername(VALID_USERNAME_STRING);
+        builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
+        builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         final HubServerConfig config = builder.build();
         assertFalse(config.getHubUrl().toString().endsWith("/"));
         assertEquals("https", config.getHubUrl().getProtocol());
@@ -185,8 +181,8 @@ public class HubServerConfigBuilderTestIT {
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setHubUrl(hubServer + "api");
         builder.setTimeout(VALID_TIMEOUT_STRING);
-        builder.setPassword(VALID_PASSWORD_STRING);
-        builder.setUsername(VALID_USERNAME_STRING);
+        builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
+        builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         final HubServerConfig config = builder.build();
         assertFalse(config.getHubUrl().toString().endsWith("/"));
         assertEquals("https", config.getHubUrl().getProtocol());
@@ -199,8 +195,8 @@ public class HubServerConfigBuilderTestIT {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setHubUrl(hubServer);
-        builder.setPassword(VALID_PASSWORD_STRING);
-        builder.setUsername(VALID_USERNAME_STRING);
+        builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
+        builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         HubServerConfig config = builder.build();
         assertFalse(config.shouldUseProxyForHub());
 

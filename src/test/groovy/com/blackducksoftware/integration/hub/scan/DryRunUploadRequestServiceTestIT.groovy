@@ -59,7 +59,7 @@ class DryRunUploadRequestServiceTestIT {
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
-        CodeLocationRequestService codeLocationRequestService = services.createCodeLocationRequestService(logger)
+        CodeLocationRequestService codeLocationRequestService = services.createCodeLocationRequestService()
         CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
         Assert.assertNotNull(codeLocationView)
 

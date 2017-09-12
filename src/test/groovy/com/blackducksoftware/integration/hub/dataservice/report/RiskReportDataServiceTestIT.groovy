@@ -45,7 +45,7 @@ class RiskReportDataServiceTestIT {
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        RiskReportDataService riskReportDataService = hubServicesFactory.createRiskReportDataService(logger, 30000)
+        RiskReportDataService riskReportDataService = hubServicesFactory.createRiskReportDataService(30000)
         File folderForReport = folderForReport.getRoot()
         File pdfFile = riskReportDataService.createReportPdfFile(folderForReport, testProjectName, testProjectVersionName)
         Assert.assertNotNull(pdfFile)
@@ -59,7 +59,7 @@ class RiskReportDataServiceTestIT {
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        RiskReportDataService riskReportDataService = hubServicesFactory.createRiskReportDataService(logger, 30000)
+        RiskReportDataService riskReportDataService = hubServicesFactory.createRiskReportDataService(30000)
         File folderForReport = folderForReport.getRoot()
         riskReportDataService.createReportFiles(folderForReport, testProjectName, testProjectVersionName)
 
@@ -82,7 +82,7 @@ class RiskReportDataServiceTestIT {
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        RiskReportDataService riskReportDataService = hubServicesFactory.createRiskReportDataService(logger, 30000)
+        RiskReportDataService riskReportDataService = hubServicesFactory.createRiskReportDataService(30000)
         File folderForReport = folderForReport.getRoot()
         File noticeReportFile = riskReportDataService.createNoticesReportFile(folderForReport, testProjectName, testProjectVersionName);
         Assert.assertNotNull(noticeReportFile)
