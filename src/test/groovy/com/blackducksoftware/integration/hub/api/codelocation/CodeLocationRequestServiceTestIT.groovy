@@ -62,7 +62,7 @@ class CodeLocationRequestServiceTestIT {
     @After
     public void testCleanup(){
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        ProjectRequestService projectRequestService = services.createProjectRequestService(logger)
+        ProjectRequestService projectRequestService = services.createProjectRequestService()
         ProjectView project = projectRequestService.getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
         projectRequestService.deleteHubProject(project)
     }
@@ -77,7 +77,7 @@ class CodeLocationRequestServiceTestIT {
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
-        CodeLocationRequestService codeLocationRequestService = services.createCodeLocationRequestService(logger)
+        CodeLocationRequestService codeLocationRequestService = services.createCodeLocationRequestService()
         CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
@@ -86,7 +86,7 @@ class CodeLocationRequestServiceTestIT {
         projectBuilder.setProjectName(projectName)
         projectBuilder.setVersionName(versionName)
 
-        ProjectVersionView version = getProjectVersion(services.createProjectRequestService(logger), services.createProjectVersionRequestService(logger), projectBuilder.build())
+        ProjectVersionView version = getProjectVersion(services.createProjectRequestService(), services.createProjectVersionRequestService(), projectBuilder.build())
 
         codeLocationRequestService.mapCodeLocation(codeLocationView, version)
         codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
@@ -99,8 +99,7 @@ class CodeLocationRequestServiceTestIT {
         Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
 
         codeLocationRequestService.deleteCodeLocation(codeLocationView)
-
-        try{
+        try {
             codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
             Assert.fail('This should have thrown an exception')
         } catch (IntegrationRestException e){

@@ -41,7 +41,7 @@ class ScanStatusDataServiceTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
         final BomImportRequestService bomImportRequestService = hubServicesFactory.createBomImportRequestService()
-        final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(logger, FIVE_MINUTES);
+        final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(FIVE_MINUTES);
 
         // import the bdio
         final File file = restConnectionTestHelper.getFile('bdio/GRADLE_rest_backend_rest_backend_4_2_0_SNAPSHOT_bdio.jsonld')
