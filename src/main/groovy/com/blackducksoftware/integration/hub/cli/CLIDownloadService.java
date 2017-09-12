@@ -191,8 +191,8 @@ public class CLIDownloadService {
         final File securityDirectory = cliLocation.getJreSecurityDirectory();
         if (securityDirectory == null || !securityDirectory.isDirectory()) {
             // the cli might not have the jre included
-            logger.debug("CLI location : " + cliLocation.getCanonicalPath());
-            logger.debug("Can not copy the cacerts into the CLI JRE. Can not find the CLI JRE.");
+            logger.warn("CLI location : " + cliLocation.getCanonicalPath());
+            logger.warn("Can not copy the cacerts into the CLI JRE. Can not find the CLI JRE.");
             return;
         }
         File cacertsFile = null;
