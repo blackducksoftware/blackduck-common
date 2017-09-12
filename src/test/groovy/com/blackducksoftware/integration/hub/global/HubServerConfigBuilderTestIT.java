@@ -176,21 +176,6 @@ public class HubServerConfigBuilderTestIT {
     }
 
     @Test
-    public void testUrlwithTrailingPath() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
-        builder.setHubUrl(hubServer + "api");
-        builder.setTimeout(VALID_TIMEOUT_STRING);
-        builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
-        builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
-        final HubServerConfig config = builder.build();
-        assertFalse(config.getHubUrl().toString().endsWith("/"));
-        assertEquals("https", config.getHubUrl().getProtocol());
-        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
-        assertEquals("/api", config.getHubUrl().getPath());
-    }
-
-    @Test
     public void testValidBuildWithProxyPortZero() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
