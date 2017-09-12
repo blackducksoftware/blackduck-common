@@ -25,6 +25,7 @@ package com.blackducksoftware.integration.hub.dataservice.phonehome;
 
 import java.net.URL;
 
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -94,7 +95,12 @@ public class PhoneHomeDataService {
         final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = new PhoneHomeRequestBodyBuilder();
         try {
             final String hubVersion = hubVersionRequestService.getHubVersion();
-            final String registrationId = hubRegistrationRequestService.getRegistrationId();
+            String registrationId = null;
+            try {
+                // We need to wrap this because this will most likely fail unless they are running as an admin
+                registrationId = hubRegistrationRequestService.getRegistrationId();
+            } catch (final IntegrationException e) {
+            }
             final URL hubHostName = hubRegistrationRequestService.getHubBaseUrl();
             phoneHomeRequestBodyBuilder.setRegistrationId(registrationId);
             phoneHomeRequestBodyBuilder.setHostName(hubHostName.toString());
