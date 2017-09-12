@@ -210,7 +210,7 @@ public class CLIDownloadService {
         final File trustStoreBackup = new File(securityDirectory, trustStoreFilename + System.currentTimeMillis());
         try {
             if (trustStore.exists()) {
-                // only backup the cacerts if it exists
+                // only backup the trust store if it exists
                 FileUtils.moveFile(trustStore, trustStoreBackup);
             }
             FileUtils.copyFile(trustStoreFile, trustStore);
