@@ -31,6 +31,7 @@ import com.blackducksoftware.integration.hub.dataservice.model.RiskProfileCounts
 import com.blackducksoftware.integration.hub.model.enumeration.MatchTypeEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.MatchedFileUsageEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ReviewStatusEnum;
+import com.blackducksoftware.integration.hub.model.enumeration.RiskCountEnum;
 import com.blackducksoftware.integration.hub.model.view.MatchedFilesView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.model.view.components.ActivityDataView;
@@ -55,6 +56,10 @@ public class VersionBomComponentModel {
         return new RiskProfileCounts(component.activityRiskProfile);
     }
 
+    public boolean hasActivityRisk() {
+        return hasRisk(getActivityRiskProfile());
+    }
+
     public String getComponent() {
         return component.component;
     }
@@ -75,12 +80,20 @@ public class VersionBomComponentModel {
         return new RiskProfileCounts(component.licenseRiskProfile);
     }
 
+    public boolean hasLicenseRisk() {
+        return hasRisk(getLicenseRiskProfile());
+    }
+
     public List<VersionBomLicenseView> getLicenses() {
         return component.licenses;
     }
 
     public RiskProfileCounts getOperationalRiskProfile() {
         return new RiskProfileCounts(component.operationalRiskProfile);
+    }
+
+    public boolean hasOperationalRisk() {
+        return hasRisk(getOperationalRiskProfile());
     }
 
     public List<OriginView> getOrigins() {
@@ -99,12 +112,20 @@ public class VersionBomComponentModel {
         return new RiskProfileCounts(component.securityRiskProfile);
     }
 
+    public boolean hasSecurityRisk() {
+        return hasRisk(getSecurityRiskProfile());
+    }
+
     public List<MatchedFileUsageEnum> getUsages() {
         return component.usages;
     }
 
     public RiskProfileCounts getVersionRiskProfile() {
         return new RiskProfileCounts(component.versionRiskProfile);
+    }
+
+    public boolean hasVersionRisk() {
+        return hasRisk(getVersionRiskProfile());
     }
 
     public ReviewStatusEnum getReviewStatus() {
@@ -121,6 +142,13 @@ public class VersionBomComponentModel {
 
     public List<MatchedFilesModel> getMatchedFiles() {
         return matchedFiles;
+    }
+
+    private boolean hasRisk(final RiskProfileCounts counts) {
+        if (counts.getCount(RiskCountEnum.LOW) + counts.getCount(RiskCountEnum.MEDIUM) + counts.getCount(RiskCountEnum.HIGH) > 0) {
+            return true;
+        }
+        return false;
     }
 
     private List<MatchedFilesModel> getMatchedFilesModel(final List<MatchedFilesView> matchedFiles) {
