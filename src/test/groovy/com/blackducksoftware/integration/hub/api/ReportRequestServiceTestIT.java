@@ -38,7 +38,6 @@ import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionR
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
-import com.blackducksoftware.integration.hub.buildtool.BuildToolConstants;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
@@ -66,7 +65,7 @@ public class ReportRequestServiceTestIT {
         final ProjectView project = getProject(projectService, restConnectionTestHelper.getProperty("TEST_REPORT_PROJECT"));
         final ProjectVersionView version = getVersion(projectVersionService, project, restConnectionTestHelper.getProperty("TEST_REPORT_VERSION"));
         try {
-            importService.importBomFile(getBDIOSingleDependency(), BuildToolConstants.BDIO_FILE_MEDIA_TYPE);
+            importService.importBomFile(getBDIOSingleDependency(), "application/ld+json");
             waitForHub(hubServicesFactory.createScanStatusDataService(120 * 1000), project.name, version.versionName, hubServicesFactory.getRestConnection().logger);
 
             final ReportCategoriesEnum[] categories = new ReportCategoriesEnum[2];
@@ -88,7 +87,7 @@ public class ReportRequestServiceTestIT {
         try {
             scanStatusDataService.assertBomImportScanStartedThenFinished(hubProjectName, hubProjectVersion);
         } catch (final IntegrationException e) {
-            logger.error(String.format(BuildToolConstants.BOM_WAIT_ERROR, e.getMessage()), e);
+            logger.error(String.format("There was an error waiting for the Bom calculations: %s", e.getMessage()), e);
         }
     }
 
