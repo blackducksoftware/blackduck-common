@@ -48,10 +48,6 @@ public class HubServerConfigBuilderTestIT {
 
     private static final int VALID_TIMEOUT_INTEGER = 120;
 
-    private static final int VALID_PROXY_PORT = 2303;
-
-    private static final String VALID_PROXY_HOST = "just need a non-empty string";
-
     @Test
     public void testValidConfigWithProxies() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
@@ -147,8 +143,8 @@ public class HubServerConfigBuilderTestIT {
         builder.setTimeout(VALID_TIMEOUT_STRING);
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
-        builder.setProxyHost(VALID_PROXY_HOST);
-        builder.setProxyPort(VALID_PROXY_PORT);
+        builder.setProxyHost(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
+        builder.setProxyPort(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"));
         builder.setIgnoredProxyHosts(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"));
         final HubServerConfig config = builder.build();
 
@@ -156,8 +152,8 @@ public class HubServerConfigBuilderTestIT {
         assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
         assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getGlobalCredentials().getUsername());
         assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getGlobalCredentials().getDecryptedPassword());
-        assertEquals(VALID_PROXY_HOST, config.getProxyInfo().getHost());
-        assertEquals(VALID_PROXY_PORT, config.getProxyInfo().getPort());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"), String.valueOf(config.getProxyInfo().getPort()));
         assertEquals(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"), config.getProxyInfo().getIgnoredProxyHosts());
     }
 
