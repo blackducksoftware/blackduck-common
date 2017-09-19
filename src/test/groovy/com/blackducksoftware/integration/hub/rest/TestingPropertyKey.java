@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.rest;
 public enum TestingPropertyKey {
     TEST_HUB_SERVER_URL,
     TEST_HTTPS_HUB_SERVER_URL,
+    TEST_HTTPS_IGNORE_HOST,
     TEST_USERNAME,
     TEST_PASSWORD,
     TEST_TRUST_HTTPS_CERT,
