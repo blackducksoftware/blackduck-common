@@ -36,6 +36,7 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
 
@@ -63,6 +64,10 @@ public class HubServerConfigBuilderTestIT {
 
     @Test
     public void testValidConfigWithProxiesNoProxy() throws Exception {
+        final IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.TRACE);
+
+        logger.info("Ignored host " + restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"));
+
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         setBuilderDefaults(builder);
         setBuilderProxyDefaults(builder);
@@ -77,8 +82,8 @@ public class HubServerConfigBuilderTestIT {
         assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")), config.getProxyInfo().getPort());
         assertEquals(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"), config.getProxyInfo().getIgnoredProxyHosts());
 
-        config.print(new PrintStreamIntLogger(System.out, LogLevel.TRACE));
-
+        config.print(logger);
+        logger.info("Ignored host " + config.getProxyInfo().getIgnoredProxyHosts());
         assertFalse(config.getProxyInfo().shouldUseProxyForUrl(config.getHubUrl()));
     }
 
