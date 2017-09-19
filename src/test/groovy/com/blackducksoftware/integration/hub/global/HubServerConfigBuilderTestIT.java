@@ -52,8 +52,6 @@ public class HubServerConfigBuilderTestIT {
 
     private static final String VALID_PROXY_HOST = "just need a non-empty string";
 
-    private static final String VALID_IGNORE_HOST_LIST = ".*eng-hub-docker-valid02.*";
-
     @Test
     public void testValidConfigWithProxies() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
@@ -74,7 +72,7 @@ public class HubServerConfigBuilderTestIT {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         setBuilderDefaults(builder);
         setBuilderProxyDefaults(builder);
-        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
+        builder.setIgnoredProxyHosts(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"));
         final HubServerConfig config = builder.build();
 
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
@@ -83,7 +81,7 @@ public class HubServerConfigBuilderTestIT {
         assertEquals("Pass", config.getGlobalCredentials().getDecryptedPassword());
         assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost());
         assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")), config.getProxyInfo().getPort());
-        assertEquals(VALID_IGNORE_HOST_LIST, config.getProxyInfo().getIgnoredProxyHosts());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"), config.getProxyInfo().getIgnoredProxyHosts());
         assertFalse(config.getProxyInfo().shouldUseProxyForUrl(config.getHubUrl()));
     }
 
@@ -112,6 +110,7 @@ public class HubServerConfigBuilderTestIT {
     public void testValidBuild() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
+        builder.setAlwaysTrustServerCertificate(true);
         builder.setHubUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_INTEGER);
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
@@ -126,6 +125,7 @@ public class HubServerConfigBuilderTestIT {
     @Test
     public void testValidBuildTimeoutString() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setAlwaysTrustServerCertificate(true);
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setHubUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_STRING);
@@ -141,6 +141,7 @@ public class HubServerConfigBuilderTestIT {
     @Test
     public void testValidBuildWithProxy() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setAlwaysTrustServerCertificate(true);
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setHubUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_STRING);
@@ -148,7 +149,7 @@ public class HubServerConfigBuilderTestIT {
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         builder.setProxyHost(VALID_PROXY_HOST);
         builder.setProxyPort(VALID_PROXY_PORT);
-        builder.setIgnoredProxyHosts(VALID_IGNORE_HOST_LIST);
+        builder.setIgnoredProxyHosts(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"));
         final HubServerConfig config = builder.build();
 
         assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
@@ -157,12 +158,13 @@ public class HubServerConfigBuilderTestIT {
         assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getGlobalCredentials().getDecryptedPassword());
         assertEquals(VALID_PROXY_HOST, config.getProxyInfo().getHost());
         assertEquals(VALID_PROXY_PORT, config.getProxyInfo().getPort());
-        assertEquals(VALID_IGNORE_HOST_LIST, config.getProxyInfo().getIgnoredProxyHosts());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"), config.getProxyInfo().getIgnoredProxyHosts());
     }
 
     @Test
     public void testUrlwithTrailingSlash() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setAlwaysTrustServerCertificate(true);
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setHubUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_STRING);
@@ -178,6 +180,7 @@ public class HubServerConfigBuilderTestIT {
     @Test
     public void testValidBuildWithProxyPortZero() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setAlwaysTrustServerCertificate(true);
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setHubUrl(hubServer);
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
@@ -204,6 +207,7 @@ public class HubServerConfigBuilderTestIT {
 
     private void setBuilderDefaults(final HubServerConfigBuilder builder) throws Exception {
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
+        builder.setAlwaysTrustServerCertificate(true);
         builder.setHubUrl(hubServer);
         builder.setTimeout("100");
         builder.setUsername("User");
