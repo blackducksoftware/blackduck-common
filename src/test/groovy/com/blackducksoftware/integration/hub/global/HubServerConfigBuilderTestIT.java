@@ -35,11 +35,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
-import com.blackducksoftware.integration.hub.certificate.CertificateHandler;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
-import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.log.LogLevel;
-import com.blackducksoftware.integration.log.PrintStreamIntLogger;
 
 public class HubServerConfigBuilderTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
@@ -83,16 +79,9 @@ public class HubServerConfigBuilderTestIT {
 
     @Test
     public void testValidBuildConnect() throws Exception {
-        final IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
-
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
-        final URL url = new URL(hubServer);
-
-        final CertificateHandler certHandler = new CertificateHandler(logger);
-        if (certHandler.isCertificateInTrustStore(url)) {
-            certHandler.removeHttpsCertificate(url);
-        }
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        builder.setAlwaysTrustServerCertificate(true);
         builder.setHubUrl(hubServer);
         builder.setTimeout(120);
         builder.setPassword("blackduck");
