@@ -36,6 +36,8 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
+import com.blackducksoftware.integration.log.LogLevel;
+import com.blackducksoftware.integration.log.PrintStreamIntLogger;
 
 public class HubServerConfigBuilderTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
@@ -74,6 +76,9 @@ public class HubServerConfigBuilderTestIT {
         assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost());
         assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")), config.getProxyInfo().getPort());
         assertEquals(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"), config.getProxyInfo().getIgnoredProxyHosts());
+
+        config.print(new PrintStreamIntLogger(System.out, LogLevel.TRACE));
+
         assertFalse(config.getProxyInfo().shouldUseProxyForUrl(config.getHubUrl()));
     }
 
