@@ -47,6 +47,7 @@ import com.blackducksoftware.integration.hub.scan.HubScanConfig
 import com.blackducksoftware.integration.hub.util.HostnameHelper
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody
+import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder
 import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName
 import com.blackducksoftware.integration.util.CIEnvironmentVariables
 import com.google.gson.Gson
@@ -105,13 +106,13 @@ public class CLIDataService {
     }
 
     public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished, final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
-        PhoneHomeRequestBody phoneHomeRequestBody = PhoneHomeRequestBody.DO_NOT_PHONE_HOME
+        PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = PhoneHomeRequestBody.DO_NOT_PHONE_HOME
         try {
-            phoneHomeRequestBody = phoneHomeDataService.buildPhoneHomeRequestBody(thirdPartyName, thirdPartyVersion, pluginVersion)
+            phoneHomeRequestBodyBuilder = phoneHomeDataService.createInitialPhoneHomeRequestBodyBuilder(thirdPartyName, thirdPartyVersion, pluginVersion)
         } catch(Exception e) {
             logger.debug(e.getMessage())
         }
-        preScan(hubServerConfig, hubScanConfig, projectRequest, phoneHomeRequestBody)
+        preScan(hubServerConfig, hubScanConfig, projectRequest, phoneHomeRequestBodyBuilder)
         SimpleScanService simpleScanService = createScanService(hubServerConfig, hubScanConfig)
         final File[] scanSummaryFiles = runScan(simpleScanService)
         postScan(hubScanConfig, scanSummaryFiles, projectRequest, shouldWaitForScansFinished, simpleScanService)
@@ -149,13 +150,13 @@ public class CLIDataService {
     }
 
     private void preScan(final HubServerConfig hubServerConfig,
-            final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final PhoneHomeRequestBody phoneHomeRequestBody) throws IntegrationException {
+            final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder) throws IntegrationException {
         final String localHostName = HostnameHelper.getMyHostname()
         logger.info("Running on machine : " + localHostName)
         printConfiguration(hubScanConfig, projectRequest)
         final String hubVersion = hubVersionRequestService.getHubVersion()
         cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), hubVersion, localHostName)
-        phoneHomeDataService.phoneHome(phoneHomeRequestBody)
+        phoneHomeDataService.phoneHome(phoneHomeRequestBodyBuilder)
 
         hubSupportHelper = new HubSupportHelper()
         hubSupportHelper.checkHubSupport(hubVersionRequestService, logger)
