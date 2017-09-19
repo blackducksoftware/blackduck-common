@@ -163,6 +163,7 @@ public class HubServerConfigValidator extends AbstractValidator {
                         new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ERROR_MSG_UNREACHABLE_CAUSE + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e));
             }
         } catch (final IntegrationException e) {
+            e.printStackTrace();
             result.addResult(HubServerConfigFieldEnum.HUBURL, new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ERROR_MSG_UNREACHABLE_CAUSE + e.getMessage(), e));
         }
     }
