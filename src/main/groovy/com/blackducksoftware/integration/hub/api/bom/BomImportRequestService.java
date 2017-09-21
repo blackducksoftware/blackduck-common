@@ -49,6 +49,10 @@ public class BomImportRequestService extends HubResponseService {
         super(restConnection);
     }
 
+    public void importBomFile(final File file) throws IntegrationException {
+        importBomFile(file, "application/ld+json");
+    }
+
     public void importBomFile(final File file, final String mediaType) throws IntegrationException {
         Response response = null;
         try {

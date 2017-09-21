@@ -58,7 +58,6 @@ import okhttp3.ResponseBody;
 
 public class CLIDownloadService {
     private final IntLogger logger;
-
     private final RestConnection restConnection;
 
     public CLIDownloadService(final IntLogger logger, final RestConnection restConnection) {
@@ -85,7 +84,8 @@ public class CLIDownloadService {
         }
     }
 
-    public void customInstall(final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables, final URL archive, final String hubVersion, final String localHostName) throws HubIntegrationException, EncryptionException {
+    public void customInstall(final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables, final URL cliDownloadUrl, final String hubVersion, final String localHostName)
+            throws HubIntegrationException, EncryptionException {
         String directoryToInstallTo;
         try {
             directoryToInstallTo = cliLocation.getCanonicalPath();
@@ -123,13 +123,13 @@ public class CLIDownloadService {
             InputStream cliStream = null;
             try {
                 try {
-                    final HttpUrl httpUrl = restConnection.createHttpUrl(archive);
+                    final HttpUrl httpUrl = restConnection.createHttpUrl(cliDownloadUrl);
                     final Map<String, String> headers = new HashMap<>();
                     headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
                     final Request request = restConnection.createGetRequest(httpUrl, headers);
                     response = restConnection.handleExecuteClientCall(request);
                 } catch (final IntegrationException e) {
-                    logger.error("Skipping installation of " + archive + " to " + directoryToInstallTo + ": " + e.toString());
+                    logger.error("Skipping installation of " + cliDownloadUrl + " to " + directoryToInstallTo + ": " + e.toString());
                     return;
                 }
                 if (response.code() == 304) {
@@ -159,7 +159,7 @@ public class CLIDownloadService {
                 logger.debug("Updating the Hub CLI.");
                 hubVersionFile.setLastModified(lastModifiedLong);
 
-                logger.info("Unpacking " + archive.toString() + " to " + directoryToInstallTo + " on " + localHostName);
+                logger.info("Unpacking " + cliDownloadUrl.toString() + " to " + directoryToInstallTo + " on " + localHostName);
 
                 final ResponseBody responseBody = response.body();
                 cliStream = responseBody.byteStream();
@@ -168,7 +168,7 @@ public class CLIDownloadService {
                     unzip(cliInstallDirectory, cis, logger);
                     updateJreSecurity(logger, cliLocation, ciEnvironmentVariables);
                 } catch (final IOException e) {
-                    throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", archive, cis.getByteCount(), responseBody.contentLength()), e);
+                    throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", cliDownloadUrl, cis.getByteCount(), responseBody.contentLength()), e);
                 } finally {
                     cis.close();
                 }
@@ -180,10 +180,8 @@ public class CLIDownloadService {
                     response.close();
                 }
             }
-        } catch (
-
-        final IOException e) {
-            throw new HubIntegrationException("Failed to install " + archive + " to " + directoryToInstallTo, e);
+        } catch (final IOException e) {
+            throw new HubIntegrationException("Failed to install " + cliDownloadUrl + " to " + directoryToInstallTo, e);
         }
     }
 
