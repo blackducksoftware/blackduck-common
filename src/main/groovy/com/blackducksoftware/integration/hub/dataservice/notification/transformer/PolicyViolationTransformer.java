@@ -27,8 +27,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
@@ -39,8 +37,6 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Noti
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum;
-import com.blackducksoftware.integration.hub.model.view.BomComponentPolicyStatusView;
 import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.model.view.NotificationView;
 import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
@@ -51,19 +47,14 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationTransformer(final HubResponseService hubResponseService, final NotificationRequestService notificationService,
-            final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
+    public PolicyViolationTransformer(final HubResponseService hubResponseService, final NotificationRequestService notificationService, final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
             final PolicyNotificationFilter policyFilter, final MetaService metaService) {
-        super(hubResponseService, notificationService, projectVersionService, policyService,
-                policyFilter, metaService);
+        super(hubResponseService, notificationService, projectVersionService, policyService, policyFilter, metaService);
     }
 
-    public PolicyViolationTransformer(final HubResponseService hubResponseService, final IntLogger logger,
-            final NotificationRequestService notificationService,
-            final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
-            final PolicyNotificationFilter policyFilter, final MetaService metaService) {
-        super(hubResponseService, logger, notificationService, projectVersionService, policyService,
-                policyFilter, metaService);
+    public PolicyViolationTransformer(final HubResponseService hubResponseService, final IntLogger logger, final NotificationRequestService notificationService, final ProjectVersionRequestService projectVersionService,
+            final PolicyRequestService policyService, final PolicyNotificationFilter policyFilter, final MetaService metaService) {
+        super(hubResponseService, logger, notificationService, projectVersionService, policyService, policyFilter, metaService);
     }
 
     @Override
@@ -86,29 +77,16 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     }
 
     @Override
-    public void handleNotification(final List<ComponentVersionStatus> componentVersionList, final String projectName, final ProjectVersionView releaseItem,
-            final NotificationView item, final List<NotificationContentItem> templateData) throws HubItemTransformException {
+    public void handleNotification(final List<ComponentVersionStatus> componentVersionList, final String projectName, final ProjectVersionView releaseItem, final NotificationView item, final List<NotificationContentItem> templateData)
+            throws HubItemTransformException {
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
             try {
                 final RuleViolationNotificationView policyViolation = (RuleViolationNotificationView) item;
                 ProjectVersionModel projectVersion;
                 try {
-                    projectVersion = createFullProjectVersion(policyViolation.content.projectVersionLink,
-                            projectName, releaseItem.versionName);
+                    projectVersion = createFullProjectVersion(policyViolation.content.projectVersionLink, projectName, releaseItem.versionName);
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
-                }
-
-                final String bomComponentVersionPolicyStatusUrl = componentVersion.bomComponentVersionPolicyStatusLink;
-                if (StringUtils.isBlank(bomComponentVersionPolicyStatusUrl)) {
-                    getLogger().warn(String.format("bomComponentVersionPolicyStatus is missing for component %s; skipping it",
-                            componentVersion.componentName));
-                    continue;
-                }
-                final BomComponentPolicyStatusView bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(bomComponentVersionPolicyStatusUrl);
-                if (bomComponentVersionPolicyStatus.approvalStatus != VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION) {
-                    getLogger().debug(String.format("Component %s is not in violation; skipping it", componentVersion.componentName));
-                    continue;
                 }
 
                 final String componentVersionLink = componentVersion.componentVersionLink;
@@ -123,10 +101,8 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
                         final PolicyRuleView rule = getPolicyRule(ruleUrl);
                         policyRuleList.add(rule);
                     }
-                    createContents(projectVersion, componentVersion.componentName, fullComponentVersion,
-                            componentVersion.componentLink,
-                            componentVersion.componentVersionLink,
-                            policyRuleList, item, templateData, componentVersion.componentIssueLink);
+                    createContents(projectVersion, componentVersion.componentName, fullComponentVersion, componentVersion.componentLink, componentVersion.componentVersionLink, policyRuleList, item, templateData,
+                            componentVersion.componentIssueLink);
                 }
 
             } catch (final Exception e) {
@@ -141,11 +117,8 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     }
 
     @Override
-    public void createContents(final ProjectVersionModel projectVersion, final String componentName,
-            final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
-            final List<PolicyRuleView> policyRuleList, final NotificationView item,
-            final List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException {
-        templateData.add(new PolicyViolationContentItem(item.createdAt, projectVersion, componentName,
-                componentVersion, componentUrl, componentVersionUrl, policyRuleList, componentIssueUrl));
+    public void createContents(final ProjectVersionModel projectVersion, final String componentName, final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
+            final List<PolicyRuleView> policyRuleList, final NotificationView item, final List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException {
+        templateData.add(new PolicyViolationContentItem(item.createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl, policyRuleList, componentIssueUrl));
     }
 }
