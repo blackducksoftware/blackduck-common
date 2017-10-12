@@ -153,7 +153,7 @@ public class ScanStatusDataService {
         boolean pendingScansOk = pendingScans.size() > 0;
         final String timeoutMessage = "No scan has started within the specified wait time: %d minutes";
         while (!done(pendingScansOk, scanStartedTimeoutInMilliseconds, startedTime, timeoutMessage)) {
-            sleep("The thread waiting for the scan to start was interrupted: ");
+            sleep("The thread waiting for the scan to start was interrupted: ", "Still waiting for the pending scans to start.");
             pendingScans = getPendingScans(projectName, projectVersion);
             pendingScansOk = pendingScans.size() > 0;
         }
@@ -167,14 +167,15 @@ public class ScanStatusDataService {
         boolean pendingScansOk = pendingScans.isEmpty();
         final String timeoutMessage = "The pending scans have not completed within the specified wait time: %d minutes";
         while (!done(pendingScansOk, scanStartedTimeoutInMilliseconds, startedTime, timeoutMessage)) {
-            sleep("The thread waiting for the scan to complete was interrupted: ");
+            sleep("The thread waiting for the scan to complete was interrupted: ", "Still waiting for the pending scans to complete.");
             pendingScans = getPendingScans(pendingScans);
             pendingScansOk = pendingScans.isEmpty();
         }
     }
 
-    private void sleep(final String interruptedMessage) throws HubIntegrationException {
+    private void sleep(final String interruptedMessage, final String ongoingMessage) throws HubIntegrationException {
         try {
+            logger.info(ongoingMessage);
             Thread.sleep(FIVE_SECONDS);
         } catch (final InterruptedException e) {
             throw new HubIntegrationException(interruptedMessage + e.getMessage(), e);
