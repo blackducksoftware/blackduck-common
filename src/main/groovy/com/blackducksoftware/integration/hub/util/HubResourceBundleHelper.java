@@ -30,7 +30,6 @@ public class HubResourceBundleHelper {
     private static final String RESOURCE_BASE_NAME = "com.blackducksoftware.integration.hub.resources.HubResources";
 
     private Locale locale = Locale.US;
-
     private String keyPrefix;
 
     public String getString(String key) {

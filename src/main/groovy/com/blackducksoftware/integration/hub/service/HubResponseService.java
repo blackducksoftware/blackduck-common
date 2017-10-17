@@ -45,11 +45,8 @@ import okhttp3.Response;
 
 public class HubResponseService {
     private final HubRequestFactory hubRequestFactory;
-
     private final URL hubBaseUrl;
-
     private final JsonParser jsonParser;
-
     private final Gson gson;
 
     public HubResponseService(final RestConnection restConnection) {

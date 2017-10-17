@@ -75,7 +75,6 @@ import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 
 public class HubServicesFactory {
     private final CIEnvironmentVariables ciEnvironmentVariables;
-
     private final RestConnection restConnection;
 
     public HubServicesFactory(final RestConnection restConnection) {

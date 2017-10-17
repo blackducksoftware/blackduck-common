@@ -28,17 +28,13 @@ import java.util.Map;
 import com.blackducksoftware.integration.hub.notification.processor.NotificationCategoryEnum;
 
 public class NotificationEvent {
-
     public final static String DATA_SET_KEY_NOTIFICATION_CONTENT = "notificationContentItem";
 
     private NotificationCategoryEnum categoryType;
-
     private final Map<String, Object> dataSet;
-
     private final String eventKey;
 
-    public NotificationEvent(final String eventKey, final NotificationCategoryEnum categoryType,
-            Map<String, Object> dataSet) {
+    public NotificationEvent(final String eventKey, final NotificationCategoryEnum categoryType, final Map<String, Object> dataSet) {
         this.eventKey = eventKey;
         this.categoryType = categoryType;
         this.dataSet = dataSet;
@@ -58,7 +54,7 @@ public class NotificationEvent {
         return categoryType;
     }
 
-    public void setCategoryType(NotificationCategoryEnum categoryType) {
+    public void setCategoryType(final NotificationCategoryEnum categoryType) {
         this.categoryType = categoryType;
     }
 

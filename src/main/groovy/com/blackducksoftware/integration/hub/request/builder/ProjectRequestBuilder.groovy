@@ -36,25 +36,15 @@ import com.blackducksoftware.integration.validator.AbstractValidator
 
 class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
     private String projectName;
-
     private String description;
-
     private Boolean projectLevelAdjustments;
-
     private String projectOwner;
-
     private Integer projectTier;
-
     private String distribution = ProjectVersionDistributionEnum.EXTERNAL.name();
-
     private String phase = ProjectVersionPhaseEnum.DEVELOPMENT.name();
-
     private String versionName;
-
     private String versionNickname;
-
     private String releaseComments;
-
     private String releasedOn;
 
     @Override

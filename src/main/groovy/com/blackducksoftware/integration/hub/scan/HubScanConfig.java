@@ -36,43 +36,25 @@ import com.blackducksoftware.integration.log.IntLogger;
 
 public class HubScanConfig {
     private final File workingDirectory;
-
     private final int scanMemory;
-
     private final Set<String> scanTargetPaths;
-
     private final boolean dryRun;
-
     private final File toolsDir;
-
     private final boolean cleanupLogsOnSuccess;
-
     private final String[] excludePatterns;
-
     private final String codeLocationAlias;
-
     private final boolean unmapPreviousCodeLocations;
-
     private final boolean deletePreviousCodeLocations;
-
     private final boolean debug;
-
     private final boolean verbose;
 
-    public HubScanConfig(final File workingDirectory,
-            final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir,
-            final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias,
-            final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations) {
-        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns,
-                codeLocationAlias,
-                unmapPreviousCodeLocations, deletePreviousCodeLocations, false, true);
-
+    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
+            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations) {
+        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations, false, true);
     }
 
-    public HubScanConfig(final File workingDirectory,
-            final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir,
-            final boolean cleanupLogsOnSuccess, final String[] excludePatterns, final String codeLocationAlias,
-            final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean debug, final boolean verbose) {
+    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
+            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean debug, final boolean verbose) {
         this.workingDirectory = workingDirectory;
         this.scanMemory = scanMemory;
         this.scanTargetPaths = scanTargetPaths;
