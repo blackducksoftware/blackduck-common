@@ -28,6 +28,8 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.HubResponse;
@@ -85,27 +87,17 @@ public class HubResponseService {
     }
 
     public <T extends HubResponse> T getItem(final HubRequest request, final Class<T> clazz) throws IntegrationException {
-        Response response = null;
-        try {
-            response = request.executeGet();
-            // the string method closes the body
-            final String jsonResponse = response.body().string();
-
-            final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
-            return getItemAs(jsonObject, clazz);
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-        }
+        return getItem(request, clazz, null);
     }
 
     public <T extends HubResponse> T getItem(final HubRequest request, final Class<T> clazz, final String mediaType) throws IntegrationException {
         Response response = null;
         try {
-            response = request.executeGet(mediaType);
+            if (StringUtils.isNotBlank(mediaType)) {
+                response = request.executeGet(mediaType);
+            } else {
+                response = request.executeGet();
+            }
             // the string method closes the body
             final String jsonResponse = response.body().string();
 
@@ -152,30 +144,20 @@ public class HubResponseService {
      * Will NOT make further paged requests to get the full list of items
      */
     public <T extends HubResponse> List<T> getItems(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
-        Response response = null;
-        try {
-            response = hubPagedRequest.executeGet();
-            final String jsonResponse = response.body().string();
-
-            final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
-            return getItems(jsonObject, clazz);
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-        }
+        return getItems(hubPagedRequest, clazz, null);
     }
 
     /**
      * Will NOT make further paged requests to get the full list of items
      */
-    public <T extends HubResponse> List<T> getItems(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType)
-            throws IntegrationException {
+    public <T extends HubResponse> List<T> getItems(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
         Response response = null;
         try {
-            response = hubPagedRequest.executeGet(mediaType);
+            if (StringUtils.isNotBlank(mediaType)) {
+                response = hubPagedRequest.executeGet(mediaType);
+            } else {
+                response = hubPagedRequest.executeGet();
+            }
             final String jsonResponse = response.body().string();
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
@@ -193,43 +175,23 @@ public class HubResponseService {
      * Will make further paged requests to get the full list of items
      */
     public <T extends HubResponse> List<T> getAllItems(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
-        final List<T> allItems = new LinkedList<>();
-        int totalCount = 0;
-        int currentOffset = hubPagedRequest.offset;
-        Response response = null;
-        try {
-            response = hubPagedRequest.executeGet();
-            final String jsonResponse = response.body().string();
-
-            final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
-            totalCount = jsonObject.get("totalCount").getAsInt();
-            allItems.addAll(getItems(jsonObject, clazz));
-            while (allItems.size() < totalCount && currentOffset < totalCount) {
-                currentOffset += hubPagedRequest.limit;
-                hubPagedRequest.offset = currentOffset;
-                allItems.addAll(getItems(hubPagedRequest, clazz));
-            }
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-        }
-        return allItems;
+        return getAllItems(hubPagedRequest, clazz, null);
     }
 
     /**
      * Will make further paged requests to get the full list of items
      */
-    public <T extends HubResponse> List<T> getAllItems(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType)
-            throws IntegrationException {
+    public <T extends HubResponse> List<T> getAllItems(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
         final List<T> allItems = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = hubPagedRequest.offset;
         Response response = null;
         try {
-            response = hubPagedRequest.executeGet(mediaType);
+            if (StringUtils.isNotBlank(mediaType)) {
+                response = hubPagedRequest.executeGet(mediaType);
+            } else {
+                response = hubPagedRequest.executeGet();
+            }
             final String jsonResponse = response.body().string();
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
@@ -255,7 +217,7 @@ public class HubResponseService {
      */
     public <T extends HubResponse> List<T> getAllItems(final String url, final Class<T> clazz) throws IntegrationException {
         final HubPagedRequest pagedRequest = hubRequestFactory.createPagedRequest(url);
-        return getAllItems(pagedRequest, clazz);
+        return getAllItems(pagedRequest, clazz, null);
     }
 
     /**
