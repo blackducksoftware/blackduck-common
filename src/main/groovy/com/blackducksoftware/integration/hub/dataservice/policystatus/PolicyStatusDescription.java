@@ -23,8 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.policystatus;
 
+import com.blackducksoftware.integration.hub.model.enumeration.PolicySeverityEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum;
 import com.blackducksoftware.integration.hub.model.view.VersionBomPolicyStatusView;
+import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionPolicyViolationCount;
 import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionStatusCount;
 
 public class PolicyStatusDescription {
@@ -58,6 +60,7 @@ public class PolicyStatusDescription {
         return stringBuilder.toString();
     }
 
+    @Deprecated
     public ComponentVersionStatusCount getCountInViolation() {
         if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.isEmpty()) {
             return null;
@@ -70,6 +73,7 @@ public class PolicyStatusDescription {
         return null;
     }
 
+    @Deprecated
     public ComponentVersionStatusCount getCountNotInViolation() {
         if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.isEmpty()) {
             return null;
@@ -82,6 +86,7 @@ public class PolicyStatusDescription {
         return null;
     }
 
+    @Deprecated
     public ComponentVersionStatusCount getCountInViolationOverridden() {
         if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.isEmpty()) {
             return null;
@@ -92,6 +97,31 @@ public class PolicyStatusDescription {
             }
         }
         return null;
+    }
+
+    public ComponentVersionStatusCount getCountOfPolicyStatus(final VersionBomPolicyStatusOverallStatusEnum overallStatus) {
+        if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.isEmpty()) {
+            return null;
+        }
+        for (final ComponentVersionStatusCount count : policyStatusItem.componentVersionStatusCounts) {
+            if (overallStatus == count.name) {
+                return count;
+            }
+        }
+        return null;
+    }
+
+    public ComponentVersionPolicyViolationCount getCountOfSeverity(final PolicySeverityEnum policySeverity) {
+        if (!VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION.equals(policyStatusItem.overallStatus)) {
+            return null;
+        }
+
+        final ComponentVersionPolicyViolationDetails policyViolationDetails = policyStatusItem.componentVersionPolicyViolationDetails;
+        for (final ComponentVersionPolicyViolationCount count : policyViolationDetails.severityLevels) {
+            if (policySeverity == count.name) {
+                return count;
+            }
+        }
     }
 
 }
