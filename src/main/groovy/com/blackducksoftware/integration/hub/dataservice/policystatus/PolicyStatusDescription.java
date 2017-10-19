@@ -27,6 +27,7 @@ import com.blackducksoftware.integration.hub.model.enumeration.PolicySeverityEnu
 import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum;
 import com.blackducksoftware.integration.hub.model.view.VersionBomPolicyStatusView;
 import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionPolicyViolationCount;
+import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionPolicyViolationDetails;
 import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionStatusCount;
 
 public class PolicyStatusDescription {
@@ -112,16 +113,20 @@ public class PolicyStatusDescription {
     }
 
     public ComponentVersionPolicyViolationCount getCountOfSeverity(final PolicySeverityEnum policySeverity) {
-        if (!VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION.equals(policyStatusItem.overallStatus)) {
+        if (policyStatusItem.componentVersionPolicyViolationDetails == null || !VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION.equals(policyStatusItem.overallStatus)) {
             return null;
         }
 
         final ComponentVersionPolicyViolationDetails policyViolationDetails = policyStatusItem.componentVersionPolicyViolationDetails;
-        for (final ComponentVersionPolicyViolationCount count : policyViolationDetails.severityLevels) {
-            if (policySeverity == count.name) {
-                return count;
+        if (policyViolationDetails.severityLevels != null || !policyViolationDetails.severityLevels.isEmpty()) {
+            for (final ComponentVersionPolicyViolationCount count : policyViolationDetails.severityLevels) {
+                if (policySeverity == count.name) {
+                    return count;
+                }
             }
         }
+
+        return null;
     }
 
 }
