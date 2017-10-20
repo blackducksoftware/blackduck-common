@@ -23,9 +23,12 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.policystatus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.model.enumeration.PolicySeverityEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum;
@@ -79,12 +82,13 @@ public class PolicyStatusDescription {
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("The Hub found: ");
         stringBuilder.append(inViolationCount);
+        stringBuilder.append(" components in violation");
         if (getCountOfStatus(VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION) != 0) {
-            stringBuilder.append(" components in violation (");
-            stringBuilder.append(getPolicySeverityMessage().trim());
+            stringBuilder.append(" (");
+            getPolicySeverityMessage(stringBuilder);
             stringBuilder.append("), ");
         } else {
-            stringBuilder.append(" components in violation, ");
+            stringBuilder.append(", ");
         }
         stringBuilder.append(inViolationOverriddenCount);
         stringBuilder.append(" components in violation, but overridden, and ");
@@ -93,21 +97,16 @@ public class PolicyStatusDescription {
         return stringBuilder.toString();
     }
 
-    private String getPolicySeverityMessage() {
-        final StringBuilder stringBuilder = new StringBuilder();
-
+    private void getPolicySeverityMessage(final StringBuilder stringBuilder) {
+        final List<String> policySeverityItems = new ArrayList<>();
         stringBuilder.append("Policy Severity counts: ");
         for (final PolicySeverityEnum policySeverityEnum : policySeverityCount.keySet()) {
             final ComponentVersionPolicyViolationCount policySeverity = policySeverityCount.get(policySeverityEnum);
             if (policySeverity != null) {
-                stringBuilder.append(policySeverity.value);
-                stringBuilder.append(" component(s) have a severity level of ");
-                stringBuilder.append(policySeverityEnum.toString());
-                stringBuilder.append(". ");
+                policySeverityItems.add(policySeverity.value + " component(s) have a severity level of " + policySeverityEnum.toString());
             }
         }
-
-        return stringBuilder.toString();
+        stringBuilder.append(StringUtils.join(policySeverityItems, ", "));
     }
 
     public ComponentVersionStatusCount getCountInViolation() {
@@ -136,6 +135,39 @@ public class PolicyStatusDescription {
             return 0;
         }
         return count.value;
+    }
+
+    public static void main(final String[] args) {
+        final ComponentVersionPolicyViolationCount blockerViolation = new ComponentVersionPolicyViolationCount();
+        blockerViolation.name = PolicySeverityEnum.BLOCKER;
+        blockerViolation.value = 3;
+
+        final ComponentVersionPolicyViolationCount trivialViolation = new ComponentVersionPolicyViolationCount();
+        trivialViolation.name = PolicySeverityEnum.TRIVIAL;
+        trivialViolation.value = 1;
+
+        final List<ComponentVersionPolicyViolationCount> violations = new ArrayList<>();
+        violations.add(blockerViolation);
+        violations.add(trivialViolation);
+
+        final ComponentVersionPolicyViolationDetails componentVersionPolicyViolationDetails = new ComponentVersionPolicyViolationDetails();
+        componentVersionPolicyViolationDetails.severityLevels = violations;
+
+        final ComponentVersionStatusCount inViolation = new ComponentVersionStatusCount();
+        inViolation.name = VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION;
+        inViolation.value = 4;
+
+        final List<ComponentVersionStatusCount> statuses = new ArrayList<>();
+        statuses.add(inViolation);
+
+        final VersionBomPolicyStatusView policyStatusItem = new VersionBomPolicyStatusView();
+        policyStatusItem.componentVersionPolicyViolationDetails = componentVersionPolicyViolationDetails;
+        policyStatusItem.componentVersionStatusCounts = statuses;
+        policyStatusItem.overallStatus = VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION;
+
+        final PolicyStatusDescription test = new PolicyStatusDescription(policyStatusItem);
+        final String result = test.getPolicyStatusMessage();
+        System.out.println(result);
     }
 
 }
