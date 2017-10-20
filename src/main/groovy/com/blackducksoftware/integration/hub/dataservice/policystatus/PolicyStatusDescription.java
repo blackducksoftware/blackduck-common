@@ -55,7 +55,9 @@ public class PolicyStatusDescription {
             final List<ComponentVersionPolicyViolationCount> severityLevels = policyViolationDetails.severityLevels;
             if (policyViolationDetails.severityLevels != null) {
                 for (final ComponentVersionPolicyViolationCount count : severityLevels) {
-                    policySeverityCount.put(count.name, count);
+                    if (count.name != null) {
+                        policySeverityCount.put(count.name, count);
+                    }
                 }
             }
         }
@@ -65,7 +67,9 @@ public class PolicyStatusDescription {
         final List<ComponentVersionStatusCount> versionStatusCounts = policyStatusItem.componentVersionStatusCounts;
         if (versionStatusCounts != null) {
             for (final ComponentVersionStatusCount policyStatus : versionStatusCounts) {
-                policyStatusCount.put(policyStatus.name, policyStatus);
+                if (policyStatus.name != null) {
+                    policyStatusCount.put(policyStatus.name, policyStatus);
+                }
             }
         }
     }
