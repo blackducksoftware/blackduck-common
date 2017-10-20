@@ -63,7 +63,7 @@ public class PolicyStatusDescription {
         }
 
         final ComponentVersionPolicyViolationDetails policyViolationDetails = policyStatusItem.componentVersionPolicyViolationDetails;
-        if (policyViolationDetails.severityLevels != null && !policyViolationDetails.severityLevels.isEmpty()) {
+        if (policyViolationDetails.severityLevels != null) {
             for (final ComponentVersionPolicyViolationCount count : policyViolationDetails.severityLevels) {
                 if (policySeverity == count.name) {
                     return count;
