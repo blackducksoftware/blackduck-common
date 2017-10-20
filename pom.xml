@@ -30,11 +30,7 @@
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>hub-common-rest</artifactId>
-<<<<<<< HEAD
-      <version>2.5.1-SNAPSHOT</version>
-=======
       <version>2.6.0</version>
->>>>>>> master
     </dependency>
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
