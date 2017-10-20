@@ -51,6 +51,12 @@ public class PolicyStatusDescription {
         }
     }
 
+    private void populatePolicyStatusMap() {
+        for (final VersionBomPolicyStatusOverallStatusEnum policyStatus : VersionBomPolicyStatusOverallStatusEnum.values()) {
+            policyStatusCount.put(policyStatus, getStatusCount(policyStatus));
+        }
+    }
+
     private ComponentVersionPolicyViolationCount getSeverityCount(final PolicySeverityEnum policySeverity) {
         if (policyStatusItem.componentVersionPolicyViolationDetails == null || !VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION.equals(policyStatusItem.overallStatus)) {
             return null;
@@ -66,12 +72,6 @@ public class PolicyStatusDescription {
         }
 
         return null;
-    }
-
-    private void populatePolicyStatusMap() {
-        for (final VersionBomPolicyStatusOverallStatusEnum policyStatus : VersionBomPolicyStatusOverallStatusEnum.values()) {
-            policyStatusCount.put(policyStatus, getStatusCount(policyStatus));
-        }
     }
 
     private ComponentVersionStatusCount getStatusCount(final VersionBomPolicyStatusOverallStatusEnum overallStatus) {
@@ -91,13 +91,9 @@ public class PolicyStatusDescription {
             return "The Hub found no components.";
         }
 
-        final ComponentVersionStatusCount inViolation = getCountInViolation();
-        final ComponentVersionStatusCount inViolationOverridden = getCountInViolationOverridden();
-        final ComponentVersionStatusCount notInViolation = getCountNotInViolation();
-
-        final int inViolationCount = inViolation == null ? 0 : inViolation.value;
-        final int inViolationOverriddenCount = inViolationOverridden == null ? 0 : inViolationOverridden.value;
-        final int notInViolationCount = notInViolation == null ? 0 : notInViolation.value;
+        final int inViolationCount = getCountOfStatus(VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION);
+        final int inViolationOverriddenCount = getCountOfStatus(VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION_OVERRIDDEN);
+        final int notInViolationCount = getCountOfStatus(VersionBomPolicyStatusOverallStatusEnum.NOT_IN_VIOLATION);
 
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("The Hub found: ");
