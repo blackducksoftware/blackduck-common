@@ -79,9 +79,13 @@ public class PolicyStatusDescription {
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("The Hub found: ");
         stringBuilder.append(inViolationCount);
-        stringBuilder.append(" components in violation (");
-        stringBuilder.append(getPolicySeverityMessage().trim());
-        stringBuilder.append("), ");
+        if (getCountOfStatus(VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION) != 0) {
+            stringBuilder.append(" components in violation (");
+            stringBuilder.append(getPolicySeverityMessage().trim());
+            stringBuilder.append("), ");
+        } else {
+            stringBuilder.append(" components in violation, ");
+        }
         stringBuilder.append(inViolationOverriddenCount);
         stringBuilder.append(" components in violation, but overridden, and ");
         stringBuilder.append(notInViolationCount);
@@ -90,10 +94,6 @@ public class PolicyStatusDescription {
     }
 
     private String getPolicySeverityMessage() {
-        if (policyStatusCount.get(VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION).value == 0) {
-            return "No policy violation's to check for severity.";
-        }
-
         final StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("Policy Severity counts: ");
