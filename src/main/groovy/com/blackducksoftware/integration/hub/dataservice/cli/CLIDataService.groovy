@@ -102,7 +102,7 @@ public class CLIDataService {
     }
 
     public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished, final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
-        installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, shouldWaitForScansFinished, thirdPartyName.toString(), thirdPartyVersion, pluginVersion);
+        installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, shouldWaitForScansFinished, thirdPartyName.getName(), thirdPartyVersion, pluginVersion);
     }
 
     public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished, final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
