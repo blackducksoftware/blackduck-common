@@ -43,6 +43,7 @@ import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationReques
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
@@ -241,6 +242,10 @@ public class HubServicesFactory {
         return new HubResponseService(restConnection);
     }
 
+    public ProjectAssignmentRequestService createProjectAssignmentRequestService() {
+        return new ProjectAssignmentRequestService(restConnection, createMetaService());
+    }
+
     public RestConnection getRestConnection() {
         return restConnection;
     }
@@ -260,7 +265,7 @@ public class HubServicesFactory {
     }
 
     public ProjectDataService createProjectDataService() {
-        return new ProjectDataService(createProjectRequestService(), createProjectVersionRequestService());
+        return new ProjectDataService(createProjectRequestService(), createProjectVersionRequestService(), createProjectAssignmentRequestService());
     }
 
     public VersionBomComponentDataService createVersionBomComponentDataservice() {
