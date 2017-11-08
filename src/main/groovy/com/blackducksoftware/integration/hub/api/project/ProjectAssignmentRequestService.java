@@ -38,7 +38,6 @@ public class ProjectAssignmentRequestService extends HubResponseService {
     public ProjectAssignmentRequestService(final RestConnection restConnection, final MetaService metaService) {
         super(restConnection);
         this.metaService = metaService;
-
     }
 
     public List<AssignedUserView> getProjectUsers(final ProjectView projectView) throws IntegrationException {

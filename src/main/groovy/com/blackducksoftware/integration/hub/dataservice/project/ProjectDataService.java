@@ -91,9 +91,10 @@ public class ProjectDataService {
         return projectVersionWrapper;
     }
 
-    public List<AssignedUserView> getAssignedUsersToProject(final ProjectRequest projectRequest) throws IntegrationException {
-        final ProjectView project = projectRequestService.getProjectByName(projectRequest.getName());
+    public List<AssignedUserView> getAssignedUsersToProject(final String projectName) throws IntegrationException {
+        final ProjectView project = projectRequestService.getProjectByName(projectName);
         final List<AssignedUserView> assignedUsers = projectAssignmentRequestService.getProjectUsers(project);
         return assignedUsers;
     }
+
 }
