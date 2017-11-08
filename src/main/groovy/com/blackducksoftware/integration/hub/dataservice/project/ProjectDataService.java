@@ -23,23 +23,28 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.project;
 
+import java.util.List;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
+import com.blackducksoftware.integration.hub.model.view.AssignedUserView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
 
 public class ProjectDataService {
     private final ProjectRequestService projectRequestService;
-
     private final ProjectVersionRequestService projectVersionRequestService;
+    private final ProjectAssignmentRequestService projectAssignmentRequestService;
 
-    public ProjectDataService(final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService) {
+    public ProjectDataService(final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService, final ProjectAssignmentRequestService projectAssignmentRequestService) {
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
+        this.projectAssignmentRequestService = projectAssignmentRequestService;
     }
 
     public ProjectVersionWrapper getProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
@@ -84,5 +89,11 @@ public class ProjectDataService {
         projectVersionWrapper.setProjectView(project);
         projectVersionWrapper.setProjectVersionView(projectVersion);
         return projectVersionWrapper;
+    }
+
+    public List<AssignedUserView> getAssignedUsersToProject(final ProjectRequest projectRequest) throws IntegrationException {
+        final ProjectView project = projectRequestService.getProjectByName(projectRequest.getName());
+        final List<AssignedUserView> assignedUsers = projectAssignmentRequestService.getProjectUsers(project);
+        return assignedUsers;
     }
 }
