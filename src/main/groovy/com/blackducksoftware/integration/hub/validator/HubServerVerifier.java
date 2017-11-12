@@ -30,8 +30,9 @@ import java.util.List;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.global.HubProxyInfo;
+import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
 import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnection;
+import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnectionBuilder;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
@@ -44,13 +45,13 @@ public class HubServerVerifier {
 
     private final URL hubURL;
 
-    private final HubProxyInfo hubProxyInfo;
+    private final ProxyInfo hubProxyInfo;
 
     private final int timeoutSeconds;
 
     private final boolean alwaysTrustServerCertificate;
 
-    public HubServerVerifier(final URL hubURL, final HubProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) {
+    public HubServerVerifier(final URL hubURL, final ProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) {
         this.hubURL = hubURL;
         this.hubProxyInfo = hubProxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
@@ -58,16 +59,15 @@ public class HubServerVerifier {
     }
 
     public void verifyIsHubServer() throws IntegrationException {
-        final UnauthenticatedRestConnection restConnection = new UnauthenticatedRestConnection(new PrintStreamIntLogger(System.out, LogLevel.INFO), hubURL, timeoutSeconds);
-        restConnection.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
+        final UnauthenticatedRestConnectionBuilder connectionBuilder = new UnauthenticatedRestConnectionBuilder();
+        connectionBuilder.setLogger(new PrintStreamIntLogger(System.out, LogLevel.INFO));
+        connectionBuilder.setBaseUrl(hubURL.toString());
+        connectionBuilder.setTimeout(timeoutSeconds);
+        connectionBuilder.setAlwaysTrustServerCertificate(alwaysTrustServerCertificate);
         if (hubProxyInfo != null) {
-            restConnection.proxyHost = hubProxyInfo.getHost();
-            restConnection.proxyPort = hubProxyInfo.getPort();
-            restConnection.proxyNoHosts = hubProxyInfo.getIgnoredProxyHosts();
-            restConnection.proxyUsername = hubProxyInfo.getUsername();
-            restConnection.proxyPassword = hubProxyInfo.getDecryptedPassword();
+            connectionBuilder.applyProxyInfo(hubProxyInfo);
         }
-
+        final UnauthenticatedRestConnection restConnection = connectionBuilder.build();
         HttpUrl httpUrl = restConnection.createHttpUrl();
         Request request = restConnection.createGetRequest(httpUrl);
         Response response = null;

@@ -24,12 +24,13 @@
 package com.blackducksoftware.integration.hub.notification.processor;
 
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
 public class MockRestConnection extends RestConnection {
 
     public MockRestConnection() {
-        super(null, null, 120);
+        super(null, null, 120, ProxyInfo.NO_PROXY_INFO);
     }
 
     @Override

@@ -32,9 +32,11 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.builder.AbstractBuilder;
 import com.blackducksoftware.integration.exception.IntegrationCertificateException;
-import com.blackducksoftware.integration.hub.global.HubCredentials;
-import com.blackducksoftware.integration.hub.global.HubProxyInfo;
+import com.blackducksoftware.integration.hub.Credentials;
+import com.blackducksoftware.integration.hub.CredentialsBuilder;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
+import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
+import com.blackducksoftware.integration.hub.proxy.ProxyInfoBuilder;
 import com.blackducksoftware.integration.hub.validator.HubServerConfigValidator;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
@@ -100,22 +102,22 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         } catch (final MalformedURLException e) {
         }
 
-        final HubCredentials credentials = getHubCredentials();
-        final HubProxyInfo proxyInfo = getHubProxyInfo();
+        final Credentials credentials = getHubCredentials();
+        final ProxyInfo proxyInfo = getHubProxyInfo();
         final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, alwaysTrustServerCertificate);
         return config;
     }
 
-    private HubCredentials getHubCredentials() {
-        final HubCredentialsBuilder credentialsBuilder = new HubCredentialsBuilder();
+    private Credentials getHubCredentials() {
+        final CredentialsBuilder credentialsBuilder = new CredentialsBuilder();
         credentialsBuilder.setUsername(username);
         credentialsBuilder.setPassword(password);
         credentialsBuilder.setPasswordLength(passwordLength);
         return credentialsBuilder.buildObject();
     }
 
-    private HubProxyInfo getHubProxyInfo() {
-        final HubProxyInfoBuilder proxyBuilder = new HubProxyInfoBuilder();
+    private ProxyInfo getHubProxyInfo() {
+        final ProxyInfoBuilder proxyBuilder = new ProxyInfoBuilder();
         proxyBuilder.setHost(proxyHost);
         proxyBuilder.setPort(proxyPort);
         proxyBuilder.setIgnoredProxyHosts(ignoredProxyHosts);

@@ -54,9 +54,9 @@ import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.certificate.HubCertificateHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ScanFailedException;
-import com.blackducksoftware.integration.hub.global.HubProxyInfo;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.model.view.ScanSummaryView;
+import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
@@ -130,7 +130,7 @@ public class SimpleScanService {
         cmd.add("-Done-jar.jar.path=" + pathToOneJar);
 
         if (hubServerConfig.shouldUseProxyForHub() && !hubScanConfig.isDryRun()) {
-            final HubProxyInfo hubProxyInfo = hubServerConfig.getProxyInfo();
+            final ProxyInfo hubProxyInfo = hubServerConfig.getProxyInfo();
             final String proxyHost = hubProxyInfo.getHost();
             final int proxyPort = hubProxyInfo.getPort();
             final String proxyUsername = hubProxyInfo.getUsername();

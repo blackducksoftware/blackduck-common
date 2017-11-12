@@ -29,8 +29,11 @@ import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
+import com.blackducksoftware.integration.hub.Credentials;
 import com.blackducksoftware.integration.hub.model.HubComponent;
+import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
+import com.blackducksoftware.integration.hub.rest.CredentialsRestConnectionBuilder;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class HubServerConfig extends HubComponent implements Serializable {
@@ -40,13 +43,13 @@ public class HubServerConfig extends HubComponent implements Serializable {
 
     private final int timeoutSeconds;
 
-    private final HubCredentials credentials;
+    private final Credentials credentials;
 
-    private final HubProxyInfo proxyInfo;
+    private final ProxyInfo proxyInfo;
 
     private final boolean alwaysTrustServerCertificate;
 
-    public HubServerConfig(final URL url, final int timeoutSeconds, final HubCredentials credentials, final HubProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
+    public HubServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
         this.hubUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.credentials = credentials;
@@ -85,25 +88,27 @@ public class HubServerConfig extends HubComponent implements Serializable {
     }
 
     public CredentialsRestConnection createCredentialsRestConnection(final IntLogger logger) throws EncryptionException {
-        final CredentialsRestConnection restConnection = new CredentialsRestConnection(logger, getHubUrl(), getGlobalCredentials().getUsername(), getGlobalCredentials().getDecryptedPassword(), getTimeout());
-        restConnection.proxyHost = getProxyInfo().getHost();
-        restConnection.proxyPort = getProxyInfo().getPort();
-        restConnection.proxyNoHosts = getProxyInfo().getIgnoredProxyHosts();
-        restConnection.proxyUsername = getProxyInfo().getUsername();
-        restConnection.proxyPassword = getProxyInfo().getDecryptedPassword();
-        restConnection.alwaysTrustServerCertificate = isAlwaysTrustServerCertificate();
-        return restConnection;
+        final CredentialsRestConnectionBuilder builder = new CredentialsRestConnectionBuilder();
+        builder.setLogger(logger);
+        builder.setBaseUrl(getHubUrl().toString());
+        builder.setTimeout(getTimeout());
+        builder.setUsername(getGlobalCredentials().getUsername());
+        builder.setPassword(getGlobalCredentials().getDecryptedPassword());
+        builder.setAlwaysTrustServerCertificate(isAlwaysTrustServerCertificate());
+        builder.applyProxyInfo(getProxyInfo());
+
+        return builder.build();
     }
 
     public URL getHubUrl() {
         return hubUrl;
     }
 
-    public HubCredentials getGlobalCredentials() {
+    public Credentials getGlobalCredentials() {
         return credentials;
     }
 
-    public HubProxyInfo getProxyInfo() {
+    public ProxyInfo getProxyInfo() {
         return proxyInfo;
     }
 

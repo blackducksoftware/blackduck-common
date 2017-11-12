@@ -31,11 +31,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.builder.HubCredentialsBuilder;
-import com.blackducksoftware.integration.hub.global.HubCredentials;
-import com.blackducksoftware.integration.hub.global.HubProxyInfo;
-import com.blackducksoftware.integration.hub.global.HubProxyInfoFieldEnum;
+import com.blackducksoftware.integration.hub.Credentials;
+import com.blackducksoftware.integration.hub.CredentialsBuilder;
 import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
+import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
+import com.blackducksoftware.integration.hub.proxy.ProxyInfoFieldEnum;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 import com.blackducksoftware.integration.validator.ValidationResult;
@@ -81,7 +81,7 @@ public class HubServerConfigValidator extends AbstractValidator {
 
     private boolean alwaysTrustServerCertificate;
 
-    private HubProxyInfo proxyInfo;
+    private ProxyInfo proxyInfo;
 
     @Override
     public ValidationResults assertValid() {
@@ -96,7 +96,7 @@ public class HubServerConfigValidator extends AbstractValidator {
     }
 
     public ValidationResults assertProxyValid() {
-        final HubProxyValidator validator = new HubProxyValidator();
+        final ProxyInfoValidator validator = new ProxyInfoValidator();
         validator.setHost(proxyHost);
         validator.setPort(proxyPort);
         validator.setIgnoredProxyHosts(ignoredProxyHosts);
@@ -111,18 +111,18 @@ public class HubServerConfigValidator extends AbstractValidator {
             if (validator.hasProxySettings()) {
                 final int port = NumberUtils.toInt(proxyPort);
                 if (validator.hasAuthenticatedProxySettings()) {
-                    final HubCredentialsBuilder credBuilder = new HubCredentialsBuilder();
+                    final CredentialsBuilder credBuilder = new CredentialsBuilder();
                     credBuilder.setUsername(proxyUsername);
                     credBuilder.setPassword(proxyPassword);
                     credBuilder.setPasswordLength(proxyPasswordLength);
-                    final HubCredentials credResult = credBuilder.build();
+                    final Credentials credResult = credBuilder.build();
 
-                    proxyInfo = new HubProxyInfo(proxyHost, port, credResult, ignoredProxyHosts);
+                    proxyInfo = new ProxyInfo(proxyHost, port, credResult, ignoredProxyHosts);
 
                 } else {
                     // password is blank or already encrypted so we just pass in the
                     // values given to us
-                    proxyInfo = new HubProxyInfo(proxyHost, port, null, ignoredProxyHosts);
+                    proxyInfo = new ProxyInfo(proxyHost, port, null, ignoredProxyHosts);
                 }
             }
         }
@@ -130,7 +130,7 @@ public class HubServerConfigValidator extends AbstractValidator {
     }
 
     public ValidationResults assertCredentialsValid() {
-        final HubCredentialsValidator credentialsBuilder = new HubCredentialsValidator();
+        final CredentialsValidator credentialsBuilder = new CredentialsValidator();
         credentialsBuilder.setUsername(username);
         credentialsBuilder.setPassword(password);
         return credentialsBuilder.assertValid();
@@ -157,7 +157,7 @@ public class HubServerConfigValidator extends AbstractValidator {
 
         } catch (final IntegrationRestException e) {
             if (e.getHttpStatusCode() == 407) {
-                result.addResult(HubProxyInfoFieldEnum.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.ERROR, e.getHttpStatusMessage()));
+                result.addResult(ProxyInfoFieldEnum.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.ERROR, e.getHttpStatusMessage()));
             } else {
                 result.addResult(HubServerConfigFieldEnum.HUBURL,
                         new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ERROR_MSG_UNREACHABLE_CAUSE + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e));
