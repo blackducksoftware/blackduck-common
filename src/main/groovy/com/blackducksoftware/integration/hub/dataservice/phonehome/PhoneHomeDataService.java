@@ -146,8 +146,10 @@ public class PhoneHomeDataService {
     }
 
     public void endPhoneHome(final Future<Boolean> task) {
-        if (!task.isDone()) {
-            task.cancel(true);
+        if (task != null) {
+            if (!task.isDone()) {
+                task.cancel(true);
+            }
         }
     }
 }
