@@ -92,8 +92,7 @@ public class HubServerConfig extends HubComponent implements Serializable {
         builder.setLogger(logger);
         builder.setBaseUrl(getHubUrl().toString());
         builder.setTimeout(getTimeout());
-        builder.setUsername(getGlobalCredentials().getUsername());
-        builder.setPassword(getGlobalCredentials().getDecryptedPassword());
+        builder.applyCredentials(getGlobalCredentials());
         builder.setAlwaysTrustServerCertificate(isAlwaysTrustServerCertificate());
         builder.applyProxyInfo(getProxyInfo());
 
