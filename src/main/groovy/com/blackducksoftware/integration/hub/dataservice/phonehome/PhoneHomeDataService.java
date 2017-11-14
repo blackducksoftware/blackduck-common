@@ -24,6 +24,10 @@
 package com.blackducksoftware.integration.hub.dataservice.phonehome;
 
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
@@ -41,12 +45,15 @@ public class PhoneHomeDataService {
     private final HubRegistrationRequestService hubRegistrationRequestService;
     private final HubVersionRequestService hubVersionRequestService;
     private final PhoneHomeClient phoneHomeClient;
+    private final ExecutorService executorService;
 
     public PhoneHomeDataService(final IntLogger logger, final PhoneHomeClient phoneHomeClient, final HubRegistrationRequestService hubRegistrationRequestService, final HubVersionRequestService hubVersionRequestService) {
         this.logger = logger;
         this.hubRegistrationRequestService = hubRegistrationRequestService;
         this.hubVersionRequestService = hubVersionRequestService;
         this.phoneHomeClient = phoneHomeClient;
+        final ThreadFactory threadFactory = Executors.defaultThreadFactory();
+        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
     }
 
     public void phoneHome(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
@@ -113,4 +120,34 @@ public class PhoneHomeDataService {
         return phoneHomeRequestBodyBuilder;
     }
 
+    public Future<Boolean> startPhoneHome(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
+        return startPhoneHome(thirdPartyName.getName(), thirdPartyVersion, pluginVersion);
+    }
+
+    public Future<Boolean> startPhoneHome(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
+        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder(thirdPartyName, thirdPartyVersion, pluginVersion);
+        return startPhoneHome(phoneHomeRequestBodyBuilder);
+    }
+
+    public Future<Boolean> startPhoneHome(final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder) {
+        try {
+            final PhoneHomeRequestBody phoneHomeRequestBody = phoneHomeRequestBodyBuilder.build();
+            return startPhoneHome(phoneHomeRequestBody);
+        } catch (final Exception e) {
+            logger.debug("Could not build phone home body" + e.getMessage(), e);
+        }
+        return null;
+    }
+
+    public Future<Boolean> startPhoneHome(final PhoneHomeRequestBody phoneHomeRequestBody) {
+        final PhoneHomeCallable task = new PhoneHomeCallable(logger, phoneHomeClient, phoneHomeRequestBody);
+        final Future<Boolean> resultTask = executorService.submit(task);
+        return resultTask;
+    }
+
+    public void endPhoneHome(final Future<Boolean> task) {
+        if (!task.isDone()) {
+            task.cancel(true);
+        }
+    }
 }
