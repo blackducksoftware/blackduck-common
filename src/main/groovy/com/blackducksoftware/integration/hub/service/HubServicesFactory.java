@@ -107,7 +107,7 @@ public class HubServicesFactory {
     }
 
     public PhoneHomeClient createPhoneHomeClient() {
-        return new PhoneHomeClient(restConnection.logger, restConnection);
+        return new PhoneHomeClient(restConnection.logger, restConnection.timeout, restConnection.getProxyInfo(), restConnection.alwaysTrustServerCertificate);
     }
 
     public RiskReportDataService createRiskReportDataService(final long timeoutInMilliseconds) throws IntegrationException {
