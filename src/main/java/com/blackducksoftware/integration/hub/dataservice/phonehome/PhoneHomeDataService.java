@@ -120,16 +120,16 @@ public class PhoneHomeDataService {
         return phoneHomeRequestBodyBuilder;
     }
 
-    public Future<Boolean> startPhoneHome(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
+    public PhoneHomeResponse startPhoneHome(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
         return startPhoneHome(thirdPartyName.getName(), thirdPartyVersion, pluginVersion);
     }
 
-    public Future<Boolean> startPhoneHome(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
+    public PhoneHomeResponse startPhoneHome(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
         final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder(thirdPartyName, thirdPartyVersion, pluginVersion);
         return startPhoneHome(phoneHomeRequestBodyBuilder);
     }
 
-    public Future<Boolean> startPhoneHome(final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder) {
+    public PhoneHomeResponse startPhoneHome(final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder) {
         try {
             final PhoneHomeRequestBody phoneHomeRequestBody = phoneHomeRequestBodyBuilder.build();
             return startPhoneHome(phoneHomeRequestBody);
@@ -139,17 +139,10 @@ public class PhoneHomeDataService {
         return null;
     }
 
-    public Future<Boolean> startPhoneHome(final PhoneHomeRequestBody phoneHomeRequestBody) {
+    public PhoneHomeResponse startPhoneHome(final PhoneHomeRequestBody phoneHomeRequestBody) {
         final PhoneHomeCallable task = new PhoneHomeCallable(logger, phoneHomeClient, phoneHomeRequestBody);
         final Future<Boolean> resultTask = executorService.submit(task);
-        return resultTask;
+        return new PhoneHomeResponse(resultTask);
     }
 
-    public void endPhoneHome(final Future<Boolean> task) {
-        if (task != null) {
-            if (!task.isDone()) {
-                task.cancel(true);
-            }
-        }
-    }
 }
