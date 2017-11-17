@@ -36,12 +36,14 @@ public class PhoneHomeResponse {
         return phoneHomeTask;
     }
 
-    public void endPhoneHome() {
+    public boolean endPhoneHome() {
         if (phoneHomeTask != null) {
             if (!phoneHomeTask.isDone()) {
-                phoneHomeTask.cancel(true);
+                return phoneHomeTask.cancel(true);
             }
         }
+
+        return false;
     }
 
 }
