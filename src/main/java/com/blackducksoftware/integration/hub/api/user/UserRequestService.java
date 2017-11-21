@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -46,5 +47,15 @@ public class UserRequestService extends HubResponseService {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, USERS_SEGMENTS);
         final List<UserView> allUserItems = getAllItems(hubPagedRequest, UserView.class);
         return allUserItems;
+    }
+
+    public UserView getUserByUserName(final String userName) throws IntegrationException {
+        final List<UserView> allUsers = getAllUsers();
+        for (final UserView user : allUsers) {
+            if (user.userName.equalsIgnoreCase(userName)) {
+                return user;
+            }
+        }
+        throw new DoesNotExistException("This User does not exist. UserName : " + userName);
     }
 }

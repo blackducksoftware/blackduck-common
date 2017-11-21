@@ -100,7 +100,7 @@ public class RestConnectionTestHelper {
         builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
         builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
         builder.setTimeout(getProperty(TestingPropertyKey.TEST_HUB_TIMEOUT));
-        builder.setAlwaysTrustServerCertificate(Boolean.getBoolean(getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
+        builder.setAlwaysTrustServerCertificate(Boolean.parseBoolean(getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
         return builder.build();
     }
