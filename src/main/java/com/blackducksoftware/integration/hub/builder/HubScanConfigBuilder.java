@@ -38,38 +38,25 @@ import com.blackducksoftware.integration.validator.AbstractValidator;
 
 public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
     private File workingDirectory;
-
     private String scanMemory;
-
     private final Set<String> scanTargetPaths = new HashSet<>();
-
     private boolean dryRun;
-
     private File toolsDir;
-
     private boolean disableScanTargetPathExistenceCheck;
-
     private boolean enableScanTargetPathsWithinWorkingDirectoryCheck;
-
     private boolean cleanupLogsOnSuccess = true;
-
     private String[] excludePatterns;
-
     private String codeLocationAlias;
-
     private boolean unmapPreviousCodeLocations;
-
     private boolean deletePreviousCodeLocations;
-
     private boolean debug;
-
     private boolean verbose = true;
+    private boolean snippetModeEnabled;
 
     @Override
     public HubScanConfig buildObject() {
-        final HubScanConfig config = new HubScanConfig(workingDirectory,
-                NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir,
-                cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations, debug, verbose);
+        final HubScanConfig config = new HubScanConfig(workingDirectory, NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias,
+                unmapPreviousCodeLocations, deletePreviousCodeLocations, debug, verbose, snippetModeEnabled);
 
         return config;
     }
@@ -164,6 +151,10 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     public void setVerbose(final boolean verbose) {
         this.verbose = verbose;
+    }
+
+    public void setSnippetModeEnabled(final boolean snippetModeEnabled) {
+        this.snippetModeEnabled = snippetModeEnabled;
     }
 
 }

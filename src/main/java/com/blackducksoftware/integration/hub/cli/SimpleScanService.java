@@ -223,6 +223,10 @@ public class SimpleScanService {
             cmd.add(hubScanConfig.getCodeLocationAlias());
         }
 
+        if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_SNIPPET_MODE) && hubScanConfig.isSnippetModeEnabled()) {
+            cmd.add("--snippet-matching");
+        }
+
         if (hubScanConfig.getExcludePatterns() != null) {
             for (final String exclusionPattern : hubScanConfig.getExcludePatterns()) {
                 if (StringUtils.isNotBlank(exclusionPattern)) {
