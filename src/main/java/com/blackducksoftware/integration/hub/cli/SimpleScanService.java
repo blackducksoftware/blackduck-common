@@ -201,6 +201,13 @@ public class SimpleScanService {
             // The CLI will create a subdirectory for the json files
             cmd.add("--dryRunWriteDir");
             cmd.add(logDirectoryPath);
+
+            if (StringUtils.isNotBlank(project) && StringUtils.isNotBlank(version)) {
+                cmd.add("--project");
+                cmd.add(project);
+                cmd.add("--release");
+                cmd.add(version);
+            }
         }
 
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
@@ -211,16 +218,13 @@ public class SimpleScanService {
             cmd.add(logDirectoryPath);
         }
 
-        if (StringUtils.isNotBlank(project) && StringUtils.isNotBlank(version)) {
-            cmd.add("--project");
-            cmd.add(project);
-            cmd.add("--release");
-            cmd.add(version);
-        }
-
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CODE_LOCATION_ALIAS) && StringUtils.isNotBlank(hubScanConfig.getCodeLocationAlias())) {
             cmd.add("--name");
             cmd.add(hubScanConfig.getCodeLocationAlias());
+        }
+
+        if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_SNIPPET_MODE) && hubScanConfig.isSnippetModeEnabled()) {
+            cmd.add("--snippet-mode");
         }
 
         if (hubScanConfig.getExcludePatterns() != null) {

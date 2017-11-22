@@ -49,13 +49,13 @@ public class HubSupportHelper implements Serializable {
     }
 
     /**
-     * This will check the Hub server to see which options this version of the
-     * Hub supports. You can use the get methods in this class after this method
-     * has run to get the supported options.
+     * This will check the Hub server to see which options this version of the Hub supports. You can use the get methods in this class after this method has run to get the supported options.
      */
     public void checkHubSupport(final HubVersionRequestService hubVersionRequestService, final IntLogger logger) throws IntegrationException {
         try {
-            if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.7.0")) {
+            if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("4.4.0")) {
+                setHub4_4Support();
+            } else if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.7.0")) {
                 setHub3_7Support();
             } else if (hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.6.0")) {
                 setHub3_6Support();
@@ -118,6 +118,11 @@ public class HubSupportHelper implements Serializable {
     private void setHub3_7Support() {
         setHub3_6Support();
         capabilities.add(HubCapabilitiesEnum.ISSUE_TRACKER);
+    }
+
+    private void setHub4_4Support() {
+        setHub3_7Support();
+        capabilities.add(HubCapabilitiesEnum.CLI_SNIPPET_MODE);
     }
 
 }

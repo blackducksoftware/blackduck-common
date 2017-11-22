@@ -63,31 +63,19 @@ import com.google.gson.Gson;
 
 public class CLIDataService {
     private final Gson gson;
-
     private final IntLogger logger;
-
     private final CIEnvironmentVariables ciEnvironmentVariables;
-
     private final HubVersionRequestService hubVersionRequestService;
-
     private final CLIDownloadService cliDownloadService;
-
     private final PhoneHomeDataService phoneHomeDataService;
-
     private final ProjectRequestService projectRequestService;
-
     private final ProjectVersionRequestService projectVersionRequestService;
-
     private final CodeLocationRequestService codeLocationRequestService;
-
     private final ScanSummaryRequestService scanSummaryRequestService;
-
     private final ScanStatusDataService scanStatusDataService;
-
     private final MetaService metaService;
 
     private HubSupportHelper hubSupportHelper;
-
     private ProjectVersionView version;
 
     public CLIDataService(final IntLogger logger, final Gson gson, final CIEnvironmentVariables ciEnvironmentVariables, final HubVersionRequestService hubVersionRequestService, final CLIDownloadService cliDownloadService,
@@ -121,23 +109,26 @@ public class CLIDataService {
             logger.debug(e.getMessage());
         }
         preScan(hubServerConfig, hubScanConfig, projectRequest, phoneHomeRequestBodyBuilder);
-        final SimpleScanService simpleScanService = createScanService(hubServerConfig, hubScanConfig);
+        final SimpleScanService simpleScanService = createScanService(hubServerConfig, hubScanConfig, projectRequest);
         final File[] scanSummaryFiles = runScan(simpleScanService);
         postScan(hubScanConfig, scanSummaryFiles, projectRequest, shouldWaitForScansFinished, simpleScanService);
         return version;
     }
 
-    private SimpleScanService createScanService(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig) {
+    private SimpleScanService createScanService(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
         final HubScanConfig controlledConfig = getControlledScanConfig(hubScanConfig);
-        final SimpleScanService simpleScanService = new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, null, null);
-        return simpleScanService;
+        if (hubScanConfig.isDryRun()) {
+            return new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, projectRequest.getName(), projectRequest.getVersionRequest().getVersionName());
+        } else {
+            return new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, null, null);
+        }
     }
 
     /**
      * This should only be invoked directly when dryRun == true. Otherwise, installAndRunControlledScan should be used.
      */
-    public File[] runControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig) throws IntegrationException {
-        final SimpleScanService simpleScanService = createScanService(hubServerConfig, hubScanConfig);
+    public File[] runControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
+        final SimpleScanService simpleScanService = createScanService(hubServerConfig, hubScanConfig, projectRequest);
         final File[] scanSummaryFiles = runScan(simpleScanService);
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
             cleanUpLogFiles(simpleScanService);

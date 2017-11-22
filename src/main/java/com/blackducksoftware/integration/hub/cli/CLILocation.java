@@ -36,17 +36,12 @@ import com.blackducksoftware.integration.log.IntLogger;
 
 public class CLILocation {
     public static final String CLI_UNZIP_DIR = "Hub_Scan_Installation";
-
     public static final String VERSION_FILE_NAME = "hubVersion.txt";
-
     public static final String DEFAULT_CLI_DOWNLOAD = "scan.cli.zip";
-
     public static final String WINDOWS_CLI_DOWNLOAD = "scan.cli-windows.zip";
-
     public static final String MAC_CLI_DOWNLOAD = "scan.cli-macosx.zip";
 
     private final File directoryToInstallTo;
-
     private final IntLogger logger;
 
     public CLILocation(final IntLogger logger, final File directoryToInstallTo) {

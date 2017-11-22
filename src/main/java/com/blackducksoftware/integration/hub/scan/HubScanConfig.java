@@ -47,14 +47,15 @@ public class HubScanConfig {
     private final boolean deletePreviousCodeLocations;
     private final boolean debug;
     private final boolean verbose;
+    private final boolean snippetModeEnabled;
 
     public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
-            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations) {
-        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations, false, true);
+            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean snippetModeEnabled) {
+        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations, false, true, snippetModeEnabled);
     }
 
     public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
-            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean debug, final boolean verbose) {
+            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean debug, final boolean verbose, final boolean snippetModeEnabled) {
         this.workingDirectory = workingDirectory;
         this.scanMemory = scanMemory;
         this.scanTargetPaths = scanTargetPaths;
@@ -67,6 +68,7 @@ public class HubScanConfig {
         this.deletePreviousCodeLocations = deletePreviousCodeLocations;
         this.debug = debug;
         this.verbose = verbose;
+        this.snippetModeEnabled = snippetModeEnabled;
     }
 
     public File getWorkingDirectory() {
@@ -117,6 +119,10 @@ public class HubScanConfig {
         return verbose;
     }
 
+    public boolean isSnippetModeEnabled() {
+        return snippetModeEnabled;
+    }
+
     public void print(final IntLogger logger) {
         try {
             logger.alwaysLog("--> Using Working Directory : " + getWorkingDirectory().getCanonicalPath());
@@ -146,6 +152,7 @@ public class HubScanConfig {
         logger.alwaysLog("--> Code Location Name : " + getCodeLocationAlias());
         logger.alwaysLog("--> Un-map previous Code Locations : " + isUnmapPreviousCodeLocations());
         logger.alwaysLog("--> Delete previous Code Locations : " + isDeletePreviousCodeLocations());
+        logger.alwaysLog("--> Enable Snippet Mode : " + isSnippetModeEnabled());
     }
 
     @Override
