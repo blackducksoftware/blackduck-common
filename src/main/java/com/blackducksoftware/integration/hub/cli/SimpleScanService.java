@@ -224,7 +224,7 @@ public class SimpleScanService {
         }
 
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_SNIPPET_MODE) && hubScanConfig.isSnippetModeEnabled()) {
-            cmd.add("--snippet-mode");
+            cmd.add("--snippet-matching");
         }
 
         if (hubScanConfig.getExcludePatterns() != null) {
