@@ -54,7 +54,7 @@ public class UserDataService extends HubResponseService {
     }
 
     public List<ProjectView> getProjectsForUser(final UserView user) throws IntegrationException {
-        logger.info("Attempting to get the assigned project for User: " + user.userName);
+        logger.debug("Attempting to get the assigned projects for User: " + user.userName);
         final String userProjectsLink = metaService.getFirstLink(user, MetaService.PROJECTS_LINK);
         final List<AssignedProjectView> assignedProjectViews = getAllItems(userProjectsLink, AssignedProjectView.class);
 
