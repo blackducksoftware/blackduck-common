@@ -31,6 +31,7 @@ import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
+import com.blackducksoftware.integration.hub.model.view.RoleView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
@@ -69,6 +70,18 @@ public class UserDataService extends HubResponseService {
         }
 
         return resolvedProjectViews;
+    }
+
+    public List<RoleView> getRolesForUser(final String userName) throws IntegrationException {
+        final UserView user = userRequestService.getUserByUserName(userName);
+        return getRolesForUser(user);
+    }
+
+    public List<RoleView> getRolesForUser(final UserView userView) throws IntegrationException {
+        final String userRolesLink = metaService.getFirstLink(userView, MetaService.ROLES_LINK);
+        final List<RoleView> assignedRoles = this.getAllItems(userRolesLink, RoleView.class);
+
+        return assignedRoles;
     }
 
 }

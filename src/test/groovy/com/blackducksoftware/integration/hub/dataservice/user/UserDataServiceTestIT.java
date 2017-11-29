@@ -24,11 +24,15 @@
 package com.blackducksoftware.integration.hub.dataservice.user;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.Test;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
+import com.blackducksoftware.integration.hub.model.view.RoleView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.TestingPropertyKey;
@@ -47,5 +51,16 @@ public class UserDataServiceTestIT {
 
         final List<ProjectView> projectsForUser = userDS.getProjectsForUser(restConnectionTestHelper.getTestUsername());
         assertNotNull(projectsForUser);
+    }
+
+    @Test
+    public void getRolesForUserTestIT() throws IllegalArgumentException, IntegrationException {
+        final RestConnection connection = restConnectionTestHelper.getIntegrationHubRestConnection();
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+
+        final UserDataService userDS = new UserDataService(connection, hubServicesFactory.createUserRequestService(), hubServicesFactory.createMetaService());
+
+        final List<RoleView> rolesForUser = userDS.getRolesForUser(restConnectionTestHelper.getTestUsername());
+        assertTrue(rolesForUser.size() == 4);
     }
 }

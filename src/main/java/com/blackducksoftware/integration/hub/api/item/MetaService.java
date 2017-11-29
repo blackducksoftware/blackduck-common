@@ -84,6 +84,8 @@ public class MetaService {
 
     public static final String TEXT_LINK = "text";
 
+    public static final String ROLES_LINK = "roles";
+
     private final IntLogger logger;
 
     public MetaService(final IntLogger logger) {
