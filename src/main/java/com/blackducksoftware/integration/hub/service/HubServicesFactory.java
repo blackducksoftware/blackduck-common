@@ -273,7 +273,7 @@ public class HubServicesFactory {
         return new UserDataService(restConnection, createUserRequestService(), createMetaService());
     }
 
-    public VersionBomComponentDataService createVersionBomComponentDataservice() {
+    public VersionBomComponentDataService createVersionBomComponentDataService() {
         return new VersionBomComponentDataService(createProjectRequestService(), createProjectVersionRequestService(), createAggregateBomRequestService(), createMatchedFilesRequestService(), createMetaService());
     }
 
