@@ -49,7 +49,7 @@ import com.blackducksoftware.integration.log.IntLogger;
 
 public class ScanStatusDataService {
     public static final long FIVE_SECONDS = 5 * 1000;
-    public static final long DEFAULT_TIMEOUT = 300000l;
+    public static final long DEFAULT_TIMEOUT = 300000L;
 
     private final IntLogger logger;
     private final ProjectRequestService projectRequestService;
