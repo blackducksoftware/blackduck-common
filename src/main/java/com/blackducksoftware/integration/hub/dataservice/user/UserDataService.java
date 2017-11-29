@@ -23,14 +23,13 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.user;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
-import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
+import com.blackducksoftware.integration.hub.model.view.RoleView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
@@ -54,21 +53,19 @@ public class UserDataService extends HubResponseService {
     }
 
     public List<ProjectView> getProjectsForUser(final UserView user) throws IntegrationException {
-        logger.info("Attempting to get the assigned project for User: " + user.userName);
+        logger.debug("Attempting to get the assigned projects for User: " + user.userName);
         final String userProjectsLink = metaService.getFirstLink(user, MetaService.PROJECTS_LINK);
-        final List<AssignedProjectView> assignedProjectViews = getAllItems(userProjectsLink, AssignedProjectView.class);
+        return userRequestService.getUserProjects(userProjectsLink);
+    }
 
-        final List<ProjectView> resolvedProjectViews = new ArrayList<>();
-        for (final AssignedProjectView assigned : assignedProjectViews) {
-            final ProjectView project = getItem(assigned.projectUrl, ProjectView.class);
-            if (project != null) {
-                resolvedProjectViews.add(project);
-            } else {
-                logger.warn("Assigned project was null: " + assigned.name);
-            }
-        }
+    public List<RoleView> getRolesForUser(final String userName) throws IntegrationException {
+        final UserView user = userRequestService.getUserByUserName(userName);
+        return getRolesForUser(user);
+    }
 
-        return resolvedProjectViews;
+    public List<RoleView> getRolesForUser(final UserView userView) throws IntegrationException {
+        final String userRolesLink = metaService.getFirstLink(userView, MetaService.ROLES_LINK);
+        return userRequestService.getUserRoles(userRolesLink);
     }
 
 }
