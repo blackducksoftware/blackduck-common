@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
@@ -42,9 +43,11 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class UserRequestService extends HubResponseService {
     private static final List<String> USERS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_USERS);
+    MetaService metaService;
 
-    public UserRequestService(final RestConnection restConnection) {
+    public UserRequestService(final RestConnection restConnection, final MetaService metaService) {
         super(restConnection);
+        this.metaService = metaService;
     }
 
     public List<UserView> getAllUsers() throws IntegrationException {
@@ -63,6 +66,16 @@ public class UserRequestService extends HubResponseService {
         throw new DoesNotExistException("This User does not exist. UserName : " + userName);
     }
 
+    public List<ProjectView> getProjectsForUser(final String userName) throws IntegrationException {
+        final UserView user = getUserByUserName(userName);
+        return getProjectsForUser(user);
+    }
+
+    public List<ProjectView> getProjectsForUser(final UserView user) throws IntegrationException {
+        final String userProjectsLink = metaService.getFirstLink(user, MetaService.PROJECTS_LINK);
+        return getUserProjects(userProjectsLink);
+    }
+
     public List<ProjectView> getUserProjects(final String userProjectsLink) throws IntegrationException {
         final List<AssignedProjectView> assignedProjectViews = getAllItems(userProjectsLink, AssignedProjectView.class);
 
@@ -75,6 +88,16 @@ public class UserRequestService extends HubResponseService {
         }
 
         return resolvedProjectViews;
+    }
+
+    public List<RoleView> getRolesForUser(final String userName) throws IntegrationException {
+        final UserView user = getUserByUserName(userName);
+        return getRolesForUser(user);
+    }
+
+    public List<RoleView> getRolesForUser(final UserView userView) throws IntegrationException {
+        final String userRolesLink = metaService.getFirstLink(userView, MetaService.ROLES_LINK);
+        return getUserRoles(userRolesLink);
     }
 
     public List<RoleView> getUserRoles(final String userRolesLink) throws IntegrationException {
