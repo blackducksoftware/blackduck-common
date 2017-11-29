@@ -48,22 +48,15 @@ import com.blackducksoftware.integration.hub.model.view.ScanSummaryView;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ScanStatusDataService {
-    private static final long FIVE_SECONDS = 5 * 1000;
-
-    private static final long DEFAULT_TIMEOUT = 300000l;
+    public static final long FIVE_SECONDS = 5 * 1000;
+    public static final long DEFAULT_TIMEOUT = 300000l;
 
     private final IntLogger logger;
-
     private final ProjectRequestService projectRequestService;
-
     private final ProjectVersionRequestService projectVersionRequestService;
-
     private final CodeLocationRequestService codeLocationRequestService;
-
     private final ScanSummaryRequestService scanSummaryRequestService;
-
     private final MetaService metaService;
-
     private final long timeoutInMilliseconds;
 
     public ScanStatusDataService(final IntLogger logger, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService, final CodeLocationRequestService codeLocationRequestService,
