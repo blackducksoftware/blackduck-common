@@ -143,9 +143,20 @@ public class CLIDataService {
     }
 
     private void printConfiguration(final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
-        logger.alwaysLog("--> Log Level : ${logger.getLogLevel().name()}");
-        logger.alwaysLog(
-                "--> Using Hub Project Name : ${projectRequest?.getName()}, Version : ${projectRequest?.getVersionRequest()?.getVersionName()}, Phase : ${projectRequest?.getVersionRequest()?.getPhase()}, Distribution : ${projectRequest?.getVersionRequest()?.getDistribution()}");
+        logger.alwaysLog(String.format("--> Log Level : %s", logger.getLogLevel().name()));
+        String projectName = null;
+        String projectVersionName = null;
+        String projectVersionPhase = null;
+        String projectVersionDistribution = null;
+        if (projectRequest != null) {
+            projectName = projectRequest.getName();
+            if (projectRequest.getVersionRequest() != null) {
+                projectVersionName = projectRequest.getVersionRequest().getVersionName();
+                projectVersionPhase = projectRequest.getVersionRequest().getPhase() == null ? null : projectRequest.getVersionRequest().getPhase().toString();
+                projectVersionDistribution = projectRequest.getVersionRequest().getDistribution() == null ? null : projectRequest.getVersionRequest().getDistribution().toString();
+            }
+        }
+        logger.alwaysLog(String.format("--> Using Hub Project Name : %s, Version : %s, Phase : %s, Distribution : %s", projectName, projectVersionName, projectVersionPhase, projectVersionDistribution));
         hubScanConfig.print(logger);
     }
 
