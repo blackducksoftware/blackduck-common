@@ -269,12 +269,12 @@ public class HubServicesFactory {
         return new ProjectDataService(createProjectRequestService(), createProjectVersionRequestService(), createProjectAssignmentRequestService());
     }
 
-    public UserDataService createUserDataService() {
-        return new UserDataService(restConnection, createUserRequestService(), createMetaService());
-    }
-
     public VersionBomComponentDataService createVersionBomComponentDataService() {
         return new VersionBomComponentDataService(createProjectRequestService(), createProjectVersionRequestService(), createAggregateBomRequestService(), createMatchedFilesRequestService(), createMetaService());
+    }
+
+    public UserDataService createUserDataService() {
+        return new UserDataService(createUserRequestService(), createProjectRequestService(), createMetaService());
     }
 
     @Override

@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.user;
+package com.blackducksoftware.integration.hub.api.user;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -31,23 +31,22 @@ import java.util.List;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.dataservice.user.UserDataService;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.RoleView;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.TestingPropertyKey;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
-public class UserDataServiceTestIT {
+public class UserRequestServiceTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper(TestingPropertyKey.TEST_HTTPS_HUB_SERVER_URL.toString());
 
     // TODO - Tested in-house; we need a dedicated Hub 4.3.x instance for testing before we can uncomment this.
     // @Test
     public void getProjectsForUserTestIT() throws IllegalArgumentException, IntegrationException {
-        final RestConnection connection = restConnectionTestHelper.getIntegrationHubRestConnection();
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final UserDataService userDS = new UserDataService(connection, hubServicesFactory.createUserRequestService(), hubServicesFactory.createMetaService());
+        final UserDataService userDS = hubServicesFactory.createUserDataService();
 
         final List<ProjectView> projectsForUser = userDS.getProjectsForUser(restConnectionTestHelper.getTestUsername());
         assertNotNull(projectsForUser);
@@ -55,12 +54,11 @@ public class UserDataServiceTestIT {
 
     @Test
     public void getRolesForUserTestIT() throws IllegalArgumentException, IntegrationException {
-        final RestConnection connection = restConnectionTestHelper.getIntegrationHubRestConnection();
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final UserDataService userDS = new UserDataService(connection, hubServicesFactory.createUserRequestService(), hubServicesFactory.createMetaService());
+        final UserDataService userDS = hubServicesFactory.createUserDataService();
 
         final List<RoleView> rolesForUser = userDS.getRolesForUser(restConnectionTestHelper.getTestUsername());
-        assertTrue(rolesForUser.size() == 4);
+        assertTrue(rolesForUser.size() > 0);
     }
 }

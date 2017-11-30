@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>hub-common</artifactId>
-  <version>21.1.0-SNAPSHOT</version>
+  <version>22.0.0-SNAPSHOT</version>
 
   <name>Hub Common</name>
   <description>General Code for Hub Integration with CI systems</description>
@@ -50,7 +50,7 @@
     <dependency>
       <groupId>com.blackducksoftware.integration</groupId>
       <artifactId>integration-bdio</artifactId>
-      <version>8.1.1</version>
+      <version>9.0.0</version>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
