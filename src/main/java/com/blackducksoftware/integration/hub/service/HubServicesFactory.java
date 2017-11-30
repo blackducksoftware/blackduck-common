@@ -269,7 +269,7 @@ public class HubServicesFactory {
         return new ProjectDataService(createProjectRequestService(), createProjectVersionRequestService(), createProjectAssignmentRequestService());
     }
 
-    public VersionBomComponentDataService createVersionBomComponentDataservice() {
+    public VersionBomComponentDataService createVersionBomComponentDataService() {
         return new VersionBomComponentDataService(createProjectRequestService(), createProjectVersionRequestService(), createAggregateBomRequestService(), createMatchedFilesRequestService(), createMetaService());
     }
 
