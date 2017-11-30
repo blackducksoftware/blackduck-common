@@ -65,6 +65,7 @@ import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStat
 import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
+import com.blackducksoftware.integration.hub.dataservice.user.UserDataService;
 import com.blackducksoftware.integration.hub.dataservice.versionbomcomponent.VersionBomComponentDataService;
 import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
@@ -186,7 +187,7 @@ public class HubServicesFactory {
     }
 
     public UserRequestService createUserRequestService() {
-        return new UserRequestService(restConnection, createMetaService());
+        return new UserRequestService(restConnection);
     }
 
     public VulnerabilityRequestService createVulnerabilityRequestService() {
@@ -270,6 +271,10 @@ public class HubServicesFactory {
 
     public VersionBomComponentDataService createVersionBomComponentDataservice() {
         return new VersionBomComponentDataService(createProjectRequestService(), createProjectVersionRequestService(), createAggregateBomRequestService(), createMatchedFilesRequestService(), createMetaService());
+    }
+
+    public UserDataService createUserDataService() {
+        return new UserDataService(createUserRequestService(), createProjectRequestService(), createMetaService());
     }
 
     @Override

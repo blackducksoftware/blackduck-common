@@ -31,6 +31,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.dataservice.user.UserDataService;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.RoleView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
@@ -45,7 +46,7 @@ public class UserRequestServiceTestIT {
     public void getProjectsForUserTestIT() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final UserRequestService userDS = hubServicesFactory.createUserRequestService();
+        final UserDataService userDS = hubServicesFactory.createUserDataService();
 
         final List<ProjectView> projectsForUser = userDS.getProjectsForUser(restConnectionTestHelper.getTestUsername());
         assertNotNull(projectsForUser);
@@ -55,9 +56,9 @@ public class UserRequestServiceTestIT {
     public void getRolesForUserTestIT() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final UserRequestService userDS = hubServicesFactory.createUserRequestService();
+        final UserDataService userDS = hubServicesFactory.createUserDataService();
 
         final List<RoleView> rolesForUser = userDS.getRolesForUser(restConnectionTestHelper.getTestUsername());
-        assertTrue(rolesForUser.size() == 4);
+        assertTrue(rolesForUser.size() > 0);
     }
 }
