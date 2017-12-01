@@ -38,7 +38,6 @@ import com.blackducksoftware.integration.hub.api.component.ComponentRequestServi
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
 import com.blackducksoftware.integration.hub.api.group.GroupRequestService;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.matchedfiles.MatchedFilesRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
@@ -101,7 +100,7 @@ public class HubServicesFactory {
 
     public CLIDataService createCLIDataService(final long timeoutInMilliseconds) {
         return new CLIDataService(restConnection.logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(), createPhoneHomeDataService(), createProjectRequestService(),
-                createProjectVersionRequestService(), createCodeLocationRequestService(), createScanSummaryRequestService(), createScanStatusDataService(timeoutInMilliseconds), createMetaService());
+                createProjectVersionRequestService(), createCodeLocationRequestService(), createScanSummaryRequestService(), createScanStatusDataService(timeoutInMilliseconds));
     }
 
     public PhoneHomeDataService createPhoneHomeDataService() {
@@ -122,17 +121,15 @@ public class HubServicesFactory {
     }
 
     public ScanStatusDataService createScanStatusDataService(final long timeoutInMilliseconds) {
-        return new ScanStatusDataService(restConnection.logger, createProjectRequestService(), createProjectVersionRequestService(), createCodeLocationRequestService(), createScanSummaryRequestService(), createMetaService(),
-                timeoutInMilliseconds);
+        return new ScanStatusDataService(restConnection.logger, createProjectRequestService(), createProjectVersionRequestService(), createCodeLocationRequestService(), createScanSummaryRequestService(), timeoutInMilliseconds);
     }
 
     public NotificationDataService createNotificationDataService() {
-        return new NotificationDataService(restConnection.logger, createHubResponseService(), createNotificationRequestService(), createProjectVersionRequestService(), createPolicyRequestService(), createMetaService());
+        return new NotificationDataService(restConnection.logger, createHubResponseService(), createNotificationRequestService(), createProjectVersionRequestService(), createPolicyRequestService());
     }
 
     public NotificationDataService createNotificationDataService(final PolicyNotificationFilter policyNotificationFilter) {
-        return new NotificationDataService(restConnection.logger, createHubResponseService(), createNotificationRequestService(), createProjectVersionRequestService(), createPolicyRequestService(), policyNotificationFilter,
-                createMetaService());
+        return new NotificationDataService(restConnection.logger, createHubResponseService(), createNotificationRequestService(), createProjectVersionRequestService(), createPolicyRequestService(), policyNotificationFilter);
     }
 
     public ExtensionConfigDataService createExtensionConfigDataService() {
@@ -140,7 +137,7 @@ public class HubServicesFactory {
     }
 
     public VulnerabilityDataService createVulnerabilityDataService() {
-        return new VulnerabilityDataService(restConnection, createComponentRequestService(), createVulnerabilityRequestService());
+        return new VulnerabilityDataService(restConnection.logger, createComponentRequestService(), createVulnerabilityRequestService());
     }
 
     public LicenseDataService createLicenseDataService() {
@@ -168,7 +165,7 @@ public class HubServicesFactory {
     }
 
     public NotificationRequestService createNotificationRequestService() {
-        return new NotificationRequestService(restConnection.logger, restConnection, createMetaService());
+        return new NotificationRequestService(restConnection);
     }
 
     public PolicyRequestService createPolicyRequestService() {
@@ -240,10 +237,6 @@ public class HubServicesFactory {
         return new AggregateBomRequestService(restConnection);
     }
 
-    public MetaService createMetaService() {
-        return new MetaService(restConnection.logger);
-    }
-
     public HubResponseService createHubResponseService() {
         return new HubResponseService(restConnection);
     }
@@ -263,7 +256,7 @@ public class HubServicesFactory {
     }
 
     public ComponentDataService createComponentDataService() {
-        return new ComponentDataService(restConnection.logger, createComponentRequestService(), createMetaService());
+        return new ComponentDataService(restConnection.logger, createComponentRequestService());
     }
 
     public BomComponentIssueRequestService createBomComponentIssueRequestService() {
@@ -275,7 +268,7 @@ public class HubServicesFactory {
     }
 
     public VersionBomComponentDataService createVersionBomComponentDataService() {
-        return new VersionBomComponentDataService(createProjectRequestService(), createProjectVersionRequestService(), createAggregateBomRequestService(), createMatchedFilesRequestService(), createMetaService());
+        return new VersionBomComponentDataService(restConnection.logger, createProjectRequestService(), createProjectVersionRequestService(), createAggregateBomRequestService(), createMatchedFilesRequestService());
     }
 
     public UserDataService createUserDataService() {

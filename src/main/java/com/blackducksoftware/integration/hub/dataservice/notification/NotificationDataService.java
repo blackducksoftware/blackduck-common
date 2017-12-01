@@ -65,44 +65,31 @@ public class NotificationDataService {
 
     private final MetaService metaService;
 
-    public NotificationDataService(final IntLogger logger, final HubResponseService hubResponseService,
-            final NotificationRequestService notificationRequestService,
-            final ProjectVersionRequestService projectVersionRequestService, final PolicyRequestService policyRequestService,
-            final MetaService metaService) {
-        this(logger, hubResponseService, notificationRequestService, projectVersionRequestService, policyRequestService,
-                null, metaService);
+    public NotificationDataService(final IntLogger logger, final HubResponseService hubResponseService, final NotificationRequestService notificationRequestService, final ProjectVersionRequestService projectVersionRequestService,
+            final PolicyRequestService policyRequestService) {
+        this(logger, hubResponseService, notificationRequestService, projectVersionRequestService, policyRequestService, null);
     }
 
-    public NotificationDataService(final IntLogger logger, final HubResponseService hubResponseService,
-            final NotificationRequestService notificationRequestService,
-            final ProjectVersionRequestService projectVersionRequestService, final PolicyRequestService policyRequestService,
-            final PolicyNotificationFilter policyNotificationFilter, final MetaService metaService) {
+    public NotificationDataService(final IntLogger logger, final HubResponseService hubResponseService, final NotificationRequestService notificationRequestService, final ProjectVersionRequestService projectVersionRequestService,
+            final PolicyRequestService policyRequestService, final PolicyNotificationFilter policyNotificationFilter) {
         this.hubResponseService = hubResponseService;
         this.notificationRequestService = notificationRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.policyRequestService = policyRequestService;
         this.policyNotificationFilter = policyNotificationFilter;
         this.parallelProcessor = new ParallelResourceProcessor<>(logger);
-        this.metaService = metaService;
+        this.metaService = new MetaService(logger);
         populateTransformerMap(logger);
     }
 
     private void populateTransformerMap(final IntLogger logger) {
         parallelProcessor.addTransform(RuleViolationNotificationView.class,
-                new PolicyViolationTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService, policyRequestService,
-                        policyNotificationFilter, metaService));
+                new PolicyViolationTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
         parallelProcessor.addTransform(PolicyOverrideNotificationView.class,
-                new PolicyViolationOverrideTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService,
-                        policyRequestService,
-                        policyNotificationFilter, metaService));
-        parallelProcessor.addTransform(VulnerabilityNotificationView.class,
-                new VulnerabilityTransformer(hubResponseService, notificationRequestService, projectVersionRequestService, policyRequestService,
-                        metaService,
-                        logger));
+                new PolicyViolationOverrideTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
+        parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubResponseService, notificationRequestService, projectVersionRequestService, policyRequestService, metaService, logger));
         parallelProcessor.addTransform(RuleViolationClearedNotificationView.class,
-                new PolicyViolationClearedTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService,
-                        policyRequestService,
-                        policyNotificationFilter, metaService));
+                new PolicyViolationClearedTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
     }
 
     public NotificationResults getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
@@ -114,8 +101,7 @@ public class NotificationDataService {
         return results;
     }
 
-    public NotificationResults getUserNotifications(final Date startDate, final Date endDate, final UserView user)
-            throws IntegrationException {
+    public NotificationResults getUserNotifications(final Date startDate, final Date endDate, final UserView user) throws IntegrationException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
         final List<NotificationView> itemList = notificationRequestService.getUserNotifications(startDate, endDate, user);
         final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);

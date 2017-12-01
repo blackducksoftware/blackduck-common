@@ -48,8 +48,7 @@ import com.blackducksoftware.integration.hub.model.view.VulnerabilityNotificatio
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.log.IntLogger;
-import com.google.gson.Gson;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -57,24 +56,19 @@ import com.google.gson.JsonParser;
 
 import okhttp3.Response;
 
-public class NotificationRequestService {
+public class NotificationRequestService extends HubResponseService {
     private static final List<String> NOTIFICATIONS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_NOTIFICATIONS);
 
     private final Map<String, Class<? extends NotificationView>> typeMap = new HashMap<>();
-
-    private final MetaService metaService;
 
     private final HubRequestFactory hubRequestFactory;
 
     private final JsonParser jsonParser;
 
-    private final Gson gson;
-
-    public NotificationRequestService(final IntLogger logger, final RestConnection restConnection, final MetaService metaService) {
+    public NotificationRequestService(final RestConnection restConnection) {
+        super(restConnection);
         this.hubRequestFactory = new HubRequestFactory(restConnection);
         this.jsonParser = restConnection.jsonParser;
-        this.gson = restConnection.gson;
-        this.metaService = metaService;
         typeMap.put("VULNERABILITY", VulnerabilityNotificationView.class);
         typeMap.put("RULE_VIOLATION", RuleViolationNotificationView.class);
         typeMap.put("POLICY_OVERRIDE", PolicyOverrideNotificationView.class);
@@ -108,12 +102,6 @@ public class NotificationRequestService {
 
         final List<NotificationView> allNotificationItems = getAllItems(hubPagedRequest);
         return allNotificationItems;
-    }
-
-    public <T extends NotificationView> T getItemAs(final JsonElement item, final Class<T> clazz) {
-        final T hubItem = gson.fromJson(item, clazz);
-        hubItem.json = gson.toJson(item);
-        return hubItem;
     }
 
     public List<NotificationView> getItems(final JsonObject jsonObject) throws IntegrationException {

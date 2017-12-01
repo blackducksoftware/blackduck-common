@@ -37,6 +37,7 @@ import com.blackducksoftware.integration.hub.model.view.MatchedFilesView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class VersionBomComponentDataService {
     private final ProjectRequestService projectRequestService;
@@ -45,13 +46,13 @@ public class VersionBomComponentDataService {
     private final MatchedFilesRequestService matchedFilesRequestService;
     private final MetaService metaService;
 
-    public VersionBomComponentDataService(final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService, final AggregateBomRequestService aggregateBomRequestService,
-            final MatchedFilesRequestService matchedFilesRequestService, final MetaService metaService) {
+    public VersionBomComponentDataService(final IntLogger logger, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
+            final AggregateBomRequestService aggregateBomRequestService, final MatchedFilesRequestService matchedFilesRequestService) {
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.aggregateBomRequestService = aggregateBomRequestService;
-        this.metaService = metaService;
         this.matchedFilesRequestService = matchedFilesRequestService;
+        this.metaService = new MetaService(logger);
     }
 
     public List<VersionBomComponentModel> getComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
