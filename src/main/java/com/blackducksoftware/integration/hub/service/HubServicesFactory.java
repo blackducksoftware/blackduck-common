@@ -266,15 +266,15 @@ public class HubServicesFactory {
     }
 
     public ProjectDataService createProjectDataService() {
-        return new ProjectDataService(createProjectRequestService(), createProjectVersionRequestService(), createProjectAssignmentRequestService());
-    }
-
-    public UserDataService createUserDataService() {
-        return new UserDataService(restConnection, createUserRequestService(), createMetaService());
+        return new ProjectDataService(restConnection, createMetaService(), createProjectRequestService(), createProjectVersionRequestService(), createProjectAssignmentRequestService());
     }
 
     public VersionBomComponentDataService createVersionBomComponentDataService() {
         return new VersionBomComponentDataService(createProjectRequestService(), createProjectVersionRequestService(), createAggregateBomRequestService(), createMatchedFilesRequestService(), createMetaService());
+    }
+
+    public UserDataService createUserDataService() {
+        return new UserDataService(restConnection, createProjectRequestService(), createUserRequestService(), createMetaService());
     }
 
     @Override

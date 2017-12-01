@@ -23,11 +23,14 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.user;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
+import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.RoleView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
@@ -39,9 +42,12 @@ public class UserDataService extends HubResponseService {
     private final IntLogger logger;
     private final UserRequestService userRequestService;
 
-    public UserDataService(final RestConnection restConnection, final UserRequestService userRequestService, final MetaService metaService) {
+    ProjectRequestService projectRequestService;
+
+    public UserDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService, final UserRequestService userRequestService, final MetaService metaService) {
         super(restConnection, metaService);
         this.logger = restConnection.logger;
+        this.projectRequestService = projectRequestService;
         this.userRequestService = userRequestService;
     }
 
@@ -50,9 +56,20 @@ public class UserDataService extends HubResponseService {
         return getProjectsForUser(user);
     }
 
-    public List<ProjectView> getProjectsForUser(final UserView user) throws IntegrationException {
-        logger.debug("Attempting to get the assigned projects for User: " + user.userName);
-        return userRequestService.getUserProjects(user);
+    public List<ProjectView> getProjectsForUser(final UserView userView) throws IntegrationException {
+        logger.debug("Attempting to get the assigned projects for User: " + userView.userName);
+        final List<AssignedProjectView> assignedProjectViews = userRequestService.getUserAssignedProjects(userView);
+
+        final List<ProjectView> resolvedProjectViews = new ArrayList<>();
+        for (final AssignedProjectView assigned : assignedProjectViews) {
+            final ProjectView project = getItem(assigned.projectUrl, ProjectView.class);
+            if (project != null) {
+                resolvedProjectViews.add(project);
+            }
+        }
+
+        return resolvedProjectViews;
+
     }
 
     public List<RoleView> getRolesForUser(final String userName) throws IntegrationException {
@@ -63,5 +80,4 @@ public class UserDataService extends HubResponseService {
     public List<RoleView> getRolesForUser(final UserView userView) throws IntegrationException {
         return userRequestService.getUserRoles(userView);
     }
-
 }

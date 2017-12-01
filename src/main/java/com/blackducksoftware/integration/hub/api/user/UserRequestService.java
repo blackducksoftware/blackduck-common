@@ -26,7 +26,6 @@ package com.blackducksoftware.integration.hub.api.user;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_USERS;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,7 +33,6 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.RoleView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -62,18 +60,9 @@ public class UserRequestService extends HubResponseService {
         throw new DoesNotExistException("This User does not exist. UserName : " + userName);
     }
 
-    public List<ProjectView> getUserProjects(final UserView userView) throws IntegrationException {
+    public List<AssignedProjectView> getUserAssignedProjects(final UserView userView) throws IntegrationException {
         final List<AssignedProjectView> assignedProjectViews = getAllItemsFromLink(userView, MetaService.PROJECTS_LINK, AssignedProjectView.class);
-
-        final List<ProjectView> resolvedProjectViews = new ArrayList<>();
-        for (final AssignedProjectView assigned : assignedProjectViews) {
-            final ProjectView project = getItem(assigned.projectUrl, ProjectView.class);
-            if (project != null) {
-                resolvedProjectViews.add(project);
-            }
-        }
-
-        return resolvedProjectViews;
+        return assignedProjectViews;
     }
 
     public List<RoleView> getUserRoles(final UserView userView) throws IntegrationException {

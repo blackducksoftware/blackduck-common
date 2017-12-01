@@ -23,9 +23,11 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.project;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
@@ -35,14 +37,23 @@ import com.blackducksoftware.integration.hub.model.view.AssignedGroupView;
 import com.blackducksoftware.integration.hub.model.view.AssignedUserView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
+import com.blackducksoftware.integration.hub.model.view.UserGroupView;
+import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.log.IntLogger;
 
-public class ProjectDataService {
+public class ProjectDataService extends HubResponseService {
+    private final IntLogger logger;
     private final ProjectRequestService projectRequestService;
     private final ProjectVersionRequestService projectVersionRequestService;
     private final ProjectAssignmentRequestService projectAssignmentRequestService;
 
-    public ProjectDataService(final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService, final ProjectAssignmentRequestService projectAssignmentRequestService) {
+    public ProjectDataService(final RestConnection restConnection, final MetaService metaService, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
+            final ProjectAssignmentRequestService projectAssignmentRequestService) {
+        super(restConnection, metaService);
+        this.logger = restConnection.logger;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.projectAssignmentRequestService = projectAssignmentRequestService;
@@ -102,6 +113,26 @@ public class ProjectDataService {
         return assignedUsers;
     }
 
+    public List<UserView> getUsersForProject(final String projectName) throws IntegrationException {
+        final ProjectView project = projectRequestService.getProjectByName(projectName);
+        return getUsersForProject(project);
+    }
+
+    public List<UserView> getUsersForProject(final ProjectView project) throws IntegrationException {
+        logger.debug("Attempting to get the assigned users for Project: " + project.name);
+        final List<AssignedUserView> assignedUsers = projectAssignmentRequestService.getProjectUsers(project);
+
+        final List<UserView> resolvedUserViews = new ArrayList<>();
+        for (final AssignedUserView assigned : assignedUsers) {
+            final UserView userView = getItem(assigned.userUrl, UserView.class);
+            if (userView != null) {
+                resolvedUserViews.add(userView);
+            }
+        }
+        return resolvedUserViews;
+
+    }
+
     public List<AssignedGroupView> getAssignedGroupsToProject(final String projectName) throws IntegrationException {
         final ProjectView project = projectRequestService.getProjectByName(projectName);
         return getAssignedGroupsToProject(project);
@@ -110,6 +141,26 @@ public class ProjectDataService {
     public List<AssignedGroupView> getAssignedGroupsToProject(final ProjectView project) throws IntegrationException {
         final List<AssignedGroupView> assignedGroups = projectAssignmentRequestService.getProjectGroups(project);
         return assignedGroups;
+    }
+
+    public List<UserGroupView> getGroupsForProject(final String projectName) throws IntegrationException {
+        final ProjectView project = projectRequestService.getProjectByName(projectName);
+        return getGroupsForProject(project);
+    }
+
+    public List<UserGroupView> getGroupsForProject(final ProjectView project) throws IntegrationException {
+        logger.debug("Attempting to get the assigned users for Project: " + project.name);
+        final List<AssignedGroupView> assignedGroups = projectAssignmentRequestService.getProjectGroups(project);
+
+        final List<UserGroupView> resolvedGroupViews = new ArrayList<>();
+        for (final AssignedGroupView assigned : assignedGroups) {
+            final UserGroupView groupView = getItem(assigned.groupUrl, UserGroupView.class);
+            if (groupView != null) {
+                resolvedGroupViews.add(groupView);
+            }
+        }
+        return resolvedGroupViews;
+
     }
 
 }
