@@ -80,8 +80,8 @@ public class RiskReportDataService extends HubResponseService {
     private final IntegrationEscapeUtil escapeUtil;
 
     public RiskReportDataService(final IntLogger logger, final RestConnection restConnection, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
-            final ReportRequestService reportRequestService, final AggregateBomRequestService bomRequestService, final MetaService metaService, final HubSupportHelper hubSupportHelper, final IntegrationEscapeUtil escapeUtil) {
-        super(restConnection, metaService);
+            final ReportRequestService reportRequestService, final AggregateBomRequestService bomRequestService, final HubSupportHelper hubSupportHelper, final IntegrationEscapeUtil escapeUtil) {
+        super(restConnection);
         this.logger = logger;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;

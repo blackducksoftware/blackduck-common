@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -44,8 +43,8 @@ import okhttp3.Response;
 public class HubRegistrationRequestService extends HubResponseService {
     private static final List<String> REGISTRATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_REGISTRATIONS);
 
-    public HubRegistrationRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public HubRegistrationRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public String getRegistrationId() throws IntegrationException {

@@ -48,8 +48,8 @@ import okhttp3.Response;
 public class CodeLocationRequestService extends HubResponseService {
     private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
 
-    public CodeLocationRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public CodeLocationRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public List<CodeLocationView> getAllCodeLocations() throws IntegrationException {

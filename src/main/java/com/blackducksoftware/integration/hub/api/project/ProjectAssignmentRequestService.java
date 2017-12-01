@@ -35,8 +35,8 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class ProjectAssignmentRequestService extends HubResponseService {
 
-    public ProjectAssignmentRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public ProjectAssignmentRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public List<AssignedUserView> getProjectUsers(final ProjectView projectView) throws IntegrationException {

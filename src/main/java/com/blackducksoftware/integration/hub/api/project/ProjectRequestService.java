@@ -32,7 +32,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
@@ -46,8 +45,8 @@ import okhttp3.Response;
 public class ProjectRequestService extends HubResponseService {
     private static final List<String> PROJECTS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS);
 
-    public ProjectRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public ProjectRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public List<ProjectView> getAllProjects() throws IntegrationException {

@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.model.response.DryRunUploadResponse;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
@@ -49,8 +48,8 @@ public class DryRunUploadRequestService extends HubResponseService {
 
     private final RestConnection restConnection;
 
-    public DryRunUploadRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public DryRunUploadRequestService(final RestConnection restConnection) {
+        super(restConnection);
         this.restConnection = restConnection;
     }
 

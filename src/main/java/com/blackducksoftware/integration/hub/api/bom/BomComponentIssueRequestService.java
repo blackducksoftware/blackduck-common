@@ -24,7 +24,6 @@
 package com.blackducksoftware.integration.hub.api.bom;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.model.view.IssueView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -34,8 +33,8 @@ import okhttp3.Response;
 
 public class BomComponentIssueRequestService extends HubResponseService {
 
-    public BomComponentIssueRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public BomComponentIssueRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public String createIssue(final IssueView issueItem, final String url) throws IntegrationException {

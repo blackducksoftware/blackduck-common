@@ -54,8 +54,8 @@ public class ExtensionConfigDataService extends HubResponseService {
     private final ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor;
 
     public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserRequestService userRequestService, final ExtensionConfigRequestService extensionConfigRequestService,
-            final ExtensionUserOptionRequestService extensionUserOptionRequestService, final MetaService metaService) {
-        super(restConnection, metaService);
+            final ExtensionUserOptionRequestService extensionUserOptionRequestService) {
+        super(restConnection);
         this.extensionConfigRequestService = extensionConfigRequestService;
         this.extensionUserOptionRequestService = extensionUserOptionRequestService;
         userConfigTransform = new UserConfigTransform(userRequestService, extensionConfigRequestService);

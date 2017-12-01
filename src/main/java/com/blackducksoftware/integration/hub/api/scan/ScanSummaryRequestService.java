@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.model.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -40,8 +39,8 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 public class ScanSummaryRequestService extends HubResponseService {
     private static final List<String> SCAN_SUMMARIES_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_SCAN_SUMMARIES);
 
-    public ScanSummaryRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public ScanSummaryRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public List<ScanSummaryView> getAllScanSummaryItems(final String scanSummaryUrl) throws IntegrationException {

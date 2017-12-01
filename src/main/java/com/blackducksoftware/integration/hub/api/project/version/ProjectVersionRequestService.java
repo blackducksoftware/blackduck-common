@@ -42,8 +42,8 @@ import okhttp3.Response;
 
 public class ProjectVersionRequestService extends HubResponseService {
 
-    public ProjectVersionRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public ProjectVersionRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public ProjectVersionView getProjectVersion(final ProjectView project, final String projectVersionName) throws IntegrationException {

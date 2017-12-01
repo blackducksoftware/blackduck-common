@@ -34,8 +34,8 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class AggregateBomRequestService extends HubResponseService {
 
-    public AggregateBomRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public AggregateBomRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public List<VersionBomComponentView> getBomEntries(final ProjectVersionView projectVersion) throws IntegrationException {

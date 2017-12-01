@@ -113,11 +113,11 @@ public class HubServicesFactory {
 
     public RiskReportDataService createRiskReportDataService(final long timeoutInMilliseconds) throws IntegrationException {
         return new RiskReportDataService(restConnection.logger, restConnection, createProjectRequestService(), createProjectVersionRequestService(), createReportRequestService(timeoutInMilliseconds), createAggregateBomRequestService(),
-                createMetaService(), createCheckedHubSupport(), createIntegrationEscapeUtil());
+                createCheckedHubSupport(), createIntegrationEscapeUtil());
     }
 
     public PolicyStatusDataService createPolicyStatusDataService() {
-        return new PolicyStatusDataService(restConnection, createProjectRequestService(), createProjectVersionRequestService(), createMetaService());
+        return new PolicyStatusDataService(restConnection, createProjectRequestService(), createProjectVersionRequestService());
     }
 
     public ScanStatusDataService createScanStatusDataService(final long timeoutInMilliseconds) {
@@ -135,11 +135,11 @@ public class HubServicesFactory {
     }
 
     public ExtensionConfigDataService createExtensionConfigDataService() {
-        return new ExtensionConfigDataService(restConnection.logger, restConnection, createUserRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService(), createMetaService());
+        return new ExtensionConfigDataService(restConnection.logger, restConnection, createUserRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService());
     }
 
     public VulnerabilityDataService createVulnerabilityDataService() {
-        return new VulnerabilityDataService(restConnection, createComponentRequestService(), createVulnerabilityRequestService(), createMetaService());
+        return new VulnerabilityDataService(restConnection, createComponentRequestService(), createVulnerabilityRequestService());
     }
 
     public LicenseDataService createLicenseDataService() {
@@ -147,23 +147,23 @@ public class HubServicesFactory {
     }
 
     public BomImportRequestService createBomImportRequestService() {
-        return new BomImportRequestService(restConnection, createMetaService());
+        return new BomImportRequestService(restConnection);
     }
 
     public DryRunUploadRequestService createDryRunUploadRequestService() {
-        return new DryRunUploadRequestService(restConnection, createMetaService());
+        return new DryRunUploadRequestService(restConnection);
     }
 
     public CodeLocationRequestService createCodeLocationRequestService() {
-        return new CodeLocationRequestService(restConnection, createMetaService());
+        return new CodeLocationRequestService(restConnection);
     }
 
     public ComponentRequestService createComponentRequestService() {
-        return new ComponentRequestService(restConnection, createMetaService());
+        return new ComponentRequestService(restConnection);
     }
 
     public HubVersionRequestService createHubVersionRequestService() {
-        return new HubVersionRequestService(restConnection, createMetaService());
+        return new HubVersionRequestService(restConnection);
     }
 
     public NotificationRequestService createNotificationRequestService() {
@@ -171,43 +171,43 @@ public class HubServicesFactory {
     }
 
     public PolicyRequestService createPolicyRequestService() {
-        return new PolicyRequestService(restConnection, createMetaService());
+        return new PolicyRequestService(restConnection);
     }
 
     public ProjectRequestService createProjectRequestService() {
-        return new ProjectRequestService(restConnection, createMetaService());
+        return new ProjectRequestService(restConnection);
     }
 
     public ProjectVersionRequestService createProjectVersionRequestService() {
-        return new ProjectVersionRequestService(restConnection, createMetaService());
+        return new ProjectVersionRequestService(restConnection);
     }
 
     public ScanSummaryRequestService createScanSummaryRequestService() {
-        return new ScanSummaryRequestService(restConnection, createMetaService());
+        return new ScanSummaryRequestService(restConnection);
     }
 
     public UserRequestService createUserRequestService() {
-        return new UserRequestService(restConnection, createMetaService());
+        return new UserRequestService(restConnection);
     }
 
     public VulnerabilityRequestService createVulnerabilityRequestService() {
-        return new VulnerabilityRequestService(restConnection, createMetaService());
+        return new VulnerabilityRequestService(restConnection);
     }
 
     public ExtensionConfigRequestService createExtensionConfigRequestService() {
-        return new ExtensionConfigRequestService(restConnection, createMetaService());
+        return new ExtensionConfigRequestService(restConnection);
     }
 
     public ExtensionUserOptionRequestService createExtensionUserOptionRequestService() {
-        return new ExtensionUserOptionRequestService(restConnection, createMetaService());
+        return new ExtensionUserOptionRequestService(restConnection);
     }
 
     public VulnerableBomComponentRequestService createVulnerableBomComponentRequestService() {
-        return new VulnerableBomComponentRequestService(restConnection, createMetaService());
+        return new VulnerableBomComponentRequestService(restConnection);
     }
 
     public MatchedFilesRequestService createMatchedFilesRequestService() {
-        return new MatchedFilesRequestService(restConnection, createMetaService());
+        return new MatchedFilesRequestService(restConnection);
     }
 
     public CLIDownloadService createCliDownloadService() {
@@ -224,15 +224,15 @@ public class HubServicesFactory {
     }
 
     public HubRegistrationRequestService createHubRegistrationRequestService() {
-        return new HubRegistrationRequestService(restConnection, createMetaService());
+        return new HubRegistrationRequestService(restConnection);
     }
 
     public ReportRequestService createReportRequestService(final long timeoutInMilliseconds) {
-        return new ReportRequestService(restConnection, restConnection.logger, createMetaService(), timeoutInMilliseconds);
+        return new ReportRequestService(restConnection, restConnection.logger, timeoutInMilliseconds);
     }
 
     public AggregateBomRequestService createAggregateBomRequestService() {
-        return new AggregateBomRequestService(restConnection, createMetaService());
+        return new AggregateBomRequestService(restConnection);
     }
 
     public MetaService createMetaService() {
@@ -240,11 +240,11 @@ public class HubServicesFactory {
     }
 
     public HubResponseService createHubResponseService() {
-        return new HubResponseService(restConnection, createMetaService());
+        return new HubResponseService(restConnection);
     }
 
     public ProjectAssignmentRequestService createProjectAssignmentRequestService() {
-        return new ProjectAssignmentRequestService(restConnection, createMetaService());
+        return new ProjectAssignmentRequestService(restConnection);
     }
 
     public RestConnection getRestConnection() {
@@ -262,11 +262,11 @@ public class HubServicesFactory {
     }
 
     public BomComponentIssueRequestService createBomComponentIssueRequestService() {
-        return new BomComponentIssueRequestService(restConnection, createMetaService());
+        return new BomComponentIssueRequestService(restConnection);
     }
 
     public ProjectDataService createProjectDataService() {
-        return new ProjectDataService(restConnection, createMetaService(), createProjectRequestService(), createProjectVersionRequestService(), createProjectAssignmentRequestService());
+        return new ProjectDataService(restConnection, createProjectRequestService(), createProjectVersionRequestService(), createProjectAssignmentRequestService());
     }
 
     public VersionBomComponentDataService createVersionBomComponentDataService() {
@@ -274,7 +274,7 @@ public class HubServicesFactory {
     }
 
     public UserDataService createUserDataService() {
-        return new UserDataService(restConnection, createProjectRequestService(), createUserRequestService(), createMetaService());
+        return new UserDataService(restConnection, createProjectRequestService(), createUserRequestService());
     }
 
     @Override

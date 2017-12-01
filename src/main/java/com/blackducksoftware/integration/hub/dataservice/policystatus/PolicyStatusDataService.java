@@ -41,8 +41,8 @@ public class PolicyStatusDataService extends HubResponseService {
 
     private final ProjectVersionRequestService projectVersionRequestService;
 
-    public PolicyStatusDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService, final MetaService metaService) {
-        super(restConnection, metaService);
+    public PolicyStatusDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService) {
+        super(restConnection);
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
     }

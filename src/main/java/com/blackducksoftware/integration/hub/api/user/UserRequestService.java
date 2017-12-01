@@ -41,8 +41,8 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 public class UserRequestService extends HubResponseService {
     private static final List<String> USERS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_USERS);
 
-    public UserRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public UserRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public List<UserView> getAllUsers() throws IntegrationException {

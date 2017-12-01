@@ -58,12 +58,12 @@ public class HubResponseService {
     private final Gson gson;
     protected final MetaService metaService;
 
-    public HubResponseService(final RestConnection restConnection, final MetaService metaService) {
+    public HubResponseService(final RestConnection restConnection) {
         this.hubRequestFactory = new HubRequestFactory(restConnection);
         this.hubBaseUrl = restConnection.hubBaseUrl;
         this.jsonParser = restConnection.jsonParser;
         this.gson = restConnection.gson;
-        this.metaService = metaService;
+        this.metaService = new MetaService(restConnection.logger);
     }
 
     public URL getHubBaseUrl() {

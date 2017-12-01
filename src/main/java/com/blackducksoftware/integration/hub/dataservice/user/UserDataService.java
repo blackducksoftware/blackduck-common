@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
@@ -44,8 +43,8 @@ public class UserDataService extends HubResponseService {
 
     ProjectRequestService projectRequestService;
 
-    public UserDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService, final UserRequestService userRequestService, final MetaService metaService) {
-        super(restConnection, metaService);
+    public UserDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService, final UserRequestService userRequestService) {
+        super(restConnection);
         this.logger = restConnection.logger;
         this.projectRequestService = projectRequestService;
         this.userRequestService = userRequestService;

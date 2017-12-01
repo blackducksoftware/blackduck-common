@@ -26,15 +26,14 @@ package com.blackducksoftware.integration.hub.api.vulnerablebomcomponent;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.model.view.VulnerableComponentView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class VulnerableBomComponentRequestService extends HubResponseService {
-    public VulnerableBomComponentRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public VulnerableBomComponentRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public List<VulnerableComponentView> getVulnerableComponentsMatchingComponentName(final String vulnerableBomComponentsUrl, final String componentName) throws IntegrationException {

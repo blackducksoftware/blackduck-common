@@ -26,14 +26,13 @@ package com.blackducksoftware.integration.hub.api.extension;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.model.view.ExternalExtensionConfigValueView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class ExtensionConfigRequestService extends HubResponseService {
-    public ExtensionConfigRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public ExtensionConfigRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public List<ExternalExtensionConfigValueView> getGlobalOptions(final String globalConfigUrl) throws IntegrationException {

@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.response.VersionComparison;
 import com.blackducksoftware.integration.hub.request.HubRequest;
@@ -48,8 +47,8 @@ public class HubVersionRequestService extends HubResponseService {
 
     private static final List<String> CURRENT_VERSION_COMPARISON_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON);
 
-    public HubVersionRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public HubVersionRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public String getHubVersion() throws IntegrationException {

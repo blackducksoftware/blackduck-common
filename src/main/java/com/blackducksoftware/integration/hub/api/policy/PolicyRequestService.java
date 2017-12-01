@@ -23,23 +23,18 @@
  */
 package com.blackducksoftware.integration.hub.api.policy;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_POLICY_RULES;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class PolicyRequestService extends HubResponseService {
-    private static final List<String> POLICY_RULE_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_POLICY_RULES);
-
-    public PolicyRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection, metaService);
+    public PolicyRequestService(final RestConnection restConnection) {
+        super(restConnection);
     }
 
     public List<PolicyRuleView> getAllPolicyRules() throws IntegrationException {

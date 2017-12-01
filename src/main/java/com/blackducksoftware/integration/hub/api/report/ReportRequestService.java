@@ -52,12 +52,12 @@ public class ReportRequestService extends HubResponseService {
 
     private final long timeoutInMilliseconds;
 
-    public ReportRequestService(final RestConnection restConnection, final IntLogger logger, final MetaService metaService) {
-        this(restConnection, logger, metaService, DEFAULT_TIMEOUT);
+    public ReportRequestService(final RestConnection restConnection, final IntLogger logger) {
+        this(restConnection, logger, DEFAULT_TIMEOUT);
     }
 
-    public ReportRequestService(final RestConnection restConnection, final IntLogger logger, final MetaService metaService, final long timeoutInMilliseconds) {
-        super(restConnection, metaService);
+    public ReportRequestService(final RestConnection restConnection, final IntLogger logger, final long timeoutInMilliseconds) {
+        super(restConnection);
         this.logger = logger;
 
         long timeout = timeoutInMilliseconds;

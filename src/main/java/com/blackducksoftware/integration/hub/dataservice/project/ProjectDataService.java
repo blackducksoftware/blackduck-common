@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentRequestService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
@@ -50,9 +49,9 @@ public class ProjectDataService extends HubResponseService {
     private final ProjectVersionRequestService projectVersionRequestService;
     private final ProjectAssignmentRequestService projectAssignmentRequestService;
 
-    public ProjectDataService(final RestConnection restConnection, final MetaService metaService, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
+    public ProjectDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
             final ProjectAssignmentRequestService projectAssignmentRequestService) {
-        super(restConnection, metaService);
+        super(restConnection);
         this.logger = restConnection.logger;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
