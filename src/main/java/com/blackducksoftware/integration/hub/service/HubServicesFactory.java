@@ -37,6 +37,7 @@ import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationReques
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
+import com.blackducksoftware.integration.hub.api.group.GroupRequestService;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.matchedfiles.MatchedFilesRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
@@ -188,6 +189,10 @@ public class HubServicesFactory {
 
     public UserRequestService createUserRequestService() {
         return new UserRequestService(restConnection);
+    }
+
+    public GroupRequestService createGroupRequestService() {
+        return new GroupRequestService(restConnection);
     }
 
     public VulnerabilityRequestService createVulnerabilityRequestService() {
