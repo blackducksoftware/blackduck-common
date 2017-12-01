@@ -52,8 +52,7 @@ public class UserDataService extends HubResponseService {
 
     public List<ProjectView> getProjectsForUser(final UserView user) throws IntegrationException {
         logger.debug("Attempting to get the assigned projects for User: " + user.userName);
-        final String userProjectsLink = metaService.getFirstLink(user, MetaService.PROJECTS_LINK);
-        return userRequestService.getUserProjects(userProjectsLink);
+        return userRequestService.getUserProjects(user);
     }
 
     public List<RoleView> getRolesForUser(final String userName) throws IntegrationException {
@@ -62,8 +61,7 @@ public class UserDataService extends HubResponseService {
     }
 
     public List<RoleView> getRolesForUser(final UserView userView) throws IntegrationException {
-        final String userRolesLink = metaService.getFirstLink(userView, MetaService.ROLES_LINK);
-        return userRequestService.getUserRoles(userRolesLink);
+        return userRequestService.getUserRoles(userView);
     }
 
 }

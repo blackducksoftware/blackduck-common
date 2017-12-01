@@ -31,6 +31,7 @@ import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
+import com.blackducksoftware.integration.hub.model.view.AssignedGroupView;
 import com.blackducksoftware.integration.hub.model.view.AssignedUserView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
@@ -93,8 +94,22 @@ public class ProjectDataService {
 
     public List<AssignedUserView> getAssignedUsersToProject(final String projectName) throws IntegrationException {
         final ProjectView project = projectRequestService.getProjectByName(projectName);
+        return getAssignedUsersToProject(project);
+    }
+
+    public List<AssignedUserView> getAssignedUsersToProject(final ProjectView project) throws IntegrationException {
         final List<AssignedUserView> assignedUsers = projectAssignmentRequestService.getProjectUsers(project);
         return assignedUsers;
+    }
+
+    public List<AssignedGroupView> getAssignedGroupsToProject(final String projectName) throws IntegrationException {
+        final ProjectView project = projectRequestService.getProjectByName(projectName);
+        return getAssignedGroupsToProject(project);
+    }
+
+    public List<AssignedGroupView> getAssignedGroupsToProject(final ProjectView project) throws IntegrationException {
+        final List<AssignedGroupView> assignedGroups = projectAssignmentRequestService.getProjectGroups(project);
+        return assignedGroups;
     }
 
 }

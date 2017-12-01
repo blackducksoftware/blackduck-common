@@ -78,6 +78,8 @@ public class MetaService {
 
     public static final String USERS_LINK = "users";
 
+    public static final String GROUPS_LINK = "usergroups";
+
     public static final String GLOBAL_OPTIONS_LINK = "global-options";
 
     public static final String USER_OPTIONS_LINK = "user-options";

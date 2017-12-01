@@ -62,8 +62,8 @@ public class UserRequestService extends HubResponseService {
         throw new DoesNotExistException("This User does not exist. UserName : " + userName);
     }
 
-    public List<ProjectView> getUserProjects(final String userProjectsLink) throws IntegrationException {
-        final List<AssignedProjectView> assignedProjectViews = getAllItems(userProjectsLink, AssignedProjectView.class);
+    public List<ProjectView> getUserProjects(final UserView userView) throws IntegrationException {
+        final List<AssignedProjectView> assignedProjectViews = getAllItemsFromLink(userView, MetaService.PROJECTS_LINK, AssignedProjectView.class);
 
         final List<ProjectView> resolvedProjectViews = new ArrayList<>();
         for (final AssignedProjectView assigned : assignedProjectViews) {
@@ -76,8 +76,8 @@ public class UserRequestService extends HubResponseService {
         return resolvedProjectViews;
     }
 
-    public List<RoleView> getUserRoles(final String userRolesLink) throws IntegrationException {
-        final List<RoleView> assignedRoles = this.getAllItems(userRolesLink, RoleView.class);
+    public List<RoleView> getUserRoles(final UserView userView) throws IntegrationException {
+        final List<RoleView> assignedRoles = this.getAllItemsFromLink(userView, MetaService.ROLES_LINK, RoleView.class);
         return assignedRoles;
     }
 }
