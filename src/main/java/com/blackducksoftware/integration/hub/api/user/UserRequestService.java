@@ -23,10 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.api.user;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_USERS;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -39,8 +37,6 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class UserRequestService extends HubResponseService {
-    private static final List<String> USERS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_USERS);
-
     public UserRequestService(final RestConnection restConnection) {
         super(restConnection);
     }

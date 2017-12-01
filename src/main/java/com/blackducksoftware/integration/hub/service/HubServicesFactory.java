@@ -272,7 +272,7 @@ public class HubServicesFactory {
     }
 
     public UserDataService createUserDataService() {
-        return new UserDataService(restConnection, createProjectRequestService(), createUserRequestService());
+        return new UserDataService(restConnection.logger, createProjectRequestService(), createUserRequestService());
     }
 
     @Override

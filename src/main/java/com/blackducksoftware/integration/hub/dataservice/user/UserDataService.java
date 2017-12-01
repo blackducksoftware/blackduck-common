@@ -33,19 +33,16 @@ import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.RoleView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class UserDataService extends HubResponseService {
+public class UserDataService {
     private final IntLogger logger;
     private final UserRequestService userRequestService;
 
     ProjectRequestService projectRequestService;
 
-    public UserDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService, final UserRequestService userRequestService) {
-        super(restConnection);
-        this.logger = restConnection.logger;
+    public UserDataService(final IntLogger logger, final ProjectRequestService projectRequestService, final UserRequestService userRequestService) {
+        this.logger = logger;
         this.projectRequestService = projectRequestService;
         this.userRequestService = userRequestService;
     }
@@ -61,7 +58,7 @@ public class UserDataService extends HubResponseService {
 
         final List<ProjectView> resolvedProjectViews = new ArrayList<>();
         for (final AssignedProjectView assigned : assignedProjectViews) {
-            final ProjectView project = getItem(assigned.projectUrl, ProjectView.class);
+            final ProjectView project = projectRequestService.getItem(assigned.projectUrl, ProjectView.class);
             if (project != null) {
                 resolvedProjectViews.add(project);
             }
