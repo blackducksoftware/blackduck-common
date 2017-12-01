@@ -134,7 +134,15 @@ public class RestConnectionTestHelper {
     }
 
     public HubServicesFactory createHubServicesFactory(final LogLevel logLevel) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        return createHubServicesFactory(new PrintStreamIntLogger(System.out, logLevel));
+        return createHubServicesFactory(createIntLogger(logLevel));
+    }
+
+    public IntLogger createIntLogger() {
+        return new PrintStreamIntLogger(System.out, LogLevel.TRACE);
+    }
+
+    public IntLogger createIntLogger(final LogLevel logLevel) {
+        return new PrintStreamIntLogger(System.out, logLevel);
     }
 
     public HubServicesFactory createHubServicesFactory(final IntLogger logger) throws IllegalArgumentException, EncryptionException, HubIntegrationException {

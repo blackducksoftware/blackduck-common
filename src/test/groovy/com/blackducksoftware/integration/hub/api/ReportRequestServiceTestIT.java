@@ -77,7 +77,7 @@ public class ReportRequestServiceTestIT {
             assertNotNull(report.getAggregateBomViewEntries());
             assertTrue(!report.getAggregateBomViewEntries().isEmpty());
         } finally {
-            final MetaService metaService = hubServicesFactory.createMetaService();
+            final MetaService metaService = new MetaService(restConnectionTestHelper.createIntLogger());
             final HubRequest hubRequest = projectService.getHubRequestFactory().createRequest(metaService.getHref(project));
             hubRequest.executeDelete();
         }
