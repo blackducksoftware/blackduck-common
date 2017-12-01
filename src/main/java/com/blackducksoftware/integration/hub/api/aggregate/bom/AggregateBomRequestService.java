@@ -23,39 +23,27 @@
  */
 package com.blackducksoftware.integration.hub.api.aggregate.bom;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class AggregateBomRequestService extends HubResponseService {
-    private final MetaService metaService;
 
     public AggregateBomRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection);
-        this.metaService = metaService;
+        super(restConnection, metaService);
     }
 
     public List<VersionBomComponentView> getBomEntries(final ProjectVersionView projectVersion) throws IntegrationException {
-        if (metaService.hasLink(projectVersion, MetaService.COMPONENTS_LINK)) {
-            final String componentURL = metaService.getFirstLink(projectVersion, MetaService.COMPONENTS_LINK);
-            return getBomEntries(componentURL);
-        } else {
-            // In some versions of the Hub, if the BOM is empty the version will not have the components link
-            return new ArrayList<>();
-        }
+        return getAllItemsFromLinkSafely(projectVersion, MetaService.COMPONENTS_LINK, VersionBomComponentView.class);
     }
 
     public List<VersionBomComponentView> getBomEntries(final String componentsUrl) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(componentsUrl);
-        final List<VersionBomComponentView> allComponentItems = getAllItems(hubPagedRequest, VersionBomComponentView.class);
-        return allComponentItems;
+        return getAllItems(componentsUrl, VersionBomComponentView.class);
     }
 
 }

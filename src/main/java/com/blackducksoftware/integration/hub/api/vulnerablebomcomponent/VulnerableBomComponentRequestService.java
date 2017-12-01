@@ -26,27 +26,24 @@ package com.blackducksoftware.integration.hub.api.vulnerablebomcomponent;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.model.view.VulnerableComponentView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class VulnerableBomComponentRequestService extends HubResponseService {
-    public VulnerableBomComponentRequestService(final RestConnection restConnection) {
-        super(restConnection);
+    public VulnerableBomComponentRequestService(final RestConnection restConnection, final MetaService metaService) {
+        super(restConnection, metaService);
     }
 
     public List<VulnerableComponentView> getVulnerableComponentsMatchingComponentName(final String vulnerableBomComponentsUrl, final String componentName) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(vulnerableBomComponentsUrl, componentName);
-
-        final List<VulnerableComponentView> allItems = getAllItems(hubPagedRequest, VulnerableComponentView.class);
+        final List<VulnerableComponentView> allItems = getAllItems(vulnerableBomComponentsUrl, VulnerableComponentView.class);
         return allItems;
     }
 
     public List<VulnerableComponentView> getVulnerableComponentsMatchingComponentName(final String vulnerableBomComponentsUrl) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(vulnerableBomComponentsUrl);
-
-        final List<VulnerableComponentView> allItems = getAllItems(hubPagedRequest, VulnerableComponentView.class);
+        final List<VulnerableComponentView> allItems = getAllItems(vulnerableBomComponentsUrl, VulnerableComponentView.class);
         return allItems;
     }
 

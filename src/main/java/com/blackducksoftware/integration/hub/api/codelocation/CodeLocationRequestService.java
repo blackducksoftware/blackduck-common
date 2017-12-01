@@ -48,32 +48,22 @@ import okhttp3.Response;
 public class CodeLocationRequestService extends HubResponseService {
     private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
 
-    private final MetaService metaService;
-
     public CodeLocationRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection);
-        this.metaService = metaService;
+        super(restConnection, metaService);
     }
 
     public List<CodeLocationView> getAllCodeLocations() throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(CODE_LOCATION_SEGMENTS);
-        final List<CodeLocationView> allCodeLocations = getAllItems(hubPagedRequest, CodeLocationView.class);
-        return allCodeLocations;
+        return getAllItemsFromApi(SEGMENT_CODE_LOCATIONS, CodeLocationView.class);
     }
 
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationEnum codeLocationType) throws IntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType", codeLocationType.toString());
-
         final List<CodeLocationView> allCodeLocations = getAllItems(hubPagedRequest, CodeLocationView.class);
         return allCodeLocations;
     }
 
     public List<CodeLocationView> getAllCodeLocationsForProjectVersion(final ProjectVersionView version) throws IntegrationException {
-        final String codeLocationUrl = metaService.getFirstLink(version, MetaService.CODE_LOCATION_LINK);
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(codeLocationUrl);
-
-        final List<CodeLocationView> allCodeLocations = getAllItems(hubPagedRequest, CodeLocationView.class);
-        return allCodeLocations;
+        return getAllItemsFromLink(version, MetaService.CODE_LOCATION_LINK, CodeLocationView.class);
     }
 
     public void unmapCodeLocations(final List<CodeLocationView> codeLocationItems) throws IntegrationException {

@@ -34,11 +34,8 @@ import okhttp3.Response;
 
 public class BomComponentIssueRequestService extends HubResponseService {
 
-    private final MetaService metaService;
-
     public BomComponentIssueRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection);
-        this.metaService = metaService;
+        super(restConnection, metaService);
     }
 
     public String createIssue(final IssueView issueItem, final String url) throws IntegrationException {

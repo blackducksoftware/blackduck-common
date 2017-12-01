@@ -53,15 +53,11 @@ public class ExtensionConfigDataService extends HubResponseService {
 
     private final ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor;
 
-    private final MetaService metaService;
-
-    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserRequestService userRequestService,
-            final ExtensionConfigRequestService extensionConfigRequestService,
+    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserRequestService userRequestService, final ExtensionConfigRequestService extensionConfigRequestService,
             final ExtensionUserOptionRequestService extensionUserOptionRequestService, final MetaService metaService) {
-        super(restConnection);
+        super(restConnection, metaService);
         this.extensionConfigRequestService = extensionConfigRequestService;
         this.extensionUserOptionRequestService = extensionUserOptionRequestService;
-        this.metaService = metaService;
         userConfigTransform = new UserConfigTransform(userRequestService, extensionConfigRequestService);
         parallelProcessor = new ParallelResourceProcessor<>(logger);
         parallelProcessor.addTransform(ExternalExtensionUserView.class, userConfigTransform);
@@ -80,8 +76,7 @@ public class ExtensionConfigDataService extends HubResponseService {
 
         final ExternalExtensionView extension = getItem(extensionUrl, ExternalExtensionView.class);
         final String userOptionsLink = metaService.getFirstLink(extension, MetaService.USER_OPTIONS_LINK);
-        final List<ExternalExtensionUserView> userOptionList = extensionUserOptionRequestService
-                .getUserOptions(userOptionsLink);
+        final List<ExternalExtensionUserView> userOptionList = extensionUserOptionRequestService.getUserOptions(userOptionsLink);
         final ParallelResourceProcessorResults<UserConfigItem> itemList = parallelProcessor.process(userOptionList);
         return itemList;
     }

@@ -23,16 +23,22 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
+
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.HubResponse;
+import com.blackducksoftware.integration.hub.model.HubView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
@@ -50,12 +56,14 @@ public class HubResponseService {
     private final URL hubBaseUrl;
     private final JsonParser jsonParser;
     private final Gson gson;
+    protected final MetaService metaService;
 
-    public HubResponseService(final RestConnection restConnection) {
+    public HubResponseService(final RestConnection restConnection, final MetaService metaService) {
         this.hubRequestFactory = new HubRequestFactory(restConnection);
         this.hubBaseUrl = restConnection.hubBaseUrl;
         this.jsonParser = restConnection.jsonParser;
         this.gson = restConnection.gson;
+        this.metaService = metaService;
     }
 
     public URL getHubBaseUrl() {
@@ -72,6 +80,44 @@ public class HubResponseService {
 
     public Gson getGson() {
         return gson;
+    }
+
+    public <T extends HubResponse> List<T> getAllItemsFromApi(final String apiSegment, final Class<T> clazz) throws IntegrationException {
+        return getAllItemsFromApi(apiSegment, clazz, 100);
+    }
+
+    public <T extends HubResponse> List<T> getAllItemsFromApi(final String apiSegment, final Class<T> clazz, final int itemsPerPage) throws IntegrationException {
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(itemsPerPage, Arrays.asList(SEGMENT_API, apiSegment));
+        final List<T> allItems = getAllItems(hubPagedRequest, clazz);
+        return allItems;
+    }
+
+    public <T extends HubResponse> List<T> getAllItemsFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
+        final String link = metaService.getFirstLink(hubView, metaLinkRef);
+        final List<T> allItems = getAllItems(link, clazz);
+        return allItems;
+    }
+
+    public <T extends HubResponse> List<T> getAllItemsFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
+        if (metaService.hasLink(hubView, metaLinkRef)) {
+            return getAllItemsFromLink(hubView, metaLinkRef, clazz);
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    public <T extends HubResponse> T getItemFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
+        final String link = metaService.getFirstLink(hubView, metaLinkRef);
+        final T item = getItem(link, clazz);
+        return item;
+    }
+
+    public <T extends HubResponse> T getItemFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
+        if (metaService.hasLink(hubView, metaLinkRef)) {
+            return getItemFromLink(hubView, metaLinkRef, clazz);
+        } else {
+            return null;
+        }
     }
 
     public <T extends HubResponse> T getItemAs(final JsonElement item, final Class<T> clazz) {

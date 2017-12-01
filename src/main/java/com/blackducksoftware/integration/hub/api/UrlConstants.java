@@ -55,6 +55,8 @@ public class UrlConstants {
 
     public static final String SEGMENT_PROJECTS = "projects";
 
+    public static final String SEGMENT_GROUPS = "usergroups";
+
     public static final String SEGMENT_USERS = "users";
 
     public static final String SEGMENT_SCANS = "scans";

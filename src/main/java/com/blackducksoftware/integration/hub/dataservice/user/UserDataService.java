@@ -38,13 +38,11 @@ import com.blackducksoftware.integration.log.IntLogger;
 public class UserDataService extends HubResponseService {
     private final IntLogger logger;
     private final UserRequestService userRequestService;
-    private final MetaService metaService;
 
     public UserDataService(final RestConnection restConnection, final UserRequestService userRequestService, final MetaService metaService) {
-        super(restConnection);
+        super(restConnection, metaService);
         this.logger = restConnection.logger;
         this.userRequestService = userRequestService;
-        this.metaService = metaService;
     }
 
     public List<ProjectView> getProjectsForUser(final String userName) throws IntegrationException {

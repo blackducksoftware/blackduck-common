@@ -33,16 +33,13 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class ProjectAssignmentRequestService extends HubResponseService {
-    private final MetaService metaService;
 
     public ProjectAssignmentRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection);
-        this.metaService = metaService;
+        super(restConnection, metaService);
     }
 
     public List<AssignedUserView> getProjectUsers(final ProjectView projectView) throws IntegrationException {
-        final String assignedUsersUrl = metaService.getFirstLink(projectView, MetaService.USERS_LINK);
-        return getProjectUsers(assignedUsersUrl);
+        return getAllItemsFromLink(projectView, MetaService.USERS_LINK, AssignedUserView.class);
     }
 
     public List<AssignedUserView> getProjectUsers(final String projectUsersUrl) throws IntegrationException {

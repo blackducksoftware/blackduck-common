@@ -31,25 +31,24 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.RoleView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class UserRequestService extends HubResponseService {
     private static final List<String> USERS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_USERS);
 
-    public UserRequestService(final RestConnection restConnection) {
-        super(restConnection);
+    public UserRequestService(final RestConnection restConnection, final MetaService metaService) {
+        super(restConnection, metaService);
     }
 
     public List<UserView> getAllUsers() throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, USERS_SEGMENTS);
-        final List<UserView> allUserItems = getAllItems(hubPagedRequest, UserView.class);
+        final List<UserView> allUserItems = getAllItemsFromApi(SEGMENT_USERS, UserView.class);
         return allUserItems;
     }
 

@@ -147,11 +147,11 @@ public class HubServicesFactory {
     }
 
     public BomImportRequestService createBomImportRequestService() {
-        return new BomImportRequestService(restConnection);
+        return new BomImportRequestService(restConnection, createMetaService());
     }
 
     public DryRunUploadRequestService createDryRunUploadRequestService() {
-        return new DryRunUploadRequestService(restConnection);
+        return new DryRunUploadRequestService(restConnection, createMetaService());
     }
 
     public CodeLocationRequestService createCodeLocationRequestService() {
@@ -159,11 +159,11 @@ public class HubServicesFactory {
     }
 
     public ComponentRequestService createComponentRequestService() {
-        return new ComponentRequestService(restConnection);
+        return new ComponentRequestService(restConnection, createMetaService());
     }
 
     public HubVersionRequestService createHubVersionRequestService() {
-        return new HubVersionRequestService(restConnection);
+        return new HubVersionRequestService(restConnection, createMetaService());
     }
 
     public NotificationRequestService createNotificationRequestService() {
@@ -171,7 +171,7 @@ public class HubServicesFactory {
     }
 
     public PolicyRequestService createPolicyRequestService() {
-        return new PolicyRequestService(restConnection);
+        return new PolicyRequestService(restConnection, createMetaService());
     }
 
     public ProjectRequestService createProjectRequestService() {
@@ -183,31 +183,31 @@ public class HubServicesFactory {
     }
 
     public ScanSummaryRequestService createScanSummaryRequestService() {
-        return new ScanSummaryRequestService(restConnection);
+        return new ScanSummaryRequestService(restConnection, createMetaService());
     }
 
     public UserRequestService createUserRequestService() {
-        return new UserRequestService(restConnection);
+        return new UserRequestService(restConnection, createMetaService());
     }
 
     public VulnerabilityRequestService createVulnerabilityRequestService() {
-        return new VulnerabilityRequestService(restConnection);
+        return new VulnerabilityRequestService(restConnection, createMetaService());
     }
 
     public ExtensionConfigRequestService createExtensionConfigRequestService() {
-        return new ExtensionConfigRequestService(restConnection);
+        return new ExtensionConfigRequestService(restConnection, createMetaService());
     }
 
     public ExtensionUserOptionRequestService createExtensionUserOptionRequestService() {
-        return new ExtensionUserOptionRequestService(restConnection);
+        return new ExtensionUserOptionRequestService(restConnection, createMetaService());
     }
 
     public VulnerableBomComponentRequestService createVulnerableBomComponentRequestService() {
-        return new VulnerableBomComponentRequestService(restConnection);
+        return new VulnerableBomComponentRequestService(restConnection, createMetaService());
     }
 
     public MatchedFilesRequestService createMatchedFilesRequestService() {
-        return new MatchedFilesRequestService(restConnection);
+        return new MatchedFilesRequestService(restConnection, createMetaService());
     }
 
     public CLIDownloadService createCliDownloadService() {
@@ -224,7 +224,7 @@ public class HubServicesFactory {
     }
 
     public HubRegistrationRequestService createHubRegistrationRequestService() {
-        return new HubRegistrationRequestService(restConnection);
+        return new HubRegistrationRequestService(restConnection, createMetaService());
     }
 
     public ReportRequestService createReportRequestService(final long timeoutInMilliseconds) {
@@ -240,7 +240,7 @@ public class HubServicesFactory {
     }
 
     public HubResponseService createHubResponseService() {
-        return new HubResponseService(restConnection);
+        return new HubResponseService(restConnection, createMetaService());
     }
 
     public ProjectAssignmentRequestService createProjectAssignmentRequestService() {

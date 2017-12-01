@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
@@ -39,12 +40,11 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 public class ComponentRequestService extends HubResponseService {
     private static final List<String> COMPONENT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_COMPONENTS);
 
-    public ComponentRequestService(final RestConnection restConnection) {
-        super(restConnection);
+    public ComponentRequestService(final RestConnection restConnection, final MetaService metaService) {
+        super(restConnection, metaService);
     }
 
-    public List<ComponentSearchResultResponse> getAllComponents(final String namespace, final String groupId, final String artifactId, final String version)
-            throws IntegrationException {
+    public List<ComponentSearchResultResponse> getAllComponents(final String namespace, final String groupId, final String artifactId, final String version) throws IntegrationException {
         final String componentQuery = String.format("id:%s|%s|%s|%s", namespace, groupId, artifactId, version);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(COMPONENT_SEGMENTS, componentQuery);
 
@@ -52,8 +52,7 @@ public class ComponentRequestService extends HubResponseService {
         return allComponents;
     }
 
-    public ComponentSearchResultResponse getExactComponentMatch(final String namespace, final String groupId, final String artifactId, final String version)
-            throws IntegrationException {
+    public ComponentSearchResultResponse getExactComponentMatch(final String namespace, final String groupId, final String artifactId, final String version) throws IntegrationException {
         final List<ComponentSearchResultResponse> allComponents = getAllComponents(namespace, groupId, artifactId, version);
         for (final ComponentSearchResultResponse componentItem : allComponents) {
             if (componentItem.originId != null) {

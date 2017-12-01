@@ -26,20 +26,18 @@ package com.blackducksoftware.integration.hub.api.matchedfiles;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.model.view.MatchedFilesView;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class MatchedFilesRequestService extends HubResponseService {
-    public MatchedFilesRequestService(final RestConnection restConnection) {
-        super(restConnection);
+    public MatchedFilesRequestService(final RestConnection restConnection, final MetaService metaService) {
+        super(restConnection, metaService);
     }
 
     public List<MatchedFilesView> getMatchedFiles(final String matchedFilesUrl) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(matchedFilesUrl);
-
-        final List<MatchedFilesView> allItems = getAllItems(hubPagedRequest, MatchedFilesView.class);
+        final List<MatchedFilesView> allItems = getAllItems(matchedFilesUrl, MatchedFilesView.class);
         return allItems;
     }
 }

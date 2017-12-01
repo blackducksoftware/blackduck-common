@@ -35,6 +35,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -45,8 +46,8 @@ import okhttp3.Response;
 public class BomImportRequestService extends HubResponseService {
     private static final List<String> BOM_IMPORT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_BOM_IMPORT);
 
-    public BomImportRequestService(final RestConnection restConnection) {
-        super(restConnection);
+    public BomImportRequestService(final RestConnection restConnection, final MetaService metaService) {
+        super(restConnection, metaService);
     }
 
     public void importBomFile(final File file) throws IntegrationException {

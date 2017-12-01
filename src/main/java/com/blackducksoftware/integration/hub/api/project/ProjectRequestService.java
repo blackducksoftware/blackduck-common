@@ -46,25 +46,20 @@ import okhttp3.Response;
 public class ProjectRequestService extends HubResponseService {
     private static final List<String> PROJECTS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS);
 
-    private final MetaService metaService;
-
     public ProjectRequestService(final RestConnection restConnection, final MetaService metaService) {
-        super(restConnection);
-        this.metaService = metaService;
+        super(restConnection, metaService);
     }
 
     public List<ProjectView> getAllProjects() throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(PROJECTS_SEGMENTS);
-        final List<ProjectView> allProjectItems = getAllItems(hubPagedRequest, ProjectView.class);
+        final List<ProjectView> allProjectItems = getAllItemsFromApi(SEGMENT_PROJECTS, ProjectView.class);
         return allProjectItems;
     }
 
     public List<ProjectView> getAllProjectMatches(final String projectName) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, PROJECTS_SEGMENTS);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(PROJECTS_SEGMENTS);
         if (StringUtils.isNotBlank(projectName)) {
             hubPagedRequest.q = "name:" + projectName;
         }
-
         final List<ProjectView> allProjectItems = getAllItems(hubPagedRequest, ProjectView.class);
         return allProjectItems;
     }

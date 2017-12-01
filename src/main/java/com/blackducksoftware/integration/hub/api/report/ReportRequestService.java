@@ -50,8 +50,6 @@ public class ReportRequestService extends HubResponseService {
 
     private final IntLogger logger;
 
-    private final MetaService metaService;
-
     private final long timeoutInMilliseconds;
 
     public ReportRequestService(final RestConnection restConnection, final IntLogger logger, final MetaService metaService) {
@@ -59,9 +57,8 @@ public class ReportRequestService extends HubResponseService {
     }
 
     public ReportRequestService(final RestConnection restConnection, final IntLogger logger, final MetaService metaService, final long timeoutInMilliseconds) {
-        super(restConnection);
+        super(restConnection, metaService);
         this.logger = logger;
-        this.metaService = metaService;
 
         long timeout = timeoutInMilliseconds;
         if (timeoutInMilliseconds <= 0l) {
