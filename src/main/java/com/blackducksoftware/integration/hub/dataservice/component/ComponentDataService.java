@@ -41,21 +41,16 @@ import com.blackducksoftware.integration.log.IntLogger;
 public class ComponentDataService {
 
     private final ComponentRequestService componentRequestService;
-
+    private final IntLogger logger;
     private final MetaService metaService;
 
-    private final IntLogger logger;
-
-    public ComponentDataService(final IntLogger logger,
-            final ComponentRequestService componentRequestService, final MetaService metaService) {
+    public ComponentDataService(final IntLogger logger, final ComponentRequestService componentRequestService) {
         this.logger = logger;
         this.componentRequestService = componentRequestService;
-        this.metaService = metaService;
+        this.metaService = new MetaService(logger);
     }
 
-    public ComponentVersionView getExactComponentVersionFromComponent(final String namespace, final String groupId, final String artifactId,
-            final String version)
-            throws IntegrationException {
+    public ComponentVersionView getExactComponentVersionFromComponent(final String namespace, final String groupId, final String artifactId, final String version) throws IntegrationException {
         for (final ComponentVersionView componentVersion : this.getAllComponentVersionsFromComponent(namespace, groupId, artifactId, version)) {
             if (componentVersion.versionName.equals(version)) {
                 return componentVersion;
@@ -66,9 +61,7 @@ public class ComponentDataService {
         throw new HubIntegrationException(errMsg);
     }
 
-    public List<ComponentVersionView> getAllComponentVersionsFromComponent(final String namespace, final String groupId, final String artifactId,
-            final String version)
-            throws IntegrationException {
+    public List<ComponentVersionView> getAllComponentVersionsFromComponent(final String namespace, final String groupId, final String artifactId, final String version) throws IntegrationException {
         final ComponentSearchResultResponse componentResponse = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
 
         final ComponentView componentItem = componentRequestService.getItem(componentResponse.component, ComponentView.class);

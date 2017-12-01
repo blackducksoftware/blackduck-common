@@ -69,8 +69,7 @@ public class HubVersionRequestService extends HubResponseService {
     }
 
     public VersionComparison getHubVersionComparison(final String consumerVersion) throws IntegrationException {
-        final HubRequest hubVersionRequest = getHubRequestFactory().createRequest(CURRENT_VERSION_COMPARISON_SEGMENTS).addQueryParameter(QUERY_VERSION,
-                consumerVersion);
+        final HubRequest hubVersionRequest = getHubRequestFactory().createRequest(CURRENT_VERSION_COMPARISON_SEGMENTS).addQueryParameter(QUERY_VERSION, consumerVersion);
         Response response = null;
         try {
             response = hubVersionRequest.executeGet();

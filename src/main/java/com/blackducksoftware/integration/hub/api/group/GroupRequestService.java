@@ -21,29 +21,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.aggregate.bom;
+package com.blackducksoftware.integration.hub.api.group;
+
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_GROUPS;
 
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
+import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
+import com.blackducksoftware.integration.hub.model.view.UserGroupView;
+import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
-public class AggregateBomRequestService extends HubResponseService {
-
-    public AggregateBomRequestService(final RestConnection restConnection) {
+public class GroupRequestService extends HubResponseService {
+    public GroupRequestService(final RestConnection restConnection) {
         super(restConnection);
     }
 
-    public List<VersionBomComponentView> getBomEntries(final ProjectVersionView projectVersion) throws IntegrationException {
-        return getAllItemsFromLinkSafely(projectVersion, MetaService.COMPONENTS_LINK, VersionBomComponentView.class);
+    public List<UserGroupView> getAllGroups() throws IntegrationException {
+        return getAllItemsFromApi(SEGMENT_GROUPS, UserGroupView.class);
     }
 
-    public List<VersionBomComponentView> getBomEntries(final String componentsUrl) throws IntegrationException {
-        return getAllItems(componentsUrl, VersionBomComponentView.class);
+    public UserGroupView getGroupByName(final String groupName) throws IntegrationException {
+        final List<UserGroupView> allGroups = getAllGroups();
+        for (final UserGroupView group : allGroups) {
+            if (group.name.equalsIgnoreCase(groupName)) {
+                return group;
+            }
+        }
+        throw new DoesNotExistException("This Group does not exist. Group name : " + groupName);
+    }
+
+    public List<UserView> getAllUsersForGroup(final UserGroupView userGroupView) throws IntegrationException {
+        return getAllItemsFromLink(userGroupView, MetaService.USERS_LINK, UserView.class);
     }
 
 }

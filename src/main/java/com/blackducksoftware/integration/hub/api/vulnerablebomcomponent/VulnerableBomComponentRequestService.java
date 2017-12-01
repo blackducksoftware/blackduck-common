@@ -37,16 +37,12 @@ public class VulnerableBomComponentRequestService extends HubResponseService {
     }
 
     public List<VulnerableComponentView> getVulnerableComponentsMatchingComponentName(final String vulnerableBomComponentsUrl, final String componentName) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(vulnerableBomComponentsUrl, componentName);
-
-        final List<VulnerableComponentView> allItems = getAllItems(hubPagedRequest, VulnerableComponentView.class);
+        final List<VulnerableComponentView> allItems = getAllItems(vulnerableBomComponentsUrl, VulnerableComponentView.class);
         return allItems;
     }
 
     public List<VulnerableComponentView> getVulnerableComponentsMatchingComponentName(final String vulnerableBomComponentsUrl) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(vulnerableBomComponentsUrl);
-
-        final List<VulnerableComponentView> allItems = getAllItems(hubPagedRequest, VulnerableComponentView.class);
+        final List<VulnerableComponentView> allItems = getAllItems(vulnerableBomComponentsUrl, VulnerableComponentView.class);
         return allItems;
     }
 

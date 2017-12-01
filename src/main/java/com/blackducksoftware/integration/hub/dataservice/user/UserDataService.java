@@ -27,21 +27,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
 import com.blackducksoftware.integration.hub.api.user.UserRequestService;
 import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.RoleView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.log.IntLogger;
 
-public class UserDataService {
-    UserRequestService userRequestService;
+public class UserDataService extends HubResponseService {
+    private final IntLogger logger;
+    private final UserRequestService userRequestService;
+
     ProjectRequestService projectRequestService;
-    MetaService metaService;
 
-    public UserDataService(final UserRequestService userRequestService, final ProjectRequestService projectRequestService, final MetaService metaService) {
-        this.metaService = metaService;
+    public UserDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService, final UserRequestService userRequestService) {
+        super(restConnection);
+        this.logger = restConnection.logger;
         this.projectRequestService = projectRequestService;
         this.userRequestService = userRequestService;
     }
@@ -51,18 +55,20 @@ public class UserDataService {
         return getProjectsForUser(user);
     }
 
-    public List<ProjectView> getProjectsForUser(final UserView user) throws IntegrationException {
-        final String userProjectsLink = metaService.getFirstLink(user, MetaService.PROJECTS_LINK);
-        final List<AssignedProjectView> assignedProjectViews = userRequestService.getUserAssignedProjects(userProjectsLink);
+    public List<ProjectView> getProjectsForUser(final UserView userView) throws IntegrationException {
+        logger.debug("Attempting to get the assigned projects for User: " + userView.userName);
+        final List<AssignedProjectView> assignedProjectViews = userRequestService.getUserAssignedProjects(userView);
+
         final List<ProjectView> resolvedProjectViews = new ArrayList<>();
         for (final AssignedProjectView assigned : assignedProjectViews) {
-            final ProjectView project = projectRequestService.getProjectByName(assigned.name);
+            final ProjectView project = getItem(assigned.projectUrl, ProjectView.class);
             if (project != null) {
                 resolvedProjectViews.add(project);
             }
         }
 
         return resolvedProjectViews;
+
     }
 
     public List<RoleView> getRolesForUser(final String userName) throws IntegrationException {
@@ -71,7 +77,6 @@ public class UserDataService {
     }
 
     public List<RoleView> getRolesForUser(final UserView userView) throws IntegrationException {
-        final String userRolesLink = metaService.getFirstLink(userView, MetaService.ROLES_LINK);
-        return userRequestService.getUserRoles(userRolesLink);
+        return userRequestService.getUserRoles(userView);
     }
 }

@@ -60,9 +60,9 @@ public class ScanStatusDataService {
     private final long timeoutInMilliseconds;
 
     public ScanStatusDataService(final IntLogger logger, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService, final CodeLocationRequestService codeLocationRequestService,
-            final ScanSummaryRequestService scanSummaryRequestService, final MetaService metaService, final long timeoutInMilliseconds) {
+            final ScanSummaryRequestService scanSummaryRequestService, final long timeoutInMilliseconds) {
         this.logger = logger;
-        this.metaService = metaService;
+        this.metaService = new MetaService(logger);
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.codeLocationRequestService = codeLocationRequestService;

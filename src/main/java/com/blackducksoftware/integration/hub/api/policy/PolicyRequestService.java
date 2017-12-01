@@ -23,29 +23,22 @@
  */
 package com.blackducksoftware.integration.hub.api.policy;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_POLICY_RULES;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class PolicyRequestService extends HubResponseService {
-    private static final List<String> POLICY_RULE_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_POLICY_RULES);
-
     public PolicyRequestService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public List<PolicyRuleView> getAllPolicyRules() throws IntegrationException {
-        final HubPagedRequest request = getHubRequestFactory().createPagedRequest(POLICY_RULE_SEGMENTS);
-
-        final List<PolicyRuleView> allPolicyRuleItems = getAllItems(request, PolicyRuleView.class);
+        final List<PolicyRuleView> allPolicyRuleItems = getAllItemsFromApi(SEGMENT_POLICY_RULES, PolicyRuleView.class);
         return allPolicyRuleItems;
     }
 }

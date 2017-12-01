@@ -41,11 +41,9 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 import okhttp3.Response;
 
 public class ProjectVersionRequestService extends HubResponseService {
-    private final MetaService metaService;
 
-    public ProjectVersionRequestService(final RestConnection restConnection, final MetaService metaService) {
+    public ProjectVersionRequestService(final RestConnection restConnection) {
         super(restConnection);
-        this.metaService = metaService;
     }
 
     public ProjectVersionView getProjectVersion(final ProjectView project, final String projectVersionName) throws IntegrationException {
@@ -66,8 +64,7 @@ public class ProjectVersionRequestService extends HubResponseService {
     }
 
     public List<ProjectVersionView> getAllProjectVersions(final ProjectView project) throws IntegrationException {
-        final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
-        return getAllProjectVersions(versionsUrl);
+        return getAllItemsFromLink(project, MetaService.VERSIONS_LINK, ProjectVersionView.class);
     }
 
     public List<ProjectVersionView> getAllProjectVersions(final String versionsUrl) throws IntegrationException {
@@ -75,13 +72,11 @@ public class ProjectVersionRequestService extends HubResponseService {
         return allProjectVersionItems;
     }
 
-    public String createHubVersion(final ProjectView project, final ProjectVersionRequest version)
-            throws IntegrationException {
+    public String createHubVersion(final ProjectView project, final ProjectVersionRequest version) throws IntegrationException {
         return createHubVersion(metaService.getFirstLink(project, MetaService.VERSIONS_LINK), version);
     }
 
-    public String createHubVersion(final String versionsUrl, final ProjectVersionRequest version)
-            throws IntegrationException {
+    public String createHubVersion(final String versionsUrl, final ProjectVersionRequest version) throws IntegrationException {
 
         final HubRequest hubRequest = getHubRequestFactory().createRequest(versionsUrl);
         Response response = null;

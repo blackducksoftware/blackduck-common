@@ -27,27 +27,24 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.model.view.AssignedGroupView;
 import com.blackducksoftware.integration.hub.model.view.AssignedUserView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class ProjectAssignmentRequestService extends HubResponseService {
-    private final MetaService metaService;
 
-    public ProjectAssignmentRequestService(final RestConnection restConnection, final MetaService metaService) {
+    public ProjectAssignmentRequestService(final RestConnection restConnection) {
         super(restConnection);
-        this.metaService = metaService;
     }
 
     public List<AssignedUserView> getProjectUsers(final ProjectView projectView) throws IntegrationException {
-        final String assignedUsersUrl = metaService.getFirstLink(projectView, MetaService.USERS_LINK);
-        return getProjectUsers(assignedUsersUrl);
+        return getAllItemsFromLink(projectView, MetaService.USERS_LINK, AssignedUserView.class);
     }
 
-    public List<AssignedUserView> getProjectUsers(final String projectUsersUrl) throws IntegrationException {
-        final List<AssignedUserView> allItems = getAllItems(projectUsersUrl, AssignedUserView.class);
-        return allItems;
+    public List<AssignedGroupView> getProjectGroups(final ProjectView projectView) throws IntegrationException {
+        return getAllItemsFromLink(projectView, MetaService.GROUPS_LINK, AssignedGroupView.class);
     }
 
 }

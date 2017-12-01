@@ -30,11 +30,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.item.MetaService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
 import com.blackducksoftware.integration.hub.model.view.RoleView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
 
@@ -46,8 +46,7 @@ public class UserRequestService extends HubResponseService {
     }
 
     public List<UserView> getAllUsers() throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, USERS_SEGMENTS);
-        final List<UserView> allUserItems = getAllItems(hubPagedRequest, UserView.class);
+        final List<UserView> allUserItems = getAllItemsFromApi(SEGMENT_USERS, UserView.class);
         return allUserItems;
     }
 
@@ -61,13 +60,13 @@ public class UserRequestService extends HubResponseService {
         throw new DoesNotExistException("This User does not exist. UserName : " + userName);
     }
 
-    public List<AssignedProjectView> getUserAssignedProjects(final String userProjectsLink) throws IntegrationException {
-        final List<AssignedProjectView> assignedProjectViews = getAllItems(userProjectsLink, AssignedProjectView.class);
+    public List<AssignedProjectView> getUserAssignedProjects(final UserView userView) throws IntegrationException {
+        final List<AssignedProjectView> assignedProjectViews = getAllItemsFromLink(userView, MetaService.PROJECTS_LINK, AssignedProjectView.class);
         return assignedProjectViews;
     }
 
-    public List<RoleView> getUserRoles(final String userRolesLink) throws IntegrationException {
-        final List<RoleView> assignedRoles = this.getAllItems(userRolesLink, RoleView.class);
+    public List<RoleView> getUserRoles(final UserView userView) throws IntegrationException {
+        final List<RoleView> assignedRoles = this.getAllItemsFromLink(userView, MetaService.ROLES_LINK, RoleView.class);
         return assignedRoles;
     }
 }

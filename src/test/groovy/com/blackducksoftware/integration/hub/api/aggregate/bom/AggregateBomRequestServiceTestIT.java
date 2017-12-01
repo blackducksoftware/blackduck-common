@@ -54,7 +54,7 @@ public class AggregateBomRequestServiceTestIT {
     @Test
     public void testGetBomEntriesForUrl() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServices = restConnectionTestHelper.createHubServicesFactory();
-        final MetaService metaService = hubServices.createMetaService();
+        final MetaService metaService = new MetaService(restConnectionTestHelper.createIntLogger());
         final AggregateBomRequestService bomRequestService = hubServices.createAggregateBomRequestService();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");

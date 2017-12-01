@@ -80,7 +80,7 @@ public class CLIDataService {
 
     public CLIDataService(final IntLogger logger, final Gson gson, final CIEnvironmentVariables ciEnvironmentVariables, final HubVersionRequestService hubVersionRequestService, final CLIDownloadService cliDownloadService,
             final PhoneHomeDataService phoneHomeDataService, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService, final CodeLocationRequestService codeLocationRequestService,
-            final ScanSummaryRequestService scanSummaryRequestService, final ScanStatusDataService scanStatusDataService, final MetaService metaService) {
+            final ScanSummaryRequestService scanSummaryRequestService, final ScanStatusDataService scanStatusDataService) {
         this.gson = gson;
         this.logger = logger;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
@@ -92,7 +92,7 @@ public class CLIDataService {
         this.codeLocationRequestService = codeLocationRequestService;
         this.scanSummaryRequestService = scanSummaryRequestService;
         this.scanStatusDataService = scanStatusDataService;
-        this.metaService = metaService;
+        this.metaService = new MetaService(logger);
     }
 
     public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished,

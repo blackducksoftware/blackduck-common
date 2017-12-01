@@ -41,18 +41,13 @@ public class PolicyStatusDataService extends HubResponseService {
 
     private final ProjectVersionRequestService projectVersionRequestService;
 
-    private final MetaService metaService;
-
-    public PolicyStatusDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService,
-            final ProjectVersionRequestService projectVersionRequestService, final MetaService metaService) {
+    public PolicyStatusDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService) {
         super(restConnection);
-        this.metaService = metaService;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
     }
 
-    public VersionBomPolicyStatusView getPolicyStatusForProjectAndVersion(final String projectName,
-            final String projectVersionName) throws IntegrationException {
+    public VersionBomPolicyStatusView getPolicyStatusForProjectAndVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = projectRequestService.getProjectByName(projectName);
         final String versionsUrl = metaService.getFirstLink(projectItem, MetaService.VERSIONS_LINK);
 
@@ -67,8 +62,7 @@ public class PolicyStatusDataService extends HubResponseService {
         return getItem(policyStatusUrl, VersionBomPolicyStatusView.class);
     }
 
-    private String findPolicyStatusUrlFromVersions(final List<ProjectVersionView> projectVersions, final String projectVersionName)
-            throws HubIntegrationException {
+    private String findPolicyStatusUrlFromVersions(final List<ProjectVersionView> projectVersions, final String projectVersionName) throws HubIntegrationException {
         for (final ProjectVersionView version : projectVersions) {
             if (projectVersionName.equals(version.versionName)) {
                 final String policyStatusLink = metaService.getFirstLink(version, MetaService.POLICY_STATUS_LINK);
