@@ -70,7 +70,7 @@ public class PhoneHomeDataService {
             final PhoneHomeRequestBody phoneHomeRequestBody = phoneHomeRequestBodyBuilder.build();
             phoneHome(phoneHomeRequestBody);
         } catch (final Exception e) {
-            logger.debug("Could not build phone home body" + e.getMessage(), e);
+            logger.debug("Could not build phone home body" + e.getMessage());
         }
     }
 
