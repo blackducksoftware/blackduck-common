@@ -98,7 +98,7 @@ public class ProjectRequestService extends HubResponseService {
     }
 
     public void deleteHubProject(final ProjectView project) throws IntegrationException {
-        final HubRequest deleteRequest = getHubRequestFactory().createRequest(metaService.getHref(project));
+        final HubRequest deleteRequest = getHubRequestFactory().createRequest(getHref(project));
         deleteRequest.executeDelete();
     }
 

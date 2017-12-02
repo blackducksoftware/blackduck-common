@@ -44,23 +44,16 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public abstract class AbstractNotificationTransformer
-        implements ItemTransform<List<NotificationContentItem>, NotificationView> {
-    private final HubResponseService hubResponseService;
-
+public abstract class AbstractNotificationTransformer implements ItemTransform<List<NotificationContentItem>, NotificationView> {
     private final IntLogger logger;
-
+    private final HubResponseService hubResponseService;
     private final NotificationRequestService notificationService;
-
     private final ProjectVersionRequestService projectVersionService;
-
     private final PolicyRequestService policyService;
-
     private final MetaService metaService;
 
-    public AbstractNotificationTransformer(final HubResponseService hubResponseService, final NotificationRequestService notificationService,
-            final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
-            final MetaService metaService) {
+    public AbstractNotificationTransformer(final HubResponseService hubResponseService, final NotificationRequestService notificationService, final ProjectVersionRequestService projectVersionService,
+            final PolicyRequestService policyService, final MetaService metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = new IntBufferedLogger();
         this.notificationService = notificationService;
@@ -69,10 +62,8 @@ public abstract class AbstractNotificationTransformer
         this.metaService = metaService;
     }
 
-    public AbstractNotificationTransformer(final HubResponseService hubResponseService, final IntLogger logger,
-            final NotificationRequestService notificationService,
-            final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
-            final MetaService metaService) {
+    public AbstractNotificationTransformer(final HubResponseService hubResponseService, final IntLogger logger, final NotificationRequestService notificationService, final ProjectVersionRequestService projectVersionService,
+            final PolicyRequestService policyService, final MetaService metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = logger;
         this.notificationService = notificationService;
@@ -104,14 +95,12 @@ public abstract class AbstractNotificationTransformer
     @Override
     public abstract List<NotificationContentItem> transform(NotificationView item) throws HubItemTransformException;
 
-    protected ProjectVersionModel createFullProjectVersion(final String projectVersionUrl, final String projectName, final String versionName)
-            throws IntegrationException {
+    protected ProjectVersionModel createFullProjectVersion(final String projectVersionUrl, final String projectName, final String versionName) throws IntegrationException {
         ProjectVersionView item;
         try {
             item = hubResponseService.getItem(projectVersionUrl, ProjectVersionView.class);
         } catch (final HubIntegrationException e) {
-            final String msg = "Error getting the full ProjectVersion for this affected project version URL: "
-                    + projectVersionUrl + ": " + e.getMessage();
+            final String msg = "Error getting the full ProjectVersion for this affected project version URL: " + projectVersionUrl + ": " + e.getMessage();
             throw new HubIntegrationException(msg, e);
         }
         final ProjectVersionModel fullProjectVersion = new ProjectVersionModel();
