@@ -38,6 +38,7 @@ import com.blackducksoftware.integration.hub.api.component.ComponentRequestServi
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
 import com.blackducksoftware.integration.hub.api.group.GroupRequestService;
+import com.blackducksoftware.integration.hub.api.license.LicenseRequestService;
 import com.blackducksoftware.integration.hub.api.matchedfiles.MatchedFilesRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
@@ -141,7 +142,7 @@ public class HubServicesFactory {
     }
 
     public LicenseDataService createLicenseDataService() {
-        return new LicenseDataService(createComponentRequestService());
+        return new LicenseDataService(restConnection.logger, createComponentRequestService(), createLicenseRequestService());
     }
 
     public BomImportRequestService createBomImportRequestService() {
@@ -178,6 +179,10 @@ public class HubServicesFactory {
 
     public ProjectVersionRequestService createProjectVersionRequestService() {
         return new ProjectVersionRequestService(restConnection);
+    }
+
+    public LicenseRequestService createLicenseRequestService() {
+        return new LicenseRequestService(restConnection);
     }
 
     public ScanSummaryRequestService createScanSummaryRequestService() {
