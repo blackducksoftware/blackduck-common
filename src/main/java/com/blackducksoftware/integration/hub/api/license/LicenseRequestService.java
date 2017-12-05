@@ -32,35 +32,13 @@ import com.blackducksoftware.integration.hub.model.view.LicenseView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
-import com.blackducksoftware.integration.log.IntLogger;
 
 import okhttp3.Response;
 
 public class LicenseRequestService extends HubResponseService {
-    private final IntLogger logger;
 
     public LicenseRequestService(final RestConnection restConnection) {
         super(restConnection);
-        logger = restConnection.logger;
-    }
-
-    public LicenseView getLicense(final String licenseUrl) throws IntegrationException {
-        logger.info(String.format("*** getLicense(): licenseUrl: %s", licenseUrl));
-        final HubRequest hubRequest = getHubRequestFactory().createRequest(licenseUrl);
-        Response response = null;
-        try {
-            response = hubRequest.executeGet();
-            final String jsonResponse = response.body().string();
-            logger.info(String.format("*** getLicense(): jsonResponse: %s", jsonResponse));
-            final LicenseView versionComparison = getItemAs(jsonResponse, LicenseView.class);
-            return versionComparison;
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-        }
     }
 
     public String getLicenseText(final LicenseView licenseView) throws IntegrationException {

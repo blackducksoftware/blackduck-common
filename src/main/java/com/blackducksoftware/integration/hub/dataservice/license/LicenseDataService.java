@@ -55,7 +55,7 @@ public class LicenseDataService {
         if (licenseUrl == null) {
             return null;
         }
-        final LicenseView licenseView = licenseRequestService.getLicense(licenseUrl);
+        final LicenseView licenseView = licenseRequestService.getItem(licenseUrl, LicenseView.class);
         return licenseView;
     }
 
