@@ -63,7 +63,7 @@ public class BomComponentIssueRequestService extends HubResponseService {
     }
 
     public void deleteIssue(final IssueView issueItem) throws IntegrationException {
-        final String codeLocationItemUrl = metaService.getHref(issueItem);
+        final String codeLocationItemUrl = getHref(issueItem);
         deleteIssue(codeLocationItemUrl);
     }
 

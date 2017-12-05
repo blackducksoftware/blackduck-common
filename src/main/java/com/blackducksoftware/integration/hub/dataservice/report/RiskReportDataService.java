@@ -64,19 +64,12 @@ import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 
 public class RiskReportDataService extends HubResponseService {
-
     private final IntLogger logger;
-
     private final ProjectRequestService projectRequestService;
-
     private final ProjectVersionRequestService projectVersionRequestService;
-
     private final ReportRequestService reportRequestService;
-
     private final AggregateBomRequestService bomRequestService;
-
     private final HubSupportHelper hubSupportHelper;
-
     private final IntegrationEscapeUtil escapeUtil;
 
     public RiskReportDataService(final IntLogger logger, final RestConnection restConnection, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
@@ -137,8 +130,8 @@ public class RiskReportDataService extends HubResponseService {
     }
 
     public ReportData getRiskReportData(final ProjectView project, final ProjectVersionView version) throws IntegrationException {
-        final String originalProjectUrl = metaService.getHref(project);
-        final String originalVersionUrl = metaService.getHref(version);
+        final String originalProjectUrl = getHref(project);
+        final String originalVersionUrl = getHref(version);
         final ReportData reportData = new ReportData();
         reportData.setProjectName(project.name);
         reportData.setProjectURL(getReportProjectUrl(originalProjectUrl));
@@ -315,7 +308,7 @@ public class RiskReportDataService extends HubResponseService {
         if (bomEntry != null && StringUtils.isNotBlank(bomEntry.approvalStatus)) {
             final BomComponentPolicyStatusApprovalStatusEnum status = BomComponentPolicyStatusApprovalStatusEnum.valueOf(bomEntry.approvalStatus);
             if (status == BomComponentPolicyStatusApprovalStatusEnum.IN_VIOLATION) {
-                final String policyRuleLink = metaService.getFirstLink(bomEntry, MetaService.POLICY_RULES_LINK);
+                final String policyRuleLink = getFirstLink(bomEntry, MetaService.POLICY_RULES_LINK);
                 final List<PolicyRuleView> rules = getAllItems(policyRuleLink, PolicyRuleView.class);
                 final List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (final PolicyRuleView policyRuleView : rules) {

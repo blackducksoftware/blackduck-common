@@ -38,7 +38,6 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 
 public class PolicyStatusDataService extends HubResponseService {
     private final ProjectRequestService projectRequestService;
-
     private final ProjectVersionRequestService projectVersionRequestService;
 
     public PolicyStatusDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService) {
@@ -49,7 +48,7 @@ public class PolicyStatusDataService extends HubResponseService {
 
     public VersionBomPolicyStatusView getPolicyStatusForProjectAndVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = projectRequestService.getProjectByName(projectName);
-        final String versionsUrl = metaService.getFirstLink(projectItem, MetaService.VERSIONS_LINK);
+        final String versionsUrl = getFirstLink(projectItem, MetaService.VERSIONS_LINK);
 
         final List<ProjectVersionView> projectVersions = projectVersionRequestService.getAllProjectVersions(versionsUrl);
         final String policyStatusUrl = findPolicyStatusUrlFromVersions(projectVersions, projectVersionName);
@@ -58,14 +57,14 @@ public class PolicyStatusDataService extends HubResponseService {
     }
 
     public VersionBomPolicyStatusView getPolicyStatusForVersion(final ProjectVersionView version) throws IntegrationException {
-        final String policyStatusUrl = metaService.getFirstLink(version, MetaService.POLICY_STATUS_LINK);
+        final String policyStatusUrl = getFirstLink(version, MetaService.POLICY_STATUS_LINK);
         return getItem(policyStatusUrl, VersionBomPolicyStatusView.class);
     }
 
     private String findPolicyStatusUrlFromVersions(final List<ProjectVersionView> projectVersions, final String projectVersionName) throws HubIntegrationException {
         for (final ProjectVersionView version : projectVersions) {
             if (projectVersionName.equals(version.versionName)) {
-                final String policyStatusLink = metaService.getFirstLink(version, MetaService.POLICY_STATUS_LINK);
+                final String policyStatusLink = getFirstLink(version, MetaService.POLICY_STATUS_LINK);
                 return policyStatusLink;
             }
         }

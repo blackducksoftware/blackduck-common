@@ -129,7 +129,6 @@ public class ProjectDataService extends HubResponseService {
             }
         }
         return resolvedUserViews;
-
     }
 
     public List<AssignedGroupView> getAssignedGroupsToProject(final String projectName) throws IntegrationException {
@@ -159,7 +158,6 @@ public class ProjectDataService extends HubResponseService {
             }
         }
         return resolvedGroupViews;
-
     }
 
 }
