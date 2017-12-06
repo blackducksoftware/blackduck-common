@@ -31,14 +31,13 @@ import com.blackducksoftware.integration.hub.model.view.ComplexLicenseView;
 import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.model.view.LicenseView;
 import com.blackducksoftware.integration.hub.model.view.components.VersionBomLicenseView;
-import com.blackducksoftware.integration.log.IntLogger;
 
 public class LicenseDataService {
 
     private final ComponentRequestService componentRequestService;
     private final LicenseRequestService licenseRequestService;
 
-    public LicenseDataService(final IntLogger logger, final ComponentRequestService componentRequestService, final LicenseRequestService licenseRequestService) {
+    public LicenseDataService(final ComponentRequestService componentRequestService, final LicenseRequestService licenseRequestService) {
         this.componentRequestService = componentRequestService;
         this.licenseRequestService = licenseRequestService;
     }
