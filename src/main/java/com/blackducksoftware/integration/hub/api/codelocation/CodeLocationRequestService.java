@@ -73,23 +73,23 @@ public class CodeLocationRequestService extends HubResponseService {
     }
 
     public void unmapCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
-        final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
+        final String codeLocationItemUrl = getHref(codeLocationItem);
         final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationItem, "");
         updateCodeLocation(codeLocationItemUrl, getGson().toJson(requestCodeLocationView));
     }
 
     public void mapCodeLocation(final CodeLocationView codeLocationItem, final ProjectVersionView version) throws IntegrationException {
-        mapCodeLocation(codeLocationItem, metaService.getHref(version));
+        mapCodeLocation(codeLocationItem, getHref(version));
     }
 
     public void mapCodeLocation(final CodeLocationView codeLocationItem, final String versionUrl) throws IntegrationException {
-        final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
+        final String codeLocationItemUrl = getHref(codeLocationItem);
         final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationItem, versionUrl);
         updateCodeLocation(codeLocationItemUrl, getGson().toJson(requestCodeLocationView));
     }
 
     public void updateCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
-        final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
+        final String codeLocationItemUrl = getHref(codeLocationItem);
         updateCodeLocation(codeLocationItemUrl, getGson().toJson(codeLocationItem));
     }
 
@@ -113,7 +113,7 @@ public class CodeLocationRequestService extends HubResponseService {
     }
 
     public void deleteCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
-        final String codeLocationItemUrl = metaService.getHref(codeLocationItem);
+        final String codeLocationItemUrl = getHref(codeLocationItem);
         deleteCodeLocation(codeLocationItemUrl);
     }
 

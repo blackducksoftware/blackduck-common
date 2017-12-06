@@ -94,7 +94,7 @@ public class NotificationRequestService extends HubResponseService {
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
-        final String url = metaService.getFirstLink(user, MetaService.NOTIFICATIONS_LINK);
+        final String url = getFirstLink(user, MetaService.NOTIFICATIONS_LINK);
 
         final HubPagedRequest hubPagedRequest = hubRequestFactory.createPagedRequest(100, url);
         hubPagedRequest.addQueryParameter("startDate", startDateString);

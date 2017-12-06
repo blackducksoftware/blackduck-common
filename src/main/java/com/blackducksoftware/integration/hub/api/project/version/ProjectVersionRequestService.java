@@ -47,7 +47,7 @@ public class ProjectVersionRequestService extends HubResponseService {
     }
 
     public ProjectVersionView getProjectVersion(final ProjectView project, final String projectVersionName) throws IntegrationException {
-        final String versionsUrl = metaService.getFirstLink(project, MetaService.VERSIONS_LINK);
+        final String versionsUrl = getFirstLink(project, MetaService.VERSIONS_LINK);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, versionsUrl);
         if (StringUtils.isNotBlank(projectVersionName)) {
             hubPagedRequest.q = String.format("versionName:%s", projectVersionName);
@@ -73,7 +73,7 @@ public class ProjectVersionRequestService extends HubResponseService {
     }
 
     public String createHubVersion(final ProjectView project, final ProjectVersionRequest version) throws IntegrationException {
-        return createHubVersion(metaService.getFirstLink(project, MetaService.VERSIONS_LINK), version);
+        return createHubVersion(getFirstLink(project, MetaService.VERSIONS_LINK), version);
     }
 
     public String createHubVersion(final String versionsUrl, final ProjectVersionRequest version) throws IntegrationException {

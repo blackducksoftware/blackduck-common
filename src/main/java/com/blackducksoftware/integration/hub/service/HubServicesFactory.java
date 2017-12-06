@@ -261,7 +261,7 @@ public class HubServicesFactory {
     }
 
     public ComponentDataService createComponentDataService() {
-        return new ComponentDataService(restConnection.logger, createComponentRequestService());
+        return new ComponentDataService(restConnection.logger, createProjectRequestService(), createProjectVersionRequestService(), createComponentRequestService());
     }
 
     public BomComponentIssueRequestService createBomComponentIssueRequestService() {

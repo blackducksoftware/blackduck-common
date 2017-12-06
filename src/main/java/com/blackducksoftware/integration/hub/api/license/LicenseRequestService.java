@@ -42,7 +42,7 @@ public class LicenseRequestService extends HubResponseService {
     }
 
     public String getLicenseText(final LicenseView licenseView) throws IntegrationException {
-        final String licenseTextUrl = metaService.getFirstLinkSafely(licenseView, MetaService.TEXT_LINK);
+        final String licenseTextUrl = getFirstLinkSafely(licenseView, MetaService.TEXT_LINK);
         final HubRequest hubRequest = getHubRequestFactory().createRequest(licenseTextUrl);
         Response response = null;
         try {

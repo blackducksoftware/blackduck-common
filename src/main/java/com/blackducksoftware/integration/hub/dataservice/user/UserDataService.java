@@ -38,8 +38,7 @@ import com.blackducksoftware.integration.log.IntLogger;
 public class UserDataService {
     private final IntLogger logger;
     private final UserRequestService userRequestService;
-
-    ProjectRequestService projectRequestService;
+    private final ProjectRequestService projectRequestService;
 
     public UserDataService(final IntLogger logger, final ProjectRequestService projectRequestService, final UserRequestService userRequestService) {
         this.logger = logger;
@@ -65,7 +64,6 @@ public class UserDataService {
         }
 
         return resolvedProjectViews;
-
     }
 
     public List<RoleView> getRolesForUser(final String userName) throws IntegrationException {
@@ -76,4 +74,5 @@ public class UserDataService {
     public List<RoleView> getRolesForUser(final UserView userView) throws IntegrationException {
         return userRequestService.getUserRoles(userView);
     }
+
 }

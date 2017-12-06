@@ -23,7 +23,6 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,22 +31,28 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.UrlConstants;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
 import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
 import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.model.view.ComponentView;
+import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.model.view.ProjectView;
+import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ComponentDataService {
-
+    private final ProjectRequestService projectRequestService;
+    private final ProjectVersionRequestService projectVersionRequestService;
     private final ComponentRequestService componentRequestService;
     private final IntLogger logger;
-    private final MetaService metaService;
 
-    public ComponentDataService(final IntLogger logger, final ComponentRequestService componentRequestService) {
+    public ComponentDataService(final IntLogger logger, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService, final ComponentRequestService componentRequestService) {
         this.logger = logger;
+        this.projectRequestService = projectRequestService;
+        this.projectVersionRequestService = projectVersionRequestService;
         this.componentRequestService = componentRequestService;
-        this.metaService = new MetaService(logger);
     }
 
     public ComponentVersionView getExactComponentVersionFromComponent(final String namespace, final String groupId, final String artifactId, final String version) throws IntegrationException {
@@ -64,13 +69,18 @@ public class ComponentDataService {
     public List<ComponentVersionView> getAllComponentVersionsFromComponent(final String namespace, final String groupId, final String artifactId, final String version) throws IntegrationException {
         final ComponentSearchResultResponse componentResponse = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
 
-        final ComponentView componentItem = componentRequestService.getItem(componentResponse.component, ComponentView.class);
-        final String versionsURL = metaService.getFirstLinkSafely(componentItem, UrlConstants.SEGMENT_VERSIONS);
-        List<ComponentVersionView> versions = new ArrayList<>();
-        if (versionsURL != null) {
-            versions = componentRequestService.getAllItems(versionsURL, ComponentVersionView.class);
-        }
-        return versions;
+        final ComponentView componentView = componentRequestService.getItem(componentResponse.component, ComponentView.class);
+        final List<ComponentVersionView> componentVersionViews = componentRequestService.getAllItemsFromLink(componentView, UrlConstants.SEGMENT_VERSIONS, ComponentVersionView.class);
+
+        return componentVersionViews;
+    }
+
+    public List<VersionBomComponentView> getAllComponentVersionsFromProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
+        final ProjectView projectItem = projectRequestService.getProjectByName(projectName);
+        final ProjectVersionView projectVersionView = projectVersionRequestService.getProjectVersion(projectItem, projectVersionName);
+        final List<VersionBomComponentView> versionBomComponentViews = projectVersionRequestService.getAllItemsFromLink(projectVersionView, MetaService.COMPONENTS_LINK, VersionBomComponentView.class);
+
+        return versionBomComponentViews;
     }
 
 }
