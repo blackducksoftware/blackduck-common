@@ -70,8 +70,12 @@ public class VersionBomComponentDataService {
         return modelBomComponents;
     }
 
-    private List<MatchedFilesView> getMatchedFiles(final VersionBomComponentView component) throws IntegrationException {
-        final String matchedFilesLink = metaService.getFirstLink(component, MetaService.MATCHED_FILES_LINK);
-        return matchedFilesRequestService.getMatchedFiles(matchedFilesLink);
+    private List<MatchedFilesView> getMatchedFiles(final VersionBomComponentView component) {
+        try {
+            final String matchedFilesLink = metaService.getFirstLink(component, MetaService.MATCHED_FILES_LINK);
+            return matchedFilesRequestService.getMatchedFiles(matchedFilesLink);
+        } catch (final IntegrationException e) {
+            return new ArrayList<>(0);
+        }
     }
 }
