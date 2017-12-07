@@ -30,8 +30,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
+import com.blackducksoftware.integration.hub.model.view.components.OriginView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubResponseService;
@@ -43,20 +45,36 @@ public class ComponentRequestService extends HubResponseService {
         super(restConnection);
     }
 
-    public List<ComponentSearchResultResponse> getAllComponents(final String namespace, final String groupId, final String artifactId, final String version) throws IntegrationException {
-        final String componentQuery = String.format("id:%s|%s|%s|%s", namespace, groupId, artifactId, version);
+    public ComponentSearchResultResponse getExactComponentMatch(final ExternalId externalId) throws IntegrationException {
+        final List<ComponentSearchResultResponse> allComponents = getAllComponents(externalId);
+        return getExactComponentMatch(allComponents, externalId.createHubOriginId());
+    }
+
+    public ComponentSearchResultResponse getExactComponentMatch(final OriginView originView) throws IntegrationException {
+        final List<ComponentSearchResultResponse> allComponents = getAllComponents(originView);
+        return getExactComponentMatch(allComponents, originView.externalId);
+    }
+
+    public List<ComponentSearchResultResponse> getAllComponents(final ExternalId externalId) throws IntegrationException {
+        return getAllComponents(externalId.forge.getName(), externalId.createHubOriginId());
+    }
+
+    public List<ComponentSearchResultResponse> getAllComponents(final OriginView originView) throws IntegrationException {
+        return getAllComponents(originView.externalNamespace, originView.externalId);
+    }
+
+    private List<ComponentSearchResultResponse> getAllComponents(final String forge, final String hubOriginId) throws IntegrationException {
+        final String componentQuery = String.format("id:%s|%s", forge, hubOriginId);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(COMPONENT_SEGMENTS, componentQuery);
 
         final List<ComponentSearchResultResponse> allComponents = getAllItems(hubPagedRequest, ComponentSearchResultResponse.class);
         return allComponents;
     }
 
-    public ComponentSearchResultResponse getExactComponentMatch(final String namespace, final String groupId, final String artifactId, final String version) throws IntegrationException {
-        final List<ComponentSearchResultResponse> allComponents = getAllComponents(namespace, groupId, artifactId, version);
+    private ComponentSearchResultResponse getExactComponentMatch(final List<ComponentSearchResultResponse> allComponents, final String matchId) throws HubIntegrationException {
         for (final ComponentSearchResultResponse componentItem : allComponents) {
-            if (componentItem.originId != null) {
-                final String exactMatch = String.format("%s:%s:%s", groupId, artifactId, version);
-                if (componentItem.originId.equals(exactMatch)) {
+            if (null != matchId) {
+                if (matchId.equals(componentItem.originId)) {
                     return componentItem;
                 }
             }
