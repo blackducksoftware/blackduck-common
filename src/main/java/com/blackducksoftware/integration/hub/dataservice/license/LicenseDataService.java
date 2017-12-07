@@ -25,22 +25,20 @@ package com.blackducksoftware.integration.hub.dataservice.license;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
+import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
 import com.blackducksoftware.integration.hub.model.view.ComplexLicenseView;
 import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
 
 public class LicenseDataService {
-
     private final ComponentRequestService componentRequestService;
 
-    public LicenseDataService(
-            final ComponentRequestService componentRequestService) {
+    public LicenseDataService(final ComponentRequestService componentRequestService) {
         this.componentRequestService = componentRequestService;
     }
 
-    public ComplexLicenseView getComplexLicenseItemFromComponent(final String namespace, final String groupId, final String artifactId, final String version)
-            throws IntegrationException {
-        final ComponentSearchResultResponse component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
+    public ComplexLicenseView getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
+        final ComponentSearchResultResponse component = componentRequestService.getExactComponentMatch(externalId);
         final String versionUrl = component.version;
         final ComponentVersionView componentVersion = componentRequestService.getItem(versionUrl, ComponentVersionView.class);
         return componentVersion.license;
