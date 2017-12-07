@@ -36,7 +36,6 @@ import com.blackducksoftware.integration.hub.service.HubResponseService;
 import okhttp3.Response;
 
 public class LicenseRequestService extends HubResponseService {
-
     public LicenseRequestService(final RestConnection restConnection) {
         super(restConnection);
     }
