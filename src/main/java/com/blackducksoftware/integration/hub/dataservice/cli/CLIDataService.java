@@ -35,11 +35,11 @@ import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.builder.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
@@ -73,7 +73,7 @@ public class CLIDataService {
     private final CodeLocationService codeLocationRequestService;
     private final ScanSummaryService scanSummaryRequestService;
     private final ScanStatusDataService scanStatusDataService;
-    private final MetaUtility metaService;
+    private final MetaHandler metaService;
 
     private HubSupportHelper hubSupportHelper;
     private ProjectVersionView version;
@@ -92,7 +92,7 @@ public class CLIDataService {
         this.codeLocationRequestService = codeLocationRequestService;
         this.scanSummaryRequestService = scanSummaryRequestService;
         this.scanStatusDataService = scanStatusDataService;
-        this.metaService = new MetaUtility(logger);
+        this.metaService = new MetaHandler(logger);
     }
 
     public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished,
@@ -193,7 +193,7 @@ public class CLIDataService {
                     scanSummary = getScanSummaryFromFile(scanSummaryFile);
                     scanSummaries.add(scanSummary);
                     scanSummaryFile.delete();
-                    final String codeLocationUrl = metaService.getFirstLinkSafely(scanSummary, MetaUtility.CODE_LOCATION_BOM_STATUS_LINK);
+                    final String codeLocationUrl = metaService.getFirstLinkSafely(scanSummary, MetaHandler.CODE_LOCATION_BOM_STATUS_LINK);
 
                     final CodeLocationView codeLocationView = codeLocationRequestService.getView(codeLocationUrl, CodeLocationView.class);
                     codeLocationViews.add(codeLocationView);

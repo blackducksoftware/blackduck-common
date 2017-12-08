@@ -34,13 +34,13 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomService;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.enumeration.BomComponentPolicyStatusApprovalStatusEnum;
@@ -226,8 +226,8 @@ public class RiskReportDataService extends HubService {
     }
 
     private String getComponentPolicyURL(final String versionURL, final String componentURL) {
-        final String componentVersionSegments = componentURL.substring(componentURL.indexOf(MetaUtility.COMPONENTS_LINK));
-        return versionURL + "/" + componentVersionSegments + "/" + MetaUtility.POLICY_STATUS_LINK;
+        final String componentVersionSegments = componentURL.substring(componentURL.indexOf(MetaHandler.COMPONENTS_LINK));
+        return versionURL + "/" + componentVersionSegments + "/" + MetaHandler.POLICY_STATUS_LINK;
     }
 
     private BomComponent createBomComponentFromBomViewEntry(final VersionReport report, final AggregateBomViewEntry bomEntry) {
@@ -308,7 +308,7 @@ public class RiskReportDataService extends HubService {
         if (bomEntry != null && StringUtils.isNotBlank(bomEntry.approvalStatus)) {
             final BomComponentPolicyStatusApprovalStatusEnum status = BomComponentPolicyStatusApprovalStatusEnum.valueOf(bomEntry.approvalStatus);
             if (status == BomComponentPolicyStatusApprovalStatusEnum.IN_VIOLATION) {
-                final String policyRuleLink = getFirstLink(bomEntry, MetaUtility.POLICY_RULES_LINK);
+                final String policyRuleLink = getFirstLink(bomEntry, MetaHandler.POLICY_RULES_LINK);
                 final List<PolicyRuleView> rules = getAllViews(policyRuleLink, PolicyRuleView.class);
                 final List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (final PolicyRuleView policyRuleView : rules) {

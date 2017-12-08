@@ -29,10 +29,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.api.notification.NotificationService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationClearedTransformer;
@@ -63,7 +63,7 @@ public class NotificationDataService {
 
     private final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor;
 
-    private final MetaUtility metaService;
+    private final MetaHandler metaService;
 
     public NotificationDataService(final IntLogger logger, final HubService hubResponseService, final NotificationService notificationRequestService, final ProjectVersionService projectVersionRequestService,
             final PolicyService policyRequestService) {
@@ -78,7 +78,7 @@ public class NotificationDataService {
         this.policyRequestService = policyRequestService;
         this.policyNotificationFilter = policyNotificationFilter;
         this.parallelProcessor = new ParallelResourceProcessor<>(logger);
-        this.metaService = new MetaUtility(logger);
+        this.metaService = new MetaHandler(logger);
         populateTransformerMap(logger);
     }
 

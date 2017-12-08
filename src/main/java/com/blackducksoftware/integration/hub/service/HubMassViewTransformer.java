@@ -35,7 +35,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.HubView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
@@ -45,14 +45,14 @@ import com.google.gson.JsonParser;
 
 import okhttp3.Response;
 
-public class HubResponseAllViewsManager {
-    private final HubResponseViewsManager hubResponseViewsManager;
+public class HubMassViewTransformer {
+    private final HubMultipleViewTransformer hubMultipleViewTransformer;
     private final HubRequestFactory hubRequestFactory;
-    private final MetaUtility metaService;
+    private final MetaHandler metaService;
     private final JsonParser jsonParser;
 
-    public HubResponseAllViewsManager(final HubResponseViewsManager hubResponseViewsManager, final HubRequestFactory hubRequestFactory, final MetaUtility metaService, final JsonParser jsonParser) {
-        this.hubResponseViewsManager = hubResponseViewsManager;
+    public HubMassViewTransformer(final HubMultipleViewTransformer hubMultipleViewTransformer, final HubRequestFactory hubRequestFactory, final MetaHandler metaService, final JsonParser jsonParser) {
+        this.hubMultipleViewTransformer = hubMultipleViewTransformer;
         this.hubRequestFactory = hubRequestFactory;
         this.metaService = metaService;
         this.jsonParser = jsonParser;
@@ -124,11 +124,11 @@ public class HubResponseAllViewsManager {
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
             totalCount = jsonObject.get("totalCount").getAsInt();
-            allViews.addAll(hubResponseViewsManager.getViews(jsonObject, clazz));
+            allViews.addAll(hubMultipleViewTransformer.getViews(jsonObject, clazz));
             while (allViews.size() < totalCount && currentOffset < totalCount) {
                 currentOffset += hubPagedRequest.limit;
                 hubPagedRequest.offset = currentOffset;
-                allViews.addAll(hubResponseViewsManager.getViews(hubPagedRequest, clazz, mediaType));
+                allViews.addAll(hubMultipleViewTransformer.getViews(hubPagedRequest, clazz, mediaType));
             }
         } catch (final IOException e) {
             throw new HubIntegrationException(e);

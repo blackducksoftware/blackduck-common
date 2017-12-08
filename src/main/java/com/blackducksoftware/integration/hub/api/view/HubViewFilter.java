@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.item;
+package com.blackducksoftware.integration.hub.api.view;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ import com.blackducksoftware.integration.hub.model.HubView;
 import com.blackducksoftware.integration.hub.model.enumeration.AllowEnum;
 
 public class HubViewFilter<T extends HubView> {
-    public List<T> getAccessibleItems(final MetaUtility metaService, final List<T> hubItems) throws HubIntegrationException {
+    public List<T> getAccessibleItems(final MetaHandler metaService, final List<T> hubItems) throws HubIntegrationException {
         final List<T> accessibleItems = new ArrayList<>();
         for (final T hubItem : hubItems) {
             final List<AllowEnum> allow = metaService.getAllowedMethods(hubItem);

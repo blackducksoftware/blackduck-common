@@ -38,11 +38,11 @@ import org.junit.rules.TemporaryFolder;
 
 import com.blackducksoftware.integration.hub.api.bom.BomImportService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.api.notification.NotificationService;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.user.UserService;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.builder.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
 import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStatusDataService;
@@ -86,7 +86,7 @@ public class ComprehensiveCookbookTestIT {
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final ProjectService projectRequestService = hubServicesFactory.createProjectRequestService();
         final ProjectVersionService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService();
-        final MetaUtility metaService = new MetaUtility(logger);
+        final MetaHandler metaService = new MetaHandler(logger);
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
 
         // delete the project, if it exists
@@ -130,7 +130,7 @@ public class ComprehensiveCookbookTestIT {
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final ProjectService projectRequestService = hubServicesFactory.createProjectRequestService();
         final ProjectVersionService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService();
-        final MetaUtility metaService = new MetaUtility(logger);
+        final MetaHandler metaService = new MetaHandler(logger);
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
 
         // delete the project, if it exists
@@ -180,7 +180,7 @@ public class ComprehensiveCookbookTestIT {
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final ProjectService projectRequestService = hubServicesFactory.createProjectRequestService();
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
-        final MetaUtility metaService = new MetaUtility(logger);
+        final MetaHandler metaService = new MetaHandler(logger);
         final BomImportService bomImportRequestService = hubServicesFactory.createBomImportRequestService();
         final CodeLocationService codeLocationRequestService = hubServicesFactory.createCodeLocationRequestService();
         final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(FIVE_MINUTES);
@@ -259,7 +259,7 @@ public class ComprehensiveCookbookTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final ProjectService projectRequestService = hubServicesFactory.createProjectRequestService();
-        final MetaUtility metaService = new MetaUtility(logger);
+        final MetaHandler metaService = new MetaHandler(logger);
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
         final CLIDataService cliDataService = hubServicesFactory.createCLIDataService(TWENTY_MINUTES);
         final PolicyStatusDataService policyStatusDataService = hubServicesFactory.createPolicyStatusDataService();

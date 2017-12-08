@@ -33,10 +33,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
 import com.blackducksoftware.integration.hub.model.enumeration.CodeLocationEnum;
@@ -56,13 +56,13 @@ public class ScanStatusDataService {
     private final ProjectVersionService projectVersionRequestService;
     private final CodeLocationService codeLocationRequestService;
     private final ScanSummaryService scanSummaryRequestService;
-    private final MetaUtility metaService;
+    private final MetaHandler metaService;
     private final long timeoutInMilliseconds;
 
     public ScanStatusDataService(final IntLogger logger, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService, final CodeLocationService codeLocationRequestService,
             final ScanSummaryService scanSummaryRequestService, final long timeoutInMilliseconds) {
         this.logger = logger;
-        this.metaService = new MetaUtility(logger);
+        this.metaService = new MetaHandler(logger);
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.codeLocationRequestService = codeLocationRequestService;
@@ -97,7 +97,7 @@ public class ScanStatusDataService {
         while (!done(foundPendingScan, timeoutInMilliseconds, startedTime, timeoutMessage)) {
             try {
                 final CodeLocationView codeLocation = codeLocationRequestService.getCodeLocationByName(codeLocationName);
-                final String scanSummariesLink = metaService.getFirstLinkSafely(codeLocation, MetaUtility.SCANS_LINK);
+                final String scanSummariesLink = metaService.getFirstLinkSafely(codeLocation, MetaHandler.SCANS_LINK);
                 if (StringUtils.isNotBlank(scanSummariesLink)) {
                     final ScanSummaryView scanSummaryView = scanSummaryRequestService.getView(scanSummariesLink, ScanSummaryView.class);
                     if (isPending(scanSummaryView.status)) {
@@ -133,7 +133,7 @@ public class ScanStatusDataService {
         final List<CodeLocationView> allCodeLocations = codeLocationRequestService.getAllCodeLocationsForProjectVersion(projectVersionView);
         final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
         for (final CodeLocationView codeLocationView : allCodeLocations) {
-            final String scansLink = metaService.getFirstLinkSafely(codeLocationView, MetaUtility.SCANS_LINK);
+            final String scansLink = metaService.getFirstLinkSafely(codeLocationView, MetaHandler.SCANS_LINK);
             final List<ScanSummaryView> codeLocationScanSummaryViews = scanSummaryRequestService.getAllScanSummaryItems(scansLink);
             scanSummaryViews.addAll(codeLocationScanSummaryViews);
         }
@@ -206,7 +206,7 @@ public class ScanStatusDataService {
                 logger.debug("Checking codeLocation: " + codeLocationItem.name);
                 final String mappedProjectVersionUrl = codeLocationItem.mappedProjectVersion;
                 if (projectVersionUrl.equals(mappedProjectVersionUrl)) {
-                    final String scanSummariesLink = metaService.getFirstLink(codeLocationItem, MetaUtility.SCANS_LINK);
+                    final String scanSummariesLink = metaService.getFirstLink(codeLocationItem, MetaHandler.SCANS_LINK);
                     allScanSummariesLinks.add(scanSummariesLink);
                 }
             }

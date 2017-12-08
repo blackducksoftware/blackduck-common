@@ -33,6 +33,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.HubView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
@@ -51,24 +52,24 @@ public class MetaServiceTestIT {
         return hubItem;
     }
 
-    public MetaUtility getMetaService() {
+    public MetaHandler getMetaService() {
         logger = new IntBufferedLogger();
-        final MetaUtility metaService = new MetaUtility(logger);
+        final MetaHandler metaService = new MetaHandler(logger);
         return metaService;
     }
 
     @Test
     public void testHasLink() throws Exception {
-        final MetaUtility metaService = getMetaService();
+        final MetaHandler metaService = getMetaService();
         final HubView hubItem = getTestHubItem();
 
-        assertFalse(metaService.hasLink(hubItem, MetaUtility.USERS_LINK));
-        assertTrue(metaService.hasLink(hubItem, MetaUtility.CANONICAL_VERSION_LINK));
+        assertFalse(metaService.hasLink(hubItem, MetaHandler.USERS_LINK));
+        assertTrue(metaService.hasLink(hubItem, MetaHandler.CANONICAL_VERSION_LINK));
     }
 
     @Test
     public void testGetFirstLinkSafely() throws Exception {
-        final MetaUtility metaService = getMetaService();
+        final MetaHandler metaService = getMetaService();
         final HubView hubItem = getTestHubItem();
 
         assertNull(metaService.getFirstLinkSafely(hubItem, "non-existent-link"));
@@ -76,30 +77,30 @@ public class MetaServiceTestIT {
 
     @Test
     public void testGetFirstLink() throws Exception {
-        final MetaUtility metaService = getMetaService();
+        final MetaHandler metaService = getMetaService();
         final HubView hubItem = getTestHubItem();
 
         try {
-            metaService.getFirstLink(hubItem, MetaUtility.USERS_LINK);
+            metaService.getFirstLink(hubItem, MetaHandler.USERS_LINK);
         } catch (final HubIntegrationException e) {
-            assertTrue(e.getMessage().contains("Could not find the link '" + MetaUtility.USERS_LINK + "', these are the available links : '" + MetaUtility.CANONICAL_VERSION_LINK + "'"));
+            assertTrue(e.getMessage().contains("Could not find the link '" + MetaHandler.USERS_LINK + "', these are the available links : '" + MetaHandler.CANONICAL_VERSION_LINK + "'"));
         }
-        final String linkValue = metaService.getFirstLink(hubItem, MetaUtility.CANONICAL_VERSION_LINK);
+        final String linkValue = metaService.getFirstLink(hubItem, MetaHandler.CANONICAL_VERSION_LINK);
         assertTrue(linkValue.startsWith("http"));
     }
 
     @Test
     public void testGetLinks() throws Exception {
-        final MetaUtility metaService = getMetaService();
+        final MetaHandler metaService = getMetaService();
         final HubView hubItem = getTestHubItem();
 
         try {
-            metaService.getLinks(hubItem, MetaUtility.USERS_LINK);
+            metaService.getLinks(hubItem, MetaHandler.USERS_LINK);
         } catch (final HubIntegrationException e) {
-            assertTrue(e.getMessage().contains("Could not find the link '" + MetaUtility.USERS_LINK + "', these are the available links : '" + MetaUtility.CANONICAL_VERSION_LINK + "'"));
+            assertTrue(e.getMessage().contains("Could not find the link '" + MetaHandler.USERS_LINK + "', these are the available links : '" + MetaHandler.CANONICAL_VERSION_LINK + "'"));
         }
 
-        final List<String> links = metaService.getLinks(hubItem, MetaUtility.CANONICAL_VERSION_LINK);
+        final List<String> links = metaService.getLinks(hubItem, MetaHandler.CANONICAL_VERSION_LINK);
         assertNotNull(links);
         assertTrue(!links.isEmpty());
         int nonHttpLinkCount = 0;

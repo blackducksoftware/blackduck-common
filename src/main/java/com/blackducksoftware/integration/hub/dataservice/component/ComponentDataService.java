@@ -30,9 +30,9 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.UrlConstants;
 import com.blackducksoftware.integration.hub.api.component.ComponentService;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
@@ -78,7 +78,7 @@ public class ComponentDataService {
     public List<VersionBomComponentView> getAllComponentVersionsFromProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = projectRequestService.getProjectByName(projectName);
         final ProjectVersionView projectVersionView = projectVersionRequestService.getProjectVersion(projectItem, projectVersionName);
-        final List<VersionBomComponentView> versionBomComponentViews = projectVersionRequestService.getAllViewsFromLink(projectVersionView, MetaUtility.COMPONENTS_LINK, VersionBomComponentView.class);
+        final List<VersionBomComponentView> versionBomComponentViews = projectVersionRequestService.getAllViewsFromLink(projectVersionView, MetaHandler.COMPONENTS_LINK, VersionBomComponentView.class);
 
         return versionBomComponentViews;
     }

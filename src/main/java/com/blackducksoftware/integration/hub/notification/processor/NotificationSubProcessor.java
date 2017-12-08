@@ -26,7 +26,7 @@ package com.blackducksoftware.integration.hub.notification.processor;
 import java.util.Collection;
 import java.util.Map;
 
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
@@ -35,9 +35,9 @@ public abstract class NotificationSubProcessor {
 
     private final SubProcessorCache cache;
 
-    private final MetaUtility metaService;
+    private final MetaHandler metaService;
 
-    public NotificationSubProcessor(final SubProcessorCache cache, final MetaUtility metaService) {
+    public NotificationSubProcessor(final SubProcessorCache cache, final MetaHandler metaService) {
         this.cache = cache;
         this.metaService = metaService;
     }
@@ -66,7 +66,7 @@ public abstract class NotificationSubProcessor {
         return cache;
     }
 
-    public MetaUtility getMetaService() {
+    public MetaHandler getMetaService() {
         return metaService;
     }
 }

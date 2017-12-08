@@ -26,7 +26,7 @@ package com.blackducksoftware.integration.hub.api.license;
 import java.io.IOException;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.view.LicenseView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
@@ -41,7 +41,7 @@ public class LicenseService extends HubService {
     }
 
     public String getLicenseText(final LicenseView licenseView) throws IntegrationException {
-        final String licenseTextUrl = getFirstLinkSafely(licenseView, MetaUtility.TEXT_LINK);
+        final String licenseTextUrl = getFirstLinkSafely(licenseView, MetaHandler.TEXT_LINK);
         final HubRequest hubRequest = getHubRequestFactory().createRequest(licenseTextUrl);
         Response response = null;
         try {

@@ -40,19 +40,19 @@ import com.google.gson.JsonParser;
 
 import okhttp3.Response;
 
-public class HubResponseViewsManager {
-    private final HubViewManager hubResponseViewManager;
+public class HubMultipleViewTransformer {
+    private final HubViewTransformer hubViewTransformer;
     private final JsonParser jsonParser;
 
-    public HubResponseViewsManager(final HubViewManager hubResponseItemManager, final JsonParser jsonParser) {
-        this.hubResponseViewManager = hubResponseItemManager;
+    public HubMultipleViewTransformer(final HubViewTransformer hubResponseItemManager, final JsonParser jsonParser) {
+        this.hubViewTransformer = hubResponseItemManager;
         this.jsonParser = jsonParser;
     }
 
     public <T extends HubView> List<T> getViews(final JsonArray viewsArray, final Class<T> clazz) {
         final LinkedList<T> itemList = new LinkedList<>();
         for (final JsonElement element : viewsArray) {
-            final T item = hubResponseViewManager.getViewAs(element, clazz);
+            final T item = hubViewTransformer.getViewAs(element, clazz);
             itemList.add(item);
         }
         return itemList;
@@ -63,7 +63,7 @@ public class HubResponseViewsManager {
         final JsonElement viewsElement = jsonObject.get("items");
         final JsonArray viewsArray = viewsElement.getAsJsonArray();
         for (final JsonElement element : viewsArray) {
-            final T item = hubResponseViewManager.getViewAs(element, clazz);
+            final T item = hubViewTransformer.getViewAs(element, clazz);
             viewList.add(item);
         }
         return viewList;

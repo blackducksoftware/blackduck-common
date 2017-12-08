@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.enumeration.ReportFormatEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ReportTypeEnum;
@@ -68,11 +68,11 @@ public class ReportService extends HubService {
     }
 
     public String startGeneratingHubReport(final ProjectVersionView version, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
-        return startGeneratingHubReport(getFirstLink(version, MetaUtility.VERSION_REPORT_LINK), ReportTypeEnum.VERSION, reportFormat, categories);
+        return startGeneratingHubReport(getFirstLink(version, MetaHandler.VERSION_REPORT_LINK), ReportTypeEnum.VERSION, reportFormat, categories);
     }
 
     public String startGeneratingHubNoticesReport(final ProjectVersionView version, final ReportFormatEnum reportFormat) throws IntegrationException {
-        return startGeneratingHubReport(getFirstLink(version, MetaUtility.VERSION_NOTICES_REPORT_LINK), ReportTypeEnum.VERSION_LICENSE, reportFormat, null);
+        return startGeneratingHubReport(getFirstLink(version, MetaHandler.VERSION_NOTICES_REPORT_LINK), ReportTypeEnum.VERSION_LICENSE, reportFormat, null);
     }
 
     private String startGeneratingHubReport(final String reportUrl, final ReportTypeEnum reportType, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
@@ -190,7 +190,7 @@ public class ReportService extends HubService {
         logger.debug("Waiting for the Report to complete.");
         final ReportView reportInfo = isReportFinishedGenerating(reportUrl);
 
-        final String contentLink = getFirstLink(reportInfo, MetaUtility.CONTENT_LINK);
+        final String contentLink = getFirstLink(reportInfo, MetaHandler.CONTENT_LINK);
 
         if (contentLink == null) {
             throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
@@ -209,7 +209,7 @@ public class ReportService extends HubService {
      *
      */
     public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatEnum reportFormat) throws IntegrationException {
-        if (hasLink(version, MetaUtility.VERSION_NOTICES_REPORT_LINK)) {
+        if (hasLink(version, MetaHandler.VERSION_NOTICES_REPORT_LINK)) {
             try {
                 logger.debug("Starting the Notices Report generation.");
                 final String reportUrl = startGeneratingHubNoticesReport(version, reportFormat);
@@ -217,7 +217,7 @@ public class ReportService extends HubService {
                 logger.debug("Waiting for the Notices Report to complete.");
                 final ReportView reportInfo = isReportFinishedGenerating(reportUrl);
 
-                final String contentLink = getFirstLink(reportInfo, MetaUtility.CONTENT_LINK);
+                final String contentLink = getFirstLink(reportInfo, MetaHandler.CONTENT_LINK);
 
                 if (contentLink == null) {
                     throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);

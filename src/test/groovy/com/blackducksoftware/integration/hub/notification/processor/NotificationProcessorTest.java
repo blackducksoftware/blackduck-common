@@ -42,7 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityService;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
@@ -63,14 +63,14 @@ import com.blackducksoftware.integration.log.IntLogger;
 public class NotificationProcessorTest {
     private final EventTestUtil testUtil = new EventTestUtil();
 
-    private MetaUtility metaService;
+    private MetaHandler metaService;
 
     @Before
     public void init() throws Exception {
         final RestConnection restConnection = new MockRestConnection();
         final HubServicesFactory factory = new HubServicesFactory(restConnection);
         final IntLogger logger = new IntBufferedLogger();
-        metaService = new MetaUtility(logger);
+        metaService = new MetaHandler(logger);
     }
 
     public MockProcessor createMockedNotificationProcessor() {

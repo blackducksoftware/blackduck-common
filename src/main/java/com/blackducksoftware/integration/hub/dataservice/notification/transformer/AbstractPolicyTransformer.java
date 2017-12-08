@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.api.notification.NotificationService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
@@ -55,7 +55,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     public AbstractPolicyTransformer(final HubService hubResponseService, final NotificationService notificationService,
             final ProjectVersionService projectVersionService, final PolicyService policyService,
             final PolicyNotificationFilter policyFilter,
-            final MetaUtility metaService) {
+            final MetaHandler metaService) {
         super(hubResponseService, notificationService, projectVersionService, policyService,
                 metaService);
         this.policyFilter = policyFilter;
@@ -65,7 +65,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
             final NotificationService notificationService,
             final ProjectVersionService projectVersionService, final PolicyService policyService,
             final PolicyNotificationFilter policyFilter,
-            final MetaUtility metaService) {
+            final MetaHandler metaService) {
         super(hubResponseService, logger, notificationService, projectVersionService, policyService,
                 metaService);
         this.policyFilter = policyFilter;

@@ -27,7 +27,7 @@ import java.net.URL;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.HubView;
 import com.blackducksoftware.integration.hub.model.enumeration.AllowEnum;
@@ -44,10 +44,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class HubService {
-    private final MetaUtility metaUtility;
-    private final HubViewManager hubViewManager;
-    private final HubResponseViewsManager hubResponseViewsManager;
-    private final HubResponseAllViewsManager hubResponseAllViewsManager;
+    private final MetaHandler metaUtility;
+    private final HubViewTransformer hubViewManager;
+    private final HubMultipleViewTransformer hubResponseViewsManager;
+    private final HubMassViewTransformer hubResponseAllViewsManager;
     private final HubRequestFactory hubRequestFactory;
     private final URL hubBaseUrl;
     private final JsonParser jsonParser;
@@ -59,10 +59,10 @@ public class HubService {
         this.jsonParser = restConnection.jsonParser;
         this.gson = restConnection.gson;
 
-        this.metaUtility = new MetaUtility(restConnection.logger);
-        this.hubViewManager = new HubViewManager(hubRequestFactory, metaUtility, jsonParser, gson);
-        this.hubResponseViewsManager = new HubResponseViewsManager(hubViewManager, jsonParser);
-        this.hubResponseAllViewsManager = new HubResponseAllViewsManager(hubResponseViewsManager, hubRequestFactory, metaUtility, jsonParser);
+        this.metaUtility = new MetaHandler(restConnection.logger);
+        this.hubViewManager = new HubViewTransformer(hubRequestFactory, metaUtility, jsonParser, gson);
+        this.hubResponseViewsManager = new HubMultipleViewTransformer(hubViewManager, jsonParser);
+        this.hubResponseAllViewsManager = new HubMassViewTransformer(hubResponseViewsManager, hubRequestFactory, metaUtility, jsonParser);
     }
 
     public URL getHubBaseUrl() {

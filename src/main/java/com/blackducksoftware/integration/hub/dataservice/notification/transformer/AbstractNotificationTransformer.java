@@ -28,10 +28,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.api.notification.NotificationService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
@@ -50,10 +50,10 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
     private final NotificationService notificationService;
     private final ProjectVersionService projectVersionService;
     private final PolicyService policyService;
-    private final MetaUtility metaService;
+    private final MetaHandler metaService;
 
     public AbstractNotificationTransformer(final HubService hubResponseService, final NotificationService notificationService, final ProjectVersionService projectVersionService,
-            final PolicyService policyService, final MetaUtility metaService) {
+            final PolicyService policyService, final MetaHandler metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = new IntBufferedLogger();
         this.notificationService = notificationService;
@@ -63,7 +63,7 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
     }
 
     public AbstractNotificationTransformer(final HubService hubResponseService, final IntLogger logger, final NotificationService notificationService, final ProjectVersionService projectVersionService,
-            final PolicyService policyService, final MetaUtility metaService) {
+            final PolicyService policyService, final MetaHandler metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = logger;
         this.notificationService = notificationService;
@@ -115,17 +115,17 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
         fullProjectVersion.setSource(item.source);
 
         fullProjectVersion.setUrl(metaService.getHref(item));
-        fullProjectVersion.setCodeLocationsLink((metaService.getFirstLinkSafely(item, MetaUtility.CODE_LOCATION_LINK)));
-        fullProjectVersion.setComponentsLink((metaService.getFirstLinkSafely(item, MetaUtility.COMPONENTS_LINK)));
-        fullProjectVersion.setPolicyStatusLink((metaService.getFirstLinkSafely(item, MetaUtility.POLICY_STATUS_LINK)));
-        fullProjectVersion.setProjectLink((metaService.getFirstLinkSafely(item, MetaUtility.PROJECT_LINK)));
-        fullProjectVersion.setRiskProfileLink((metaService.getFirstLinkSafely(item, MetaUtility.RISK_PROFILE_LINK)));
-        fullProjectVersion.setVersionReportLink((metaService.getFirstLinkSafely(item, MetaUtility.VERSION_REPORT_LINK)));
-        fullProjectVersion.setVulnerableComponentsLink((metaService.getFirstLinkSafely(item, MetaUtility.VULNERABLE_COMPONENTS_LINK)));
+        fullProjectVersion.setCodeLocationsLink((metaService.getFirstLinkSafely(item, MetaHandler.CODE_LOCATION_LINK)));
+        fullProjectVersion.setComponentsLink((metaService.getFirstLinkSafely(item, MetaHandler.COMPONENTS_LINK)));
+        fullProjectVersion.setPolicyStatusLink((metaService.getFirstLinkSafely(item, MetaHandler.POLICY_STATUS_LINK)));
+        fullProjectVersion.setProjectLink((metaService.getFirstLinkSafely(item, MetaHandler.PROJECT_LINK)));
+        fullProjectVersion.setRiskProfileLink((metaService.getFirstLinkSafely(item, MetaHandler.RISK_PROFILE_LINK)));
+        fullProjectVersion.setVersionReportLink((metaService.getFirstLinkSafely(item, MetaHandler.VERSION_REPORT_LINK)));
+        fullProjectVersion.setVulnerableComponentsLink((metaService.getFirstLinkSafely(item, MetaHandler.VULNERABLE_COMPONENTS_LINK)));
         return fullProjectVersion;
     }
 
-    public MetaUtility getMetaService() {
+    public MetaHandler getMetaService() {
         return metaService;
     }
 

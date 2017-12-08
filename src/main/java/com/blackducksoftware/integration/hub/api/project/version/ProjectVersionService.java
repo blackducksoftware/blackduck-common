@@ -28,7 +28,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
@@ -46,7 +46,7 @@ public class ProjectVersionService extends HubService {
     }
 
     public ProjectVersionView getProjectVersion(final ProjectView project, final String projectVersionName) throws IntegrationException {
-        final String versionsUrl = getFirstLink(project, MetaUtility.VERSIONS_LINK);
+        final String versionsUrl = getFirstLink(project, MetaHandler.VERSIONS_LINK);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, versionsUrl);
         if (StringUtils.isNotBlank(projectVersionName)) {
             hubPagedRequest.q = String.format("versionName:%s", projectVersionName);
@@ -63,7 +63,7 @@ public class ProjectVersionService extends HubService {
     }
 
     public List<ProjectVersionView> getAllProjectVersions(final ProjectView project) throws IntegrationException {
-        return getAllViewsFromLink(project, MetaUtility.VERSIONS_LINK, ProjectVersionView.class);
+        return getAllViewsFromLink(project, MetaHandler.VERSIONS_LINK, ProjectVersionView.class);
     }
 
     public List<ProjectVersionView> getAllProjectVersions(final String versionsUrl) throws IntegrationException {
@@ -72,7 +72,7 @@ public class ProjectVersionService extends HubService {
     }
 
     public String createHubVersion(final ProjectView project, final ProjectVersionRequest version) throws IntegrationException {
-        return createHubVersion(getFirstLink(project, MetaUtility.VERSIONS_LINK), version);
+        return createHubVersion(getFirstLink(project, MetaHandler.VERSIONS_LINK), version);
     }
 
     public String createHubVersion(final String versionsUrl, final ProjectVersionRequest version) throws IntegrationException {

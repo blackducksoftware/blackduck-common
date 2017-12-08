@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.item;
+package com.blackducksoftware.integration.hub.api.view;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ import com.blackducksoftware.integration.hub.model.view.components.LinkView;
 import com.blackducksoftware.integration.hub.model.view.components.MetaView;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class MetaUtility {
+public class MetaHandler {
     public static final String PROJECTS_LINK = "projects";
     public static final String PROJECT_LINK = "project";
     public static final String VERSIONS_LINK = "versions";
@@ -64,12 +64,12 @@ public class MetaUtility {
 
     private final IntLogger logger;
 
-    public MetaUtility(final IntLogger logger) {
+    public MetaHandler(final IntLogger logger) {
         this.logger = logger;
     }
 
-    public boolean hasLink(final HubView item, final String linkKey) throws HubIntegrationException {
-        final MetaView meta = item.meta;
+    public boolean hasLink(final HubView view, final String linkKey) throws HubIntegrationException {
+        final MetaView meta = view.meta;
         if (meta == null) {
             return false;
         }
@@ -85,8 +85,8 @@ public class MetaUtility {
         return false;
     }
 
-    public String getFirstLink(final HubView item, final String linkKey) throws HubIntegrationException {
-        final List<LinkView> links = getLinkViews(item);
+    public String getFirstLink(final HubView view, final String linkKey) throws HubIntegrationException {
+        final List<LinkView> links = getLinkViews(view);
         final StringBuilder linksAvailable = new StringBuilder();
         linksAvailable.append("Could not find the link '" + linkKey + "', these are the available links : ");
         int i = 0;
@@ -100,22 +100,22 @@ public class MetaUtility {
             linksAvailable.append("'" + link.rel + "'");
             i++;
         }
-        linksAvailable.append(". For Item : " + item.meta.href);
+        linksAvailable.append(". For View : " + view.meta.href);
         throw new HubIntegrationException(linksAvailable.toString());
     }
 
-    public String getFirstLinkSafely(final HubView item, final String linkKey) {
+    public String getFirstLinkSafely(final HubView view, final String linkKey) {
         try {
-            final String link = getFirstLink(item, linkKey);
+            final String link = getFirstLink(view, linkKey);
             return link;
         } catch (final HubIntegrationException e) {
-            logger.debug("Link '" + linkKey + "' not found on item : " + item.json, e);
+            logger.debug("Link '" + linkKey + "' not found on view : " + view.json, e);
             return null;
         }
     }
 
-    public List<String> getLinks(final HubView item, final String linkKey) throws HubIntegrationException {
-        final List<LinkView> links = getLinkViews(item);
+    public List<String> getLinks(final HubView view, final String linkKey) throws HubIntegrationException {
+        final List<LinkView> links = getLinkViews(view);
         final List<String> linkHrefs = new ArrayList<>();
         final StringBuilder linksAvailable = new StringBuilder();
         linksAvailable.append("Could not find the link '" + linkKey + "', these are the available links : ");
@@ -133,40 +133,40 @@ public class MetaUtility {
         if (!linkHrefs.isEmpty()) {
             return linkHrefs;
         }
-        linksAvailable.append(". For Item : " + item.meta.href);
+        linksAvailable.append(". For View : " + view.meta.href);
         throw new HubIntegrationException(linksAvailable.toString());
     }
 
-    public MetaView getMetaView(final HubView item) throws HubIntegrationException {
-        final MetaView meta = item.meta;
+    public MetaView getMetaView(final HubView view) throws HubIntegrationException {
+        final MetaView meta = view.meta;
         if (meta == null) {
-            throw new HubIntegrationException("Could not find meta information for this item : " + item.json);
+            throw new HubIntegrationException("Could not find meta information for this view : " + view.json);
         }
         return meta;
     }
 
-    public List<LinkView> getLinkViews(final HubView item) throws HubIntegrationException {
-        final MetaView meta = getMetaView(item);
+    public List<LinkView> getLinkViews(final HubView view) throws HubIntegrationException {
+        final MetaView meta = getMetaView(view);
         final List<LinkView> links = meta.links;
         if (links == null) {
-            throw new HubIntegrationException("Could not find any links for this item : " + item.json);
+            throw new HubIntegrationException("Could not find any links for this view : " + view.json);
         }
         return links;
     }
 
-    public List<AllowEnum> getAllowedMethods(final HubView item) throws HubIntegrationException {
-        final MetaView meta = getMetaView(item);
+    public List<AllowEnum> getAllowedMethods(final HubView view) throws HubIntegrationException {
+        final MetaView meta = getMetaView(view);
         return meta.allow;
     }
 
-    public String getHref(final HubView item) throws HubIntegrationException {
-        final MetaView meta = getMetaView(item);
+    public String getHref(final HubView view) throws HubIntegrationException {
+        final MetaView meta = getMetaView(view);
         final String href = meta.href;
         if (href == null) {
             if (logger != null) {
-                logger.error("Hub Item has no href : " + item.json);
+                logger.error("Hub View has no href : " + view.json);
             }
-            throw new HubIntegrationException("This Hub item does not have any href information.");
+            throw new HubIntegrationException("This Hub view does not have any href information.");
         }
         return href;
     }

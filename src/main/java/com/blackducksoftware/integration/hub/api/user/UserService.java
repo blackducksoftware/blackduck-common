@@ -28,7 +28,7 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_USE
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
 import com.blackducksoftware.integration.hub.model.view.RoleView;
@@ -57,12 +57,12 @@ public class UserService extends HubService {
     }
 
     public List<AssignedProjectView> getUserAssignedProjects(final UserView userView) throws IntegrationException {
-        final List<AssignedProjectView> assignedProjectViews = getAllViewsFromLink(userView, MetaUtility.PROJECTS_LINK, AssignedProjectView.class);
+        final List<AssignedProjectView> assignedProjectViews = getAllViewsFromLink(userView, MetaHandler.PROJECTS_LINK, AssignedProjectView.class);
         return assignedProjectViews;
     }
 
     public List<RoleView> getUserRoles(final UserView userView) throws IntegrationException {
-        final List<RoleView> assignedRoles = this.getAllViewsFromLink(userView, MetaUtility.ROLES_LINK, RoleView.class);
+        final List<RoleView> assignedRoles = this.getAllViewsFromLink(userView, MetaHandler.ROLES_LINK, RoleView.class);
         return assignedRoles;
     }
 

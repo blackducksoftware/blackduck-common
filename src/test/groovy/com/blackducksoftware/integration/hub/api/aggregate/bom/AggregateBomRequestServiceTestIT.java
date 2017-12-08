@@ -33,7 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
@@ -54,7 +54,7 @@ public class AggregateBomRequestServiceTestIT {
     @Test
     public void testGetBomEntriesForUrl() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServices = restConnectionTestHelper.createHubServicesFactory();
-        final MetaUtility metaService = new MetaUtility(restConnectionTestHelper.createIntLogger());
+        final MetaHandler metaService = new MetaHandler(restConnectionTestHelper.createIntLogger());
         final AggregateBomService bomRequestService = hubServices.createAggregateBomRequestService();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");

@@ -33,7 +33,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.enumeration.CodeLocationEnum;
 import com.blackducksoftware.integration.hub.model.view.CodeLocationView;
@@ -63,7 +63,7 @@ public class CodeLocationService extends HubService {
     }
 
     public List<CodeLocationView> getAllCodeLocationsForProjectVersion(final ProjectVersionView version) throws IntegrationException {
-        return getAllViewsFromLink(version, MetaUtility.CODE_LOCATION_LINK, CodeLocationView.class);
+        return getAllViewsFromLink(version, MetaHandler.CODE_LOCATION_LINK, CodeLocationView.class);
     }
 
     public void unmapCodeLocations(final List<CodeLocationView> codeLocationItems) throws IntegrationException {

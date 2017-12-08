@@ -26,7 +26,7 @@ package com.blackducksoftware.integration.hub.api.project;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.model.view.AssignedGroupView;
 import com.blackducksoftware.integration.hub.model.view.AssignedUserView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
@@ -39,11 +39,11 @@ public class ProjectAssignmentService extends HubService {
     }
 
     public List<AssignedUserView> getProjectUsers(final ProjectView projectView) throws IntegrationException {
-        return getAllViewsFromLink(projectView, MetaUtility.USERS_LINK, AssignedUserView.class);
+        return getAllViewsFromLink(projectView, MetaHandler.USERS_LINK, AssignedUserView.class);
     }
 
     public List<AssignedGroupView> getProjectGroups(final ProjectView projectView) throws IntegrationException {
-        return getAllViewsFromLink(projectView, MetaUtility.GROUPS_LINK, AssignedGroupView.class);
+        return getAllViewsFromLink(projectView, MetaHandler.GROUPS_LINK, AssignedGroupView.class);
     }
 
 }

@@ -28,7 +28,7 @@ import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.HubView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
@@ -40,13 +40,13 @@ import com.google.gson.JsonParser;
 
 import okhttp3.Response;
 
-public class HubViewManager {
+public class HubViewTransformer {
     private final HubRequestFactory hubRequestFactory;
-    private final MetaUtility metaUtility;
+    private final MetaHandler metaUtility;
     private final JsonParser jsonParser;
     private final Gson gson;
 
-    public HubViewManager(final HubRequestFactory hubRequestFactory, final MetaUtility metaUtility, final JsonParser jsonParser, final Gson gson) {
+    public HubViewTransformer(final HubRequestFactory hubRequestFactory, final MetaHandler metaUtility, final JsonParser jsonParser, final Gson gson) {
         this.hubRequestFactory = hubRequestFactory;
         this.metaUtility = metaUtility;
         this.jsonParser = jsonParser;

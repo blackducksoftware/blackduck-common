@@ -32,12 +32,12 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.bom.BomImportService;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
@@ -77,7 +77,7 @@ public class ReportRequestServiceTestIT {
             assertNotNull(report.getAggregateBomViewEntries());
             assertTrue(!report.getAggregateBomViewEntries().isEmpty());
         } finally {
-            final MetaUtility metaService = new MetaUtility(restConnectionTestHelper.createIntLogger());
+            final MetaHandler metaService = new MetaHandler(restConnectionTestHelper.createIntLogger());
             final HubRequest hubRequest = projectService.getHubRequestFactory().createRequest(metaService.getHref(project));
             hubRequest.executeDelete();
         }

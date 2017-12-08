@@ -26,7 +26,7 @@ package com.blackducksoftware.integration.hub.api.aggregate.bom;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -38,7 +38,7 @@ public class AggregateBomService extends HubService {
     }
 
     public List<VersionBomComponentView> getBomEntries(final ProjectVersionView projectVersion) throws IntegrationException {
-        return getAllViewsFromLinkSafely(projectVersion, MetaUtility.COMPONENTS_LINK, VersionBomComponentView.class);
+        return getAllViewsFromLinkSafely(projectVersion, MetaHandler.COMPONENTS_LINK, VersionBomComponentView.class);
     }
 
     public List<VersionBomComponentView> getBomEntries(final String componentsUrl) throws IntegrationException {

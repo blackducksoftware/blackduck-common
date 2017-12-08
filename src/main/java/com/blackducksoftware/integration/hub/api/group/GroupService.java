@@ -28,7 +28,7 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_GRO
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.view.UserGroupView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
@@ -55,7 +55,7 @@ public class GroupService extends HubService {
     }
 
     public List<UserView> getAllUsersForGroup(final UserGroupView userGroupView) throws IntegrationException {
-        return getAllViewsFromLink(userGroupView, MetaUtility.USERS_LINK, UserView.class);
+        return getAllViewsFromLink(userGroupView, MetaHandler.USERS_LINK, UserView.class);
     }
 
 }
