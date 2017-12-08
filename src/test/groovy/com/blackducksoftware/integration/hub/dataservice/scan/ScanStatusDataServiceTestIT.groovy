@@ -26,7 +26,7 @@ package com.blackducksoftware.integration.hub.dataservice.scan
 import org.junit.Assert
 import org.junit.Test
 
-import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService
+import com.blackducksoftware.integration.hub.api.bom.BomImportService
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
@@ -40,7 +40,7 @@ class ScanStatusDataServiceTestIT {
     void testBdioImportForNewProject() {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        final BomImportRequestService bomImportRequestService = hubServicesFactory.createBomImportRequestService()
+        final BomImportService bomImportRequestService = hubServicesFactory.createBomImportRequestService()
         final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(FIVE_MINUTES);
 
         // import the bdio

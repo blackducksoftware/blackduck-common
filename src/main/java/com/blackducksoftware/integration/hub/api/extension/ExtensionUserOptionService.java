@@ -26,27 +26,17 @@ package com.blackducksoftware.integration.hub.api.extension;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.model.view.ExternalExtensionConfigValueView;
+import com.blackducksoftware.integration.hub.model.view.ExternalExtensionUserView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
-public class ExtensionConfigRequestService extends HubResponseService {
-    public ExtensionConfigRequestService(final RestConnection restConnection) {
+public class ExtensionUserOptionService extends HubService {
+    public ExtensionUserOptionService(final RestConnection restConnection) {
         super(restConnection);
     }
 
-    public List<ExternalExtensionConfigValueView> getGlobalOptions(final String globalConfigUrl) throws IntegrationException {
-        final List<ExternalExtensionConfigValueView> allItems = getAllItems(globalConfigUrl, ExternalExtensionConfigValueView.class);
-        return allItems;
-    }
-
-    public List<ExternalExtensionConfigValueView> getCurrentUserOptions(final String currentUserConfigUrl) throws IntegrationException {
-        final List<ExternalExtensionConfigValueView> allItems = getAllItems(currentUserConfigUrl, ExternalExtensionConfigValueView.class);
-        return allItems;
-    }
-
-    public List<ExternalExtensionConfigValueView> getUserConfiguration(final String userConfigUrl) throws IntegrationException {
-        final List<ExternalExtensionConfigValueView> allItems = getAllItems(userConfigUrl, ExternalExtensionConfigValueView.class);
+    public List<ExternalExtensionUserView> getUserOptions(final String userOptionsUrl) throws IntegrationException {
+        final List<ExternalExtensionUserView> allItems = getAllViews(userOptionsUrl, ExternalExtensionUserView.class);
         return allItems;
     }
 

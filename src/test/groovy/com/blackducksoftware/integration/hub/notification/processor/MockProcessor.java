@@ -26,8 +26,8 @@ package com.blackducksoftware.integration.hub.notification.processor;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityService;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
@@ -36,7 +36,7 @@ import com.blackducksoftware.integration.hub.notification.processor.event.Notifi
 
 public class MockProcessor extends NotificationProcessor<Collection<NotificationEvent>> {
 
-    public MockProcessor(final VulnerabilityRequestService vulnerabilityRequestService, final MetaService metaService) {
+    public MockProcessor(final VulnerabilityService vulnerabilityRequestService, final MetaUtility metaService) {
         final MapProcessorCache cache = new MapProcessorCache();
         getCacheList().add(cache);
         getProcessorMap().put(PolicyViolationContentItem.class, new MockEventProcessor(cache, metaService));

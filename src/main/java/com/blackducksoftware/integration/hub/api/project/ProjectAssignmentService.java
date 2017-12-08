@@ -21,24 +21,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.vulnerability;
+package com.blackducksoftware.integration.hub.api.project;
 
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.HubMediaTypes;
-import com.blackducksoftware.integration.hub.model.view.VulnerabilityView;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.model.view.AssignedGroupView;
+import com.blackducksoftware.integration.hub.model.view.AssignedUserView;
+import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
-public class VulnerabilityRequestService extends HubResponseService {
-    public VulnerabilityRequestService(final RestConnection restConnection) {
+public class ProjectAssignmentService extends HubService {
+    public ProjectAssignmentService(final RestConnection restConnection) {
         super(restConnection);
     }
 
-    public List<VulnerabilityView> getComponentVersionVulnerabilities(final String vulnerabilitiesUrl) throws IntegrationException {
-        final List<VulnerabilityView> allItems = getAllItems(vulnerabilitiesUrl, VulnerabilityView.class, HubMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
-        return allItems;
+    public List<AssignedUserView> getProjectUsers(final ProjectView projectView) throws IntegrationException {
+        return getAllViewsFromLink(projectView, MetaUtility.USERS_LINK, AssignedUserView.class);
+    }
+
+    public List<AssignedGroupView> getProjectGroups(final ProjectView projectView) throws IntegrationException {
+        return getAllViewsFromLink(projectView, MetaUtility.GROUPS_LINK, AssignedGroupView.class);
     }
 
 }

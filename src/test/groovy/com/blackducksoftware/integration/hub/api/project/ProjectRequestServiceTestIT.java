@@ -33,7 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
 import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
@@ -47,9 +47,9 @@ import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 public class ProjectRequestServiceTestIT {
     private static HubServicesFactory hubServices;
 
-    private static ProjectRequestService projectRequestService;
+    private static ProjectService projectRequestService;
 
-    private static ProjectVersionRequestService projectVersionRequestService;
+    private static ProjectVersionService projectVersionRequestService;
 
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
@@ -81,7 +81,7 @@ public class ProjectRequestServiceTestIT {
         final String projectUrl = projectRequestService.createHubProject(new ProjectRequest(testProjectName));
         System.out.println("projectUrl: " + projectUrl);
 
-        project = projectRequestService.getItem(projectUrl, ProjectView.class);
+        project = projectRequestService.getView(projectUrl, ProjectView.class);
         projectVersionRequestService.createHubVersion(project, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion1Name));
         projectVersionRequestService.createHubVersion(project, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion2Name));
         projectVersionRequestService.createHubVersion(project, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion3Name));
@@ -99,7 +99,7 @@ public class ProjectRequestServiceTestIT {
         project = null;
 
         try {
-            project = projectRequestService.getItem(projectUrl, ProjectView.class);
+            project = projectRequestService.getView(projectUrl, ProjectView.class);
             if (project != null) {
                 fail("This project should have been deleted");
             }

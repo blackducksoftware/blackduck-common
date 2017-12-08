@@ -26,21 +26,21 @@ package com.blackducksoftware.integration.hub.dataservice.policystatus;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.project.ProjectService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomPolicyStatusView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
-public class PolicyStatusDataService extends HubResponseService {
-    private final ProjectRequestService projectRequestService;
-    private final ProjectVersionRequestService projectVersionRequestService;
+public class PolicyStatusDataService extends HubService {
+    private final ProjectService projectRequestService;
+    private final ProjectVersionService projectVersionRequestService;
 
-    public PolicyStatusDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService) {
+    public PolicyStatusDataService(final RestConnection restConnection, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService) {
         super(restConnection);
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
@@ -48,23 +48,23 @@ public class PolicyStatusDataService extends HubResponseService {
 
     public VersionBomPolicyStatusView getPolicyStatusForProjectAndVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = projectRequestService.getProjectByName(projectName);
-        final String versionsUrl = getFirstLink(projectItem, MetaService.VERSIONS_LINK);
+        final String versionsUrl = getFirstLink(projectItem, MetaUtility.VERSIONS_LINK);
 
         final List<ProjectVersionView> projectVersions = projectVersionRequestService.getAllProjectVersions(versionsUrl);
         final String policyStatusUrl = findPolicyStatusUrlFromVersions(projectVersions, projectVersionName);
 
-        return getItem(policyStatusUrl, VersionBomPolicyStatusView.class);
+        return getView(policyStatusUrl, VersionBomPolicyStatusView.class);
     }
 
     public VersionBomPolicyStatusView getPolicyStatusForVersion(final ProjectVersionView version) throws IntegrationException {
-        final String policyStatusUrl = getFirstLink(version, MetaService.POLICY_STATUS_LINK);
-        return getItem(policyStatusUrl, VersionBomPolicyStatusView.class);
+        final String policyStatusUrl = getFirstLink(version, MetaUtility.POLICY_STATUS_LINK);
+        return getView(policyStatusUrl, VersionBomPolicyStatusView.class);
     }
 
     private String findPolicyStatusUrlFromVersions(final List<ProjectVersionView> projectVersions, final String projectVersionName) throws HubIntegrationException {
         for (final ProjectVersionView version : projectVersions) {
             if (projectVersionName.equals(version.versionName)) {
-                final String policyStatusLink = getFirstLink(version, MetaService.POLICY_STATUS_LINK);
+                final String policyStatusLink = getFirstLink(version, MetaUtility.POLICY_STATUS_LINK);
                 return policyStatusLink;
             }
         }

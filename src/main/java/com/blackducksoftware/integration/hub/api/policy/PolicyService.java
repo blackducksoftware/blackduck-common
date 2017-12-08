@@ -30,15 +30,15 @@ import java.util.List;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
-public class PolicyRequestService extends HubResponseService {
-    public PolicyRequestService(final RestConnection restConnection) {
+public class PolicyService extends HubService {
+    public PolicyService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public List<PolicyRuleView> getAllPolicyRules() throws IntegrationException {
-        final List<PolicyRuleView> allPolicyRuleItems = getAllItemsFromApi(SEGMENT_POLICY_RULES, PolicyRuleView.class);
+        final List<PolicyRuleView> allPolicyRuleItems = getAllViewsFromApi(SEGMENT_POLICY_RULES, PolicyRuleView.class);
         return allPolicyRuleItems;
     }
 }

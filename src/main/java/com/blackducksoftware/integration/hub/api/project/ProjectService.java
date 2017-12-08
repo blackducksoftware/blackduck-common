@@ -38,19 +38,19 @@ import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
 import okhttp3.Response;
 
-public class ProjectRequestService extends HubResponseService {
+public class ProjectService extends HubService {
     private static final List<String> PROJECTS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS);
 
-    public ProjectRequestService(final RestConnection restConnection) {
+    public ProjectService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public List<ProjectView> getAllProjects() throws IntegrationException {
-        final List<ProjectView> allProjectItems = getAllItemsFromApi(SEGMENT_PROJECTS, ProjectView.class);
+        final List<ProjectView> allProjectItems = getAllViewsFromApi(SEGMENT_PROJECTS, ProjectView.class);
         return allProjectItems;
     }
 
@@ -59,7 +59,7 @@ public class ProjectRequestService extends HubResponseService {
         if (StringUtils.isNotBlank(projectName)) {
             hubPagedRequest.q = "name:" + projectName;
         }
-        final List<ProjectView> allProjectItems = getAllItems(hubPagedRequest, ProjectView.class);
+        final List<ProjectView> allProjectItems = getAllViews(hubPagedRequest, ProjectView.class);
         return allProjectItems;
     }
 
@@ -69,7 +69,7 @@ public class ProjectRequestService extends HubResponseService {
             hubPagedRequest.q = "name:" + projectName;
         }
 
-        final List<ProjectView> projectItems = getItems(hubPagedRequest, ProjectView.class);
+        final List<ProjectView> projectItems = getViews(hubPagedRequest, ProjectView.class);
         return projectItems;
     }
 

@@ -32,11 +32,11 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
-import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.project.ProjectService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
 import com.blackducksoftware.integration.hub.model.enumeration.CodeLocationEnum;
@@ -52,17 +52,17 @@ public class ScanStatusDataService {
     public static final long DEFAULT_TIMEOUT = 300000L;
 
     private final IntLogger logger;
-    private final ProjectRequestService projectRequestService;
-    private final ProjectVersionRequestService projectVersionRequestService;
-    private final CodeLocationRequestService codeLocationRequestService;
-    private final ScanSummaryRequestService scanSummaryRequestService;
-    private final MetaService metaService;
+    private final ProjectService projectRequestService;
+    private final ProjectVersionService projectVersionRequestService;
+    private final CodeLocationService codeLocationRequestService;
+    private final ScanSummaryService scanSummaryRequestService;
+    private final MetaUtility metaService;
     private final long timeoutInMilliseconds;
 
-    public ScanStatusDataService(final IntLogger logger, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService, final CodeLocationRequestService codeLocationRequestService,
-            final ScanSummaryRequestService scanSummaryRequestService, final long timeoutInMilliseconds) {
+    public ScanStatusDataService(final IntLogger logger, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService, final CodeLocationService codeLocationRequestService,
+            final ScanSummaryService scanSummaryRequestService, final long timeoutInMilliseconds) {
         this.logger = logger;
-        this.metaService = new MetaService(logger);
+        this.metaService = new MetaUtility(logger);
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.codeLocationRequestService = codeLocationRequestService;
@@ -97,9 +97,9 @@ public class ScanStatusDataService {
         while (!done(foundPendingScan, timeoutInMilliseconds, startedTime, timeoutMessage)) {
             try {
                 final CodeLocationView codeLocation = codeLocationRequestService.getCodeLocationByName(codeLocationName);
-                final String scanSummariesLink = metaService.getFirstLinkSafely(codeLocation, MetaService.SCANS_LINK);
+                final String scanSummariesLink = metaService.getFirstLinkSafely(codeLocation, MetaUtility.SCANS_LINK);
                 if (StringUtils.isNotBlank(scanSummariesLink)) {
-                    final ScanSummaryView scanSummaryView = scanSummaryRequestService.getItem(scanSummariesLink, ScanSummaryView.class);
+                    final ScanSummaryView scanSummaryView = scanSummaryRequestService.getView(scanSummariesLink, ScanSummaryView.class);
                     if (isPending(scanSummaryView.status)) {
                         pendingScans.add(scanSummaryView);
                     }
@@ -133,7 +133,7 @@ public class ScanStatusDataService {
         final List<CodeLocationView> allCodeLocations = codeLocationRequestService.getAllCodeLocationsForProjectVersion(projectVersionView);
         final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
         for (final CodeLocationView codeLocationView : allCodeLocations) {
-            final String scansLink = metaService.getFirstLinkSafely(codeLocationView, MetaService.SCANS_LINK);
+            final String scansLink = metaService.getFirstLinkSafely(codeLocationView, MetaUtility.SCANS_LINK);
             final List<ScanSummaryView> codeLocationScanSummaryViews = scanSummaryRequestService.getAllScanSummaryItems(scansLink);
             scanSummaryViews.addAll(codeLocationScanSummaryViews);
         }
@@ -206,7 +206,7 @@ public class ScanStatusDataService {
                 logger.debug("Checking codeLocation: " + codeLocationItem.name);
                 final String mappedProjectVersionUrl = codeLocationItem.mappedProjectVersion;
                 if (projectVersionUrl.equals(mappedProjectVersionUrl)) {
-                    final String scanSummariesLink = metaService.getFirstLink(codeLocationItem, MetaService.SCANS_LINK);
+                    final String scanSummariesLink = metaService.getFirstLink(codeLocationItem, MetaUtility.SCANS_LINK);
                     allScanSummariesLinks.add(scanSummariesLink);
                 }
             }
@@ -237,7 +237,7 @@ public class ScanStatusDataService {
         final List<ScanSummaryView> pendingScans = new ArrayList<>();
         for (final ScanSummaryView scanSummaryItem : scanSummaries) {
             final String scanSummaryLink = metaService.getHref(scanSummaryItem);
-            final ScanSummaryView currentScanSummaryItem = scanSummaryRequestService.getItem(scanSummaryLink, ScanSummaryView.class);
+            final ScanSummaryView currentScanSummaryItem = scanSummaryRequestService.getView(scanSummaryLink, ScanSummaryView.class);
             if (isPending(currentScanSummaryItem.status)) {
                 pendingScans.add(currentScanSummaryItem);
             } else if (isError(currentScanSummaryItem.status)) {

@@ -34,7 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
@@ -49,7 +49,7 @@ import com.blackducksoftware.integration.hub.notification.processor.event.Notifi
 public class MockEventProcessor extends NotificationSubProcessor {
     private final Logger logger = LoggerFactory.getLogger(MockEventProcessor.class);
 
-    public MockEventProcessor(final MapProcessorCache cache, final MetaService metaService) {
+    public MockEventProcessor(final MapProcessorCache cache, final MetaUtility metaService) {
         super(cache, metaService);
     }
 

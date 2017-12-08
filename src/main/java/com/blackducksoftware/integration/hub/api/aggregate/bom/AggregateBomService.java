@@ -21,30 +21,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.project;
+package com.blackducksoftware.integration.hub.api.aggregate.bom;
 
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.model.view.AssignedGroupView;
-import com.blackducksoftware.integration.hub.model.view.AssignedUserView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
-public class ProjectAssignmentRequestService extends HubResponseService {
-
-    public ProjectAssignmentRequestService(final RestConnection restConnection) {
+public class AggregateBomService extends HubService {
+    public AggregateBomService(final RestConnection restConnection) {
         super(restConnection);
     }
 
-    public List<AssignedUserView> getProjectUsers(final ProjectView projectView) throws IntegrationException {
-        return getAllItemsFromLink(projectView, MetaService.USERS_LINK, AssignedUserView.class);
+    public List<VersionBomComponentView> getBomEntries(final ProjectVersionView projectVersion) throws IntegrationException {
+        return getAllViewsFromLinkSafely(projectVersion, MetaUtility.COMPONENTS_LINK, VersionBomComponentView.class);
     }
 
-    public List<AssignedGroupView> getProjectGroups(final ProjectView projectView) throws IntegrationException {
-        return getAllItemsFromLink(projectView, MetaService.GROUPS_LINK, AssignedGroupView.class);
+    public List<VersionBomComponentView> getBomEntries(final String componentsUrl) throws IntegrationException {
+        return getAllViews(componentsUrl, VersionBomComponentView.class);
     }
 
 }

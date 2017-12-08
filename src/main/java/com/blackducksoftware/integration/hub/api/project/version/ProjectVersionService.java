@@ -28,7 +28,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
@@ -36,24 +36,23 @@ import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
 import okhttp3.Response;
 
-public class ProjectVersionRequestService extends HubResponseService {
-
-    public ProjectVersionRequestService(final RestConnection restConnection) {
+public class ProjectVersionService extends HubService {
+    public ProjectVersionService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public ProjectVersionView getProjectVersion(final ProjectView project, final String projectVersionName) throws IntegrationException {
-        final String versionsUrl = getFirstLink(project, MetaService.VERSIONS_LINK);
+        final String versionsUrl = getFirstLink(project, MetaUtility.VERSIONS_LINK);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, versionsUrl);
         if (StringUtils.isNotBlank(projectVersionName)) {
             hubPagedRequest.q = String.format("versionName:%s", projectVersionName);
         }
 
-        final List<ProjectVersionView> allProjectVersionMatchingItems = getAllItems(hubPagedRequest, ProjectVersionView.class);
+        final List<ProjectVersionView> allProjectVersionMatchingItems = getAllViews(hubPagedRequest, ProjectVersionView.class);
         for (final ProjectVersionView projectVersion : allProjectVersionMatchingItems) {
             if (projectVersionName.equals(projectVersion.versionName)) {
                 return projectVersion;
@@ -64,16 +63,16 @@ public class ProjectVersionRequestService extends HubResponseService {
     }
 
     public List<ProjectVersionView> getAllProjectVersions(final ProjectView project) throws IntegrationException {
-        return getAllItemsFromLink(project, MetaService.VERSIONS_LINK, ProjectVersionView.class);
+        return getAllViewsFromLink(project, MetaUtility.VERSIONS_LINK, ProjectVersionView.class);
     }
 
     public List<ProjectVersionView> getAllProjectVersions(final String versionsUrl) throws IntegrationException {
-        final List<ProjectVersionView> allProjectVersionItems = getAllItems(versionsUrl, ProjectVersionView.class);
+        final List<ProjectVersionView> allProjectVersionItems = getAllViews(versionsUrl, ProjectVersionView.class);
         return allProjectVersionItems;
     }
 
     public String createHubVersion(final ProjectView project, final ProjectVersionRequest version) throws IntegrationException {
-        return createHubVersion(getFirstLink(project, MetaService.VERSIONS_LINK), version);
+        return createHubVersion(getFirstLink(project, MetaUtility.VERSIONS_LINK), version);
     }
 
     public String createHubVersion(final String versionsUrl, final ProjectVersionRequest version) throws IntegrationException {

@@ -24,28 +24,28 @@
 package com.blackducksoftware.integration.hub.dataservice.license;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
-import com.blackducksoftware.integration.hub.api.license.LicenseRequestService;
-import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
+import com.blackducksoftware.integration.hub.api.component.ComponentService;
+import com.blackducksoftware.integration.hub.api.license.LicenseService;
 import com.blackducksoftware.integration.hub.model.view.ComplexLicenseView;
+import com.blackducksoftware.integration.hub.model.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.model.view.LicenseView;
 import com.blackducksoftware.integration.hub.model.view.components.VersionBomLicenseView;
 
 public class LicenseDataService {
 
-    private final ComponentRequestService componentRequestService;
-    private final LicenseRequestService licenseRequestService;
+    private final ComponentService componentRequestService;
+    private final LicenseService licenseRequestService;
 
-    public LicenseDataService(final ComponentRequestService componentRequestService, final LicenseRequestService licenseRequestService) {
+    public LicenseDataService(final ComponentService componentRequestService, final LicenseService licenseRequestService) {
         this.componentRequestService = componentRequestService;
         this.licenseRequestService = licenseRequestService;
     }
 
     public ComplexLicenseView getComplexLicenseItemFromComponent(final String namespace, final String groupId, final String artifactId, final String version) throws IntegrationException {
-        final ComponentSearchResultResponse component = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
-        final String versionUrl = component.version;
-        final ComponentVersionView componentVersion = componentRequestService.getItem(versionUrl, ComponentVersionView.class);
+        final ComponentSearchResultView componentSearchView = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
+        final String componentVersionUrl = componentSearchView.componentVersionUrl;
+        final ComponentVersionView componentVersion = componentRequestService.getView(componentVersionUrl, ComponentVersionView.class);
         return componentVersion.license;
     }
 
@@ -54,7 +54,7 @@ public class LicenseDataService {
         if (licenseUrl == null) {
             return null;
         }
-        final LicenseView licenseView = licenseRequestService.getItem(licenseUrl, LicenseView.class);
+        final LicenseView licenseView = licenseRequestService.getView(licenseUrl, LicenseView.class);
         return licenseView;
     }
 

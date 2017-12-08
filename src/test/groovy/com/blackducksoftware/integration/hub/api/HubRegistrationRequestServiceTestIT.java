@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
+import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
@@ -38,7 +38,7 @@ public class HubRegistrationRequestServiceTestIT {
     @Test
     public void testGettingAllProjects() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final HubRegistrationRequestService hubRegistrationRequestService = hubServicesFactory.createHubRegistrationRequestService();
+        final HubRegistrationService hubRegistrationRequestService = hubServicesFactory.createHubRegistrationRequestService();
         final String registrationId = hubRegistrationRequestService.getRegistrationId();
         assertTrue(StringUtils.isNotBlank(registrationId));
         System.out.println(registrationId);

@@ -25,8 +25,8 @@ package com.blackducksoftware.integration.hub.api;
 
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
-import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
+import com.blackducksoftware.integration.hub.api.component.ComponentService;
+import com.blackducksoftware.integration.hub.model.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
@@ -36,11 +36,9 @@ public class ComponentRequestServiceTestIT {
     @Test
     public void testGettingHubCommon() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final ComponentRequestService componentRequestService = hubServicesFactory.createComponentRequestService();
-        final ComponentSearchResultResponse componentItem = componentRequestService.getExactComponentMatch("maven", "com.blackducksoftware.integration",
-                "hub-common",
-                "2.1.0");
-        System.out.println(componentItem);
+        final ComponentService componentRequestService = hubServicesFactory.createComponentRequestService();
+        final ComponentSearchResultView componentSearchView = componentRequestService.getExactComponentMatch("maven", "com.blackducksoftware.integration", "hub-common", "2.1.0");
+        System.out.println(componentSearchView);
     }
 
 }

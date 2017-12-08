@@ -27,13 +27,12 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.model.view.IssueView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
 import okhttp3.Response;
 
-public class BomComponentIssueRequestService extends HubResponseService {
-
-    public BomComponentIssueRequestService(final RestConnection restConnection) {
+public class BomComponentIssueService extends HubService {
+    public BomComponentIssueService(final RestConnection restConnection) {
         super(restConnection);
     }
 
@@ -71,4 +70,5 @@ public class BomComponentIssueRequestService extends HubResponseService {
         final HubRequest request = getHubRequestFactory().createRequest(issueItemUrl);
         request.executeDelete();
     }
+
 }

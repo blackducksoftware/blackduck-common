@@ -26,22 +26,22 @@ package com.blackducksoftware.integration.hub.api.license;
 import java.io.IOException;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.view.LicenseView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
 import okhttp3.Response;
 
-public class LicenseRequestService extends HubResponseService {
-    public LicenseRequestService(final RestConnection restConnection) {
+public class LicenseService extends HubService {
+    public LicenseService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public String getLicenseText(final LicenseView licenseView) throws IntegrationException {
-        final String licenseTextUrl = getFirstLinkSafely(licenseView, MetaService.TEXT_LINK);
+        final String licenseTextUrl = getFirstLinkSafely(licenseView, MetaUtility.TEXT_LINK);
         final HubRequest hubRequest = getHubRequestFactory().createRequest(licenseTextUrl);
         Response response = null;
         try {

@@ -34,15 +34,15 @@ import org.apache.commons.io.FileUtils;
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
-import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
+import com.blackducksoftware.integration.hub.api.project.ProjectService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
 import com.blackducksoftware.integration.hub.builder.HubScanConfigBuilder;
-import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
-import com.blackducksoftware.integration.hub.cli.SimpleScanService;
+import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
+import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
@@ -65,22 +65,22 @@ public class CLIDataService {
     private final Gson gson;
     private final IntLogger logger;
     private final CIEnvironmentVariables ciEnvironmentVariables;
-    private final HubVersionRequestService hubVersionRequestService;
-    private final CLIDownloadService cliDownloadService;
+    private final HubVersionService hubVersionRequestService;
+    private final CLIDownloadUtility cliDownloadService;
     private final PhoneHomeDataService phoneHomeDataService;
-    private final ProjectRequestService projectRequestService;
-    private final ProjectVersionRequestService projectVersionRequestService;
-    private final CodeLocationRequestService codeLocationRequestService;
-    private final ScanSummaryRequestService scanSummaryRequestService;
+    private final ProjectService projectRequestService;
+    private final ProjectVersionService projectVersionRequestService;
+    private final CodeLocationService codeLocationRequestService;
+    private final ScanSummaryService scanSummaryRequestService;
     private final ScanStatusDataService scanStatusDataService;
-    private final MetaService metaService;
+    private final MetaUtility metaService;
 
     private HubSupportHelper hubSupportHelper;
     private ProjectVersionView version;
 
-    public CLIDataService(final IntLogger logger, final Gson gson, final CIEnvironmentVariables ciEnvironmentVariables, final HubVersionRequestService hubVersionRequestService, final CLIDownloadService cliDownloadService,
-            final PhoneHomeDataService phoneHomeDataService, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService, final CodeLocationRequestService codeLocationRequestService,
-            final ScanSummaryRequestService scanSummaryRequestService, final ScanStatusDataService scanStatusDataService) {
+    public CLIDataService(final IntLogger logger, final Gson gson, final CIEnvironmentVariables ciEnvironmentVariables, final HubVersionService hubVersionRequestService, final CLIDownloadUtility cliDownloadService,
+            final PhoneHomeDataService phoneHomeDataService, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService, final CodeLocationService codeLocationRequestService,
+            final ScanSummaryService scanSummaryRequestService, final ScanStatusDataService scanStatusDataService) {
         this.gson = gson;
         this.logger = logger;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
@@ -92,7 +92,7 @@ public class CLIDataService {
         this.codeLocationRequestService = codeLocationRequestService;
         this.scanSummaryRequestService = scanSummaryRequestService;
         this.scanStatusDataService = scanStatusDataService;
-        this.metaService = new MetaService(logger);
+        this.metaService = new MetaUtility(logger);
     }
 
     public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished,
@@ -109,18 +109,18 @@ public class CLIDataService {
             logger.debug(e.getMessage());
         }
         preScan(hubServerConfig, hubScanConfig, projectRequest, phoneHomeRequestBodyBuilder);
-        final SimpleScanService simpleScanService = createScanService(hubServerConfig, hubScanConfig, projectRequest);
+        final SimpleScanUtility simpleScanService = createScanService(hubServerConfig, hubScanConfig, projectRequest);
         final File[] scanSummaryFiles = runScan(simpleScanService);
         postScan(hubScanConfig, scanSummaryFiles, projectRequest, shouldWaitForScansFinished, simpleScanService);
         return version;
     }
 
-    private SimpleScanService createScanService(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
+    private SimpleScanUtility createScanService(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
         final HubScanConfig controlledConfig = getControlledScanConfig(hubScanConfig);
         if (hubScanConfig.isDryRun()) {
-            return new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, projectRequest.getName(), projectRequest.getVersionRequest().getVersionName());
+            return new SimpleScanUtility(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, projectRequest.getName(), projectRequest.getVersionRequest().getVersionName());
         } else {
-            return new SimpleScanService(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, null, null);
+            return new SimpleScanUtility(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, null, null);
         }
     }
 
@@ -128,7 +128,7 @@ public class CLIDataService {
      * This should only be invoked directly when dryRun == true. Otherwise, installAndRunControlledScan should be used.
      */
     public File[] runControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
-        final SimpleScanService simpleScanService = createScanService(hubServerConfig, hubScanConfig, projectRequest);
+        final SimpleScanUtility simpleScanService = createScanService(hubServerConfig, hubScanConfig, projectRequest);
         final File[] scanSummaryFiles = runScan(simpleScanService);
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
             cleanUpLogFiles(simpleScanService);
@@ -136,7 +136,7 @@ public class CLIDataService {
         return scanSummaryFiles;
     }
 
-    private File[] runScan(final SimpleScanService simpleScanService) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+    private File[] runScan(final SimpleScanUtility simpleScanService) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         simpleScanService.setupAndExecuteScan();
         final File[] scanSummaryFiles = simpleScanService.getScanSummaryFiles();
         return scanSummaryFiles;
@@ -176,7 +176,7 @@ public class CLIDataService {
         }
     }
 
-    private void postScan(final HubScanConfig hubScanConfig, final File[] scanSummaryFiles, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished, final SimpleScanService simpleScanService)
+    private void postScan(final HubScanConfig hubScanConfig, final File[] scanSummaryFiles, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished, final SimpleScanUtility simpleScanService)
             throws IntegrationException {
         logger.trace("Scan is dry run ${hubScanConfig.isDryRun()}");
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
@@ -193,9 +193,9 @@ public class CLIDataService {
                     scanSummary = getScanSummaryFromFile(scanSummaryFile);
                     scanSummaries.add(scanSummary);
                     scanSummaryFile.delete();
-                    final String codeLocationUrl = metaService.getFirstLinkSafely(scanSummary, MetaService.CODE_LOCATION_BOM_STATUS_LINK);
+                    final String codeLocationUrl = metaService.getFirstLinkSafely(scanSummary, MetaUtility.CODE_LOCATION_BOM_STATUS_LINK);
 
-                    final CodeLocationView codeLocationView = codeLocationRequestService.getItem(codeLocationUrl, CodeLocationView.class);
+                    final CodeLocationView codeLocationView = codeLocationRequestService.getView(codeLocationUrl, CodeLocationView.class);
                     codeLocationViews.add(codeLocationView);
                     codeLocationRequestService.mapCodeLocation(codeLocationView, version);
                 } catch (final IOException ex) {
@@ -232,7 +232,7 @@ public class CLIDataService {
         return builder.build();
     }
 
-    private void cleanUpLogFiles(final SimpleScanService simpleScanService) {
+    private void cleanUpLogFiles(final SimpleScanUtility simpleScanService) {
         final File standardOutputFile = simpleScanService.getStandardOutputFile();
         if (standardOutputFile != null && standardOutputFile.exists()) {
             standardOutputFile.delete();
@@ -285,13 +285,13 @@ public class CLIDataService {
             project = projectRequestService.getProjectByName(projectRequest.getName());
         } catch (final DoesNotExistException e) {
             final String projectURL = projectRequestService.createHubProject(projectRequest);
-            project = projectRequestService.getItem(projectURL, ProjectView.class);
+            project = projectRequestService.getView(projectURL, ProjectView.class);
         }
         try {
             version = projectVersionRequestService.getProjectVersion(project, projectRequest.getVersionRequest().getVersionName());
         } catch (final DoesNotExistException e) {
             final String versionURL = projectVersionRequestService.createHubVersion(project, projectRequest.getVersionRequest());
-            version = projectVersionRequestService.getItem(versionURL, ProjectVersionView.class);
+            version = projectVersionRequestService.getView(versionURL, ProjectVersionView.class);
         }
     }
 

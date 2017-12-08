@@ -27,8 +27,8 @@ import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
 
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadRequestService
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService
+import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
 import com.blackducksoftware.integration.hub.model.response.DryRunUploadResponse
 import com.blackducksoftware.integration.hub.model.view.CodeLocationView
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
@@ -55,11 +55,11 @@ class DryRunUploadRequestServiceTestIT {
     @Test
     public void testDryRunUpload(){
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        DryRunUploadRequestService dryRunUploadRequestService = services.createDryRunUploadRequestService()
+        DryRunUploadService dryRunUploadRequestService = services.createDryRunUploadRequestService()
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
-        CodeLocationRequestService codeLocationRequestService = services.createCodeLocationRequestService()
+        CodeLocationService codeLocationRequestService = services.createCodeLocationRequestService()
         CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
         Assert.assertNotNull(codeLocationView)
 

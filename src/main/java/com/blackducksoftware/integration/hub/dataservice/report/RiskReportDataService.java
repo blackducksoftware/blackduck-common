@@ -33,13 +33,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.project.ProjectService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
-import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
+import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -59,21 +59,21 @@ import com.blackducksoftware.integration.hub.report.api.ReportData;
 import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
 import com.blackducksoftware.integration.hub.report.pdf.PDFBoxWriter;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 
-public class RiskReportDataService extends HubResponseService {
+public class RiskReportDataService extends HubService {
     private final IntLogger logger;
-    private final ProjectRequestService projectRequestService;
-    private final ProjectVersionRequestService projectVersionRequestService;
-    private final ReportRequestService reportRequestService;
-    private final AggregateBomRequestService bomRequestService;
+    private final ProjectService projectRequestService;
+    private final ProjectVersionService projectVersionRequestService;
+    private final ReportService reportRequestService;
+    private final AggregateBomService bomRequestService;
     private final HubSupportHelper hubSupportHelper;
     private final IntegrationEscapeUtil escapeUtil;
 
-    public RiskReportDataService(final IntLogger logger, final RestConnection restConnection, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
-            final ReportRequestService reportRequestService, final AggregateBomRequestService bomRequestService, final HubSupportHelper hubSupportHelper, final IntegrationEscapeUtil escapeUtil) {
+    public RiskReportDataService(final IntLogger logger, final RestConnection restConnection, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService,
+            final ReportService reportRequestService, final AggregateBomService bomRequestService, final HubSupportHelper hubSupportHelper, final IntegrationEscapeUtil escapeUtil) {
         super(restConnection);
         this.logger = logger;
         this.projectRequestService = projectRequestService;
@@ -157,7 +157,7 @@ public class RiskReportDataService extends HubResponseService {
                     if (!policyFailure) {
                         // FIXME if we could check if the Hub has the policy module we could remove a lot of the mess
                         try {
-                            final BomComponentPolicyStatusView bomPolicyStatus = getItem(componentPolicyStatusURL, BomComponentPolicyStatusView.class);
+                            final BomComponentPolicyStatusView bomPolicyStatus = getView(componentPolicyStatusURL, BomComponentPolicyStatusView.class);
                             policyStatus = bomPolicyStatus.approvalStatus.toString();
                         } catch (final IntegrationException e) {
                             policyFailure = true;
@@ -226,8 +226,8 @@ public class RiskReportDataService extends HubResponseService {
     }
 
     private String getComponentPolicyURL(final String versionURL, final String componentURL) {
-        final String componentVersionSegments = componentURL.substring(componentURL.indexOf(MetaService.COMPONENTS_LINK));
-        return versionURL + "/" + componentVersionSegments + "/" + MetaService.POLICY_STATUS_LINK;
+        final String componentVersionSegments = componentURL.substring(componentURL.indexOf(MetaUtility.COMPONENTS_LINK));
+        return versionURL + "/" + componentVersionSegments + "/" + MetaUtility.POLICY_STATUS_LINK;
     }
 
     private BomComponent createBomComponentFromBomViewEntry(final VersionReport report, final AggregateBomViewEntry bomEntry) {
@@ -308,8 +308,8 @@ public class RiskReportDataService extends HubResponseService {
         if (bomEntry != null && StringUtils.isNotBlank(bomEntry.approvalStatus)) {
             final BomComponentPolicyStatusApprovalStatusEnum status = BomComponentPolicyStatusApprovalStatusEnum.valueOf(bomEntry.approvalStatus);
             if (status == BomComponentPolicyStatusApprovalStatusEnum.IN_VIOLATION) {
-                final String policyRuleLink = getFirstLink(bomEntry, MetaService.POLICY_RULES_LINK);
-                final List<PolicyRuleView> rules = getAllItems(policyRuleLink, PolicyRuleView.class);
+                final String policyRuleLink = getFirstLink(bomEntry, MetaUtility.POLICY_RULES_LINK);
+                final List<PolicyRuleView> rules = getAllViews(policyRuleLink, PolicyRuleView.class);
                 final List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (final PolicyRuleView policyRuleView : rules) {
                     final PolicyRule ruleViolated = new PolicyRule();

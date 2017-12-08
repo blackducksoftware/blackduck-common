@@ -62,7 +62,7 @@ import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 import com.google.gson.Gson;
 
-public class SimpleScanService {
+public class SimpleScanUtility {
     public static final int DEFAULT_MEMORY = 4096;
 
     private final Gson gson;
@@ -77,7 +77,7 @@ public class SimpleScanService {
 
     private File logDirectory;
 
-    public SimpleScanService(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig,
+    public SimpleScanUtility(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig,
             final String project, final String version) {
         this.gson = gson;
         this.logger = logger;

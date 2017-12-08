@@ -38,16 +38,15 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.response.VersionComparison;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
 import okhttp3.Response;
 
-public class HubVersionRequestService extends HubResponseService {
+public class HubVersionService extends HubService {
     private static final List<String> CURRENT_VERSION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION);
-
     private static final List<String> CURRENT_VERSION_COMPARISON_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON);
 
-    public HubVersionRequestService(final RestConnection restConnection) {
+    public HubVersionService(final RestConnection restConnection) {
         super(restConnection);
     }
 
@@ -74,7 +73,7 @@ public class HubVersionRequestService extends HubResponseService {
         try {
             response = hubVersionRequest.executeGet();
             final String jsonResponse = response.body().string();
-            final VersionComparison versionComparison = getItemAs(jsonResponse, VersionComparison.class);
+            final VersionComparison versionComparison = getGson().fromJson(jsonResponse, VersionComparison.class);
             return versionComparison;
         } catch (final IOException e) {
             throw new HubIntegrationException(e);

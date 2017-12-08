@@ -28,10 +28,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.notification.NotificationService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
@@ -40,20 +40,20 @@ import com.blackducksoftware.integration.hub.exception.HubItemTransformException
 import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.model.view.NotificationView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public abstract class AbstractNotificationTransformer implements ItemTransform<List<NotificationContentItem>, NotificationView> {
     private final IntLogger logger;
-    private final HubResponseService hubResponseService;
-    private final NotificationRequestService notificationService;
-    private final ProjectVersionRequestService projectVersionService;
-    private final PolicyRequestService policyService;
-    private final MetaService metaService;
+    private final HubService hubResponseService;
+    private final NotificationService notificationService;
+    private final ProjectVersionService projectVersionService;
+    private final PolicyService policyService;
+    private final MetaUtility metaService;
 
-    public AbstractNotificationTransformer(final HubResponseService hubResponseService, final NotificationRequestService notificationService, final ProjectVersionRequestService projectVersionService,
-            final PolicyRequestService policyService, final MetaService metaService) {
+    public AbstractNotificationTransformer(final HubService hubResponseService, final NotificationService notificationService, final ProjectVersionService projectVersionService,
+            final PolicyService policyService, final MetaUtility metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = new IntBufferedLogger();
         this.notificationService = notificationService;
@@ -62,8 +62,8 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
         this.metaService = metaService;
     }
 
-    public AbstractNotificationTransformer(final HubResponseService hubResponseService, final IntLogger logger, final NotificationRequestService notificationService, final ProjectVersionRequestService projectVersionService,
-            final PolicyRequestService policyService, final MetaService metaService) {
+    public AbstractNotificationTransformer(final HubService hubResponseService, final IntLogger logger, final NotificationService notificationService, final ProjectVersionService projectVersionService,
+            final PolicyService policyService, final MetaUtility metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = logger;
         this.notificationService = notificationService;
@@ -72,7 +72,7 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
         this.metaService = metaService;
     }
 
-    public HubResponseService getHubResponseService() {
+    public HubService getHubResponseService() {
         return hubResponseService;
     }
 
@@ -80,15 +80,15 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
         return logger;
     }
 
-    public NotificationRequestService getNotificationService() {
+    public NotificationService getNotificationService() {
         return notificationService;
     }
 
-    public ProjectVersionRequestService getProjectVersionService() {
+    public ProjectVersionService getProjectVersionService() {
         return projectVersionService;
     }
 
-    public PolicyRequestService getPolicyService() {
+    public PolicyService getPolicyService() {
         return policyService;
     }
 
@@ -98,7 +98,7 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
     protected ProjectVersionModel createFullProjectVersion(final String projectVersionUrl, final String projectName, final String versionName) throws IntegrationException {
         ProjectVersionView item;
         try {
-            item = hubResponseService.getItem(projectVersionUrl, ProjectVersionView.class);
+            item = hubResponseService.getView(projectVersionUrl, ProjectVersionView.class);
         } catch (final HubIntegrationException e) {
             final String msg = "Error getting the full ProjectVersion for this affected project version URL: " + projectVersionUrl + ": " + e.getMessage();
             throw new HubIntegrationException(msg, e);
@@ -115,24 +115,24 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
         fullProjectVersion.setSource(item.source);
 
         fullProjectVersion.setUrl(metaService.getHref(item));
-        fullProjectVersion.setCodeLocationsLink((metaService.getFirstLinkSafely(item, MetaService.CODE_LOCATION_LINK)));
-        fullProjectVersion.setComponentsLink((metaService.getFirstLinkSafely(item, MetaService.COMPONENTS_LINK)));
-        fullProjectVersion.setPolicyStatusLink((metaService.getFirstLinkSafely(item, MetaService.POLICY_STATUS_LINK)));
-        fullProjectVersion.setProjectLink((metaService.getFirstLinkSafely(item, MetaService.PROJECT_LINK)));
-        fullProjectVersion.setRiskProfileLink((metaService.getFirstLinkSafely(item, MetaService.RISK_PROFILE_LINK)));
-        fullProjectVersion.setVersionReportLink((metaService.getFirstLinkSafely(item, MetaService.VERSION_REPORT_LINK)));
-        fullProjectVersion.setVulnerableComponentsLink((metaService.getFirstLinkSafely(item, MetaService.VULNERABLE_COMPONENTS_LINK)));
+        fullProjectVersion.setCodeLocationsLink((metaService.getFirstLinkSafely(item, MetaUtility.CODE_LOCATION_LINK)));
+        fullProjectVersion.setComponentsLink((metaService.getFirstLinkSafely(item, MetaUtility.COMPONENTS_LINK)));
+        fullProjectVersion.setPolicyStatusLink((metaService.getFirstLinkSafely(item, MetaUtility.POLICY_STATUS_LINK)));
+        fullProjectVersion.setProjectLink((metaService.getFirstLinkSafely(item, MetaUtility.PROJECT_LINK)));
+        fullProjectVersion.setRiskProfileLink((metaService.getFirstLinkSafely(item, MetaUtility.RISK_PROFILE_LINK)));
+        fullProjectVersion.setVersionReportLink((metaService.getFirstLinkSafely(item, MetaUtility.VERSION_REPORT_LINK)));
+        fullProjectVersion.setVulnerableComponentsLink((metaService.getFirstLinkSafely(item, MetaUtility.VULNERABLE_COMPONENTS_LINK)));
         return fullProjectVersion;
     }
 
-    public MetaService getMetaService() {
+    public MetaUtility getMetaService() {
         return metaService;
     }
 
     protected ComponentVersionView getComponentVersion(final String componentVersionLink) throws IntegrationException {
         ComponentVersionView componentVersion = null;
         if (!StringUtils.isBlank(componentVersionLink)) {
-            componentVersion = hubResponseService.getItem(componentVersionLink, ComponentVersionView.class);
+            componentVersion = hubResponseService.getView(componentVersionLink, ComponentVersionView.class);
         }
         return componentVersion;
     }

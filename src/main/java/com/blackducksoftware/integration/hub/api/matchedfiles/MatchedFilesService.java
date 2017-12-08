@@ -21,23 +21,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.extension;
+package com.blackducksoftware.integration.hub.api.matchedfiles;
 
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.model.view.ExternalExtensionUserView;
+import com.blackducksoftware.integration.hub.model.view.MatchedFilesView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
-public class ExtensionUserOptionRequestService extends HubResponseService {
-    public ExtensionUserOptionRequestService(final RestConnection restConnection) {
+public class MatchedFilesService extends HubService {
+    public MatchedFilesService(final RestConnection restConnection) {
         super(restConnection);
     }
 
-    public List<ExternalExtensionUserView> getUserOptions(final String userOptionsUrl) throws IntegrationException {
-        final List<ExternalExtensionUserView> allItems = getAllItems(userOptionsUrl, ExternalExtensionUserView.class);
+    public List<MatchedFilesView> getMatchedFiles(final String matchedFilesUrl) throws IntegrationException {
+        final List<MatchedFilesView> allItems = getAllViews(matchedFilesUrl, MatchedFilesView.class);
         return allItems;
     }
-
 }

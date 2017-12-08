@@ -56,11 +56,11 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public class CLIDownloadService {
+public class CLIDownloadUtility {
     private final IntLogger logger;
     private final RestConnection restConnection;
 
-    public CLIDownloadService(final IntLogger logger, final RestConnection restConnection) {
+    public CLIDownloadUtility(final IntLogger logger, final RestConnection restConnection) {
         this.logger = logger;
         this.restConnection = restConnection;
     }

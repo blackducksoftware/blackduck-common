@@ -29,27 +29,28 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.model.view.VulnerableComponentView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
-public class VulnerableBomComponentRequestService extends HubResponseService {
-    public VulnerableBomComponentRequestService(final RestConnection restConnection) {
+public class VulnerableBomComponentService extends HubService {
+    public VulnerableBomComponentService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public List<VulnerableComponentView> getVulnerableComponentsMatchingComponentName(final String vulnerableBomComponentsUrl, final String componentName) throws IntegrationException {
-        final List<VulnerableComponentView> allItems = getAllItems(vulnerableBomComponentsUrl, VulnerableComponentView.class);
+        final List<VulnerableComponentView> allItems = getAllViews(vulnerableBomComponentsUrl, VulnerableComponentView.class);
         return allItems;
     }
 
     public List<VulnerableComponentView> getVulnerableComponentsMatchingComponentName(final String vulnerableBomComponentsUrl) throws IntegrationException {
-        final List<VulnerableComponentView> allItems = getAllItems(vulnerableBomComponentsUrl, VulnerableComponentView.class);
+        final List<VulnerableComponentView> allItems = getAllViews(vulnerableBomComponentsUrl, VulnerableComponentView.class);
         return allItems;
     }
 
     public List<VulnerableComponentView> getVulnerableComponentsMatchingComponentName(final String vulnerableBomComponentsUrl, final int itemsPerPage) throws IntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(itemsPerPage, vulnerableBomComponentsUrl);
 
-        final List<VulnerableComponentView> allItems = getAllItems(hubPagedRequest, VulnerableComponentView.class);
+        final List<VulnerableComponentView> allItems = getAllViews(hubPagedRequest, VulnerableComponentView.class);
         return allItems;
     }
+
 }

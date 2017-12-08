@@ -21,43 +21,46 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.nonpublic;
+package com.blackducksoftware.integration.hub.api.bom;
 
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_REGISTRATIONS;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_BOM_IMPORT;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+
+import org.apache.commons.io.FileUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
-import com.google.gson.JsonObject;
+import com.blackducksoftware.integration.hub.service.HubService;
 
 import okhttp3.Response;
 
-public class HubRegistrationRequestService extends HubResponseService {
-    private static final List<String> REGISTRATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_REGISTRATIONS);
+public class BomImportService extends HubService {
+    private static final List<String> BOM_IMPORT_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_BOM_IMPORT);
 
-    public HubRegistrationRequestService(final RestConnection restConnection) {
+    public BomImportService(final RestConnection restConnection) {
         super(restConnection);
     }
 
-    public String getRegistrationId() throws IntegrationException {
-        final HubRequest request = getHubRequestFactory().createRequest(REGISTRATION_SEGMENTS);
+    public void importBomFile(final File file) throws IntegrationException {
+        importBomFile(file, "application/ld+json");
+    }
+
+    public void importBomFile(final File file, final String mediaType) throws IntegrationException {
         Response response = null;
         try {
-            response = request.executeGet();
-            final String jsonResponse = response.body().string();
-            final JsonObject jsonObject = getJsonParser().parse(jsonResponse).getAsJsonObject();
-            final String registrationId = jsonObject.get("registrationId").getAsString();
-            return registrationId;
+            final HubRequest hubRequest = getHubRequestFactory().createRequest(BOM_IMPORT_SEGMENTS);
+            response = hubRequest.executePost(mediaType, FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+
         } catch (final IOException e) {
-            throw new HubIntegrationException(e);
+            throw new HubIntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub with Error : " + e.getMessage(), e);
         } finally {
             if (response != null) {
                 response.close();

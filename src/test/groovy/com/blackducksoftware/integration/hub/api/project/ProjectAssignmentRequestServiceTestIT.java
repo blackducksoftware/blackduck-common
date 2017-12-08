@@ -42,8 +42,8 @@ import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
 public class ProjectAssignmentRequestServiceTestIT {
     private static HubServicesFactory hubServices;
-    private static ProjectRequestService projectRequestService;
-    private static ProjectAssignmentRequestService projectAssignmentRequestService;
+    private static ProjectService projectRequestService;
+    private static ProjectAssignmentService projectAssignmentRequestService;
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
     private static ProjectView project = null;
 
@@ -69,7 +69,7 @@ public class ProjectAssignmentRequestServiceTestIT {
         final String projectUrl = projectRequestService.createHubProject(new ProjectRequest(testProjectName));
         System.out.println("projectUrl: " + projectUrl);
 
-        project = projectRequestService.getItem(projectUrl, ProjectView.class);
+        project = projectRequestService.getView(projectUrl, ProjectView.class);
         final List<AssignedUserView> assignedUsers = projectAssignmentRequestService.getProjectUsers(project);
         assertFalse(assignedUsers.isEmpty());
         assertEquals(1, assignedUsers.size());

@@ -33,7 +33,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.enumeration.CodeLocationEnum;
 import com.blackducksoftware.integration.hub.model.view.CodeLocationView;
@@ -41,29 +41,29 @@ import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
 import okhttp3.Response;
 
-public class CodeLocationRequestService extends HubResponseService {
+public class CodeLocationService extends HubService {
     private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
 
-    public CodeLocationRequestService(final RestConnection restConnection) {
+    public CodeLocationService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public List<CodeLocationView> getAllCodeLocations() throws IntegrationException {
-        return getAllItemsFromApi(SEGMENT_CODE_LOCATIONS, CodeLocationView.class);
+        return getAllViewsFromApi(SEGMENT_CODE_LOCATIONS, CodeLocationView.class);
     }
 
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationEnum codeLocationType) throws IntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType", codeLocationType.toString());
-        final List<CodeLocationView> allCodeLocations = getAllItems(hubPagedRequest, CodeLocationView.class);
+        final List<CodeLocationView> allCodeLocations = getAllViews(hubPagedRequest, CodeLocationView.class);
         return allCodeLocations;
     }
 
     public List<CodeLocationView> getAllCodeLocationsForProjectVersion(final ProjectVersionView version) throws IntegrationException {
-        return getAllItemsFromLink(version, MetaService.CODE_LOCATION_LINK, CodeLocationView.class);
+        return getAllViewsFromLink(version, MetaUtility.CODE_LOCATION_LINK, CodeLocationView.class);
     }
 
     public void unmapCodeLocations(final List<CodeLocationView> codeLocationItems) throws IntegrationException {
@@ -126,7 +126,7 @@ public class CodeLocationRequestService extends HubResponseService {
         if (StringUtils.isNotBlank(codeLocationName)) {
             final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(CODE_LOCATION_SEGMENTS);
             hubPagedRequest.q = "name:" + codeLocationName;
-            final List<CodeLocationView> codeLocations = getAllItems(hubPagedRequest, CodeLocationView.class);
+            final List<CodeLocationView> codeLocations = getAllViews(hubPagedRequest, CodeLocationView.class);
             for (final CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.name)) {
                     return codeLocation;
@@ -141,7 +141,7 @@ public class CodeLocationRequestService extends HubResponseService {
         final List<String> segments = new ArrayList<>(CODE_LOCATION_SEGMENTS);
         segments.add(codeLocationId);
         final HubRequest request = getHubRequestFactory().createRequest(segments);
-        return getItem(request, CodeLocationView.class);
+        return getView(request, CodeLocationView.class);
     }
 
     private CodeLocationView createRequestCodeLocationView(final CodeLocationView codeLocationItem, final String versionUrl) {

@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.notification.NotificationService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
@@ -43,17 +43,17 @@ import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.RuleViolationNotificationView;
 import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionStatus;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationTransformer(final HubResponseService hubResponseService, final NotificationRequestService notificationService, final ProjectVersionRequestService projectVersionService, final PolicyRequestService policyService,
-            final PolicyNotificationFilter policyFilter, final MetaService metaService) {
+    public PolicyViolationTransformer(final HubService hubResponseService, final NotificationService notificationService, final ProjectVersionService projectVersionService, final PolicyService policyService,
+            final PolicyNotificationFilter policyFilter, final MetaUtility metaService) {
         super(hubResponseService, notificationService, projectVersionService, policyService, policyFilter, metaService);
     }
 
-    public PolicyViolationTransformer(final HubResponseService hubResponseService, final IntLogger logger, final NotificationRequestService notificationService, final ProjectVersionRequestService projectVersionService,
-            final PolicyRequestService policyService, final PolicyNotificationFilter policyFilter, final MetaService metaService) {
+    public PolicyViolationTransformer(final HubService hubResponseService, final IntLogger logger, final NotificationService notificationService, final ProjectVersionService projectVersionService,
+            final PolicyService policyService, final PolicyNotificationFilter policyFilter, final MetaUtility metaService) {
         super(hubResponseService, logger, notificationService, projectVersionService, policyService, policyFilter, metaService);
     }
 
@@ -112,7 +112,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     }
 
     private ProjectVersionView getReleaseItem(final String projectVersionLink) throws IntegrationException {
-        final ProjectVersionView releaseItem = getProjectVersionService().getItem(projectVersionLink, ProjectVersionView.class);
+        final ProjectVersionView releaseItem = getProjectVersionService().getView(projectVersionLink, ProjectVersionView.class);
         return releaseItem;
     }
 

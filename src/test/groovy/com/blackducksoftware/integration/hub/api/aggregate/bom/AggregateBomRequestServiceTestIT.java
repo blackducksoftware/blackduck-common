@@ -33,7 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
@@ -54,8 +54,8 @@ public class AggregateBomRequestServiceTestIT {
     @Test
     public void testGetBomEntriesForUrl() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServices = restConnectionTestHelper.createHubServicesFactory();
-        final MetaService metaService = new MetaService(restConnectionTestHelper.createIntLogger());
-        final AggregateBomRequestService bomRequestService = hubServices.createAggregateBomRequestService();
+        final MetaUtility metaService = new MetaUtility(restConnectionTestHelper.createIntLogger());
+        final AggregateBomService bomRequestService = hubServices.createAggregateBomRequestService();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
         final String testProjectVersionName = "BomRequestServiceTest";
@@ -90,7 +90,7 @@ public class AggregateBomRequestServiceTestIT {
     @Test
     public void testGetBomEntriesForProjectVersion() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServices = restConnectionTestHelper.createHubServicesFactory();
-        final AggregateBomRequestService bomRequestService = hubServices.createAggregateBomRequestService();
+        final AggregateBomService bomRequestService = hubServices.createAggregateBomRequestService();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
         final String testProjectVersionName = "BomRequestServiceTest";

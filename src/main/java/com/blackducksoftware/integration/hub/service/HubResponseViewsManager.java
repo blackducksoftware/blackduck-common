@@ -31,7 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.HubResponse;
+import com.blackducksoftware.integration.hub.model.HubView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -40,40 +40,40 @@ import com.google.gson.JsonParser;
 
 import okhttp3.Response;
 
-public class HubResponseItemsManager {
-    private final HubResponseItemManager hubResponseItemManager;
+public class HubResponseViewsManager {
+    private final HubViewManager hubResponseViewManager;
     private final JsonParser jsonParser;
 
-    public HubResponseItemsManager(final HubResponseItemManager hubResponseItemManager, final JsonParser jsonParser) {
-        this.hubResponseItemManager = hubResponseItemManager;
+    public HubResponseViewsManager(final HubViewManager hubResponseItemManager, final JsonParser jsonParser) {
+        this.hubResponseViewManager = hubResponseItemManager;
         this.jsonParser = jsonParser;
     }
 
-    public <T extends HubResponse> List<T> getItems(final JsonArray itemsArray, final Class<T> clazz) {
+    public <T extends HubView> List<T> getViews(final JsonArray viewsArray, final Class<T> clazz) {
         final LinkedList<T> itemList = new LinkedList<>();
-        for (final JsonElement element : itemsArray) {
-            final T item = hubResponseItemManager.getItemAs(element, clazz);
+        for (final JsonElement element : viewsArray) {
+            final T item = hubResponseViewManager.getViewAs(element, clazz);
             itemList.add(item);
         }
         return itemList;
     }
 
-    public <T extends HubResponse> List<T> getItems(final JsonObject jsonObject, final Class<T> clazz) throws IntegrationException {
-        final LinkedList<T> itemList = new LinkedList<>();
-        final JsonElement itemsElement = jsonObject.get("items");
-        final JsonArray itemsArray = itemsElement.getAsJsonArray();
-        for (final JsonElement element : itemsArray) {
-            final T item = hubResponseItemManager.getItemAs(element, clazz);
-            itemList.add(item);
+    public <T extends HubView> List<T> getViews(final JsonObject jsonObject, final Class<T> clazz) throws IntegrationException {
+        final LinkedList<T> viewList = new LinkedList<>();
+        final JsonElement viewsElement = jsonObject.get("items");
+        final JsonArray viewsArray = viewsElement.getAsJsonArray();
+        for (final JsonElement element : viewsArray) {
+            final T item = hubResponseViewManager.getViewAs(element, clazz);
+            viewList.add(item);
         }
-        return itemList;
+        return viewList;
     }
 
-    public <T extends HubResponse> List<T> getItems(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
-        return getItems(hubPagedRequest, clazz, null);
+    public <T extends HubView> List<T> getViews(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
+        return getViews(hubPagedRequest, clazz, null);
     }
 
-    public <T extends HubResponse> List<T> getItems(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
+    public <T extends HubView> List<T> getViews(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
         Response response = null;
         try {
             if (StringUtils.isNotBlank(mediaType)) {
@@ -84,7 +84,7 @@ public class HubResponseItemsManager {
             final String jsonResponse = response.body().string();
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
-            return getItems(jsonObject, clazz);
+            return getViews(jsonObject, clazz);
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
         } finally {

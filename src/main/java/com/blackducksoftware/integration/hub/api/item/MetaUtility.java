@@ -33,7 +33,7 @@ import com.blackducksoftware.integration.hub.model.view.components.LinkView;
 import com.blackducksoftware.integration.hub.model.view.components.MetaView;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class MetaService {
+public class MetaUtility {
     public static final String PROJECTS_LINK = "projects";
     public static final String PROJECT_LINK = "project";
     public static final String VERSIONS_LINK = "versions";
@@ -64,7 +64,7 @@ public class MetaService {
 
     private final IntLogger logger;
 
-    public MetaService(final IntLogger logger) {
+    public MetaUtility(final IntLogger logger) {
         this.logger = logger;
     }
 

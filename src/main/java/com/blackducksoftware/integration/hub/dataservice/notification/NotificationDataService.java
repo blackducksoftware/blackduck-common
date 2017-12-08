@@ -29,10 +29,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
+import com.blackducksoftware.integration.hub.api.notification.NotificationService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationClearedTransformer;
@@ -47,38 +47,38 @@ import com.blackducksoftware.integration.hub.model.view.RuleViolationClearedNoti
 import com.blackducksoftware.integration.hub.model.view.RuleViolationNotificationView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.model.view.VulnerabilityNotificationView;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class NotificationDataService {
-    private final HubResponseService hubResponseService;
+    private final HubService hubResponseService;
 
-    private final NotificationRequestService notificationRequestService;
+    private final NotificationService notificationRequestService;
 
-    private final ProjectVersionRequestService projectVersionRequestService;
+    private final ProjectVersionService projectVersionRequestService;
 
-    private final PolicyRequestService policyRequestService;
+    private final PolicyService policyRequestService;
 
     private final PolicyNotificationFilter policyNotificationFilter;
 
     private final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor;
 
-    private final MetaService metaService;
+    private final MetaUtility metaService;
 
-    public NotificationDataService(final IntLogger logger, final HubResponseService hubResponseService, final NotificationRequestService notificationRequestService, final ProjectVersionRequestService projectVersionRequestService,
-            final PolicyRequestService policyRequestService) {
+    public NotificationDataService(final IntLogger logger, final HubService hubResponseService, final NotificationService notificationRequestService, final ProjectVersionService projectVersionRequestService,
+            final PolicyService policyRequestService) {
         this(logger, hubResponseService, notificationRequestService, projectVersionRequestService, policyRequestService, null);
     }
 
-    public NotificationDataService(final IntLogger logger, final HubResponseService hubResponseService, final NotificationRequestService notificationRequestService, final ProjectVersionRequestService projectVersionRequestService,
-            final PolicyRequestService policyRequestService, final PolicyNotificationFilter policyNotificationFilter) {
+    public NotificationDataService(final IntLogger logger, final HubService hubResponseService, final NotificationService notificationRequestService, final ProjectVersionService projectVersionRequestService,
+            final PolicyService policyRequestService, final PolicyNotificationFilter policyNotificationFilter) {
         this.hubResponseService = hubResponseService;
         this.notificationRequestService = notificationRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.policyRequestService = policyRequestService;
         this.policyNotificationFilter = policyNotificationFilter;
         this.parallelProcessor = new ParallelResourceProcessor<>(logger);
-        this.metaService = new MetaService(logger);
+        this.metaService = new MetaUtility(logger);
         populateTransformerMap(logger);
     }
 

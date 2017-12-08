@@ -34,17 +34,17 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.model.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
-public class ScanSummaryRequestService extends HubResponseService {
+public class ScanSummaryService extends HubService {
     private static final List<String> SCAN_SUMMARIES_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_SCAN_SUMMARIES);
 
-    public ScanSummaryRequestService(final RestConnection restConnection) {
+    public ScanSummaryService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public List<ScanSummaryView> getAllScanSummaryItems(final String scanSummaryUrl) throws IntegrationException {
-        final List<ScanSummaryView> allScanSummaryItems = getAllItems(scanSummaryUrl, ScanSummaryView.class);
+        final List<ScanSummaryView> allScanSummaryItems = getAllViews(scanSummaryUrl, ScanSummaryView.class);
         return allScanSummaryItems;
     }
 
@@ -52,7 +52,7 @@ public class ScanSummaryRequestService extends HubResponseService {
         final List<String> segments = new ArrayList<>(SCAN_SUMMARIES_SEGMENTS);
         segments.add(scanSummaryId);
         final HubRequest request = getHubRequestFactory().createRequest(segments);
-        return getItem(request, ScanSummaryView.class);
+        return getView(request, ScanSummaryView.class);
     }
 
 }

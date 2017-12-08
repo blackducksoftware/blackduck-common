@@ -28,21 +28,21 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_USE
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
 import com.blackducksoftware.integration.hub.model.view.RoleView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 
-public class UserRequestService extends HubResponseService {
-    public UserRequestService(final RestConnection restConnection) {
+public class UserService extends HubService {
+    public UserService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public List<UserView> getAllUsers() throws IntegrationException {
-        final List<UserView> allUserItems = getAllItemsFromApi(SEGMENT_USERS, UserView.class);
+        final List<UserView> allUserItems = getAllViewsFromApi(SEGMENT_USERS, UserView.class);
         return allUserItems;
     }
 
@@ -57,12 +57,13 @@ public class UserRequestService extends HubResponseService {
     }
 
     public List<AssignedProjectView> getUserAssignedProjects(final UserView userView) throws IntegrationException {
-        final List<AssignedProjectView> assignedProjectViews = getAllItemsFromLink(userView, MetaService.PROJECTS_LINK, AssignedProjectView.class);
+        final List<AssignedProjectView> assignedProjectViews = getAllViewsFromLink(userView, MetaUtility.PROJECTS_LINK, AssignedProjectView.class);
         return assignedProjectViews;
     }
 
     public List<RoleView> getUserRoles(final UserView userView) throws IntegrationException {
-        final List<RoleView> assignedRoles = this.getAllItemsFromLink(userView, MetaService.ROLES_LINK, RoleView.class);
+        final List<RoleView> assignedRoles = this.getAllViewsFromLink(userView, MetaUtility.ROLES_LINK, RoleView.class);
         return assignedRoles;
     }
+
 }

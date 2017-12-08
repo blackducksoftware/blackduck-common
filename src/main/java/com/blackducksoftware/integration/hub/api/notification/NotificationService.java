@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.item.MetaUtility;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.view.NotificationView;
 import com.blackducksoftware.integration.hub.model.view.PolicyOverrideNotificationView;
@@ -48,7 +48,7 @@ import com.blackducksoftware.integration.hub.model.view.VulnerabilityNotificatio
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -56,16 +56,13 @@ import com.google.gson.JsonParser;
 
 import okhttp3.Response;
 
-public class NotificationRequestService extends HubResponseService {
+public class NotificationService extends HubService {
     private static final List<String> NOTIFICATIONS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_NOTIFICATIONS);
-
     private final Map<String, Class<? extends NotificationView>> typeMap = new HashMap<>();
-
     private final HubRequestFactory hubRequestFactory;
-
     private final JsonParser jsonParser;
 
-    public NotificationRequestService(final RestConnection restConnection) {
+    public NotificationService(final RestConnection restConnection) {
         super(restConnection);
         this.hubRequestFactory = new HubRequestFactory(restConnection);
         this.jsonParser = restConnection.jsonParser;
@@ -94,7 +91,7 @@ public class NotificationRequestService extends HubResponseService {
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
-        final String url = getFirstLink(user, MetaService.NOTIFICATIONS_LINK);
+        final String url = getFirstLink(user, MetaUtility.NOTIFICATIONS_LINK);
 
         final HubPagedRequest hubPagedRequest = hubRequestFactory.createPagedRequest(100, url);
         hubPagedRequest.addQueryParameter("startDate", startDateString);
@@ -114,7 +111,7 @@ public class NotificationRequestService extends HubResponseService {
             if (typeMap.containsKey(type)) {
                 notificationClass = typeMap.get(type);
             }
-            final NotificationView item = getItemAs(element, notificationClass);
+            final NotificationView item = getViewAs(element, notificationClass);
             itemList.add(item);
         }
         return itemList;
