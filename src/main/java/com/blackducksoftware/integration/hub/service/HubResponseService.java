@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
@@ -43,6 +44,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import okhttp3.Response;
 
 public class HubResponseService {
     private final MetaService metaService;
@@ -80,6 +83,14 @@ public class HubResponseService {
 
     public Gson getGson() {
         return gson;
+    }
+
+    public String readResponseString(final Response response) throws IntegrationException {
+        try {
+            return response.body().string();
+        } catch (final IOException e) {
+            throw new IntegrationException(e);
+        }
     }
 
     public boolean hasLink(final HubView item, final String linkKey) throws HubIntegrationException {

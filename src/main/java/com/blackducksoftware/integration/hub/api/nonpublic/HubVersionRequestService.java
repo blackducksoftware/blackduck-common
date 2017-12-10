@@ -29,12 +29,12 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CUR
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CURRENT_VERSION_COMPARISON;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.response.VersionComparison;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -44,7 +44,6 @@ import okhttp3.Response;
 
 public class HubVersionRequestService extends HubResponseService {
     private static final List<String> CURRENT_VERSION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION);
-
     private static final List<String> CURRENT_VERSION_COMPARISON_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON);
 
     public HubVersionRequestService(final RestConnection restConnection) {
@@ -56,15 +55,11 @@ public class HubVersionRequestService extends HubResponseService {
         Response response = null;
         try {
             response = request.executeGet();
-            final String hubVersionWithPossibleSurroundingQuotes = response.body().string();
+            final String hubVersionWithPossibleSurroundingQuotes = readResponseString(response);
             final String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
             return hubVersion;
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
         } finally {
-            if (response != null) {
-                response.close();
-            }
+            IOUtils.closeQuietly(response);
         }
     }
 
@@ -73,15 +68,11 @@ public class HubVersionRequestService extends HubResponseService {
         Response response = null;
         try {
             response = hubVersionRequest.executeGet();
-            final String jsonResponse = response.body().string();
+            final String jsonResponse = readResponseString(response);
             final VersionComparison versionComparison = getItemAs(jsonResponse, VersionComparison.class);
             return versionComparison;
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
         } finally {
-            if (response != null) {
-                response.close();
-            }
+            IOUtils.closeQuietly(response);
         }
     }
 
