@@ -31,7 +31,6 @@ import com.blackducksoftware.integration.hub.api.component.ComponentRequestServi
 import com.blackducksoftware.integration.hub.bdio.SimpleBdioFactory;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
-import com.blackducksoftware.integration.hub.model.view.components.OriginView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
@@ -39,27 +38,13 @@ public class ComponentRequestServiceTestIT {
     private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
     @Test
-    public void testGettingHubCommonWithExternalId() throws Exception {
+    public void testGettingHubCommon() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final ComponentRequestService componentRequestService = hubServicesFactory.createComponentRequestService();
         final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
 
         final ExternalId hubCommonExternalId = simpleBdioFactory.createMavenExternalId("com.blackducksoftware.integration", "hub-common", "2.1.0");
         final ComponentSearchResultResponse componentItem = componentRequestService.getExactComponentMatch(hubCommonExternalId);
-
-        assertNotNull(componentItem);
-    }
-
-    @Test
-    public void testGettingHubCommonWithOriginView() throws Exception {
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final ComponentRequestService componentRequestService = hubServicesFactory.createComponentRequestService();
-        final OriginView hubCommonOriginView = new OriginView();
-
-        hubCommonOriginView.externalNamespace = "maven";
-        hubCommonOriginView.externalId = "com.blackducksoftware.integration:hub-common:2.1.0";
-
-        final ComponentSearchResultResponse componentItem = componentRequestService.getExactComponentMatch(hubCommonOriginView);
 
         assertNotNull(componentItem);
     }
