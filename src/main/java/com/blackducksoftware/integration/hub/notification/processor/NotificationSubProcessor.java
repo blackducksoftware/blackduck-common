@@ -35,11 +35,11 @@ public abstract class NotificationSubProcessor {
 
     private final SubProcessorCache cache;
 
-    private final MetaHandler metaService;
+    private final MetaHandler metaHandler;
 
-    public NotificationSubProcessor(final SubProcessorCache cache, final MetaHandler metaService) {
+    public NotificationSubProcessor(final SubProcessorCache cache, final MetaHandler metaHandler) {
         this.cache = cache;
-        this.metaService = metaService;
+        this.metaHandler = metaHandler;
     }
 
     public abstract void process(NotificationContentItem notification) throws HubIntegrationException;
@@ -66,7 +66,7 @@ public abstract class NotificationSubProcessor {
         return cache;
     }
 
-    public MetaHandler getMetaService() {
-        return metaService;
+    public MetaHandler getMetaHandler() {
+        return metaHandler;
     }
 }

@@ -47,10 +47,10 @@ import com.google.gson.JsonParser;
 import okhttp3.Response;
 
 public class HubService {
-    private final MetaHandler metaUtility;
+    private final MetaHandler metaHandler;
     private final HubViewTransformer hubViewManager;
-    private final HubMultipleViewTransformer hubResponseViewsManager;
-    private final HubMassViewTransformer hubResponseAllViewsManager;
+    private final HubMultipleViewTransformer hubMultipleViewTransformer;
+    private final HubMassViewTransformer hubMassViewTransformer;
     private final HubRequestFactory hubRequestFactory;
     private final URL hubBaseUrl;
     private final JsonParser jsonParser;
@@ -61,11 +61,10 @@ public class HubService {
         this.hubBaseUrl = restConnection.hubBaseUrl;
         this.jsonParser = restConnection.jsonParser;
         this.gson = restConnection.gson;
-
-        this.metaUtility = new MetaHandler(restConnection.logger);
-        this.hubViewManager = new HubViewTransformer(hubRequestFactory, metaUtility, jsonParser, gson);
-        this.hubResponseViewsManager = new HubMultipleViewTransformer(hubViewManager, jsonParser);
-        this.hubResponseAllViewsManager = new HubMassViewTransformer(hubResponseViewsManager, hubRequestFactory, metaUtility, jsonParser);
+        this.metaHandler = new MetaHandler(restConnection.logger);
+        this.hubViewManager = new HubViewTransformer(hubRequestFactory, metaHandler, jsonParser, gson);
+        this.hubMultipleViewTransformer = new HubMultipleViewTransformer(hubViewManager, jsonParser);
+        this.hubMassViewTransformer = new HubMassViewTransformer(hubMultipleViewTransformer, hubRequestFactory, metaHandler, jsonParser);
     }
 
     public URL getHubBaseUrl() {
@@ -93,35 +92,35 @@ public class HubService {
     }
 
     public boolean hasLink(final HubView view, final String linkKey) throws HubIntegrationException {
-        return metaUtility.hasLink(view, linkKey);
+        return metaHandler.hasLink(view, linkKey);
     }
 
     public String getFirstLink(final HubView view, final String linkKey) throws HubIntegrationException {
-        return metaUtility.getFirstLink(view, linkKey);
+        return metaHandler.getFirstLink(view, linkKey);
     }
 
     public String getFirstLinkSafely(final HubView view, final String linkKey) {
-        return metaUtility.getFirstLinkSafely(view, linkKey);
+        return metaHandler.getFirstLinkSafely(view, linkKey);
     }
 
     public List<String> getLinks(final HubView view, final String linkKey) throws HubIntegrationException {
-        return metaUtility.getLinks(view, linkKey);
+        return metaHandler.getLinks(view, linkKey);
     }
 
     public MetaView getMetaView(final HubView view) throws HubIntegrationException {
-        return metaUtility.getMetaView(view);
+        return metaHandler.getMetaView(view);
     }
 
     public List<LinkView> getLinkViews(final HubView view) throws HubIntegrationException {
-        return metaUtility.getLinkViews(view);
+        return metaHandler.getLinkViews(view);
     }
 
     public List<AllowEnum> getAllowedMethods(final HubView view) throws HubIntegrationException {
-        return metaUtility.getAllowedMethods(view);
+        return metaHandler.getAllowedMethods(view);
     }
 
     public String getHref(final HubView view) throws HubIntegrationException {
-        return metaUtility.getHref(view);
+        return metaHandler.getHref(view);
     }
 
     public <T extends HubView> T getViewFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
@@ -168,112 +167,112 @@ public class HubService {
      * Will NOT make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getViews(final JsonArray viewsArray, final Class<T> clazz) {
-        return hubResponseViewsManager.getViews(viewsArray, clazz);
+        return hubMultipleViewTransformer.getViews(viewsArray, clazz);
     }
 
     /**
      * Will NOT make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getViews(final JsonObject jsonObject, final Class<T> clazz) throws IntegrationException {
-        return hubResponseViewsManager.getViews(jsonObject, clazz);
+        return hubMultipleViewTransformer.getViews(jsonObject, clazz);
     }
 
     /**
      * Will NOT make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getViews(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
-        return hubResponseViewsManager.getViews(hubPagedRequest, clazz);
+        return hubMultipleViewTransformer.getViews(hubPagedRequest, clazz);
     }
 
     /**
      * Will NOT make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getViews(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return hubResponseViewsManager.getViews(hubPagedRequest, clazz, mediaType);
+        return hubMultipleViewTransformer.getViews(hubPagedRequest, clazz, mediaType);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getAllViewsFromApi(final String apiSegment, final Class<T> clazz) throws IntegrationException {
-        return hubResponseAllViewsManager.getAllViewsFromApi(apiSegment, clazz);
+        return hubMassViewTransformer.getAllViewsFromApi(apiSegment, clazz);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getAllViewsFromApi(final String apiSegment, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return hubResponseAllViewsManager.getAllViewsFromApi(apiSegment, clazz, mediaType);
+        return hubMassViewTransformer.getAllViewsFromApi(apiSegment, clazz, mediaType);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getAllViewsFromApi(final String apiSegment, final Class<T> clazz, final int viewsPerPage) throws IntegrationException {
-        return hubResponseAllViewsManager.getAllViewsFromApi(apiSegment, clazz, viewsPerPage);
+        return hubMassViewTransformer.getAllViewsFromApi(apiSegment, clazz, viewsPerPage);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getAllViewsFromApi(final String apiSegment, final Class<T> clazz, final int viewsPerPage, final String mediaType) throws IntegrationException {
-        return hubResponseAllViewsManager.getAllViewsFromApi(apiSegment, clazz, viewsPerPage, mediaType);
+        return hubMassViewTransformer.getAllViewsFromApi(apiSegment, clazz, viewsPerPage, mediaType);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getAllViewsFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return hubResponseAllViewsManager.getAllViewsFromLinkSafely(hubView, metaLinkRef, clazz);
+        return hubMassViewTransformer.getAllViewsFromLinkSafely(hubView, metaLinkRef, clazz);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getAllViewsFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return hubResponseAllViewsManager.getAllViewsFromLinkSafely(hubView, metaLinkRef, clazz, mediaType);
+        return hubMassViewTransformer.getAllViewsFromLinkSafely(hubView, metaLinkRef, clazz, mediaType);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getAllViewsFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return hubResponseAllViewsManager.getAllViewsFromLink(hubView, metaLinkRef, clazz);
+        return hubMassViewTransformer.getAllViewsFromLink(hubView, metaLinkRef, clazz);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getAllViewsFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return hubResponseAllViewsManager.getAllViewsFromLink(hubView, metaLinkRef, clazz, mediaType);
+        return hubMassViewTransformer.getAllViewsFromLink(hubView, metaLinkRef, clazz, mediaType);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getAllViews(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
-        return hubResponseAllViewsManager.getAllViews(hubPagedRequest, clazz);
+        return hubMassViewTransformer.getAllViews(hubPagedRequest, clazz);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getAllViews(final String url, final Class<T> clazz) throws IntegrationException {
-        return hubResponseAllViewsManager.getAllViews(url, clazz);
+        return hubMassViewTransformer.getAllViews(url, clazz);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getAllViews(final String url, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return hubResponseAllViewsManager.getAllViews(url, clazz, mediaType);
+        return hubMassViewTransformer.getAllViews(url, clazz, mediaType);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubView> List<T> getAllViews(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return hubResponseAllViewsManager.getAllViews(hubPagedRequest, clazz, mediaType);
+        return hubMassViewTransformer.getAllViews(hubPagedRequest, clazz, mediaType);
     }
 
 }

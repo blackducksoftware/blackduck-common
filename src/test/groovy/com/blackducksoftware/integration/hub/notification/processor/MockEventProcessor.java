@@ -172,7 +172,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
 
         keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_POLICY_RULE_REL_URL_HASHED_NAME);
         keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
-        keyBuilder.append(hashString(getMetaService().getHref(rule)));
+        keyBuilder.append(hashString(getMetaHandler().getHref(rule)));
         final String key = keyBuilder.toString();
         return key;
     }

@@ -42,13 +42,13 @@ import okhttp3.Response;
 
 public class HubViewTransformer {
     private final HubRequestFactory hubRequestFactory;
-    private final MetaHandler metaUtility;
+    private final MetaHandler metaHandler;
     private final JsonParser jsonParser;
     private final Gson gson;
 
-    public HubViewTransformer(final HubRequestFactory hubRequestFactory, final MetaHandler metaUtility, final JsonParser jsonParser, final Gson gson) {
+    public HubViewTransformer(final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler, final JsonParser jsonParser, final Gson gson) {
         this.hubRequestFactory = hubRequestFactory;
-        this.metaUtility = metaUtility;
+        this.metaHandler = metaHandler;
         this.jsonParser = jsonParser;
         this.gson = gson;
     }
@@ -58,7 +58,7 @@ public class HubViewTransformer {
     }
 
     public <T extends HubView> T getViewFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        if (!metaUtility.hasLink(hubView, metaLinkRef)) {
+        if (!metaHandler.hasLink(hubView, metaLinkRef)) {
             return getViewFromLink(hubView, metaLinkRef, clazz, mediaType);
         } else {
             return null;
@@ -70,7 +70,7 @@ public class HubViewTransformer {
     }
 
     public <T extends HubView> T getViewFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        final String link = metaUtility.getFirstLink(hubView, metaLinkRef);
+        final String link = metaHandler.getFirstLink(hubView, metaLinkRef);
         return getView(link, clazz, mediaType);
     }
 

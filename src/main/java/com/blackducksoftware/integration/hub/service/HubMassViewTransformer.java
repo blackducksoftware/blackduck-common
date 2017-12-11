@@ -48,13 +48,13 @@ import okhttp3.Response;
 public class HubMassViewTransformer {
     private final HubMultipleViewTransformer hubMultipleViewTransformer;
     private final HubRequestFactory hubRequestFactory;
-    private final MetaHandler metaService;
+    private final MetaHandler metaHandler;
     private final JsonParser jsonParser;
 
-    public HubMassViewTransformer(final HubMultipleViewTransformer hubMultipleViewTransformer, final HubRequestFactory hubRequestFactory, final MetaHandler metaService, final JsonParser jsonParser) {
+    public HubMassViewTransformer(final HubMultipleViewTransformer hubMultipleViewTransformer, final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler, final JsonParser jsonParser) {
         this.hubMultipleViewTransformer = hubMultipleViewTransformer;
         this.hubRequestFactory = hubRequestFactory;
-        this.metaService = metaService;
+        this.metaHandler = metaHandler;
         this.jsonParser = jsonParser;
     }
 
@@ -80,7 +80,7 @@ public class HubMassViewTransformer {
     }
 
     public <T extends HubView> List<T> getAllViewsFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        if (!metaService.hasLink(hubView, metaLinkRef)) {
+        if (!metaHandler.hasLink(hubView, metaLinkRef)) {
             return Collections.emptyList();
         }
 
@@ -92,7 +92,7 @@ public class HubMassViewTransformer {
     }
 
     public <T extends HubView> List<T> getAllViewsFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        final String link = metaService.getFirstLink(hubView, metaLinkRef);
+        final String link = metaHandler.getFirstLink(hubView, metaLinkRef);
         return getAllViews(link, clazz, mediaType);
     }
 
