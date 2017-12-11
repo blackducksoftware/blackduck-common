@@ -25,14 +25,13 @@ package com.blackducksoftware.integration.hub.dataservice.component;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.UrlConstants;
 import com.blackducksoftware.integration.hub.api.component.ComponentService;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
+import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
@@ -55,19 +54,19 @@ public class ComponentDataService {
         this.componentRequestService = componentRequestService;
     }
 
-    public ComponentVersionView getExactComponentVersionFromComponent(final String namespace, final String groupId, final String artifactId, final String version) throws IntegrationException {
-        for (final ComponentVersionView componentVersion : this.getAllComponentVersionsFromComponent(namespace, groupId, artifactId, version)) {
-            if (componentVersion.versionName.equals(version)) {
+    public ComponentVersionView getExactComponentVersionFromComponent(final ExternalId externalId) throws IntegrationException {
+        for (final ComponentVersionView componentVersion : this.getAllComponentVersionsFromComponent(externalId)) {
+            if (componentVersion.versionName.equals(externalId.version)) {
                 return componentVersion;
             }
         }
-        final String errMsg = "Could not find version " + version + " of component " + StringUtils.join(new String[] { groupId, artifactId, version }, ":");
+        final String errMsg = "Could not find version " + externalId.version + " of component " + externalId.createHubOriginId();
         logger.error(errMsg);
         throw new HubIntegrationException(errMsg);
     }
 
-    public List<ComponentVersionView> getAllComponentVersionsFromComponent(final String namespace, final String groupId, final String artifactId, final String version) throws IntegrationException {
-        final ComponentSearchResultView componentSearchView = componentRequestService.getExactComponentMatch(namespace, groupId, artifactId, version);
+    public List<ComponentVersionView> getAllComponentVersionsFromComponent(final ExternalId externalId) throws IntegrationException {
+        final ComponentSearchResultView componentSearchView = componentRequestService.getExactComponentMatch(externalId);
 
         final ComponentView componentView = componentRequestService.getView(componentSearchView.componentUrl, ComponentView.class);
         final List<ComponentVersionView> componentVersionViews = componentRequestService.getAllViewsFromLink(componentView, UrlConstants.SEGMENT_VERSIONS, ComponentVersionView.class);
