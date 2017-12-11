@@ -30,6 +30,8 @@ import static org.junit.Assert.assertTrue;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.bdio.SimpleBdioFactory;
+import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.dataservice.license.LicenseDataService;
 import com.blackducksoftware.integration.hub.model.enumeration.ComplexLicenseCodeSharingEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ComplexLicenseEnum;
@@ -46,7 +48,9 @@ public class LicenseDataServiceTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final LicenseDataService licenseDataService = hubServicesFactory.createLicenseDataService();
 
-        final ComplexLicenseView complexLicense = licenseDataService.getComplexLicenseItemFromComponent("maven", "com.google.guava", "guava", "20.0");
+        final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
+        final ExternalId guavaExternalId = simpleBdioFactory.createMavenExternalId("com.google.guava", "guava", "20.0");
+        final ComplexLicenseView complexLicense = licenseDataService.getComplexLicenseItemFromComponent(guavaExternalId);
         assertNull(complexLicense.codeSharing);
         assertNull(complexLicense.license);
         assertNull(complexLicense.name);
