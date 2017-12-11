@@ -38,7 +38,7 @@ public class HubRegistrationRequestServiceTestIT {
     @Test
     public void testGettingAllProjects() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final HubRegistrationService hubRegistrationRequestService = hubServicesFactory.createHubRegistrationRequestService();
+        final HubRegistrationService hubRegistrationRequestService = hubServicesFactory.createHubRegistrationService();
         final String registrationId = hubRegistrationRequestService.getRegistrationId();
         assertTrue(StringUtils.isNotBlank(registrationId));
         System.out.println(registrationId);

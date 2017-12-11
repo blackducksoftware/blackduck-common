@@ -38,7 +38,7 @@ import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.TestingPropertyKey;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
-public class UserRequestServiceTestIT {
+public class UserServiceTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper(TestingPropertyKey.TEST_HTTPS_HUB_SERVER_URL.toString());
 
     // TODO - Tested in-house; we need a dedicated Hub 4.3.x instance for testing before we can uncomment this.

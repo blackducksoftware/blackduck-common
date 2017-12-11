@@ -84,8 +84,8 @@ public class ComprehensiveCookbookTestIT {
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final ProjectService projectRequestService = hubServicesFactory.createProjectRequestService();
-        final ProjectVersionService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService();
+        final ProjectService projectRequestService = hubServicesFactory.createProjectService();
+        final ProjectVersionService projectVersionRequestService = hubServicesFactory.createProjectVersionService();
         final MetaHandler metaService = new MetaHandler(logger);
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
 
@@ -128,8 +128,8 @@ public class ComprehensiveCookbookTestIT {
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final ProjectService projectRequestService = hubServicesFactory.createProjectRequestService();
-        final ProjectVersionService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService();
+        final ProjectService projectRequestService = hubServicesFactory.createProjectService();
+        final ProjectVersionService projectVersionRequestService = hubServicesFactory.createProjectVersionService();
         final MetaHandler metaService = new MetaHandler(logger);
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
 
@@ -178,14 +178,14 @@ public class ComprehensiveCookbookTestIT {
         final Date startDate = new Date();
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final ProjectService projectRequestService = hubServicesFactory.createProjectRequestService();
+        final ProjectService projectRequestService = hubServicesFactory.createProjectService();
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
         final MetaHandler metaService = new MetaHandler(logger);
-        final BomImportService bomImportRequestService = hubServicesFactory.createBomImportRequestService();
-        final CodeLocationService codeLocationRequestService = hubServicesFactory.createCodeLocationRequestService();
+        final BomImportService bomImportRequestService = hubServicesFactory.createBomImportService();
+        final CodeLocationService codeLocationRequestService = hubServicesFactory.createCodeLocationService();
         final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(FIVE_MINUTES);
         final PolicyStatusDataService policyStatusDataService = hubServicesFactory.createPolicyStatusDataService();
-        final NotificationService notificationRequestService = hubServicesFactory.createNotificationRequestService();
+        final NotificationService notificationRequestService = hubServicesFactory.createNotificationService();
 
         // delete the project, if it exists
         try {
@@ -258,7 +258,7 @@ public class ComprehensiveCookbookTestIT {
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final ProjectService projectRequestService = hubServicesFactory.createProjectRequestService();
+        final ProjectService projectRequestService = hubServicesFactory.createProjectService();
         final MetaHandler metaService = new MetaHandler(logger);
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
         final CLIDataService cliDataService = hubServicesFactory.createCLIDataService(TWENTY_MINUTES);
@@ -316,8 +316,8 @@ public class ComprehensiveCookbookTestIT {
     public void testGettingAllProjectsAndVersions() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final ProjectService projectRequestService = hubServicesFactory.createProjectRequestService();
-        final ProjectVersionService projectVersionRequestService = hubServicesFactory.createProjectVersionRequestService();
+        final ProjectService projectRequestService = hubServicesFactory.createProjectService();
+        final ProjectVersionService projectVersionRequestService = hubServicesFactory.createProjectVersionService();
 
         final List<ProjectView> allProjects = projectRequestService.getAllProjects();
         System.out.println(String.format("project count: %d", allProjects.size()));
@@ -337,7 +337,7 @@ public class ComprehensiveCookbookTestIT {
     public void testGettingAllCodeLocations() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final CodeLocationService codeLocationRequestService = hubServicesFactory.createCodeLocationRequestService();
+        final CodeLocationService codeLocationRequestService = hubServicesFactory.createCodeLocationService();
 
         final List<CodeLocationView> allCodeLocations = codeLocationRequestService.getAllCodeLocations();
         System.out.println(String.format("code location count: %d", allCodeLocations.size()));
@@ -351,7 +351,7 @@ public class ComprehensiveCookbookTestIT {
     @Test
     public void testGettingAllUsers() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final UserService userRequestService = hubServicesFactory.createUserRequestService();
+        final UserService userRequestService = hubServicesFactory.createUserService();
 
         final List<UserView> userItems = userRequestService.getAllUsers();
         System.out.println(String.format("user count: %d", userItems.size()));

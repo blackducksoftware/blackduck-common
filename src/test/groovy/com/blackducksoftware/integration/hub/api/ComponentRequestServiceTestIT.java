@@ -40,7 +40,7 @@ public class ComponentRequestServiceTestIT {
     @Test
     public void testGettingHubCommon() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final ComponentService componentRequestService = hubServicesFactory.createComponentRequestService();
+        final ComponentService componentRequestService = hubServicesFactory.createComponentService();
         final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
 
         final ExternalId hubCommonExternalId = simpleBdioFactory.createMavenExternalId("com.blackducksoftware.integration", "hub-common", "2.1.0");

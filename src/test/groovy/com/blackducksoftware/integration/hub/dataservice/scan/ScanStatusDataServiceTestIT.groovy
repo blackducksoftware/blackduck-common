@@ -40,7 +40,7 @@ class ScanStatusDataServiceTestIT {
     void testBdioImportForNewProject() {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        final BomImportService bomImportRequestService = hubServicesFactory.createBomImportRequestService()
+        final BomImportService bomImportRequestService = hubServicesFactory.createBomImportService()
         final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(FIVE_MINUTES);
 
         // import the bdio

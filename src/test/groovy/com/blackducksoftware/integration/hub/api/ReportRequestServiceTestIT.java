@@ -57,10 +57,10 @@ public class ReportRequestServiceTestIT {
     @Test
     public void testGenerateReport() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final ProjectService projectService = hubServicesFactory.createProjectRequestService();
-        final ProjectVersionService projectVersionService = hubServicesFactory.createProjectVersionRequestService();
-        final BomImportService importService = hubServicesFactory.createBomImportRequestService();
-        final ReportService reportservice = hubServicesFactory.createReportRequestService(120 * 1000);
+        final ProjectService projectService = hubServicesFactory.createProjectService();
+        final ProjectVersionService projectVersionService = hubServicesFactory.createProjectVersionService();
+        final BomImportService importService = hubServicesFactory.createBomImportService();
+        final ReportService reportservice = hubServicesFactory.createReportService(120 * 1000);
 
         final ProjectView project = getProject(projectService, restConnectionTestHelper.getProperty("TEST_REPORT_PROJECT"));
         final ProjectVersionView version = getVersion(projectVersionService, project, restConnectionTestHelper.getProperty("TEST_REPORT_VERSION"));

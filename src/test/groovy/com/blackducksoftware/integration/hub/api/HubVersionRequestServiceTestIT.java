@@ -39,7 +39,7 @@ public class HubVersionRequestServiceTestIT {
     @Test
     public void testGettingHubVersion() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionRequestService();
+        final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionService();
         final String hubVersion = hubVersionRequestService.getHubVersion();
         assertNotNull(hubVersion);
         System.out.println(hubVersion);
@@ -48,7 +48,7 @@ public class HubVersionRequestServiceTestIT {
     @Test
     public void testComparingHubVersions() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionRequestService();
+        final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionService();
         final boolean versionIsOlder = hubVersionRequestService.isConsumerVersionLessThanOrEqualToServerVersion("3.3.0");
         assertTrue(versionIsOlder);
 

@@ -40,7 +40,7 @@ import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
-public class AggregateBomRequestServiceTestIT {
+public class AggregateBomServiceTestIT {
     private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
     @BeforeClass
@@ -55,15 +55,15 @@ public class AggregateBomRequestServiceTestIT {
     public void testGetBomEntriesForUrl() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServices = restConnectionTestHelper.createHubServicesFactory();
         final MetaHandler metaService = new MetaHandler(restConnectionTestHelper.createIntLogger());
-        final AggregateBomService bomRequestService = hubServices.createAggregateBomRequestService();
+        final AggregateBomService bomRequestService = hubServices.createAggregateBomService();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
         final String testProjectVersionName = "BomRequestServiceTest";
         final String testComponentName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT");
         final String testComponentVersionName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_VERSION");
 
-        final ProjectView project = hubServices.createProjectRequestService().getProjectByName(testProjectName);
-        final List<ProjectVersionView> projectVersions = hubServices.createProjectVersionRequestService().getAllProjectVersions(project);
+        final ProjectView project = hubServices.createProjectService().getProjectByName(testProjectName);
+        final List<ProjectVersionView> projectVersions = hubServices.createProjectVersionService().getAllProjectVersions(project);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
             if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {
@@ -90,15 +90,15 @@ public class AggregateBomRequestServiceTestIT {
     @Test
     public void testGetBomEntriesForProjectVersion() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServices = restConnectionTestHelper.createHubServicesFactory();
-        final AggregateBomService bomRequestService = hubServices.createAggregateBomRequestService();
+        final AggregateBomService bomRequestService = hubServices.createAggregateBomService();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
         final String testProjectVersionName = "BomRequestServiceTest";
         final String testComponentName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT");
         final String testComponentVersionName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_VERSION");
 
-        final ProjectView project = hubServices.createProjectRequestService().getProjectByName(testProjectName);
-        final List<ProjectVersionView> projectVersions = hubServices.createProjectVersionRequestService().getAllProjectVersions(project);
+        final ProjectView project = hubServices.createProjectService().getProjectByName(testProjectName);
+        final List<ProjectVersionView> projectVersions = hubServices.createProjectVersionService().getAllProjectVersions(project);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
             if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {

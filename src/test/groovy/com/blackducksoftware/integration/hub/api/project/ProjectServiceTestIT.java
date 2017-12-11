@@ -44,22 +44,18 @@ import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
-public class ProjectRequestServiceTestIT {
+public class ProjectServiceTestIT {
     private static HubServicesFactory hubServices;
-
     private static ProjectService projectRequestService;
-
     private static ProjectVersionService projectVersionRequestService;
-
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
-
     private static ProjectView project = null;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         hubServices = restConnectionTestHelper.createHubServicesFactory();
-        projectRequestService = hubServices.createProjectRequestService();
-        projectVersionRequestService = hubServices.createProjectVersionRequestService();
+        projectRequestService = hubServices.createProjectService();
+        projectVersionRequestService = hubServices.createProjectVersionService();
     }
 
     @AfterClass
@@ -71,9 +67,8 @@ public class ProjectRequestServiceTestIT {
 
     @Test
     public void testCreateDeleteWithNickname() throws IllegalArgumentException, IntegrationException {
-
         final Long timestamp = (new Date()).getTime();
-        final String testProjectName = "hub-common-it-ProjectRequestServiceTest-" + timestamp;
+        final String testProjectName = "hub-common-it-ProjectServiceTest-" + timestamp;
         final String testProjectVersion1Name = "1";
         final String testProjectVersion2Name = "2";
         final String testProjectVersion3Name = "3";

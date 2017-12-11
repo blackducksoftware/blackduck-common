@@ -62,7 +62,7 @@ class CodeLocationRequestServiceTestIT {
     @After
     public void testCleanup(){
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        ProjectService projectRequestService = services.createProjectRequestService()
+        ProjectService projectRequestService = services.createProjectService()
         ProjectView project = projectRequestService.getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
         projectRequestService.deleteHubProject(project)
     }
@@ -73,11 +73,11 @@ class CodeLocationRequestServiceTestIT {
         final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        DryRunUploadService dryRunUploadRequestService = services.createDryRunUploadRequestService()
+        DryRunUploadService dryRunUploadRequestService = services.createDryRunUploadService()
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
-        CodeLocationService codeLocationRequestService = services.createCodeLocationRequestService()
+        CodeLocationService codeLocationRequestService = services.createCodeLocationService()
         CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
@@ -86,7 +86,7 @@ class CodeLocationRequestServiceTestIT {
         projectBuilder.setProjectName(projectName)
         projectBuilder.setVersionName(versionName)
 
-        ProjectVersionView version = getProjectVersion(services.createProjectRequestService(), services.createProjectVersionRequestService(), projectBuilder.build())
+        ProjectVersionView version = getProjectVersion(services.createProjectService(), services.createProjectVersionService(), projectBuilder.build())
 
         codeLocationRequestService.mapCodeLocation(codeLocationView, version)
         codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)

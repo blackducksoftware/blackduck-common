@@ -40,37 +40,37 @@ import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
-public class ProjectAssignmentRequestServiceTestIT {
-    private static HubServicesFactory hubServices;
-    private static ProjectService projectRequestService;
-    private static ProjectAssignmentService projectAssignmentRequestService;
+public class ProjectAssignmentServiceTestIT {
+    private static HubServicesFactory hubServicesFactory;
+    private static ProjectService projectService;
+    private static ProjectAssignmentService projectAssignmentService;
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
     private static ProjectView project = null;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        hubServices = restConnectionTestHelper.createHubServicesFactory();
-        projectRequestService = hubServices.createProjectRequestService();
-        projectAssignmentRequestService = hubServices.createProjectAssignmentRequestService();
+        hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        projectService = hubServicesFactory.createProjectService();
+        projectAssignmentService = hubServicesFactory.createProjectAssignmentService();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         if (project != null) {
-            projectRequestService.deleteHubProject(project);
+            projectService.deleteHubProject(project);
         }
     }
 
     @Test
     public void testGetAssignedUsersFromProjectView() throws IllegalArgumentException, IntegrationException {
         final Long timestamp = (new Date()).getTime();
-        final String testProjectName = "hub-common-it-ProjectAssignmentRequestServiceTest-" + timestamp;
+        final String testProjectName = "hub-common-it-ProjectAssignmentServiceTest-" + timestamp;
 
-        final String projectUrl = projectRequestService.createHubProject(new ProjectRequest(testProjectName));
+        final String projectUrl = projectService.createHubProject(new ProjectRequest(testProjectName));
         System.out.println("projectUrl: " + projectUrl);
 
-        project = projectRequestService.getView(projectUrl, ProjectView.class);
-        final List<AssignedUserView> assignedUsers = projectAssignmentRequestService.getProjectUsers(project);
+        project = projectService.getView(projectUrl, ProjectView.class);
+        final List<AssignedUserView> assignedUsers = projectAssignmentService.getProjectUsers(project);
         assertFalse(assignedUsers.isEmpty());
         assertEquals(1, assignedUsers.size());
         assertEquals("sysadmin", assignedUsers.get(0).name);

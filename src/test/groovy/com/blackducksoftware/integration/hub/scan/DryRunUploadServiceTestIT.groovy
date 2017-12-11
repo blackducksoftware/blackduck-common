@@ -38,7 +38,7 @@ import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
 import com.blackducksoftware.integration.log.PrintStreamIntLogger
 
-class DryRunUploadRequestServiceTestIT {
+class DryRunUploadServiceTestIT {
 
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
@@ -55,11 +55,11 @@ class DryRunUploadRequestServiceTestIT {
     @Test
     public void testDryRunUpload(){
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        DryRunUploadService dryRunUploadRequestService = services.createDryRunUploadRequestService()
+        DryRunUploadService dryRunUploadRequestService = services.createDryRunUploadService()
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
-        CodeLocationService codeLocationRequestService = services.createCodeLocationRequestService()
+        CodeLocationService codeLocationRequestService = services.createCodeLocationService()
         CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
         Assert.assertNotNull(codeLocationView)
 

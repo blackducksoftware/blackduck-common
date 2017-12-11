@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.item;
+package com.blackducksoftware.integration.hub.api.view;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -40,7 +40,7 @@ import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.google.gson.Gson;
 
-public class MetaServiceTestIT {
+public class MetaHandlerTestIT {
     private static final Gson gson = new Gson();
 
     private IntBufferedLogger logger;
