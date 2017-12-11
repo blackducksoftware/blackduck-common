@@ -25,16 +25,21 @@ package com.blackducksoftware.integration.hub.dataservice.license;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
+import com.blackducksoftware.integration.hub.api.license.LicenseRequestService;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
 import com.blackducksoftware.integration.hub.model.view.ComplexLicenseView;
 import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.model.view.LicenseView;
+import com.blackducksoftware.integration.hub.model.view.components.VersionBomLicenseView;
 
 public class LicenseDataService {
     private final ComponentRequestService componentRequestService;
+    private final LicenseRequestService licenseRequestService;
 
-    public LicenseDataService(final ComponentRequestService componentRequestService) {
+    public LicenseDataService(final ComponentRequestService componentRequestService, final LicenseRequestService licenseRequestService) {
         this.componentRequestService = componentRequestService;
+        this.licenseRequestService = licenseRequestService;
     }
 
     public ComplexLicenseView getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
@@ -42,6 +47,20 @@ public class LicenseDataService {
         final String versionUrl = component.version;
         final ComponentVersionView componentVersion = componentRequestService.getItem(versionUrl, ComponentVersionView.class);
         return componentVersion.license;
+    }
+
+    public LicenseView getLicenseView(final VersionBomLicenseView versionBomLicenseView) throws IntegrationException {
+        final String licenseUrl = versionBomLicenseView.license;
+        if (licenseUrl == null) {
+            return null;
+        }
+        final LicenseView licenseView = licenseRequestService.getItem(licenseUrl, LicenseView.class);
+        return licenseView;
+    }
+
+    public String getLicenseText(final LicenseView licenseView) throws IntegrationException {
+        final String licenseText = licenseRequestService.getLicenseText(licenseView);
+        return licenseText;
     }
 
 }
