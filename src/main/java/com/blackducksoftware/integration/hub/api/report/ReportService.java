@@ -23,9 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.api.report;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.io.IOUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
@@ -121,19 +122,15 @@ public class ReportService extends HubService {
         Response response = null;
         try {
             response = hubRequest.executeGet();
-            final String jsonResponse = response.body().string();
+            final String jsonResponse = readResponseString(response);
 
             final JsonObject json = getJsonParser().parse(jsonResponse).getAsJsonObject();
             final JsonElement content = json.get("reportContent");
             final JsonArray reportConentArray = content.getAsJsonArray();
             final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
             return reportFile.get("fileContent");
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
         } finally {
-            if (response != null) {
-                response.close();
-            }
+            IOUtils.closeQuietly(response);
         }
     }
 
@@ -151,14 +148,10 @@ public class ReportService extends HubService {
             Response response = null;
             try {
                 response = hubRequest.executeGet();
-                final String jsonResponse = response.body().string();
+                final String jsonResponse = readResponseString(response);
                 reportInfo = getViewAs(jsonResponse, ReportView.class);
-            } catch (final IOException e) {
-                throw new HubIntegrationException(e);
             } finally {
-                if (response != null) {
-                    response.close();
-                }
+                IOUtils.closeQuietly(response);
             }
             timeFinished = reportInfo.finishedAt;
             if (timeFinished != null) {

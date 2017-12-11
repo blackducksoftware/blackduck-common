@@ -23,11 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.api.license;
 
-import java.io.IOException;
+import org.apache.commons.io.IOUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.view.LicenseView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -46,14 +45,10 @@ public class LicenseService extends HubService {
         Response response = null;
         try {
             response = hubRequest.executeGet();
-            final String jsonResponse = response.body().string();
+            final String jsonResponse = readResponseString(response);
             return jsonResponse;
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
         } finally {
-            if (response != null) {
-                response.close();
-            }
+            IOUtils.closeQuietly(response);
         }
     }
 }

@@ -28,13 +28,12 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_SCA
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.response.DryRunUploadResponse;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -45,30 +44,21 @@ import okhttp3.Response;
 public class DryRunUploadService extends HubService {
     private static final List<String> DRY_RUN_UPLOAD_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_SCANS);
 
-    private final RestConnection restConnection;
-
     public DryRunUploadService(final RestConnection restConnection) {
         super(restConnection);
-        this.restConnection = restConnection;
     }
 
     public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws IntegrationException {
         final HubRequest uploadDryRunFileRequest = getHubRequestFactory().createRequest(DRY_RUN_UPLOAD_SEGMENTS);
         Response response = null;
         try {
-            final byte[] dryRunFileBytes = Files.readAllBytes(dryRunFile.toPath());
-            final String dryRunFileString = new String(dryRunFileBytes);
-            response = uploadDryRunFileRequest.executePost("application/json", dryRunFileString);
-            final String jsonResponse = response.body().string();
-            final DryRunUploadResponse dryRunUploadResponse = getGson().fromJson(jsonResponse, DryRunUploadResponse.class);
-            dryRunUploadResponse.json = jsonResponse;
-            return dryRunUploadResponse;
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
+            response = uploadDryRunFileRequest.executePost("application/json", dryRunFile);
+            final String responseString = readResponseString(response);
+            final DryRunUploadResponse uploadResponse = getGson().fromJson(responseString, DryRunUploadResponse.class);
+            uploadResponse.json = responseString;
+            return uploadResponse;
         } finally {
-            if (response != null) {
-                response.close();
-            }
+            IOUtils.closeQuietly(response);
         }
     }
 }

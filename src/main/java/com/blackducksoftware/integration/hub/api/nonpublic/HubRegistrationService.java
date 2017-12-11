@@ -27,12 +27,12 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_REGISTRATIONS;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
@@ -52,16 +52,12 @@ public class HubRegistrationService extends HubService {
         Response response = null;
         try {
             response = request.executeGet();
-            final String jsonResponse = response.body().string();
+            final String jsonResponse = readResponseString(response);
             final JsonObject jsonObject = getJsonParser().parse(jsonResponse).getAsJsonObject();
             final String registrationId = jsonObject.get("registrationId").getAsString();
             return registrationId;
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
         } finally {
-            if (response != null) {
-                response.close();
-            }
+            IOUtils.closeQuietly(response);
         }
     }
 

@@ -26,7 +26,6 @@ package com.blackducksoftware.integration.hub.api.notification;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_NOTIFICATIONS;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -36,9 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.commons.io.IOUtils;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.model.view.NotificationView;
 import com.blackducksoftware.integration.hub.model.view.PolicyOverrideNotificationView;
 import com.blackducksoftware.integration.hub.model.view.RuleViolationClearedNotificationView;
@@ -58,6 +58,7 @@ import okhttp3.Response;
 
 public class NotificationService extends HubService {
     private static final List<String> NOTIFICATIONS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_NOTIFICATIONS);
+
     private final Map<String, Class<? extends NotificationView>> typeMap = new HashMap<>();
     private final HubRequestFactory hubRequestFactory;
     private final JsonParser jsonParser;
@@ -124,16 +125,12 @@ public class NotificationService extends HubService {
         Response response = null;
         try {
             response = hubPagedRequest.executeGet();
-            final String jsonResponse = response.body().string();
+            final String jsonResponse = readResponseString(response);
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
             return getItems(jsonObject);
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
         } finally {
-            if (response != null) {
-                response.close();
-            }
+            IOUtils.closeQuietly(response);
         }
     }
 
@@ -147,7 +144,7 @@ public class NotificationService extends HubService {
         Response response = null;
         try {
             response = hubPagedRequest.executeGet();
-            final String jsonResponse = response.body().string();
+            final String jsonResponse = readResponseString(response);
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
             totalCount = jsonObject.get("totalCount").getAsInt();
@@ -157,12 +154,8 @@ public class NotificationService extends HubService {
                 hubPagedRequest.offset = currentOffset;
                 allItems.addAll(getItems(hubPagedRequest));
             }
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
         } finally {
-            if (response != null) {
-                response.close();
-            }
+            IOUtils.closeQuietly(response);
         }
 
         return allItems;

@@ -33,9 +33,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
@@ -57,14 +57,15 @@ public class BomImportService extends HubService {
         Response response = null;
         try {
             final HubRequest hubRequest = getHubRequestFactory().createRequest(BOM_IMPORT_SEGMENTS);
-            response = hubRequest.executePost(mediaType, FileUtils.readFileToString(file, StandardCharsets.UTF_8));
-
-        } catch (final IOException e) {
-            throw new HubIntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub with Error : " + e.getMessage(), e);
-        } finally {
-            if (response != null) {
-                response.close();
+            String jsonPayload;
+            try {
+                jsonPayload = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+            } catch (final IOException e) {
+                throw new IntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub with because parsing the file to json failed: " + e.getMessage(), e);
             }
+            response = hubRequest.executePost(mediaType, jsonPayload);
+        } finally {
+            IOUtils.closeQuietly(response);
         }
     }
 
