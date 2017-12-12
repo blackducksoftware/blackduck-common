@@ -45,14 +45,14 @@ import com.google.gson.JsonParser;
 
 import okhttp3.Response;
 
-public class HubMassViewTransformer {
-    private final HubMultipleViewTransformer hubMultipleViewTransformer;
+public class AllHubViewsCollectionTransformer {
+    private final HubViewsCollectionTransformer hubViewsCollectionTransformer;
     private final HubRequestFactory hubRequestFactory;
     private final MetaHandler metaHandler;
     private final JsonParser jsonParser;
 
-    public HubMassViewTransformer(final HubMultipleViewTransformer hubMultipleViewTransformer, final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler, final JsonParser jsonParser) {
-        this.hubMultipleViewTransformer = hubMultipleViewTransformer;
+    public AllHubViewsCollectionTransformer(final HubViewsCollectionTransformer hubViewsCollectionTransformer, final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler, final JsonParser jsonParser) {
+        this.hubViewsCollectionTransformer = hubViewsCollectionTransformer;
         this.hubRequestFactory = hubRequestFactory;
         this.metaHandler = metaHandler;
         this.jsonParser = jsonParser;
@@ -124,11 +124,11 @@ public class HubMassViewTransformer {
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
             totalCount = jsonObject.get("totalCount").getAsInt();
-            allViews.addAll(hubMultipleViewTransformer.getViews(jsonObject, clazz));
+            allViews.addAll(hubViewsCollectionTransformer.getViews(jsonObject, clazz));
             while (allViews.size() < totalCount && currentOffset < totalCount) {
                 currentOffset += hubPagedRequest.limit;
                 hubPagedRequest.offset = currentOffset;
-                allViews.addAll(hubMultipleViewTransformer.getViews(hubPagedRequest, clazz, mediaType));
+                allViews.addAll(hubViewsCollectionTransformer.getViews(hubPagedRequest, clazz, mediaType));
             }
         } catch (final IOException e) {
             throw new HubIntegrationException(e);

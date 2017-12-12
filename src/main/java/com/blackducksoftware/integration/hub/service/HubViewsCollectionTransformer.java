@@ -40,11 +40,11 @@ import com.google.gson.JsonParser;
 
 import okhttp3.Response;
 
-public class HubMultipleViewTransformer {
+public class HubViewsCollectionTransformer {
     private final HubViewTransformer hubViewTransformer;
     private final JsonParser jsonParser;
 
-    public HubMultipleViewTransformer(final HubViewTransformer hubResponseItemManager, final JsonParser jsonParser) {
+    public HubViewsCollectionTransformer(final HubViewTransformer hubResponseItemManager, final JsonParser jsonParser) {
         this.hubViewTransformer = hubResponseItemManager;
         this.jsonParser = jsonParser;
     }
