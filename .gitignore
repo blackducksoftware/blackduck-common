@@ -6,3 +6,4 @@ bin/
 pom.xml.bak
 .DS_Store
 test.properties
+/.gradle/
