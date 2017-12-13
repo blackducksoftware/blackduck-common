@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentRequestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentService;
+import com.blackducksoftware.integration.hub.api.project.ProjectService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
 import com.blackducksoftware.integration.hub.model.view.AssignedGroupView;
@@ -40,17 +40,17 @@ import com.blackducksoftware.integration.hub.model.view.UserGroupView;
 import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ProjectDataService extends HubResponseService {
+public class ProjectDataService extends HubService {
     private final IntLogger logger;
-    private final ProjectRequestService projectRequestService;
-    private final ProjectVersionRequestService projectVersionRequestService;
-    private final ProjectAssignmentRequestService projectAssignmentRequestService;
+    private final ProjectService projectRequestService;
+    private final ProjectVersionService projectVersionRequestService;
+    private final ProjectAssignmentService projectAssignmentRequestService;
 
-    public ProjectDataService(final RestConnection restConnection, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
-            final ProjectAssignmentRequestService projectAssignmentRequestService) {
+    public ProjectDataService(final RestConnection restConnection, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService,
+            final ProjectAssignmentService projectAssignmentRequestService) {
         super(restConnection);
         this.logger = restConnection.logger;
         this.projectRequestService = projectRequestService;
@@ -86,14 +86,14 @@ public class ProjectDataService extends HubResponseService {
             project = projectRequestService.getProjectByName(projectRequest.getName());
         } catch (final DoesNotExistException e) {
             final String projectURL = projectRequestService.createHubProject(projectRequest);
-            project = projectRequestService.getItem(projectURL, ProjectView.class);
+            project = projectRequestService.getView(projectURL, ProjectView.class);
         }
 
         try {
             projectVersion = projectVersionRequestService.getProjectVersion(project, projectRequest.getVersionRequest().getVersionName());
         } catch (final DoesNotExistException e) {
             final String versionURL = projectVersionRequestService.createHubVersion(project, projectRequest.getVersionRequest());
-            projectVersion = projectVersionRequestService.getItem(versionURL, ProjectVersionView.class);
+            projectVersion = projectVersionRequestService.getView(versionURL, ProjectVersionView.class);
         }
 
         final ProjectVersionWrapper projectVersionWrapper = new ProjectVersionWrapper();
@@ -123,7 +123,7 @@ public class ProjectDataService extends HubResponseService {
 
         final List<UserView> resolvedUserViews = new ArrayList<>();
         for (final AssignedUserView assigned : assignedUsers) {
-            final UserView userView = getItem(assigned.userUrl, UserView.class);
+            final UserView userView = getView(assigned.userUrl, UserView.class);
             if (userView != null) {
                 resolvedUserViews.add(userView);
             }
@@ -152,7 +152,7 @@ public class ProjectDataService extends HubResponseService {
 
         final List<UserGroupView> resolvedGroupViews = new ArrayList<>();
         for (final AssignedGroupView assigned : assignedGroups) {
-            final UserGroupView groupView = getItem(assigned.groupUrl, UserGroupView.class);
+            final UserGroupView groupView = getView(assigned.groupUrl, UserGroupView.class);
             if (groupView != null) {
                 resolvedGroupViews.add(groupView);
             }

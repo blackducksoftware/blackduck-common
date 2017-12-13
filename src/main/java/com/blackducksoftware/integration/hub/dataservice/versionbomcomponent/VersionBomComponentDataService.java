@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.matchedfiles.MatchedFilesRequestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
+import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomService;
+import com.blackducksoftware.integration.hub.api.matchedfiles.MatchedFilesService;
+import com.blackducksoftware.integration.hub.api.project.ProjectService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.versionbomcomponent.model.VersionBomComponentModel;
 import com.blackducksoftware.integration.hub.model.view.MatchedFilesView;
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
@@ -40,19 +40,19 @@ import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class VersionBomComponentDataService {
-    private final ProjectRequestService projectRequestService;
-    private final ProjectVersionRequestService projectVersionRequestService;
-    private final AggregateBomRequestService aggregateBomRequestService;
-    private final MatchedFilesRequestService matchedFilesRequestService;
-    private final MetaService metaService;
+    private final ProjectService projectRequestService;
+    private final ProjectVersionService projectVersionRequestService;
+    private final AggregateBomService aggregateBomRequestService;
+    private final MatchedFilesService matchedFilesRequestService;
+    private final MetaHandler metaService;
 
-    public VersionBomComponentDataService(final IntLogger logger, final ProjectRequestService projectRequestService, final ProjectVersionRequestService projectVersionRequestService,
-            final AggregateBomRequestService aggregateBomRequestService, final MatchedFilesRequestService matchedFilesRequestService) {
+    public VersionBomComponentDataService(final IntLogger logger, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService,
+            final AggregateBomService aggregateBomRequestService, final MatchedFilesService matchedFilesRequestService) {
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.aggregateBomRequestService = aggregateBomRequestService;
         this.matchedFilesRequestService = matchedFilesRequestService;
-        this.metaService = new MetaService(logger);
+        this.metaService = new MetaHandler(logger);
     }
 
     public List<VersionBomComponentModel> getComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
@@ -72,7 +72,7 @@ public class VersionBomComponentDataService {
 
     private List<MatchedFilesView> getMatchedFiles(final VersionBomComponentView component) {
         try {
-            final String matchedFilesLink = metaService.getFirstLink(component, MetaService.MATCHED_FILES_LINK);
+            final String matchedFilesLink = metaService.getFirstLink(component, MetaHandler.MATCHED_FILES_LINK);
             return matchedFilesRequestService.getMatchedFiles(matchedFilesLink);
         } catch (final IntegrationException e) {
             return new ArrayList<>(0);

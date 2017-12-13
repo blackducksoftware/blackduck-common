@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
-import com.blackducksoftware.integration.hub.api.user.UserRequestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigService;
+import com.blackducksoftware.integration.hub.api.user.UserService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.model.view.ExternalExtensionConfigValueView;
@@ -39,19 +39,19 @@ import com.blackducksoftware.integration.hub.model.view.ExternalExtensionUserVie
 import com.blackducksoftware.integration.hub.model.view.UserView;
 
 public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, ExternalExtensionUserView> {
-    private final UserRequestService userRequestService;
+    private final UserService userRequestService;
 
-    private final ExtensionConfigRequestService extensionConfigRequestService;
+    private final ExtensionConfigService extensionConfigRequestService;
 
-    public UserConfigTransform(final UserRequestService userRequestService,
-            final ExtensionConfigRequestService extensionConfigRequestService) {
+    public UserConfigTransform(final UserService userRequestService,
+            final ExtensionConfigService extensionConfigRequestService) {
         this.userRequestService = userRequestService;
         this.extensionConfigRequestService = extensionConfigRequestService;
     }
 
     @Override
     public List<UserConfigItem> transform(final ExternalExtensionUserView item) throws IntegrationException {
-        final UserView user = userRequestService.getItem(item.user, UserView.class);
+        final UserView user = userRequestService.getView(item.user, UserView.class);
         if (!user.active) {
             return Collections.emptyList();
         } else {

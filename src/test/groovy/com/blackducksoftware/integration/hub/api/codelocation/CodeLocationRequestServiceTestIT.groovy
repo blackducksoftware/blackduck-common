@@ -29,9 +29,9 @@ import org.junit.BeforeClass
 import org.junit.Test
 
 import com.blackducksoftware.integration.exception.IntegrationException
-import com.blackducksoftware.integration.hub.api.project.ProjectRequestService
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadRequestService
+import com.blackducksoftware.integration.hub.api.project.ProjectService
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService
+import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException
 import com.blackducksoftware.integration.hub.model.request.ProjectRequest
 import com.blackducksoftware.integration.hub.model.response.DryRunUploadResponse
@@ -62,7 +62,7 @@ class CodeLocationRequestServiceTestIT {
     @After
     public void testCleanup(){
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        ProjectRequestService projectRequestService = services.createProjectRequestService()
+        ProjectService projectRequestService = services.createProjectService()
         ProjectView project = projectRequestService.getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
         projectRequestService.deleteHubProject(project)
     }
@@ -73,11 +73,11 @@ class CodeLocationRequestServiceTestIT {
         final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        DryRunUploadRequestService dryRunUploadRequestService = services.createDryRunUploadRequestService()
+        DryRunUploadService dryRunUploadRequestService = services.createDryRunUploadService()
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
-        CodeLocationRequestService codeLocationRequestService = services.createCodeLocationRequestService()
+        CodeLocationService codeLocationRequestService = services.createCodeLocationService()
         CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
@@ -86,7 +86,7 @@ class CodeLocationRequestServiceTestIT {
         projectBuilder.setProjectName(projectName)
         projectBuilder.setVersionName(versionName)
 
-        ProjectVersionView version = getProjectVersion(services.createProjectRequestService(), services.createProjectVersionRequestService(), projectBuilder.build())
+        ProjectVersionView version = getProjectVersion(services.createProjectService(), services.createProjectVersionService(), projectBuilder.build())
 
         codeLocationRequestService.mapCodeLocation(codeLocationView, version)
         codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
@@ -107,20 +107,20 @@ class CodeLocationRequestServiceTestIT {
         }
     }
 
-    private ProjectVersionView getProjectVersion(ProjectRequestService projectRequestService, ProjectVersionRequestService projectVersionRequestService,  final ProjectRequest projectRequest) throws IntegrationException {
+    private ProjectVersionView getProjectVersion(ProjectService projectRequestService, ProjectVersionService projectVersionRequestService,  final ProjectRequest projectRequest) throws IntegrationException {
         ProjectView project = null
         try {
             project = projectRequestService.getProjectByName(projectRequest.getName())
         } catch (final DoesNotExistException e) {
             final String projectURL = projectRequestService.createHubProject(projectRequest)
-            project = projectRequestService.getItem(projectURL, ProjectView.class)
+            project = projectRequestService.getView(projectURL, ProjectView.class)
         }
         ProjectVersionView version = null
         try {
             version = projectVersionRequestService.getProjectVersion(project, projectRequest.getVersionRequest().getVersionName())
         } catch (final DoesNotExistException e) {
             final String versionURL = projectVersionRequestService.createHubVersion(project, projectRequest.getVersionRequest())
-            version = projectVersionRequestService.getItem(versionURL, ProjectVersionView.class)
+            version = projectVersionRequestService.getView(versionURL, ProjectVersionView.class)
         }
         return version
     }

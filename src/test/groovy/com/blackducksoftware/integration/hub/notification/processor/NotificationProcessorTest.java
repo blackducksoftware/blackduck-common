@@ -42,8 +42,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
+import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityService;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
@@ -63,18 +63,18 @@ import com.blackducksoftware.integration.log.IntLogger;
 public class NotificationProcessorTest {
     private final EventTestUtil testUtil = new EventTestUtil();
 
-    private MetaService metaService;
+    private MetaHandler metaService;
 
     @Before
     public void init() throws Exception {
         final RestConnection restConnection = new MockRestConnection();
         final HubServicesFactory factory = new HubServicesFactory(restConnection);
         final IntLogger logger = new IntBufferedLogger();
-        metaService = new MetaService(logger);
+        metaService = new MetaHandler(logger);
     }
 
     public MockProcessor createMockedNotificationProcessor() {
-        final VulnerabilityRequestService vulnerabilityRequestService = Mockito.mock(VulnerabilityRequestService.class);
+        final VulnerabilityService vulnerabilityRequestService = Mockito.mock(VulnerabilityService.class);
         final MockProcessor processor = new MockProcessor(vulnerabilityRequestService, metaService);
         return processor;
     }
@@ -83,7 +83,7 @@ public class NotificationProcessorTest {
         final ComponentVersionView compVersion = Mockito.mock(ComponentVersionView.class);
         compVersion.json = createComponentJson();
         compVersion.meta = createComponentMeta();
-        final VulnerabilityRequestService vulnerabilityRequestService = Mockito.mock(VulnerabilityRequestService.class);
+        final VulnerabilityService vulnerabilityRequestService = Mockito.mock(VulnerabilityService.class);
         Mockito.when(vulnerabilityRequestService.getComponentVersionVulnerabilities(Mockito.anyString())).thenReturn(vulnerabilityList);
         final MockProcessor processor = new MockProcessor(vulnerabilityRequestService, metaService);
         return processor;

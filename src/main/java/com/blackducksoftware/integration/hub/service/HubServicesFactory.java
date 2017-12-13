@@ -30,31 +30,31 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomRequestService;
-import com.blackducksoftware.integration.hub.api.bom.BomComponentIssueRequestService;
-import com.blackducksoftware.integration.hub.api.bom.BomImportRequestService;
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationRequestService;
-import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
-import com.blackducksoftware.integration.hub.api.group.GroupRequestService;
-import com.blackducksoftware.integration.hub.api.license.LicenseRequestService;
-import com.blackducksoftware.integration.hub.api.matchedfiles.MatchedFilesRequestService;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationRequestService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyRequestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentRequestService;
-import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionRequestService;
-import com.blackducksoftware.integration.hub.api.report.ReportRequestService;
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadRequestService;
-import com.blackducksoftware.integration.hub.api.scan.ScanSummaryRequestService;
-import com.blackducksoftware.integration.hub.api.user.UserRequestService;
-import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityRequestService;
-import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.VulnerableBomComponentRequestService;
-import com.blackducksoftware.integration.hub.cli.CLIDownloadService;
-import com.blackducksoftware.integration.hub.cli.SimpleScanService;
+import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomService;
+import com.blackducksoftware.integration.hub.api.bom.BomComponentIssueService;
+import com.blackducksoftware.integration.hub.api.bom.BomImportService;
+import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
+import com.blackducksoftware.integration.hub.api.component.ComponentService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionService;
+import com.blackducksoftware.integration.hub.api.group.GroupService;
+import com.blackducksoftware.integration.hub.api.license.LicenseService;
+import com.blackducksoftware.integration.hub.api.matchedfiles.MatchedFilesService;
+import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
+import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
+import com.blackducksoftware.integration.hub.api.notification.NotificationService;
+import com.blackducksoftware.integration.hub.api.policy.PolicyService;
+import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentService;
+import com.blackducksoftware.integration.hub.api.project.ProjectService;
+import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
+import com.blackducksoftware.integration.hub.api.report.ReportService;
+import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService;
+import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
+import com.blackducksoftware.integration.hub.api.user.UserService;
+import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityService;
+import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.VulnerableBomComponentService;
+import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
+import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
 import com.blackducksoftware.integration.hub.dataservice.component.ComponentDataService;
 import com.blackducksoftware.integration.hub.dataservice.extension.ExtensionConfigDataService;
@@ -100,12 +100,12 @@ public class HubServicesFactory {
     }
 
     public CLIDataService createCLIDataService(final long timeoutInMilliseconds) {
-        return new CLIDataService(restConnection.logger, restConnection.gson, ciEnvironmentVariables, createHubVersionRequestService(), createCliDownloadService(), createPhoneHomeDataService(), createProjectRequestService(),
-                createProjectVersionRequestService(), createCodeLocationRequestService(), createScanSummaryRequestService(), createScanStatusDataService(timeoutInMilliseconds));
+        return new CLIDataService(restConnection.logger, restConnection.gson, ciEnvironmentVariables, createHubVersionService(), createCliDownloadUtility(), createPhoneHomeDataService(), createProjectService(),
+                createProjectVersionService(), createCodeLocationService(), createScanSummaryService(), createScanStatusDataService(timeoutInMilliseconds));
     }
 
     public PhoneHomeDataService createPhoneHomeDataService() {
-        return new PhoneHomeDataService(restConnection.logger, createPhoneHomeClient(), createHubRegistrationRequestService(), createHubVersionRequestService());
+        return new PhoneHomeDataService(restConnection.logger, createPhoneHomeClient(), createHubRegistrationService(), createHubVersionService());
     }
 
     public PhoneHomeClient createPhoneHomeClient() {
@@ -113,141 +113,141 @@ public class HubServicesFactory {
     }
 
     public RiskReportDataService createRiskReportDataService(final long timeoutInMilliseconds) throws IntegrationException {
-        return new RiskReportDataService(restConnection.logger, restConnection, createProjectRequestService(), createProjectVersionRequestService(), createReportRequestService(timeoutInMilliseconds), createAggregateBomRequestService(),
+        return new RiskReportDataService(restConnection.logger, restConnection, createProjectService(), createProjectVersionService(), createReportService(timeoutInMilliseconds), createAggregateBomService(),
                 createCheckedHubSupport(), createIntegrationEscapeUtil());
     }
 
     public PolicyStatusDataService createPolicyStatusDataService() {
-        return new PolicyStatusDataService(restConnection, createProjectRequestService(), createProjectVersionRequestService());
+        return new PolicyStatusDataService(restConnection, createProjectService(), createProjectVersionService());
     }
 
     public ScanStatusDataService createScanStatusDataService(final long timeoutInMilliseconds) {
-        return new ScanStatusDataService(restConnection.logger, createProjectRequestService(), createProjectVersionRequestService(), createCodeLocationRequestService(), createScanSummaryRequestService(), timeoutInMilliseconds);
+        return new ScanStatusDataService(restConnection.logger, createProjectService(), createProjectVersionService(), createCodeLocationService(), createScanSummaryService(), timeoutInMilliseconds);
     }
 
     public NotificationDataService createNotificationDataService() {
-        return new NotificationDataService(restConnection.logger, createHubResponseService(), createNotificationRequestService(), createProjectVersionRequestService(), createPolicyRequestService());
+        return new NotificationDataService(restConnection.logger, createHubService(), createNotificationService(), createProjectVersionService(), createPolicyService());
     }
 
     public NotificationDataService createNotificationDataService(final PolicyNotificationFilter policyNotificationFilter) {
-        return new NotificationDataService(restConnection.logger, createHubResponseService(), createNotificationRequestService(), createProjectVersionRequestService(), createPolicyRequestService(), policyNotificationFilter);
+        return new NotificationDataService(restConnection.logger, createHubService(), createNotificationService(), createProjectVersionService(), createPolicyService(), policyNotificationFilter);
     }
 
     public ExtensionConfigDataService createExtensionConfigDataService() {
-        return new ExtensionConfigDataService(restConnection.logger, restConnection, createUserRequestService(), createExtensionConfigRequestService(), createExtensionUserOptionRequestService());
+        return new ExtensionConfigDataService(restConnection.logger, restConnection, createUserService(), createExtensionConfigService(), createExtensionUserOptionService());
     }
 
     public VulnerabilityDataService createVulnerabilityDataService() {
-        return new VulnerabilityDataService(restConnection.logger, createComponentRequestService(), createVulnerabilityRequestService());
+        return new VulnerabilityDataService(restConnection.logger, createComponentService(), createVulnerabilityService());
     }
 
     public LicenseDataService createLicenseDataService() {
-        return new LicenseDataService(createComponentRequestService(), createLicenseRequestService());
+        return new LicenseDataService(createComponentService(), createLicenseService());
     }
 
-    public BomImportRequestService createBomImportRequestService() {
-        return new BomImportRequestService(restConnection);
+    public BomImportService createBomImportService() {
+        return new BomImportService(restConnection);
     }
 
-    public DryRunUploadRequestService createDryRunUploadRequestService() {
-        return new DryRunUploadRequestService(restConnection);
+    public DryRunUploadService createDryRunUploadService() {
+        return new DryRunUploadService(restConnection);
     }
 
-    public CodeLocationRequestService createCodeLocationRequestService() {
-        return new CodeLocationRequestService(restConnection);
+    public CodeLocationService createCodeLocationService() {
+        return new CodeLocationService(restConnection);
     }
 
-    public ComponentRequestService createComponentRequestService() {
-        return new ComponentRequestService(restConnection);
+    public ComponentService createComponentService() {
+        return new ComponentService(restConnection);
     }
 
-    public HubVersionRequestService createHubVersionRequestService() {
-        return new HubVersionRequestService(restConnection);
+    public HubVersionService createHubVersionService() {
+        return new HubVersionService(restConnection);
     }
 
-    public NotificationRequestService createNotificationRequestService() {
-        return new NotificationRequestService(restConnection);
+    public NotificationService createNotificationService() {
+        return new NotificationService(restConnection);
     }
 
-    public PolicyRequestService createPolicyRequestService() {
-        return new PolicyRequestService(restConnection);
+    public PolicyService createPolicyService() {
+        return new PolicyService(restConnection);
     }
 
-    public ProjectRequestService createProjectRequestService() {
-        return new ProjectRequestService(restConnection);
+    public ProjectService createProjectService() {
+        return new ProjectService(restConnection);
     }
 
-    public ProjectVersionRequestService createProjectVersionRequestService() {
-        return new ProjectVersionRequestService(restConnection);
+    public ProjectVersionService createProjectVersionService() {
+        return new ProjectVersionService(restConnection);
     }
 
-    public LicenseRequestService createLicenseRequestService() {
-        return new LicenseRequestService(restConnection);
+    public LicenseService createLicenseService() {
+        return new LicenseService(restConnection);
     }
 
-    public ScanSummaryRequestService createScanSummaryRequestService() {
-        return new ScanSummaryRequestService(restConnection);
+    public ScanSummaryService createScanSummaryService() {
+        return new ScanSummaryService(restConnection);
     }
 
-    public UserRequestService createUserRequestService() {
-        return new UserRequestService(restConnection);
+    public UserService createUserService() {
+        return new UserService(restConnection);
     }
 
-    public GroupRequestService createGroupRequestService() {
-        return new GroupRequestService(restConnection);
+    public GroupService createGroupService() {
+        return new GroupService(restConnection);
     }
 
-    public VulnerabilityRequestService createVulnerabilityRequestService() {
-        return new VulnerabilityRequestService(restConnection);
+    public VulnerabilityService createVulnerabilityService() {
+        return new VulnerabilityService(restConnection);
     }
 
-    public ExtensionConfigRequestService createExtensionConfigRequestService() {
-        return new ExtensionConfigRequestService(restConnection);
+    public ExtensionConfigService createExtensionConfigService() {
+        return new ExtensionConfigService(restConnection);
     }
 
-    public ExtensionUserOptionRequestService createExtensionUserOptionRequestService() {
-        return new ExtensionUserOptionRequestService(restConnection);
+    public ExtensionUserOptionService createExtensionUserOptionService() {
+        return new ExtensionUserOptionService(restConnection);
     }
 
-    public VulnerableBomComponentRequestService createVulnerableBomComponentRequestService() {
-        return new VulnerableBomComponentRequestService(restConnection);
+    public VulnerableBomComponentService createVulnerableBomComponentService() {
+        return new VulnerableBomComponentService(restConnection);
     }
 
-    public MatchedFilesRequestService createMatchedFilesRequestService() {
-        return new MatchedFilesRequestService(restConnection);
+    public MatchedFilesService createMatchedFilesService() {
+        return new MatchedFilesService(restConnection);
     }
 
-    public CLIDownloadService createCliDownloadService() {
-        return new CLIDownloadService(restConnection.logger, restConnection);
+    public CLIDownloadUtility createCliDownloadUtility() {
+        return new CLIDownloadUtility(restConnection.logger, restConnection);
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {
         return new IntegrationEscapeUtil();
     }
 
-    public SimpleScanService createSimpleScanService(final RestConnection restConnection, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final HubScanConfig hubScanConfig, final String projectName,
+    public SimpleScanUtility createSimpleScanUtility(final RestConnection restConnection, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final HubScanConfig hubScanConfig, final String projectName,
             final String versionName) {
-        return new SimpleScanService(restConnection.logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
+        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
     }
 
-    public HubRegistrationRequestService createHubRegistrationRequestService() {
-        return new HubRegistrationRequestService(restConnection);
+    public HubRegistrationService createHubRegistrationService() {
+        return new HubRegistrationService(restConnection);
     }
 
-    public ReportRequestService createReportRequestService(final long timeoutInMilliseconds) {
-        return new ReportRequestService(restConnection, restConnection.logger, timeoutInMilliseconds);
+    public ReportService createReportService(final long timeoutInMilliseconds) {
+        return new ReportService(restConnection, restConnection.logger, timeoutInMilliseconds);
     }
 
-    public AggregateBomRequestService createAggregateBomRequestService() {
-        return new AggregateBomRequestService(restConnection);
+    public AggregateBomService createAggregateBomService() {
+        return new AggregateBomService(restConnection);
     }
 
-    public HubResponseService createHubResponseService() {
-        return new HubResponseService(restConnection);
+    public HubService createHubService() {
+        return new HubService(restConnection);
     }
 
-    public ProjectAssignmentRequestService createProjectAssignmentRequestService() {
-        return new ProjectAssignmentRequestService(restConnection);
+    public ProjectAssignmentService createProjectAssignmentService() {
+        return new ProjectAssignmentService(restConnection);
     }
 
     public RestConnection getRestConnection() {
@@ -256,28 +256,28 @@ public class HubServicesFactory {
 
     public HubSupportHelper createCheckedHubSupport() throws IntegrationException {
         final HubSupportHelper supportHelper = new HubSupportHelper();
-        supportHelper.checkHubSupport(createHubVersionRequestService(), restConnection.logger);
+        supportHelper.checkHubSupport(createHubVersionService(), restConnection.logger);
         return supportHelper;
     }
 
     public ComponentDataService createComponentDataService() {
-        return new ComponentDataService(restConnection.logger, createProjectRequestService(), createProjectVersionRequestService(), createComponentRequestService());
+        return new ComponentDataService(restConnection.logger, createProjectService(), createProjectVersionService(), createComponentService());
     }
 
-    public BomComponentIssueRequestService createBomComponentIssueRequestService() {
-        return new BomComponentIssueRequestService(restConnection);
+    public BomComponentIssueService createBomComponentIssueService() {
+        return new BomComponentIssueService(restConnection);
     }
 
     public ProjectDataService createProjectDataService() {
-        return new ProjectDataService(restConnection, createProjectRequestService(), createProjectVersionRequestService(), createProjectAssignmentRequestService());
+        return new ProjectDataService(restConnection, createProjectService(), createProjectVersionService(), createProjectAssignmentService());
     }
 
     public VersionBomComponentDataService createVersionBomComponentDataService() {
-        return new VersionBomComponentDataService(restConnection.logger, createProjectRequestService(), createProjectVersionRequestService(), createAggregateBomRequestService(), createMatchedFilesRequestService());
+        return new VersionBomComponentDataService(restConnection.logger, createProjectService(), createProjectVersionService(), createAggregateBomService(), createMatchedFilesService());
     }
 
     public UserDataService createUserDataService() {
-        return new UserDataService(restConnection.logger, createProjectRequestService(), createUserRequestService());
+        return new UserDataService(restConnection.logger, createProjectService(), createUserService());
     }
 
     @Override

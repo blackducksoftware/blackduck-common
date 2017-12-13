@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.project.ProjectRequestService;
-import com.blackducksoftware.integration.hub.api.user.UserRequestService;
+import com.blackducksoftware.integration.hub.api.project.ProjectService;
+import com.blackducksoftware.integration.hub.api.user.UserService;
 import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
 import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.model.view.RoleView;
@@ -37,10 +37,10 @@ import com.blackducksoftware.integration.log.IntLogger;
 
 public class UserDataService {
     private final IntLogger logger;
-    private final UserRequestService userRequestService;
-    private final ProjectRequestService projectRequestService;
+    private final UserService userRequestService;
+    private final ProjectService projectRequestService;
 
-    public UserDataService(final IntLogger logger, final ProjectRequestService projectRequestService, final UserRequestService userRequestService) {
+    public UserDataService(final IntLogger logger, final ProjectService projectRequestService, final UserService userRequestService) {
         this.logger = logger;
         this.projectRequestService = projectRequestService;
         this.userRequestService = userRequestService;
@@ -57,7 +57,7 @@ public class UserDataService {
 
         final List<ProjectView> resolvedProjectViews = new ArrayList<>();
         for (final AssignedProjectView assigned : assignedProjectViews) {
-            final ProjectView project = projectRequestService.getItem(assigned.projectUrl, ProjectView.class);
+            final ProjectView project = projectRequestService.getView(assigned.projectUrl, ProjectView.class);
             if (project != null) {
                 resolvedProjectViews.add(project);
             }

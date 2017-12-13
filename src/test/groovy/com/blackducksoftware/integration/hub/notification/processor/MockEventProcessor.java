@@ -34,7 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.blackducksoftware.integration.hub.api.item.MetaService;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
@@ -49,7 +49,7 @@ import com.blackducksoftware.integration.hub.notification.processor.event.Notifi
 public class MockEventProcessor extends NotificationSubProcessor {
     private final Logger logger = LoggerFactory.getLogger(MockEventProcessor.class);
 
-    public MockEventProcessor(final MapProcessorCache cache, final MetaService metaService) {
+    public MockEventProcessor(final MapProcessorCache cache, final MetaHandler metaService) {
         super(cache, metaService);
     }
 
@@ -172,7 +172,7 @@ public class MockEventProcessor extends NotificationSubProcessor {
 
         keyBuilder.append(NotificationEventConstants.EVENT_KEY_HUB_POLICY_RULE_REL_URL_HASHED_NAME);
         keyBuilder.append(NotificationEventConstants.EVENT_KEY_NAME_VALUE_SEPARATOR);
-        keyBuilder.append(hashString(getMetaService().getHref(rule)));
+        keyBuilder.append(hashString(getMetaHandler().getHref(rule)));
         final String key = keyBuilder.toString();
         return key;
     }

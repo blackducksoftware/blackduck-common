@@ -30,8 +30,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationRequestService;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionRequestService;
+import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
+import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;
@@ -42,12 +42,12 @@ import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName;
 
 public class PhoneHomeDataService {
     private final IntLogger logger;
-    private final HubRegistrationRequestService hubRegistrationRequestService;
-    private final HubVersionRequestService hubVersionRequestService;
+    private final HubRegistrationService hubRegistrationRequestService;
+    private final HubVersionService hubVersionRequestService;
     private final PhoneHomeClient phoneHomeClient;
     private final ExecutorService executorService;
 
-    public PhoneHomeDataService(final IntLogger logger, final PhoneHomeClient phoneHomeClient, final HubRegistrationRequestService hubRegistrationRequestService, final HubVersionRequestService hubVersionRequestService) {
+    public PhoneHomeDataService(final IntLogger logger, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationRequestService, final HubVersionService hubVersionRequestService) {
         this.logger = logger;
         this.hubRegistrationRequestService = hubRegistrationRequestService;
         this.hubVersionRequestService = hubVersionRequestService;

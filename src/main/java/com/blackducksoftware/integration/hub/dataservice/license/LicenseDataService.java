@@ -24,28 +24,29 @@
 package com.blackducksoftware.integration.hub.dataservice.license;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
-import com.blackducksoftware.integration.hub.api.license.LicenseRequestService;
+import com.blackducksoftware.integration.hub.api.component.ComponentService;
+import com.blackducksoftware.integration.hub.api.license.LicenseService;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
-import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
 import com.blackducksoftware.integration.hub.model.view.ComplexLicenseView;
+import com.blackducksoftware.integration.hub.model.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.model.view.LicenseView;
 import com.blackducksoftware.integration.hub.model.view.components.VersionBomLicenseView;
 
 public class LicenseDataService {
-    private final ComponentRequestService componentRequestService;
-    private final LicenseRequestService licenseRequestService;
+    private final ComponentService componentService;
+    private final LicenseService licenseService;
 
-    public LicenseDataService(final ComponentRequestService componentRequestService, final LicenseRequestService licenseRequestService) {
-        this.componentRequestService = componentRequestService;
-        this.licenseRequestService = licenseRequestService;
+    public LicenseDataService(final ComponentService componentService, final LicenseService licenseService) {
+        this.componentService = componentService;
+        this.licenseService = licenseService;
     }
 
     public ComplexLicenseView getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
-        final ComponentSearchResultResponse component = componentRequestService.getExactComponentMatch(externalId);
-        final String versionUrl = component.version;
-        final ComponentVersionView componentVersion = componentRequestService.getItem(versionUrl, ComponentVersionView.class);
+        final ComponentSearchResultView componentSearchView = componentService.getExactComponentMatch(externalId);
+        final String componentVersionUrl = componentSearchView.componentVersionUrl;
+        final ComponentVersionView componentVersion = componentService.getView(componentVersionUrl, ComponentVersionView.class);
+
         return componentVersion.license;
     }
 
@@ -54,12 +55,12 @@ public class LicenseDataService {
         if (licenseUrl == null) {
             return null;
         }
-        final LicenseView licenseView = licenseRequestService.getItem(licenseUrl, LicenseView.class);
+        final LicenseView licenseView = licenseService.getView(licenseUrl, LicenseView.class);
         return licenseView;
     }
 
     public String getLicenseText(final LicenseView licenseView) throws IntegrationException {
-        final String licenseText = licenseRequestService.getLicenseText(licenseView);
+        final String licenseText = licenseService.getLicenseText(licenseView);
         return licenseText;
     }
 

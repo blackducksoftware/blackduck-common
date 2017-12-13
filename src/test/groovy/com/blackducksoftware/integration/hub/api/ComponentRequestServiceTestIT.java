@@ -27,10 +27,10 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.api.component.ComponentRequestService;
+import com.blackducksoftware.integration.hub.api.component.ComponentService;
 import com.blackducksoftware.integration.hub.bdio.SimpleBdioFactory;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
-import com.blackducksoftware.integration.hub.model.response.ComponentSearchResultResponse;
+import com.blackducksoftware.integration.hub.model.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
@@ -40,13 +40,13 @@ public class ComponentRequestServiceTestIT {
     @Test
     public void testGettingHubCommon() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final ComponentRequestService componentRequestService = hubServicesFactory.createComponentRequestService();
+        final ComponentService componentRequestService = hubServicesFactory.createComponentService();
         final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
 
         final ExternalId hubCommonExternalId = simpleBdioFactory.createMavenExternalId("com.blackducksoftware.integration", "hub-common", "2.1.0");
-        final ComponentSearchResultResponse componentItem = componentRequestService.getExactComponentMatch(hubCommonExternalId);
+        final ComponentSearchResultView componentView = componentRequestService.getExactComponentMatch(hubCommonExternalId);
 
-        assertNotNull(componentItem);
+        assertNotNull(componentView);
     }
 
 }

@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigRequestService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionRequestService;
-import com.blackducksoftware.integration.hub.api.item.MetaService;
-import com.blackducksoftware.integration.hub.api.user.UserRequestService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigService;
+import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionService;
+import com.blackducksoftware.integration.hub.api.user.UserService;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.dataservice.extension.transformer.UserConfigTransform;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
@@ -40,17 +40,17 @@ import com.blackducksoftware.integration.hub.model.view.ExternalExtensionConfigV
 import com.blackducksoftware.integration.hub.model.view.ExternalExtensionUserView;
 import com.blackducksoftware.integration.hub.model.view.ExternalExtensionView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubResponseService;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ExtensionConfigDataService extends HubResponseService {
-    private final ExtensionConfigRequestService extensionConfigRequestService;
+public class ExtensionConfigDataService extends HubService {
+    private final ExtensionConfigService extensionConfigRequestService;
     private final UserConfigTransform userConfigTransform;
-    private final ExtensionUserOptionRequestService extensionUserOptionRequestService;
+    private final ExtensionUserOptionService extensionUserOptionRequestService;
     private final ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor;
 
-    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserRequestService userRequestService, final ExtensionConfigRequestService extensionConfigRequestService,
-            final ExtensionUserOptionRequestService extensionUserOptionRequestService) {
+    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserService userRequestService, final ExtensionConfigService extensionConfigRequestService,
+            final ExtensionUserOptionService extensionUserOptionRequestService) {
         super(restConnection);
         this.extensionConfigRequestService = extensionConfigRequestService;
         this.extensionUserOptionRequestService = extensionUserOptionRequestService;
@@ -62,15 +62,15 @@ public class ExtensionConfigDataService extends HubResponseService {
 
     public Map<String, ExternalExtensionConfigValueView> getGlobalConfigMap(final String extensionUrl) throws IntegrationException {
         Map<String, ExternalExtensionConfigValueView> globalConfigMap = new HashMap<>();
-        final ExternalExtensionView extension = getItem(extensionUrl, ExternalExtensionView.class);
-        final String globalOptionsLink = getFirstLink(extension, MetaService.GLOBAL_OPTIONS_LINK);
+        final ExternalExtensionView extension = getView(extensionUrl, ExternalExtensionView.class);
+        final String globalOptionsLink = getFirstLink(extension, MetaHandler.GLOBAL_OPTIONS_LINK);
         globalConfigMap = createGlobalConfigMap(globalOptionsLink);
         return globalConfigMap;
     }
 
     public ParallelResourceProcessorResults<UserConfigItem> getUserConfigList(final String extensionUrl) throws IntegrationException {
-        final ExternalExtensionView extension = getItem(extensionUrl, ExternalExtensionView.class);
-        final String userOptionsLink = getFirstLink(extension, MetaService.USER_OPTIONS_LINK);
+        final ExternalExtensionView extension = getView(extensionUrl, ExternalExtensionView.class);
+        final String userOptionsLink = getFirstLink(extension, MetaHandler.USER_OPTIONS_LINK);
         final List<ExternalExtensionUserView> userOptionList = extensionUserOptionRequestService.getUserOptions(userOptionsLink);
         final ParallelResourceProcessorResults<UserConfigItem> itemList = parallelProcessor.process(userOptionList);
         return itemList;
