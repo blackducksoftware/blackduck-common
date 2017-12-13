@@ -45,14 +45,14 @@ import com.google.gson.JsonParser;
 
 import okhttp3.Response;
 
-public class AllHubViewsCollectionTransformer {
-    private final HubViewsCollectionTransformer hubViewsCollectionTransformer;
+public class AllHubViewsTransformer {
+    private final HubViewsTransformer hubViewsTransformer;
     private final HubRequestFactory hubRequestFactory;
     private final MetaHandler metaHandler;
     private final JsonParser jsonParser;
 
-    public AllHubViewsCollectionTransformer(final HubViewsCollectionTransformer hubViewsCollectionTransformer, final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler, final JsonParser jsonParser) {
-        this.hubViewsCollectionTransformer = hubViewsCollectionTransformer;
+    public AllHubViewsTransformer(final HubViewsTransformer hubViewsTransformer, final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler, final JsonParser jsonParser) {
+        this.hubViewsTransformer = hubViewsTransformer;
         this.hubRequestFactory = hubRequestFactory;
         this.metaHandler = metaHandler;
         this.jsonParser = jsonParser;
@@ -124,11 +124,11 @@ public class AllHubViewsCollectionTransformer {
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
             totalCount = jsonObject.get("totalCount").getAsInt();
-            allViews.addAll(hubViewsCollectionTransformer.getViews(jsonObject, clazz));
+            allViews.addAll(hubViewsTransformer.getViews(jsonObject, clazz));
             while (allViews.size() < totalCount && currentOffset < totalCount) {
                 currentOffset += hubPagedRequest.limit;
                 hubPagedRequest.offset = currentOffset;
-                allViews.addAll(hubViewsCollectionTransformer.getViews(hubPagedRequest, clazz, mediaType));
+                allViews.addAll(hubViewsTransformer.getViews(hubPagedRequest, clazz, mediaType));
             }
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
