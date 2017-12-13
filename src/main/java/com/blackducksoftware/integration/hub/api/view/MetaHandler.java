@@ -59,6 +59,7 @@ public class MetaHandler {
     public static final String GROUPS_LINK = "usergroups";
     public static final String GLOBAL_OPTIONS_LINK = "global-options";
     public static final String USER_OPTIONS_LINK = "user-options";
+    public static final String LICENSE_LINK = "license";
     public static final String TEXT_LINK = "text";
     public static final String ROLES_LINK = "roles";
 
