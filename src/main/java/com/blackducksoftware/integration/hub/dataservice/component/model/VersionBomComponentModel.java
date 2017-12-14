@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.versionbomcomponent.model;
+package com.blackducksoftware.integration.hub.dataservice.component.model;
 
 import java.util.ArrayList;
 import java.util.Date;
