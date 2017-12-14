@@ -67,7 +67,6 @@ import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataServ
 import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.user.UserDataService;
-import com.blackducksoftware.integration.hub.dataservice.versionbomcomponent.VersionBomComponentDataService;
 import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -113,8 +112,8 @@ public class HubServicesFactory {
     }
 
     public RiskReportDataService createRiskReportDataService(final long timeoutInMilliseconds) throws IntegrationException {
-        return new RiskReportDataService(restConnection.logger, restConnection, createProjectService(), createProjectVersionService(), createReportService(timeoutInMilliseconds), createAggregateBomService(),
-                createCheckedHubSupport(), createIntegrationEscapeUtil());
+        return new RiskReportDataService(restConnection.logger, restConnection, createProjectService(), createProjectVersionService(), createReportService(timeoutInMilliseconds), createAggregateBomService(), createCheckedHubSupport(),
+                createIntegrationEscapeUtil());
     }
 
     public PolicyStatusDataService createPolicyStatusDataService() {
@@ -261,7 +260,7 @@ public class HubServicesFactory {
     }
 
     public ComponentDataService createComponentDataService() {
-        return new ComponentDataService(restConnection.logger, createProjectService(), createProjectVersionService(), createComponentService());
+        return new ComponentDataService(restConnection.logger, createProjectService(), createProjectVersionService(), createComponentService(), createAggregateBomService(), createMatchedFilesService());
     }
 
     public BomComponentIssueService createBomComponentIssueService() {
@@ -270,10 +269,6 @@ public class HubServicesFactory {
 
     public ProjectDataService createProjectDataService() {
         return new ProjectDataService(restConnection, createProjectService(), createProjectVersionService(), createProjectAssignmentService());
-    }
-
-    public VersionBomComponentDataService createVersionBomComponentDataService() {
-        return new VersionBomComponentDataService(restConnection.logger, createProjectService(), createProjectVersionService(), createAggregateBomService(), createMatchedFilesService());
     }
 
     public UserDataService createUserDataService() {
