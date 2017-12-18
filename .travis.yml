@@ -9,5 +9,4 @@ script:
   
 after_success:
 - mvn jacoco:report coveralls:report 
-- mvn com.blackducksoftware.integration:hub-maven-plugin:1.4.0:createHubOutput -Dhub.output.directory=.
-- bash <(curl -s https://copilot.blackducksoftware.com/bash/travis) ./*_bdio.jsonld
+- bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
