@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.ApiKeyFieldEnum;
 import com.blackducksoftware.integration.hub.Credentials;
 import com.blackducksoftware.integration.hub.CredentialsBuilder;
 import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
@@ -44,52 +45,35 @@ import com.blackducksoftware.integration.validator.ValidationResults;
 
 public class HubServerConfigValidator extends AbstractValidator {
     public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
-
     public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
-
     public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
-
     public static final String ERROR_MSG_UNREACHABLE_CAUSE = ", because: ";
-
     public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
-
     public static final String ERROR_MSG_URL_NOT_HUB_PREFIX = "The Url does not appear to be a Hub server :";
-
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
 
     private String hubUrl;
-
     private String timeoutSeconds;
-
     private String username;
-
     private String password;
-
     private int passwordLength;
-
+    private String apiKey;
     private String proxyHost;
-
     private String proxyPort;
-
     private String proxyUsername;
-
     private String proxyPassword;
-
     private int proxyPasswordLength;
-
     private String ignoredProxyHosts;
-
     private boolean alwaysTrustServerCertificate;
-
     private ProxyInfo proxyInfo;
 
     @Override
     public ValidationResults assertValid() {
         final ValidationResults proxyResult = assertProxyValid();
-        final ValidationResults credentialResult = assertCredentialsValid();
+        final ValidationResults credentialsOrApiKeyResult = assertCredentialsOrApiKeyValid();
         final ValidationResults result = new ValidationResults();
         result.addAllResults(proxyResult.getResultMap());
-        result.addAllResults(credentialResult.getResultMap());
+        result.addAllResults(credentialsOrApiKeyResult.getResultMap());
         validateHubUrl(result);
         validateTimeout(result, null);
         return result;
@@ -129,11 +113,21 @@ public class HubServerConfigValidator extends AbstractValidator {
         return results;
     }
 
-    public ValidationResults assertCredentialsValid() {
+    public ValidationResults assertCredentialsOrApiKeyValid() {
         final CredentialsValidator credentialsBuilder = new CredentialsValidator();
         credentialsBuilder.setUsername(username);
         credentialsBuilder.setPassword(password);
-        return credentialsBuilder.assertValid();
+        final ValidationResults credentialsResults = credentialsBuilder.assertValid();
+        if (credentialsResults.hasErrors()) {
+            // you can specify either username/password OR apiKey
+            if (StringUtils.isNotBlank(apiKey)) {
+                return new ValidationResults();
+            } else {
+                credentialsResults.addResult(ApiKeyFieldEnum.API_KEY, new ValidationResult(ValidationResultEnum.ERROR, "No api key was found."));
+            }
+        }
+
+        return credentialsResults;
     }
 
     public void validateHubUrl(final ValidationResults result) {
@@ -233,6 +227,14 @@ public class HubServerConfigValidator extends AbstractValidator {
      */
     public void setPasswordLength(final int passwordLength) {
         this.passwordLength = passwordLength;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(final String apiKey) {
+        this.apiKey = apiKey;
     }
 
     public String getProxyHost() {

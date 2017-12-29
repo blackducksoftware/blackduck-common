@@ -47,29 +47,18 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
 
     private String hubUrl;
-
     private String timeoutSeconds;
-
     private String username;
-
     private String password;
-
     private int passwordLength;
-
+    private String apiKey;
     private String proxyHost;
-
     private String proxyPort;
-
     private String proxyUsername;
-
     private String proxyPassword;
-
     private int proxyPasswordLength;
-
     private String ignoredProxyHosts;
-
     private boolean alwaysTrustServerCertificate;
-
     private IntLogger logger;
 
     public HubServerConfigBuilder() {
@@ -102,10 +91,13 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         } catch (final MalformedURLException e) {
         }
 
-        final Credentials credentials = getHubCredentials();
         final ProxyInfo proxyInfo = getHubProxyInfo();
-        final HubServerConfig config = new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, alwaysTrustServerCertificate);
-        return config;
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+            final Credentials credentials = getHubCredentials();
+            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, alwaysTrustServerCertificate);
+        } else {
+            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), apiKey, proxyInfo, alwaysTrustServerCertificate);
+        }
     }
 
     private Credentials getHubCredentials() {
@@ -133,6 +125,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         validator.setHubUrl(hubUrl);
         validator.setUsername(username);
         validator.setPassword(password);
+        validator.setApiKey(apiKey);
         validator.setTimeout(timeoutSeconds);
         validator.setProxyHost(proxyHost);
         validator.setProxyPort(proxyPort);
@@ -148,6 +141,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         final String hubUrl = properties.getProperty("hub.url");
         final String hubUsername = properties.getProperty("hub.username");
         final String hubPassword = properties.getProperty("hub.password");
+        final String hubApiKey = properties.getProperty("hub.api.key");
         final String hubTimeout = properties.getProperty("hub.timeout");
         final String hubProxyHost = properties.getProperty("hub.proxy.host");
         final String hubProxyPort = properties.getProperty("hub.proxy.port");
@@ -158,6 +152,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         setHubUrl(hubUrl);
         setUsername(hubUsername);
         setPassword(hubPassword);
+        setApiKey(hubApiKey);
         setTimeout(hubTimeout);
         setProxyHost(hubProxyHost);
         setProxyPort(hubProxyPort);
@@ -191,6 +186,10 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
      */
     public void setPasswordLength(final int passwordLength) {
         this.passwordLength = passwordLength;
+    }
+
+    public void setApiKey(final String apiKey) {
+        this.apiKey = apiKey;
     }
 
     public void setProxyHost(final String proxyHost) {

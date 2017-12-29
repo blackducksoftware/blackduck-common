@@ -43,27 +43,17 @@ import com.blackducksoftware.integration.validator.ValidationResult;
 import com.blackducksoftware.integration.validator.ValidationResults;
 
 public class HubServerConfigBuilderTest {
-
     private static final String VALID_TIMEOUT_STRING = "120";
-
     private static final String VALID_USERNAME_STRING = "username";
-
     private static final String VALID_PASSWORD_STRING = "password";
-
     private static final int VALID_TIMEOUT_INTEGER = 120;
-
     private static final String VALID_URL = "https://www.google.com";
-
     private static final String ERROR_MSG_NO_HUB_TIMEOUT = "No Hub Timeout was found.";
-
     private static final int VALID_PROXY_PORT = 2303;
-
     private static final String VALID_PROXY_HOST = "just need a non-empty string";
-
     private static final String VALID_IGNORE_HOST_LIST = ".*google.*,.*msn.*,.*yahoo.*";
 
     private List<String> expectedMessages;
-
     private List<String> actualMessages;
 
     @Before
@@ -74,8 +64,7 @@ public class HubServerConfigBuilderTest {
 
     @After
     public void tearDown() {
-        assertEquals("Too many/not enough messages expected: \n" + actualMessages.size(), expectedMessages.size(),
-                actualMessages.size());
+        assertEquals("Too many/not enough messages expected: \n" + actualMessages.size(), expectedMessages.size(), actualMessages.size());
 
         for (final String expectedMessage : expectedMessages) {
             boolean foundExpectedMessage = false;
@@ -85,8 +74,7 @@ public class HubServerConfigBuilderTest {
                     break;
                 }
             }
-            assertTrue("Did not find the expected message : " + expectedMessage,
-                    foundExpectedMessage);
+            assertTrue("Did not find the expected message : " + expectedMessage, foundExpectedMessage);
         }
     }
 
