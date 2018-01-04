@@ -125,7 +125,7 @@ public class HubServerConfigValidator extends AbstractValidator {
             validationResults.addAllResults(credentialsResults.getResultMap());
 
             if (validationResults.hasErrors()) {
-                credentialsResults.addResult(ApiKeyFieldEnum.API_KEY, new ValidationResult(ValidationResultEnum.ERROR, "No api key was found."));
+                validationResults.addResult(ApiKeyFieldEnum.API_KEY, new ValidationResult(ValidationResultEnum.ERROR, "No api key was found."));
             }
         }
 
