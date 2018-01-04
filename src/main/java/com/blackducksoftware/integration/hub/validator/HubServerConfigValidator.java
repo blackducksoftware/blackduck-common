@@ -113,21 +113,23 @@ public class HubServerConfigValidator extends AbstractValidator {
         return results;
     }
 
+    // you can specify either username/password OR apiKey
     public ValidationResults assertCredentialsOrApiKeyValid() {
-        final CredentialsValidator credentialsBuilder = new CredentialsValidator();
-        credentialsBuilder.setUsername(username);
-        credentialsBuilder.setPassword(password);
-        final ValidationResults credentialsResults = credentialsBuilder.assertValid();
-        if (credentialsResults.hasErrors()) {
-            // you can specify either username/password OR apiKey
-            if (StringUtils.isNotBlank(apiKey)) {
-                return new ValidationResults();
-            } else {
+        final ValidationResults validationResults = new ValidationResults();
+
+        if (StringUtils.isBlank(apiKey)) {
+            final CredentialsValidator credentialsBuilder = new CredentialsValidator();
+            credentialsBuilder.setUsername(username);
+            credentialsBuilder.setPassword(password);
+            final ValidationResults credentialsResults = credentialsBuilder.assertValid();
+            validationResults.addAllResults(credentialsResults.getResultMap());
+
+            if (validationResults.hasErrors()) {
                 credentialsResults.addResult(ApiKeyFieldEnum.API_KEY, new ValidationResult(ValidationResultEnum.ERROR, "No api key was found."));
             }
         }
 
-        return credentialsResults;
+        return validationResults;
     }
 
     public void validateHubUrl(final ValidationResults result) {

@@ -79,7 +79,7 @@ public class HubServerConfig extends HubComponent implements Serializable {
             logger.alwaysLog("--> Hub User : " + getGlobalCredentials().getUsername());
         }
         if (StringUtils.isNotBlank(apiKey)) {
-            logger.alwaysLog("--> Hub API Key : " + getApiKey());
+            logger.alwaysLog("--> Hub API Key Used");
         }
         if (alwaysTrustServerCertificate) {
             logger.alwaysLog("--> Trust Hub certificate : " + isAlwaysTrustServerCertificate());
