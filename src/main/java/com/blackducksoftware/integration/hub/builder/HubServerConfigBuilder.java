@@ -92,11 +92,11 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         }
 
         final ProxyInfo proxyInfo = getHubProxyInfo();
-        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+        if (StringUtils.isNotBlank(apiKey)) {
+            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), apiKey, proxyInfo, alwaysTrustServerCertificate);
+        } else {
             final Credentials credentials = getHubCredentials();
             return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, alwaysTrustServerCertificate);
-        } else {
-            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), apiKey, proxyInfo, alwaysTrustServerCertificate);
         }
     }
 
