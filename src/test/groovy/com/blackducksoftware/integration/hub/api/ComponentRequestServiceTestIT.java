@@ -26,7 +26,9 @@ package com.blackducksoftware.integration.hub.api;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.hub.api.component.ComponentService;
 import com.blackducksoftware.integration.hub.bdio.SimpleBdioFactory;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
@@ -34,6 +36,7 @@ import com.blackducksoftware.integration.hub.model.view.ComponentSearchResultVie
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
+@Category(IntegrationTest.class)
 public class ComponentRequestServiceTestIT {
     private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 

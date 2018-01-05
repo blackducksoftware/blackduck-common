@@ -33,10 +33,13 @@ import java.net.URL;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 
+@Category(IntegrationTest.class)
 public class HubServerConfigBuilderTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 

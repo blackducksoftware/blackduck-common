@@ -25,12 +25,15 @@ package com.blackducksoftware.integration.hub.dataservice.scan
 
 import org.junit.Assert
 import org.junit.Test
+import org.junit.experimental.categories.Category
 
+import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.hub.api.bom.BomImportService
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 
+@Category(IntegrationTest.class)
 class ScanStatusDataServiceTestIT {
     private static final long FIVE_MINUTES = 5 * 60 * 1000;
 

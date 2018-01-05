@@ -26,7 +26,9 @@ package com.blackducksoftware.integration.hub.scan
 import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
+import org.junit.experimental.categories.Category
 
+import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService
 import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
 import com.blackducksoftware.integration.hub.model.response.DryRunUploadResponse
@@ -38,13 +40,13 @@ import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
 import com.blackducksoftware.integration.log.PrintStreamIntLogger
 
+@Category(IntegrationTest.class)
 class DryRunUploadServiceTestIT {
-
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
-    private IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO)
-
     private static File dryRunFile;
+
+    private IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO)
 
     @BeforeClass
     public static void init(){
