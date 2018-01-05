@@ -27,7 +27,9 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
+import org.junit.experimental.categories.Category
 
+import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.project.ProjectService
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService
@@ -46,6 +48,7 @@ import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
 import com.blackducksoftware.integration.log.PrintStreamIntLogger
 
+@Category(IntegrationTest.class)
 class CodeLocationRequestServiceTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 

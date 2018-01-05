@@ -1,9 +1,12 @@
+# operating system
+.DS_Store
+
+# ide
 .settings/
 .classpath
 .project
-target/
 bin/
-pom.xml.bak
-.DS_Store
-test.properties
-/.gradle/
+
+# build tool
+.gradle/
+build/

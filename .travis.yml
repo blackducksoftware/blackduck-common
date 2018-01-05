@@ -2,11 +2,20 @@ language: java
 
 jdk:
   - oraclejdk8
-    
+
+notifications:
+  email:
+    recipients:
+      - akamen@blackducksoftware.com
+      - jrichard@blackducksoftware.com
+      - psantos@blackducksoftware.com
+      - ekerwin@blackducksoftware.com
+
 install: true
+
 script:
-- mvn -U clean package 
-  
+  - ./gradlew clean build
+
 after_success:
-- mvn jacoco:report coveralls:report 
-- bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
+  - ./gradlew test jacocoTestReport coveralls
+  - bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
