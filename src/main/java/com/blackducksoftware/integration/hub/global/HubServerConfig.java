@@ -32,27 +32,37 @@ import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.Credentials;
 import com.blackducksoftware.integration.hub.model.HubComponent;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
+import com.blackducksoftware.integration.hub.rest.ApiKeyRestConnection;
+import com.blackducksoftware.integration.hub.rest.ApiKeyRestConnectionBuilder;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnectionBuilder;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class HubServerConfig extends HubComponent implements Serializable {
     private static final long serialVersionUID = -1581638027683631935L;
 
     private final URL hubUrl;
-
     private final int timeoutSeconds;
-
     private final Credentials credentials;
-
+    private final String apiKey;
     private final ProxyInfo proxyInfo;
-
     private final boolean alwaysTrustServerCertificate;
 
     public HubServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
         this.hubUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.credentials = credentials;
+        this.apiKey = null;
+        this.proxyInfo = proxyInfo;
+        this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
+    }
+
+    public HubServerConfig(final URL url, final int timeoutSeconds, final String apiKey, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
+        this.hubUrl = url;
+        this.timeoutSeconds = timeoutSeconds;
+        this.credentials = null;
+        this.apiKey = apiKey;
         this.proxyInfo = proxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
     }
@@ -65,8 +75,11 @@ public class HubServerConfig extends HubComponent implements Serializable {
         if (getHubUrl() != null) {
             logger.alwaysLog("--> Hub Server Url : " + getHubUrl());
         }
-        if (StringUtils.isNotBlank(getGlobalCredentials().getUsername())) {
+        if (getGlobalCredentials() != null && StringUtils.isNotBlank(getGlobalCredentials().getUsername())) {
             logger.alwaysLog("--> Hub User : " + getGlobalCredentials().getUsername());
+        }
+        if (StringUtils.isNotBlank(apiKey)) {
+            logger.alwaysLog("--> Hub API Key Used");
         }
         if (alwaysTrustServerCertificate) {
             logger.alwaysLog("--> Trust Hub certificate : " + isAlwaysTrustServerCertificate());
@@ -87,6 +100,14 @@ public class HubServerConfig extends HubComponent implements Serializable {
         }
     }
 
+    public RestConnection createRestConnection(final IntLogger logger) throws EncryptionException {
+        if (StringUtils.isNotBlank(apiKey)) {
+            return createApiKeyRestConnection(logger);
+        } else {
+            return createCredentialsRestConnection(logger);
+        }
+    }
+
     public CredentialsRestConnection createCredentialsRestConnection(final IntLogger logger) throws EncryptionException {
         final CredentialsRestConnectionBuilder builder = new CredentialsRestConnectionBuilder();
         builder.setLogger(logger);
@@ -99,12 +120,28 @@ public class HubServerConfig extends HubComponent implements Serializable {
         return builder.build();
     }
 
+    public ApiKeyRestConnection createApiKeyRestConnection(final IntLogger logger) {
+        final ApiKeyRestConnectionBuilder builder = new ApiKeyRestConnectionBuilder();
+        builder.setLogger(logger);
+        builder.setBaseUrl(getHubUrl().toString());
+        builder.setTimeout(getTimeout());
+        builder.setApiKey(getApiKey());
+        builder.setAlwaysTrustServerCertificate(isAlwaysTrustServerCertificate());
+        builder.applyProxyInfo(getProxyInfo());
+
+        return builder.build();
+    }
+
     public URL getHubUrl() {
         return hubUrl;
     }
 
     public Credentials getGlobalCredentials() {
         return credentials;
+    }
+
+    public String getApiKey() {
+        return apiKey;
     }
 
     public ProxyInfo getProxyInfo() {
