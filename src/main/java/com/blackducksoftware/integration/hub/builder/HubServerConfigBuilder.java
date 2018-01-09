@@ -148,6 +148,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         final String hubIgnoredProxyHosts = properties.getProperty("hub.ignored.proxy.hosts");
         final String hubProxyUsername = properties.getProperty("hub.proxy.username");
         final String hubProxyPassword = properties.getProperty("hub.proxy.password");
+        final boolean hubAlwaysTrustServerCertificate = Boolean.parseBoolean(properties.getProperty("hub.trust.cert"));
 
         setHubUrl(hubUrl);
         setUsername(hubUsername);
@@ -159,6 +160,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         setIgnoredProxyHosts(hubIgnoredProxyHosts);
         setProxyUsername(hubProxyUsername);
         setProxyPassword(hubProxyPassword);
+        setAlwaysTrustServerCertificate(hubAlwaysTrustServerCertificate);
     }
 
     public void setHubUrl(final String hubUrl) {
