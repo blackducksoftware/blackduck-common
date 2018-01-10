@@ -29,6 +29,5 @@ public enum ItemTypeEnum {
     COMPONENT,
     COUNT,
     PERSON,
-    VERSION,
-    OPERATION;
+    VERSION;
 }
