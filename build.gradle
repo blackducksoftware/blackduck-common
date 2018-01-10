@@ -9,7 +9,7 @@ buildscript {
 
 plugins { id 'groovy' }
 
-version = '25.0.2'
+version = '25.0.3-SNAPSHOT'
 
 apply plugin: 'com.blackducksoftware.integration.library'
 
