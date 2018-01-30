@@ -12,3 +12,4 @@ bin/
 build/
 
 src/test/resources/test.properties
+/target/
