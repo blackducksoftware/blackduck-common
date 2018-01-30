@@ -33,10 +33,10 @@ import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.project.ProjectService
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService
+import com.blackducksoftware.integration.hub.api.scan.DryRunUploadResponse
 import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException
 import com.blackducksoftware.integration.hub.model.request.ProjectRequest
-import com.blackducksoftware.integration.hub.model.response.DryRunUploadResponse
 import com.blackducksoftware.integration.hub.model.view.CodeLocationView
 import com.blackducksoftware.integration.hub.model.view.ProjectVersionView
 import com.blackducksoftware.integration.hub.model.view.ProjectView
@@ -76,12 +76,12 @@ class CodeLocationRequestServiceTestIT {
         final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        DryRunUploadService dryRunUploadRequestService = services.createDryRunUploadService()
+        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.getRestConnection())
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
         CodeLocationService codeLocationRequestService = services.createCodeLocationService()
-        CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
+        CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
 
@@ -92,18 +92,18 @@ class CodeLocationRequestServiceTestIT {
         ProjectVersionView version = getProjectVersion(services.createProjectService(), services.createProjectVersionService(), projectBuilder.build())
 
         codeLocationRequestService.mapCodeLocation(codeLocationView, version)
-        codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
+        codeLocationView = codeLocationRequestService.getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isNotBlank(codeLocationView.mappedProjectVersion))
 
         codeLocationRequestService.unmapCodeLocation(codeLocationView)
-        codeLocationView = codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
+        codeLocationView = codeLocationRequestService.getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
 
         codeLocationRequestService.deleteCodeLocation(codeLocationView)
         try {
-            codeLocationRequestService.getCodeLocationById(response.scanGroup.codeLocationKey.entityId)
+            codeLocationRequestService.getCodeLocationById(response.codeLocationId)
             Assert.fail('This should have thrown an exception')
         } catch (IntegrationRestException e){
             Assert.assertEquals(404, e.getHttpStatusCode())

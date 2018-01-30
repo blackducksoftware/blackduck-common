@@ -48,7 +48,6 @@ import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentServic
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.report.ReportService;
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
 import com.blackducksoftware.integration.hub.api.user.UserService;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityService;
@@ -146,10 +145,6 @@ public class HubServicesFactory {
 
     public BomImportService createBomImportService() {
         return new BomImportService(restConnection);
-    }
-
-    public DryRunUploadService createDryRunUploadService() {
-        return new DryRunUploadService(restConnection);
     }
 
     public CodeLocationService createCodeLocationService() {
