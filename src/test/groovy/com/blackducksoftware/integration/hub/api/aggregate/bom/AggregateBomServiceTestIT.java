@@ -28,8 +28,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -45,14 +43,6 @@ import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 @Category(IntegrationTest.class)
 public class AggregateBomServiceTestIT {
     private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
 
     @Test
     public void testGetBomEntriesForUrl() throws IllegalArgumentException, IntegrationException {

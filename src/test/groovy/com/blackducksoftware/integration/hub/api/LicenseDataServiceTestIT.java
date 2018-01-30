@@ -36,7 +36,6 @@ import com.blackducksoftware.integration.hub.bdio.SimpleBdioFactory;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.dataservice.license.LicenseDataService;
 import com.blackducksoftware.integration.hub.model.enumeration.ComplexLicenseCodeSharingEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ComplexLicenseEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ComplexLicenseOwnershipEnum;
 import com.blackducksoftware.integration.hub.model.view.ComplexLicenseView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
@@ -54,19 +53,13 @@ public class LicenseDataServiceTestIT {
         final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
         final ExternalId guavaExternalId = simpleBdioFactory.createMavenExternalId("com.google.guava", "guava", "20.0");
         final ComplexLicenseView complexLicense = licenseDataService.getComplexLicenseItemFromComponent(guavaExternalId);
-        assertNull(complexLicense.codeSharing);
-        assertNull(complexLicense.license);
-        assertNull(complexLicense.name);
-        assertNull(complexLicense.ownership);
-        assertEquals(ComplexLicenseEnum.CONJUNCTIVE, complexLicense.type);
-        assertEquals(1, complexLicense.licenses.size());
 
-        assertEquals(ComplexLicenseCodeSharingEnum.PERMISSIVE, complexLicense.licenses.get(0).codeSharing);
-        assertTrue(StringUtils.isNotBlank(complexLicense.licenses.get(0).license));
-        assertEquals("Apache License 2.0", complexLicense.licenses.get(0).name);
-        assertEquals(ComplexLicenseOwnershipEnum.OPEN_SOURCE, complexLicense.licenses.get(0).ownership);
-        assertNull(complexLicense.licenses.get(0).type);
-        assertEquals(0, complexLicense.licenses.get(0).licenses.size());
+        assertEquals(ComplexLicenseCodeSharingEnum.PERMISSIVE, complexLicense.codeSharing);
+        assertTrue(StringUtils.isNotBlank(complexLicense.license));
+        assertEquals("Apache License 2.0", complexLicense.name);
+        assertEquals(ComplexLicenseOwnershipEnum.OPEN_SOURCE, complexLicense.ownership);
+        assertNull(complexLicense.type);
+        assertEquals(0, complexLicense.licenses.size());
 
         System.out.println(complexLicense);
     }

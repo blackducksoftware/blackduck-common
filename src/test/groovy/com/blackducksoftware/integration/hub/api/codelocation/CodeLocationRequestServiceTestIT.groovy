@@ -22,6 +22,7 @@
  * under the License.
  */
 package com.blackducksoftware.integration.hub.api.codelocation
+
 import org.apache.commons.lang3.StringUtils
 import org.junit.After
 import org.junit.Assert
