@@ -229,6 +229,7 @@ public class CLIDataService {
         builder.setToolsDir(originalHubScanConfig.getToolsDir());
         builder.setWorkingDirectory(originalHubScanConfig.getWorkingDirectory());
         builder.addAllScanTargetPaths(new ArrayList<>(originalHubScanConfig.getScanTargetPaths()));
+        builder.setSnippetModeEnabled(originalHubScanConfig.isSnippetModeEnabled());
         return builder.build();
     }
 
