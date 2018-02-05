@@ -32,9 +32,9 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -50,7 +50,7 @@ public class ProjectService extends HubService {
     }
 
     public List<ProjectView> getAllProjects() throws IntegrationException {
-        final List<ProjectView> allProjectItems = getAllViewsFromApi(SEGMENT_PROJECTS, ProjectView.class);
+        final List<ProjectView> allProjectItems = getAllResponsesFromApi(SEGMENT_PROJECTS, ProjectView.class);
         return allProjectItems;
     }
 
@@ -59,7 +59,7 @@ public class ProjectService extends HubService {
         if (StringUtils.isNotBlank(projectName)) {
             hubPagedRequest.q = "name:" + projectName;
         }
-        final List<ProjectView> allProjectItems = getAllViews(hubPagedRequest, ProjectView.class);
+        final List<ProjectView> allProjectItems = getAllResponses(hubPagedRequest, ProjectView.class);
         return allProjectItems;
     }
 
@@ -69,7 +69,7 @@ public class ProjectService extends HubService {
             hubPagedRequest.q = "name:" + projectName;
         }
 
-        final List<ProjectView> projectItems = getViews(hubPagedRequest, ProjectView.class);
+        final List<ProjectView> projectItems = getResponses(hubPagedRequest, ProjectView.class);
         return projectItems;
     }
 

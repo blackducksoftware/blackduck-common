@@ -25,13 +25,13 @@ package com.blackducksoftware.integration.hub.dataservice.license;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.component.ComponentService;
+import com.blackducksoftware.integration.hub.api.generated.model.VersionBomLicenseView;
+import com.blackducksoftware.integration.hub.api.generated.view.ComplexLicenseView;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.LicenseView;
 import com.blackducksoftware.integration.hub.api.license.LicenseService;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
-import com.blackducksoftware.integration.hub.model.view.ComplexLicenseView;
-import com.blackducksoftware.integration.hub.model.view.ComponentSearchResultView;
-import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
-import com.blackducksoftware.integration.hub.model.view.LicenseView;
-import com.blackducksoftware.integration.hub.model.view.components.VersionBomLicenseView;
 
 public class LicenseDataService {
     private final ComponentService componentService;
@@ -44,8 +44,8 @@ public class LicenseDataService {
 
     public ComplexLicenseView getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
         final ComponentSearchResultView componentSearchView = componentService.getExactComponentMatch(externalId);
-        final String componentVersionUrl = componentSearchView.componentVersionUrl;
-        final ComponentVersionView componentVersion = componentService.getView(componentVersionUrl, ComponentVersionView.class);
+        final String componentVersionUrl = componentSearchView.version;
+        final ComponentVersionView componentVersion = componentService.getResponse(componentVersionUrl, ComponentVersionView.class);
 
         return componentVersion.license;
     }
@@ -62,7 +62,7 @@ public class LicenseDataService {
         if (licenseUrl == null) {
             return null;
         }
-        final LicenseView licenseView = licenseService.getView(licenseUrl, LicenseView.class);
+        final LicenseView licenseView = licenseService.getResponse(licenseUrl, LicenseView.class);
         return licenseView;
     }
 

@@ -35,11 +35,16 @@ import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
+import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
+import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
+import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.builder.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
@@ -48,11 +53,6 @@ import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataServ
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
-import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
-import com.blackducksoftware.integration.hub.model.view.CodeLocationView;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
-import com.blackducksoftware.integration.hub.model.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.util.HostnameHelper;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -118,7 +118,7 @@ public class CLIDataService {
     private SimpleScanUtility createScanService(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
         final HubScanConfig controlledConfig = getControlledScanConfig(hubScanConfig);
         if (hubScanConfig.isDryRun()) {
-            return new SimpleScanUtility(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, projectRequest.getName(), projectRequest.getVersionRequest().getVersionName());
+            return new SimpleScanUtility(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, projectRequest.name, projectRequest.versionRequest.versionName);
         } else {
             return new SimpleScanUtility(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, null, null);
         }
@@ -149,11 +149,11 @@ public class CLIDataService {
         String projectVersionPhase = null;
         String projectVersionDistribution = null;
         if (projectRequest != null) {
-            projectName = projectRequest.getName();
-            if (projectRequest.getVersionRequest() != null) {
-                projectVersionName = projectRequest.getVersionRequest().getVersionName();
-                projectVersionPhase = projectRequest.getVersionRequest().getPhase() == null ? null : projectRequest.getVersionRequest().getPhase().toString();
-                projectVersionDistribution = projectRequest.getVersionRequest().getDistribution() == null ? null : projectRequest.getVersionRequest().getDistribution().toString();
+            projectName = projectRequest.name;
+            if (projectRequest.versionRequest != null) {
+                projectVersionName = projectRequest.versionRequest.versionName;
+                projectVersionPhase = projectRequest.versionRequest.phase == null ? null : projectRequest.versionRequest.phase.toString();
+                projectVersionDistribution = projectRequest.versionRequest.distribution == null ? null : projectRequest.versionRequest.distribution.toString();
             }
         }
         logger.alwaysLog(String.format("--> Using Hub Project Name : %s, Version : %s, Phase : %s, Distribution : %s", projectName, projectVersionName, projectVersionPhase, projectVersionDistribution));
@@ -195,7 +195,7 @@ public class CLIDataService {
                     scanSummaryFile.delete();
                     final String codeLocationUrl = metaService.getFirstLinkSafely(scanSummary, MetaHandler.CODE_LOCATION_BOM_STATUS_LINK);
 
-                    final CodeLocationView codeLocationView = codeLocationRequestService.getView(codeLocationUrl, CodeLocationView.class);
+                    final CodeLocationView codeLocationView = codeLocationRequestService.getResponse(codeLocationUrl, CodeLocationView.class);
                     codeLocationViews.add(codeLocationView);
                     codeLocationRequestService.mapCodeLocation(codeLocationView, version);
                 } catch (final IOException ex) {
@@ -283,16 +283,16 @@ public class CLIDataService {
     private void getProjectVersion(final ProjectRequest projectRequest) throws IntegrationException {
         ProjectView project = null;
         try {
-            project = projectRequestService.getProjectByName(projectRequest.getName());
+            project = projectRequestService.getProjectByName(projectRequest.name);
         } catch (final DoesNotExistException e) {
             final String projectURL = projectRequestService.createHubProject(projectRequest);
-            project = projectRequestService.getView(projectURL, ProjectView.class);
+            project = projectRequestService.getResponse(projectURL, ProjectView.class);
         }
         try {
-            version = projectVersionRequestService.getProjectVersion(project, projectRequest.getVersionRequest().getVersionName());
+            version = projectVersionRequestService.getProjectVersion(project, projectRequest.versionRequest.versionName);
         } catch (final DoesNotExistException e) {
-            final String versionURL = projectVersionRequestService.createHubVersion(project, projectRequest.getVersionRequest());
-            version = projectVersionRequestService.getView(versionURL, ProjectVersionView.class);
+            final String versionURL = projectVersionRequestService.createHubVersion(project, projectRequest.versionRequest);
+            version = projectVersionRequestService.getResponse(versionURL, ProjectVersionView.class);
         }
     }
 

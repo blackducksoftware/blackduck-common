@@ -26,16 +26,16 @@ package com.blackducksoftware.integration.hub.dataservice.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.blackducksoftware.integration.hub.model.enumeration.RiskCountEnum;
-import com.blackducksoftware.integration.hub.model.view.components.RiskCountView;
-import com.blackducksoftware.integration.hub.model.view.components.RiskProfileView;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.RiskCountType;
+import com.blackducksoftware.integration.hub.api.generated.model.RiskCountView;
+import com.blackducksoftware.integration.hub.api.generated.view.RiskProfileView;
 
 public class RiskProfileCounts {
-    private final Map<RiskCountEnum, Integer> countsMap;
+    private final Map<RiskCountType, Integer> countsMap;
 
     public RiskProfileCounts(final RiskProfileView view) {
         countsMap = new HashMap<>();
-        for (final RiskCountEnum value : RiskCountEnum.values()) {
+        for (final RiskCountType value : RiskCountType.values()) {
             countsMap.put(value, 0);
         }
         if (view != null) {
@@ -45,7 +45,7 @@ public class RiskProfileCounts {
         }
     }
 
-    public int getCount(final RiskCountEnum level) {
+    public int getCount(final RiskCountType level) {
         return countsMap.get(level);
     }
 }

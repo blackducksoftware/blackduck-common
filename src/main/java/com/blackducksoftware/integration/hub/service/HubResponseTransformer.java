@@ -28,9 +28,10 @@ import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.HubResponse;
+import com.blackducksoftware.integration.hub.api.HubView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.HubView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.google.gson.Gson;
@@ -40,54 +41,54 @@ import com.google.gson.JsonParser;
 
 import okhttp3.Response;
 
-public class HubViewTransformer {
+public class HubResponseTransformer {
     private final HubRequestFactory hubRequestFactory;
     private final MetaHandler metaHandler;
     private final JsonParser jsonParser;
     private final Gson gson;
 
-    public HubViewTransformer(final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler, final JsonParser jsonParser, final Gson gson) {
+    public HubResponseTransformer(final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler, final JsonParser jsonParser, final Gson gson) {
         this.hubRequestFactory = hubRequestFactory;
         this.metaHandler = metaHandler;
         this.jsonParser = jsonParser;
         this.gson = gson;
     }
 
-    public <T extends HubView> T getViewFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return getViewFromLinkSafely(hubView, metaLinkRef, clazz, null);
+    public <T extends HubResponse> T getResponseFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
+        return getResponseFromLinkSafely(hubView, metaLinkRef, clazz, null);
     }
 
-    public <T extends HubView> T getViewFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
+    public <T extends HubResponse> T getResponseFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
         if (!metaHandler.hasLink(hubView, metaLinkRef)) {
-            return getViewFromLink(hubView, metaLinkRef, clazz, mediaType);
+            return getResponseFromLink(hubView, metaLinkRef, clazz, mediaType);
         } else {
             return null;
         }
     }
 
-    public <T extends HubView> T getViewFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return getViewFromLink(hubView, metaLinkRef, clazz, null);
+    public <T extends HubResponse> T getResponseFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
+        return getResponseFromLink(hubView, metaLinkRef, clazz, null);
     }
 
-    public <T extends HubView> T getViewFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
+    public <T extends HubResponse> T getResponseFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
         final String link = metaHandler.getFirstLink(hubView, metaLinkRef);
-        return getView(link, clazz, mediaType);
+        return getResponse(link, clazz, mediaType);
     }
 
-    public <T extends HubView> T getView(final HubRequest request, final Class<T> clazz) throws IntegrationException {
-        return getView(request, clazz, null);
+    public <T extends HubResponse> T getResponse(final HubRequest request, final Class<T> clazz) throws IntegrationException {
+        return getResponse(request, clazz, null);
     }
 
-    public <T extends HubView> T getView(final String url, final Class<T> clazz) throws IntegrationException {
-        return getView(url, clazz, null);
+    public <T extends HubResponse> T getResponse(final String url, final Class<T> clazz) throws IntegrationException {
+        return getResponse(url, clazz, null);
     }
 
-    public <T extends HubView> T getView(final String url, final Class<T> clazz, final String mediaType) throws IntegrationException {
+    public <T extends HubResponse> T getResponse(final String url, final Class<T> clazz, final String mediaType) throws IntegrationException {
         final HubRequest request = hubRequestFactory.createRequest(url);
-        return getView(request, clazz, mediaType);
+        return getResponse(request, clazz, mediaType);
     }
 
-    public <T extends HubView> T getView(final HubRequest request, final Class<T> clazz, final String mediaType) throws IntegrationException {
+    public <T extends HubResponse> T getResponse(final HubRequest request, final Class<T> clazz, final String mediaType) throws IntegrationException {
         Response response = null;
         try {
             if (StringUtils.isNotBlank(mediaType)) {
@@ -99,7 +100,7 @@ public class HubViewTransformer {
             final String jsonResponse = response.body().string();
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
-            return getViewAs(jsonObject, clazz);
+            return getResponseAs(jsonObject, clazz);
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
         } finally {
@@ -109,13 +110,13 @@ public class HubViewTransformer {
         }
     }
 
-    public <T extends HubView> T getViewAs(final JsonElement view, final Class<T> clazz) {
+    public <T extends HubResponse> T getResponseAs(final JsonElement view, final Class<T> clazz) {
         final T hubItem = gson.fromJson(view, clazz);
         hubItem.json = gson.toJson(view);
         return hubItem;
     }
 
-    public <T extends HubView> T getViewAs(final String view, final Class<T> clazz) {
+    public <T extends HubResponse> T getResponseAs(final String view, final Class<T> clazz) {
         final T hubItem = gson.fromJson(view, clazz);
         hubItem.json = view;
         return hubItem;

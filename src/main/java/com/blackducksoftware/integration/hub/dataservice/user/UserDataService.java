@@ -27,12 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.response.AssignedProjectView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
+import com.blackducksoftware.integration.hub.api.generated.view.RoleView;
+import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.user.UserService;
-import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
-import com.blackducksoftware.integration.hub.model.view.RoleView;
-import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class UserDataService {
@@ -57,7 +57,7 @@ public class UserDataService {
 
         final List<ProjectView> resolvedProjectViews = new ArrayList<>();
         for (final AssignedProjectView assigned : assignedProjectViews) {
-            final ProjectView project = projectRequestService.getView(assigned.projectUrl, ProjectView.class);
+            final ProjectView project = projectRequestService.getResponse(assigned.project, ProjectView.class);
             if (project != null) {
                 resolvedProjectViews.add(project);
             }

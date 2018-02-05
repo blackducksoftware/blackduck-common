@@ -30,9 +30,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
@@ -64,7 +64,7 @@ public class ComponentService extends HubService {
         final String componentQuery = String.format("id:%s|%s", forge, hubOriginId);
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(COMPONENT_SEGMENTS, componentQuery);
 
-        final List<ComponentSearchResultView> allComponents = getAllViews(hubPagedRequest, ComponentSearchResultView.class);
+        final List<ComponentSearchResultView> allComponents = getAllResponses(hubPagedRequest, ComponentSearchResultView.class);
         return allComponents;
     }
 

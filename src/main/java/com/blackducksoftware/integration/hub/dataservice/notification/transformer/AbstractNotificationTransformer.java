@@ -28,6 +28,9 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.notification.NotificationService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
@@ -37,9 +40,6 @@ import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionMod
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
-import com.blackducksoftware.integration.hub.model.view.NotificationView;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -98,7 +98,7 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
     protected ProjectVersionModel createFullProjectVersion(final String projectVersionUrl, final String projectName, final String versionName) throws IntegrationException {
         ProjectVersionView item;
         try {
-            item = hubResponseService.getView(projectVersionUrl, ProjectVersionView.class);
+            item = hubResponseService.getResponse(projectVersionUrl, ProjectVersionView.class);
         } catch (final HubIntegrationException e) {
             final String msg = "Error getting the full ProjectVersion for this affected project version URL: " + projectVersionUrl + ": " + e.getMessage();
             throw new HubIntegrationException(msg, e);
@@ -132,7 +132,7 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
     protected ComponentVersionView getComponentVersion(final String componentVersionLink) throws IntegrationException {
         ComponentVersionView componentVersion = null;
         if (!StringUtils.isBlank(componentVersionLink)) {
-            componentVersion = hubResponseService.getView(componentVersionLink, ComponentVersionView.class);
+            componentVersion = hubResponseService.getResponse(componentVersionLink, ComponentVersionView.class);
         }
         return componentVersion;
     }

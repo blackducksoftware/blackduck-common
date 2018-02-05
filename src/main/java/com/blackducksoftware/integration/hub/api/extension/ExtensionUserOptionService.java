@@ -26,7 +26,7 @@ package com.blackducksoftware.integration.hub.api.extension;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.model.view.ExternalExtensionUserView;
+import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionUserView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 
@@ -36,7 +36,7 @@ public class ExtensionUserOptionService extends HubService {
     }
 
     public List<ExternalExtensionUserView> getUserOptions(final String userOptionsUrl) throws IntegrationException {
-        final List<ExternalExtensionUserView> allItems = getAllViews(userOptionsUrl, ExternalExtensionUserView.class);
+        final List<ExternalExtensionUserView> allItems = getAllResponses(userOptionsUrl, ExternalExtensionUserView.class);
         return allItems;
     }
 

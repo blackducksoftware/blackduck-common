@@ -30,6 +30,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.notification.NotificationService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
@@ -39,14 +45,6 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Noti
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum;
-import com.blackducksoftware.integration.hub.model.view.BomComponentPolicyStatusView;
-import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
-import com.blackducksoftware.integration.hub.model.view.NotificationView;
-import com.blackducksoftware.integration.hub.model.view.PolicyOverrideNotificationView;
-import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
@@ -81,7 +79,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
         componentVersionList.add(componentStatus);
 
         try {
-            releaseItem = getProjectVersionService().getView(policyOverride.content.projectVersionLink, ProjectVersionView.class);
+            releaseItem = getProjectVersionService().getResponse(policyOverride.content.projectVersionLink, ProjectVersionView.class);
         } catch (final IntegrationException e) {
             throw new HubItemTransformException(e);
         }
@@ -117,9 +115,9 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
                             componentVersion.componentName));
                     continue;
                 }
-                final BomComponentPolicyStatusView bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
+                final PolicyStatusView bomComponentVersionPolicyStatus = getBomComponentVersionPolicyStatus(
                         bomComponentVersionPolicyStatusUrl);
-                if (bomComponentVersionPolicyStatus.approvalStatus != VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION_OVERRIDDEN) {
+                if (bomComponentVersionPolicyStatus.approvalStatus != PolicyStatusApprovalStatusType.IN_VIOLATION_OVERRIDDEN) {
                     getLogger().debug(String.format("Component %s status is not 'violation overridden'; skipping it", componentVersion.componentName));
                     continue;
                 }

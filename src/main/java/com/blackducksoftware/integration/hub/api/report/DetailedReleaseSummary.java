@@ -32,17 +32,17 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
 
 /**
  * Detailed release summary.
  *
  */
 public class DetailedReleaseSummary {
-    private final static Map<ProjectVersionDistributionEnum, String> distributionDisplayStringsMap = new HashMap<>();
+    private final static Map<ProjectVersionDistributionType, String> distributionDisplayStringsMap = new HashMap<>();
 
-    private final static Map<ProjectVersionPhaseEnum, String> phaseDisplayStringsMap = new HashMap<>();
+    private final static Map<ProjectVersionPhaseType, String> phaseDisplayStringsMap = new HashMap<>();
 
     private final String projectId;
 
@@ -65,16 +65,16 @@ public class DetailedReleaseSummary {
     private final URLProvider uiUrlGenerator;
 
     static {
-        distributionDisplayStringsMap.put(ProjectVersionDistributionEnum.EXTERNAL, "External");
-        distributionDisplayStringsMap.put(ProjectVersionDistributionEnum.SAAS, "SaaS");
-        distributionDisplayStringsMap.put(ProjectVersionDistributionEnum.INTERNAL, "Internal");
-        distributionDisplayStringsMap.put(ProjectVersionDistributionEnum.OPENSOURCE, "Open Source");
+        distributionDisplayStringsMap.put(ProjectVersionDistributionType.EXTERNAL, "External");
+        distributionDisplayStringsMap.put(ProjectVersionDistributionType.SAAS, "SaaS");
+        distributionDisplayStringsMap.put(ProjectVersionDistributionType.INTERNAL, "Internal");
+        distributionDisplayStringsMap.put(ProjectVersionDistributionType.OPENSOURCE, "Open Source");
 
-        phaseDisplayStringsMap.put(ProjectVersionPhaseEnum.ARCHIVED, "Archived");
-        phaseDisplayStringsMap.put(ProjectVersionPhaseEnum.DEPRECATED, "Deprecated");
-        phaseDisplayStringsMap.put(ProjectVersionPhaseEnum.DEVELOPMENT, "In Development");
-        phaseDisplayStringsMap.put(ProjectVersionPhaseEnum.PLANNING, "In Planning");
-        phaseDisplayStringsMap.put(ProjectVersionPhaseEnum.RELEASED, "Released");
+        phaseDisplayStringsMap.put(ProjectVersionPhaseType.ARCHIVED, "Archived");
+        phaseDisplayStringsMap.put(ProjectVersionPhaseType.DEPRECATED, "Deprecated");
+        phaseDisplayStringsMap.put(ProjectVersionPhaseType.DEVELOPMENT, "In Development");
+        phaseDisplayStringsMap.put(ProjectVersionPhaseType.PLANNING, "In Planning");
+        phaseDisplayStringsMap.put(ProjectVersionPhaseType.RELEASED, "Released");
     }
 
     public DetailedReleaseSummary(final String projectId, final String versionId, final String projectName,
@@ -155,7 +155,7 @@ public class DetailedReleaseSummary {
             return null;
         } else {
             final String fixedPhaseString = phase.replaceAll("\\s", "").toUpperCase();
-            for (final ProjectVersionPhaseEnum type : ProjectVersionPhaseEnum.values()) {
+            for (final ProjectVersionPhaseType type : ProjectVersionPhaseType.values()) {
                 if (type.toString().equals(fixedPhaseString)) {
                     return phaseDisplayStringsMap.get(type);
                 }
@@ -170,7 +170,7 @@ public class DetailedReleaseSummary {
             return null;
         } else {
             final String fixedDistributionString = distribution.replaceAll("\\s", "").toUpperCase();
-            for (final ProjectVersionDistributionEnum type : ProjectVersionDistributionEnum.values()) {
+            for (final ProjectVersionDistributionType type : ProjectVersionDistributionType.values()) {
                 if (type.toString().equals(fixedDistributionString)) {
                     return distributionDisplayStringsMap.get(type);
                 }

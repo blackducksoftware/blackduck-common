@@ -38,13 +38,13 @@ import java.util.TimeZone;
 import org.apache.commons.io.IOUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
+import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.model.view.NotificationView;
-import com.blackducksoftware.integration.hub.model.view.PolicyOverrideNotificationView;
-import com.blackducksoftware.integration.hub.model.view.RuleViolationClearedNotificationView;
-import com.blackducksoftware.integration.hub.model.view.RuleViolationNotificationView;
-import com.blackducksoftware.integration.hub.model.view.UserView;
-import com.blackducksoftware.integration.hub.model.view.VulnerabilityNotificationView;
+import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyOverrideNotificationView;
+import com.blackducksoftware.integration.hub.dataservice.notification.transformer.RuleViolationClearedNotificationView;
+import com.blackducksoftware.integration.hub.dataservice.notification.transformer.RuleViolationNotificationView;
+import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityNotificationView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -112,7 +112,7 @@ public class NotificationService extends HubService {
             if (typeMap.containsKey(type)) {
                 notificationClass = typeMap.get(type);
             }
-            final NotificationView item = getViewAs(element, notificationClass);
+            final NotificationView item = getResponseAs(element, notificationClass);
             itemList.add(item);
         }
         return itemList;

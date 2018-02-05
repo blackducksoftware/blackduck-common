@@ -25,8 +25,8 @@ package com.blackducksoftware.integration.hub.dataservice.notification.model;
 
 import java.util.Date;
 
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
-import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
 
 public class PolicyContentItem extends NotificationContentItem {
     private final String componentUrl;

@@ -29,40 +29,34 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
+import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.notification.NotificationService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
+import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyOverrideNotificationView;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationClearedTransformer;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationOverrideTransformer;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationTransformer;
+import com.blackducksoftware.integration.hub.dataservice.notification.transformer.RuleViolationClearedNotificationView;
+import com.blackducksoftware.integration.hub.dataservice.notification.transformer.RuleViolationNotificationView;
+import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityNotificationView;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
-import com.blackducksoftware.integration.hub.model.view.NotificationView;
-import com.blackducksoftware.integration.hub.model.view.PolicyOverrideNotificationView;
-import com.blackducksoftware.integration.hub.model.view.RuleViolationClearedNotificationView;
-import com.blackducksoftware.integration.hub.model.view.RuleViolationNotificationView;
-import com.blackducksoftware.integration.hub.model.view.UserView;
-import com.blackducksoftware.integration.hub.model.view.VulnerabilityNotificationView;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class NotificationDataService {
     private final HubService hubResponseService;
-
     private final NotificationService notificationRequestService;
-
     private final ProjectVersionService projectVersionRequestService;
-
     private final PolicyService policyRequestService;
-
     private final PolicyNotificationFilter policyNotificationFilter;
-
     private final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor;
-
     private final MetaHandler metaService;
 
     public NotificationDataService(final IntLogger logger, final HubService hubResponseService, final NotificationService notificationRequestService, final ProjectVersionService projectVersionRequestService,

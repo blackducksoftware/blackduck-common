@@ -32,9 +32,9 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskCounts;
 import com.blackducksoftware.integration.hub.api.report.risk.RiskProfile;
-import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum;
 
 /**
  * This is a view of an aggregation of BomEntries.
@@ -98,8 +98,8 @@ public class AggregateBomViewEntry {
         return policyApprovalStatus;
     }
 
-    public VersionBomPolicyStatusOverallStatusEnum getPolicyApprovalStatusEnum() {
-        return VersionBomPolicyStatusOverallStatusEnum.valueOf(policyApprovalStatus);
+    public PolicyStatusApprovalStatusType getPolicyApprovalStatusEnum() {
+        return PolicyStatusApprovalStatusType.valueOf(policyApprovalStatus);
     }
 
     public List<String> getBomEntryIds() {
@@ -204,8 +204,7 @@ public class AggregateBomViewEntry {
     }
 
     /**
-     * Returns the appropriate String for the License Risk type to be used in
-     * the UI. If the License Risk is null it will return an empty String.
+     * Returns the appropriate String for the License Risk type to be used in the UI. If the License Risk is null it will return an empty String.
      *
      */
     public String getLicenseRiskString() {
@@ -232,9 +231,7 @@ public class AggregateBomViewEntry {
     }
 
     /**
-     * Returns the appropriate String for the Operational Risk type to be used
-     * in the UI. If the Operational Risk is null it will return an empty
-     * String.
+     * Returns the appropriate String for the Operational Risk type to be used in the UI. If the Operational Risk is null it will return an empty String.
      *
      */
     public String getOperationalRiskString() {

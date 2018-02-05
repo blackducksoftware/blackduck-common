@@ -28,11 +28,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.model.ProjectVersionRequest;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -52,7 +52,7 @@ public class ProjectVersionService extends HubService {
             hubPagedRequest.q = String.format("versionName:%s", projectVersionName);
         }
 
-        final List<ProjectVersionView> allProjectVersionMatchingItems = getAllViews(hubPagedRequest, ProjectVersionView.class);
+        final List<ProjectVersionView> allProjectVersionMatchingItems = getAllResponses(hubPagedRequest, ProjectVersionView.class);
         for (final ProjectVersionView projectVersion : allProjectVersionMatchingItems) {
             if (projectVersionName.equals(projectVersion.versionName)) {
                 return projectVersion;
@@ -63,11 +63,11 @@ public class ProjectVersionService extends HubService {
     }
 
     public List<ProjectVersionView> getAllProjectVersions(final ProjectView project) throws IntegrationException {
-        return getAllViewsFromLink(project, MetaHandler.VERSIONS_LINK, ProjectVersionView.class);
+        return getAllResponsesFromLink(project, MetaHandler.VERSIONS_LINK, ProjectVersionView.class);
     }
 
     public List<ProjectVersionView> getAllProjectVersions(final String versionsUrl) throws IntegrationException {
-        final List<ProjectVersionView> allProjectVersionItems = getAllViews(versionsUrl, ProjectVersionView.class);
+        final List<ProjectVersionView> allProjectVersionItems = getAllResponses(versionsUrl, ProjectVersionView.class);
         return allProjectVersionItems;
     }
 

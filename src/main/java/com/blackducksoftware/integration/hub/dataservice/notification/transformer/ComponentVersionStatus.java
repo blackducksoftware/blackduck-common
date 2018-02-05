@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * hub-common-response
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -21,25 +21,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.view;
+package com.blackducksoftware.integration.hub.dataservice.notification.transformer;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.HttpAllow;
-import com.blackducksoftware.integration.hub.api.HubView;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.api.HubResponse;
+import com.google.gson.annotations.SerializedName;
 
-public class HubViewFilter<T extends HubView> {
-    public List<T> getAccessibleItems(final MetaHandler metaService, final List<T> hubItems) throws HubIntegrationException {
-        final List<T> accessibleItems = new ArrayList<>();
-        for (final T hubItem : hubItems) {
-            final List<HttpAllow> allow = metaService.getAllowedMethods(hubItem);
-            if (allow != null && !allow.isEmpty() && allow.contains(HttpAllow.GET) && allow.contains(HttpAllow.PUT)) {
-                accessibleItems.add(hubItem);
-            }
-        }
-        return accessibleItems;
-    }
+public class ComponentVersionStatus extends HubResponse {
+    public String componentName;
+
+    // If version is specified, componentVersionLink will be populated
+    // otherwise it will be null
+    @SerializedName("componentVersion")
+    public String componentVersionLink;
+
+    // If version is not specified, componentLink will be populated
+    // otherwise it will be null
+    @SerializedName("component")
+    public String componentLink;
+
+    @SerializedName("bomComponentVersionPolicyStatus")
+    public String bomComponentVersionPolicyStatusLink;
+
+    public List<String> policies;
+
+    public String componentIssueLink;
 
 }

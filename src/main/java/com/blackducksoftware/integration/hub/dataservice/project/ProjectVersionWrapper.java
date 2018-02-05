@@ -46,8 +46,8 @@
 */
 package com.blackducksoftware.integration.hub.dataservice.project;
 
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 
 public class ProjectVersionWrapper {
     private ProjectView projectView;

@@ -34,6 +34,15 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomService;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportFormatType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.RiskCountType;
+import com.blackducksoftware.integration.hub.api.generated.model.RiskCountView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
+import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
@@ -43,15 +52,6 @@ import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.enumeration.BomComponentPolicyStatusApprovalStatusEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ReportFormatEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.RiskCountEnum;
-import com.blackducksoftware.integration.hub.model.view.BomComponentPolicyStatusView;
-import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
-import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
-import com.blackducksoftware.integration.hub.model.view.components.RiskCountView;
 import com.blackducksoftware.integration.hub.report.RiskReportWriter;
 import com.blackducksoftware.integration.hub.report.api.BomComponent;
 import com.blackducksoftware.integration.hub.report.api.PolicyRule;
@@ -92,7 +92,7 @@ public class RiskReportDataService extends HubService {
 
     public String getNoticesReportData(final ProjectView project, final ProjectVersionView version) throws IntegrationException {
         logger.trace("Getting the Notices Report Contents using the Report Rest Server");
-        return reportRequestService.generateHubNoticesReport(version, ReportFormatEnum.TEXT);
+        return reportRequestService.generateHubNoticesReport(version, ReportFormatType.TEXT);
     }
 
     public File createNoticesReportFile(final File outputDirectory, final String projectName, final String projectVersionName) throws IntegrationException {
@@ -146,7 +146,7 @@ public class RiskReportDataService extends HubService {
             boolean policyFailure = false;
             for (final VersionBomComponentView bomEntry : bomEntries) {
                 final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
-                String policyStatus = bomEntry.approvalStatus;
+                String policyStatus = bomEntry.approvalStatus.toString();
                 if (StringUtils.isBlank(policyStatus)) {
                     String componentPolicyStatusURL = null;
                     if (!StringUtils.isBlank(bomEntry.componentVersion)) {
@@ -157,7 +157,7 @@ public class RiskReportDataService extends HubService {
                     if (!policyFailure) {
                         // FIXME if we could check if the Hub has the policy module we could remove a lot of the mess
                         try {
-                            final BomComponentPolicyStatusView bomPolicyStatus = getView(componentPolicyStatusURL, BomComponentPolicyStatusView.class);
+                            final PolicyStatusView bomPolicyStatus = getResponse(componentPolicyStatusURL, PolicyStatusView.class);
                             policyStatus = bomPolicyStatus.approvalStatus.toString();
                         } catch (final IntegrationException e) {
                             policyFailure = true;
@@ -172,7 +172,7 @@ public class RiskReportDataService extends HubService {
         } else {
             logger.trace("Getting the Report Contents using the Report Rest Server");
             final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
-            final VersionReport versionReport = reportRequestService.generateHubReport(version, ReportFormatEnum.JSON, categories);
+            final VersionReport versionReport = reportRequestService.generateHubReport(version, ReportFormatType.JSON, categories);
             final List<AggregateBomViewEntry> bomEntries = versionReport.getAggregateBomViewEntries();
             for (final AggregateBomViewEntry bomEntry : bomEntries) {
                 final BomComponent component = createBomComponentFromBomViewEntry(versionReport, bomEntry);
@@ -270,33 +270,33 @@ public class RiskReportDataService extends HubService {
         component.setLicense(bomEntry.licenses.get(0).licenseDisplay);
         if (bomEntry.securityRiskProfile != null && bomEntry.securityRiskProfile.counts != null && !bomEntry.securityRiskProfile.counts.isEmpty()) {
             for (final RiskCountView count : bomEntry.securityRiskProfile.counts) {
-                if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
+                if (count.countType == RiskCountType.HIGH && count.count > 0) {
                     component.setSecurityRiskHighCount(count.count);
-                } else if (count.countType == RiskCountEnum.MEDIUM && count.count > 0) {
+                } else if (count.countType == RiskCountType.MEDIUM && count.count > 0) {
                     component.setSecurityRiskMediumCount(count.count);
-                } else if (count.countType == RiskCountEnum.LOW && count.count > 0) {
+                } else if (count.countType == RiskCountType.LOW && count.count > 0) {
                     component.setSecurityRiskLowCount(count.count);
                 }
             }
         }
         if (bomEntry.licenseRiskProfile != null && bomEntry.licenseRiskProfile.counts != null && !bomEntry.licenseRiskProfile.counts.isEmpty()) {
             for (final RiskCountView count : bomEntry.licenseRiskProfile.counts) {
-                if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
+                if (count.countType == RiskCountType.HIGH && count.count > 0) {
                     component.setLicenseRiskHighCount(count.count);
-                } else if (count.countType == RiskCountEnum.MEDIUM && count.count > 0) {
+                } else if (count.countType == RiskCountType.MEDIUM && count.count > 0) {
                     component.setLicenseRiskMediumCount(count.count);
-                } else if (count.countType == RiskCountEnum.LOW && count.count > 0) {
+                } else if (count.countType == RiskCountType.LOW && count.count > 0) {
                     component.setLicenseRiskLowCount(count.count);
                 }
             }
         }
         if (bomEntry.operationalRiskProfile != null && bomEntry.operationalRiskProfile.counts != null && !bomEntry.operationalRiskProfile.counts.isEmpty()) {
             for (final RiskCountView count : bomEntry.operationalRiskProfile.counts) {
-                if (count.countType == RiskCountEnum.HIGH && count.count > 0) {
+                if (count.countType == RiskCountType.HIGH && count.count > 0) {
                     component.setOperationalRiskHighCount(count.count);
-                } else if (count.countType == RiskCountEnum.MEDIUM && count.count > 0) {
+                } else if (count.countType == RiskCountType.MEDIUM && count.count > 0) {
                     component.setOperationalRiskMediumCount(count.count);
-                } else if (count.countType == RiskCountEnum.LOW && count.count > 0) {
+                } else if (count.countType == RiskCountType.LOW && count.count > 0) {
                     component.setOperationalRiskLowCount(count.count);
                 }
             }
@@ -305,11 +305,11 @@ public class RiskReportDataService extends HubService {
     }
 
     public void addPolicyRuleInfo(final BomComponent component, final VersionBomComponentView bomEntry) throws IntegrationException {
-        if (bomEntry != null && StringUtils.isNotBlank(bomEntry.approvalStatus)) {
-            final BomComponentPolicyStatusApprovalStatusEnum status = BomComponentPolicyStatusApprovalStatusEnum.valueOf(bomEntry.approvalStatus);
-            if (status == BomComponentPolicyStatusApprovalStatusEnum.IN_VIOLATION) {
+        if (bomEntry != null && bomEntry.approvalStatus != null) {
+            final PolicyStatusApprovalStatusType status = bomEntry.approvalStatus;
+            if (status == PolicyStatusApprovalStatusType.IN_VIOLATION) {
                 final String policyRuleLink = getFirstLink(bomEntry, MetaHandler.POLICY_RULES_LINK);
-                final List<PolicyRuleView> rules = getAllViews(policyRuleLink, PolicyRuleView.class);
+                final List<PolicyRuleView> rules = getAllResponses(policyRuleLink, PolicyRuleView.class);
                 final List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (final PolicyRuleView policyRuleView : rules) {
                     final PolicyRule ruleViolated = new PolicyRule();

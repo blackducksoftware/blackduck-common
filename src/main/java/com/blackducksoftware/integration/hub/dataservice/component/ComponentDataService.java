@@ -30,6 +30,13 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.UrlConstants;
 import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomService;
 import com.blackducksoftware.integration.hub.api.component.ComponentService;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
+import com.blackducksoftware.integration.hub.api.generated.view.MatchedFileView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
+import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.api.matchedfiles.MatchedFilesService;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
@@ -37,13 +44,6 @@ import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.dataservice.component.model.VersionBomComponentModel;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.view.ComponentSearchResultView;
-import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
-import com.blackducksoftware.integration.hub.model.view.ComponentView;
-import com.blackducksoftware.integration.hub.model.view.MatchedFilesView;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
-import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ComponentDataService {
@@ -80,8 +80,8 @@ public class ComponentDataService {
     public List<ComponentVersionView> getAllComponentVersionsFromComponent(final ExternalId externalId) throws IntegrationException {
         final ComponentSearchResultView componentSearchView = componentRequestService.getExactComponentMatch(externalId);
 
-        final ComponentView componentView = componentRequestService.getView(componentSearchView.componentUrl, ComponentView.class);
-        final List<ComponentVersionView> componentVersionViews = componentRequestService.getAllViewsFromLink(componentView, UrlConstants.SEGMENT_VERSIONS, ComponentVersionView.class);
+        final ComponentView componentView = componentRequestService.getResponse(componentSearchView.component, ComponentView.class);
+        final List<ComponentVersionView> componentVersionViews = componentRequestService.getAllResponsesFromLink(componentView, UrlConstants.SEGMENT_VERSIONS, ComponentVersionView.class);
 
         return componentVersionViews;
     }
@@ -92,7 +92,7 @@ public class ComponentDataService {
         final String projectVersionComponentsUrl = projectVersionRequestService.getFirstLink(projectVersionView, MetaHandler.COMPONENTS_LINK);
 
         final ComponentSearchResultView componentSearchResultView = componentRequestService.getExactComponentMatch(componentExternalId);
-        final String componentVersionUrl = componentSearchResultView.componentVersionUrl;
+        final String componentVersionUrl = componentSearchResultView.version;
 
         aggregateBomService.addBomComponent("application/json", projectVersionComponentsUrl, componentVersionUrl);
     }
@@ -100,7 +100,7 @@ public class ComponentDataService {
     public List<VersionBomComponentView> getAllComponentVersionsFromProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = projectRequestService.getProjectByName(projectName);
         final ProjectVersionView projectVersionView = projectVersionRequestService.getProjectVersion(projectItem, projectVersionName);
-        final List<VersionBomComponentView> versionBomComponentViews = projectVersionRequestService.getAllViewsFromLink(projectVersionView, MetaHandler.COMPONENTS_LINK, VersionBomComponentView.class);
+        final List<VersionBomComponentView> versionBomComponentViews = projectVersionRequestService.getAllResponsesFromLink(projectVersionView, MetaHandler.COMPONENTS_LINK, VersionBomComponentView.class);
 
         return versionBomComponentViews;
     }
@@ -120,7 +120,7 @@ public class ComponentDataService {
         return modelBomComponents;
     }
 
-    private List<MatchedFilesView> getMatchedFiles(final VersionBomComponentView component) {
+    private List<MatchedFileView> getMatchedFiles(final VersionBomComponentView component) {
         try {
             final String matchedFilesLink = metaHandler.getFirstLink(component, MetaHandler.MATCHED_FILES_LINK);
             return matchedFilesService.getMatchedFiles(matchedFilesLink);

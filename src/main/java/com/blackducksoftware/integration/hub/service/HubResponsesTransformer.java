@@ -30,8 +30,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.HubResponse;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.HubView;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -40,40 +40,40 @@ import com.google.gson.JsonParser;
 
 import okhttp3.Response;
 
-public class HubViewsTransformer {
-    private final HubViewTransformer hubViewTransformer;
+public class HubResponsesTransformer {
+    private final HubResponseTransformer hubResponseTransformer;
     private final JsonParser jsonParser;
 
-    public HubViewsTransformer(final HubViewTransformer hubResponseItemManager, final JsonParser jsonParser) {
-        this.hubViewTransformer = hubResponseItemManager;
+    public HubResponsesTransformer(final HubResponseTransformer hubResponseTransformer, final JsonParser jsonParser) {
+        this.hubResponseTransformer = hubResponseTransformer;
         this.jsonParser = jsonParser;
     }
 
-    public <T extends HubView> List<T> getViews(final JsonArray viewsArray, final Class<T> clazz) {
+    public <T extends HubResponse> List<T> getResponses(final JsonArray responsesArray, final Class<T> clazz) {
         final LinkedList<T> itemList = new LinkedList<>();
-        for (final JsonElement element : viewsArray) {
-            final T item = hubViewTransformer.getViewAs(element, clazz);
+        for (final JsonElement element : responsesArray) {
+            final T item = hubResponseTransformer.getResponseAs(element, clazz);
             itemList.add(item);
         }
         return itemList;
     }
 
-    public <T extends HubView> List<T> getViews(final JsonObject jsonObject, final Class<T> clazz) throws IntegrationException {
-        final LinkedList<T> viewList = new LinkedList<>();
-        final JsonElement viewsElement = jsonObject.get("items");
-        final JsonArray viewsArray = viewsElement.getAsJsonArray();
-        for (final JsonElement element : viewsArray) {
-            final T item = hubViewTransformer.getViewAs(element, clazz);
-            viewList.add(item);
+    public <T extends HubResponse> List<T> getResponses(final JsonObject jsonObject, final Class<T> clazz) throws IntegrationException {
+        final LinkedList<T> responseList = new LinkedList<>();
+        final JsonElement responsesElement = jsonObject.get("items");
+        final JsonArray responsesArray = responsesElement.getAsJsonArray();
+        for (final JsonElement element : responsesArray) {
+            final T item = hubResponseTransformer.getResponseAs(element, clazz);
+            responseList.add(item);
         }
-        return viewList;
+        return responseList;
     }
 
-    public <T extends HubView> List<T> getViews(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
-        return getViews(hubPagedRequest, clazz, null);
+    public <T extends HubResponse> List<T> getResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
+        return getResponses(hubPagedRequest, clazz, null);
     }
 
-    public <T extends HubView> List<T> getViews(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
+    public <T extends HubResponse> List<T> getResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
         Response response = null;
         try {
             if (StringUtils.isNotBlank(mediaType)) {
@@ -84,7 +84,7 @@ public class HubViewsTransformer {
             final String jsonResponse = response.body().string();
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
-            return getViews(jsonObject, clazz);
+            return getResponses(jsonObject, clazz);
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
         } finally {

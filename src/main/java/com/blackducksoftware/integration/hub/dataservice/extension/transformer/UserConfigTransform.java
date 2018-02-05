@@ -31,12 +31,12 @@ import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigService;
+import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionConfigValueView;
+import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionUserView;
+import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.user.UserService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
-import com.blackducksoftware.integration.hub.model.view.ExternalExtensionConfigValueView;
-import com.blackducksoftware.integration.hub.model.view.ExternalExtensionUserView;
-import com.blackducksoftware.integration.hub.model.view.UserView;
 
 public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, ExternalExtensionUserView> {
     private final UserService userRequestService;
@@ -51,7 +51,7 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
 
     @Override
     public List<UserConfigItem> transform(final ExternalExtensionUserView item) throws IntegrationException {
-        final UserView user = userRequestService.getView(item.user, UserView.class);
+        final UserView user = userRequestService.getResponse(item.user, UserView.class);
         if (!user.active) {
             return Collections.emptyList();
         } else {

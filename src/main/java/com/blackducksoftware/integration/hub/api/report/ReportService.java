@@ -29,12 +29,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportFormatType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportType;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ReportView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.enumeration.ReportFormatEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ReportTypeEnum;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.ReportView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
@@ -68,15 +68,15 @@ public class ReportService extends HubService {
         this.timeoutInMilliseconds = timeout;
     }
 
-    public String startGeneratingHubReport(final ProjectVersionView version, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
-        return startGeneratingHubReport(getFirstLink(version, MetaHandler.VERSION_REPORT_LINK), ReportTypeEnum.VERSION, reportFormat, categories);
+    public String startGeneratingHubReport(final ProjectVersionView version, final ReportFormatType reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
+        return startGeneratingHubReport(getFirstLink(version, MetaHandler.VERSION_REPORT_LINK), ReportType.VERSION, reportFormat, categories);
     }
 
-    public String startGeneratingHubNoticesReport(final ProjectVersionView version, final ReportFormatEnum reportFormat) throws IntegrationException {
-        return startGeneratingHubReport(getFirstLink(version, MetaHandler.VERSION_NOTICES_REPORT_LINK), ReportTypeEnum.VERSION_LICENSE, reportFormat, null);
+    public String startGeneratingHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws IntegrationException {
+        return startGeneratingHubReport(getFirstLink(version, MetaHandler.VERSION_NOTICES_REPORT_LINK), ReportType.VERSION_LICENSE, reportFormat, null);
     }
 
-    private String startGeneratingHubReport(final String reportUrl, final ReportTypeEnum reportType, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
+    private String startGeneratingHubReport(final String reportUrl, final ReportType reportType, final ReportFormatType reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
         final JsonObject json = new JsonObject();
         json.addProperty("reportFormat", reportFormat.toString());
         json.addProperty("reportType", reportType.toString());
@@ -149,7 +149,7 @@ public class ReportService extends HubService {
             try {
                 response = hubRequest.executeGet();
                 final String jsonResponse = readResponseString(response);
-                reportInfo = getViewAs(jsonResponse, ReportView.class);
+                reportInfo = getResponseAs(jsonResponse, ReportView.class);
             } finally {
                 IOUtils.closeQuietly(response);
             }
@@ -176,7 +176,7 @@ public class ReportService extends HubService {
      * Assumes the BOM has already been updated
      *
      */
-    public VersionReport generateHubReport(final ProjectVersionView version, final ReportFormatEnum reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
+    public VersionReport generateHubReport(final ProjectVersionView version, final ReportFormatType reportFormat, final ReportCategoriesEnum[] categories) throws IntegrationException {
         logger.debug("Starting the Report generation.");
         final String reportUrl = startGeneratingHubReport(version, reportFormat, categories);
 
@@ -201,7 +201,7 @@ public class ReportService extends HubService {
      * Assumes the BOM has already been updated
      *
      */
-    public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatEnum reportFormat) throws IntegrationException {
+    public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws IntegrationException {
         if (hasLink(version, MetaHandler.VERSION_NOTICES_REPORT_LINK)) {
             try {
                 logger.debug("Starting the Notices Report generation.");

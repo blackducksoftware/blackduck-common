@@ -28,11 +28,11 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_USE
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.response.AssignedProjectView;
+import com.blackducksoftware.integration.hub.api.generated.view.RoleView;
+import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.model.view.AssignedProjectView;
-import com.blackducksoftware.integration.hub.model.view.RoleView;
-import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 
@@ -42,7 +42,7 @@ public class UserService extends HubService {
     }
 
     public List<UserView> getAllUsers() throws IntegrationException {
-        final List<UserView> allUserItems = getAllViewsFromApi(SEGMENT_USERS, UserView.class);
+        final List<UserView> allUserItems = getAllResponsesFromApi(SEGMENT_USERS, UserView.class);
         return allUserItems;
     }
 
@@ -57,12 +57,12 @@ public class UserService extends HubService {
     }
 
     public List<AssignedProjectView> getUserAssignedProjects(final UserView userView) throws IntegrationException {
-        final List<AssignedProjectView> assignedProjectViews = getAllViewsFromLink(userView, MetaHandler.PROJECTS_LINK, AssignedProjectView.class);
+        final List<AssignedProjectView> assignedProjectViews = getAllResponsesFromLink(userView, MetaHandler.PROJECTS_LINK, AssignedProjectView.class);
         return assignedProjectViews;
     }
 
     public List<RoleView> getUserRoles(final UserView userView) throws IntegrationException {
-        final List<RoleView> assignedRoles = this.getAllViewsFromLink(userView, MetaHandler.ROLES_LINK, RoleView.class);
+        final List<RoleView> assignedRoles = this.getAllResponsesFromLink(userView, MetaHandler.ROLES_LINK, RoleView.class);
         return assignedRoles;
     }
 

@@ -23,26 +23,27 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.component.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
-import com.blackducksoftware.integration.hub.model.enumeration.MatchedFileUsageEnum;
-import com.blackducksoftware.integration.hub.model.view.MatchedFilesView;
-import com.blackducksoftware.integration.hub.model.view.components.FilePathView;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.MatchedFileUsagesType;
+import com.blackducksoftware.integration.hub.api.generated.model.CompositePathWithArchiveContext;
+import com.blackducksoftware.integration.hub.api.generated.view.MatchedFileView;
 
 public class MatchedFilesModel {
     private final String path;
     private final String archiveContext;
     private final String fileName;
     private final String compositePathContext;
-    private final Set<MatchedFileUsageEnum> usages;
+    private final Set<MatchedFileUsagesType> usages;
 
-    public MatchedFilesModel(final MatchedFilesView matchedFile) {
-        final FilePathView pathView = matchedFile.filePath;
+    public MatchedFilesModel(final MatchedFileView matchedFile) {
+        final CompositePathWithArchiveContext pathView = matchedFile.filePath;
         this.path = pathView.path;
         this.archiveContext = pathView.archiveContext;
         this.fileName = pathView.fileName;
         this.compositePathContext = pathView.compositePathContext;
-        this.usages = matchedFile.usages;
+        this.usages = new HashSet<>(matchedFile.usages);
     }
 
     public String getPath() {
@@ -61,7 +62,7 @@ public class MatchedFilesModel {
         return compositePathContext;
     }
 
-    public Set<MatchedFileUsageEnum> getUsages() {
+    public Set<MatchedFileUsagesType> getUsages() {
         return usages;
     }
 }

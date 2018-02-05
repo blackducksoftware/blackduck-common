@@ -28,6 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.notification.NotificationService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
@@ -37,12 +41,6 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Noti
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
-import com.blackducksoftware.integration.hub.model.view.NotificationView;
-import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.RuleViolationClearedNotificationView;
-import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
@@ -129,7 +127,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
     }
 
     private ProjectVersionView getReleaseItem(final String projectVersionLink) throws IntegrationException {
-        final ProjectVersionView releaseItem = getProjectVersionService().getView(projectVersionLink, ProjectVersionView.class);
+        final ProjectVersionView releaseItem = getProjectVersionService().getResponse(projectVersionLink, ProjectVersionView.class);
         return releaseItem;
     }
 

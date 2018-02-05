@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * hub-common-response
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -21,24 +21,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.policy;
+package com.blackducksoftware.integration.hub.dataservice.notification.transformer;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_POLICY_RULES;
+import com.blackducksoftware.integration.hub.api.HubResponse;
 
-import java.util.List;
+public class AffectedProjectVersion extends HubResponse {
+    public String projectName;
+    public String projectVersionName;
+    public String projectVersion;
+    public String componentIssueUrl;
 
-import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubService;
-
-public class PolicyService extends HubService {
-    public PolicyService(final RestConnection restConnection) {
-        super(restConnection);
-    }
-
-    public List<PolicyRuleView> getAllPolicyRules() throws IntegrationException {
-        final List<PolicyRuleView> allPolicyRuleItems = getAllResponsesFromApi(SEGMENT_POLICY_RULES, PolicyRuleView.class);
-        return allPolicyRuleItems;
-    }
 }

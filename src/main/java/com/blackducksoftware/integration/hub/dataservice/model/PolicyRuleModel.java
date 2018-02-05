@@ -26,12 +26,11 @@ package com.blackducksoftware.integration.hub.dataservice.model;
 import java.util.Collections;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.generated.model.PolicyRuleExpression;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.model.view.components.PolicyRuleConditionEnum;
-import com.blackducksoftware.integration.hub.model.view.components.PolicyRuleExpression;
 
 public class PolicyRuleModel {
-
     private final PolicyRuleView rule;
 
     public PolicyRuleModel(final PolicyRuleView rule) {
@@ -55,7 +54,7 @@ public class PolicyRuleModel {
         boolean hasNonProjectLevelCondition = false;
 
         for (final PolicyRuleExpression expression : getExpressionList()) {
-            final PolicyRuleConditionEnum condition = PolicyRuleConditionEnum.valueOf(expression.name);
+            final PolicyRuleConditionEnum condition = PolicyRuleConditionType.valueOf(expression.name);
             if (condition == PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION) {
                 continue;
             }

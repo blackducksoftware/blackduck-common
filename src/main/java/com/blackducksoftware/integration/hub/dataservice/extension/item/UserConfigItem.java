@@ -25,8 +25,8 @@ package com.blackducksoftware.integration.hub.dataservice.extension.item;
 
 import java.util.Map;
 
-import com.blackducksoftware.integration.hub.model.view.ExternalExtensionConfigValueView;
-import com.blackducksoftware.integration.hub.model.view.UserView;
+import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionConfigValueView;
+import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 
 public class UserConfigItem {
     private final UserView user;

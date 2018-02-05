@@ -28,47 +28,30 @@ import java.util.Date;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionSourceEnum;
-import com.blackducksoftware.integration.hub.model.view.ComplexLicenseView;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.OriginSourceType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
+import com.blackducksoftware.integration.hub.api.generated.view.ComplexLicenseView;
 
 public class ProjectVersionModel {
     private String projectName;
-
     private String projectVersionName;
-
     private String url;
-
-    private ProjectVersionDistributionEnum distribution;
-
+    private ProjectVersionDistributionType distribution;
     private ComplexLicenseView license;
-
     private String nickname;
-
-    private ProjectVersionPhaseEnum phase;
-
+    private ProjectVersionPhaseType phase;
     private String releaseComments;
-
     private Date releasedOn;
-
     // description from Hub API: "Read-Only; No matter the value it will always default to 'CUSTOM'",
-    private ProjectVersionSourceEnum source;
-
+    private OriginSourceType source;
     private String versionName;
-
     private String versionReportLink;
-
     private String riskProfileLink;
-
     private String componentsLink;
-
     private String vulnerableComponentsLink;
-
     private String projectLink;
-
     private String policyStatusLink;
-
     private String codeLocationsLink;
 
     public String getProjectName() {
@@ -95,11 +78,11 @@ public class ProjectVersionModel {
         this.url = url;
     }
 
-    public ProjectVersionDistributionEnum getDistribution() {
+    public ProjectVersionDistributionType getDistribution() {
         return distribution;
     }
 
-    public void setDistribution(final ProjectVersionDistributionEnum distribution) {
+    public void setDistribution(final ProjectVersionDistributionType distribution) {
         this.distribution = distribution;
     }
 
@@ -119,11 +102,11 @@ public class ProjectVersionModel {
         this.nickname = nickname;
     }
 
-    public ProjectVersionPhaseEnum getPhase() {
+    public ProjectVersionPhaseType getPhase() {
         return phase;
     }
 
-    public void setPhase(final ProjectVersionPhaseEnum phase) {
+    public void setPhase(final ProjectVersionPhaseType phase) {
         this.phase = phase;
     }
 
@@ -143,11 +126,11 @@ public class ProjectVersionModel {
         this.releasedOn = releasedOn;
     }
 
-    public ProjectVersionSourceEnum getSource() {
+    public OriginSourceType getSource() {
         return source;
     }
 
-    public void setSource(final ProjectVersionSourceEnum source) {
+    public void setSource(final OriginSourceType source) {
         this.source = source;
     }
 

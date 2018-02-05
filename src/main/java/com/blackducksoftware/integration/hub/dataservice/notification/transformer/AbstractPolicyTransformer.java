@@ -28,6 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.notification.NotificationService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
@@ -36,12 +41,6 @@ import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionMod
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.model.view.BomComponentPolicyStatusView;
-import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
-import com.blackducksoftware.integration.hub.model.view.NotificationView;
-import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
@@ -49,8 +48,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     private final PolicyNotificationFilter policyFilter;
 
     /**
-     * policyFilter.size() == 0: match no rules
-     * policyFilter == null: match all rules
+     * policyFilter.size() == 0: match no rules policyFilter == null: match all rules
      */
     public AbstractPolicyTransformer(final HubService hubResponseService, final NotificationService notificationService,
             final ProjectVersionService projectVersionService, final PolicyService policyService,
@@ -81,7 +79,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         }
         final List<PolicyRuleView> rules = new ArrayList<>();
         for (final String ruleUrlViolated : ruleUrlsViolated) {
-            final PolicyRuleView ruleViolated = getPolicyService().getView(ruleUrlViolated, PolicyRuleView.class);
+            final PolicyRuleView ruleViolated = getPolicyService().getResponse(ruleUrlViolated, PolicyRuleView.class);
             rules.add(ruleViolated);
         }
         return rules;
@@ -111,7 +109,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     protected PolicyRuleView getPolicyRule(final String ruleUrl) throws IntegrationException {
-        final PolicyRuleView rule = getPolicyService().getView(ruleUrl, PolicyRuleView.class);
+        final PolicyRuleView rule = getPolicyService().getResponse(ruleUrl, PolicyRuleView.class);
         return rule;
     }
 
@@ -142,11 +140,8 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     /**
-     * In Hub versions prior to 3.2, the rule URLs contained in notifications
-     * are internal. To match the configured rule URLs, the "internal" segment
-     * of the URL from the notification must be removed. This is the workaround
-     * recommended by Rob P. In Hub 3.2 on, these URLs will exclude the
-     * "internal" segment.
+     * In Hub versions prior to 3.2, the rule URLs contained in notifications are internal. To match the configured rule URLs, the "internal" segment of the URL from the notification must be removed. This is the workaround recommended by
+     * Rob P. In Hub 3.2 on, these URLs will exclude the "internal" segment.
      *
      * @param origRuleUrl
      * @return
@@ -159,9 +154,9 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         return fixedRuleUrl;
     }
 
-    protected BomComponentPolicyStatusView getBomComponentVersionPolicyStatus(final String policyStatusUrl) throws IntegrationException {
-        BomComponentPolicyStatusView bomComponentVersionPolicyStatus;
-        bomComponentVersionPolicyStatus = getHubResponseService().getView(policyStatusUrl, BomComponentPolicyStatusView.class);
+    protected PolicyStatusView getBomComponentVersionPolicyStatus(final String policyStatusUrl) throws IntegrationException {
+        PolicyStatusView bomComponentVersionPolicyStatus;
+        bomComponentVersionPolicyStatus = getHubResponseService().getResponse(policyStatusUrl, PolicyStatusView.class);
 
         return bomComponentVersionPolicyStatus;
     }

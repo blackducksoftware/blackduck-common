@@ -27,23 +27,24 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.generated.enumeration.MatchedFileUsagesType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.RiskCountType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.VersionBomComponentMatchType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.VersionBomComponentReviewStatusType;
+import com.blackducksoftware.integration.hub.api.generated.model.ActivityDataView;
+import com.blackducksoftware.integration.hub.api.generated.model.ReviewedDetails;
+import com.blackducksoftware.integration.hub.api.generated.model.VersionBomLicenseView;
+import com.blackducksoftware.integration.hub.api.generated.model.VersionBomOriginView;
+import com.blackducksoftware.integration.hub.api.generated.view.MatchedFileView;
+import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.dataservice.model.RiskProfileCounts;
-import com.blackducksoftware.integration.hub.model.enumeration.MatchTypeEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.MatchedFileUsageEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ReviewStatusEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.RiskCountEnum;
-import com.blackducksoftware.integration.hub.model.view.MatchedFilesView;
-import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
-import com.blackducksoftware.integration.hub.model.view.components.ActivityDataView;
-import com.blackducksoftware.integration.hub.model.view.components.OriginView;
-import com.blackducksoftware.integration.hub.model.view.components.ReviewedDetailsView;
-import com.blackducksoftware.integration.hub.model.view.components.VersionBomLicenseView;
 
 public class VersionBomComponentModel {
     private final VersionBomComponentView component;
     private final List<MatchedFilesModel> matchedFiles;
 
-    public VersionBomComponentModel(final VersionBomComponentView component, final List<MatchedFilesView> matchedFiles) {
+    public VersionBomComponentModel(final VersionBomComponentView component, final List<MatchedFileView> matchedFiles) {
         this.component = component;
         this.matchedFiles = getMatchedFilesModel(matchedFiles);
     }
@@ -96,11 +97,11 @@ public class VersionBomComponentModel {
         return hasRisk(getOperationalRiskProfile());
     }
 
-    public List<OriginView> getOrigins() {
+    public List<VersionBomOriginView> getOrigins() {
         return component.origins;
     }
 
-    public List<MatchTypeEnum> getMatchTypes() {
+    public List<VersionBomComponentMatchType> getMatchTypes() {
         return component.matchTypes;
     }
 
@@ -116,7 +117,7 @@ public class VersionBomComponentModel {
         return hasRisk(getSecurityRiskProfile());
     }
 
-    public List<MatchedFileUsageEnum> getUsages() {
+    public List<MatchedFileUsagesType> getUsages() {
         return component.usages;
     }
 
@@ -128,15 +129,15 @@ public class VersionBomComponentModel {
         return hasRisk(getVersionRiskProfile());
     }
 
-    public ReviewStatusEnum getReviewStatus() {
+    public VersionBomComponentReviewStatusType getReviewStatus() {
         return component.reviewStatus;
     }
 
-    public ReviewedDetailsView getReviewedDetails() {
+    public ReviewedDetails getReviewedDetails() {
         return component.reviewedDetails;
     }
 
-    public String getApprovalStatus() {
+    public PolicyStatusApprovalStatusType getApprovalStatus() {
         return component.approvalStatus;
     }
 
@@ -145,15 +146,15 @@ public class VersionBomComponentModel {
     }
 
     private boolean hasRisk(final RiskProfileCounts counts) {
-        if (counts.getCount(RiskCountEnum.LOW) + counts.getCount(RiskCountEnum.MEDIUM) + counts.getCount(RiskCountEnum.HIGH) > 0) {
+        if (counts.getCount(RiskCountType.LOW) + counts.getCount(RiskCountType.MEDIUM) + counts.getCount(RiskCountType.HIGH) > 0) {
             return true;
         }
         return false;
     }
 
-    private List<MatchedFilesModel> getMatchedFilesModel(final List<MatchedFilesView> matchedFiles) {
+    private List<MatchedFilesModel> getMatchedFilesModel(final List<MatchedFileView> matchedFiles) {
         final List<MatchedFilesModel> matchedFileModels = new ArrayList<>(matchedFiles.size());
-        for (final MatchedFilesView matchedFile : matchedFiles) {
+        for (final MatchedFileView matchedFile : matchedFiles) {
             matchedFileModels.add(new MatchedFilesModel(matchedFile));
         }
         return matchedFileModels;

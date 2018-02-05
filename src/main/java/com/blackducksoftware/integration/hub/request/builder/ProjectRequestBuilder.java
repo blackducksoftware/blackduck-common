@@ -29,10 +29,10 @@ import java.text.SimpleDateFormat;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.builder.AbstractBuilder;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
-import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
-import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
+import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
+import com.blackducksoftware.integration.hub.api.generated.model.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.request.validator.ProjectRequestValidator;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.validator.AbstractValidator;
@@ -43,8 +43,8 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
     private Boolean projectLevelAdjustments;
     private String projectOwner;
     private Integer projectTier;
-    private String distribution = ProjectVersionDistributionEnum.EXTERNAL.name();
-    private String phase = ProjectVersionPhaseEnum.DEVELOPMENT.name();
+    private String distribution = ProjectVersionDistributionType.EXTERNAL.name();
+    private String phase = ProjectVersionPhaseType.DEVELOPMENT.name();
     private String versionName;
     private String versionNickname;
     private String releaseComments;
@@ -69,26 +69,30 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
 
     @Override
     public ProjectRequest buildObject() {
-        final ProjectVersionDistributionEnum distributionValue = ProjectVersionDistributionEnum.valueOf(distribution.toUpperCase());
-        final ProjectVersionPhaseEnum phaseValue = ProjectVersionPhaseEnum.valueOf(phase.toUpperCase());
-        final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest(distributionValue, phaseValue, versionName);
-        projectVersionRequest.setReleaseComments(releaseComments);
+        final ProjectVersionDistributionType distributionValue = ProjectVersionDistributionType.valueOf(distribution.toUpperCase());
+        final ProjectVersionPhaseType phaseValue = ProjectVersionPhaseType.valueOf(phase.toUpperCase());
+        final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
+        projectVersionRequest.distribution = distributionValue;
+        projectVersionRequest.phase = phaseValue;
+        projectVersionRequest.versionName = versionName;
+        projectVersionRequest.releaseComments = releaseComments;
         if (StringUtils.isNotBlank(releasedOn)) {
             final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
             try {
-                projectVersionRequest.setReleasedOn(sdf.parse(releasedOn));
+                projectVersionRequest.releasedOn = sdf.parse(releasedOn);
             } catch (final ParseException e) {
 
             }
         }
-        projectVersionRequest.setNickname(versionNickname);
+        projectVersionRequest.nickname = versionNickname;
 
-        final ProjectRequest projectRequest = new ProjectRequest(projectName);
-        projectRequest.setDescription(description);
-        projectRequest.setProjectLevelAdjustments(projectLevelAdjustments);
-        projectRequest.setProjectOwner(projectOwner);
-        projectRequest.setProjectTier(projectTier);
-        projectRequest.setVersionRequest(projectVersionRequest);
+        final ProjectRequest projectRequest = new ProjectRequest();
+        projectRequest.name = projectName;
+        projectRequest.description = description;
+        projectRequest.projectLevelAdjustments = projectLevelAdjustments;
+        projectRequest.projectOwner = projectOwner;
+        projectRequest.projectTier = projectTier;
+        projectRequest.versionRequest = projectVersionRequest;
         return projectRequest;
     }
 
@@ -116,7 +120,7 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
         this.distribution = distribution;
     }
 
-    public void setDistribution(final ProjectVersionDistributionEnum distribution) {
+    public void setDistribution(final ProjectVersionDistributionType distribution) {
         this.distribution = distribution.name();
     }
 
@@ -124,7 +128,7 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
         this.phase = phase;
     }
 
-    public void setPhase(final ProjectVersionPhaseEnum phase) {
+    public void setPhase(final ProjectVersionPhaseType phase) {
         this.phase = phase.name();
     }
 

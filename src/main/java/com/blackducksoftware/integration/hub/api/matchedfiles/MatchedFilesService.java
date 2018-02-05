@@ -26,7 +26,7 @@ package com.blackducksoftware.integration.hub.api.matchedfiles;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.model.view.MatchedFilesView;
+import com.blackducksoftware.integration.hub.api.generated.view.MatchedFileView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 
@@ -35,8 +35,8 @@ public class MatchedFilesService extends HubService {
         super(restConnection);
     }
 
-    public List<MatchedFilesView> getMatchedFiles(final String matchedFilesUrl) throws IntegrationException {
-        final List<MatchedFilesView> allItems = getAllViews(matchedFilesUrl, MatchedFilesView.class);
+    public List<MatchedFileView> getMatchedFiles(final String matchedFilesUrl) throws IntegrationException {
+        final List<MatchedFileView> allItems = getAllResponses(matchedFilesUrl, MatchedFileView.class);
         return allItems;
     }
 }

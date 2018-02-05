@@ -27,17 +27,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
+import com.blackducksoftware.integration.hub.api.generated.response.AssignedUserGroupView;
+import com.blackducksoftware.integration.hub.api.generated.view.AssignedUserView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
+import com.blackducksoftware.integration.hub.api.generated.view.UserGroupView;
+import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentService;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
-import com.blackducksoftware.integration.hub.model.view.AssignedGroupView;
-import com.blackducksoftware.integration.hub.model.view.AssignedUserView;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
-import com.blackducksoftware.integration.hub.model.view.UserGroupView;
-import com.blackducksoftware.integration.hub.model.view.UserView;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
@@ -83,17 +83,17 @@ public class ProjectDataService extends HubService {
         ProjectVersionView projectVersion = null;
 
         try {
-            project = projectRequestService.getProjectByName(projectRequest.getName());
+            project = projectRequestService.getProjectByName(projectRequest.name);
         } catch (final DoesNotExistException e) {
             final String projectURL = projectRequestService.createHubProject(projectRequest);
-            project = projectRequestService.getView(projectURL, ProjectView.class);
+            project = projectRequestService.getResponse(projectURL, ProjectView.class);
         }
 
         try {
-            projectVersion = projectVersionRequestService.getProjectVersion(project, projectRequest.getVersionRequest().getVersionName());
+            projectVersion = projectVersionRequestService.getProjectVersion(project, projectRequest.versionRequest.versionName);
         } catch (final DoesNotExistException e) {
-            final String versionURL = projectVersionRequestService.createHubVersion(project, projectRequest.getVersionRequest());
-            projectVersion = projectVersionRequestService.getView(versionURL, ProjectVersionView.class);
+            final String versionURL = projectVersionRequestService.createHubVersion(project, projectRequest.versionRequest);
+            projectVersion = projectVersionRequestService.getResponse(versionURL, ProjectVersionView.class);
         }
 
         final ProjectVersionWrapper projectVersionWrapper = new ProjectVersionWrapper();
@@ -123,7 +123,7 @@ public class ProjectDataService extends HubService {
 
         final List<UserView> resolvedUserViews = new ArrayList<>();
         for (final AssignedUserView assigned : assignedUsers) {
-            final UserView userView = getView(assigned.userUrl, UserView.class);
+            final UserView userView = getResponse(assigned.user, UserView.class);
             if (userView != null) {
                 resolvedUserViews.add(userView);
             }
@@ -131,13 +131,13 @@ public class ProjectDataService extends HubService {
         return resolvedUserViews;
     }
 
-    public List<AssignedGroupView> getAssignedGroupsToProject(final String projectName) throws IntegrationException {
+    public List<AssignedUserGroupView> getAssignedGroupsToProject(final String projectName) throws IntegrationException {
         final ProjectView project = projectRequestService.getProjectByName(projectName);
         return getAssignedGroupsToProject(project);
     }
 
-    public List<AssignedGroupView> getAssignedGroupsToProject(final ProjectView project) throws IntegrationException {
-        final List<AssignedGroupView> assignedGroups = projectAssignmentRequestService.getProjectGroups(project);
+    public List<AssignedUserGroupView> getAssignedGroupsToProject(final ProjectView project) throws IntegrationException {
+        final List<AssignedUserGroupView> assignedGroups = projectAssignmentRequestService.getProjectGroups(project);
         return assignedGroups;
     }
 
@@ -148,11 +148,11 @@ public class ProjectDataService extends HubService {
 
     public List<UserGroupView> getGroupsForProject(final ProjectView project) throws IntegrationException {
         logger.debug("Attempting to get the assigned users for Project: " + project.name);
-        final List<AssignedGroupView> assignedGroups = projectAssignmentRequestService.getProjectGroups(project);
+        final List<AssignedUserGroupView> assignedGroups = projectAssignmentRequestService.getProjectGroups(project);
 
         final List<UserGroupView> resolvedGroupViews = new ArrayList<>();
-        for (final AssignedGroupView assigned : assignedGroups) {
-            final UserGroupView groupView = getView(assigned.groupUrl, UserGroupView.class);
+        for (final AssignedUserGroupView assigned : assignedGroups) {
+            final UserGroupView groupView = getResponse(assigned.group, UserGroupView.class);
             if (groupView != null) {
                 resolvedGroupViews.add(groupView);
             }

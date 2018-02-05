@@ -27,8 +27,8 @@ import java.text.SimpleDateFormat;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
 import com.blackducksoftware.integration.hub.request.ProjectRequestField;
 import com.blackducksoftware.integration.hub.request.ProjectVersionRequestField;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -72,7 +72,7 @@ public class ProjectRequestValidator extends AbstractValidator {
             result.addResult(ProjectVersionRequestField.DISTRIBUTION, new ValidationResult(ValidationResultEnum.ERROR, "Did not provide a version distribution."));
         } else {
             try {
-                ProjectVersionDistributionEnum.valueOf(distribution.toUpperCase());
+                ProjectVersionDistributionType.valueOf(distribution.toUpperCase());
             } catch (final Exception e) {
                 result.addResult(ProjectVersionRequestField.DISTRIBUTION, new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
             }
@@ -82,7 +82,7 @@ public class ProjectRequestValidator extends AbstractValidator {
             result.addResult(ProjectVersionRequestField.PHASE, new ValidationResult(ValidationResultEnum.ERROR, "Did not provide a version phase."));
         } else {
             try {
-                ProjectVersionPhaseEnum.valueOf(phase.toUpperCase());
+                ProjectVersionPhaseType.valueOf(phase.toUpperCase());
             } catch (final Exception e) {
                 result.addResult(ProjectVersionRequestField.PHASE, new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));
             }

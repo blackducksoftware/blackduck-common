@@ -28,9 +28,9 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
@@ -43,11 +43,11 @@ public class AggregateBomService extends HubService {
     }
 
     public List<VersionBomComponentView> getBomEntries(final ProjectVersionView projectVersion) throws IntegrationException {
-        return getAllViewsFromLinkSafely(projectVersion, MetaHandler.COMPONENTS_LINK, VersionBomComponentView.class);
+        return getAllResponsesFromLinkSafely(projectVersion, MetaHandler.COMPONENTS_LINK, VersionBomComponentView.class);
     }
 
     public List<VersionBomComponentView> getBomEntries(final String componentsUrl) throws IntegrationException {
-        return getAllViews(componentsUrl, VersionBomComponentView.class);
+        return getAllResponses(componentsUrl, VersionBomComponentView.class);
     }
 
     public void addBomComponent(final String mediaType, final String projectVersionComponentsUrl, final String componentVersionUrl) throws IntegrationException {

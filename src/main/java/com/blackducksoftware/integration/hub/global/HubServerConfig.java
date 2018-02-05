@@ -30,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.Credentials;
-import com.blackducksoftware.integration.hub.model.HubComponent;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
 import com.blackducksoftware.integration.hub.rest.ApiKeyRestConnection;
 import com.blackducksoftware.integration.hub.rest.ApiKeyRestConnectionBuilder;
@@ -38,8 +37,9 @@ import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnectionBuilder;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.util.Stringable;
 
-public class HubServerConfig extends HubComponent implements Serializable {
+public class HubServerConfig extends Stringable implements Serializable {
     private static final long serialVersionUID = -1581638027683631935L;
 
     private final URL hubUrl;
