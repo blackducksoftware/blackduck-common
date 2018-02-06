@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.service;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
@@ -180,6 +181,13 @@ public class HubService {
     /**
      * Will NOT make further paged requests to get the full list of items
      */
+    public <T extends HubResponse> List<T> getResponses(final JsonObject jsonObject, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        return hubResponsesTransformer.getResponses(jsonObject, clazz, typeMap);
+    }
+
+    /**
+     * Will NOT make further paged requests to get the full list of items
+     */
     public <T extends HubResponse> List<T> getResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
         return hubResponsesTransformer.getResponses(hubPagedRequest, clazz);
     }
@@ -189,6 +197,20 @@ public class HubService {
      */
     public <T extends HubResponse> List<T> getResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
         return hubResponsesTransformer.getResponses(hubPagedRequest, clazz, mediaType);
+    }
+
+    /**
+     * Will NOT make further paged requests to get the full list of items
+     */
+    public <T extends HubResponse> List<T> getResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        return hubResponsesTransformer.getResponses(hubPagedRequest, clazz, typeMap, null);
+    }
+
+    /**
+     * Will NOT make further paged requests to get the full list of items
+     */
+    public <T extends HubResponse> List<T> getResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap, final String mediaType) throws IntegrationException {
+        return hubResponsesTransformer.getResponses(hubPagedRequest, clazz, typeMap, mediaType);
     }
 
     /**
@@ -264,6 +286,13 @@ public class HubService {
     /**
      * WILL make further paged requests to get the full list of items
      */
+    public <T extends HubResponse> List<T> getAllResponses(final String url, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        return allHubResponsesTransformer.getAllResponses(url, clazz, typeMap);
+    }
+
+    /**
+     * WILL make further paged requests to get the full list of items
+     */
     public <T extends HubResponse> List<T> getAllResponses(final String url, final Class<T> clazz, final String mediaType) throws IntegrationException {
         return allHubResponsesTransformer.getAllResponses(url, clazz, mediaType);
     }
@@ -272,7 +301,21 @@ public class HubService {
      * WILL make further paged requests to get the full list of items
      */
     public <T extends HubResponse> List<T> getAllResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponses(hubPagedRequest, clazz, mediaType);
+        return allHubResponsesTransformer.getAllResponses(hubPagedRequest, clazz, null, mediaType);
+    }
+
+    /**
+     * WILL make further paged requests to get the full list of items
+     */
+    public <T extends HubResponse> List<T> getAllResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        return allHubResponsesTransformer.getAllResponses(hubPagedRequest, clazz, typeMap, null);
+    }
+
+    /**
+     * WILL make further paged requests to get the full list of items
+     */
+    public <T extends HubResponse> List<T> getAllResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap, final String mediaType) throws IntegrationException {
+        return allHubResponsesTransformer.getAllResponses(hubPagedRequest, clazz, typeMap, mediaType);
     }
 
 }

@@ -31,7 +31,6 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.notification.NotificationService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
@@ -47,26 +46,23 @@ import com.blackducksoftware.integration.log.IntLogger;
 public abstract class AbstractNotificationTransformer implements ItemTransform<List<NotificationContentItem>, NotificationView> {
     private final IntLogger logger;
     private final HubService hubResponseService;
-    private final NotificationService notificationService;
     private final ProjectVersionService projectVersionService;
     private final PolicyService policyService;
     private final MetaHandler metaService;
 
-    public AbstractNotificationTransformer(final HubService hubResponseService, final NotificationService notificationService, final ProjectVersionService projectVersionService,
+    public AbstractNotificationTransformer(final HubService hubResponseService, final ProjectVersionService projectVersionService,
             final PolicyService policyService, final MetaHandler metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = new IntBufferedLogger();
-        this.notificationService = notificationService;
         this.projectVersionService = projectVersionService;
         this.policyService = policyService;
         this.metaService = metaService;
     }
 
-    public AbstractNotificationTransformer(final HubService hubResponseService, final IntLogger logger, final NotificationService notificationService, final ProjectVersionService projectVersionService,
+    public AbstractNotificationTransformer(final HubService hubResponseService, final IntLogger logger, final ProjectVersionService projectVersionService,
             final PolicyService policyService, final MetaHandler metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = logger;
-        this.notificationService = notificationService;
         this.projectVersionService = projectVersionService;
         this.policyService = policyService;
         this.metaService = metaService;
@@ -78,10 +74,6 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
 
     protected IntLogger getLogger() {
         return logger;
-    }
-
-    public NotificationService getNotificationService() {
-        return notificationService;
     }
 
     public ProjectVersionService getProjectVersionService() {

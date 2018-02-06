@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.service;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -69,11 +70,31 @@ public class HubResponsesTransformer {
         return responseList;
     }
 
+    public <T extends HubResponse> List<T> getResponses(final JsonObject jsonObject, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        final LinkedList<T> responseList = new LinkedList<>();
+        final JsonElement responsesElement = jsonObject.get("items");
+        final JsonArray responsesArray = responsesElement.getAsJsonArray();
+        for (final JsonElement element : responsesArray) {
+            final String type = element.getAsJsonObject().get("type").getAsString();
+            Class<? extends T> actualClass = clazz;
+            if (typeMap.containsKey(type)) {
+                actualClass = typeMap.get(type);
+            }
+            final T item = hubResponseTransformer.getResponseAs(element, actualClass);
+            responseList.add(item);
+        }
+        return responseList;
+    }
+
     public <T extends HubResponse> List<T> getResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
-        return getResponses(hubPagedRequest, clazz, null);
+        return getResponses(hubPagedRequest, clazz, null, null);
     }
 
     public <T extends HubResponse> List<T> getResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
+        return getResponses(hubPagedRequest, clazz, null, mediaType);
+    }
+
+    public <T extends HubResponse> List<T> getResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap, final String mediaType) throws IntegrationException {
         Response response = null;
         try {
             if (StringUtils.isNotBlank(mediaType)) {
@@ -84,7 +105,11 @@ public class HubResponsesTransformer {
             final String jsonResponse = response.body().string();
 
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
-            return getResponses(jsonObject, clazz);
+            if (typeMap != null) {
+                return getResponses(jsonObject, clazz, typeMap);
+            } else {
+                return getResponses(jsonObject, clazz);
+            }
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
         } finally {

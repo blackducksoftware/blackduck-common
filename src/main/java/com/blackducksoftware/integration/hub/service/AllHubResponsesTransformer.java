@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -70,7 +71,7 @@ public class AllHubResponsesTransformer {
 
     public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiPath, final Class<T> clazz, final int itemsPerPage, final String mediaType) throws IntegrationException {
         final HubPagedRequest hubPagedRequest = hubRequestFactory.createPagedRequest(itemsPerPage, apiPath);
-        return getAllResponses(hubPagedRequest, clazz, mediaType);
+        return getAllResponses(hubPagedRequest, clazz, null, mediaType);
     }
 
     public <T extends HubResponse> List<T> getAllResponsesFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
@@ -95,19 +96,29 @@ public class AllHubResponsesTransformer {
     }
 
     public <T extends HubResponse> List<T> getAllResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
-        return getAllResponses(hubPagedRequest, clazz, null);
+        return getAllResponses(hubPagedRequest, clazz, null, null);
+    }
+
+    public <T extends HubResponse> List<T> getAllResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        return getAllResponses(hubPagedRequest, clazz, typeMap, null);
     }
 
     public <T extends HubResponse> List<T> getAllResponses(final String url, final Class<T> clazz) throws IntegrationException {
-        return getAllResponses(url, clazz, null);
+        final HubPagedRequest hubPagedRequest = hubRequestFactory.createPagedRequest(url);
+        return getAllResponses(hubPagedRequest, clazz, null, null);
+    }
+
+    public <T extends HubResponse> List<T> getAllResponses(final String url, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        final HubPagedRequest hubPagedRequest = hubRequestFactory.createPagedRequest(url);
+        return getAllResponses(hubPagedRequest, clazz, null, null);
     }
 
     public <T extends HubResponse> List<T> getAllResponses(final String url, final Class<T> clazz, final String mediaType) throws IntegrationException {
         final HubPagedRequest hubPagedRequest = hubRequestFactory.createPagedRequest(url);
-        return getAllResponses(hubPagedRequest, clazz, mediaType);
+        return getAllResponses(hubPagedRequest, clazz, null, mediaType);
     }
 
-    public <T extends HubResponse> List<T> getAllResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
+    public <T extends HubResponse> List<T> getAllResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap, final String mediaType) throws IntegrationException {
         final List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = hubPagedRequest.offset;
@@ -126,7 +137,11 @@ public class AllHubResponsesTransformer {
             while (allResponses.size() < totalCount && currentOffset < totalCount) {
                 currentOffset += hubPagedRequest.limit;
                 hubPagedRequest.offset = currentOffset;
-                allResponses.addAll(hubResponsesTransformer.getResponses(hubPagedRequest, clazz, mediaType));
+                if (typeMap != null) {
+                    allResponses.addAll(hubResponsesTransformer.getResponses(hubPagedRequest, clazz, typeMap, mediaType));
+                } else {
+                    allResponses.addAll(hubResponsesTransformer.getResponses(hubPagedRequest, clazz, mediaType));
+                }
             }
         } catch (final IOException e) {
             throw new HubIntegrationException(e);

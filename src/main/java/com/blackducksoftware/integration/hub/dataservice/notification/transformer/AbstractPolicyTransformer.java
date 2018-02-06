@@ -33,7 +33,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.notification.NotificationService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
@@ -51,21 +50,21 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     /**
      * policyFilter.size() == 0: match no rules policyFilter == null: match all rules
      */
-    public AbstractPolicyTransformer(final HubService hubResponseService, final NotificationService notificationService,
+    public AbstractPolicyTransformer(final HubService hubResponseService,
             final ProjectVersionService projectVersionService, final PolicyService policyService,
             final PolicyNotificationFilter policyFilter,
             final MetaHandler metaService) {
-        super(hubResponseService, notificationService, projectVersionService, policyService,
+        super(hubResponseService, projectVersionService, policyService,
                 metaService);
         this.policyFilter = policyFilter;
     }
 
     public AbstractPolicyTransformer(final HubService hubResponseService, final IntLogger logger,
-            final NotificationService notificationService,
+
             final ProjectVersionService projectVersionService, final PolicyService policyService,
             final PolicyNotificationFilter policyFilter,
             final MetaHandler metaService) {
-        super(hubResponseService, logger, notificationService, projectVersionService, policyService,
+        super(hubResponseService, logger, projectVersionService, policyService,
                 metaService);
         this.policyFilter = policyFilter;
     }

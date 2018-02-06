@@ -23,15 +23,22 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.notification;
 
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_NOTIFICATIONS;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
-import com.blackducksoftware.integration.hub.api.notification.NotificationService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
@@ -47,61 +54,97 @@ import com.blackducksoftware.integration.hub.dataservice.notification.transforme
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
+import com.blackducksoftware.integration.hub.request.HubPagedRequest;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class NotificationDataService {
+public class NotificationDataService extends HubService {
+    private final Map<String, Class<? extends NotificationView>> typeMap = new HashMap<>();
+
     private final HubService hubResponseService;
-    private final NotificationService notificationRequestService;
     private final ProjectVersionService projectVersionRequestService;
     private final PolicyService policyRequestService;
     private final PolicyNotificationFilter policyNotificationFilter;
     private final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor;
     private final MetaHandler metaService;
 
-    public NotificationDataService(final IntLogger logger, final HubService hubResponseService, final NotificationService notificationRequestService, final ProjectVersionService projectVersionRequestService,
+    public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService, final ProjectVersionService projectVersionRequestService,
             final PolicyService policyRequestService) {
-        this(logger, hubResponseService, notificationRequestService, projectVersionRequestService, policyRequestService, null);
+        this(restConnection, hubResponseService, projectVersionRequestService, policyRequestService, null);
     }
 
-    public NotificationDataService(final IntLogger logger, final HubService hubResponseService, final NotificationService notificationRequestService, final ProjectVersionService projectVersionRequestService,
+    public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService, final ProjectVersionService projectVersionRequestService,
             final PolicyService policyRequestService, final PolicyNotificationFilter policyNotificationFilter) {
+        super(restConnection);
         this.hubResponseService = hubResponseService;
-        this.notificationRequestService = notificationRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.policyRequestService = policyRequestService;
         this.policyNotificationFilter = policyNotificationFilter;
-        this.parallelProcessor = new ParallelResourceProcessor<>(logger);
-        this.metaService = new MetaHandler(logger);
-        populateTransformerMap(logger);
+        this.parallelProcessor = new ParallelResourceProcessor<>(restConnection.logger);
+        this.metaService = new MetaHandler(restConnection.logger);
+        populateTransformerMap(restConnection.logger);
+        typeMap.put("VULNERABILITY", VulnerabilityNotificationView.class);
+        typeMap.put("RULE_VIOLATION", RuleViolationNotificationView.class);
+        typeMap.put("POLICY_OVERRIDE", PolicyOverrideNotificationView.class);
+        typeMap.put("RULE_VIOLATION_CLEARED", RuleViolationClearedNotificationView.class);
     }
 
     private void populateTransformerMap(final IntLogger logger) {
         parallelProcessor.addTransform(RuleViolationNotificationView.class,
-                new PolicyViolationTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
+                new PolicyViolationTransformer(hubResponseService, logger, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
         parallelProcessor.addTransform(PolicyOverrideNotificationView.class,
-                new PolicyViolationOverrideTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
-        parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubResponseService, notificationRequestService, projectVersionRequestService, policyRequestService, metaService, logger));
+                new PolicyViolationOverrideTransformer(hubResponseService, logger, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
+        parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubResponseService, projectVersionRequestService, policyRequestService, metaService, logger));
         parallelProcessor.addTransform(RuleViolationClearedNotificationView.class,
-                new PolicyViolationClearedTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
+                new PolicyViolationClearedTransformer(hubResponseService, logger, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
     }
 
-    public NotificationResults getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
+    public NotificationResults getAllNotificationResults(final Date startDate, final Date endDate) throws IntegrationException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
-        final List<NotificationView> itemList = notificationRequestService.getAllNotifications(startDate, endDate);
+        final List<NotificationView> itemList = getAllNotifications(startDate, endDate);
         final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
         contentList.addAll(processorResults.getResults());
         final NotificationResults results = new NotificationResults(contentList, processorResults.getExceptions());
         return results;
     }
 
-    public NotificationResults getUserNotifications(final Date startDate, final Date endDate, final UserView user) throws IntegrationException {
+    public NotificationResults getUserNotificationResults(final Date startDate, final Date endDate, final UserView user) throws IntegrationException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
-        final List<NotificationView> itemList = notificationRequestService.getUserNotifications(startDate, endDate, user);
+        final List<NotificationView> itemList = getUserNotifications(startDate, endDate, user);
         final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
         contentList.addAll(processorResults.getResults());
         final NotificationResults results = new NotificationResults(contentList, processorResults.getExceptions());
         return results;
+    }
+
+    public List<NotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
+        final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        final String startDateString = sdf.format(startDate);
+        final String endDateString = sdf.format(endDate);
+
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, Arrays.asList(SEGMENT_API, SEGMENT_NOTIFICATIONS));
+        hubPagedRequest.addQueryParameter("startDate", startDateString);
+        hubPagedRequest.addQueryParameter("endDate", endDateString);
+
+        final List<NotificationView> allNotificationItems = getAllResponses(hubPagedRequest, NotificationView.class, typeMap);
+        return allNotificationItems;
+    }
+
+    public List<NotificationView> getUserNotifications(final Date startDate, final Date endDate, final UserView user) throws IntegrationException {
+        final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        final String startDateString = sdf.format(startDate);
+        final String endDateString = sdf.format(endDate);
+        final String url = getFirstLink(user, MetaHandler.NOTIFICATIONS_LINK);
+
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, url);
+        hubPagedRequest.addQueryParameter("startDate", startDateString);
+        hubPagedRequest.addQueryParameter("endDate", endDateString);
+
+        final List<NotificationView> allNotificationItems = getAllResponses(hubPagedRequest, NotificationView.class, typeMap);
+        return allNotificationItems;
     }
 
 }
