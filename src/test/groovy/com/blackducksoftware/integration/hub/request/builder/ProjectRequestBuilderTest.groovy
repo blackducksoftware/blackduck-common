@@ -23,15 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.request.builder
 
-import java.text.SimpleDateFormat
-
-import org.junit.Assert
 import org.junit.Test
-
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum
-import com.blackducksoftware.integration.hub.model.request.ProjectRequest
-import com.blackducksoftware.integration.hub.rest.RestConnection
 
 class ProjectRequestBuilderTest {
 

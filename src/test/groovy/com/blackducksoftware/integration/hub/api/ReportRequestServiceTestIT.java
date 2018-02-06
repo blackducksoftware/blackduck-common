@@ -34,6 +34,11 @@ import org.junit.experimental.categories.Category;
 import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.bom.BomImportService;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportFormatType;
+import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
+import com.blackducksoftware.integration.hub.api.generated.model.ProjectVersionRequest;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
@@ -43,11 +48,6 @@ import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ReportFormatEnum;
-import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
-import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
@@ -75,7 +75,7 @@ public class ReportRequestServiceTestIT {
             categories[0] = ReportCategoriesEnum.VERSION;
             categories[1] = ReportCategoriesEnum.COMPONENTS;
 
-            final VersionReport report = reportservice.generateHubReport(version, ReportFormatEnum.JSON, categories);
+            final VersionReport report = reportservice.generateHubReport(version, ReportFormatType.JSON, categories);
             assertNotNull(report);
             assertNotNull(report.getAggregateBomViewEntries());
             assertTrue(!report.getAggregateBomViewEntries().isEmpty());
@@ -100,8 +100,10 @@ public class ReportRequestServiceTestIT {
             project = projectService.getProjectByName(projectName);
         } catch (final IntegrationException e) {
             try {
-                final String projectUrl = projectService.createHubProject(new ProjectRequest(projectName));
-                project = projectService.getView(projectUrl, ProjectView.class);
+                final ProjectRequest projectRequest = new ProjectRequest();
+                projectRequest.name = projectName;
+                final String projectUrl = projectService.createHubProject(projectRequest);
+                project = projectService.getResponse(projectUrl, ProjectView.class);
             } catch (final IntegrationException e1) {
                 throw new RuntimeException(e1);
             }
@@ -116,7 +118,7 @@ public class ReportRequestServiceTestIT {
         } catch (final IntegrationException e) {
             try {
                 final String versionUrl = versionService.createHubVersion(project, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, versionName));
-                version = versionService.getView(versionUrl, ProjectVersionView.class);
+                version = versionService.getResponse(versionUrl, ProjectVersionView.class);
             } catch (final IntegrationException e1) {
                 throw new RuntimeException(e1);
             }

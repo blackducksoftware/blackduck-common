@@ -32,12 +32,12 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import com.blackducksoftware.integration.IntegrationTest;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.LicenseCodeSharingType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.LicenseOwnershipType;
+import com.blackducksoftware.integration.hub.api.generated.view.ComplexLicenseView;
 import com.blackducksoftware.integration.hub.bdio.SimpleBdioFactory;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.dataservice.license.LicenseDataService;
-import com.blackducksoftware.integration.hub.model.enumeration.ComplexLicenseCodeSharingEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ComplexLicenseOwnershipEnum;
-import com.blackducksoftware.integration.hub.model.view.ComplexLicenseView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
@@ -54,10 +54,10 @@ public class LicenseDataServiceTestIT {
         final ExternalId guavaExternalId = simpleBdioFactory.createMavenExternalId("com.google.guava", "guava", "20.0");
         final ComplexLicenseView complexLicense = licenseDataService.getComplexLicenseItemFromComponent(guavaExternalId);
 
-        assertEquals(ComplexLicenseCodeSharingEnum.PERMISSIVE, complexLicense.codeSharing);
+        assertEquals(LicenseCodeSharingType.PERMISSIVE, complexLicense.codeSharing);
         assertTrue(StringUtils.isNotBlank(complexLicense.license));
         assertEquals("Apache License 2.0", complexLicense.name);
-        assertEquals(ComplexLicenseOwnershipEnum.OPEN_SOURCE, complexLicense.ownership);
+        assertEquals(LicenseOwnershipType.OPEN_SOURCE, complexLicense.ownership);
         assertNull(complexLicense.type);
         assertEquals(0, complexLicense.licenses.size());
 

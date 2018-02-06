@@ -1,6 +1,6 @@
 package com.blackducksoftware.integration.hub.api.scan;
 
-import com.blackducksoftware.integration.hub.model.HubResponse;
+import com.blackducksoftware.integration.hub.api.core.HubResponse;
 
 public class DryRunUploadResponse extends HubResponse {
     public String codeLocationId;

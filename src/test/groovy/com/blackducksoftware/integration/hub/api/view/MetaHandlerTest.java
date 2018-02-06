@@ -34,9 +34,9 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.api.core.HubView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.HubView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.google.gson.Gson;
 

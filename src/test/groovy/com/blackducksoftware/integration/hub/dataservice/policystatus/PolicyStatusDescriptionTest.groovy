@@ -23,15 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.policystatus
 
-import org.junit.Assert
 import org.junit.Test
-
-import com.blackducksoftware.integration.hub.model.enumeration.PolicySeverityEnum
-import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum
-import com.blackducksoftware.integration.hub.model.view.VersionBomPolicyStatusView
-import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionPolicyViolationCount
-import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionPolicyViolationDetails
-import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionStatusCount
 
 class PolicyStatusDescriptionTest {
 
