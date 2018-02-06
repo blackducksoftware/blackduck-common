@@ -31,7 +31,6 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionConfigValueView;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionView;
-import com.blackducksoftware.integration.hub.api.user.UserService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.dataservice.extension.transformer.UserConfigTransform;
@@ -45,9 +44,9 @@ public class ExtensionConfigDataService extends HubService {
     private final UserConfigTransform userConfigTransform;
     private final ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor;
 
-    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserService userRequestService, final HubService hubService) {
+    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final HubService hubService) {
         super(restConnection);
-        userConfigTransform = new UserConfigTransform(userRequestService, hubService);
+        userConfigTransform = new UserConfigTransform(hubService);
         parallelProcessor = new ParallelResourceProcessor<>(logger);
         parallelProcessor.addTransform(ExternalExtensionUserView.class, userConfigTransform);
     }

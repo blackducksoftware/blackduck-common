@@ -33,23 +33,20 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionConfigValueView;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
-import com.blackducksoftware.integration.hub.api.user.UserService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.service.HubService;
 
 public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, ExternalExtensionUserView> {
-    private final UserService userRequestService;
     private final HubService hubService;
 
-    public UserConfigTransform(final UserService userRequestService, final HubService hubService) {
-        this.userRequestService = userRequestService;
+    public UserConfigTransform(final HubService hubService) {
         this.hubService = hubService;
     }
 
     @Override
     public List<UserConfigItem> transform(final ExternalExtensionUserView item) throws IntegrationException {
-        final UserView user = userRequestService.getResponse(item.user, UserView.class);
+        final UserView user = hubService.getResponse(item.user, UserView.class);
         if (!user.active) {
             return Collections.emptyList();
         } else {

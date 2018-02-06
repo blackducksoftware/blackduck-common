@@ -40,7 +40,6 @@ import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
-import com.blackducksoftware.integration.hub.api.user.UserService;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityService;
 import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.VulnerableBomComponentService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
@@ -124,7 +123,7 @@ public class HubServicesFactory {
     }
 
     public ExtensionConfigDataService createExtensionConfigDataService() {
-        return new ExtensionConfigDataService(restConnection.logger, restConnection, createUserService(), createHubService());
+        return new ExtensionConfigDataService(restConnection.logger, restConnection, createHubService());
     }
 
     public LicenseDataService createLicenseDataService() {
@@ -165,10 +164,6 @@ public class HubServicesFactory {
 
     public ScanSummaryService createScanSummaryService() {
         return new ScanSummaryService(restConnection);
-    }
-
-    public UserService createUserService() {
-        return new UserService(restConnection);
     }
 
     public VulnerabilityService createVulnerabilityService() {
@@ -231,7 +226,7 @@ public class HubServicesFactory {
     }
 
     public UserGroupDataService createUserGroupDataService() {
-        return new UserGroupDataService(restConnection, createProjectService(), createUserService());
+        return new UserGroupDataService(restConnection, createProjectService());
     }
 
     @Override
