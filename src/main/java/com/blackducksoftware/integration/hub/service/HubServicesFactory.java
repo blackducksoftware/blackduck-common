@@ -39,7 +39,6 @@ import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
-import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
@@ -160,10 +159,6 @@ public class HubServicesFactory {
         return new ScanSummaryService(restConnection);
     }
 
-    public VulnerabilityService createVulnerabilityService() {
-        return new VulnerabilityService(restConnection);
-    }
-
     public CLIDownloadUtility createCliDownloadUtility() {
         return new CLIDownloadUtility(restConnection.logger, restConnection);
     }
@@ -204,7 +199,7 @@ public class HubServicesFactory {
     }
 
     public ComponentDataService createComponentDataService() {
-        return new ComponentDataService(restConnection, createVulnerabilityService());
+        return new ComponentDataService(restConnection);
     }
 
     public IssueDataService createIssueDataService() {
