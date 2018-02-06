@@ -33,7 +33,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
@@ -50,20 +49,16 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
      * policyFilter.size() == 0: match no rules policyFilter == null: match all rules
      */
     public AbstractPolicyTransformer(final HubService hubResponseService,
-            final ProjectVersionService projectVersionService,
             final PolicyNotificationFilter policyFilter,
             final MetaHandler metaService) {
-        super(hubResponseService, projectVersionService,
-                metaService);
+        super(hubResponseService, metaService);
         this.policyFilter = policyFilter;
     }
 
     public AbstractPolicyTransformer(final HubService hubResponseService, final IntLogger logger,
-
-            final ProjectVersionService projectVersionService,
             final PolicyNotificationFilter policyFilter,
             final MetaHandler metaService) {
-        super(hubResponseService, logger, projectVersionService, metaService);
+        super(hubResponseService, logger, metaService);
         this.policyFilter = policyFilter;
     }
 

@@ -32,7 +32,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersion
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.RuleViolationNotificationView;
@@ -45,14 +44,14 @@ import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationTransformer(final HubService hubResponseService, final ProjectVersionService projectVersionService,
+    public PolicyViolationTransformer(final HubService hubResponseService,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
-        super(hubResponseService, projectVersionService, policyFilter, metaService);
+        super(hubResponseService, policyFilter, metaService);
     }
 
-    public PolicyViolationTransformer(final HubService hubResponseService, final IntLogger logger, final ProjectVersionService projectVersionService,
+    public PolicyViolationTransformer(final HubService hubResponseService, final IntLogger logger,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
-        super(hubResponseService, logger, projectVersionService, policyFilter, metaService);
+        super(hubResponseService, logger, policyFilter, metaService);
     }
 
     @Override
@@ -110,7 +109,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     }
 
     private ProjectVersionView getReleaseItem(final String projectVersionLink) throws IntegrationException {
-        final ProjectVersionView releaseItem = getProjectVersionService().getResponse(projectVersionLink, ProjectVersionView.class);
+        final ProjectVersionView releaseItem = getHubService().getResponse(projectVersionLink, ProjectVersionView.class);
         return releaseItem;
     }
 

@@ -39,7 +39,6 @@ import java.util.TreeSet;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotificationView;
 import com.blackducksoftware.integration.hub.api.view.RuleViolationClearedNotificationView;
@@ -62,20 +61,18 @@ public class NotificationDataService extends HubService {
     private final Map<String, Class<? extends NotificationView>> typeMap = new HashMap<>();
 
     private final HubService hubResponseService;
-    private final ProjectVersionService projectVersionRequestService;
     private final PolicyNotificationFilter policyNotificationFilter;
     private final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor;
     private final MetaHandler metaService;
 
-    public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService, final ProjectVersionService projectVersionRequestService) {
-        this(restConnection, hubResponseService, projectVersionRequestService, null);
+    public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService) {
+        this(restConnection, hubResponseService, null);
     }
 
-    public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService, final ProjectVersionService projectVersionRequestService,
+    public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService,
             final PolicyNotificationFilter policyNotificationFilter) {
         super(restConnection);
         this.hubResponseService = hubResponseService;
-        this.projectVersionRequestService = projectVersionRequestService;
         this.policyNotificationFilter = policyNotificationFilter;
         this.parallelProcessor = new ParallelResourceProcessor<>(restConnection.logger);
         this.metaService = new MetaHandler(restConnection.logger);
@@ -88,12 +85,12 @@ public class NotificationDataService extends HubService {
 
     private void populateTransformerMap(final IntLogger logger) {
         parallelProcessor.addTransform(RuleViolationNotificationView.class,
-                new PolicyViolationTransformer(hubResponseService, logger, projectVersionRequestService, policyNotificationFilter, metaService));
+                new PolicyViolationTransformer(hubResponseService, logger, policyNotificationFilter, metaService));
         parallelProcessor.addTransform(PolicyOverrideNotificationView.class,
-                new PolicyViolationOverrideTransformer(hubResponseService, logger, projectVersionRequestService, policyNotificationFilter, metaService));
-        parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubResponseService, projectVersionRequestService, metaService, logger));
+                new PolicyViolationOverrideTransformer(hubResponseService, logger, policyNotificationFilter, metaService));
+        parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubResponseService, metaService, logger));
         parallelProcessor.addTransform(RuleViolationClearedNotificationView.class,
-                new PolicyViolationClearedTransformer(hubResponseService, logger, projectVersionRequestService, policyNotificationFilter, metaService));
+                new PolicyViolationClearedTransformer(hubResponseService, logger, policyNotificationFilter, metaService));
     }
 
     public NotificationResults getAllNotificationResults(final Date startDate, final Date endDate) throws IntegrationException {

@@ -31,7 +31,6 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
@@ -45,22 +44,19 @@ import com.blackducksoftware.integration.log.IntLogger;
 public abstract class AbstractNotificationTransformer implements ItemTransform<List<NotificationContentItem>, NotificationView> {
     private final IntLogger logger;
     private final HubService hubResponseService;
-    private final ProjectVersionService projectVersionService;
     private final MetaHandler metaService;
 
-    public AbstractNotificationTransformer(final HubService hubResponseService, final ProjectVersionService projectVersionService,
+    public AbstractNotificationTransformer(final HubService hubResponseService,
             final MetaHandler metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = new IntBufferedLogger();
-        this.projectVersionService = projectVersionService;
         this.metaService = metaService;
     }
 
-    public AbstractNotificationTransformer(final HubService hubResponseService, final IntLogger logger, final ProjectVersionService projectVersionService,
+    public AbstractNotificationTransformer(final HubService hubResponseService, final IntLogger logger,
             final MetaHandler metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = logger;
-        this.projectVersionService = projectVersionService;
         this.metaService = metaService;
     }
 
@@ -70,10 +66,6 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
 
     protected IntLogger getLogger() {
         return logger;
-    }
-
-    public ProjectVersionService getProjectVersionService() {
-        return projectVersionService;
     }
 
     @Override

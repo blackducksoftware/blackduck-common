@@ -37,10 +37,7 @@ import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
-import com.blackducksoftware.integration.hub.api.project.ProjectService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.builder.HubScanConfigBuilder;
@@ -48,8 +45,9 @@ import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.dataservice.codelocation.CodeLocationDataService;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
-import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -70,17 +68,16 @@ public class CLIDataService extends HubService {
     private final HubVersionService hubVersionRequestService;
     private final CLIDownloadUtility cliDownloadService;
     private final PhoneHomeDataService phoneHomeDataService;
-    private final ProjectService projectRequestService;
-    private final ProjectVersionService projectVersionRequestService;
+    private final ProjectDataService projectDataService;
     private final CodeLocationDataService codeLocationDataService;
     private final ScanStatusDataService scanStatusDataService;
     private final MetaHandler metaService;
 
     private HubSupportHelper hubSupportHelper;
-    private ProjectVersionView version;
+    private ProjectVersionWrapper projectVersionWrapper;
 
     public CLIDataService(final RestConnection restConnection, final CIEnvironmentVariables ciEnvironmentVariables, final HubVersionService hubVersionRequestService, final CLIDownloadUtility cliDownloadService,
-            final PhoneHomeDataService phoneHomeDataService, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService, final CodeLocationDataService codeLocationDataService,
+            final PhoneHomeDataService phoneHomeDataService, final ProjectDataService projectDataService, final CodeLocationDataService codeLocationDataService,
             final ScanStatusDataService scanStatusDataService) {
         super(restConnection);
         this.gson = restConnection.gson;
@@ -89,19 +86,19 @@ public class CLIDataService extends HubService {
         this.hubVersionRequestService = hubVersionRequestService;
         this.cliDownloadService = cliDownloadService;
         this.phoneHomeDataService = phoneHomeDataService;
-        this.projectRequestService = projectRequestService;
-        this.projectVersionRequestService = projectVersionRequestService;
+        this.projectDataService = projectDataService;
         this.codeLocationDataService = codeLocationDataService;
         this.scanStatusDataService = scanStatusDataService;
         this.metaService = new MetaHandler(logger);
     }
 
-    public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished,
+    public ProjectVersionWrapper installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished,
             final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
         return installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, shouldWaitForScansFinished, thirdPartyName.getName(), thirdPartyVersion, pluginVersion);
     }
 
-    public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished, final String thirdPartyName,
+    public ProjectVersionWrapper installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished,
+            final String thirdPartyName,
             final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
         PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = null;
         try {
@@ -113,7 +110,7 @@ public class CLIDataService extends HubService {
         final SimpleScanUtility simpleScanService = createScanService(hubServerConfig, hubScanConfig, projectRequest);
         final File[] scanSummaryFiles = runScan(simpleScanService);
         postScan(hubScanConfig, scanSummaryFiles, projectRequest, shouldWaitForScansFinished, simpleScanService);
-        return version;
+        return projectVersionWrapper;
     }
 
     private SimpleScanUtility createScanService(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
@@ -173,7 +170,7 @@ public class CLIDataService extends HubService {
         hubSupportHelper.checkHubSupport(hubVersionRequestService, logger);
 
         if (!hubScanConfig.isDryRun()) {
-            getProjectVersion(projectRequest);
+            projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);
         }
     }
 
@@ -198,7 +195,7 @@ public class CLIDataService extends HubService {
 
                     final CodeLocationView codeLocationView = codeLocationDataService.getResponse(codeLocationUrl, CodeLocationView.class);
                     codeLocationViews.add(codeLocationView);
-                    codeLocationDataService.mapCodeLocation(codeLocationView, version);
+                    codeLocationDataService.mapCodeLocation(codeLocationView, projectVersionWrapper.getProjectVersionView());
                 } catch (final IOException ex) {
                     logger.trace("Error reading scan summary file", ex);
                 }
@@ -250,7 +247,7 @@ public class CLIDataService extends HubService {
 
     private void cleanupCodeLocations(final List<CodeLocationView> codeLocationsFromCurentScan, final HubScanConfig hubScanConfig) throws IntegrationException {
         if (hubScanConfig.isDeletePreviousCodeLocations() || hubScanConfig.isUnmapPreviousCodeLocations()) {
-            final List<CodeLocationView> codeLocationsNotJustScanned = getCodeLocationsNotJustScanned(version, codeLocationsFromCurentScan);
+            final List<CodeLocationView> codeLocationsNotJustScanned = getCodeLocationsNotJustScanned(projectVersionWrapper.getProjectVersionView(), codeLocationsFromCurentScan);
             if (hubScanConfig.isDeletePreviousCodeLocations()) {
                 codeLocationDataService.deleteCodeLocations(codeLocationsNotJustScanned);
             } else if (hubScanConfig.isUnmapPreviousCodeLocations()) {
@@ -279,22 +276,6 @@ public class CLIDataService extends HubService {
             }
         }
         return codeLocationsNotJustScanned;
-    }
-
-    private void getProjectVersion(final ProjectRequest projectRequest) throws IntegrationException {
-        ProjectView project = null;
-        try {
-            project = projectRequestService.getProjectByName(projectRequest.name);
-        } catch (final DoesNotExistException e) {
-            final String projectURL = projectRequestService.createHubProject(projectRequest);
-            project = projectRequestService.getResponse(projectURL, ProjectView.class);
-        }
-        try {
-            version = projectVersionRequestService.getProjectVersion(project, projectRequest.versionRequest.versionName);
-        } catch (final DoesNotExistException e) {
-            final String versionURL = projectVersionRequestService.createHubVersion(project, projectRequest.versionRequest);
-            version = projectVersionRequestService.getResponse(versionURL, ProjectVersionView.class);
-        }
     }
 
 }

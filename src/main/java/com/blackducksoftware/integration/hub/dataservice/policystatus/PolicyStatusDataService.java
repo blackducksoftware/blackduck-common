@@ -29,28 +29,25 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView;
-import com.blackducksoftware.integration.hub.api.project.ProjectService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 
 public class PolicyStatusDataService extends HubService {
-    private final ProjectService projectRequestService;
-    private final ProjectVersionService projectVersionRequestService;
+    private final ProjectDataService projectDataService;
 
-    public PolicyStatusDataService(final RestConnection restConnection, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService) {
+    public PolicyStatusDataService(final RestConnection restConnection, final ProjectDataService projectDataService) {
         super(restConnection);
-        this.projectRequestService = projectRequestService;
-        this.projectVersionRequestService = projectVersionRequestService;
+        this.projectDataService = projectDataService;
     }
 
     public VersionBomPolicyStatusView getPolicyStatusForProjectAndVersion(final String projectName, final String projectVersionName) throws IntegrationException {
-        final ProjectView projectItem = projectRequestService.getProjectByName(projectName);
+        final ProjectView projectItem = projectDataService.getProjectByName(projectName);
         final String versionsUrl = getFirstLink(projectItem, MetaHandler.VERSIONS_LINK);
 
-        final List<ProjectVersionView> projectVersions = projectVersionRequestService.getAllProjectVersions(versionsUrl);
+        final List<ProjectVersionView> projectVersions = getAllResponses(versionsUrl, ProjectVersionView.class);
         final String policyStatusUrl = findPolicyStatusUrlFromVersions(projectVersions, projectVersionName);
 
         return getResponse(policyStatusUrl, VersionBomPolicyStatusView.class);

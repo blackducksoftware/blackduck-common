@@ -36,7 +36,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotificationView;
@@ -50,16 +49,14 @@ import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationOverrideTransformer extends AbstractPolicyTransformer {
     public PolicyViolationOverrideTransformer(final HubService hubResponseService,
-            final ProjectVersionService projectVersionService,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
-        super(hubResponseService, projectVersionService,
+        super(hubResponseService,
                 policyFilter, metaService);
     }
 
     public PolicyViolationOverrideTransformer(final HubService hubResponseService, final IntLogger logger,
-            final ProjectVersionService projectVersionService,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
-        super(hubResponseService, logger, projectVersionService,
+        super(hubResponseService, logger,
                 policyFilter, metaService);
     }
 
@@ -78,7 +75,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
         componentVersionList.add(componentStatus);
 
         try {
-            releaseItem = getProjectVersionService().getResponse(policyOverride.content.projectVersionLink, ProjectVersionView.class);
+            releaseItem = getHubService().getResponse(policyOverride.content.projectVersionLink, ProjectVersionView.class);
         } catch (final IntegrationException e) {
             throw new HubItemTransformException(e);
         }

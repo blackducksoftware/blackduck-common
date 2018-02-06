@@ -32,9 +32,6 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
-import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentService;
-import com.blackducksoftware.integration.hub.api.project.ProjectService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
@@ -84,8 +81,8 @@ public class HubServicesFactory {
     }
 
     public CLIDataService createCLIDataService(final long timeoutInMilliseconds) {
-        return new CLIDataService(restConnection, ciEnvironmentVariables, createHubVersionService(), createCliDownloadUtility(), createPhoneHomeDataService(), createProjectService(),
-                createProjectVersionService(), createCodeLocationDataService(), createScanStatusDataService(timeoutInMilliseconds));
+        return new CLIDataService(restConnection, ciEnvironmentVariables, createHubVersionService(), createCliDownloadUtility(), createPhoneHomeDataService(), createProjectDataService(),
+                createCodeLocationDataService(), createScanStatusDataService(timeoutInMilliseconds));
     }
 
     public PhoneHomeDataService createPhoneHomeDataService() {
@@ -97,24 +94,24 @@ public class HubServicesFactory {
     }
 
     public ReportDataService createReportDataService(final long timeoutInMilliseconds) throws IntegrationException {
-        return new ReportDataService(restConnection.logger, restConnection, createProjectService(), createProjectVersionService(), createReportService(timeoutInMilliseconds), createProjectDataService(), createCheckedHubSupport(),
+        return new ReportDataService(restConnection, createReportService(timeoutInMilliseconds), createProjectDataService(), createCheckedHubSupport(),
                 createIntegrationEscapeUtil());
     }
 
     public PolicyStatusDataService createPolicyStatusDataService() {
-        return new PolicyStatusDataService(restConnection, createProjectService(), createProjectVersionService());
+        return new PolicyStatusDataService(restConnection, createProjectDataService());
     }
 
     public ScanStatusDataService createScanStatusDataService(final long timeoutInMilliseconds) {
-        return new ScanStatusDataService(restConnection, createProjectService(), createProjectVersionService(), createCodeLocationDataService(), createScanSummaryService(), timeoutInMilliseconds);
+        return new ScanStatusDataService(restConnection, createProjectDataService(), createCodeLocationDataService(), createScanSummaryService(), timeoutInMilliseconds);
     }
 
     public NotificationDataService createNotificationDataService() {
-        return new NotificationDataService(restConnection, createHubService(), createProjectVersionService());
+        return new NotificationDataService(restConnection, createHubService());
     }
 
     public NotificationDataService createNotificationDataService(final PolicyNotificationFilter policyNotificationFilter) {
-        return new NotificationDataService(restConnection, createHubService(), createProjectVersionService(), policyNotificationFilter);
+        return new NotificationDataService(restConnection, createHubService(), policyNotificationFilter);
     }
 
     public ExtensionConfigDataService createExtensionConfigDataService() {
@@ -135,14 +132,6 @@ public class HubServicesFactory {
 
     public HubVersionService createHubVersionService() {
         return new HubVersionService(restConnection);
-    }
-
-    public ProjectService createProjectService() {
-        return new ProjectService(restConnection);
-    }
-
-    public ProjectVersionService createProjectVersionService() {
-        return new ProjectVersionService(restConnection);
     }
 
     public ScanSummaryService createScanSummaryService() {
@@ -174,10 +163,6 @@ public class HubServicesFactory {
         return new HubService(restConnection);
     }
 
-    public ProjectAssignmentService createProjectAssignmentService() {
-        return new ProjectAssignmentService(restConnection);
-    }
-
     public RestConnection getRestConnection() {
         return restConnection;
     }
@@ -197,11 +182,11 @@ public class HubServicesFactory {
     }
 
     public ProjectDataService createProjectDataService() {
-        return new ProjectDataService(restConnection, createProjectService(), createProjectVersionService(), createProjectAssignmentService(), createComponentDataService());
+        return new ProjectDataService(restConnection, createComponentDataService());
     }
 
     public UserGroupDataService createUserGroupDataService() {
-        return new UserGroupDataService(restConnection, createProjectService());
+        return new UserGroupDataService(restConnection);
     }
 
     @Override

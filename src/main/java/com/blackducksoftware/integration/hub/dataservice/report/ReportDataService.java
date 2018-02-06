@@ -42,8 +42,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
-import com.blackducksoftware.integration.hub.api.project.ProjectService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportService;
@@ -65,19 +63,15 @@ import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 
 public class ReportDataService extends HubService {
     private final IntLogger logger;
-    private final ProjectService projectRequestService;
-    private final ProjectVersionService projectVersionRequestService;
     private final ReportService reportRequestService;
     private final ProjectDataService projectDataService;
     private final HubSupportHelper hubSupportHelper;
     private final IntegrationEscapeUtil escapeUtil;
 
-    public ReportDataService(final IntLogger logger, final RestConnection restConnection, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService,
+    public ReportDataService(final RestConnection restConnection,
             final ReportService reportRequestService, final ProjectDataService projectDataService, final HubSupportHelper hubSupportHelper, final IntegrationEscapeUtil escapeUtil) {
         super(restConnection);
-        this.logger = logger;
-        this.projectRequestService = projectRequestService;
-        this.projectVersionRequestService = projectVersionRequestService;
+        this.logger = restConnection.logger;
         this.reportRequestService = reportRequestService;
         this.projectDataService = projectDataService;
         this.hubSupportHelper = hubSupportHelper;
@@ -85,8 +79,8 @@ public class ReportDataService extends HubService {
     }
 
     public String getNoticesReportData(final String projectName, final String projectVersionName) throws IntegrationException {
-        final ProjectView project = projectRequestService.getProjectByName(projectName);
-        final ProjectVersionView version = projectVersionRequestService.getProjectVersion(project, projectVersionName);
+        final ProjectView project = projectDataService.getProjectByName(projectName);
+        final ProjectVersionView version = projectDataService.getProjectVersion(project, projectVersionName);
         return getNoticesReportData(project, version);
     }
 
@@ -124,8 +118,8 @@ public class ReportDataService extends HubService {
     }
 
     public ReportData getRiskReportData(final String projectName, final String projectVersionName) throws IntegrationException {
-        final ProjectView project = projectRequestService.getProjectByName(projectName);
-        final ProjectVersionView version = projectVersionRequestService.getProjectVersion(project, projectVersionName);
+        final ProjectView project = projectDataService.getProjectByName(projectName);
+        final ProjectVersionView version = projectDataService.getProjectVersion(project, projectVersionName);
         return getRiskReportData(project, version);
     }
 
