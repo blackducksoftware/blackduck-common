@@ -33,7 +33,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
@@ -51,21 +50,20 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
      * policyFilter.size() == 0: match no rules policyFilter == null: match all rules
      */
     public AbstractPolicyTransformer(final HubService hubResponseService,
-            final ProjectVersionService projectVersionService, final PolicyService policyService,
+            final ProjectVersionService projectVersionService,
             final PolicyNotificationFilter policyFilter,
             final MetaHandler metaService) {
-        super(hubResponseService, projectVersionService, policyService,
+        super(hubResponseService, projectVersionService,
                 metaService);
         this.policyFilter = policyFilter;
     }
 
     public AbstractPolicyTransformer(final HubService hubResponseService, final IntLogger logger,
 
-            final ProjectVersionService projectVersionService, final PolicyService policyService,
+            final ProjectVersionService projectVersionService,
             final PolicyNotificationFilter policyFilter,
             final MetaHandler metaService) {
-        super(hubResponseService, logger, projectVersionService, policyService,
-                metaService);
+        super(hubResponseService, logger, projectVersionService, metaService);
         this.policyFilter = policyFilter;
     }
 
@@ -79,7 +77,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         }
         final List<PolicyRuleView> rules = new ArrayList<>();
         for (final String ruleUrlViolated : ruleUrlsViolated) {
-            final PolicyRuleView ruleViolated = getPolicyService().getResponse(ruleUrlViolated, PolicyRuleView.class);
+            final PolicyRuleView ruleViolated = getHubService().getResponse(ruleUrlViolated, PolicyRuleView.class);
             rules.add(ruleViolated);
         }
         return rules;
@@ -109,7 +107,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     protected PolicyRuleView getPolicyRule(final String ruleUrl) throws IntegrationException {
-        final PolicyRuleView rule = getPolicyService().getResponse(ruleUrl, PolicyRuleView.class);
+        final PolicyRuleView rule = getHubService().getResponse(ruleUrl, PolicyRuleView.class);
         return rule;
     }
 
@@ -156,7 +154,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
 
     protected PolicyStatusView getBomComponentVersionPolicyStatus(final String policyStatusUrl) throws IntegrationException {
         PolicyStatusView bomComponentVersionPolicyStatus;
-        bomComponentVersionPolicyStatus = getHubResponseService().getResponse(policyStatusUrl, PolicyStatusView.class);
+        bomComponentVersionPolicyStatus = getHubService().getResponse(policyStatusUrl, PolicyStatusView.class);
 
         return bomComponentVersionPolicyStatus;
     }

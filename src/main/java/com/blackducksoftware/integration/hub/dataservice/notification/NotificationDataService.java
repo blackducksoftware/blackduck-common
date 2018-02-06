@@ -39,7 +39,6 @@ import java.util.TreeSet;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
-import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotificationView;
@@ -64,22 +63,19 @@ public class NotificationDataService extends HubService {
 
     private final HubService hubResponseService;
     private final ProjectVersionService projectVersionRequestService;
-    private final PolicyService policyRequestService;
     private final PolicyNotificationFilter policyNotificationFilter;
     private final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor;
     private final MetaHandler metaService;
 
-    public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService, final ProjectVersionService projectVersionRequestService,
-            final PolicyService policyRequestService) {
-        this(restConnection, hubResponseService, projectVersionRequestService, policyRequestService, null);
+    public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService, final ProjectVersionService projectVersionRequestService) {
+        this(restConnection, hubResponseService, projectVersionRequestService, null);
     }
 
     public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService, final ProjectVersionService projectVersionRequestService,
-            final PolicyService policyRequestService, final PolicyNotificationFilter policyNotificationFilter) {
+            final PolicyNotificationFilter policyNotificationFilter) {
         super(restConnection);
         this.hubResponseService = hubResponseService;
         this.projectVersionRequestService = projectVersionRequestService;
-        this.policyRequestService = policyRequestService;
         this.policyNotificationFilter = policyNotificationFilter;
         this.parallelProcessor = new ParallelResourceProcessor<>(restConnection.logger);
         this.metaService = new MetaHandler(restConnection.logger);
@@ -92,12 +88,12 @@ public class NotificationDataService extends HubService {
 
     private void populateTransformerMap(final IntLogger logger) {
         parallelProcessor.addTransform(RuleViolationNotificationView.class,
-                new PolicyViolationTransformer(hubResponseService, logger, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
+                new PolicyViolationTransformer(hubResponseService, logger, projectVersionRequestService, policyNotificationFilter, metaService));
         parallelProcessor.addTransform(PolicyOverrideNotificationView.class,
-                new PolicyViolationOverrideTransformer(hubResponseService, logger, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
-        parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubResponseService, projectVersionRequestService, policyRequestService, metaService, logger));
+                new PolicyViolationOverrideTransformer(hubResponseService, logger, projectVersionRequestService, policyNotificationFilter, metaService));
+        parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubResponseService, projectVersionRequestService, metaService, logger));
         parallelProcessor.addTransform(RuleViolationClearedNotificationView.class,
-                new PolicyViolationClearedTransformer(hubResponseService, logger, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
+                new PolicyViolationClearedTransformer(hubResponseService, logger, projectVersionRequestService, policyNotificationFilter, metaService));
     }
 
     public NotificationResults getAllNotificationResults(final Date startDate, final Date endDate) throws IntegrationException {

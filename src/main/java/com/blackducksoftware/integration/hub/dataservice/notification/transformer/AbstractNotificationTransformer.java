@@ -31,7 +31,6 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
@@ -47,28 +46,25 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
     private final IntLogger logger;
     private final HubService hubResponseService;
     private final ProjectVersionService projectVersionService;
-    private final PolicyService policyService;
     private final MetaHandler metaService;
 
     public AbstractNotificationTransformer(final HubService hubResponseService, final ProjectVersionService projectVersionService,
-            final PolicyService policyService, final MetaHandler metaService) {
+            final MetaHandler metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = new IntBufferedLogger();
         this.projectVersionService = projectVersionService;
-        this.policyService = policyService;
         this.metaService = metaService;
     }
 
     public AbstractNotificationTransformer(final HubService hubResponseService, final IntLogger logger, final ProjectVersionService projectVersionService,
-            final PolicyService policyService, final MetaHandler metaService) {
+            final MetaHandler metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = logger;
         this.projectVersionService = projectVersionService;
-        this.policyService = policyService;
         this.metaService = metaService;
     }
 
-    public HubService getHubResponseService() {
+    public HubService getHubService() {
         return hubResponseService;
     }
 
@@ -78,10 +74,6 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
 
     public ProjectVersionService getProjectVersionService() {
         return projectVersionService;
-    }
-
-    public PolicyService getPolicyService() {
-        return policyService;
     }
 
     @Override

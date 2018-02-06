@@ -32,7 +32,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersion
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
@@ -46,14 +45,14 @@ import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationTransformer(final HubService hubResponseService, final ProjectVersionService projectVersionService, final PolicyService policyService,
+    public PolicyViolationTransformer(final HubService hubResponseService, final ProjectVersionService projectVersionService,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
-        super(hubResponseService, projectVersionService, policyService, policyFilter, metaService);
+        super(hubResponseService, projectVersionService, policyFilter, metaService);
     }
 
     public PolicyViolationTransformer(final HubService hubResponseService, final IntLogger logger, final ProjectVersionService projectVersionService,
-            final PolicyService policyService, final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
-        super(hubResponseService, logger, projectVersionService, policyService, policyFilter, metaService);
+            final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
+        super(hubResponseService, logger, projectVersionService, policyFilter, metaService);
     }
 
     @Override

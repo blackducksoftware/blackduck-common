@@ -32,7 +32,6 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyService;
 import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentService;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
@@ -111,11 +110,11 @@ public class HubServicesFactory {
     }
 
     public NotificationDataService createNotificationDataService() {
-        return new NotificationDataService(restConnection, createHubService(), createProjectVersionService(), createPolicyService());
+        return new NotificationDataService(restConnection, createHubService(), createProjectVersionService());
     }
 
     public NotificationDataService createNotificationDataService(final PolicyNotificationFilter policyNotificationFilter) {
-        return new NotificationDataService(restConnection, createHubService(), createProjectVersionService(), createPolicyService(), policyNotificationFilter);
+        return new NotificationDataService(restConnection, createHubService(), createProjectVersionService(), policyNotificationFilter);
     }
 
     public ExtensionConfigDataService createExtensionConfigDataService() {
@@ -136,10 +135,6 @@ public class HubServicesFactory {
 
     public HubVersionService createHubVersionService() {
         return new HubVersionService(restConnection);
-    }
-
-    public PolicyService createPolicyService() {
-        return new PolicyService(restConnection);
     }
 
     public ProjectService createProjectService() {
