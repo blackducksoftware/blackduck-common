@@ -30,7 +30,6 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.license.LicenseService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
 import com.blackducksoftware.integration.hub.api.policy.PolicyService;
@@ -124,7 +123,7 @@ public class HubServicesFactory {
     }
 
     public LicenseDataService createLicenseDataService() {
-        return new LicenseDataService(restConnection, createComponentDataService(), createLicenseService());
+        return new LicenseDataService(restConnection, createComponentDataService());
     }
 
     public CodeLocationDataService createBdioUploadDataService() {
@@ -149,10 +148,6 @@ public class HubServicesFactory {
 
     public ProjectVersionService createProjectVersionService() {
         return new ProjectVersionService(restConnection);
-    }
-
-    public LicenseService createLicenseService() {
-        return new LicenseService(restConnection);
     }
 
     public ScanSummaryService createScanSummaryService() {
