@@ -21,23 +21,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.codelocation;
+package com.blackducksoftware.integration.hub.dataservice.codelocation;
 
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_BOM_IMPORT;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CODE_LOCATIONS;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
@@ -46,23 +49,31 @@ import com.blackducksoftware.integration.hub.service.HubService;
 
 import okhttp3.Response;
 
-public class CodeLocationService extends HubService {
-    public CodeLocationService(final RestConnection restConnection) {
+public class CodeLocationDataService extends HubService {
+    public CodeLocationDataService(final RestConnection restConnection) {
         super(restConnection);
     }
 
-    public List<CodeLocationView> getAllCodeLocations() throws IntegrationException {
-        return getAllResponsesFromApi(ApiDiscovery.CODELOCATIONS_LINK, CodeLocationView.class);
+    public void importBomFile(final File file) throws IntegrationException {
+        importBomFile(file, "application/ld+json");
+    }
+
+    public void importBomFile(final File file, final String mediaType) throws IntegrationException {
+        String jsonPayload;
+        try {
+            jsonPayload = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+        } catch (final IOException e) {
+            throw new IntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub because : " + e.getMessage(), e);
+        }
+        final HubRequest hubRequest = getHubRequestFactory().createRequest(Arrays.asList(SEGMENT_API, SEGMENT_BOM_IMPORT));
+        try (Response response = hubRequest.executePost(mediaType, jsonPayload)) {
+        }
     }
 
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationType codeLocationType) throws IntegrationException {
         final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS)).addQueryParameter("codeLocationType", codeLocationType.toString());
         final List<CodeLocationView> allCodeLocations = getAllResponses(hubPagedRequest, CodeLocationView.class);
         return allCodeLocations;
-    }
-
-    public List<CodeLocationView> getAllCodeLocationsForProjectVersion(final ProjectVersionView version) throws IntegrationException {
-        return getAllResponsesFromLink(version, MetaHandler.CODE_LOCATION_LINK, CodeLocationView.class);
     }
 
     public void unmapCodeLocations(final List<CodeLocationView> codeLocationItems) throws IntegrationException {

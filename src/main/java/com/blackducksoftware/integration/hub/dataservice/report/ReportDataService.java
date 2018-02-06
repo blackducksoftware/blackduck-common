@@ -142,7 +142,8 @@ public class ReportDataService extends HubService {
         final List<BomComponent> components = new ArrayList<>();
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.AGGREGATE_BOM_REST_SERVER)) {
             logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
-            final List<VersionBomComponentView> bomEntries = projectDataService.getComponentsForProjectVersion(version);
+            final String componentsLink = getFirstLink(version, ProjectVersionView.COMPONENTS_LINK);
+            final List<VersionBomComponentView> bomEntries = getAllResponses(componentsLink, VersionBomComponentView.class);
             boolean policyFailure = false;
             for (final VersionBomComponentView bomEntry : bomEntries) {
                 final BomComponent component = createBomComponentFromBomComponentView(bomEntry);

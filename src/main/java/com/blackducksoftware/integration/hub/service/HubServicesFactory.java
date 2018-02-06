@@ -30,9 +30,6 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.bom.BomComponentIssueService;
-import com.blackducksoftware.integration.hub.api.bom.BomImportService;
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionService;
 import com.blackducksoftware.integration.hub.api.group.GroupService;
@@ -52,8 +49,10 @@ import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.Vulnerab
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
+import com.blackducksoftware.integration.hub.dataservice.codelocation.CodeLocationDataService;
 import com.blackducksoftware.integration.hub.dataservice.component.ComponentDataService;
 import com.blackducksoftware.integration.hub.dataservice.extension.ExtensionConfigDataService;
+import com.blackducksoftware.integration.hub.dataservice.issue.IssueDataService;
 import com.blackducksoftware.integration.hub.dataservice.license.LicenseDataService;
 import com.blackducksoftware.integration.hub.dataservice.notification.NotificationDataService;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
@@ -94,8 +93,8 @@ public class HubServicesFactory {
     }
 
     public CLIDataService createCLIDataService(final long timeoutInMilliseconds) {
-        return new CLIDataService(restConnection.logger, restConnection.gson, ciEnvironmentVariables, createHubVersionService(), createCliDownloadUtility(), createPhoneHomeDataService(), createProjectService(),
-                createProjectVersionService(), createCodeLocationService(), createScanSummaryService(), createScanStatusDataService(timeoutInMilliseconds));
+        return new CLIDataService(restConnection, ciEnvironmentVariables, createHubVersionService(), createCliDownloadUtility(), createPhoneHomeDataService(), createProjectService(),
+                createProjectVersionService(), createCodeLocationDataService(), createScanStatusDataService(timeoutInMilliseconds));
     }
 
     public PhoneHomeDataService createPhoneHomeDataService() {
@@ -116,7 +115,7 @@ public class HubServicesFactory {
     }
 
     public ScanStatusDataService createScanStatusDataService(final long timeoutInMilliseconds) {
-        return new ScanStatusDataService(restConnection.logger, createProjectService(), createProjectVersionService(), createCodeLocationService(), createScanSummaryService(), timeoutInMilliseconds);
+        return new ScanStatusDataService(restConnection, createProjectService(), createProjectVersionService(), createCodeLocationDataService(), createScanSummaryService(), timeoutInMilliseconds);
     }
 
     public NotificationDataService createNotificationDataService() {
@@ -135,12 +134,12 @@ public class HubServicesFactory {
         return new LicenseDataService(restConnection, createComponentDataService(), createLicenseService());
     }
 
-    public BomImportService createBomImportService() {
-        return new BomImportService(restConnection);
+    public CodeLocationDataService createBdioUploadDataService() {
+        return new CodeLocationDataService(restConnection);
     }
 
-    public CodeLocationService createCodeLocationService() {
-        return new CodeLocationService(restConnection);
+    public CodeLocationDataService createCodeLocationDataService() {
+        return new CodeLocationDataService(restConnection);
     }
 
     public HubVersionService createHubVersionService() {
@@ -238,8 +237,8 @@ public class HubServicesFactory {
         return new ComponentDataService(restConnection, createVulnerabilityService());
     }
 
-    public BomComponentIssueService createBomComponentIssueService() {
-        return new BomComponentIssueService(restConnection);
+    public IssueDataService createIssueDataService() {
+        return new IssueDataService(restConnection);
     }
 
     public ProjectDataService createProjectDataService() {

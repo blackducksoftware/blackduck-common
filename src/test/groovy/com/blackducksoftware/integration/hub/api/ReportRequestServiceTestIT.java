@@ -33,7 +33,6 @@ import org.junit.experimental.categories.Category;
 
 import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.bom.BomImportService;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportFormatType;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectVersionRequest;
@@ -45,6 +44,7 @@ import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
+import com.blackducksoftware.integration.hub.dataservice.codelocation.CodeLocationDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
 import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
@@ -62,7 +62,7 @@ public class ReportRequestServiceTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final ProjectService projectService = hubServicesFactory.createProjectService();
         final ProjectVersionService projectVersionService = hubServicesFactory.createProjectVersionService();
-        final BomImportService importService = hubServicesFactory.createBomImportService();
+        final CodeLocationDataService importService = hubServicesFactory.createBomImportService();
         final ReportService reportservice = hubServicesFactory.createReportService(120 * 1000);
 
         final ProjectView project = getProject(projectService, restConnectionTestHelper.getProperty("TEST_REPORT_PROJECT"));

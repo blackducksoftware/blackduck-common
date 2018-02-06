@@ -196,11 +196,6 @@ public class ProjectDataService extends HubService {
         return versionBomComponentViews;
     }
 
-    public List<VersionBomComponentView> getComponentsForProjectVersion(final ProjectVersionView version) throws IntegrationException {
-        final String componentsLink = getFirstLink(version, ProjectVersionView.COMPONENTS_LINK);
-        return getAllResponses(componentsLink, VersionBomComponentView.class);
-    }
-
     public List<VersionBomComponentModel> getComponentsWithMatchedFilesForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView project = projectRequestService.getProjectByName(projectName);
         final ProjectVersionView version = projectVersionRequestService.getProjectVersion(project, projectVersionName);
