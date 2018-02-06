@@ -23,11 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.api.group;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_GROUPS;
-
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.view.UserGroupView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
@@ -41,7 +40,7 @@ public class GroupService extends HubService {
     }
 
     public List<UserGroupView> getAllGroups() throws IntegrationException {
-        return getAllResponsesFromApi(SEGMENT_GROUPS, UserGroupView.class);
+        return getAllResponsesFromApi(ApiDiscovery.USERGROUPS_LINK, UserGroupView.class);
     }
 
     public UserGroupView getGroupByName(final String groupName) throws IntegrationException {

@@ -23,11 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.api.policy;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_POLICY_RULES;
-
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
@@ -38,7 +37,7 @@ public class PolicyService extends HubService {
     }
 
     public List<PolicyRuleView> getAllPolicyRules() throws IntegrationException {
-        final List<PolicyRuleView> allPolicyRuleItems = getAllResponsesFromApi(SEGMENT_POLICY_RULES, PolicyRuleView.class);
+        final List<PolicyRuleView> allPolicyRuleItems = getAllResponsesFromApi(ApiDiscovery.POLICY_RULES_LINK, PolicyRuleView.class);
         return allPolicyRuleItems;
     }
 }

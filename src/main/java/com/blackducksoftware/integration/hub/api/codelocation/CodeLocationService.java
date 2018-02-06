@@ -33,6 +33,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
@@ -46,18 +47,16 @@ import com.blackducksoftware.integration.hub.service.HubService;
 import okhttp3.Response;
 
 public class CodeLocationService extends HubService {
-    private static final List<String> CODE_LOCATION_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS);
-
     public CodeLocationService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public List<CodeLocationView> getAllCodeLocations() throws IntegrationException {
-        return getAllResponsesFromApi(SEGMENT_CODE_LOCATIONS, CodeLocationView.class);
+        return getAllResponsesFromApi(ApiDiscovery.CODELOCATIONS_LINK, CodeLocationView.class);
     }
 
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationType codeLocationType) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(CODE_LOCATION_SEGMENTS).addQueryParameter("codeLocationType", codeLocationType.toString());
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS)).addQueryParameter("codeLocationType", codeLocationType.toString());
         final List<CodeLocationView> allCodeLocations = getAllResponses(hubPagedRequest, CodeLocationView.class);
         return allCodeLocations;
     }
@@ -124,7 +123,7 @@ public class CodeLocationService extends HubService {
 
     public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
-            final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(CODE_LOCATION_SEGMENTS);
+            final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS));
             hubPagedRequest.q = "name:" + codeLocationName;
             final List<CodeLocationView> codeLocations = getAllResponses(hubPagedRequest, CodeLocationView.class);
             for (final CodeLocationView codeLocation : codeLocations) {
@@ -138,7 +137,7 @@ public class CodeLocationService extends HubService {
     }
 
     public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {
-        final List<String> segments = new ArrayList<>(CODE_LOCATION_SEGMENTS);
+        final List<String> segments = new ArrayList<>(Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS));
         segments.add(codeLocationId);
         final HubRequest request = getHubRequestFactory().createRequest(segments);
         return getResponse(request, CodeLocationView.class);

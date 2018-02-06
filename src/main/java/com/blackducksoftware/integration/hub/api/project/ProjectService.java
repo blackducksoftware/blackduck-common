@@ -32,6 +32,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
@@ -43,19 +44,17 @@ import com.blackducksoftware.integration.hub.service.HubService;
 import okhttp3.Response;
 
 public class ProjectService extends HubService {
-    private static final List<String> PROJECTS_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS);
-
     public ProjectService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public List<ProjectView> getAllProjects() throws IntegrationException {
-        final List<ProjectView> allProjectItems = getAllResponsesFromApi(SEGMENT_PROJECTS, ProjectView.class);
+        final List<ProjectView> allProjectItems = getAllResponsesFromApi(ApiDiscovery.PROJECTS_LINK, ProjectView.class);
         return allProjectItems;
     }
 
     public List<ProjectView> getAllProjectMatches(final String projectName) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(PROJECTS_SEGMENTS);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS));
         if (StringUtils.isNotBlank(projectName)) {
             hubPagedRequest.q = "name:" + projectName;
         }
@@ -64,7 +63,7 @@ public class ProjectService extends HubService {
     }
 
     public List<ProjectView> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(limit, PROJECTS_SEGMENTS);
+        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(limit, Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS));
         if (StringUtils.isNotBlank(projectName)) {
             hubPagedRequest.q = "name:" + projectName;
         }
@@ -84,7 +83,7 @@ public class ProjectService extends HubService {
     }
 
     public String createHubProject(final ProjectRequest project) throws IntegrationException {
-        final HubRequest projectItemRequest = getHubRequestFactory().createRequest(PROJECTS_SEGMENTS);
+        final HubRequest projectItemRequest = getHubRequestFactory().createRequest(Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS));
         Response response = null;
         try {
             final String projectJson = getGson().toJson(project);

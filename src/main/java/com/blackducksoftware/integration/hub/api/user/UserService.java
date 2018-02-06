@@ -23,11 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.api.user;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_USERS;
-
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.response.AssignedProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.RoleView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
@@ -42,7 +41,7 @@ public class UserService extends HubService {
     }
 
     public List<UserView> getAllUsers() throws IntegrationException {
-        final List<UserView> allUserItems = getAllResponsesFromApi(SEGMENT_USERS, UserView.class);
+        final List<UserView> allUserItems = getAllResponsesFromApi(ApiDiscovery.USERS_LINK, UserView.class);
         return allUserItems;
     }
 
