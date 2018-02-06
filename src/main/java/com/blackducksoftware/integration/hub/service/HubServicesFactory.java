@@ -40,7 +40,6 @@ import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionS
 import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
 import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityService;
-import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.VulnerableBomComponentService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
@@ -163,10 +162,6 @@ public class HubServicesFactory {
 
     public VulnerabilityService createVulnerabilityService() {
         return new VulnerabilityService(restConnection);
-    }
-
-    public VulnerableBomComponentService createVulnerableBomComponentService() {
-        return new VulnerableBomComponentService(restConnection);
     }
 
     public CLIDownloadUtility createCliDownloadUtility() {

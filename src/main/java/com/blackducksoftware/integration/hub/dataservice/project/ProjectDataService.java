@@ -37,6 +37,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserGroupView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
+import com.blackducksoftware.integration.hub.api.generated.view.VulnerableComponentView;
 import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentService;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
@@ -192,8 +193,14 @@ public class ProjectDataService extends HubService {
         final ProjectView projectItem = projectRequestService.getProjectByName(projectName);
         final ProjectVersionView projectVersionView = projectVersionRequestService.getProjectVersion(projectItem, projectVersionName);
         final List<VersionBomComponentView> versionBomComponentViews = projectVersionRequestService.getAllResponsesFromLink(projectVersionView, ProjectVersionView.COMPONENTS_LINK, VersionBomComponentView.class);
-
         return versionBomComponentViews;
+    }
+
+    public List<VulnerableComponentView> getVulnerableComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
+        final ProjectView projectItem = projectRequestService.getProjectByName(projectName);
+        final ProjectVersionView projectVersionView = projectVersionRequestService.getProjectVersion(projectItem, projectVersionName);
+        final List<VulnerableComponentView> vulnerableBomComponentViews = projectVersionRequestService.getAllResponsesFromLink(projectVersionView, ProjectVersionView.VULNERABLE_COMPONENTS_LINK, VulnerableComponentView.class);
+        return vulnerableBomComponentViews;
     }
 
     public List<VersionBomComponentModel> getComponentsWithMatchedFilesForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
