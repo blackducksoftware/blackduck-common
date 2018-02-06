@@ -37,7 +37,6 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocat
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
-import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.dataservice.codelocation.CodeLocationDataService;
@@ -55,18 +54,16 @@ public class ScanStatusDataService extends HubService {
     private final IntLogger logger;
     private final ProjectDataService projectDataService;
     private final CodeLocationDataService codeLocationDataService;
-    private final ScanSummaryService scanSummaryRequestService;
     private final MetaHandler metaService;
     private final long timeoutInMilliseconds;
 
     public ScanStatusDataService(final RestConnection restConnection, final ProjectDataService projectDataService, final CodeLocationDataService codeLocationDataService,
-            final ScanSummaryService scanSummaryRequestService, final long timeoutInMilliseconds) {
+            final long timeoutInMilliseconds) {
         super(restConnection);
         this.logger = restConnection.logger;
         this.metaService = new MetaHandler(logger);
         this.projectDataService = projectDataService;
         this.codeLocationDataService = codeLocationDataService;
-        this.scanSummaryRequestService = scanSummaryRequestService;
 
         long timeout = timeoutInMilliseconds;
         if (timeoutInMilliseconds <= 0L) {
@@ -99,7 +96,7 @@ public class ScanStatusDataService extends HubService {
                 final CodeLocationView codeLocation = codeLocationDataService.getCodeLocationByName(codeLocationName);
                 final String scanSummariesLink = metaService.getFirstLinkSafely(codeLocation, MetaHandler.SCANS_LINK);
                 if (StringUtils.isNotBlank(scanSummariesLink)) {
-                    final ScanSummaryView scanSummaryView = scanSummaryRequestService.getResponse(scanSummariesLink, ScanSummaryView.class);
+                    final ScanSummaryView scanSummaryView = getResponse(scanSummariesLink, ScanSummaryView.class);
                     if (isPending(scanSummaryView.status)) {
                         pendingScans.add(scanSummaryView);
                     }
@@ -134,8 +131,8 @@ public class ScanStatusDataService extends HubService {
         final List<CodeLocationView> allCodeLocations = getAllResponses(codeLocationsLink, CodeLocationView.class);
         final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
         for (final CodeLocationView codeLocationView : allCodeLocations) {
-            final String scansLink = metaService.getFirstLinkSafely(codeLocationView, MetaHandler.SCANS_LINK);
-            final List<ScanSummaryView> codeLocationScanSummaryViews = scanSummaryRequestService.getAllScanSummaryItems(scansLink);
+            final String scansLink = metaService.getFirstLinkSafely(codeLocationView, CodeLocationView.SCANS_LINK);
+            final List<ScanSummaryView> codeLocationScanSummaryViews = getAllResponses(scansLink, ScanSummaryView.class);
             scanSummaryViews.addAll(codeLocationScanSummaryViews);
         }
         assertScansFinished(scanSummaryViews);
@@ -207,14 +204,14 @@ public class ScanStatusDataService extends HubService {
                 logger.debug("Checking codeLocation: " + codeLocationItem.name);
                 final String mappedProjectVersionUrl = codeLocationItem.mappedProjectVersion;
                 if (projectVersionUrl.equals(mappedProjectVersionUrl)) {
-                    final String scanSummariesLink = metaService.getFirstLink(codeLocationItem, MetaHandler.SCANS_LINK);
+                    final String scanSummariesLink = metaService.getFirstLink(codeLocationItem, CodeLocationView.SCANS_LINK);
                     allScanSummariesLinks.add(scanSummariesLink);
                 }
             }
 
             final List<ScanSummaryView> allScanSummaries = new ArrayList<>();
             for (final String scanSummaryLink : allScanSummariesLinks) {
-                allScanSummaries.addAll(scanSummaryRequestService.getAllScanSummaryItems(scanSummaryLink));
+                allScanSummaries.addAll(getAllResponses(scanSummaryLink, ScanSummaryView.class));
             }
 
             pendingScans = new ArrayList<>();
@@ -238,7 +235,7 @@ public class ScanStatusDataService extends HubService {
         final List<ScanSummaryView> pendingScans = new ArrayList<>();
         for (final ScanSummaryView scanSummaryItem : scanSummaries) {
             final String scanSummaryLink = metaService.getHref(scanSummaryItem);
-            final ScanSummaryView currentScanSummaryItem = scanSummaryRequestService.getResponse(scanSummaryLink, ScanSummaryView.class);
+            final ScanSummaryView currentScanSummaryItem = getResponse(scanSummaryLink, ScanSummaryView.class);
             if (isPending(currentScanSummaryItem.status)) {
                 pendingScans.add(currentScanSummaryItem);
             } else if (isError(currentScanSummaryItem.status)) {

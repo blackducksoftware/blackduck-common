@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.dataservice.codelocation;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_BOM_IMPORT;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CODE_LOCATIONS;
+import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_SCAN_SUMMARIES;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +42,7 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
 import com.blackducksoftware.integration.hub.request.HubRequest;
@@ -165,4 +167,10 @@ public class CodeLocationDataService extends HubService {
         return requestCodeLocationView;
     }
 
+    public ScanSummaryView getScanSummaryViewById(final String scanSummaryId) throws IntegrationException {
+        final List<String> segments = Arrays.asList(SEGMENT_API, SEGMENT_SCAN_SUMMARIES);
+        segments.add(scanSummaryId);
+        final HubRequest request = getHubRequestFactory().createRequest(segments);
+        return getResponse(request, ScanSummaryView.class);
+    }
 }

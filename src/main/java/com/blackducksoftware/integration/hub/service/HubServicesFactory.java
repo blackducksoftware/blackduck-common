@@ -33,7 +33,6 @@ import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
 import com.blackducksoftware.integration.hub.api.report.ReportService;
-import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
@@ -103,7 +102,7 @@ public class HubServicesFactory {
     }
 
     public ScanStatusDataService createScanStatusDataService(final long timeoutInMilliseconds) {
-        return new ScanStatusDataService(restConnection, createProjectDataService(), createCodeLocationDataService(), createScanSummaryService(), timeoutInMilliseconds);
+        return new ScanStatusDataService(restConnection, createProjectDataService(), createCodeLocationDataService(), timeoutInMilliseconds);
     }
 
     public NotificationDataService createNotificationDataService() {
@@ -132,10 +131,6 @@ public class HubServicesFactory {
 
     public HubVersionService createHubVersionService() {
         return new HubVersionService(restConnection);
-    }
-
-    public ScanSummaryService createScanSummaryService() {
-        return new ScanSummaryService(restConnection);
     }
 
     public CLIDownloadUtility createCliDownloadUtility() {
