@@ -63,7 +63,7 @@ import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 
-public class RiskReportDataService extends HubService {
+public class ReportDataService extends HubService {
     private final IntLogger logger;
     private final ProjectService projectRequestService;
     private final ProjectVersionService projectVersionRequestService;
@@ -72,7 +72,7 @@ public class RiskReportDataService extends HubService {
     private final HubSupportHelper hubSupportHelper;
     private final IntegrationEscapeUtil escapeUtil;
 
-    public RiskReportDataService(final IntLogger logger, final RestConnection restConnection, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService,
+    public ReportDataService(final IntLogger logger, final RestConnection restConnection, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService,
             final ReportService reportRequestService, final AggregateBomService bomRequestService, final HubSupportHelper hubSupportHelper, final IntegrationEscapeUtil escapeUtil) {
         super(restConnection);
         this.logger = logger;
