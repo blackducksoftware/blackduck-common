@@ -1,5 +1,5 @@
 /**
- * hub-common-response
+ * hub-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -35,6 +35,9 @@ import com.blackducksoftware.integration.hub.api.generated.model.NameValuePairVi
 public class ComponentVersionPolicyViolationCount {
     public PolicySeverityType name;
     public int value;
+
+    public ComponentVersionPolicyViolationCount() {
+    }
 
     public ComponentVersionPolicyViolationCount(final NameValuePairView nameValuePair) {
         final Set<PolicySeverityType> policySeverityTypes = EnumSet.allOf(PolicySeverityType.class);

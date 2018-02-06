@@ -1,5 +1,5 @@
 /**
- * hub-common-response
+ * hub-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -36,6 +36,9 @@ import com.blackducksoftware.integration.util.Stringable;
 public class ComponentVersionStatusCount extends Stringable {
     public PolicyStatusApprovalStatusType name;
     public int value;
+
+    public ComponentVersionStatusCount() {
+    }
 
     public ComponentVersionStatusCount(final NameValuePairView nameValuePair) {
         final Set<PolicyStatusApprovalStatusType> policyStatusTypes = EnumSet.allOf(PolicyStatusApprovalStatusType.class);
