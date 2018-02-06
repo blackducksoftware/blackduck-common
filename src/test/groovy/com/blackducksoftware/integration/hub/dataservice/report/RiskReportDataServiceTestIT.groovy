@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.report
 
+import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.experimental.categories.Category
@@ -30,6 +31,8 @@ import org.junit.rules.TemporaryFolder
 
 import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
+import com.blackducksoftware.integration.hub.service.HubServicesFactory
+import com.blackducksoftware.integration.log.IntLogger
 
 @Category(IntegrationTest.class)
 class RiskReportDataServiceTestIT {

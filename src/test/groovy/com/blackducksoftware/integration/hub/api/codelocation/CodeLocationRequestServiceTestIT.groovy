@@ -23,9 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.api.codelocation
 
-import java.io.File
-
+import org.apache.commons.lang3.StringUtils
 import org.junit.After
+import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.experimental.categories.Category
@@ -33,11 +33,21 @@ import org.junit.experimental.categories.Category
 import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest
+import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.api.project.ProjectService
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService
+import com.blackducksoftware.integration.hub.api.scan.DryRunUploadResponse
+import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
+import com.blackducksoftware.integration.hub.exception.DoesNotExistException
+import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
+import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
+import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
+import com.blackducksoftware.integration.log.LogLevel
+import com.blackducksoftware.integration.log.PrintStreamIntLogger
 
 @Category(IntegrationTest.class)
 class CodeLocationRequestServiceTestIT {

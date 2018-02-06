@@ -69,10 +69,12 @@ public class ProjectAssignmentServiceTestIT {
         final Long timestamp = (new Date()).getTime();
         final String testProjectName = "hub-common-it-ProjectAssignmentServiceTest-" + timestamp;
 
-        final String projectUrl = projectService.createHubProject(new ProjectRequest(testProjectName));
+        final ProjectRequest projectRequest = new ProjectRequest();
+        projectRequest.name = testProjectName;
+        final String projectUrl = projectService.createHubProject(projectRequest);
         System.out.println("projectUrl: " + projectUrl);
 
-        project = projectService.getView(projectUrl, ProjectView.class);
+        project = projectService.getResponse(projectUrl, ProjectView.class);
         final List<AssignedUserView> assignedUsers = projectAssignmentService.getProjectUsers(project);
         assertFalse(assignedUsers.isEmpty());
         assertEquals(1, assignedUsers.size());

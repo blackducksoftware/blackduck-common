@@ -34,6 +34,8 @@ import org.junit.experimental.categories.Category;
 import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.bom.BomImportService;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportFormatType;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectVersionRequest;
@@ -46,8 +48,6 @@ import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
@@ -117,7 +117,12 @@ public class ReportRequestServiceTestIT {
             version = versionService.getProjectVersion(project, versionName);
         } catch (final IntegrationException e) {
             try {
-                final String versionUrl = versionService.createHubVersion(project, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, versionName));
+                final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
+                projectVersionRequest.distribution = ProjectVersionDistributionType.INTERNAL;
+                projectVersionRequest.phase = ProjectVersionPhaseType.DEVELOPMENT;
+                projectVersionRequest.versionName = versionName;
+                final String versionUrl = versionService.createHubVersion(project, projectVersionRequest);
+
                 version = versionService.getResponse(versionUrl, ProjectVersionView.class);
             } catch (final IntegrationException e1) {
                 throw new RuntimeException(e1);

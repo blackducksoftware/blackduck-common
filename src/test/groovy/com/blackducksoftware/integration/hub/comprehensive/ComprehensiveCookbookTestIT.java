@@ -40,6 +40,10 @@ import org.junit.rules.TemporaryFolder;
 import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.hub.api.bom.BomImportService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
@@ -58,10 +62,6 @@ import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStat
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
-import com.blackducksoftware.integration.hub.model.enumeration.CodeLocationEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.VersionBomPolicyStatusOverallStatusEnum;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.request.HubRequestFactory;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
@@ -105,8 +105,10 @@ public class ComprehensiveCookbookTestIT {
         final int projectCount = projectRequestService.getAllProjects().size();
 
         // create the project
-        final String projectUrl = projectRequestService.createHubProject(new ProjectRequest(testProjectName));
-        final ProjectView projectItem = projectRequestService.getView(projectUrl, ProjectView.class);
+        final ProjectRequest projectRequest = new ProjectRequest();
+        projectRequest.name = testProjectName;
+        final String projectUrl = projectRequestService.createHubProject(projectRequest);
+        final ProjectView projectItem = projectRequestService.getResponse(projectUrl, ProjectView.class);
         final ProjectView projectItemFromName = projectRequestService.getProjectByName(testProjectName);
         // should return the same project
         assertEquals(projectItem.toString(), projectItemFromName.toString());
@@ -116,8 +118,12 @@ public class ComprehensiveCookbookTestIT {
 
         final int projectVersionCount = projectVersionRequestService.getAllProjectVersions(projectItem).size();
 
-        final String projectVersionUrl = projectVersionRequestService.createHubVersion(projectItem, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, "RestConnectionTest"));
-        final ProjectVersionView projectVersionItem = projectVersionRequestService.getView(projectVersionUrl, ProjectVersionView.class);
+        final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
+        projectVersionRequest.distribution = ProjectVersionDistributionType.INTERNAL;
+        projectVersionRequest.phase = ProjectVersionPhaseType.DEVELOPMENT;
+        projectVersionRequest.versionName = "RestConnectionTest";
+        final String projectVersionUrl = projectVersionRequestService.createHubVersion(projectItem, projectVersionRequest);
+        final ProjectVersionView projectVersionItem = projectVersionRequestService.getResponse(projectVersionUrl, ProjectVersionView.class);
         final ProjectVersionView projectVersionItemFromName = projectVersionRequestService.getProjectVersion(projectItem, "RestConnectionTest");
         // should return the same project version
         assertEquals(projectVersionItem.toString(), projectVersionItemFromName.toString());
@@ -149,8 +155,8 @@ public class ComprehensiveCookbookTestIT {
         final int projectCount = projectRequestService.getAllProjects().size();
 
         final String versionName = "RestConnectionTest";
-        final ProjectVersionDistributionEnum distribution = ProjectVersionDistributionEnum.INTERNAL;
-        final ProjectVersionPhaseEnum phase = ProjectVersionPhaseEnum.DEVELOPMENT;
+        final ProjectVersionDistributionType distribution = ProjectVersionDistributionType.INTERNAL;
+        final ProjectVersionPhaseType phase = ProjectVersionPhaseType.DEVELOPMENT;
         final ProjectRequestBuilder projectBuilder = new ProjectRequestBuilder();
         projectBuilder.setProjectName(testProjectName);
         projectBuilder.setVersionName(versionName);
@@ -161,7 +167,7 @@ public class ComprehensiveCookbookTestIT {
 
         // create the project
         final String projectUrl = projectRequestService.createHubProject(projectRequest);
-        final ProjectView projectItem = projectRequestService.getView(projectUrl, ProjectView.class);
+        final ProjectView projectItem = projectRequestService.getResponse(projectUrl, ProjectView.class);
         final ProjectView projectItemFromName = projectRequestService.getProjectByName(testProjectName);
         // should return the same project
         assertEquals(projectItem.toString(), projectItemFromName.toString());
@@ -216,7 +222,7 @@ public class ComprehensiveCookbookTestIT {
         System.out.println("Number of code locations: " + codeLocationItems.size());
 
         // since we imported bdio, we should also have some BOM_IMPORT code locations
-        codeLocationItems = codeLocationRequestService.getAllCodeLocationsForCodeLocationType(CodeLocationEnum.BOM_IMPORT);
+        codeLocationItems = codeLocationRequestService.getAllCodeLocationsForCodeLocationType(CodeLocationType.BOM_IMPORT);
         assertTrue(codeLocationItems != null && codeLocationItems.size() > 0);
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             for (final CodeLocationView item : codeLocationItems) {
@@ -226,7 +232,7 @@ public class ComprehensiveCookbookTestIT {
 
         // verify the policy
         final VersionBomPolicyStatusView policyStatusItem = policyStatusDataService.getPolicyStatusForProjectAndVersion("ek_mtglist", "0.0.1");
-        assertEquals(VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION, policyStatusItem.overallStatus);
+        assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
         System.out.println(policyStatusItem);
 
         // TODO write a decent test for notifications
@@ -311,7 +317,7 @@ public class ComprehensiveCookbookTestIT {
 
         // verify the policy
         final VersionBomPolicyStatusView policyStatusItem = policyStatusDataService.getPolicyStatusForVersion(version);
-        assertEquals(VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION, policyStatusItem.overallStatus);
+        assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
         System.out.println(policyStatusItem);
     }
 

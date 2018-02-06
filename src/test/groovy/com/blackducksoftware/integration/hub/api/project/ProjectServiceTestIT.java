@@ -35,13 +35,13 @@ import org.junit.experimental.categories.Category;
 
 import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
@@ -76,13 +76,30 @@ public class ProjectServiceTestIT {
         final String testProjectVersion2Name = "2";
         final String testProjectVersion3Name = "3";
 
-        final String projectUrl = projectRequestService.createHubProject(new ProjectRequest(testProjectName));
+        final ProjectRequest projectRequest = new ProjectRequest();
+        projectRequest.name = testProjectName;
+        final String projectUrl = projectRequestService.createHubProject(projectRequest);
         System.out.println("projectUrl: " + projectUrl);
 
-        project = projectRequestService.getView(projectUrl, ProjectView.class);
-        projectVersionRequestService.createHubVersion(project, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion1Name));
-        projectVersionRequestService.createHubVersion(project, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion2Name));
-        projectVersionRequestService.createHubVersion(project, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion3Name));
+        project = projectRequestService.getResponse(projectUrl, ProjectView.class);
+        final ProjectVersionRequest projectVersionRequest1 = new ProjectVersionRequest();
+        projectVersionRequest1.distribution = ProjectVersionDistributionType.INTERNAL;
+        projectVersionRequest1.phase = ProjectVersionPhaseType.DEVELOPMENT;
+        projectVersionRequest1.versionName = testProjectVersion1Name;
+
+        final ProjectVersionRequest projectVersionRequest2 = new ProjectVersionRequest();
+        projectVersionRequest2.distribution = ProjectVersionDistributionType.INTERNAL;
+        projectVersionRequest2.phase = ProjectVersionPhaseType.DEVELOPMENT;
+        projectVersionRequest2.versionName = testProjectVersion2Name;
+
+        final ProjectVersionRequest projectVersionRequest3 = new ProjectVersionRequest();
+        projectVersionRequest3.distribution = ProjectVersionDistributionType.INTERNAL;
+        projectVersionRequest3.phase = ProjectVersionPhaseType.DEVELOPMENT;
+        projectVersionRequest3.versionName = testProjectVersion3Name;
+
+        projectVersionRequestService.createHubVersion(project, projectVersionRequest1);
+        projectVersionRequestService.createHubVersion(project, projectVersionRequest2);
+        projectVersionRequestService.createHubVersion(project, projectVersionRequest3);
 
         final ProjectVersionView projectVersion1 = projectVersionRequestService.getProjectVersion(project, testProjectVersion1Name);
         assertEquals(testProjectVersion1Name, projectVersion1.versionName);
@@ -97,7 +114,7 @@ public class ProjectServiceTestIT {
         project = null;
 
         try {
-            project = projectRequestService.getView(projectUrl, ProjectView.class);
+            project = projectRequestService.getResponse(projectUrl, ProjectView.class);
             if (project != null) {
                 fail("This project should have been deleted");
             }

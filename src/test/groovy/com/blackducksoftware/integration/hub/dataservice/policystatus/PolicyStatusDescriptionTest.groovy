@@ -23,7 +23,11 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.policystatus
 
+import org.junit.Assert
 import org.junit.Test
+
+import com.blackducksoftware.integration.hub.api.generated.model.ComponentVersionPolicyViolationDetails
+import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView
 
 class PolicyStatusDescriptionTest {
 

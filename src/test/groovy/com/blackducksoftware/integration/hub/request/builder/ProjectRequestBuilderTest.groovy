@@ -23,7 +23,13 @@
  */
 package com.blackducksoftware.integration.hub.request.builder
 
+import java.text.SimpleDateFormat
+
+import org.junit.Assert
 import org.junit.Test
+
+import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest
+import com.blackducksoftware.integration.hub.rest.RestConnection
 
 class ProjectRequestBuilderTest {
 
