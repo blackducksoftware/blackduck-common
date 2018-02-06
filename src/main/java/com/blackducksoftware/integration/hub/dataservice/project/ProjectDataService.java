@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.component.ComponentService;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.response.AssignedUserGroupView;
 import com.blackducksoftware.integration.hub.api.generated.view.AssignedUserView;
@@ -42,6 +41,7 @@ import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentServic
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
+import com.blackducksoftware.integration.hub.dataservice.component.ComponentDataService;
 import com.blackducksoftware.integration.hub.dataservice.component.model.VersionBomComponentModel;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.request.HubRequest;
@@ -57,16 +57,16 @@ public class ProjectDataService extends HubService {
     private final ProjectService projectRequestService;
     private final ProjectVersionService projectVersionRequestService;
     private final ProjectAssignmentService projectAssignmentRequestService;
-    private final ComponentService componentRequestService;
+    private final ComponentDataService componentDataService;
 
     public ProjectDataService(final RestConnection restConnection, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService,
-            final ProjectAssignmentService projectAssignmentRequestService, final ComponentService componentRequestService) {
+            final ProjectAssignmentService projectAssignmentRequestService, final ComponentDataService componentDataService) {
         super(restConnection);
         this.logger = restConnection.logger;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.projectAssignmentRequestService = projectAssignmentRequestService;
-        this.componentRequestService = componentRequestService;
+        this.componentDataService = componentDataService;
     }
 
     public ProjectVersionWrapper getProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
@@ -182,7 +182,7 @@ public class ProjectDataService extends HubService {
         final ProjectVersionView projectVersionView = projectVersionRequestService.getProjectVersion(projectView, projectVersionName);
         final String projectVersionComponentsUrl = projectVersionRequestService.getFirstLink(projectVersionView, ProjectVersionView.COMPONENTS_LINK);
 
-        final ComponentSearchResultView componentSearchResultView = componentRequestService.getExactComponentMatch(componentExternalId);
+        final ComponentSearchResultView componentSearchResultView = componentDataService.getExactComponentMatch(componentExternalId);
         final String componentVersionUrl = componentSearchResultView.version;
 
         addComponentToProjectVersion("application/json", projectVersionComponentsUrl, componentVersionUrl);

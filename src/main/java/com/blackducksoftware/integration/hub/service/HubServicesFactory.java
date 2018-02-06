@@ -33,7 +33,6 @@ import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.bom.BomComponentIssueService;
 import com.blackducksoftware.integration.hub.api.bom.BomImportService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
-import com.blackducksoftware.integration.hub.api.component.ComponentService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigService;
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionService;
 import com.blackducksoftware.integration.hub.api.group.GroupService;
@@ -64,7 +63,6 @@ import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataServ
 import com.blackducksoftware.integration.hub.dataservice.report.ReportDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.user.UserDataService;
-import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
@@ -133,12 +131,8 @@ public class HubServicesFactory {
         return new ExtensionConfigDataService(restConnection.logger, restConnection, createUserService(), createExtensionConfigService(), createExtensionUserOptionService());
     }
 
-    public VulnerabilityDataService createVulnerabilityDataService() {
-        return new VulnerabilityDataService(restConnection.logger, createComponentService(), createVulnerabilityService());
-    }
-
     public LicenseDataService createLicenseDataService() {
-        return new LicenseDataService(createComponentService(), createLicenseService());
+        return new LicenseDataService(restConnection, createComponentDataService(), createLicenseService());
     }
 
     public BomImportService createBomImportService() {
@@ -147,10 +141,6 @@ public class HubServicesFactory {
 
     public CodeLocationService createCodeLocationService() {
         return new CodeLocationService(restConnection);
-    }
-
-    public ComponentService createComponentService() {
-        return new ComponentService(restConnection);
     }
 
     public HubVersionService createHubVersionService() {
@@ -245,7 +235,7 @@ public class HubServicesFactory {
     }
 
     public ComponentDataService createComponentDataService() {
-        return new ComponentDataService(restConnection.logger, createComponentService());
+        return new ComponentDataService(restConnection, createVulnerabilityService());
     }
 
     public BomComponentIssueService createBomComponentIssueService() {
@@ -253,7 +243,7 @@ public class HubServicesFactory {
     }
 
     public ProjectDataService createProjectDataService() {
-        return new ProjectDataService(restConnection, createProjectService(), createProjectVersionService(), createProjectAssignmentService(), createComponentService());
+        return new ProjectDataService(restConnection, createProjectService(), createProjectVersionService(), createProjectAssignmentService(), createComponentDataService());
     }
 
     public UserDataService createUserDataService() {
