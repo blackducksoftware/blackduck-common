@@ -38,7 +38,6 @@ import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigServic
 import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionService;
 import com.blackducksoftware.integration.hub.api.group.GroupService;
 import com.blackducksoftware.integration.hub.api.license.LicenseService;
-import com.blackducksoftware.integration.hub.api.matchedfiles.MatchedFilesService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
 import com.blackducksoftware.integration.hub.api.notification.NotificationService;
@@ -204,10 +203,6 @@ public class HubServicesFactory {
 
     public VulnerableBomComponentService createVulnerableBomComponentService() {
         return new VulnerableBomComponentService(restConnection);
-    }
-
-    public MatchedFilesService createMatchedFilesService() {
-        return new MatchedFilesService(restConnection);
     }
 
     public CLIDownloadUtility createCliDownloadUtility() {
