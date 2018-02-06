@@ -30,8 +30,6 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionService;
 import com.blackducksoftware.integration.hub.api.group.GroupService;
 import com.blackducksoftware.integration.hub.api.license.LicenseService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
@@ -127,7 +125,7 @@ public class HubServicesFactory {
     }
 
     public ExtensionConfigDataService createExtensionConfigDataService() {
-        return new ExtensionConfigDataService(restConnection.logger, restConnection, createUserService(), createExtensionConfigService(), createExtensionUserOptionService());
+        return new ExtensionConfigDataService(restConnection.logger, restConnection, createUserService(), createHubService());
     }
 
     public LicenseDataService createLicenseDataService() {
@@ -180,14 +178,6 @@ public class HubServicesFactory {
 
     public VulnerabilityService createVulnerabilityService() {
         return new VulnerabilityService(restConnection);
-    }
-
-    public ExtensionConfigService createExtensionConfigService() {
-        return new ExtensionConfigService(restConnection);
-    }
-
-    public ExtensionUserOptionService createExtensionUserOptionService() {
-        return new ExtensionUserOptionService(restConnection);
     }
 
     public VulnerableBomComponentService createVulnerableBomComponentService() {

@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionService;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionConfigValueView;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionView;
@@ -44,17 +42,12 @@ import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ExtensionConfigDataService extends HubService {
-    private final ExtensionConfigService extensionConfigRequestService;
     private final UserConfigTransform userConfigTransform;
-    private final ExtensionUserOptionService extensionUserOptionRequestService;
     private final ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor;
 
-    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserService userRequestService, final ExtensionConfigService extensionConfigRequestService,
-            final ExtensionUserOptionService extensionUserOptionRequestService) {
+    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserService userRequestService, final HubService hubService) {
         super(restConnection);
-        this.extensionConfigRequestService = extensionConfigRequestService;
-        this.extensionUserOptionRequestService = extensionUserOptionRequestService;
-        userConfigTransform = new UserConfigTransform(userRequestService, extensionConfigRequestService);
+        userConfigTransform = new UserConfigTransform(userRequestService, hubService);
         parallelProcessor = new ParallelResourceProcessor<>(logger);
         parallelProcessor.addTransform(ExternalExtensionUserView.class, userConfigTransform);
     }
@@ -70,13 +63,13 @@ public class ExtensionConfigDataService extends HubService {
     public ParallelResourceProcessorResults<UserConfigItem> getUserConfigList(final String extensionUrl) throws IntegrationException {
         final ExternalExtensionView extension = getResponse(extensionUrl, ExternalExtensionView.class);
         final String userOptionsLink = getFirstLink(extension, MetaHandler.USER_OPTIONS_LINK);
-        final List<ExternalExtensionUserView> userOptionList = extensionUserOptionRequestService.getUserOptions(userOptionsLink);
+        final List<ExternalExtensionUserView> userOptionList = getAllResponses(userOptionsLink, ExternalExtensionUserView.class);
         final ParallelResourceProcessorResults<UserConfigItem> itemList = parallelProcessor.process(userOptionList);
         return itemList;
     }
 
     private Map<String, ExternalExtensionConfigValueView> createGlobalConfigMap(final String globalConfigUrl) throws IntegrationException {
-        final List<ExternalExtensionConfigValueView> itemList = extensionConfigRequestService.getGlobalOptions(globalConfigUrl);
+        final List<ExternalExtensionConfigValueView> itemList = getAllResponses(globalConfigUrl, ExternalExtensionConfigValueView.class);
         final Map<String, ExternalExtensionConfigValueView> itemMap = createConfigMap(itemList);
         return itemMap;
     }
