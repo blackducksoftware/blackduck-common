@@ -30,7 +30,6 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomService;
 import com.blackducksoftware.integration.hub.api.bom.BomComponentIssueService;
 import com.blackducksoftware.integration.hub.api.bom.BomImportService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
@@ -111,7 +110,7 @@ public class HubServicesFactory {
     }
 
     public ReportDataService createReportDataService(final long timeoutInMilliseconds) throws IntegrationException {
-        return new ReportDataService(restConnection.logger, restConnection, createProjectService(), createProjectVersionService(), createReportService(timeoutInMilliseconds), createAggregateBomService(), createCheckedHubSupport(),
+        return new ReportDataService(restConnection.logger, restConnection, createProjectService(), createProjectVersionService(), createReportService(timeoutInMilliseconds), createProjectDataService(), createCheckedHubSupport(),
                 createIntegrationEscapeUtil());
     }
 
@@ -232,10 +231,6 @@ public class HubServicesFactory {
         return new ReportService(restConnection, restConnection.logger, timeoutInMilliseconds);
     }
 
-    public AggregateBomService createAggregateBomService() {
-        return new AggregateBomService(restConnection);
-    }
-
     public HubService createHubService() {
         return new HubService(restConnection);
     }
@@ -255,7 +250,7 @@ public class HubServicesFactory {
     }
 
     public ComponentDataService createComponentDataService() {
-        return new ComponentDataService(restConnection.logger, createProjectService(), createProjectVersionService(), createComponentService(), createAggregateBomService(), createMatchedFilesService());
+        return new ComponentDataService(restConnection.logger, createComponentService());
     }
 
     public BomComponentIssueService createBomComponentIssueService() {
@@ -263,7 +258,7 @@ public class HubServicesFactory {
     }
 
     public ProjectDataService createProjectDataService() {
-        return new ProjectDataService(restConnection, createProjectService(), createProjectVersionService(), createProjectAssignmentService());
+        return new ProjectDataService(restConnection, createProjectService(), createProjectVersionService(), createProjectAssignmentService(), createComponentService());
     }
 
     public UserDataService createUserDataService() {
