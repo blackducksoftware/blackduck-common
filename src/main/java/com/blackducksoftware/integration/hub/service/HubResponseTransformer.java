@@ -28,8 +28,8 @@ import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.HubResponse;
-import com.blackducksoftware.integration.hub.api.HubView;
+import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import com.blackducksoftware.integration.hub.api.core.HubView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubRequest;

@@ -21,26 +21,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.notification.transformer;
+package com.blackducksoftware.integration.hub.api.enumeration;
 
-import java.util.List;
-
-import com.blackducksoftware.integration.hub.api.HubResponse;
-import com.google.gson.annotations.SerializedName;
-
-public class VulnerabilityNotificationContent extends HubResponse {
-    public int newVulnerabilityCount;
-    public int updatedVulnerabilityCount;
-    public int deletedVulnerabilityCount;
-    public List<VulnerabilitySourceQualifiedId> newVulnerabilityIds;
-    public List<VulnerabilitySourceQualifiedId> updatedVulnerabilityIds;
-    public List<VulnerabilitySourceQualifiedId> deletedVulnerabilityIds;
-
-    @SerializedName("componentVersion")
-    public String componentVersionLink;
-
-    public String componentName;
-    public String versionName;
-    public List<AffectedProjectVersion> affectedProjectVersions;
+public enum ScanSummaryStatusType {
+    UNSTARTED,
+    SCANNING,
+    SAVING_SCAN_DATA,
+    SCAN_DATA_SAVE_COMPLETE,
+    REQUESTED_MATCH_JOB,
+    MATCHING,
+    BOM_VERSION_CHECK,
+    BUILDING_BOM,
+    COMPLETE,
+    CANCELLED,
+    CLONED,
+    ERROR_SCANNING,
+    ERROR_SAVING_SCAN_DATA,
+    ERROR_MATCHING,
+    ERROR_BUILDING_BOM,
+    ERROR;
 
 }

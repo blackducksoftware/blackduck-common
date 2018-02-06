@@ -32,13 +32,12 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.model.response.VersionComparison;
+import com.blackducksoftware.integration.hub.api.response.VersionComparison;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.util.ResourceUtil;
 
 import okhttp3.Response;
 
@@ -59,7 +58,7 @@ public class HubVersionService extends HubService {
             final String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
             return hubVersion;
         } finally {
-            IOUtils.closeQuietly(response);
+            ResourceUtil.closeQuietly(response);
         }
     }
 
@@ -72,7 +71,7 @@ public class HubVersionService extends HubService {
             final VersionComparison versionComparison = getGson().fromJson(jsonResponse, VersionComparison.class);
             return versionComparison;
         } finally {
-            IOUtils.closeQuietly(response);
+            ResourceUtil.closeQuietly(response);
         }
     }
 

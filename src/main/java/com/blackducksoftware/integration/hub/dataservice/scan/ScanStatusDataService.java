@@ -33,7 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
-import com.blackducksoftware.integration.hub.api.enumeration.ScanSummaryStatusEnum;
+import com.blackducksoftware.integration.hub.api.enumeration.ScanSummaryStatusType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
@@ -248,24 +248,24 @@ public class ScanStatusDataService {
         return pendingScans;
     }
 
-    private static final Set<ScanSummaryStatusEnum> PENDING_STATES = EnumSet.of(ScanSummaryStatusEnum.UNSTARTED, ScanSummaryStatusEnum.SCANNING, ScanSummaryStatusEnum.SAVING_SCAN_DATA, ScanSummaryStatusEnum.SCAN_DATA_SAVE_COMPLETE,
-            ScanSummaryStatusEnum.REQUESTED_MATCH_JOB, ScanSummaryStatusEnum.MATCHING, ScanSummaryStatusEnum.BOM_VERSION_CHECK, ScanSummaryStatusEnum.BUILDING_BOM);
+    private static final Set<ScanSummaryStatusType> PENDING_STATES = EnumSet.of(ScanSummaryStatusType.UNSTARTED, ScanSummaryStatusType.SCANNING, ScanSummaryStatusType.SAVING_SCAN_DATA, ScanSummaryStatusType.SCAN_DATA_SAVE_COMPLETE,
+            ScanSummaryStatusType.REQUESTED_MATCH_JOB, ScanSummaryStatusType.MATCHING, ScanSummaryStatusType.BOM_VERSION_CHECK, ScanSummaryStatusType.BUILDING_BOM);
 
-    private static final Set<ScanSummaryStatusEnum> DONE_STATES = EnumSet.of(ScanSummaryStatusEnum.COMPLETE, ScanSummaryStatusEnum.CANCELLED, ScanSummaryStatusEnum.CLONED, ScanSummaryStatusEnum.ERROR_SCANNING,
-            ScanSummaryStatusEnum.ERROR_SAVING_SCAN_DATA, ScanSummaryStatusEnum.ERROR_MATCHING, ScanSummaryStatusEnum.ERROR_BUILDING_BOM, ScanSummaryStatusEnum.ERROR);
+    private static final Set<ScanSummaryStatusType> DONE_STATES = EnumSet.of(ScanSummaryStatusType.COMPLETE, ScanSummaryStatusType.CANCELLED, ScanSummaryStatusType.CLONED, ScanSummaryStatusType.ERROR_SCANNING,
+            ScanSummaryStatusType.ERROR_SAVING_SCAN_DATA, ScanSummaryStatusType.ERROR_MATCHING, ScanSummaryStatusType.ERROR_BUILDING_BOM, ScanSummaryStatusType.ERROR);
 
-    private static final Set<ScanSummaryStatusEnum> ERROR_STATES = EnumSet.of(ScanSummaryStatusEnum.CANCELLED, ScanSummaryStatusEnum.ERROR_SCANNING, ScanSummaryStatusEnum.ERROR_SAVING_SCAN_DATA, ScanSummaryStatusEnum.ERROR_MATCHING,
-            ScanSummaryStatusEnum.ERROR_BUILDING_BOM, ScanSummaryStatusEnum.ERROR);
+    private static final Set<ScanSummaryStatusType> ERROR_STATES = EnumSet.of(ScanSummaryStatusType.CANCELLED, ScanSummaryStatusType.ERROR_SCANNING, ScanSummaryStatusType.ERROR_SAVING_SCAN_DATA, ScanSummaryStatusType.ERROR_MATCHING,
+            ScanSummaryStatusType.ERROR_BUILDING_BOM, ScanSummaryStatusType.ERROR);
 
-    public boolean isPending(final ScanSummaryStatusEnum statusEnum) {
+    public boolean isPending(final ScanSummaryStatusType statusEnum) {
         return PENDING_STATES.contains(statusEnum);
     }
 
-    public boolean isDone(final ScanSummaryStatusEnum statusEnum) {
+    public boolean isDone(final ScanSummaryStatusType statusEnum) {
         return DONE_STATES.contains(statusEnum);
     }
 
-    public boolean isError(final ScanSummaryStatusEnum statusEnum) {
+    public boolean isError(final ScanSummaryStatusType statusEnum) {
         return ERROR_STATES.contains(statusEnum);
     }
 

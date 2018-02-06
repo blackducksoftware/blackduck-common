@@ -29,19 +29,18 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
+import com.blackducksoftware.integration.hub.api.enumeration.PolicySeverityType;
 import com.blackducksoftware.integration.hub.api.generated.model.NameValuePairView;
-import com.blackducksoftware.integration.util.Stringable;
 
-public class ComponentVersionStatusCount extends Stringable {
-    public PolicyStatusApprovalStatusType name;
+public class ComponentVersionPolicyViolationCount {
+    public PolicySeverityType name;
     public int value;
 
-    public ComponentVersionStatusCount(final NameValuePairView nameValuePair) {
-        final Set<PolicyStatusApprovalStatusType> policyStatusTypes = EnumSet.allOf(PolicyStatusApprovalStatusType.class);
-        final Set<String> policyStatusTypeValues = policyStatusTypes.stream().map(Object::toString).collect(Collectors.toSet());
+    public ComponentVersionPolicyViolationCount(final NameValuePairView nameValuePair) {
+        final Set<PolicySeverityType> policySeverityTypes = EnumSet.allOf(PolicySeverityType.class);
+        final Set<String> policyStatusTypeValues = policySeverityTypes.stream().map(Object::toString).collect(Collectors.toSet());
         if (policyStatusTypeValues.contains(nameValuePair.name)) {
-            name = PolicyStatusApprovalStatusType.valueOf(nameValuePair.name);
+            name = PolicySeverityType.valueOf(nameValuePair.name);
         }
 
         if (StringUtils.isNumeric(nameValuePair.value)) {

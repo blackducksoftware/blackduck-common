@@ -26,9 +26,9 @@ package com.blackducksoftware.integration.hub.dataservice.model;
 import java.util.Collections;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.enumeration.PolicyRuleConditionType;
 import com.blackducksoftware.integration.hub.api.generated.model.PolicyRuleExpression;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.model.view.components.PolicyRuleConditionEnum;
 
 public class PolicyRuleModel {
     private final PolicyRuleView rule;
@@ -54,13 +54,13 @@ public class PolicyRuleModel {
         boolean hasNonProjectLevelCondition = false;
 
         for (final PolicyRuleExpression expression : getExpressionList()) {
-            final PolicyRuleConditionEnum condition = PolicyRuleConditionType.valueOf(expression.name);
-            if (condition == PolicyRuleConditionEnum.UNKNOWN_RULE_CONDTION) {
+            final PolicyRuleConditionType condition = PolicyRuleConditionType.valueOf(expression.name);
+            if (condition == PolicyRuleConditionType.UNKNOWN_RULE_CONDTION) {
                 continue;
             }
-            if (condition != PolicyRuleConditionEnum.PROJECT_TIER
-                    && condition != PolicyRuleConditionEnum.VERSION_PHASE
-                    && condition != PolicyRuleConditionEnum.VERSION_DISTRIBUTION) {
+            if (condition != PolicyRuleConditionType.PROJECT_TIER
+                    && condition != PolicyRuleConditionType.VERSION_PHASE
+                    && condition != PolicyRuleConditionType.VERSION_DISTRIBUTION) {
                 hasNonProjectLevelCondition = true;
             }
         }

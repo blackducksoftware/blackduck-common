@@ -35,14 +35,12 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicySta
 import com.blackducksoftware.integration.hub.api.generated.model.ComponentVersionPolicyViolationDetails;
 import com.blackducksoftware.integration.hub.api.generated.model.NameValuePairView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView;
-import com.blackducksoftware.integration.hub.model.enumeration.PolicySeverityEnum;
-import com.blackducksoftware.integration.hub.model.view.components.ComponentVersionPolicyViolationCount;
 
 public class PolicyStatusDescription {
     private final VersionBomPolicyStatusView policyStatusItem;
 
     private final Map<PolicyStatusApprovalStatusType, ComponentVersionStatusCount> policyStatusCount = new HashMap<>();
-    private final Map<PolicySeverityType, NameValuePairView> policySeverityCount = new HashMap<>();
+    private final Map<PolicySeverityType, ComponentVersionPolicyViolationCount> policySeverityCount = new HashMap<>();
 
     public PolicyStatusDescription(final VersionBomPolicyStatusView policyStatusItem) {
         this.policyStatusItem = policyStatusItem;
@@ -53,11 +51,12 @@ public class PolicyStatusDescription {
     private void populatePolicySeverityMap() {
         final ComponentVersionPolicyViolationDetails policyViolationDetails = policyStatusItem.componentVersionPolicyViolationDetails;
         if (policyViolationDetails != null && PolicyStatusApprovalStatusType.IN_VIOLATION.equals(policyStatusItem.overallStatus)) {
-            final List<NameValuePairView> severityLevels = policyViolationDetails.severityLevels;
-            if (policyViolationDetails.severityLevels != null) {
-                for (final NameValuePairView count : severityLevels) {
-                    if (count.name != null) {
-                        policySeverityCount.put(count.name, count);
+            final List<NameValuePairView> nameValuePairs = policyViolationDetails.severityLevels;
+            if (nameValuePairs != null) {
+                for (final NameValuePairView nameValuePairView : nameValuePairs) {
+                    if (nameValuePairView.name != null) {
+                        final ComponentVersionPolicyViolationCount componentVersionPolicyViolationCount = new ComponentVersionPolicyViolationCount(nameValuePairView);
+                        policySeverityCount.put(componentVersionPolicyViolationCount.name, componentVersionPolicyViolationCount);
                     }
                 }
             }
@@ -65,11 +64,12 @@ public class PolicyStatusDescription {
     }
 
     private void populatePolicyStatusMap() {
-        final List<ComponentVersionStatusCount> versionStatusCounts = policyStatusItem.componentVersionStatusCounts;
-        if (versionStatusCounts != null) {
-            for (final ComponentVersionStatusCount policyStatus : versionStatusCounts) {
-                if (policyStatus.name != null) {
-                    policyStatusCount.put(policyStatus.name, policyStatus);
+        final List<NameValuePairView> nameValuePairs = policyStatusItem.componentVersionStatusCounts;
+        if (nameValuePairs != null) {
+            for (final NameValuePairView nameValuePairView : nameValuePairs) {
+                if (nameValuePairView.name != null) {
+                    final ComponentVersionStatusCount componentVersionStatusCount = new ComponentVersionStatusCount(nameValuePairView);
+                    policyStatusCount.put(componentVersionStatusCount.name, componentVersionStatusCount);
                 }
             }
         }
@@ -104,7 +104,7 @@ public class PolicyStatusDescription {
     private void getPolicySeverityMessage(final StringBuilder stringBuilder) {
         final List<String> policySeverityItems = new ArrayList<>();
         stringBuilder.append("Policy Severity counts: ");
-        for (final PolicySeverityEnum policySeverityEnum : policySeverityCount.keySet()) {
+        for (final PolicySeverityType policySeverityEnum : policySeverityCount.keySet()) {
             final ComponentVersionPolicyViolationCount policySeverity = policySeverityCount.get(policySeverityEnum);
             if (policySeverity != null) {
                 policySeverityItems.add(policySeverity.value + " component(s) have a severity level of " + policySeverityEnum.toString());
@@ -133,7 +133,7 @@ public class PolicyStatusDescription {
         return count.value;
     }
 
-    public int getCountOfSeverity(final PolicySeverityEnum severity) {
+    public int getCountOfSeverity(final PolicySeverityType severity) {
         final ComponentVersionPolicyViolationCount count = policySeverityCount.get(severity);
         if (count == null) {
             return 0;

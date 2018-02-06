@@ -28,11 +28,10 @@ import java.net.URL;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.HttpAllow;
-import com.blackducksoftware.integration.hub.api.HubLink;
-import com.blackducksoftware.integration.hub.api.HubMeta;
-import com.blackducksoftware.integration.hub.api.HubResponse;
-import com.blackducksoftware.integration.hub.api.HubView;
+import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import com.blackducksoftware.integration.hub.api.core.HubView;
+import com.blackducksoftware.integration.hub.api.generated.model.ResourceLink;
+import com.blackducksoftware.integration.hub.api.generated.model.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
@@ -108,15 +107,15 @@ public class HubService {
         return metaHandler.getLinks(view, linkKey);
     }
 
-    public HubMeta getMetaView(final HubView view) throws HubIntegrationException {
+    public ResourceMetadata getMetaView(final HubView view) throws HubIntegrationException {
         return metaHandler.getMetaView(view);
     }
 
-    public List<HubLink> getLinkViews(final HubView view) throws HubIntegrationException {
+    public List<ResourceLink> getLinkViews(final HubView view) throws HubIntegrationException {
         return metaHandler.getLinkViews(view);
     }
 
-    public List<HttpAllow> getAllowedMethods(final HubView view) throws HubIntegrationException {
+    public List<String> getAllowedMethods(final HubView view) throws HubIntegrationException {
         return metaHandler.getAllowedMethods(view);
     }
 

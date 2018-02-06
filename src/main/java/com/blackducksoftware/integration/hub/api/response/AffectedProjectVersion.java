@@ -21,11 +21,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.notification.transformer;
+package com.blackducksoftware.integration.hub.api.response;
 
-import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
+import com.blackducksoftware.integration.hub.api.core.HubResponse;
 
-public class RuleViolationClearedNotificationView extends NotificationView {
-    public RuleViolationClearedNotificationContent content;
+public class AffectedProjectVersion extends HubResponse {
+    public String projectName;
+    public String projectVersionName;
+    public String projectVersion;
+    public String componentIssueUrl;
 
 }

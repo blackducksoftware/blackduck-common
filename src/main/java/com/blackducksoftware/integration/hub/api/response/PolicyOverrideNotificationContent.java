@@ -21,14 +21,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.notification.transformer;
+package com.blackducksoftware.integration.hub.api.response;
 
-import com.blackducksoftware.integration.hub.api.HubResponse;
+import java.util.List;
 
-public class AffectedProjectVersion extends HubResponse {
+import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import com.google.gson.annotations.SerializedName;
+
+public class PolicyOverrideNotificationContent extends HubResponse {
     public String projectName;
     public String projectVersionName;
-    public String projectVersion;
-    public String componentIssueUrl;
+    public String componentName;
+    public String componentVersionName;
+    public String firstName;
+    public String lastName;
+
+    @SerializedName("projectVersion")
+    public String projectVersionLink;
+
+    // If version is specified, componentVersionLink will be populated
+    // otherwise it will be null
+    @SerializedName("componentVersion")
+    public String componentVersionLink;
+
+    // If version is not specified, componentLink will be populated
+    // otherwise it will be null
+    @SerializedName("component")
+    public String componentLink;
+
+    @SerializedName("bomComponentVersionPolicyStatus")
+    public String bomComponentVersionPolicyStatusLink;
+
+    public List<String> policies;
 
 }

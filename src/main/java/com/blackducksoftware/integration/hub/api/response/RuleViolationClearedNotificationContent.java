@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * hub-common-response
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -21,24 +21,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.view;
+package com.blackducksoftware.integration.hub.api.response;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.core.HubView;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import com.google.gson.annotations.SerializedName;
 
-public class HubViewFilter<T extends HubView> {
-    public List<T> getAccessibleItems(final MetaHandler metaService, final List<T> hubItems) throws HubIntegrationException {
-        final List<T> accessibleItems = new ArrayList<>();
-        for (final T hubItem : hubItems) {
-            final List<String> allow = metaService.getAllowedMethods(hubItem);
-            if (allow != null && !allow.isEmpty() && allow.contains("GET") && allow.contains("PUT")) {
-                accessibleItems.add(hubItem);
-            }
-        }
-        return accessibleItems;
-    }
+public class RuleViolationClearedNotificationContent extends HubResponse {
+    public String projectName;
+    public String projectVersionName;
+    public int componentVersionsInViolation;
+    public List<ComponentVersionStatus> componentVersionStatuses;
+
+    @SerializedName("projectVersion")
+    public String projectVersionLink;
 
 }

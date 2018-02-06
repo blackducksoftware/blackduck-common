@@ -21,11 +21,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.notification.transformer;
+package com.blackducksoftware.integration.hub.api.view;
 
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
+import com.blackducksoftware.integration.hub.api.response.PolicyOverrideNotificationContent;
 
-public class VulnerabilityNotificationView extends NotificationView {
-    public VulnerabilityNotificationContent content;
+public class PolicyOverrideNotificationView extends NotificationView {
+    public PolicyOverrideNotificationContent content;
 
 }
