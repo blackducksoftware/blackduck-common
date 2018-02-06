@@ -30,7 +30,6 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.group.GroupService;
 import com.blackducksoftware.integration.hub.api.license.LicenseService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
@@ -59,7 +58,7 @@ import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStat
 import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.dataservice.report.ReportDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
-import com.blackducksoftware.integration.hub.dataservice.user.UserDataService;
+import com.blackducksoftware.integration.hub.dataservice.user.UserGroupDataService;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
@@ -172,10 +171,6 @@ public class HubServicesFactory {
         return new UserService(restConnection);
     }
 
-    public GroupService createGroupService() {
-        return new GroupService(restConnection);
-    }
-
     public VulnerabilityService createVulnerabilityService() {
         return new VulnerabilityService(restConnection);
     }
@@ -235,8 +230,8 @@ public class HubServicesFactory {
         return new ProjectDataService(restConnection, createProjectService(), createProjectVersionService(), createProjectAssignmentService(), createComponentDataService());
     }
 
-    public UserDataService createUserDataService() {
-        return new UserDataService(restConnection.logger, createProjectService(), createUserService());
+    public UserGroupDataService createUserGroupDataService() {
+        return new UserGroupDataService(restConnection, createProjectService(), createUserService());
     }
 
     @Override

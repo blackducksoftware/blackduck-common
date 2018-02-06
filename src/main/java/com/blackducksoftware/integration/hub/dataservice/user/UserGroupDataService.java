@@ -27,21 +27,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.response.AssignedProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.RoleView;
+import com.blackducksoftware.integration.hub.api.generated.view.UserGroupView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.user.UserService;
+import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class UserDataService {
+public class UserGroupDataService extends HubService {
     private final IntLogger logger;
     private final UserService userRequestService;
     private final ProjectService projectRequestService;
 
-    public UserDataService(final IntLogger logger, final ProjectService projectRequestService, final UserService userRequestService) {
-        this.logger = logger;
+    public UserGroupDataService(final RestConnection restConnection, final ProjectService projectRequestService, final UserService userRequestService) {
+        super(restConnection);
+        this.logger = restConnection.logger;
         this.projectRequestService = projectRequestService;
         this.userRequestService = userRequestService;
     }
@@ -73,6 +79,16 @@ public class UserDataService {
 
     public List<RoleView> getRolesForUser(final UserView userView) throws IntegrationException {
         return userRequestService.getUserRoles(userView);
+    }
+
+    public UserGroupView getGroupByName(final String groupName) throws IntegrationException {
+        final List<UserGroupView> allGroups = getAllResponsesFromApi(ApiDiscovery.USERGROUPS_LINK, UserGroupView.class);
+        for (final UserGroupView group : allGroups) {
+            if (group.name.equalsIgnoreCase(groupName)) {
+                return group;
+            }
+        }
+        throw new DoesNotExistException("This Group does not exist. Group name : " + groupName);
     }
 
 }
