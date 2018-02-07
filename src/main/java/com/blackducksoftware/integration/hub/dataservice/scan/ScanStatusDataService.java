@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
 import com.blackducksoftware.integration.hub.api.enumeration.ScanSummaryStatusType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
@@ -43,29 +42,33 @@ import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionS
 import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
+import com.blackducksoftware.integration.hub.dataservice.codelocation.CodeLocationDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ScanStatusDataService {
+public class ScanStatusDataService extends HubService {
     public static final long FIVE_SECONDS = 5 * 1000;
     public static final long DEFAULT_TIMEOUT = 300000L;
 
     private final IntLogger logger;
     private final ProjectService projectRequestService;
     private final ProjectVersionService projectVersionRequestService;
-    private final CodeLocationService codeLocationRequestService;
+    private final CodeLocationDataService codeLocationDataService;
     private final ScanSummaryService scanSummaryRequestService;
     private final MetaHandler metaService;
     private final long timeoutInMilliseconds;
 
-    public ScanStatusDataService(final IntLogger logger, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService, final CodeLocationService codeLocationRequestService,
+    public ScanStatusDataService(final RestConnection restConnection, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService, final CodeLocationDataService codeLocationDataService,
             final ScanSummaryService scanSummaryRequestService, final long timeoutInMilliseconds) {
-        this.logger = logger;
+        super(restConnection);
+        this.logger = restConnection.logger;
         this.metaService = new MetaHandler(logger);
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
-        this.codeLocationRequestService = codeLocationRequestService;
+        this.codeLocationDataService = codeLocationDataService;
         this.scanSummaryRequestService = scanSummaryRequestService;
 
         long timeout = timeoutInMilliseconds;
@@ -96,7 +99,7 @@ public class ScanStatusDataService {
         final String timeoutMessage = "No pending code locations found within the specified wait time: %d minutes";
         while (!done(foundPendingScan, timeoutInMilliseconds, startedTime, timeoutMessage)) {
             try {
-                final CodeLocationView codeLocation = codeLocationRequestService.getCodeLocationByName(codeLocationName);
+                final CodeLocationView codeLocation = codeLocationDataService.getCodeLocationByName(codeLocationName);
                 final String scanSummariesLink = metaService.getFirstLinkSafely(codeLocation, MetaHandler.SCANS_LINK);
                 if (StringUtils.isNotBlank(scanSummariesLink)) {
                     final ScanSummaryView scanSummaryView = scanSummaryRequestService.getResponse(scanSummariesLink, ScanSummaryView.class);
@@ -130,7 +133,8 @@ public class ScanStatusDataService {
     }
 
     public void assertScansFinished(final ProjectVersionView projectVersionView) throws HubTimeoutExceededException, IntegrationException {
-        final List<CodeLocationView> allCodeLocations = codeLocationRequestService.getAllCodeLocationsForProjectVersion(projectVersionView);
+        final String codeLocationsLink = getFirstLink(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK);
+        final List<CodeLocationView> allCodeLocations = getAllResponses(codeLocationsLink, CodeLocationView.class);
         final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
         for (final CodeLocationView codeLocationView : allCodeLocations) {
             final String scansLink = metaService.getFirstLinkSafely(codeLocationView, MetaHandler.SCANS_LINK);
@@ -199,7 +203,7 @@ public class ScanStatusDataService {
             final ProjectVersionView projectVersionItem = projectVersionRequestService.getProjectVersion(projectItem, projectVersion);
             final String projectVersionUrl = metaService.getHref(projectVersionItem);
 
-            final List<CodeLocationView> allCodeLocations = codeLocationRequestService.getAllCodeLocationsForCodeLocationType(CodeLocationType.BOM_IMPORT);
+            final List<CodeLocationView> allCodeLocations = codeLocationDataService.getAllCodeLocationsForCodeLocationType(CodeLocationType.BOM_IMPORT);
 
             final List<String> allScanSummariesLinks = new ArrayList<>();
             for (final CodeLocationView codeLocationItem : allCodeLocations) {

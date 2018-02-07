@@ -33,7 +33,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomService;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportFormatType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.RiskCountType;
@@ -51,6 +50,7 @@ import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.report.RiskReportWriter;
 import com.blackducksoftware.integration.hub.report.api.BomComponent;
@@ -68,18 +68,18 @@ public class ReportDataService extends HubService {
     private final ProjectService projectRequestService;
     private final ProjectVersionService projectVersionRequestService;
     private final ReportService reportRequestService;
-    private final AggregateBomService bomRequestService;
+    private final ProjectDataService projectDataService;
     private final HubSupportHelper hubSupportHelper;
     private final IntegrationEscapeUtil escapeUtil;
 
     public ReportDataService(final IntLogger logger, final RestConnection restConnection, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService,
-            final ReportService reportRequestService, final AggregateBomService bomRequestService, final HubSupportHelper hubSupportHelper, final IntegrationEscapeUtil escapeUtil) {
+            final ReportService reportRequestService, final ProjectDataService projectDataService, final HubSupportHelper hubSupportHelper, final IntegrationEscapeUtil escapeUtil) {
         super(restConnection);
         this.logger = logger;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.reportRequestService = reportRequestService;
-        this.bomRequestService = bomRequestService;
+        this.projectDataService = projectDataService;
         this.hubSupportHelper = hubSupportHelper;
         this.escapeUtil = escapeUtil;
     }
@@ -142,7 +142,8 @@ public class ReportDataService extends HubService {
         final List<BomComponent> components = new ArrayList<>();
         if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.AGGREGATE_BOM_REST_SERVER)) {
             logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
-            final List<VersionBomComponentView> bomEntries = bomRequestService.getBomEntries(version);
+            final String componentsLink = getFirstLink(version, ProjectVersionView.COMPONENTS_LINK);
+            final List<VersionBomComponentView> bomEntries = getAllResponses(componentsLink, VersionBomComponentView.class);
             boolean policyFailure = false;
             for (final VersionBomComponentView bomEntry : bomEntries) {
                 final BomComponent component = createBomComponentFromBomComponentView(bomEntry);

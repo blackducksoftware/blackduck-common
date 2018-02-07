@@ -30,28 +30,23 @@ import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigService;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionConfigValueView;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
-import com.blackducksoftware.integration.hub.api.user.UserService;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
+import com.blackducksoftware.integration.hub.service.HubService;
 
 public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, ExternalExtensionUserView> {
-    private final UserService userRequestService;
+    private final HubService hubService;
 
-    private final ExtensionConfigService extensionConfigRequestService;
-
-    public UserConfigTransform(final UserService userRequestService,
-            final ExtensionConfigService extensionConfigRequestService) {
-        this.userRequestService = userRequestService;
-        this.extensionConfigRequestService = extensionConfigRequestService;
+    public UserConfigTransform(final HubService hubService) {
+        this.hubService = hubService;
     }
 
     @Override
     public List<UserConfigItem> transform(final ExternalExtensionUserView item) throws IntegrationException {
-        final UserView user = userRequestService.getResponse(item.user, UserView.class);
+        final UserView user = hubService.getResponse(item.user, UserView.class);
         if (!user.active) {
             return Collections.emptyList();
         } else {
@@ -63,7 +58,7 @@ public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, 
     }
 
     private Map<String, ExternalExtensionConfigValueView> getUserConfigOptions(final String userConfigUrl) throws IntegrationException {
-        final List<ExternalExtensionConfigValueView> userItemList = extensionConfigRequestService.getUserConfiguration(userConfigUrl);
+        final List<ExternalExtensionConfigValueView> userItemList = hubService.getAllResponses(userConfigUrl, ExternalExtensionConfigValueView.class);
         final Map<String, ExternalExtensionConfigValueView> itemMap = createConfigMap(userItemList);
         return itemMap;
     }

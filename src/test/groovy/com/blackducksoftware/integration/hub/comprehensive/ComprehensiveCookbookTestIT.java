@@ -38,7 +38,6 @@ import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
 
 import com.blackducksoftware.integration.IntegrationTest;
-import com.blackducksoftware.integration.hub.api.bom.BomImportService;
 import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
@@ -58,6 +57,7 @@ import com.blackducksoftware.integration.hub.api.user.UserService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.builder.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
+import com.blackducksoftware.integration.hub.dataservice.codelocation.CodeLocationDataService;
 import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -190,7 +190,7 @@ public class ComprehensiveCookbookTestIT {
         final ProjectService projectRequestService = hubServicesFactory.createProjectService();
         final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection());
         final MetaHandler metaService = new MetaHandler(logger);
-        final BomImportService bomImportRequestService = hubServicesFactory.createBomImportService();
+        final CodeLocationDataService bomImportRequestService = hubServicesFactory.createBomImportService();
         final CodeLocationService codeLocationRequestService = hubServicesFactory.createCodeLocationService();
         final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(FIVE_MINUTES);
         final PolicyStatusDataService policyStatusDataService = hubServicesFactory.createPolicyStatusDataService();

@@ -23,10 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,20 +56,20 @@ public class AllHubResponsesTransformer {
         this.jsonParser = jsonParser;
     }
 
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiSegment, final Class<T> clazz) throws IntegrationException {
-        return getAllResponsesFromApi(apiSegment, clazz, 100, null);
+    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiPath, final Class<T> clazz) throws IntegrationException {
+        return getAllResponsesFromApi(apiPath, clazz, 100, null);
     }
 
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiSegment, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return getAllResponsesFromApi(apiSegment, clazz, 100, mediaType);
+    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiPath, final Class<T> clazz, final String mediaType) throws IntegrationException {
+        return getAllResponsesFromApi(apiPath, clazz, 100, mediaType);
     }
 
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiSegment, final Class<T> clazz, final int itemsPerPage) throws IntegrationException {
-        return getAllResponsesFromApi(apiSegment, clazz, itemsPerPage, null);
+    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiPath, final Class<T> clazz, final int itemsPerPage) throws IntegrationException {
+        return getAllResponsesFromApi(apiPath, clazz, itemsPerPage, null);
     }
 
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiSegment, final Class<T> clazz, final int itemsPerPage, final String mediaType) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = hubRequestFactory.createPagedRequest(itemsPerPage, Arrays.asList(SEGMENT_API, apiSegment));
+    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiPath, final Class<T> clazz, final int itemsPerPage, final String mediaType) throws IntegrationException {
+        final HubPagedRequest hubPagedRequest = hubRequestFactory.createPagedRequest(itemsPerPage, apiPath);
         return getAllResponses(hubPagedRequest, clazz, mediaType);
     }
 

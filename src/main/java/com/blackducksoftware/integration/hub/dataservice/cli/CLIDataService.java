@@ -34,7 +34,6 @@ import org.apache.commons.io.FileUtils;
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
@@ -42,18 +41,20 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
-import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.builder.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
+import com.blackducksoftware.integration.hub.dataservice.codelocation.CodeLocationDataService;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.hub.util.HostnameHelper;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder;
@@ -61,7 +62,8 @@ import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 import com.google.gson.Gson;
 
-public class CLIDataService {
+public class CLIDataService extends HubService {
+
     private final Gson gson;
     private final IntLogger logger;
     private final CIEnvironmentVariables ciEnvironmentVariables;
@@ -70,27 +72,26 @@ public class CLIDataService {
     private final PhoneHomeDataService phoneHomeDataService;
     private final ProjectService projectRequestService;
     private final ProjectVersionService projectVersionRequestService;
-    private final CodeLocationService codeLocationRequestService;
-    private final ScanSummaryService scanSummaryRequestService;
+    private final CodeLocationDataService codeLocationDataService;
     private final ScanStatusDataService scanStatusDataService;
     private final MetaHandler metaService;
 
     private HubSupportHelper hubSupportHelper;
     private ProjectVersionView version;
 
-    public CLIDataService(final IntLogger logger, final Gson gson, final CIEnvironmentVariables ciEnvironmentVariables, final HubVersionService hubVersionRequestService, final CLIDownloadUtility cliDownloadService,
-            final PhoneHomeDataService phoneHomeDataService, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService, final CodeLocationService codeLocationRequestService,
-            final ScanSummaryService scanSummaryRequestService, final ScanStatusDataService scanStatusDataService) {
-        this.gson = gson;
-        this.logger = logger;
+    public CLIDataService(final RestConnection restConnection, final CIEnvironmentVariables ciEnvironmentVariables, final HubVersionService hubVersionRequestService, final CLIDownloadUtility cliDownloadService,
+            final PhoneHomeDataService phoneHomeDataService, final ProjectService projectRequestService, final ProjectVersionService projectVersionRequestService, final CodeLocationDataService codeLocationDataService,
+            final ScanStatusDataService scanStatusDataService) {
+        super(restConnection);
+        this.gson = restConnection.gson;
+        this.logger = restConnection.logger;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
         this.hubVersionRequestService = hubVersionRequestService;
         this.cliDownloadService = cliDownloadService;
         this.phoneHomeDataService = phoneHomeDataService;
         this.projectRequestService = projectRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
-        this.codeLocationRequestService = codeLocationRequestService;
-        this.scanSummaryRequestService = scanSummaryRequestService;
+        this.codeLocationDataService = codeLocationDataService;
         this.scanStatusDataService = scanStatusDataService;
         this.metaService = new MetaHandler(logger);
     }
@@ -195,9 +196,9 @@ public class CLIDataService {
                     scanSummaryFile.delete();
                     final String codeLocationUrl = metaService.getFirstLinkSafely(scanSummary, MetaHandler.CODE_LOCATION_BOM_STATUS_LINK);
 
-                    final CodeLocationView codeLocationView = codeLocationRequestService.getResponse(codeLocationUrl, CodeLocationView.class);
+                    final CodeLocationView codeLocationView = codeLocationDataService.getResponse(codeLocationUrl, CodeLocationView.class);
                     codeLocationViews.add(codeLocationView);
-                    codeLocationRequestService.mapCodeLocation(codeLocationView, version);
+                    codeLocationDataService.mapCodeLocation(codeLocationView, version);
                 } catch (final IOException ex) {
                     logger.trace("Error reading scan summary file", ex);
                 }
@@ -251,15 +252,15 @@ public class CLIDataService {
         if (hubScanConfig.isDeletePreviousCodeLocations() || hubScanConfig.isUnmapPreviousCodeLocations()) {
             final List<CodeLocationView> codeLocationsNotJustScanned = getCodeLocationsNotJustScanned(version, codeLocationsFromCurentScan);
             if (hubScanConfig.isDeletePreviousCodeLocations()) {
-                codeLocationRequestService.deleteCodeLocations(codeLocationsNotJustScanned);
+                codeLocationDataService.deleteCodeLocations(codeLocationsNotJustScanned);
             } else if (hubScanConfig.isUnmapPreviousCodeLocations()) {
-                codeLocationRequestService.unmapCodeLocations(codeLocationsNotJustScanned);
+                codeLocationDataService.unmapCodeLocations(codeLocationsNotJustScanned);
             }
         }
     }
 
     private List<CodeLocationView> getCodeLocationsNotJustScanned(final ProjectVersionView version, final List<CodeLocationView> codeLocationsFromCurentScan) throws IntegrationException {
-        final List<CodeLocationView> codeLocationsMappedToVersion = codeLocationRequestService.getAllCodeLocationsForProjectVersion(version);
+        final List<CodeLocationView> codeLocationsMappedToVersion = getAllResponsesFromLink(version, ProjectVersionView.CODELOCATIONS_LINK, CodeLocationView.class);
         return getCodeLocationsNotJustScanned(codeLocationsMappedToVersion, codeLocationsFromCurentScan);
     }
 
@@ -296,13 +297,4 @@ public class CLIDataService {
         }
     }
 
-    private void cleanupScanSummaryFile(final File scanSummaryFile) {
-        scanSummaryFile.delete();
-        final File parentDirectory = scanSummaryFile.getParentFile();
-        final File[] fileList = parentDirectory.listFiles();
-
-        if (fileList != null && fileList.length == 0) {
-            parentDirectory.delete();
-        }
-    }
 }

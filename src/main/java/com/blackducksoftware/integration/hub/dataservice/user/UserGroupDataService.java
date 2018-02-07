@@ -27,33 +27,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.response.AssignedProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.RoleView;
+import com.blackducksoftware.integration.hub.api.generated.view.UserGroupView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.project.ProjectService;
-import com.blackducksoftware.integration.hub.api.user.UserService;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
+import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class UserDataService {
+public class UserGroupDataService extends HubService {
     private final IntLogger logger;
-    private final UserService userRequestService;
     private final ProjectService projectRequestService;
 
-    public UserDataService(final IntLogger logger, final ProjectService projectRequestService, final UserService userRequestService) {
-        this.logger = logger;
+    public UserGroupDataService(final RestConnection restConnection, final ProjectService projectRequestService) {
+        super(restConnection);
+        this.logger = restConnection.logger;
         this.projectRequestService = projectRequestService;
-        this.userRequestService = userRequestService;
+    }
+
+    public UserView getUserByUserName(final String userName) throws IntegrationException {
+        final List<UserView> allUsers = getAllResponsesFromApi(ApiDiscovery.USERS_LINK, UserView.class);
+        for (final UserView user : allUsers) {
+            if (user.userName.equalsIgnoreCase(userName)) {
+                return user;
+            }
+        }
+        throw new DoesNotExistException("This User does not exist. UserName : " + userName);
     }
 
     public List<ProjectView> getProjectsForUser(final String userName) throws IntegrationException {
-        final UserView user = userRequestService.getUserByUserName(userName);
+        final UserView user = getUserByUserName(userName);
         return getProjectsForUser(user);
     }
 
     public List<ProjectView> getProjectsForUser(final UserView userView) throws IntegrationException {
         logger.debug("Attempting to get the assigned projects for User: " + userView.userName);
-        final List<AssignedProjectView> assignedProjectViews = userRequestService.getUserAssignedProjects(userView);
+        final List<AssignedProjectView> assignedProjectViews = getAllResponsesFromLink(userView, MetaHandler.PROJECTS_LINK, AssignedProjectView.class);
 
         final List<ProjectView> resolvedProjectViews = new ArrayList<>();
         for (final AssignedProjectView assigned : assignedProjectViews) {
@@ -67,12 +81,22 @@ public class UserDataService {
     }
 
     public List<RoleView> getRolesForUser(final String userName) throws IntegrationException {
-        final UserView user = userRequestService.getUserByUserName(userName);
+        final UserView user = getUserByUserName(userName);
         return getRolesForUser(user);
     }
 
     public List<RoleView> getRolesForUser(final UserView userView) throws IntegrationException {
-        return userRequestService.getUserRoles(userView);
+        return this.getAllResponsesFromLink(userView, MetaHandler.ROLES_LINK, RoleView.class);
+    }
+
+    public UserGroupView getGroupByName(final String groupName) throws IntegrationException {
+        final List<UserGroupView> allGroups = getAllResponsesFromApi(ApiDiscovery.USERGROUPS_LINK, UserGroupView.class);
+        for (final UserGroupView group : allGroups) {
+            if (group.name.equalsIgnoreCase(groupName)) {
+                return group;
+            }
+        }
+        throw new DoesNotExistException("This Group does not exist. Group name : " + groupName);
     }
 
 }

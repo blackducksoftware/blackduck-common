@@ -194,29 +194,29 @@ public class HubService {
     /**
      * WILL make further paged requests to get the full list of items
      */
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiSegment, final Class<T> clazz) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromApi(apiSegment, clazz);
+    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiPath, final Class<T> clazz) throws IntegrationException {
+        return allHubResponsesTransformer.getAllResponsesFromApi(apiPath, clazz);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiSegment, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromApi(apiSegment, clazz, mediaType);
+    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiPath, final Class<T> clazz, final String mediaType) throws IntegrationException {
+        return allHubResponsesTransformer.getAllResponsesFromApi(apiPath, clazz, mediaType);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiSegment, final Class<T> clazz, final int viewsPerPage) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromApi(apiSegment, clazz, viewsPerPage);
+    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiPath, final Class<T> clazz, final int viewsPerPage) throws IntegrationException {
+        return allHubResponsesTransformer.getAllResponsesFromApi(apiPath, clazz, viewsPerPage);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiSegment, final Class<T> clazz, final int viewsPerPage, final String mediaType) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromApi(apiSegment, clazz, viewsPerPage, mediaType);
+    public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiPath, final Class<T> clazz, final int viewsPerPage, final String mediaType) throws IntegrationException {
+        return allHubResponsesTransformer.getAllResponsesFromApi(apiPath, clazz, viewsPerPage, mediaType);
     }
 
     /**
