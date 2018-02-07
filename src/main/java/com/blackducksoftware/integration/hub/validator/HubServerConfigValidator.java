@@ -36,7 +36,7 @@ import com.blackducksoftware.integration.hub.Credentials;
 import com.blackducksoftware.integration.hub.CredentialsBuilder;
 import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
-import com.blackducksoftware.integration.hub.proxy.ProxyInfoFieldEnum;
+import com.blackducksoftware.integration.hub.proxy.ProxyInfoField;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 import com.blackducksoftware.integration.validator.ValidationResult;
@@ -64,6 +64,9 @@ public class HubServerConfigValidator extends AbstractValidator {
     private String proxyPassword;
     private int proxyPasswordLength;
     private String ignoredProxyHosts;
+    private String ntlmDomain;
+    private String ntlmWorkstation;
+
     private boolean alwaysTrustServerCertificate;
     private ProxyInfo proxyInfo;
 
@@ -86,6 +89,8 @@ public class HubServerConfigValidator extends AbstractValidator {
         validator.setIgnoredProxyHosts(ignoredProxyHosts);
         validator.setUsername(proxyUsername);
         validator.setPassword(proxyPassword);
+        validator.setNtlmDomain(ntlmDomain);
+        validator.setNtlmWorkstation(ntlmWorkstation);
         if (proxyPasswordLength > 0) {
             validator.setPasswordLength(proxyPasswordLength);
         }
@@ -101,12 +106,12 @@ public class HubServerConfigValidator extends AbstractValidator {
                     credBuilder.setPasswordLength(proxyPasswordLength);
                     final Credentials credResult = credBuilder.build();
 
-                    proxyInfo = new ProxyInfo(proxyHost, port, credResult, ignoredProxyHosts);
+                    proxyInfo = new ProxyInfo(proxyHost, port, credResult, ignoredProxyHosts, ntlmDomain, ntlmWorkstation);
 
                 } else {
                     // password is blank or already encrypted so we just pass in the
                     // values given to us
-                    proxyInfo = new ProxyInfo(proxyHost, port, null, ignoredProxyHosts);
+                    proxyInfo = new ProxyInfo(proxyHost, port, null, ignoredProxyHosts, ntlmDomain, ntlmWorkstation);
                 }
             }
         }
@@ -153,7 +158,7 @@ public class HubServerConfigValidator extends AbstractValidator {
 
         } catch (final IntegrationRestException e) {
             if (e.getHttpStatusCode() == 407) {
-                result.addResult(ProxyInfoFieldEnum.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.ERROR, e.getHttpStatusMessage()));
+                result.addResult(ProxyInfoField.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.ERROR, e.getHttpStatusMessage()));
             } else {
                 result.addResult(HubServerConfigFieldEnum.HUBURL,
                         new ValidationResult(ValidationResultEnum.ERROR, ERROR_MSG_UNREACHABLE_PREFIX + hubUrl + ERROR_MSG_UNREACHABLE_CAUSE + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e));
