@@ -31,7 +31,6 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
-import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
@@ -92,7 +91,7 @@ public class HubServicesFactory {
     }
 
     public ReportDataService createReportDataService(final long timeoutInMilliseconds) throws IntegrationException {
-        return new ReportDataService(restConnection, createReportService(timeoutInMilliseconds), createProjectDataService(), createIntegrationEscapeUtil());
+        return new ReportDataService(restConnection, createProjectDataService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
     }
 
     public PolicyStatusDataService createPolicyStatusDataService() {
@@ -146,10 +145,6 @@ public class HubServicesFactory {
 
     public HubRegistrationService createHubRegistrationService() {
         return new HubRegistrationService(restConnection);
-    }
-
-    public ReportService createReportService(final long timeoutInMilliseconds) {
-        return new ReportService(restConnection, restConnection.logger, timeoutInMilliseconds);
     }
 
     public HubService createHubService() {

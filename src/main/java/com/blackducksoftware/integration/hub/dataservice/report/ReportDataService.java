@@ -27,23 +27,24 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportFormatType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.RiskCountType;
 import com.blackducksoftware.integration.hub.api.generated.model.RiskCountView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
+import com.blackducksoftware.integration.hub.api.generated.view.ReportView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
-import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
-import com.blackducksoftware.integration.hub.api.report.ReportService;
-import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -53,24 +54,43 @@ import com.blackducksoftware.integration.hub.report.api.PolicyRule;
 import com.blackducksoftware.integration.hub.report.api.ReportData;
 import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
 import com.blackducksoftware.integration.hub.report.pdf.PDFBoxWriter;
+import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import okhttp3.Response;
 
 public class ReportDataService extends HubService {
+    public final static long DEFAULT_TIMEOUT = 1000 * 60 * 5;
+
     private final IntLogger logger;
-    private final ReportService reportRequestService;
     private final ProjectDataService projectDataService;
     private final IntegrationEscapeUtil escapeUtil;
 
-    public ReportDataService(final RestConnection restConnection,
-            final ReportService reportRequestService, final ProjectDataService projectDataService, final IntegrationEscapeUtil escapeUtil) {
+    private final long timeoutInMilliseconds;
+
+    public ReportDataService(final RestConnection restConnection, final ProjectDataService projectDataService, final IntegrationEscapeUtil escapeUtil) {
+        this(restConnection, projectDataService, escapeUtil, DEFAULT_TIMEOUT);
+    }
+
+    public ReportDataService(final RestConnection restConnection, final ProjectDataService projectDataService, final IntegrationEscapeUtil escapeUtil, final long timeoutInMilliseconds) {
         super(restConnection);
         this.logger = restConnection.logger;
-        this.reportRequestService = reportRequestService;
         this.projectDataService = projectDataService;
         this.escapeUtil = escapeUtil;
+
+        long timeout = timeoutInMilliseconds;
+        if (timeoutInMilliseconds <= 0l) {
+            timeout = DEFAULT_TIMEOUT;
+            logger.alwaysLog(timeoutInMilliseconds + "ms is not a valid BOM wait time, using : " + timeout + "ms instead");
+        }
+        this.timeoutInMilliseconds = timeout;
     }
 
     public String getNoticesReportData(final String projectName, final String projectVersionName) throws IntegrationException {
@@ -81,7 +101,7 @@ public class ReportDataService extends HubService {
 
     public String getNoticesReportData(final ProjectView project, final ProjectVersionView version) throws IntegrationException {
         logger.trace("Getting the Notices Report Contents using the Report Rest Server");
-        return reportRequestService.generateHubNoticesReport(version, ReportFormatType.TEXT);
+        return generateHubNoticesReport(version, ReportFormatType.TEXT);
     }
 
     public File createNoticesReportFile(final File outputDirectory, final String projectName, final String projectVersionName) throws IntegrationException {
@@ -155,7 +175,7 @@ public class ReportDataService extends HubService {
                 }
             }
             component.setPolicyStatus(policyStatus);
-            addPolicyRuleInfo(component, bomEntry);
+            populatePolicyRuleInfo(component, bomEntry);
             components.add(component);
         }
         reportData.setComponents(components);
@@ -209,37 +229,6 @@ public class ReportDataService extends HubService {
         return versionURL + "/" + componentVersionSegments + "/" + MetaHandler.POLICY_STATUS_LINK;
     }
 
-    private BomComponent createBomComponentFromBomViewEntry(final VersionReport report, final AggregateBomViewEntry bomEntry) {
-        final BomComponent component = new BomComponent();
-        if (bomEntry.getProducerProject() != null) {
-            component.setComponentName(bomEntry.getProducerProject().getName());
-            component.setComponentURL(report.getComponentUrl(bomEntry));
-        }
-        if (bomEntry.getProducerReleases() != null && !bomEntry.getProducerReleases().isEmpty()) {
-            component.setComponentVersion(bomEntry.getProducerReleases().get(0).getVersion());
-            component.setComponentVersionURL(report.getVersionUrl(bomEntry));
-        }
-        component.setLicense(bomEntry.getLicensesDisplay());
-        component.setPolicyStatus(bomEntry.getPolicyApprovalStatusEnum().toString());
-        if (bomEntry.getVulnerabilityRisk() != null) {
-            component.setSecurityRiskHighCount(bomEntry.getVulnerabilityRisk().getHIGH());
-            component.setSecurityRiskMediumCount(bomEntry.getVulnerabilityRisk().getMEDIUM());
-            component.setSecurityRiskLowCount(bomEntry.getVulnerabilityRisk().getLOW());
-        }
-        if (bomEntry.getLicenseRisk() != null) {
-            component.setLicenseRiskHighCount(bomEntry.getLicenseRisk().getHIGH());
-            component.setLicenseRiskMediumCount(bomEntry.getLicenseRisk().getMEDIUM());
-            component.setLicenseRiskLowCount(bomEntry.getLicenseRisk().getLOW());
-        }
-        if (bomEntry.getOperationalRisk() != null) {
-            component.setOperationalRiskHighCount(bomEntry.getOperationalRisk().getHIGH());
-            component.setOperationalRiskMediumCount(bomEntry.getOperationalRisk().getMEDIUM());
-            component.setOperationalRiskLowCount(bomEntry.getOperationalRisk().getLOW());
-        }
-
-        return component;
-    }
-
     private BomComponent createBomComponentFromBomComponentView(final VersionBomComponentView bomEntry) {
         final BomComponent component = new BomComponent();
         component.setComponentName(bomEntry.componentName);
@@ -283,7 +272,7 @@ public class ReportDataService extends HubService {
         return component;
     }
 
-    public void addPolicyRuleInfo(final BomComponent component, final VersionBomComponentView bomEntry) throws IntegrationException {
+    public void populatePolicyRuleInfo(final BomComponent component, final VersionBomComponentView bomEntry) throws IntegrationException {
         if (bomEntry != null && bomEntry.approvalStatus != null) {
             final PolicyStatusApprovalStatusType status = bomEntry.approvalStatus;
             if (status == PolicyStatusApprovalStatusType.IN_VIOLATION) {
@@ -333,5 +322,114 @@ public class ReportDataService extends HubService {
             urlBuilder.append("/view:bom");
         }
         return urlBuilder.toString();
+    }
+
+    /**
+     * Assumes the BOM has already been updated
+     *
+     */
+    public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws IntegrationException {
+        if (hasLink(version, ProjectVersionView.LICENSEREPORTS_LINK)) {
+            try {
+                logger.debug("Starting the Notices Report generation.");
+                final String reportUrl = startGeneratingHubNoticesReport(version, reportFormat);
+
+                logger.debug("Waiting for the Notices Report to complete.");
+                final ReportView reportInfo = isReportFinishedGenerating(reportUrl);
+
+                final String contentLink = getFirstLink(reportInfo, ReportView.CONTENT_LINK);
+
+                if (contentLink == null) {
+                    throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
+                }
+
+                logger.debug("Getting the Notices Report content.");
+                final String noticesReport = getNoticesReportContent(contentLink);
+                logger.debug("Finished retrieving the Notices Report.");
+                logger.debug("Cleaning up the Notices Report on the server.");
+                deleteHubReport(reportUrl);
+                return noticesReport;
+            } catch (final IntegrationRestException e) {
+                if (e.getHttpStatusCode() == 402) {
+                    // unlike the policy module, the licenseReports link is still present when the module is not enabled
+                    logger.warn("Can not create the notice report, the Hub notice module is not enabled.");
+                } else {
+                    throw e;
+                }
+            }
+        } else {
+            logger.warn("Can not create the notice report, the Hub notice module is not enabled.");
+        }
+        return null;
+    }
+
+    public String startGeneratingHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws IntegrationException {
+        final String reportUrl = getFirstLink(version, ProjectVersionView.LICENSEREPORTS_LINK);
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("reportFormat", reportFormat.toString());
+        json.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
+
+        final HubRequest hubRequest = getHubRequestFactory().createRequest(reportUrl);
+        try (Response response = hubRequest.executePost(getGson().toJson(json))) {
+            return response.header("location");
+        }
+    }
+
+    /**
+     * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done being generated. Throws HubIntegrationException after 30 minutes if the report has not been generated yet.
+     */
+    public ReportView isReportFinishedGenerating(final String reportUrl) throws IntegrationException {
+        final long startTime = System.currentTimeMillis();
+        long elapsedTime = 0;
+        Date timeFinished = null;
+        ReportView reportInfo = null;
+
+        while (timeFinished == null) {
+            final HubRequest hubRequest = getHubRequestFactory().createRequest(reportUrl);
+            try (Response response = hubRequest.executeGet()) {
+                final String jsonResponse = readResponseString(response);
+                reportInfo = getResponseAs(jsonResponse, ReportView.class);
+            }
+            timeFinished = reportInfo.finishedAt;
+            if (timeFinished != null) {
+                break;
+            }
+            if (elapsedTime >= timeoutInMilliseconds) {
+                final String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(timeoutInMilliseconds));
+                throw new HubIntegrationException("The Report has not finished generating in : " + formattedTime);
+            }
+            // Retry every 5 seconds
+            try {
+                Thread.sleep(5000);
+            } catch (final InterruptedException e) {
+                throw new HubIntegrationException("The thread waiting for the report generation was interrupted", e);
+            }
+            elapsedTime = System.currentTimeMillis() - startTime;
+        }
+        return reportInfo;
+    }
+
+    public String getNoticesReportContent(final String reportContentUrl) throws IntegrationException {
+        final JsonElement fileContent = getReportContentJson(reportContentUrl);
+        return fileContent.getAsString();
+    }
+
+    private JsonElement getReportContentJson(final String reportContentUrl) throws IntegrationException {
+        final HubRequest hubRequest = getHubRequestFactory().createRequest(reportContentUrl);
+        try (Response response = hubRequest.executeGet()) {
+            final String jsonResponse = readResponseString(response);
+
+            final JsonObject json = getJsonParser().parse(jsonResponse).getAsJsonObject();
+            final JsonElement content = json.get("reportContent");
+            final JsonArray reportConentArray = content.getAsJsonArray();
+            final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
+            return reportFile.get("fileContent");
+        }
+    }
+
+    public void deleteHubReport(final String reportUrl) throws IntegrationException {
+        final HubRequest hubRequest = getHubRequestFactory().createRequest(reportUrl);
+        hubRequest.executeDelete();
     }
 }
