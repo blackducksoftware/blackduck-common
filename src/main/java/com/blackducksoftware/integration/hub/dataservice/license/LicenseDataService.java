@@ -29,20 +29,20 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComplexLicenseVi
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.LicenseView;
-import com.blackducksoftware.integration.hub.api.license.LicenseService;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.dataservice.component.ComponentDataService;
+import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 
+import okhttp3.Response;
+
 public class LicenseDataService extends HubService {
     private final ComponentDataService componentDataService;
-    private final LicenseService licenseService;
 
-    public LicenseDataService(final RestConnection restConnection, final ComponentDataService componentDataService, final LicenseService licenseService) {
+    public LicenseDataService(final RestConnection restConnection, final ComponentDataService componentDataService) {
         super(restConnection);
         this.componentDataService = componentDataService;
-        this.licenseService = licenseService;
     }
 
     public ComplexLicenseView getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
@@ -70,6 +70,11 @@ public class LicenseDataService extends HubService {
     }
 
     public String getLicenseText(final LicenseView licenseView) throws IntegrationException {
-        return licenseService.getLicenseText(licenseView);
+        final String licenseTextUrl = getFirstLinkSafely(licenseView, LicenseView.TEXT_LINK);
+        final HubRequest hubRequest = getHubRequestFactory().createRequest(licenseTextUrl);
+        try (Response response = hubRequest.executeGet();) {
+            final String jsonResponse = readResponseString(response);
+            return jsonResponse;
+        }
     }
 }

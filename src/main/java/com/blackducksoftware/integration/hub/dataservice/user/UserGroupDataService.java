@@ -33,7 +33,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.RoleView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserGroupView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
-import com.blackducksoftware.integration.hub.api.project.ProjectService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -42,12 +41,10 @@ import com.blackducksoftware.integration.log.IntLogger;
 
 public class UserGroupDataService extends HubService {
     private final IntLogger logger;
-    private final ProjectService projectRequestService;
 
-    public UserGroupDataService(final RestConnection restConnection, final ProjectService projectRequestService) {
+    public UserGroupDataService(final RestConnection restConnection) {
         super(restConnection);
         this.logger = restConnection.logger;
-        this.projectRequestService = projectRequestService;
     }
 
     public UserView getUserByUserName(final String userName) throws IntegrationException {
@@ -71,7 +68,7 @@ public class UserGroupDataService extends HubService {
 
         final List<ProjectView> resolvedProjectViews = new ArrayList<>();
         for (final AssignedProjectView assigned : assignedProjectViews) {
-            final ProjectView project = projectRequestService.getResponse(assigned.project, ProjectView.class);
+            final ProjectView project = getResponse(assigned.project, ProjectView.class);
             if (project != null) {
                 resolvedProjectViews.add(project);
             }

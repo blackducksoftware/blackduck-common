@@ -36,9 +36,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.notification.NotificationService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotificationView;
@@ -51,18 +48,15 @@ import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationOverrideTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationOverrideTransformer(final HubService hubResponseService, final NotificationService notificationService,
-            final ProjectVersionService projectVersionService, final PolicyService policyService,
+    public PolicyViolationOverrideTransformer(final HubService hubResponseService,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
-        super(hubResponseService, notificationService, projectVersionService, policyService,
+        super(hubResponseService,
                 policyFilter, metaService);
     }
 
     public PolicyViolationOverrideTransformer(final HubService hubResponseService, final IntLogger logger,
-            final NotificationService notificationService,
-            final ProjectVersionService projectVersionService, final PolicyService policyService,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
-        super(hubResponseService, logger, notificationService, projectVersionService, policyService,
+        super(hubResponseService, logger,
                 policyFilter, metaService);
     }
 
@@ -81,7 +75,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
         componentVersionList.add(componentStatus);
 
         try {
-            releaseItem = getProjectVersionService().getResponse(policyOverride.content.projectVersionLink, ProjectVersionView.class);
+            releaseItem = getHubService().getResponse(policyOverride.content.projectVersionLink, ProjectVersionView.class);
         } catch (final IntegrationException e) {
             throw new HubItemTransformException(e);
         }

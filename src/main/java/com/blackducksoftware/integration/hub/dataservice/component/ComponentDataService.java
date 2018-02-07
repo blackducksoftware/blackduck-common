@@ -30,13 +30,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.HubMediaTypes;
 import com.blackducksoftware.integration.hub.api.UrlConstants;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV1View;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityService;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.HubPagedRequest;
@@ -46,12 +46,10 @@ import com.blackducksoftware.integration.log.IntLogger;
 
 public class ComponentDataService extends HubService {
     private final IntLogger logger;
-    private final VulnerabilityService vulnerabilityService;
 
-    public ComponentDataService(final RestConnection restConnection, final VulnerabilityService vulnerabilityService) {
+    public ComponentDataService(final RestConnection restConnection) {
         super(restConnection);
         this.logger = restConnection.logger;
-        this.vulnerabilityService = vulnerabilityService;
     }
 
     public ComponentVersionView getExactComponentVersionFromComponent(final ExternalId externalId) throws IntegrationException {
@@ -102,7 +100,7 @@ public class ComponentDataService extends HubService {
         if (null != componentVersionURL) {
             final ComponentVersionView componentVersion = getResponse(componentVersionURL, ComponentVersionView.class);
             final String vulnerabilitiesLink = getFirstLink(componentVersion, MetaHandler.VULNERABILITIES_LINK);
-            final List<VulnerabilityV1View> vulnerabilityList = vulnerabilityService.getComponentVersionVulnerabilities(vulnerabilitiesLink);
+            final List<VulnerabilityV1View> vulnerabilityList = getAllResponses(vulnerabilitiesLink, VulnerabilityV1View.class, HubMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
             return vulnerabilityList;
         }
 

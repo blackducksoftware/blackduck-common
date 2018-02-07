@@ -32,9 +32,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersion
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.notification.NotificationService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.RuleViolationClearedNotificationView;
@@ -47,18 +44,15 @@ import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationClearedTransformer(final HubService hubResponseService, final NotificationService notificationService,
-            final ProjectVersionService projectVersionService, final PolicyService policyService,
+    public PolicyViolationClearedTransformer(final HubService hubResponseService,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
-        super(hubResponseService, notificationService, projectVersionService, policyService,
+        super(hubResponseService,
                 policyFilter, metaService);
     }
 
     public PolicyViolationClearedTransformer(final HubService hubResponseService, final IntLogger logger,
-            final NotificationService notificationService,
-            final ProjectVersionService projectVersionService, final PolicyService policyService,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
-        super(hubResponseService, logger, notificationService, projectVersionService, policyService,
+        super(hubResponseService, logger,
                 policyFilter, metaService);
     }
 
@@ -72,7 +66,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         final String projectVersionLink = policyViolation.content.projectVersionLink;
         ProjectVersionView releaseItem;
         try {
-            releaseItem = getReleaseItem(projectVersionLink);
+            releaseItem = getHubService().getResponse(projectVersionLink, ProjectVersionView.class);
         } catch (final IntegrationException e1) {
             throw new HubItemTransformException("Error getting release item while transforming notification " + item
                     + "; projectVersionLink: " + projectVersionLink + ": " + e1.getMessage(), e1);
@@ -126,11 +120,6 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
                 throw new HubItemTransformException(e);
             }
         }
-    }
-
-    private ProjectVersionView getReleaseItem(final String projectVersionLink) throws IntegrationException {
-        final ProjectVersionView releaseItem = getProjectVersionService().getResponse(projectVersionLink, ProjectVersionView.class);
-        return releaseItem;
     }
 
     @Override
