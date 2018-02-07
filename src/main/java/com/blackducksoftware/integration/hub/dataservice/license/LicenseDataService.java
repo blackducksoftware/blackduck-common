@@ -23,6 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.license;
 
+import java.io.IOException;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.model.VersionBomLicenseView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComplexLicenseView;
@@ -31,11 +33,10 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersion
 import com.blackducksoftware.integration.hub.api.generated.view.LicenseView;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.dataservice.component.ComponentDataService;
-import com.blackducksoftware.integration.hub.request.HubRequest;
+import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
-
-import okhttp3.Response;
 
 public class LicenseDataService extends HubService {
     private final ComponentDataService componentDataService;
@@ -71,10 +72,11 @@ public class LicenseDataService extends HubService {
 
     public String getLicenseText(final LicenseView licenseView) throws IntegrationException {
         final String licenseTextUrl = getFirstLinkSafely(licenseView, LicenseView.TEXT_LINK);
-        final HubRequest hubRequest = getHubRequestFactory().createRequest(licenseTextUrl);
-        try (Response response = hubRequest.executeGet();) {
-            final String jsonResponse = readResponseString(response);
-            return jsonResponse;
+        final Request request = new Request(licenseTextUrl);
+        try (Response response = getRestConnection().executeRequest(request)) {
+            return response.getContentString();
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
         }
     }
 }

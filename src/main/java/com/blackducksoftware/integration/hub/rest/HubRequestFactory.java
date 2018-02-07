@@ -43,6 +43,11 @@ public class HubRequestFactory {
         return request;
     }
 
+    public PagedRequest createGetPagedRequest(final String uri, final String q, final int limit) {
+        final PagedRequest request = new PagedRequest(uri, null, q, HttpMethod.GET, null, null, null, limit, 0);
+        return request;
+    }
+
     public Request createRequest(final String uri, final HttpMethod method) {
         final Request request = new Request(uri, null, null, method, null, null, null);
         return request;

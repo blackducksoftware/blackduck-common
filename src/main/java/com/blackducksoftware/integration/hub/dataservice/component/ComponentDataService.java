@@ -23,15 +23,12 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.component;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_COMPONENTS;
-
-import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.HubMediaTypes;
 import com.blackducksoftware.integration.hub.api.UrlConstants;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
@@ -39,7 +36,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV1V
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
+import com.blackducksoftware.integration.hub.request.PagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -88,9 +85,11 @@ public class ComponentDataService extends HubService {
         final String forge = externalId.forge.getName();
         final String hubOriginId = externalId.createHubOriginId();
         final String componentQuery = String.format("id:%s|%s", forge, hubOriginId);
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(Arrays.asList(SEGMENT_API, SEGMENT_COMPONENTS), componentQuery);
 
-        final List<ComponentSearchResultView> allComponents = getAllResponses(hubPagedRequest, ComponentSearchResultView.class);
+        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), ApiDiscovery.COMPONENTS_LINK);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequest(uri, componentQuery);
+
+        final List<ComponentSearchResultView> allComponents = getAllResponses(pagedRequest, ComponentSearchResultView.class);
         return allComponents;
     }
 
