@@ -33,7 +33,6 @@ import org.apache.commons.io.FileUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
@@ -73,7 +72,6 @@ public class CLIDataService extends HubService {
     private final ScanStatusDataService scanStatusDataService;
     private final MetaHandler metaService;
 
-    private HubSupportHelper hubSupportHelper;
     private ProjectVersionWrapper projectVersionWrapper;
 
     public CLIDataService(final RestConnection restConnection, final CIEnvironmentVariables ciEnvironmentVariables, final HubVersionService hubVersionRequestService, final CLIDownloadUtility cliDownloadService,
@@ -116,9 +114,9 @@ public class CLIDataService extends HubService {
     private SimpleScanUtility createScanService(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
         final HubScanConfig controlledConfig = getControlledScanConfig(hubScanConfig);
         if (hubScanConfig.isDryRun()) {
-            return new SimpleScanUtility(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, projectRequest.name, projectRequest.versionRequest.versionName);
+            return new SimpleScanUtility(logger, gson, hubServerConfig, ciEnvironmentVariables, controlledConfig, projectRequest.name, projectRequest.versionRequest.versionName);
         } else {
-            return new SimpleScanUtility(logger, gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, controlledConfig, null, null);
+            return new SimpleScanUtility(logger, gson, hubServerConfig, ciEnvironmentVariables, controlledConfig, null, null);
         }
     }
 
@@ -165,9 +163,6 @@ public class CLIDataService extends HubService {
         final String hubVersion = hubVersionRequestService.getHubVersion();
         cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), hubVersion, localHostName);
         phoneHomeDataService.phoneHome(phoneHomeRequestBodyBuilder);
-
-        hubSupportHelper = new HubSupportHelper();
-        hubSupportHelper.checkHubSupport(hubVersionRequestService, logger);
 
         if (!hubScanConfig.isDryRun()) {
             projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);

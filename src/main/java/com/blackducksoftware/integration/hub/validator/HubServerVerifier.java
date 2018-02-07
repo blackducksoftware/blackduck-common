@@ -70,18 +70,12 @@ public class HubServerVerifier {
         final UnauthenticatedRestConnection restConnection = connectionBuilder.build();
         HttpUrl httpUrl = restConnection.createHttpUrl();
         Request request = restConnection.createGetRequest(httpUrl);
-        Response response = null;
-        try {
-            response = restConnection.handleExecuteClientCall(request);
+        try (Response response = restConnection.createResponse(request)) {
         } catch (final IntegrationRestException e) {
             if (e.getHttpStatusCode() == 401 && e.getHttpStatusCode() == 403) {
                 // This could be a Hub server
             } else {
                 throw e;
-            }
-        } finally {
-            if (response != null) {
-                response.close();
             }
         }
         final List<String> urlSegments = new ArrayList<>();
@@ -89,16 +83,11 @@ public class HubServerVerifier {
         urlSegments.add(CLILocation.DEFAULT_CLI_DOWNLOAD);
         httpUrl = restConnection.createHttpUrl(urlSegments);
         request = restConnection.createGetRequest(httpUrl);
-        try {
-            response = restConnection.handleExecuteClientCall(request);
+        try (Response response = restConnection.createResponse(request)) {
         } catch (final IntegrationRestException e) {
             throw new HubIntegrationException("The Url does not appear to be a Hub server :" + httpUrl.uri().toString() + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
         } catch (final IntegrationException e) {
             throw new HubIntegrationException("The Url does not appear to be a Hub server :" + httpUrl.uri().toString() + ", because: " + e.getMessage(), e);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
         }
     }
 
