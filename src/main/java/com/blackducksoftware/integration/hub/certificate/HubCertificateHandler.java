@@ -30,16 +30,13 @@ import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class HubCertificateHandler {
-    private final IntLogger logger;
     private final CertificateHandler handler;
 
     public HubCertificateHandler(final IntLogger logger) {
-        this.logger = logger;
         handler = new CertificateHandler(logger);
     }
 
     public HubCertificateHandler(final IntLogger logger, final File javaHomeOverride) {
-        this.logger = logger;
         handler = new CertificateHandler(logger, javaHomeOverride);
     }
 

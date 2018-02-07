@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -119,19 +121,12 @@ public class CLIDownloadUtility {
             }
             final long cliTimestamp = hubVersionFile.lastModified();
 
-            Response response = null;
-            InputStream cliStream = null;
-            try {
-                try {
-                    final HttpUrl httpUrl = restConnection.createHttpUrl(cliDownloadUrl);
-                    final Map<String, String> headers = new HashMap<>();
-                    headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
-                    final Request request = restConnection.createGetRequest(httpUrl, headers);
-                    response = restConnection.handleExecuteClientCall(request);
-                } catch (final IntegrationException e) {
-                    logger.error("Skipping installation of " + cliDownloadUrl + " to " + directoryToInstallTo + ": " + e.toString());
-                    return;
-                }
+            final HttpUrl httpUrl = restConnection.createHttpUrl(cliDownloadUrl);
+            final Map<String, String> headers = new HashMap<>();
+            headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
+            final Request request = restConnection.createGetRequest(httpUrl, headers);
+
+            try (Response response = restConnection.createResponse(request)) {
                 if (response.code() == 304) {
                     // CLI has not been modified
                     return;
@@ -141,7 +136,13 @@ public class CLIDownloadUtility {
 
                 if (StringUtils.isNotBlank(lastModified)) {
                     // Should parse the Date just like URLConnection did
-                    lastModifiedLong = Date.parse(lastModified);
+                    try {
+                        final SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+                        final Date parsed = format.parse(lastModified);
+                        lastModifiedLong = parsed.getTime();
+                    } catch (final ParseException pe) {
+                        throw new HubIntegrationException("Could not parse the last modified date : " + pe.getMessage());
+                    }
                 }
 
                 if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
@@ -162,23 +163,19 @@ public class CLIDownloadUtility {
                 logger.info("Unpacking " + cliDownloadUrl.toString() + " to " + directoryToInstallTo + " on " + localHostName);
 
                 final ResponseBody responseBody = response.body();
-                cliStream = responseBody.byteStream();
-                final CountingInputStream cis = new CountingInputStream(cliStream);
-                try {
-                    unzip(cliInstallDirectory, cis, logger);
-                    updateJreSecurity(logger, cliLocation, ciEnvironmentVariables);
-                } catch (final IOException e) {
-                    throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", cliDownloadUrl, cis.getByteCount(), responseBody.contentLength()), e);
-                } finally {
-                    cis.close();
+                try (InputStream cliStream = responseBody.byteStream()) {
+                    long byteCount = 0;
+                    try (CountingInputStream cis = new CountingInputStream(cliStream)) {
+                        byteCount = cis.getByteCount();
+                        unzip(cliInstallDirectory, cis, logger);
+                        updateJreSecurity(logger, cliLocation, ciEnvironmentVariables);
+                    } catch (final IOException e) {
+                        throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", cliDownloadUrl, byteCount, responseBody.contentLength()), e);
+                    }
                 }
-            } finally {
-                if (cliStream != null) {
-                    cliStream.close();
-                }
-                if (response != null) {
-                    response.close();
-                }
+            } catch (final IntegrationException e) {
+                logger.error("Skipping installation of " + cliDownloadUrl + " to " + directoryToInstallTo + ": " + e.toString());
+                return;
             }
         } catch (final IOException e) {
             throw new HubIntegrationException("Failed to install " + cliDownloadUrl + " to " + directoryToInstallTo, e);
@@ -260,11 +257,8 @@ public class CLIDownloadUtility {
     }
 
     private void copyInputStreamToFile(final InputStream in, final File f) throws IOException {
-        final FileOutputStream fos = new FileOutputStream(f);
-        try {
+        try (FileOutputStream fos = new FileOutputStream(f)) {
             org.apache.commons.io.IOUtils.copy(in, fos);
-        } finally {
-            org.apache.commons.io.IOUtils.closeQuietly(fos);
         }
     }
 
