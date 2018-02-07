@@ -29,7 +29,6 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
 import com.blackducksoftware.integration.hub.api.report.ReportService;
@@ -93,8 +92,7 @@ public class HubServicesFactory {
     }
 
     public ReportDataService createReportDataService(final long timeoutInMilliseconds) throws IntegrationException {
-        return new ReportDataService(restConnection, createReportService(timeoutInMilliseconds), createProjectDataService(), createCheckedHubSupport(),
-                createIntegrationEscapeUtil());
+        return new ReportDataService(restConnection, createReportService(timeoutInMilliseconds), createProjectDataService(), createIntegrationEscapeUtil());
     }
 
     public PolicyStatusDataService createPolicyStatusDataService() {
@@ -141,9 +139,9 @@ public class HubServicesFactory {
         return new IntegrationEscapeUtil();
     }
 
-    public SimpleScanUtility createSimpleScanUtility(final RestConnection restConnection, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final HubScanConfig hubScanConfig, final String projectName,
+    public SimpleScanUtility createSimpleScanUtility(final RestConnection restConnection, final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final String projectName,
             final String versionName) {
-        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
+        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
     }
 
     public HubRegistrationService createHubRegistrationService() {
@@ -160,12 +158,6 @@ public class HubServicesFactory {
 
     public RestConnection getRestConnection() {
         return restConnection;
-    }
-
-    public HubSupportHelper createCheckedHubSupport() throws IntegrationException {
-        final HubSupportHelper supportHelper = new HubSupportHelper();
-        supportHelper.checkHubSupport(createHubVersionService(), restConnection.logger);
-        return supportHelper;
     }
 
     public ComponentDataService createComponentDataService() {

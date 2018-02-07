@@ -32,7 +32,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.HubSupportHelper;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportFormatType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.RiskCountType;
@@ -43,11 +42,9 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.api.report.AggregateBomViewEntry;
-import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
 import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.report.RiskReportWriter;
@@ -65,16 +62,14 @@ public class ReportDataService extends HubService {
     private final IntLogger logger;
     private final ReportService reportRequestService;
     private final ProjectDataService projectDataService;
-    private final HubSupportHelper hubSupportHelper;
     private final IntegrationEscapeUtil escapeUtil;
 
     public ReportDataService(final RestConnection restConnection,
-            final ReportService reportRequestService, final ProjectDataService projectDataService, final HubSupportHelper hubSupportHelper, final IntegrationEscapeUtil escapeUtil) {
+            final ReportService reportRequestService, final ProjectDataService projectDataService, final IntegrationEscapeUtil escapeUtil) {
         super(restConnection);
         this.logger = restConnection.logger;
         this.reportRequestService = reportRequestService;
         this.projectDataService = projectDataService;
-        this.hubSupportHelper = hubSupportHelper;
         this.escapeUtil = escapeUtil;
     }
 
@@ -134,45 +129,34 @@ public class ReportDataService extends HubService {
         reportData.setPhase(version.phase.toString());
         reportData.setDistribution(version.distribution.toString());
         final List<BomComponent> components = new ArrayList<>();
-        if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.AGGREGATE_BOM_REST_SERVER)) {
-            logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
-            final String componentsLink = getFirstLink(version, ProjectVersionView.COMPONENTS_LINK);
-            final List<VersionBomComponentView> bomEntries = getAllResponses(componentsLink, VersionBomComponentView.class);
-            boolean policyFailure = false;
-            for (final VersionBomComponentView bomEntry : bomEntries) {
-                final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
-                String policyStatus = bomEntry.approvalStatus.toString();
-                if (StringUtils.isBlank(policyStatus)) {
-                    String componentPolicyStatusURL = null;
-                    if (!StringUtils.isBlank(bomEntry.componentVersion)) {
-                        componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.componentVersion);
-                    } else {
-                        componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.component);
-                    }
-                    if (!policyFailure) {
-                        // FIXME if we could check if the Hub has the policy module we could remove a lot of the mess
-                        try {
-                            final PolicyStatusView bomPolicyStatus = getResponse(componentPolicyStatusURL, PolicyStatusView.class);
-                            policyStatus = bomPolicyStatus.approvalStatus.toString();
-                        } catch (final IntegrationException e) {
-                            policyFailure = true;
-                            logger.debug("Could not get the component policy status, the Hub policy module is not enabled");
-                        }
+        logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
+        final String componentsLink = getFirstLink(version, ProjectVersionView.COMPONENTS_LINK);
+        final List<VersionBomComponentView> bomEntries = getAllResponses(componentsLink, VersionBomComponentView.class);
+        boolean policyFailure = false;
+        for (final VersionBomComponentView bomEntry : bomEntries) {
+            final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
+            String policyStatus = bomEntry.approvalStatus.toString();
+            if (StringUtils.isBlank(policyStatus)) {
+                String componentPolicyStatusURL = null;
+                if (!StringUtils.isBlank(bomEntry.componentVersion)) {
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.componentVersion);
+                } else {
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.component);
+                }
+                if (!policyFailure) {
+                    // FIXME if we could check if the Hub has the policy module we could remove a lot of the mess
+                    try {
+                        final PolicyStatusView bomPolicyStatus = getResponse(componentPolicyStatusURL, PolicyStatusView.class);
+                        policyStatus = bomPolicyStatus.approvalStatus.toString();
+                    } catch (final IntegrationException e) {
+                        policyFailure = true;
+                        logger.debug("Could not get the component policy status, the Hub policy module is not enabled");
                     }
                 }
-                component.setPolicyStatus(policyStatus);
-                addPolicyRuleInfo(component, bomEntry);
-                components.add(component);
             }
-        } else {
-            logger.trace("Getting the Report Contents using the Report Rest Server");
-            final ReportCategoriesEnum[] categories = { ReportCategoriesEnum.VERSION, ReportCategoriesEnum.COMPONENTS };
-            final VersionReport versionReport = reportRequestService.generateHubReport(version, ReportFormatType.JSON, categories);
-            final List<AggregateBomViewEntry> bomEntries = versionReport.getAggregateBomViewEntries();
-            for (final AggregateBomViewEntry bomEntry : bomEntries) {
-                final BomComponent component = createBomComponentFromBomViewEntry(versionReport, bomEntry);
-                components.add(component);
-            }
+            component.setPolicyStatus(policyStatus);
+            addPolicyRuleInfo(component, bomEntry);
+            components.add(component);
         }
         reportData.setComponents(components);
         return reportData;
