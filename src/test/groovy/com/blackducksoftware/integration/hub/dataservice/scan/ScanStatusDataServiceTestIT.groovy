@@ -23,11 +23,15 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.scan
 
+import org.junit.Assert;
 import org.junit.Test
 import org.junit.experimental.categories.Category
 
 import com.blackducksoftware.integration.IntegrationTest
+import com.blackducksoftware.integration.hub.dataservice.codelocation.CodeLocationDataService
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
+import com.blackducksoftware.integration.hub.service.HubServicesFactory
+import com.blackducksoftware.integration.log.IntLogger
 
 @Category(IntegrationTest.class)
 class ScanStatusDataServiceTestIT {
@@ -39,7 +43,7 @@ class ScanStatusDataServiceTestIT {
     void testBdioImportForNewProject() {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        final BomImportService bomImportRequestService = hubServicesFactory.createBomImportService()
+        final CodeLocationDataService codeLocationDataService = hubServicesFactory.createCodeLocationDataService()
         final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(FIVE_MINUTES);
 
         // import the bdio
@@ -51,7 +55,7 @@ class ScanStatusDataServiceTestIT {
         File uniquelyNamedBdio = File.createTempFile('uniquebdio', '.jsonld')
         uniquelyNamedBdio << alteredContents
 
-        bomImportRequestService.importBomFile(uniquelyNamedBdio, 'application/ld+json');
+        codeLocationDataService.importBomFile(uniquelyNamedBdio, 'application/ld+json');
         // wait for the scan to start/finish
         try {
             scanStatusDataService.assertBomImportScanStartedThenFinished(uniqueName, version);
