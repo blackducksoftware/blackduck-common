@@ -41,7 +41,6 @@ import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
@@ -49,22 +48,18 @@ import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 @Category(IntegrationTest.class)
 public class ProjectServiceTestIT {
     private static HubServicesFactory hubServices;
-    private static ProjectService projectRequestService;
-    private static ProjectVersionService projectVersionRequestService;
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
     private static ProjectView project = null;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         hubServices = restConnectionTestHelper.createHubServicesFactory();
-        projectRequestService = hubServices.createProjectService();
-        projectVersionRequestService = hubServices.createProjectVersionService();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         if (project != null) {
-            projectRequestService.deleteHubProject(project);
+            hubServices.createProjectDataService().deleteHubProject(project);
         }
     }
 
@@ -78,10 +73,10 @@ public class ProjectServiceTestIT {
 
         final ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.name = testProjectName;
-        final String projectUrl = projectRequestService.createHubProject(projectRequest);
+        final String projectUrl = hubServices.createProjectDataService().createHubProject(projectRequest);
         System.out.println("projectUrl: " + projectUrl);
 
-        project = projectRequestService.getResponse(projectUrl, ProjectView.class);
+        project = hubServices.createHubService().getResponse(projectUrl, ProjectView.class);
         final ProjectVersionRequest projectVersionRequest1 = new ProjectVersionRequest();
         projectVersionRequest1.distribution = ProjectVersionDistributionType.INTERNAL;
         projectVersionRequest1.phase = ProjectVersionPhaseType.DEVELOPMENT;
@@ -97,31 +92,30 @@ public class ProjectServiceTestIT {
         projectVersionRequest3.phase = ProjectVersionPhaseType.DEVELOPMENT;
         projectVersionRequest3.versionName = testProjectVersion3Name;
 
-        projectVersionRequestService.createHubVersion(project, projectVersionRequest1);
-        projectVersionRequestService.createHubVersion(project, projectVersionRequest2);
-        projectVersionRequestService.createHubVersion(project, projectVersionRequest3);
+        hubServices.createProjectDataService().createHubVersion(project, projectVersionRequest1);
+        hubServices.createProjectDataService().createHubVersion(project, projectVersionRequest2);
+        hubServices.createProjectDataService().createHubVersion(project, projectVersionRequest3);
 
-        final ProjectVersionView projectVersion1 = projectVersionRequestService.getProjectVersion(project, testProjectVersion1Name);
+        final ProjectVersionView projectVersion1 = hubServices.createProjectDataService().getProjectVersion(project, testProjectVersion1Name);
         assertEquals(testProjectVersion1Name, projectVersion1.versionName);
 
-        final ProjectVersionView projectVersion2 = projectVersionRequestService.getProjectVersion(project, testProjectVersion2Name);
+        final ProjectVersionView projectVersion2 = hubServices.createProjectDataService().getProjectVersion(project, testProjectVersion2Name);
         assertEquals(testProjectVersion2Name, projectVersion2.versionName);
 
-        final ProjectVersionView projectVersion3 = projectVersionRequestService.getProjectVersion(project, testProjectVersion3Name);
+        final ProjectVersionView projectVersion3 = hubServices.createProjectDataService().getProjectVersion(project, testProjectVersion3Name);
         assertEquals(testProjectVersion3Name, projectVersion3.versionName);
 
-        projectRequestService.deleteHubProject(project);
+        hubServices.createProjectDataService().deleteHubProject(project);
         project = null;
 
         try {
-            project = projectRequestService.getResponse(projectUrl, ProjectView.class);
+            project = hubServices.createHubService().getResponse(projectUrl, ProjectView.class);
             if (project != null) {
                 fail("This project should have been deleted");
             }
         } catch (final IntegrationRestException e) {
             // expected
         }
-
     }
 
 }

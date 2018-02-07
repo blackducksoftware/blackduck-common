@@ -28,7 +28,6 @@ import org.junit.Test
 import org.junit.experimental.categories.Category
 
 import com.blackducksoftware.integration.IntegrationTest
-import com.blackducksoftware.integration.hub.api.bom.BomImportService
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
@@ -43,8 +42,6 @@ class ScanStatusDataServiceTestIT {
     void testBdioImportForNewProject() {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        final BomImportService bomImportRequestService = hubServicesFactory.createBomImportService()
-        final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(FIVE_MINUTES);
 
         // import the bdio
         final File file = restConnectionTestHelper.getFile('bdio/GRADLE_rest_backend_rest_backend_4_2_0_SNAPSHOT_bdio.jsonld')
@@ -55,10 +52,10 @@ class ScanStatusDataServiceTestIT {
         File uniquelyNamedBdio = File.createTempFile('uniquebdio', '.jsonld')
         uniquelyNamedBdio << alteredContents
 
-        bomImportRequestService.importBomFile(uniquelyNamedBdio, 'application/ld+json');
+        hubServicesFactory.createCodeLocationDataService().importBomFile(uniquelyNamedBdio, 'application/ld+json');
         // wait for the scan to start/finish
         try {
-            scanStatusDataService.assertBomImportScanStartedThenFinished(uniqueName, version);
+            hubServicesFactory.createScanStatusDataService().assertBomImportScanStartedThenFinished(uniqueName, version);
         } catch (Throwable t) {
             Assert.fail("Nothing should have been thrown: " + t.getMessage())
         }

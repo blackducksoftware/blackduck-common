@@ -38,6 +38,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
 @Category(IntegrationTest.class)
@@ -48,15 +49,15 @@ public class AggregateBomServiceTestIT {
     public void testGetBomEntriesForUrl() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServices = restConnectionTestHelper.createHubServicesFactory();
         final MetaHandler metaService = new MetaHandler(restConnectionTestHelper.createIntLogger());
-        final AggregateBomService bomRequestService = hubServices.createAggregateBomService();
+        final HubService hubService = hubServices.createHubService();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
         final String testProjectVersionName = "BomRequestServiceTest";
         final String testComponentName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT");
         final String testComponentVersionName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_VERSION");
 
-        final ProjectView project = hubServices.createProjectService().getProjectByName(testProjectName);
-        final List<ProjectVersionView> projectVersions = hubServices.createProjectVersionService().getAllProjectVersions(project);
+        final ProjectView project = hubServices.createProjectDataService().getProjectByName(testProjectName);
+        final List<ProjectVersionView> projectVersions = hubService.getAllResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
             if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {
@@ -66,7 +67,7 @@ public class AggregateBomServiceTestIT {
         assertNotNull(projectVersion);
 
         final String bomUrl = metaService.getFirstLink(projectVersion, "components");
-        final List<VersionBomComponentView> bomComponents = bomRequestService.getBomEntries(bomUrl);
+        final List<VersionBomComponentView> bomComponents = hubService.getAllResponses(bomUrl, VersionBomComponentView.class);
         System.out.println("BOM size: " + bomComponents.size());
 
         // Look for testComponent in BOM
@@ -83,15 +84,14 @@ public class AggregateBomServiceTestIT {
     @Test
     public void testGetBomEntriesForProjectVersion() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServices = restConnectionTestHelper.createHubServicesFactory();
-        final AggregateBomService bomRequestService = hubServices.createAggregateBomService();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
         final String testProjectVersionName = "BomRequestServiceTest";
         final String testComponentName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT");
         final String testComponentVersionName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_VERSION");
 
-        final ProjectView project = hubServices.createProjectService().getProjectByName(testProjectName);
-        final List<ProjectVersionView> projectVersions = hubServices.createProjectVersionService().getAllProjectVersions(project);
+        final ProjectView project = hubServices.createProjectDataService().getProjectByName(testProjectName);
+        final List<ProjectVersionView> projectVersions = hubServices.createHubService().getAllResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
             if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {
@@ -100,7 +100,7 @@ public class AggregateBomServiceTestIT {
         }
         assertNotNull(projectVersion);
 
-        final List<VersionBomComponentView> bomComponents = bomRequestService.getBomEntries(projectVersion);
+        final List<VersionBomComponentView> bomComponents = hubServices.createHubService().getAllResponsesFromLinkResponse(projectVersion, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         System.out.println("BOM size: " + bomComponents.size());
 
         // Look for testComponent in BOM

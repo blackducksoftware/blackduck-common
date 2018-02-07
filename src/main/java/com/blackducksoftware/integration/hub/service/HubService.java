@@ -31,6 +31,8 @@ import java.util.Map;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.core.HubView;
+import com.blackducksoftware.integration.hub.api.core.LinkMultipleResponses;
+import com.blackducksoftware.integration.hub.api.core.LinkSingleResponse;
 import com.blackducksoftware.integration.hub.api.generated.model.ResourceLink;
 import com.blackducksoftware.integration.hub.api.generated.model.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
@@ -122,6 +124,24 @@ public class HubService {
 
     public String getHref(final HubView view) throws HubIntegrationException {
         return metaHandler.getHref(view);
+    }
+
+    public <T extends HubResponse> T getResponseFromLinkResponse(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
+        return hubResponseTransformer.getResponseFromLink(hubView, linkSingleResponse.link, linkSingleResponse.responseClass);
+    }
+
+    /**
+     * WILL make further paged requests to get the full list of items
+     */
+    public <T extends HubResponse> List<T> getAllResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
+        return allHubResponsesTransformer.getAllResponsesFromLink(hubView, linkMultipleResponses.link, linkMultipleResponses.responseClass);
+    }
+
+    /**
+     * WILL make further paged requests to get the full list of items
+     */
+    public <T extends HubResponse> List<T> getAllResponsesFromApi(final LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
+        return allHubResponsesTransformer.getAllResponsesFromApi(linkMultipleResponses.link, linkMultipleResponses.responseClass);
     }
 
     public <T extends HubResponse> T getResponseFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {

@@ -40,13 +40,12 @@ import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
-import com.blackducksoftware.integration.hub.api.project.ProjectService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
 import com.blackducksoftware.integration.hub.api.report.ReportCategoriesEnum;
 import com.blackducksoftware.integration.hub.api.report.ReportService;
 import com.blackducksoftware.integration.hub.api.report.VersionReport;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.codelocation.CodeLocationDataService;
+import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.request.HubRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
@@ -60,15 +59,14 @@ public class ReportRequestServiceTestIT {
     @Test
     public void testGenerateReport() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final ProjectService projectService = hubServicesFactory.createProjectService();
-        final ProjectVersionService projectVersionService = hubServicesFactory.createProjectVersionService();
-        final CodeLocationDataService importService = hubServicesFactory.createBomImportService();
+        final ProjectDataService projectService = hubServicesFactory.createProjectDataService();
+        final CodeLocationDataService codeLocationDataService = hubServicesFactory.createCodeLocationDataService();
         final ReportService reportservice = hubServicesFactory.createReportService(120 * 1000);
 
         final ProjectView project = getProject(projectService, restConnectionTestHelper.getProperty("TEST_REPORT_PROJECT"));
-        final ProjectVersionView version = getVersion(projectVersionService, project, restConnectionTestHelper.getProperty("TEST_REPORT_VERSION"));
+        final ProjectVersionView version = getVersion(projectService, project, restConnectionTestHelper.getProperty("TEST_REPORT_VERSION"));
         try {
-            importService.importBomFile(getBDIOSingleDependency(), "application/ld+json");
+            codeLocationDataService.importBomFile(getBDIOSingleDependency(), "application/ld+json");
             waitForHub(hubServicesFactory.createScanStatusDataService(120 * 1000), project.name, version.versionName, hubServicesFactory.getRestConnection().logger);
 
             final ReportCategoriesEnum[] categories = new ReportCategoriesEnum[2];
@@ -94,7 +92,7 @@ public class ReportRequestServiceTestIT {
         }
     }
 
-    private ProjectView getProject(final ProjectService projectService, final String projectName) {
+    private ProjectView getProject(final ProjectDataService projectService, final String projectName) {
         ProjectView project;
         try {
             project = projectService.getProjectByName(projectName);
@@ -111,7 +109,7 @@ public class ReportRequestServiceTestIT {
         return project;
     }
 
-    private ProjectVersionView getVersion(final ProjectVersionService versionService, final ProjectView project, final String versionName) {
+    private ProjectVersionView getVersion(final ProjectDataService versionService, final ProjectView project, final String versionName) {
         ProjectVersionView version;
         try {
             version = versionService.getProjectVersion(project, versionName);
