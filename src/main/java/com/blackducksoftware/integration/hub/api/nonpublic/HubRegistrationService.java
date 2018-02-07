@@ -27,25 +27,27 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_REGISTRATIONS;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.request.HubRequest;
+import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.google.gson.JsonObject;
-
-import okhttp3.Response;
 
 public class HubRegistrationService extends HubService {
     public HubRegistrationService(final RestConnection restConnection) {
         super(restConnection);
     }
 
-    public String getRegistrationId() throws IntegrationException {
-        final HubRequest request = getHubRequestFactory().createRequest(Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_REGISTRATIONS));
-        try (Response response = request.executeGet()) {
-            final String jsonResponse = readResponseString(response);
+    public String getRegistrationId() throws IntegrationException, IOException {
+        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_REGISTRATIONS));
+        final Request request = new Request(uri);
+
+        try (Response response = getRestConnection().executeRequest(request)) {
+            final String jsonResponse = response.getContentString();
             final JsonObject jsonObject = getJsonParser().parse(jsonResponse).getAsJsonObject();
             final String registrationId = jsonObject.get("registrationId").getAsString();
             return registrationId;

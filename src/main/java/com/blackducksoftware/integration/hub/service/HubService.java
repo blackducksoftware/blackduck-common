@@ -35,9 +35,7 @@ import com.blackducksoftware.integration.hub.api.generated.model.ResourceLink;
 import com.blackducksoftware.integration.hub.api.generated.model.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
-import com.blackducksoftware.integration.hub.request.HubRequest;
-import com.blackducksoftware.integration.hub.request.HubRequestFactory;
+import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -45,9 +43,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import okhttp3.Response;
-
 public class HubService {
+    private final RestConnection restConnection;
     private final MetaHandler metaHandler;
     private final HubResponseTransformer hubResponseTransformer;
     private final HubResponsesTransformer hubResponsesTransformer;
@@ -58,14 +55,19 @@ public class HubService {
     private final Gson gson;
 
     public HubService(final RestConnection restConnection) {
-        this.hubRequestFactory = new HubRequestFactory(restConnection);
-        this.hubBaseUrl = restConnection.hubBaseUrl;
+        this.restConnection = restConnection;
+        this.hubRequestFactory = new HubRequestFactory();
+        this.hubBaseUrl = restConnection.baseUrl;
         this.jsonParser = restConnection.jsonParser;
         this.gson = restConnection.gson;
         this.metaHandler = new MetaHandler(restConnection.logger);
         this.hubResponseTransformer = new HubResponseTransformer(hubRequestFactory, metaHandler, jsonParser, gson);
         this.hubResponsesTransformer = new HubResponsesTransformer(hubResponseTransformer, jsonParser);
         this.allHubResponsesTransformer = new AllHubResponsesTransformer(hubResponsesTransformer, hubRequestFactory, metaHandler, jsonParser);
+    }
+
+    public RestConnection getRestConnection() {
+        return restConnection;
     }
 
     public URL getHubBaseUrl() {

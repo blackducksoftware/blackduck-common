@@ -29,15 +29,17 @@ import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CUR
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CURRENT_VERSION_COMPARISON;
 import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.response.VersionComparison;
-import com.blackducksoftware.integration.hub.request.HubRequest;
+import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
-
-import okhttp3.Response;
 
 public class HubVersionService extends HubService {
 
@@ -46,24 +48,32 @@ public class HubVersionService extends HubService {
     }
 
     public String getHubVersion() throws IntegrationException {
-        final HubRequest request = getHubRequestFactory().createRequest(Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION));
-        try (Response response = request.executeGet()) {
-            final String hubVersionWithPossibleSurroundingQuotes = readResponseString(response);
+        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION));
+        final Request request = new Request(uri);
+
+        try (Response response = getRestConnection().executeRequest(request)) {
+            final String hubVersionWithPossibleSurroundingQuotes = response.getContentString();
             final String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
             return hubVersion;
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
         }
     }
 
-    public VersionComparison getHubVersionComparison(final String consumerVersion) throws IntegrationException {
-        final HubRequest hubVersionRequest = getHubRequestFactory().createRequest(Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON)).addQueryParameter(QUERY_VERSION, consumerVersion);
-        try (Response response = hubVersionRequest.executeGet()) {
-            final String jsonResponse = readResponseString(response);
+    public VersionComparison getHubVersionComparison(final String consumerVersion) throws IntegrationException, IOException {
+        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON));
+        final Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put(QUERY_VERSION, consumerVersion);
+        final Request request = getHubRequestFactory().createGetRequest(uri, queryParameters);
+
+        try (Response response = getRestConnection().executeRequest(request)) {
+            final String jsonResponse = response.getContentString();
             final VersionComparison versionComparison = getGson().fromJson(jsonResponse, VersionComparison.class);
             return versionComparison;
         }
     }
 
-    public boolean isConsumerVersionLessThanOrEqualToServerVersion(final String consumerVersion) throws IntegrationException {
+    public boolean isConsumerVersionLessThanOrEqualToServerVersion(final String consumerVersion) throws IntegrationException, IOException {
         final VersionComparison versionComparison = getHubVersionComparison(consumerVersion);
         if (versionComparison.numericResult <= 0) {
             return true;
