@@ -26,8 +26,6 @@ package com.blackducksoftware.integration.hub.validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
@@ -82,9 +80,9 @@ public class HubServerVerifier {
             } catch (final IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
-            final HubRequestFactory hubRequestFactory = new HubRequestFactory();
-            final String downloadUri = hubRequestFactory.pieceTogetherURI(hubURL, "download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
-            request = new Request(downloadUri);
+            final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubURL);
+            request = hubRequestFactory.createGetRequestFromPath("download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
+            final String downloadUri = request.getUri();
             try (Response response = restConnection.executeRequest(request)) {
             } catch (final IntegrationRestException e) {
                 throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);

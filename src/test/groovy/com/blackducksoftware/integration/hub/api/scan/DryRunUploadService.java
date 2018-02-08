@@ -37,8 +37,7 @@ public class DryRunUploadService extends HubService {
     }
 
     public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws Exception {
-        final String uri = getHubRequestFactory().pieceTogetherURI(getRestConnection().baseUrl, "api/v1/scans");
-        final Request request = getHubRequestFactory().createRequest(uri, HttpMethod.POST, "application/json");
+        final Request request = getHubRequestFactory().createRequestFromPath("api/v1/scans", HttpMethod.POST, "application/json");
         request.setBodyContentFile(dryRunFile);
         try (Response response = getRestConnection().executeRequest(request)) {
             final String responseString = response.getContentString();

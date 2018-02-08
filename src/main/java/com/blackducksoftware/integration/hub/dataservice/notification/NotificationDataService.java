@@ -118,8 +118,7 @@ public class NotificationDataService extends HubService {
         queryParameters.put("startDate", startDateString);
         queryParameters.put("endDate", endDateString);
 
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), ApiDiscovery.NOTIFICATIONS_LINK);
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequest(uri, queryParameters);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPath(ApiDiscovery.NOTIFICATIONS_LINK, queryParameters);
 
         final List<NotificationView> allNotificationItems = getAllResponses(pagedRequest, NotificationView.class, typeMap);
         return allNotificationItems;
@@ -130,7 +129,7 @@ public class NotificationDataService extends HubService {
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
-        final String uri = getFirstLink(user, MetaHandler.NOTIFICATIONS_LINK);
+        final String uri = getFirstLink(user, UserView.NOTIFICATIONS_LINK);
 
         final Map<String, String> queryParameters = new HashMap<>();
         queryParameters.put("startDate", startDateString);

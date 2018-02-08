@@ -85,8 +85,7 @@ public class ComponentDataService extends HubService {
         final String hubOriginId = externalId.createHubOriginId();
         final String componentQuery = String.format("id:%s|%s", forge, hubOriginId);
 
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), ApiDiscovery.COMPONENTS_LINK);
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestWithQ(uri, componentQuery);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPathWithQ(ApiDiscovery.COMPONENTS_LINK, componentQuery);
 
         final List<ComponentSearchResultView> allComponents = getAllResponses(pagedRequest, ComponentSearchResultView.class);
         return allComponents;

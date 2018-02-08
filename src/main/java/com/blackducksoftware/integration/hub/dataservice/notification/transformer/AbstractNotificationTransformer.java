@@ -91,13 +91,13 @@ public abstract class AbstractNotificationTransformer implements ItemTransform<L
         fullProjectVersion.setSource(item.source);
 
         fullProjectVersion.setUrl(metaService.getHref(item));
-        fullProjectVersion.setCodeLocationsLink((metaService.getFirstLinkSafely(item, MetaHandler.CODE_LOCATION_LINK)));
-        fullProjectVersion.setComponentsLink((metaService.getFirstLinkSafely(item, MetaHandler.COMPONENTS_LINK)));
-        fullProjectVersion.setPolicyStatusLink((metaService.getFirstLinkSafely(item, MetaHandler.POLICY_STATUS_LINK)));
-        fullProjectVersion.setProjectLink((metaService.getFirstLinkSafely(item, MetaHandler.PROJECT_LINK)));
-        fullProjectVersion.setRiskProfileLink((metaService.getFirstLinkSafely(item, MetaHandler.RISK_PROFILE_LINK)));
-        fullProjectVersion.setVersionReportLink((metaService.getFirstLinkSafely(item, MetaHandler.VERSION_REPORT_LINK)));
-        fullProjectVersion.setVulnerableComponentsLink((metaService.getFirstLinkSafely(item, MetaHandler.VULNERABLE_COMPONENTS_LINK)));
+        fullProjectVersion.setCodeLocationsLink((metaService.getFirstLinkSafely(item, ProjectVersionView.CODELOCATIONS_LINK)));
+        fullProjectVersion.setComponentsLink((metaService.getFirstLinkSafely(item, ProjectVersionView.COMPONENTS_LINK)));
+        fullProjectVersion.setPolicyStatusLink((metaService.getFirstLinkSafely(item, ProjectVersionView.POLICY_STATUS_LINK)));
+        fullProjectVersion.setProjectLink((metaService.getFirstLinkSafely(item, ProjectVersionView.PROJECT_LINK)));
+        fullProjectVersion.setRiskProfileLink((metaService.getFirstLinkSafely(item, ProjectVersionView.RISKPROFILE_LINK)));
+        fullProjectVersion.setVersionReportLink((metaService.getFirstLinkSafely(item, ProjectVersionView.VERSIONREPORT_LINK)));
+        fullProjectVersion.setVulnerableComponentsLink((metaService.getFirstLinkSafely(item, ProjectVersionView.VULNERABLE_COMPONENTS_LINK)));
         return fullProjectVersion;
     }
 

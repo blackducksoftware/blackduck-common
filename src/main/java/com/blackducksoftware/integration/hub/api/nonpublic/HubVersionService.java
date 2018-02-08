@@ -43,9 +43,7 @@ public class HubVersionService extends HubService {
     }
 
     public String getHubVersion() throws IntegrationException {
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), "api/v1/current-version");
-        final Request request = new Request(uri);
-
+        final Request request = getHubRequestFactory().createGetRequestFromPath("api/v1/current-version");
         try (Response response = getRestConnection().executeRequest(request)) {
             final String hubVersionWithPossibleSurroundingQuotes = response.getContentString();
             final String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
@@ -56,11 +54,9 @@ public class HubVersionService extends HubService {
     }
 
     public VersionComparison getHubVersionComparison(final String consumerVersion) throws IntegrationException, IOException {
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), "api/v1/current-version-comparison");
         final Map<String, String> queryParameters = new HashMap<>();
         queryParameters.put(QUERY_VERSION, consumerVersion);
-        final Request request = getHubRequestFactory().createGetRequest(uri, queryParameters);
-
+        final Request request = getHubRequestFactory().createGetRequestFromPath("api/v1/current-version-comparison", queryParameters);
         try (Response response = getRestConnection().executeRequest(request)) {
             final String jsonResponse = response.getContentString();
             final VersionComparison versionComparison = getGson().fromJson(jsonResponse, VersionComparison.class);

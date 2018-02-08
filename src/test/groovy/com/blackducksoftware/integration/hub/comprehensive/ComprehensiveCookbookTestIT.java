@@ -86,7 +86,7 @@ public class ComprehensiveCookbookTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
-        final HubRequestFactory hubRequestFactory = new HubRequestFactory();
+        final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection().baseUrl);
 
         // delete the project, if it exists
         deleteIfProjectExists(logger, hubServicesFactory, hubRequestFactory, metaHandler, testProjectName);
@@ -128,7 +128,7 @@ public class ComprehensiveCookbookTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
-        final HubRequestFactory hubRequestFactory = new HubRequestFactory();
+        final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection().baseUrl);
 
         // delete the project, if it exists
         deleteIfProjectExists(logger, hubServicesFactory, hubRequestFactory, metaHandler, testProjectName);
@@ -169,7 +169,7 @@ public class ComprehensiveCookbookTestIT {
         final Date startDate = new Date();
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
-        final HubRequestFactory hubRequestFactory = new HubRequestFactory();
+        final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection().baseUrl);
         final MetaHandler metaHandler = new MetaHandler(logger);
         final ScanStatusDataService scanStatusDataService = hubServicesFactory.createScanStatusDataService(FIVE_MINUTES);
         final PolicyStatusDataService policyStatusDataService = hubServicesFactory.createPolicyStatusDataService();
@@ -240,7 +240,7 @@ public class ComprehensiveCookbookTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
-        final HubRequestFactory hubRequestFactory = new HubRequestFactory();
+        final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubServicesFactory.getRestConnection().baseUrl);
         final CLIDataService cliDataService = hubServicesFactory.createCLIDataService(TWENTY_MINUTES);
         final PolicyStatusDataService policyStatusDataService = hubServicesFactory.createPolicyStatusDataService();
 

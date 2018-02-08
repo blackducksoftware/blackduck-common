@@ -38,9 +38,7 @@ public class HubRegistrationService extends HubService {
     }
 
     public String getRegistrationId() throws IntegrationException, IOException {
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), "api/v1/registrations");
-        final Request request = new Request(uri);
-
+        final Request request = getHubRequestFactory().createGetRequestFromPath("api/v1/registrations");
         try (Response response = getRestConnection().executeRequest(request)) {
             final String jsonResponse = response.getContentString();
             final JsonObject jsonObject = getJsonParser().parse(jsonResponse).getAsJsonObject();

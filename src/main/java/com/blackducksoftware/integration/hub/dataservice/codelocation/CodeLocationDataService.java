@@ -63,8 +63,7 @@ public class CodeLocationDataService extends HubService {
         } catch (final IOException e) {
             throw new IntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub because : " + e.getMessage(), e);
         }
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), HubService.BOMIMPORT_LINK);
-        final Request request = getHubRequestFactory().createRequest(uri, HttpMethod.POST, mimeType);
+        final Request request = getHubRequestFactory().createRequestFromPath(HubService.BOMIMPORT_LINK, HttpMethod.POST, mimeType);
         request.setBodyContent(jsonPayload);
         try (Response response = getRestConnection().executeRequest(request)) {
         } catch (final IOException e) {
@@ -75,8 +74,7 @@ public class CodeLocationDataService extends HubService {
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationType codeLocationType) throws IntegrationException {
         final Map<String, String> queryParameters = new HashMap<>();
         queryParameters.put("codeLocationType", codeLocationType.toString());
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), ApiDiscovery.CODELOCATIONS_LINK);
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequest(uri, queryParameters);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPath(ApiDiscovery.CODELOCATIONS_LINK, queryParameters);
 
         final List<CodeLocationView> allCodeLocations = getAllResponses(pagedRequest, CodeLocationView.class);
         return allCodeLocations;
@@ -140,8 +138,7 @@ public class CodeLocationDataService extends HubService {
 
     public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
-            final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), ApiDiscovery.CODELOCATIONS_LINK);
-            final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestWithQ(uri, "name:" + codeLocationName);
+            final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPathWithQ(ApiDiscovery.CODELOCATIONS_LINK, "name:" + codeLocationName);
             final List<CodeLocationView> codeLocations = getAllResponses(pagedRequest, CodeLocationView.class);
             for (final CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.name)) {
@@ -154,8 +151,7 @@ public class CodeLocationDataService extends HubService {
     }
 
     public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), ApiDiscovery.CODELOCATIONS_LINK + "/" + codeLocationId);
-        final Request request = new Request(uri);
+        final Request request = getHubRequestFactory().createGetRequestFromPath(ApiDiscovery.CODELOCATIONS_LINK + "/" + codeLocationId);
         return getResponse(request, CodeLocationView.class);
     }
 
@@ -171,8 +167,7 @@ public class CodeLocationDataService extends HubService {
     }
 
     public ScanSummaryView getScanSummaryViewById(final String scanSummaryId) throws IntegrationException {
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), HubService.SCANSUMMARIES_LINK + "/" + scanSummaryId);
-        final Request request = new Request(uri);
+        final Request request = getHubRequestFactory().createGetRequestFromPath(HubService.SCANSUMMARIES_LINK + "/" + scanSummaryId);
         return getResponse(request, ScanSummaryView.class);
     }
 }

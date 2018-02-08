@@ -36,7 +36,6 @@ import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.PagedRequest;
 import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
@@ -70,8 +69,7 @@ public class AllHubResponsesTransformer {
     }
 
     public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiPath, final Class<T> clazz, final int itemsPerPage, final String mediaType) throws IntegrationException {
-        final String uri = hubRequestFactory.pieceTogetherURI(restConnection.baseUrl, apiPath);
-        final PagedRequest pagedRequest = new PagedRequest(uri, null, null, HttpMethod.GET, mediaType, null, null, itemsPerPage, 0);
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromPath(apiPath, mediaType, itemsPerPage);
         return getAllResponses(pagedRequest, clazz, null);
     }
 

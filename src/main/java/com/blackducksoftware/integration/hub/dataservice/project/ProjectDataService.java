@@ -72,8 +72,7 @@ public class ProjectDataService extends HubService {
         if (StringUtils.isNotBlank(projectName)) {
             q = "name:" + projectName;
         }
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), ApiDiscovery.PROJECTS_LINK);
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestWithQ(uri, q);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPathWithQ(ApiDiscovery.PROJECTS_LINK, q);
 
         final List<ProjectView> allProjectItems = getAllResponses(pagedRequest, ProjectView.class);
         return allProjectItems;
@@ -84,8 +83,7 @@ public class ProjectDataService extends HubService {
         if (StringUtils.isNotBlank(projectName)) {
             q = "name:" + projectName;
         }
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), ApiDiscovery.PROJECTS_LINK);
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestWithQ(uri, q, limit);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPathWithQ(ApiDiscovery.PROJECTS_LINK, q, limit);
 
         final List<ProjectView> projectItems = getResponses(pagedRequest, ProjectView.class);
         return projectItems;
@@ -102,8 +100,7 @@ public class ProjectDataService extends HubService {
     }
 
     public String createHubProject(final ProjectRequest project) throws IntegrationException {
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), ApiDiscovery.PROJECTS_LINK);
-        final Request request = getHubRequestFactory().createRequest(uri, HttpMethod.POST);
+        final Request request = getHubRequestFactory().createRequestFromPath(ApiDiscovery.PROJECTS_LINK, HttpMethod.POST);
         request.setBodyContent(getGson().toJson(project));
         try (Response response = getRestConnection().executeRequest(request)) {
             return response.getHeaderValue("location");

@@ -62,8 +62,8 @@ public class HubService {
 
     public HubService(final RestConnection restConnection) {
         this.restConnection = restConnection;
-        this.hubRequestFactory = new HubRequestFactory();
         this.hubBaseUrl = restConnection.baseUrl;
+        this.hubRequestFactory = new HubRequestFactory(hubBaseUrl);
         this.jsonParser = restConnection.jsonParser;
         this.gson = restConnection.gson;
         this.metaHandler = new MetaHandler(restConnection.logger);
@@ -122,6 +122,10 @@ public class HubService {
 
     public String getHref(final HubView view) throws HubIntegrationException {
         return metaHandler.getHref(view);
+    }
+
+    public <T extends HubResponse> T getResponseFromLinkResponse(final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
+        return hubResponseTransformer.getResponse(linkSingleResponse.link, linkSingleResponse.responseClass);
     }
 
     public <T extends HubResponse> T getResponseFromLinkResponse(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
