@@ -450,7 +450,7 @@ public class CLIInstallerTestIT {
         final TestLogger logger = new TestLogger();
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final URL hubUrl = hubServicesFactory.getRestConnection().hubBaseUrl;
+        final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
 
         final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionService();
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
@@ -465,7 +465,7 @@ public class CLIInstallerTestIT {
         final File installDir = folder.newFolder();
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final URL hubUrl = hubServicesFactory.getRestConnection().hubBaseUrl;
+        final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
 
         final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionService();
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
@@ -480,7 +480,7 @@ public class CLIInstallerTestIT {
         final File installDir = folder.newFolder();
         final CLILocation cliLocation = new CLILocation(logger, installDir);
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory(logger);
-        final URL hubUrl = hubServicesFactory.getRestConnection().hubBaseUrl;
+        final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
 
         final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionService();
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
@@ -515,13 +515,13 @@ public class CLIInstallerTestIT {
         builder.setTimeout(restConnectionTestHelper.getProperty("TEST_HUB_TIMEOUT"));
         builder.setProxyHost(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
         builder.setProxyPort(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"));
-        builder.setAlwaysTrustServerCertificate(Boolean.getBoolean(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
+        builder.setAlwaysTrustServerCertificate(Boolean.valueOf(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
         final CredentialsRestConnection restConnection = restConnectionTestHelper.getRestConnection(builder.build());
         restConnection.logger = logger;
 
         final HubServicesFactory hubServicesFactory = new HubServicesFactory(restConnection);
-        final URL hubUrl = restConnection.hubBaseUrl;
+        final URL hubUrl = restConnection.baseUrl;
 
         final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionService();
         final String hubVersion = hubVersionRequestService.getHubVersion();
@@ -558,13 +558,13 @@ public class CLIInstallerTestIT {
         builder.setProxyPort(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_BASIC"));
         builder.setProxyUsername(restConnectionTestHelper.getProperty("TEST_PROXY_USER_BASIC"));
         builder.setProxyPassword(restConnectionTestHelper.getProperty("TEST_PROXY_PASSWORD_BASIC"));
-        builder.setAlwaysTrustServerCertificate(Boolean.getBoolean(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
+        builder.setAlwaysTrustServerCertificate(Boolean.valueOf(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
         final CredentialsRestConnection restConnection = restConnectionTestHelper.getRestConnection(builder.build());
         restConnection.logger = logger;
 
         final HubServicesFactory hubServicesFactory = new HubServicesFactory(restConnection);
-        final URL hubUrl = restConnection.hubBaseUrl;
+        final URL hubUrl = restConnection.baseUrl;
 
         final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionService();
         final String hubVersion = hubVersionRequestService.getHubVersion();

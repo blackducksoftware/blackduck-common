@@ -55,9 +55,9 @@ class ScanStatusDataServiceTestIT {
         hubServicesFactory.createCodeLocationDataService().importBomFile(uniquelyNamedBdio, 'application/ld+json');
         // wait for the scan to start/finish
         try {
-            hubServicesFactory.createScanStatusDataService().assertBomImportScanStartedThenFinished(uniqueName, version);
-        } catch (Throwable t) {
-            Assert.fail("Nothing should have been thrown: " + t.getMessage())
+            hubServicesFactory.createScanStatusDataService(FIVE_MINUTES).assertBomImportScanStartedThenFinished(uniqueName, version);
+        } catch (Exception e) {
+            Assert.fail("Nothing should have been thrown: " + e.getMessage())
         }
     }
 }

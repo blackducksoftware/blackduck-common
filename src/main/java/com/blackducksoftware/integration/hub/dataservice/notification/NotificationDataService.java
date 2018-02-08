@@ -23,11 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.notification;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_NOTIFICATIONS;
-
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +33,7 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
@@ -52,7 +49,7 @@ import com.blackducksoftware.integration.hub.dataservice.notification.transforme
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
+import com.blackducksoftware.integration.hub.request.PagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -117,11 +114,13 @@ public class NotificationDataService extends HubService {
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, Arrays.asList(SEGMENT_API, SEGMENT_NOTIFICATIONS));
-        hubPagedRequest.addQueryParameter("startDate", startDateString);
-        hubPagedRequest.addQueryParameter("endDate", endDateString);
+        final Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put("startDate", startDateString);
+        queryParameters.put("endDate", endDateString);
 
-        final List<NotificationView> allNotificationItems = getAllResponses(hubPagedRequest, NotificationView.class, typeMap);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPath(ApiDiscovery.NOTIFICATIONS_LINK, queryParameters);
+
+        final List<NotificationView> allNotificationItems = getAllResponses(pagedRequest, NotificationView.class, typeMap);
         return allNotificationItems;
     }
 
@@ -130,13 +129,15 @@ public class NotificationDataService extends HubService {
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
-        final String url = getFirstLink(user, MetaHandler.NOTIFICATIONS_LINK);
+        final String uri = getFirstLink(user, UserView.NOTIFICATIONS_LINK);
 
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, url);
-        hubPagedRequest.addQueryParameter("startDate", startDateString);
-        hubPagedRequest.addQueryParameter("endDate", endDateString);
+        final Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put("startDate", startDateString);
+        queryParameters.put("endDate", endDateString);
 
-        final List<NotificationView> allNotificationItems = getAllResponses(hubPagedRequest, NotificationView.class, typeMap);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequest(uri, queryParameters);
+
+        final List<NotificationView> allNotificationItems = getAllResponses(pagedRequest, NotificationView.class, typeMap);
         return allNotificationItems;
     }
 

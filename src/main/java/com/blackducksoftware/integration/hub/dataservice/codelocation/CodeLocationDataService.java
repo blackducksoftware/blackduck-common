@@ -23,33 +23,29 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.codelocation;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_BOM_IMPORT;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CODE_LOCATIONS;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_SCAN_SUMMARIES;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
-import com.blackducksoftware.integration.hub.request.HubRequest;
+import com.blackducksoftware.integration.hub.request.PagedRequest;
+import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.Response;
+import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
-
-import okhttp3.Response;
 
 public class CodeLocationDataService extends HubService {
     public CodeLocationDataService(final RestConnection restConnection) {
@@ -60,21 +56,27 @@ public class CodeLocationDataService extends HubService {
         importBomFile(file, "application/ld+json");
     }
 
-    public void importBomFile(final File file, final String mediaType) throws IntegrationException {
+    public void importBomFile(final File file, final String mimeType) throws IntegrationException {
         String jsonPayload;
         try {
             jsonPayload = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
         } catch (final IOException e) {
             throw new IntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub because : " + e.getMessage(), e);
         }
-        final HubRequest hubRequest = getHubRequestFactory().createRequest(Arrays.asList(SEGMENT_API, SEGMENT_BOM_IMPORT));
-        try (Response response = hubRequest.executePost(mediaType, jsonPayload)) {
+        final Request request = getHubRequestFactory().createRequestFromPath(HubService.BOMIMPORT_LINK, HttpMethod.POST, mimeType);
+        request.setBodyContent(jsonPayload);
+        try (Response response = getRestConnection().executeRequest(request)) {
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
         }
     }
 
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationType codeLocationType) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS)).addQueryParameter("codeLocationType", codeLocationType.toString());
-        final List<CodeLocationView> allCodeLocations = getAllResponses(hubPagedRequest, CodeLocationView.class);
+        final Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put("codeLocationType", codeLocationType.toString());
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPath(ApiDiscovery.CODELOCATIONS_LINK, queryParameters);
+
+        final List<CodeLocationView> allCodeLocations = getAllResponses(pagedRequest, CodeLocationView.class);
         return allCodeLocations;
     }
 
@@ -106,14 +108,11 @@ public class CodeLocationDataService extends HubService {
     }
 
     public void updateCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws IntegrationException {
-        final HubRequest request = getHubRequestFactory().createRequest(codeLocationItemUrl);
-        Response response = null;
-        try {
-            response = request.executePut(codeLocationItemJson);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
+        final Request request = getHubRequestFactory().createRequest(codeLocationItemUrl, HttpMethod.PUT);
+        request.setBodyContent(codeLocationItemJson);
+        try (Response response = getRestConnection().executeRequest(request)) {
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
         }
 
     }
@@ -130,15 +129,17 @@ public class CodeLocationDataService extends HubService {
     }
 
     public void deleteCodeLocation(final String codeLocationItemUrl) throws IntegrationException {
-        final HubRequest request = getHubRequestFactory().createRequest(codeLocationItemUrl);
-        request.executeDelete();
+        final Request request = getHubRequestFactory().createRequest(codeLocationItemUrl, HttpMethod.DELETE);
+        try (Response response = getRestConnection().executeRequest(request)) {
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
     }
 
     public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
-            final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS));
-            hubPagedRequest.q = "name:" + codeLocationName;
-            final List<CodeLocationView> codeLocations = getAllResponses(hubPagedRequest, CodeLocationView.class);
+            final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPathWithQ(ApiDiscovery.CODELOCATIONS_LINK, "name:" + codeLocationName);
+            final List<CodeLocationView> codeLocations = getAllResponses(pagedRequest, CodeLocationView.class);
             for (final CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.name)) {
                     return codeLocation;
@@ -150,9 +151,7 @@ public class CodeLocationDataService extends HubService {
     }
 
     public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {
-        final List<String> segments = new ArrayList<>(Arrays.asList(SEGMENT_API, SEGMENT_CODE_LOCATIONS));
-        segments.add(codeLocationId);
-        final HubRequest request = getHubRequestFactory().createRequest(segments);
+        final Request request = getHubRequestFactory().createGetRequestFromPath(ApiDiscovery.CODELOCATIONS_LINK + "/" + codeLocationId);
         return getResponse(request, CodeLocationView.class);
     }
 
@@ -168,9 +167,7 @@ public class CodeLocationDataService extends HubService {
     }
 
     public ScanSummaryView getScanSummaryViewById(final String scanSummaryId) throws IntegrationException {
-        final List<String> segments = Arrays.asList(SEGMENT_API, SEGMENT_SCAN_SUMMARIES);
-        segments.add(scanSummaryId);
-        final HubRequest request = getHubRequestFactory().createRequest(segments);
+        final Request request = getHubRequestFactory().createGetRequestFromPath(HubService.SCANSUMMARIES_LINK + "/" + scanSummaryId);
         return getResponse(request, ScanSummaryView.class);
     }
 }

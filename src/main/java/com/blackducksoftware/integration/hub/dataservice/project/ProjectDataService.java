@@ -23,16 +23,14 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.project;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_PROJECTS;
-
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.model.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.api.generated.response.AssignedUserGroupView;
@@ -45,19 +43,18 @@ import com.blackducksoftware.integration.hub.api.generated.view.UserGroupView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerableComponentView;
-import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.dataservice.component.ComponentDataService;
 import com.blackducksoftware.integration.hub.dataservice.component.model.VersionBomComponentModel;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
-import com.blackducksoftware.integration.hub.request.HubRequest;
+import com.blackducksoftware.integration.hub.request.PagedRequest;
+import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
+import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
-
-import okhttp3.Response;
 
 public class ProjectDataService extends HubService {
     private final IntLogger logger;
@@ -71,21 +68,24 @@ public class ProjectDataService extends HubService {
     }
 
     public List<ProjectView> getAllProjectMatches(final String projectName) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS));
+        String q = null;
         if (StringUtils.isNotBlank(projectName)) {
-            hubPagedRequest.q = "name:" + projectName;
+            q = "name:" + projectName;
         }
-        final List<ProjectView> allProjectItems = getAllResponses(hubPagedRequest, ProjectView.class);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPathWithQ(ApiDiscovery.PROJECTS_LINK, q);
+
+        final List<ProjectView> allProjectItems = getAllResponses(pagedRequest, ProjectView.class);
         return allProjectItems;
     }
 
     public List<ProjectView> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(limit, Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS));
+        String q = null;
         if (StringUtils.isNotBlank(projectName)) {
-            hubPagedRequest.q = "name:" + projectName;
+            q = "name:" + projectName;
         }
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPathWithQ(ApiDiscovery.PROJECTS_LINK, q, limit);
 
-        final List<ProjectView> projectItems = getResponses(hubPagedRequest, ProjectView.class);
+        final List<ProjectView> projectItems = getResponses(pagedRequest, ProjectView.class);
         return projectItems;
     }
 
@@ -100,32 +100,33 @@ public class ProjectDataService extends HubService {
     }
 
     public String createHubProject(final ProjectRequest project) throws IntegrationException {
-        final HubRequest projectItemRequest = getHubRequestFactory().createRequest(Arrays.asList(SEGMENT_API, SEGMENT_PROJECTS));
-        Response response = null;
-        try {
-            final String projectJson = getGson().toJson(project);
-            response = projectItemRequest.executePost(projectJson);
-            return response.header("location");
-        } finally {
-            if (response != null) {
-                response.close();
-            }
+        final Request request = getHubRequestFactory().createRequestFromPath(ApiDiscovery.PROJECTS_LINK, HttpMethod.POST);
+        request.setBodyContent(getGson().toJson(project));
+        try (Response response = getRestConnection().executeRequest(request)) {
+            return response.getHeaderValue("location");
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
         }
     }
 
     public void deleteHubProject(final ProjectView project) throws IntegrationException {
-        final HubRequest deleteRequest = getHubRequestFactory().createRequest(getHref(project));
-        deleteRequest.executeDelete();
+        final String uri = getHref(project);
+        final Request request = getHubRequestFactory().createRequest(uri, HttpMethod.DELETE);
+        try (Response response = getRestConnection().executeRequest(request)) {
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
     }
 
     public ProjectVersionView getProjectVersion(final ProjectView project, final String projectVersionName) throws IntegrationException {
-        final String versionsUrl = getFirstLink(project, MetaHandler.VERSIONS_LINK);
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(100, versionsUrl);
+        final String versionsUri = getFirstLink(project, ProjectView.VERSIONS_LINK);
+        String q = "";
         if (StringUtils.isNotBlank(projectVersionName)) {
-            hubPagedRequest.q = String.format("versionName:%s", projectVersionName);
+            q = String.format("versionName:%s", projectVersionName);
         }
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestWithQ(versionsUri, q);
 
-        final List<ProjectVersionView> allProjectVersionMatchingItems = getAllResponses(hubPagedRequest, ProjectVersionView.class);
+        final List<ProjectVersionView> allProjectVersionMatchingItems = getAllResponses(pagedRequest, ProjectVersionView.class);
         for (final ProjectVersionView projectVersion : allProjectVersionMatchingItems) {
             if (projectVersionName.equals(projectVersion.versionName)) {
                 return projectVersion;
@@ -136,20 +137,16 @@ public class ProjectDataService extends HubService {
     }
 
     public String createHubVersion(final ProjectView project, final ProjectVersionRequest version) throws IntegrationException {
-        return createHubVersion(getFirstLink(project, MetaHandler.VERSIONS_LINK), version);
+        return createHubVersion(getFirstLink(project, ProjectView.VERSIONS_LINK), version);
     }
 
-    public String createHubVersion(final String versionsUrl, final ProjectVersionRequest version) throws IntegrationException {
-
-        final HubRequest hubRequest = getHubRequestFactory().createRequest(versionsUrl);
-        Response response = null;
-        try {
-            response = hubRequest.executePost(getGson().toJson(version));
-            return response.header("location");
-        } finally {
-            if (response != null) {
-                response.close();
-            }
+    public String createHubVersion(final String versionsUri, final ProjectVersionRequest version) throws IntegrationException {
+        final Request request = getHubRequestFactory().createRequest(versionsUri, HttpMethod.POST);
+        request.setBodyContent(getGson().toJson(version));
+        try (Response response = getRestConnection().executeRequest(request)) {
+            return response.getHeaderValue("location");
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
         }
     }
 
@@ -203,7 +200,7 @@ public class ProjectDataService extends HubService {
     }
 
     public List<AssignedUserView> getAssignedUsersToProject(final ProjectView project) throws IntegrationException {
-        final List<AssignedUserView> assignedUsers = getAllResponsesFromLink(project, MetaHandler.USERS_LINK, AssignedUserView.class);
+        final List<AssignedUserView> assignedUsers = getAllResponsesFromLink(project, ProjectView.USERS_LINK, AssignedUserView.class);
         return assignedUsers;
     }
 
@@ -214,7 +211,7 @@ public class ProjectDataService extends HubService {
 
     public List<UserView> getUsersForProject(final ProjectView project) throws IntegrationException {
         logger.debug("Attempting to get the assigned users for Project: " + project.name);
-        final List<AssignedUserView> assignedUsers = getAllResponsesFromLink(project, MetaHandler.USERS_LINK, AssignedUserView.class);
+        final List<AssignedUserView> assignedUsers = getAllResponsesFromLink(project, ProjectView.USERS_LINK, AssignedUserView.class);
 
         final List<UserView> resolvedUserViews = new ArrayList<>();
         for (final AssignedUserView assigned : assignedUsers) {
@@ -232,7 +229,7 @@ public class ProjectDataService extends HubService {
     }
 
     public List<AssignedUserGroupView> getAssignedGroupsToProject(final ProjectView project) throws IntegrationException {
-        final List<AssignedUserGroupView> assignedGroups = getAllResponsesFromLink(project, MetaHandler.GROUPS_LINK, AssignedUserGroupView.class);
+        final List<AssignedUserGroupView> assignedGroups = getAllResponsesFromLink(project, ProjectView.USERGROUPS_LINK, AssignedUserGroupView.class);
         return assignedGroups;
     }
 
@@ -243,7 +240,7 @@ public class ProjectDataService extends HubService {
 
     public List<UserGroupView> getGroupsForProject(final ProjectView project) throws IntegrationException {
         logger.debug("Attempting to get the assigned users for Project: " + project.name);
-        final List<AssignedUserGroupView> assignedGroups = getAllResponsesFromLink(project, MetaHandler.GROUPS_LINK, AssignedUserGroupView.class);
+        final List<AssignedUserGroupView> assignedGroups = getAllResponsesFromLink(project, ProjectView.USERGROUPS_LINK, AssignedUserGroupView.class);
 
         final List<UserGroupView> resolvedGroupViews = new ArrayList<>();
         for (final AssignedUserGroupView assigned : assignedGroups) {
@@ -255,9 +252,12 @@ public class ProjectDataService extends HubService {
         return resolvedGroupViews;
     }
 
-    public void addComponentToProjectVersion(final String mediaType, final String projectVersionComponentsUrl, final String componentVersionUrl) throws IntegrationException {
-        final HubRequest hubRequest = getHubRequestFactory().createRequest(projectVersionComponentsUrl);
-        try (Response response = hubRequest.executePost(mediaType, "{\"component\": \"" + componentVersionUrl + "\"}");) {
+    public void addComponentToProjectVersion(final String mediaType, final String projectVersionComponentsUri, final String componentVersionUrl) throws IntegrationException {
+        final Request request = getHubRequestFactory().createRequest(projectVersionComponentsUri, HttpMethod.POST);
+        request.setBodyContent("{\"component\": \"" + componentVersionUrl + "\"}");
+        try (Response response = getRestConnection().executeRequest(request)) {
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
         }
     }
 

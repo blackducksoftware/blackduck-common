@@ -54,7 +54,9 @@ import com.blackducksoftware.integration.hub.report.api.PolicyRule;
 import com.blackducksoftware.integration.hub.report.api.ReportData;
 import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
 import com.blackducksoftware.integration.hub.report.pdf.PDFBoxWriter;
-import com.blackducksoftware.integration.hub.request.HubRequest;
+import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.Response;
+import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.HubService;
@@ -63,8 +65,6 @@ import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import okhttp3.Response;
 
 public class ReportDataService extends HubService {
     public final static long DEFAULT_TIMEOUT = 1000 * 60 * 5;
@@ -364,32 +364,38 @@ public class ReportDataService extends HubService {
     }
 
     public String startGeneratingHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws IntegrationException {
-        final String reportUrl = getFirstLink(version, ProjectVersionView.LICENSEREPORTS_LINK);
+        final String reportUri = getFirstLink(version, ProjectVersionView.LICENSEREPORTS_LINK);
 
         final JsonObject json = new JsonObject();
         json.addProperty("reportFormat", reportFormat.toString());
         json.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
 
-        final HubRequest hubRequest = getHubRequestFactory().createRequest(reportUrl);
-        try (Response response = hubRequest.executePost(getGson().toJson(json))) {
-            return response.header("location");
+        final Request request = getHubRequestFactory().createRequest(reportUri, HttpMethod.POST);
+        request.setBodyContent(getGson().toJson(json));
+        try (Response response = getRestConnection().executeRequest(request)) {
+            return response.getHeaderValue("location");
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
         }
     }
 
     /**
      * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done being generated. Throws HubIntegrationException after 30 minutes if the report has not been generated yet.
      */
-    public ReportView isReportFinishedGenerating(final String reportUrl) throws IntegrationException {
+    public ReportView isReportFinishedGenerating(final String reportUri) throws IntegrationException {
         final long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         Date timeFinished = null;
         ReportView reportInfo = null;
 
         while (timeFinished == null) {
-            final HubRequest hubRequest = getHubRequestFactory().createRequest(reportUrl);
-            try (Response response = hubRequest.executeGet()) {
-                final String jsonResponse = readResponseString(response);
+
+            final Request request = new Request(reportUri);
+            try (Response response = getRestConnection().executeRequest(request)) {
+                final String jsonResponse = response.getContentString();
                 reportInfo = getResponseAs(jsonResponse, ReportView.class);
+            } catch (final IOException e) {
+                throw new IntegrationException(e.getMessage(), e);
             }
             timeFinished = reportInfo.finishedAt;
             if (timeFinished != null) {
@@ -410,26 +416,31 @@ public class ReportDataService extends HubService {
         return reportInfo;
     }
 
-    public String getNoticesReportContent(final String reportContentUrl) throws IntegrationException {
-        final JsonElement fileContent = getReportContentJson(reportContentUrl);
+    public String getNoticesReportContent(final String reportContentUri) throws IntegrationException {
+        final JsonElement fileContent = getReportContentJson(reportContentUri);
         return fileContent.getAsString();
     }
 
-    private JsonElement getReportContentJson(final String reportContentUrl) throws IntegrationException {
-        final HubRequest hubRequest = getHubRequestFactory().createRequest(reportContentUrl);
-        try (Response response = hubRequest.executeGet()) {
-            final String jsonResponse = readResponseString(response);
+    private JsonElement getReportContentJson(final String reportContentUri) throws IntegrationException {
+        final Request request = new Request(reportContentUri);
+        try (Response response = getRestConnection().executeRequest(request)) {
+            final String jsonResponse = response.getContentString();
 
             final JsonObject json = getJsonParser().parse(jsonResponse).getAsJsonObject();
             final JsonElement content = json.get("reportContent");
             final JsonArray reportConentArray = content.getAsJsonArray();
             final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
             return reportFile.get("fileContent");
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
         }
     }
 
-    public void deleteHubReport(final String reportUrl) throws IntegrationException {
-        final HubRequest hubRequest = getHubRequestFactory().createRequest(reportUrl);
-        hubRequest.executeDelete();
+    public void deleteHubReport(final String reportUri) throws IntegrationException {
+        final Request request = getHubRequestFactory().createRequest(reportUri, HttpMethod.DELETE);
+        try (Response response = getRestConnection().executeRequest(request)) {
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
     }
 }

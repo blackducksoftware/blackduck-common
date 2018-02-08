@@ -46,13 +46,8 @@ public class HubCertificateHandler {
         }
         handler.timeout = hubServerConfig.getTimeout();
         if (hubServerConfig.getProxyInfo() != null) {
-            handler.proxyHost = hubServerConfig.getProxyInfo().getHost();
-            handler.proxyPort = hubServerConfig.getProxyInfo().getPort();
-            handler.proxyNoHosts = hubServerConfig.getProxyInfo().getIgnoredProxyHosts();
-            handler.proxyUsername = hubServerConfig.getProxyInfo().getUsername();
-            handler.proxyPassword = hubServerConfig.getProxyInfo().getDecryptedPassword();
+            handler.proxyInfo = hubServerConfig.getProxyInfo();
         }
-
         if (handler.isCertificateInTrustStore(hubServerConfig.getHubUrl())) {
             return;
         }

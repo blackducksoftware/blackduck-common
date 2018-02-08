@@ -23,15 +23,11 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.component;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_COMPONENTS;
-
-import java.util.Arrays;
 import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.HubMediaTypes;
-import com.blackducksoftware.integration.hub.api.UrlConstants;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
@@ -39,7 +35,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV1V
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
+import com.blackducksoftware.integration.hub.request.PagedRequest;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -67,7 +63,7 @@ public class ComponentDataService extends HubService {
         final ComponentSearchResultView componentSearchView = getExactComponentMatch(externalId);
 
         final ComponentView componentView = getResponse(componentSearchView.component, ComponentView.class);
-        final List<ComponentVersionView> componentVersionViews = getAllResponsesFromLink(componentView, UrlConstants.SEGMENT_VERSIONS, ComponentVersionView.class);
+        final List<ComponentVersionView> componentVersionViews = getAllResponsesFromLink(componentView, "versions", ComponentVersionView.class);
         return componentVersionViews;
     }
 
@@ -88,9 +84,10 @@ public class ComponentDataService extends HubService {
         final String forge = externalId.forge.getName();
         final String hubOriginId = externalId.createHubOriginId();
         final String componentQuery = String.format("id:%s|%s", forge, hubOriginId);
-        final HubPagedRequest hubPagedRequest = getHubRequestFactory().createPagedRequest(Arrays.asList(SEGMENT_API, SEGMENT_COMPONENTS), componentQuery);
 
-        final List<ComponentSearchResultView> allComponents = getAllResponses(hubPagedRequest, ComponentSearchResultView.class);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPathWithQ(ApiDiscovery.COMPONENTS_LINK, componentQuery);
+
+        final List<ComponentSearchResultView> allComponents = getAllResponses(pagedRequest, ComponentSearchResultView.class);
         return allComponents;
     }
 

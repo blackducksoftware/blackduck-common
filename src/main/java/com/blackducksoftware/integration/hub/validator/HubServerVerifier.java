@@ -23,23 +23,22 @@
  */
 package com.blackducksoftware.integration.hub.validator;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
+import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.Response;
+import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnection;
 import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnectionBuilder;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
-
-import okhttp3.HttpUrl;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class HubServerVerifier {
 
@@ -68,26 +67,32 @@ public class HubServerVerifier {
             connectionBuilder.applyProxyInfo(hubProxyInfo);
         }
         final UnauthenticatedRestConnection restConnection = connectionBuilder.build();
-        HttpUrl httpUrl = restConnection.createHttpUrl();
-        Request request = restConnection.createGetRequest(httpUrl);
-        try (Response response = restConnection.createResponse(request)) {
-        } catch (final IntegrationRestException e) {
-            if (e.getHttpStatusCode() == 401 && e.getHttpStatusCode() == 403) {
-                // This could be a Hub server
-            } else {
-                throw e;
+
+        try {
+            Request request = new Request(hubURL.toURI().toString());
+            try (Response response = restConnection.executeRequest(request)) {
+            } catch (final IntegrationRestException e) {
+                if (e.getHttpStatusCode() == 401 && e.getHttpStatusCode() == 403) {
+                    // This could be a Hub server
+                } else {
+                    throw e;
+                }
+            } catch (final IOException e) {
+                throw new IntegrationException(e.getMessage(), e);
             }
-        }
-        final List<String> urlSegments = new ArrayList<>();
-        urlSegments.add("download");
-        urlSegments.add(CLILocation.DEFAULT_CLI_DOWNLOAD);
-        httpUrl = restConnection.createHttpUrl(urlSegments);
-        request = restConnection.createGetRequest(httpUrl);
-        try (Response response = restConnection.createResponse(request)) {
-        } catch (final IntegrationRestException e) {
-            throw new HubIntegrationException("The Url does not appear to be a Hub server :" + httpUrl.uri().toString() + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
-        } catch (final IntegrationException e) {
-            throw new HubIntegrationException("The Url does not appear to be a Hub server :" + httpUrl.uri().toString() + ", because: " + e.getMessage(), e);
+            final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubURL);
+            request = hubRequestFactory.createGetRequestFromPath("download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
+            final String downloadUri = request.getUri();
+            try (Response response = restConnection.executeRequest(request)) {
+            } catch (final IntegrationRestException e) {
+                throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
+            } catch (final IntegrationException e) {
+                throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getMessage(), e);
+            } catch (final IOException e) {
+                throw new IntegrationException(e.getMessage(), e);
+            }
+        } catch (final URISyntaxException e) {
+            throw new IntegrationException("The Url does not appear to be a Hub server :" + hubURL.toString() + ", because: " + e.getMessage(), e);
         }
     }
 
