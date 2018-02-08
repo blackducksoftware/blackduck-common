@@ -27,7 +27,6 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.HubMediaTypes;
-import com.blackducksoftware.integration.hub.api.UrlConstants;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
@@ -64,7 +63,7 @@ public class ComponentDataService extends HubService {
         final ComponentSearchResultView componentSearchView = getExactComponentMatch(externalId);
 
         final ComponentView componentView = getResponse(componentSearchView.component, ComponentView.class);
-        final List<ComponentVersionView> componentVersionViews = getAllResponsesFromLink(componentView, UrlConstants.SEGMENT_VERSIONS, ComponentVersionView.class);
+        final List<ComponentVersionView> componentVersionViews = getAllResponsesFromLink(componentView, "versions", ComponentVersionView.class);
         return componentVersionViews;
     }
 

@@ -23,14 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.codelocation;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_BOM_IMPORT;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_SCAN_SUMMARIES;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,16 +56,15 @@ public class CodeLocationDataService extends HubService {
         importBomFile(file, "application/ld+json");
     }
 
-    public void importBomFile(final File file, final String mediaType) throws IntegrationException {
+    public void importBomFile(final File file, final String mimeType) throws IntegrationException {
         String jsonPayload;
         try {
             jsonPayload = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
         } catch (final IOException e) {
             throw new IntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub because : " + e.getMessage(), e);
         }
-        // TODO add bom-import to ApiDiscovery
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), Arrays.asList(SEGMENT_API, SEGMENT_BOM_IMPORT));
-        final Request request = getHubRequestFactory().createRequest(uri, HttpMethod.POST);
+        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), HubService.BOMIMPORT_LINK);
+        final Request request = getHubRequestFactory().createRequest(uri, HttpMethod.POST, mimeType);
         request.setBodyContent(jsonPayload);
         try (Response response = getRestConnection().executeRequest(request)) {
         } catch (final IOException e) {
@@ -177,10 +171,7 @@ public class CodeLocationDataService extends HubService {
     }
 
     public ScanSummaryView getScanSummaryViewById(final String scanSummaryId) throws IntegrationException {
-        // TODO add scan-summaries to ApiDiscovery
-        final List<String> segments = Arrays.asList(SEGMENT_API, SEGMENT_SCAN_SUMMARIES);
-        segments.add(scanSummaryId);
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), segments);
+        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), HubService.SCANSUMMARIES_LINK + "/" + scanSummaryId);
         final Request request = new Request(uri);
         return getResponse(request, ScanSummaryView.class);
     }

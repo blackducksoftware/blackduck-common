@@ -47,6 +47,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class HubService {
+    public static final String BOMIMPORT_LINK = "/api/bom-import";
+    public static final String SCANSUMMARIES_LINK = "/api/scan-summaries";
+
     private final RestConnection restConnection;
     private final MetaHandler metaHandler;
     private final HubResponseTransformer hubResponseTransformer;

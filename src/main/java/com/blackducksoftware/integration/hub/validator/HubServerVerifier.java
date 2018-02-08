@@ -83,10 +83,7 @@ public class HubServerVerifier {
                 throw new IntegrationException(e.getMessage(), e);
             }
             final HubRequestFactory hubRequestFactory = new HubRequestFactory();
-            final List<String> pathSegments = new ArrayList<>();
-            pathSegments.add("download");
-            pathSegments.add(CLILocation.DEFAULT_CLI_DOWNLOAD);
-            final String downloadUri = hubRequestFactory.pieceTogetherURI(hubURL, pathSegments);
+            final String downloadUri = hubRequestFactory.pieceTogetherURI(hubURL, "download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
             request = new Request(downloadUri);
             try (Response response = restConnection.executeRequest(request)) {
             } catch (final IntegrationRestException e) {

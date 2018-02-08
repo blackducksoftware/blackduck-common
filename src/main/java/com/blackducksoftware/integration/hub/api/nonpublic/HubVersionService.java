@@ -24,13 +24,8 @@
 package com.blackducksoftware.integration.hub.api.nonpublic;
 
 import static com.blackducksoftware.integration.hub.RestConstants.QUERY_VERSION;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CURRENT_VERSION;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_CURRENT_VERSION_COMPARISON;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +43,7 @@ public class HubVersionService extends HubService {
     }
 
     public String getHubVersion() throws IntegrationException {
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION));
+        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), "api/v1/current-version");
         final Request request = new Request(uri);
 
         try (Response response = getRestConnection().executeRequest(request)) {
@@ -61,7 +56,7 @@ public class HubVersionService extends HubService {
     }
 
     public VersionComparison getHubVersionComparison(final String consumerVersion) throws IntegrationException, IOException {
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_CURRENT_VERSION_COMPARISON));
+        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), "api/v1/current-version-comparison");
         final Map<String, String> queryParameters = new HashMap<>();
         queryParameters.put(QUERY_VERSION, consumerVersion);
         final Request request = getHubRequestFactory().createGetRequest(uri, queryParameters);

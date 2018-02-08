@@ -23,12 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.api.nonpublic;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_REGISTRATIONS;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
-
 import java.io.IOException;
-import java.util.Arrays;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.request.Request;
@@ -43,7 +38,7 @@ public class HubRegistrationService extends HubService {
     }
 
     public String getRegistrationId() throws IntegrationException, IOException {
-        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_REGISTRATIONS));
+        final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), "api/v1/registrations");
         final Request request = new Request(uri);
 
         try (Response response = getRestConnection().executeRequest(request)) {

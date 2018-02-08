@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -136,7 +137,8 @@ public class CLIDownloadUtility {
                 if (StringUtils.isNotBlank(lastModified)) {
                     // Should parse the Date just like URLConnection did
                     try {
-                        final SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+                        final SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+                        format.setTimeZone(TimeZone.getTimeZone("UTC"));
                         final Date parsed = format.parse(lastModified);
                         lastModifiedLong = parsed.getTime();
                     } catch (final ParseException pe) {

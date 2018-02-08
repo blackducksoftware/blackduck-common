@@ -73,7 +73,7 @@ public class ProjectDataService extends HubService {
             q = "name:" + projectName;
         }
         final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), ApiDiscovery.PROJECTS_LINK);
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequest(uri, q);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestWithQ(uri, q);
 
         final List<ProjectView> allProjectItems = getAllResponses(pagedRequest, ProjectView.class);
         return allProjectItems;
@@ -85,7 +85,7 @@ public class ProjectDataService extends HubService {
             q = "name:" + projectName;
         }
         final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), ApiDiscovery.PROJECTS_LINK);
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequest(uri, q, limit);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestWithQ(uri, q, limit);
 
         final List<ProjectView> projectItems = getResponses(pagedRequest, ProjectView.class);
         return projectItems;
@@ -127,7 +127,7 @@ public class ProjectDataService extends HubService {
         if (StringUtils.isNotBlank(projectVersionName)) {
             q = String.format("versionName:%s", projectVersionName);
         }
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequest(versionsUri, q);
+        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestWithQ(versionsUri, q);
 
         final List<ProjectVersionView> allProjectVersionMatchingItems = getAllResponses(pagedRequest, ProjectVersionView.class);
         for (final ProjectVersionView projectVersion : allProjectVersionMatchingItems) {

@@ -23,13 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.api.scan;
 
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_API;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_SCANS;
-import static com.blackducksoftware.integration.hub.api.UrlConstants.SEGMENT_V1;
-
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
@@ -38,14 +32,12 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 
 public class DryRunUploadService extends HubService {
-    private static final List<String> DRY_RUN_UPLOAD_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_SCANS);
-
     public DryRunUploadService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws Exception {
-        final String uri = getHubRequestFactory().pieceTogetherURI(getRestConnection().baseUrl, DRY_RUN_UPLOAD_SEGMENTS);
+        final String uri = getHubRequestFactory().pieceTogetherURI(getRestConnection().baseUrl, "api/v1/scans");
         final Request request = getHubRequestFactory().createRequest(uri, HttpMethod.POST, "application/json");
         request.setBodyContentFile(dryRunFile);
         try (Response response = getRestConnection().executeRequest(request)) {
