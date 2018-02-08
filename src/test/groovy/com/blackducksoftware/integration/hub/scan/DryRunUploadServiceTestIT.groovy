@@ -23,15 +23,21 @@
  */
 package com.blackducksoftware.integration.hub.scan
 
-import java.io.File
-
+import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.experimental.categories.Category
 
 import com.blackducksoftware.integration.IntegrationTest
+import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
+import com.blackducksoftware.integration.hub.api.scan.DryRunUploadResponse
+import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
+import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
+import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
+import com.blackducksoftware.integration.log.LogLevel
+import com.blackducksoftware.integration.log.PrintStreamIntLogger
 
 @Category(IntegrationTest.class)
 class DryRunUploadServiceTestIT {
@@ -54,14 +60,13 @@ class DryRunUploadServiceTestIT {
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
-        CodeLocationService codeLocationRequestService = services.createCodeLocationService()
-        CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.codeLocationId)
+        CodeLocationView codeLocationView = services.createCodeLocationDataService().getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
 
         //cleanup
-        codeLocationRequestService.deleteCodeLocation(codeLocationView)
+        services.createCodeLocationDataService().deleteCodeLocation(codeLocationView)
         try{
-            codeLocationRequestService.getCodeLocationById(response.codeLocationId)
+            services.createCodeLocationDataService().getCodeLocationById(response.codeLocationId)
             Assert.fail('This should have thrown an exception')
         } catch (IntegrationRestException e){
             Assert.assertEquals(404, e.getHttpStatusCode())

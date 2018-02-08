@@ -42,21 +42,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import com.blackducksoftware.integration.hub.api.generated.model.ResourceLink;
+import com.blackducksoftware.integration.hub.api.generated.model.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV1View;
 import com.blackducksoftware.integration.hub.api.response.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityService;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.VulnerabilityContentItem;
-import com.blackducksoftware.integration.hub.model.view.VulnerabilityView;
-import com.blackducksoftware.integration.hub.model.view.components.LinkView;
-import com.blackducksoftware.integration.hub.model.view.components.MetaView;
 import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
 
@@ -67,25 +64,20 @@ public class NotificationProcessorTest {
 
     @Before
     public void init() throws Exception {
-        final RestConnection restConnection = new MockRestConnection();
-        final HubServicesFactory factory = new HubServicesFactory(restConnection);
         final IntLogger logger = new IntBufferedLogger();
         metaService = new MetaHandler(logger);
     }
 
     public MockProcessor createMockedNotificationProcessor() {
-        final VulnerabilityService vulnerabilityRequestService = Mockito.mock(VulnerabilityService.class);
-        final MockProcessor processor = new MockProcessor(vulnerabilityRequestService, metaService);
+        final MockProcessor processor = new MockProcessor(metaService);
         return processor;
     }
 
-    public MockProcessor createMockedNotificationProcessor(final List<VulnerabilityView> vulnerabilityList) throws Exception {
+    public MockProcessor createMockedNotificationProcessor(final List<VulnerabilityV1View> vulnerabilityList) throws Exception {
         final ComponentVersionView compVersion = Mockito.mock(ComponentVersionView.class);
         compVersion.json = createComponentJson();
         compVersion.meta = createComponentMeta();
-        final VulnerabilityService vulnerabilityRequestService = Mockito.mock(VulnerabilityService.class);
-        Mockito.when(vulnerabilityRequestService.getComponentVersionVulnerabilities(Mockito.anyString())).thenReturn(vulnerabilityList);
-        final MockProcessor processor = new MockProcessor(vulnerabilityRequestService, metaService);
+        final MockProcessor processor = new MockProcessor(metaService);
         return processor;
     }
 
@@ -94,19 +86,19 @@ public class NotificationProcessorTest {
                 + "\"rel\":\"vulnerable-components\"," + "\"href\": \"" + EventTestUtil.COMPONENT_VERSION_URL + "\"" + "}]}}";
     }
 
-    private MetaView createComponentMeta() {
-        final MetaView meta = new MetaView();
+    private ResourceMetadata createComponentMeta() {
+        final ResourceMetadata meta = new ResourceMetadata();
         meta.href = EventTestUtil.COMPONENT_VERSION_URL;
 
-        final LinkView vulnerabilityLink = new LinkView();
+        final ResourceLink vulnerabilityLink = new ResourceLink();
         vulnerabilityLink.rel = "vulnerabilities";
         vulnerabilityLink.href = EventTestUtil.COMPONENT_VERSION_URL;
 
-        final LinkView vulnerableComponentLink = new LinkView();
+        final ResourceLink vulnerableComponentLink = new ResourceLink();
         vulnerableComponentLink.rel = "vulnerable-components";
         vulnerableComponentLink.href = EventTestUtil.COMPONENT_VERSION_URL;
 
-        final List<LinkView> links = new ArrayList<>();
+        final List<ResourceLink> links = new ArrayList<>();
         links.add(vulnerableComponentLink);
         links.add(vulnerabilityLink);
 
@@ -249,7 +241,7 @@ public class NotificationProcessorTest {
         vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
         vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
         vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
-        final List<VulnerabilityView> vulnerabilityList = testUtil.createVulnerabiltyItemList(vulnerabilities);
+        final List<VulnerabilityV1View> vulnerabilityList = testUtil.createVulnerabiltyItemList(vulnerabilities);
         final DateTime dateTime = new DateTime();
         final List<VulnerabilitySourceQualifiedId> emptyVulnSourceList = Collections.emptyList();
         final VulnerabilityContentItem vulnerability = testUtil.createVulnerability(dateTime.toDate(), EventTestUtil.PROJECT_NAME, EventTestUtil.PROJECT_VERSION_NAME, EventTestUtil.COMPONENT, EventTestUtil.VERSION, vulnerabilities,
@@ -276,7 +268,7 @@ public class NotificationProcessorTest {
         vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
         vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
         vulnerabilities.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.LOW_VULN_ID));
-        final List<VulnerabilityView> vulnerabilityList = testUtil.createVulnerabiltyItemList(vulnerabilities);
+        final List<VulnerabilityV1View> vulnerabilityList = testUtil.createVulnerabiltyItemList(vulnerabilities);
 
         final DateTime dateTime = new DateTime();
         final List<VulnerabilitySourceQualifiedId> emptyVulnSourceList = Collections.emptyList();
@@ -339,7 +331,7 @@ public class NotificationProcessorTest {
         final List<VulnerabilitySourceQualifiedId> resultVulnList = new ArrayList<>(2);
         resultVulnList.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
         resultVulnList.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
-        final List<VulnerabilityView> vulnerabilityList = testUtil.createVulnerabiltyItemList(resultVulnList);
+        final List<VulnerabilityV1View> vulnerabilityList = testUtil.createVulnerabiltyItemList(resultVulnList);
 
         final List<VulnerabilitySourceQualifiedId> added = new ArrayList<>(3);
         added.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
@@ -379,7 +371,7 @@ public class NotificationProcessorTest {
         final List<VulnerabilitySourceQualifiedId> resultVulnList = new ArrayList<>(2);
         resultVulnList.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));
         resultVulnList.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.MEDIUM_VULN_ID));
-        final List<VulnerabilityView> vulnerabilityList = testUtil.createVulnerabiltyItemList(resultVulnList);
+        final List<VulnerabilityV1View> vulnerabilityList = testUtil.createVulnerabiltyItemList(resultVulnList);
 
         final List<VulnerabilitySourceQualifiedId> added1 = new LinkedList<>();
         added1.add(createVulnerabilitySourceQualifiedId(EventTestUtil.VULN_SOURCE, EventTestUtil.HIGH_VULN_ID));

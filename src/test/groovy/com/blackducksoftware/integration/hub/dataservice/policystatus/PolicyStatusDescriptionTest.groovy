@@ -23,18 +23,25 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.policystatus
 
+import org.junit.Assert
 import org.junit.Test
+
+import com.blackducksoftware.integration.hub.api.enumeration.PolicySeverityType
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType
+import com.blackducksoftware.integration.hub.api.generated.model.ComponentVersionPolicyViolationDetails
+import com.blackducksoftware.integration.hub.api.generated.model.NameValuePairView
+import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView
 
 class PolicyStatusDescriptionTest {
 
     @Test
     void getCountTest() {
-        final ComponentVersionPolicyViolationCount blockerViolation = new ComponentVersionPolicyViolationCount()
-        blockerViolation.name = PolicySeverityEnum.BLOCKER
+        final NameValuePairView blockerViolation = new NameValuePairView()
+        blockerViolation.name = PolicySeverityType.BLOCKER
         blockerViolation.value = 3
 
-        final ComponentVersionPolicyViolationCount trivialViolation = new ComponentVersionPolicyViolationCount()
-        trivialViolation.name = PolicySeverityEnum.TRIVIAL
+        final NameValuePairView trivialViolation = new NameValuePairView()
+        trivialViolation.name = PolicySeverityType.TRIVIAL
         trivialViolation.value = 1
 
         def violations = []
@@ -44,8 +51,8 @@ class PolicyStatusDescriptionTest {
         final ComponentVersionPolicyViolationDetails componentVersionPolicyViolationDetails = new ComponentVersionPolicyViolationDetails()
         componentVersionPolicyViolationDetails.severityLevels = violations
 
-        final ComponentVersionStatusCount inViolation = new ComponentVersionStatusCount()
-        inViolation.name = VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION
+        final NameValuePairView inViolation = new NameValuePairView()
+        inViolation.name = PolicyStatusApprovalStatusType.IN_VIOLATION
         inViolation.value = 4
 
         def statuses = []
@@ -54,7 +61,7 @@ class PolicyStatusDescriptionTest {
         final VersionBomPolicyStatusView policyStatusItem = new VersionBomPolicyStatusView()
         policyStatusItem.componentVersionPolicyViolationDetails = componentVersionPolicyViolationDetails
         policyStatusItem.componentVersionStatusCounts = statuses
-        policyStatusItem.overallStatus = VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION
+        policyStatusItem.overallStatus = PolicyStatusApprovalStatusType.IN_VIOLATION
 
         final PolicyStatusDescription test = new PolicyStatusDescription(policyStatusItem)
 
@@ -63,11 +70,11 @@ class PolicyStatusDescriptionTest {
         int expectedBlockerSeverity = 3
         int expectedTrivialSeverity = 1
         int expectedMajorSeverity = 0
-        int actualInViolationOverall = test.getCountOfStatus(VersionBomPolicyStatusOverallStatusEnum.IN_VIOLATION)
-        int actualNotInViolationOverall = test.getCountOfStatus(VersionBomPolicyStatusOverallStatusEnum.NOT_IN_VIOLATION)
-        int actualBlockerSeverity = test.getCountOfSeverity(PolicySeverityEnum.BLOCKER)
-        int actualTrivialSeverity = test.getCountOfSeverity(PolicySeverityEnum.TRIVIAL)
-        int actualMajorSeverity = test.getCountOfSeverity(PolicySeverityEnum.MAJOR)
+        int actualInViolationOverall = test.getCountOfStatus(PolicyStatusApprovalStatusType.IN_VIOLATION)
+        int actualNotInViolationOverall = test.getCountOfStatus(PolicyStatusApprovalStatusType.NOT_IN_VIOLATION)
+        int actualBlockerSeverity = test.getCountOfSeverity(PolicySeverityType.BLOCKER)
+        int actualTrivialSeverity = test.getCountOfSeverity(PolicySeverityType.TRIVIAL)
+        int actualMajorSeverity = test.getCountOfSeverity(PolicySeverityType.MAJOR)
 
         Assert.assertEquals(expectedInViolationOverall, actualInViolationOverall)
         Assert.assertEquals(expectedNotInViolationOverall, actualNotInViolationOverall)

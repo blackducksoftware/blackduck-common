@@ -23,7 +23,15 @@
  */
 package com.blackducksoftware.integration.hub.request.builder
 
+import java.text.SimpleDateFormat
+
+import org.junit.Assert
 import org.junit.Test
+
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
+import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest
+import com.blackducksoftware.integration.hub.rest.RestConnection
 
 class ProjectRequestBuilderTest {
 
@@ -108,8 +116,8 @@ class ProjectRequestBuilderTest {
         Assert.assertEquals(description, request.description)
         Assert.assertNotNull(request.versionRequest)
         Assert.assertEquals(versionName, request.versionRequest.versionName)
-        Assert.assertEquals(ProjectVersionDistributionEnum.valueOf(distribution.toUpperCase()), request.versionRequest.distribution)
-        Assert.assertEquals(ProjectVersionPhaseEnum.valueOf(phase.toUpperCase()), request.versionRequest.phase)
+        Assert.assertEquals(ProjectVersionDistributionType.valueOf(distribution.toUpperCase()), request.versionRequest.distribution)
+        Assert.assertEquals(ProjectVersionPhaseType.valueOf(phase.toUpperCase()), request.versionRequest.phase)
         Assert.assertEquals(releaseComments, request.versionRequest.releaseComments)
         Assert.assertEquals(sdf.parse(releasedOn), request.versionRequest.releasedOn)
         Assert.assertEquals(versionNickname, request.versionRequest.nickname)
@@ -134,8 +142,8 @@ class ProjectRequestBuilderTest {
         Assert.assertNull(request.description)
         Assert.assertNotNull(request.versionRequest)
         Assert.assertEquals(versionName, request.versionRequest.versionName)
-        Assert.assertEquals(ProjectVersionDistributionEnum.EXTERNAL, request.versionRequest.distribution)
-        Assert.assertEquals(ProjectVersionPhaseEnum.DEVELOPMENT, request.versionRequest.phase)
+        Assert.assertEquals(ProjectVersionDistributionType.EXTERNAL, request.versionRequest.distribution)
+        Assert.assertEquals(ProjectVersionPhaseType.DEVELOPMENT, request.versionRequest.phase)
         Assert.assertNull(request.versionRequest.releaseComments)
         Assert.assertNull(request.versionRequest.releasedOn)
         Assert.assertNull(request.versionRequest.nickname)
