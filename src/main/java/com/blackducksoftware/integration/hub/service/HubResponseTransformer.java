@@ -25,30 +25,33 @@ package com.blackducksoftware.integration.hub.service;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.core.HubView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class HubResponseTransformer {
+    private final RestConnection restConnection;
     private final HubRequestFactory hubRequestFactory;
     private final MetaHandler metaHandler;
     private final JsonParser jsonParser;
     private final Gson gson;
 
-    public HubResponseTransformer(final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler, final JsonParser jsonParser, final Gson gson) {
+    public HubResponseTransformer(final RestConnection restConnection, final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler) {
+        this.restConnection = restConnection;
         this.hubRequestFactory = hubRequestFactory;
         this.metaHandler = metaHandler;
-        this.jsonParser = jsonParser;
-        this.gson = gson;
+        this.jsonParser = restConnection.jsonParser;
+        this.gson = restConnection.gson;
     }
 
     public <T extends HubResponse> T getResponseFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
@@ -67,43 +70,27 @@ public class HubResponseTransformer {
         return getResponseFromLink(hubView, metaLinkRef, clazz, null);
     }
 
-    public <T extends HubResponse> T getResponseFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
+    public <T extends HubResponse> T getResponseFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mimeType) throws IntegrationException {
         final String link = metaHandler.getFirstLink(hubView, metaLinkRef);
-        return getResponse(link, clazz, mediaType);
+        return getResponse(link, clazz, mimeType);
     }
 
-    public <T extends HubResponse> T getResponse(final HubRequest request, final Class<T> clazz) throws IntegrationException {
-        return getResponse(request, clazz, null);
+    public <T extends HubResponse> T getResponse(final String uri, final Class<T> clazz) throws IntegrationException {
+        return getResponse(uri, clazz, null);
     }
 
-    public <T extends HubResponse> T getResponse(final String url, final Class<T> clazz) throws IntegrationException {
-        return getResponse(url, clazz, null);
+    public <T extends HubResponse> T getResponse(final String uri, final Class<T> clazz, final String mimeType) throws IntegrationException {
+        final Request request = hubRequestFactory.createGetRequest(uri, mimeType);
+        return getResponse(request, clazz);
     }
 
-    public <T extends HubResponse> T getResponse(final String url, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        final HubRequest request = hubRequestFactory.createRequest(url);
-        return getResponse(request, clazz, mediaType);
-    }
-
-    public <T extends HubResponse> T getResponse(final HubRequest request, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        Response response = null;
-        try {
-            if (StringUtils.isNotBlank(mediaType)) {
-                response = request.executeGet(mediaType);
-            } else {
-                response = request.executeGet();
-            }
-            // the string method closes the body
-            final String jsonResponse = response.body().string();
-
+    public <T extends HubResponse> T getResponse(final Request request, final Class<T> clazz) throws IntegrationException {
+        try (Response response = restConnection.executeRequest(request)) {
+            final String jsonResponse = response.getContentString();
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
             return getResponseAs(jsonObject, clazz);
         } catch (final IOException e) {
-            throw new HubIntegrationException(e);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
+            throw new HubIntegrationException(e.getMessage(), e);
         }
     }
 

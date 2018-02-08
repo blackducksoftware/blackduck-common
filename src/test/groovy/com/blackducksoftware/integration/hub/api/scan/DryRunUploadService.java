@@ -31,14 +31,11 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-
-import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.request.HubRequest;
+import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.Response;
+import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
-
-import okhttp3.Response;
 
 public class DryRunUploadService extends HubService {
     private static final List<String> DRY_RUN_UPLOAD_SEGMENTS = Arrays.asList(SEGMENT_API, SEGMENT_V1, SEGMENT_SCANS);
@@ -47,17 +44,15 @@ public class DryRunUploadService extends HubService {
         super(restConnection);
     }
 
-    public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws IntegrationException {
-        final HubRequest uploadDryRunFileRequest = getHubRequestFactory().createRequest(DRY_RUN_UPLOAD_SEGMENTS);
-        Response response = null;
-        try {
-            response = uploadDryRunFileRequest.executePost("application/json", dryRunFile);
-            final String responseString = readResponseString(response);
+    public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws Exception {
+        final String uri = getHubRequestFactory().pieceTogetherURI(getRestConnection().baseUrl, DRY_RUN_UPLOAD_SEGMENTS);
+        final Request request = getHubRequestFactory().createRequest(uri, HttpMethod.POST, "application/json");
+        request.setBodyContentFile(dryRunFile);
+        try (Response response = getRestConnection().executeRequest(request)) {
+            final String responseString = response.getContentString();
             final DryRunUploadResponse uploadResponse = getGson().fromJson(responseString, DryRunUploadResponse.class);
             uploadResponse.json = responseString;
             return uploadResponse;
-        } finally {
-            IOUtils.closeQuietly(response);
         }
     }
 }

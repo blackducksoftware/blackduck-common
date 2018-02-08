@@ -450,7 +450,7 @@ public class CLIInstallerTestIT {
         final TestLogger logger = new TestLogger();
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final URL hubUrl = hubServicesFactory.getRestConnection().hubBaseUrl;
+        final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
 
         final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionService();
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
@@ -465,7 +465,7 @@ public class CLIInstallerTestIT {
         final File installDir = folder.newFolder();
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final URL hubUrl = hubServicesFactory.getRestConnection().hubBaseUrl;
+        final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
 
         final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionService();
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
@@ -480,7 +480,7 @@ public class CLIInstallerTestIT {
         final File installDir = folder.newFolder();
         final CLILocation cliLocation = new CLILocation(logger, installDir);
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory(logger);
-        final URL hubUrl = hubServicesFactory.getRestConnection().hubBaseUrl;
+        final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
 
         final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionService();
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
@@ -521,7 +521,7 @@ public class CLIInstallerTestIT {
         restConnection.logger = logger;
 
         final HubServicesFactory hubServicesFactory = new HubServicesFactory(restConnection);
-        final URL hubUrl = restConnection.hubBaseUrl;
+        final URL hubUrl = restConnection.baseUrl;
 
         final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionService();
         final String hubVersion = hubVersionRequestService.getHubVersion();
@@ -564,7 +564,7 @@ public class CLIInstallerTestIT {
         restConnection.logger = logger;
 
         final HubServicesFactory hubServicesFactory = new HubServicesFactory(restConnection);
-        final URL hubUrl = restConnection.hubBaseUrl;
+        final URL hubUrl = restConnection.baseUrl;
 
         final HubVersionService hubVersionRequestService = hubServicesFactory.createHubVersionService();
         final String hubVersion = hubVersionRequestService.getHubVersion();

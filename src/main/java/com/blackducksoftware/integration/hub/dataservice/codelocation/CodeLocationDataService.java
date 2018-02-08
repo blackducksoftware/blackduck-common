@@ -147,7 +147,7 @@ public class CodeLocationDataService extends HubService {
     public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
             final String uri = getHubRequestFactory().pieceTogetherURI(getHubBaseUrl(), ApiDiscovery.CODELOCATIONS_LINK);
-            final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequest(uri, "name:" + codeLocationName);
+            final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestWithQ(uri, "name:" + codeLocationName);
             final List<CodeLocationView> codeLocations = getAllResponses(pagedRequest, CodeLocationView.class);
             for (final CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.name)) {

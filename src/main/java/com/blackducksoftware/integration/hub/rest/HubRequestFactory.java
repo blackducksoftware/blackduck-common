@@ -28,6 +28,11 @@ public class HubRequestFactory {
         }
     }
 
+    public Request createGetRequest(final String uri, final String mimeType) {
+        final Request request = new Request(uri, null, null, HttpMethod.GET, mimeType, null, null);
+        return request;
+    }
+
     public Request createGetRequest(final String uri, final Map<String, String> queryParameters) {
         final Request request = new Request(uri, queryParameters, null, HttpMethod.GET, null, null, null);
         return request;
@@ -38,7 +43,12 @@ public class HubRequestFactory {
         return request;
     }
 
-    public PagedRequest createGetPagedRequest(final String uri, final String q) {
+    public PagedRequest createGetPagedRequest(final String uri, final String mimeType) {
+        final PagedRequest request = new PagedRequest(uri, null, null, HttpMethod.GET, mimeType, null, null);
+        return request;
+    }
+
+    public PagedRequest createGetPagedRequestWithQ(final String uri, final String q) {
         final PagedRequest request = new PagedRequest(uri, null, q, HttpMethod.GET, null, null, null);
         return request;
     }
@@ -53,45 +63,9 @@ public class HubRequestFactory {
         return request;
     }
 
-    // public Request createRequest(final String uri, final HttpMethod method, final String mimeType, final File bodyContent) {
-    // final Request request = new Request(uri, null, null, method, mimeType, null, null);
-    // request.setBodyContentFile(bodyContent);
-    // return request;
-    // }
-    //
-    // public Request createRequest(final String uri, final HttpMethod method, final String mimeType, final String bodyContent) {
-    // final Request request = new Request(uri, null, null, method, mimeType, null, null);
-    // request.setBodyContent(bodyContent);
-    // return request;
-    // }
-    //
-    // public Request createRequest(final String uri, final HttpMethod method, final String mimeType, final Map<String, String> bodyContent) {
-    // final Request request = new Request(uri, null, null, method, mimeType, null, null);
-    // request.setBodyContentMap(bodyContent);
-    // return request;
-    // }
-    //
-    // public Request createRequest(final String uri, final HttpMethod method) {
-    // final Request request = new Request(uri, null, null, method, null, null, null);
-    // return request;
-    // }
-    //
-    // public Request createRequest(final String uri, final HttpMethod method, final File bodyContent) {
-    // final Request request = new Request(uri, null, null, method, null, null, null);
-    // request.setBodyContentFile(bodyContent);
-    // return request;
-    // }
-    //
-    // public Request createRequest(final String uri, final HttpMethod method, final String bodyContent) {
-    // final Request request = new Request(uri, null, null, method, null, null, null);
-    // request.setBodyContent(bodyContent);
-    // return request;
-    // }
-    //
-    // public Request createRequest(final String uri, final HttpMethod method, final Map<String, String> bodyContent) {
-    // final Request request = new Request(uri, null, null, method, null, null, null);
-    // request.setBodyContentMap(bodyContent);
-    // return request;
-    // }
+    public Request createRequest(final String uri, final HttpMethod method, final String mimeType) {
+        final Request request = new Request(uri, null, null, method, mimeType, null, null);
+        return request;
+    }
 
 }

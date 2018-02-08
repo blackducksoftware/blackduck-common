@@ -28,26 +28,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
+import com.blackducksoftware.integration.hub.request.PagedRequest;
+import com.blackducksoftware.integration.hub.request.Response;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import okhttp3.Response;
-
 public class HubResponsesTransformer {
+    private final RestConnection restConnection;
     private final HubResponseTransformer hubResponseTransformer;
     private final JsonParser jsonParser;
 
-    public HubResponsesTransformer(final HubResponseTransformer hubResponseTransformer, final JsonParser jsonParser) {
+    public HubResponsesTransformer(final RestConnection restConnection, final HubResponseTransformer hubResponseTransformer) {
+        this.restConnection = restConnection;
         this.hubResponseTransformer = hubResponseTransformer;
-        this.jsonParser = jsonParser;
+        this.jsonParser = restConnection.jsonParser;
     }
 
     public <T extends HubResponse> List<T> getResponses(final JsonArray responsesArray, final Class<T> clazz) {
@@ -86,24 +86,14 @@ public class HubResponsesTransformer {
         return responseList;
     }
 
-    public <T extends HubResponse> List<T> getResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
-        return getResponses(hubPagedRequest, clazz, null, null);
+    public <T extends HubResponse> List<T> getResponses(final PagedRequest pagedRequest, final Class<T> clazz) throws IntegrationException {
+        return getResponses(pagedRequest, clazz, null);
     }
 
-    public <T extends HubResponse> List<T> getResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return getResponses(hubPagedRequest, clazz, null, mediaType);
-    }
+    public <T extends HubResponse> List<T> getResponses(final PagedRequest pagedRequest, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
 
-    public <T extends HubResponse> List<T> getResponses(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap, final String mediaType) throws IntegrationException {
-        Response response = null;
-        try {
-            if (StringUtils.isNotBlank(mediaType)) {
-                response = hubPagedRequest.executeGet(mediaType);
-            } else {
-                response = hubPagedRequest.executeGet();
-            }
-            final String jsonResponse = response.body().string();
-
+        try (Response response = restConnection.executeRequest(pagedRequest)) {
+            final String jsonResponse = response.getContentString();
             final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
             if (typeMap != null) {
                 return getResponses(jsonObject, clazz, typeMap);
@@ -112,10 +102,6 @@ public class HubResponsesTransformer {
             }
         } catch (final IOException e) {
             throw new HubIntegrationException(e);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
         }
     }
 
