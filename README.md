@@ -1,5 +1,5 @@
 ## Overview ##
-The hub-common library supplies convenient communication with a Hub server through rest Api's as well as providing convenient ways to download the CLI and execute it.
+Detect for TFS plugin.
 
 ## Build ##
 
