@@ -26,9 +26,7 @@ package com.blackducksoftware.integration.hub.dataservice.codelocation;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,10 +38,10 @@ import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.request.PagedRequest;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
+import com.blackducksoftware.integration.hub.rest.RequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 
@@ -72,11 +70,9 @@ public class CodeLocationDataService extends HubService {
     }
 
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationType codeLocationType) throws IntegrationException {
-        final Map<String, String> queryParameters = new HashMap<>();
-        queryParameters.put("codeLocationType", codeLocationType.toString());
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPath(ApiDiscovery.CODELOCATIONS_LINK, queryParameters);
-
-        final List<CodeLocationView> allCodeLocations = getAllResponses(pagedRequest, CodeLocationView.class);
+        final RequestWrapper requestWrapper = new RequestWrapper();
+        requestWrapper.addQueryParameter("codeLocationType", codeLocationType.toString());
+        final List<CodeLocationView> allCodeLocations = getAllResponsesFromApi(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestWrapper);
         return allCodeLocations;
     }
 
@@ -138,8 +134,9 @@ public class CodeLocationDataService extends HubService {
 
     public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
-            final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPathWithQ(ApiDiscovery.CODELOCATIONS_LINK, "name:" + codeLocationName);
-            final List<CodeLocationView> codeLocations = getAllResponses(pagedRequest, CodeLocationView.class);
+            final RequestWrapper requestWrapper = new RequestWrapper();
+            requestWrapper.setQ("name:" + codeLocationName);
+            final List<CodeLocationView> codeLocations = getAllResponsesFromApi(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestWrapper);
             for (final CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.name)) {
                     return codeLocation;
@@ -151,8 +148,7 @@ public class CodeLocationDataService extends HubService {
     }
 
     public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {
-        final Request request = getHubRequestFactory().createGetRequestFromPath(ApiDiscovery.CODELOCATIONS_LINK + "/" + codeLocationId);
-        return getResponse(request, CodeLocationView.class);
+        return getResponseFromPath(ApiDiscovery.CODELOCATIONS_LINK + "/" + codeLocationId, CodeLocationView.class);
     }
 
     private CodeLocationView createRequestCodeLocationView(final CodeLocationView codeLocationItem, final String versionUrl) {
@@ -167,7 +163,6 @@ public class CodeLocationDataService extends HubService {
     }
 
     public ScanSummaryView getScanSummaryViewById(final String scanSummaryId) throws IntegrationException {
-        final Request request = getHubRequestFactory().createGetRequestFromPath(HubService.SCANSUMMARIES_LINK + "/" + scanSummaryId);
-        return getResponse(request, ScanSummaryView.class);
+        return getResponseFromPath(HubService.SCANSUMMARIES_LINK + "/" + scanSummaryId, ScanSummaryView.class);
     }
 }

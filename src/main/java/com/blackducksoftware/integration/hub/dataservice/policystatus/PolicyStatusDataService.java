@@ -29,7 +29,6 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView;
-import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
@@ -45,27 +44,23 @@ public class PolicyStatusDataService extends HubService {
 
     public VersionBomPolicyStatusView getPolicyStatusForProjectAndVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = projectDataService.getProjectByName(projectName);
-        final String versionsUrl = getFirstLink(projectItem, MetaHandler.VERSIONS_LINK);
 
-        final List<ProjectVersionView> projectVersions = getAllResponses(versionsUrl, ProjectVersionView.class);
-        final String policyStatusUrl = findPolicyStatusUrlFromVersions(projectVersions, projectVersionName);
+        final List<ProjectVersionView> projectVersions = getAllResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE);
+        final ProjectVersionView projectVersionView = findMatchingVersion(projectVersions, projectVersionName);
 
-        return getResponse(policyStatusUrl, VersionBomPolicyStatusView.class);
+        return getPolicyStatusForVersion(projectVersionView);
     }
 
     public VersionBomPolicyStatusView getPolicyStatusForVersion(final ProjectVersionView version) throws IntegrationException {
-        final String policyStatusUrl = getFirstLink(version, MetaHandler.POLICY_STATUS_LINK);
-        return getResponse(policyStatusUrl, VersionBomPolicyStatusView.class);
+        return getResponseFromLinkResponse(version, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
     }
 
-    private String findPolicyStatusUrlFromVersions(final List<ProjectVersionView> projectVersions, final String projectVersionName) throws HubIntegrationException {
+    private ProjectVersionView findMatchingVersion(final List<ProjectVersionView> projectVersions, final String projectVersionName) throws HubIntegrationException {
         for (final ProjectVersionView version : projectVersions) {
             if (projectVersionName.equals(version.versionName)) {
-                final String policyStatusLink = getFirstLink(version, MetaHandler.POLICY_STATUS_LINK);
-                return policyStatusLink;
+                return version;
             }
         }
-
         return null;
     }
 

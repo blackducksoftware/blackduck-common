@@ -49,7 +49,7 @@ import com.blackducksoftware.integration.hub.dataservice.notification.transforme
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
-import com.blackducksoftware.integration.hub.request.PagedRequest;
+import com.blackducksoftware.integration.hub.rest.RequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -114,13 +114,11 @@ public class NotificationDataService extends HubService {
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final Map<String, String> queryParameters = new HashMap<>();
-        queryParameters.put("startDate", startDateString);
-        queryParameters.put("endDate", endDateString);
+        final RequestWrapper requestWrapper = new RequestWrapper();
+        requestWrapper.addQueryParameter("startDate", startDateString);
+        requestWrapper.addQueryParameter("endDate", endDateString);
 
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPath(ApiDiscovery.NOTIFICATIONS_LINK, queryParameters);
-
-        final List<NotificationView> allNotificationItems = getAllResponses(pagedRequest, NotificationView.class, typeMap);
+        final List<NotificationView> allNotificationItems = getAllResponsesFromApi(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestWrapper, typeMap);
         return allNotificationItems;
     }
 
@@ -129,15 +127,16 @@ public class NotificationDataService extends HubService {
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
-        final String uri = getFirstLink(user, UserView.NOTIFICATIONS_LINK);
 
         final Map<String, String> queryParameters = new HashMap<>();
         queryParameters.put("startDate", startDateString);
         queryParameters.put("endDate", endDateString);
 
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequest(uri, queryParameters);
+        final RequestWrapper requestWrapper = new RequestWrapper();
+        requestWrapper.addQueryParameter("startDate", startDateString);
+        requestWrapper.addQueryParameter("endDate", endDateString);
 
-        final List<NotificationView> allNotificationItems = getAllResponses(pagedRequest, NotificationView.class, typeMap);
+        final List<NotificationView> allNotificationItems = getAllResponsesFromLinkResponse(user, ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestWrapper, typeMap);
         return allNotificationItems;
     }
 

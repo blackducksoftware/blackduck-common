@@ -34,7 +34,7 @@ import org.junit.experimental.categories.Category;
 import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
-import com.blackducksoftware.integration.hub.api.generated.view.RoleView;
+import com.blackducksoftware.integration.hub.api.generated.view.RoleAssignmentView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.TestingPropertyKey;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
@@ -56,7 +56,7 @@ public class UserServiceTestIT {
     public void getRolesForUserTestIT() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final List<RoleView> rolesForUser = hubServicesFactory.createUserGroupDataService().getRolesForUser(restConnectionTestHelper.getTestUsername());
+        final List<RoleAssignmentView> rolesForUser = hubServicesFactory.createUserGroupDataService().getRolesForUser(restConnectionTestHelper.getTestUsername());
         assertTrue(rolesForUser.size() > 0);
     }
 }

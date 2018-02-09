@@ -50,6 +50,34 @@ public class HubRequestFactory {
         }
     }
 
+    public Request createGetRequestFromWrapper(final String uri, final RequestWrapper requestWrapper) throws IntegrationException {
+        if (requestWrapper == null) {
+            return new Request(uri);
+        }
+        return new Request(uri, requestWrapper.getQueryParameters(), requestWrapper.getQ(), HttpMethod.GET, requestWrapper.getMimeType(), requestWrapper.getBodyEncoding(), requestWrapper.getAdditionalHeaders());
+    }
+
+    public PagedRequest createGetPagedRequestFromWrapper(final String uri, final RequestWrapper requestWrapper) throws IntegrationException {
+        if (requestWrapper == null) {
+            return new PagedRequest(uri);
+        }
+        return new PagedRequest(uri, requestWrapper.getQueryParameters(), requestWrapper.getQ(), HttpMethod.GET, requestWrapper.getMimeType(), requestWrapper.getBodyEncoding(),
+                requestWrapper.getAdditionalHeaders(), requestWrapper.getLimitPerRequest(), 0);
+    }
+
+    public Request createGetRequestFromPathFromWrapper(final String path, final RequestWrapper requestWrapper) throws IntegrationException {
+        final String uri = pieceTogetherURI(baseUrl, path);
+        final Request request = new Request(uri, requestWrapper.getQueryParameters(), requestWrapper.getQ(), HttpMethod.GET, requestWrapper.getMimeType(), requestWrapper.getBodyEncoding(), requestWrapper.getAdditionalHeaders());
+        return request;
+    }
+
+    public PagedRequest createGetPagedRequestFromPathFromWrapper(final String path, final RequestWrapper requestWrapper) throws IntegrationException {
+        final String uri = pieceTogetherURI(baseUrl, path);
+        final PagedRequest pagedRequest = new PagedRequest(uri, requestWrapper.getQueryParameters(), requestWrapper.getQ(), HttpMethod.GET, requestWrapper.getMimeType(), requestWrapper.getBodyEncoding(),
+                requestWrapper.getAdditionalHeaders(), requestWrapper.getLimitPerRequest(), 0);
+        return pagedRequest;
+    }
+
     public Request createGetRequestFromPath(final String path) throws IntegrationException {
         final String uri = pieceTogetherURI(baseUrl, path);
         final Request request = new Request(uri, null, null, HttpMethod.GET, null, null, null);

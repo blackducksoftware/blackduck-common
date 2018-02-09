@@ -94,6 +94,7 @@ public class ScanStatusDataService extends HubService {
         while (!done(foundPendingScan, timeoutInMilliseconds, startedTime, timeoutMessage)) {
             try {
                 final CodeLocationView codeLocation = codeLocationDataService.getCodeLocationByName(codeLocationName);
+
                 final String scanSummariesLink = metaService.getFirstLinkSafely(codeLocation, MetaHandler.SCANS_LINK);
                 if (StringUtils.isNotBlank(scanSummariesLink)) {
                     final ScanSummaryView scanSummaryView = getResponse(scanSummariesLink, ScanSummaryView.class);
@@ -127,8 +128,7 @@ public class ScanStatusDataService extends HubService {
     }
 
     public void assertScansFinished(final ProjectVersionView projectVersionView) throws HubTimeoutExceededException, IntegrationException {
-        final String codeLocationsLink = getFirstLink(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK);
-        final List<CodeLocationView> allCodeLocations = getAllResponses(codeLocationsLink, CodeLocationView.class);
+        final List<CodeLocationView> allCodeLocations = getAllResponsesFromLinkResponse(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
         for (final CodeLocationView codeLocationView : allCodeLocations) {
             final String scansLink = metaService.getFirstLinkSafely(codeLocationView, CodeLocationView.SCANS_LINK);
