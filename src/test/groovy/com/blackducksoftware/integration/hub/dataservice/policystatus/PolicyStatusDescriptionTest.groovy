@@ -27,9 +27,9 @@ import org.junit.Assert
 import org.junit.Test
 
 import com.blackducksoftware.integration.hub.api.enumeration.PolicySeverityType
+import com.blackducksoftware.integration.hub.api.generated.component.ComponentVersionPolicyViolationDetails
+import com.blackducksoftware.integration.hub.api.generated.component.NameValuePairView
 import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType
-import com.blackducksoftware.integration.hub.api.generated.model.ComponentVersionPolicyViolationDetails
-import com.blackducksoftware.integration.hub.api.generated.model.NameValuePairView
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView
 
 class PolicyStatusDescriptionTest {

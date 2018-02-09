@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.api.enumeration.PolicySeverityType;
-import com.blackducksoftware.integration.hub.api.generated.model.NameValuePairView;
+import com.blackducksoftware.integration.hub.api.generated.component.NameValuePairView;
 
 public class ComponentVersionPolicyViolationCount {
     public PolicySeverityType name;

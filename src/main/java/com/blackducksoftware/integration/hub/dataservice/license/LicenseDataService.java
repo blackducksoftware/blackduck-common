@@ -26,7 +26,7 @@ package com.blackducksoftware.integration.hub.dataservice.license;
 import java.io.IOException;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.generated.model.VersionBomLicenseView;
+import com.blackducksoftware.integration.hub.api.generated.component.VersionBomLicenseView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComplexLicenseView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;

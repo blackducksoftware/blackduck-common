@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.enumeration.PolicyRuleConditionType;
-import com.blackducksoftware.integration.hub.api.generated.model.PolicyRuleExpression;
+import com.blackducksoftware.integration.hub.api.generated.component.PolicyRuleExpression;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 
 public class PolicyRuleModel {

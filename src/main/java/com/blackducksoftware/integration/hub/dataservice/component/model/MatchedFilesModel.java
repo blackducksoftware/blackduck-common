@@ -26,8 +26,8 @@ package com.blackducksoftware.integration.hub.dataservice.component.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.blackducksoftware.integration.hub.api.generated.component.CompositePathWithArchiveContext;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.MatchedFileUsagesType;
-import com.blackducksoftware.integration.hub.api.generated.model.CompositePathWithArchiveContext;
 import com.blackducksoftware.integration.hub.api.generated.view.MatchedFileView;
 
 public class MatchedFilesModel {

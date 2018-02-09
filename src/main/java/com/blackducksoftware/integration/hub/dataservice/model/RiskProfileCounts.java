@@ -26,8 +26,8 @@ package com.blackducksoftware.integration.hub.dataservice.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.blackducksoftware.integration.hub.api.generated.component.RiskCountView;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.RiskCountType;
-import com.blackducksoftware.integration.hub.api.generated.model.RiskCountView;
 import com.blackducksoftware.integration.hub.api.generated.view.RiskProfileView;
 
 public class RiskProfileCounts {

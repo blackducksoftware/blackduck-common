@@ -42,8 +42,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.blackducksoftware.integration.hub.api.generated.model.ResourceLink;
-import com.blackducksoftware.integration.hub.api.generated.model.ResourceMetadata;
+import com.blackducksoftware.integration.hub.api.generated.component.ResourceLink;
+import com.blackducksoftware.integration.hub.api.generated.component.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV1View;
 import com.blackducksoftware.integration.hub.api.response.VulnerabilitySourceQualifiedId;

@@ -29,10 +29,10 @@ import java.text.SimpleDateFormat;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.builder.AbstractBuilder;
+import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
+import com.blackducksoftware.integration.hub.api.generated.component.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
-import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest;
-import com.blackducksoftware.integration.hub.api.generated.model.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.request.validator.ProjectRequestValidator;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.validator.AbstractValidator;

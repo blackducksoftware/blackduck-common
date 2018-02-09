@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.hub.api.generated.component.NameValuePairView;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
-import com.blackducksoftware.integration.hub.api.generated.model.NameValuePairView;
 import com.blackducksoftware.integration.util.Stringable;
 
 public class ComponentVersionStatusCount extends Stringable {

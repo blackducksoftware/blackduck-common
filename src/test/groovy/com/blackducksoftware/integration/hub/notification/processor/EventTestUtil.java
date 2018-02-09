@@ -30,9 +30,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.generated.component.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.VulnerabilityV2Cvss2AccessComplexityType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.VulnerabilityV2SourceType;
-import com.blackducksoftware.integration.hub.api.generated.model.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV1View;
@@ -45,79 +45,42 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Vuln
 
 public class EventTestUtil {
     public static final String DESCRIPTION = "description";
-
     public static final String LOW_VULN_PREFIX = "low";
-
     public static final String MEDIUM_VULN_PREFIX = "medium";
-
     public static final String HIGH_VULN_PREFIX = "high";
-
     public static final String UPDATED_BY = "me";
-
     public static final String CREATED_BY = "you";
-
     public static final String UPDATED_AT = "now";
-
     public static final String CREATED_AT = "then";
-
     public static final String RULE_NAME_2 = "Rule 2";
-
     public static final String RULE_NAME_1 = "Rule 1";
-
     public static final String LOW_VULN_ID1 = "low_vuln_id1";
-
     public static final String LOW_VULN_ID2 = "low_vuln_id2";
-
     public static final String MEDIUM_VULN_ID2 = "medium_vuln_id2";
-
     public static final String LOW_VULN_ID = "low_vuln_id";
-
     public static final String MEDIUM_VULN_ID = "medium_vuln_id";
-
     public static final String HIGH_VULN_ID = "high_vuln_id";
-
     public static final String VULN_SOURCE = "vuln_source";
-
     public static final String POLICY_RULE_2_HREF_URL = "http://a.hub.server/policy/rule2/url";
-
     public static final String POLICY_RULE_1_HREF_URL = "http://a.hub.server/policy/rule1/url";
-
     public static final String VERSIONS_URL_SEGMENT = "/versions/";
-
     public static final String COMPONENT_URL_PREFIX = "http://localhost/api/components/";
-
     public static final String PROJECT_VERSION_URL_PREFIX = "http://a.hub.server/project/";
-
     public static final String PROJECT_VERSION_URL_SEGMENT = "/version/";
-
     public static final String COMPONENT_VERSION_URL = "http://a.hub.server/components/component/version";
-
     public static final String LAST_NAME = "LastName";
-
     public static final String FIRST_NAME = "FirstName";
-
     public static final String PREFIX_RULE = "Rule ";
-
     public static final String VERSION = "Version";
-
     public static final String COMPONENT = "Component";
-
     public static final String VERSION2 = "Version2";
-
     public static final String COMPONENT2 = "Component2";
-
     public static final String PROJECT_VERSION_NAME = "ProjectVersionName";
-
     public static final String PROJECT_NAME = "ProjectName";
-
     public static final String PROJECT_VERSION_NAME2 = "ProjectVersionName2";
-
     public static final String PROJECT_NAME2 = "ProjectName2";
-
     public static final String COMPONENT_ID = "component_id";
-
     public static final String COMPONENT_VERSION_ID = "component_version_id";
-
     public static final List<String> ALLOW_LIST = Collections.emptyList();
 
     public List<VulnerabilityV1View> createVulnerabiltyItemList(final List<VulnerabilitySourceQualifiedId> vulnSourceList) {

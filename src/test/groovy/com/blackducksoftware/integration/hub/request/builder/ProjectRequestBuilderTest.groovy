@@ -28,9 +28,9 @@ import java.text.SimpleDateFormat
 import org.junit.Assert
 import org.junit.Test
 
+import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
-import com.blackducksoftware.integration.hub.api.generated.model.ProjectRequest
 import com.blackducksoftware.integration.hub.rest.RestConnection
 
 class ProjectRequestBuilderTest {
