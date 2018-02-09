@@ -124,10 +124,6 @@ public class HubService {
         return metaHandler.getHref(view);
     }
 
-    public <T extends HubResponse> T getResponseFromLinkResponse(final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
-        return hubResponseTransformer.getResponse(linkSingleResponse.link, linkSingleResponse.responseClass);
-    }
-
     public <T extends HubResponse> T getResponseFromLinkResponse(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
         return hubResponseTransformer.getResponseFromLink(hubView, linkSingleResponse.link, linkSingleResponse.responseClass);
     }
