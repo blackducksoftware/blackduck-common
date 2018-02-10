@@ -8,6 +8,7 @@ The hub-common library supplies convenient communication with a Hub server throu
 [![Black Duck Security Risk](https://copilot.blackducksoftware.com/github/repos/blackducksoftware/hub-common/branches/master/badge-risk.svg)](https://copilot.blackducksoftware.com/github/repos/blackducksoftware/hub-common/branches/master)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![CircleCI](https://circleci.com/gh/blackducksoftware/hub-common/tree/master.svg?style=svg&circle-token=e46637f3fa1c9b84d11fa9462348f64dc3b70af9)](https://circleci.com/gh/blackducksoftware/hub-common/tree/master)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.blackducksoftware.integration%3Ahub-common&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.blackducksoftware.integration%3Ahub-common)
 
 ## Where can I get the latest release? ##
 You can download the latest release from Maven Central.
