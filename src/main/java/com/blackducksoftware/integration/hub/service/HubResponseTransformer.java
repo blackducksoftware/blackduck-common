@@ -91,6 +91,15 @@ public class HubResponseTransformer {
         return getResponse(request, clazz);
     }
 
+    public <T extends HubResponse> T getResponseFromLinkResponse(final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
+        return getResponseFromLinkResponse(linkSingleResponse, null);
+    }
+
+    public <T extends HubResponse> T getResponseFromLinkResponse(final LinkSingleResponse<T> linkSingleResponse, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        final Request request = hubRequestFactory.createGetRequestFromPath(linkSingleResponse.link, requestWrapper);
+        return getResponse(request, linkSingleResponse.responseClass);
+    }
+
     public <T extends HubResponse> T getResponse(final Request request, final Class<T> clazz) throws IntegrationException {
         try (Response response = restConnection.executeRequest(request)) {
             final String jsonResponse = response.getContentString();

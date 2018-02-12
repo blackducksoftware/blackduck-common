@@ -43,9 +43,9 @@ import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.HubDataService;
 
-public class CodeLocationDataService extends HubService {
+public class CodeLocationDataService extends HubDataService {
     public CodeLocationDataService(final RestConnection restConnection) {
         super(restConnection);
     }
@@ -63,7 +63,7 @@ public class CodeLocationDataService extends HubService {
         }
         final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, jsonPayload);
         requestWrapper.setMimeType(mimeType);
-        try (Response response = executeUpdateRequestFromPath(HubService.BOMIMPORT_LINK, requestWrapper)) {
+        try (Response response = executeUpdateRequestFromPath(HubDataService.BOMIMPORT_LINK, requestWrapper)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -161,6 +161,6 @@ public class CodeLocationDataService extends HubService {
     }
 
     public ScanSummaryView getScanSummaryViewById(final String scanSummaryId) throws IntegrationException {
-        return getResponseFromPath(HubService.SCANSUMMARIES_LINK + "/" + scanSummaryId, ScanSummaryView.class);
+        return getResponseFromPath(HubDataService.SCANSUMMARIES_LINK + "/" + scanSummaryId, ScanSummaryView.class);
     }
 }

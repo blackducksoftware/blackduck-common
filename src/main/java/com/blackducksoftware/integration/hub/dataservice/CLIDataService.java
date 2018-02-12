@@ -34,9 +34,10 @@ import org.apache.commons.io.FileUtils;
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
+import com.blackducksoftware.integration.hub.api.generated.response.CurrentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.builder.HubScanConfigBuilder;
@@ -47,7 +48,7 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.hub.util.HostnameHelper;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder;
@@ -55,12 +56,11 @@ import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 import com.google.gson.Gson;
 
-public class CLIDataService extends HubService {
+public class CLIDataService extends HubDataService {
 
     private final Gson gson;
     private final IntLogger logger;
     private final CIEnvironmentVariables ciEnvironmentVariables;
-    private final HubVersionService hubVersionRequestService;
     private final CLIDownloadUtility cliDownloadService;
     private final PhoneHomeDataService phoneHomeDataService;
     private final ProjectDataService projectDataService;
@@ -70,14 +70,13 @@ public class CLIDataService extends HubService {
 
     private ProjectVersionWrapper projectVersionWrapper;
 
-    public CLIDataService(final RestConnection restConnection, final CIEnvironmentVariables ciEnvironmentVariables, final HubVersionService hubVersionRequestService, final CLIDownloadUtility cliDownloadService,
+    public CLIDataService(final RestConnection restConnection, final CIEnvironmentVariables ciEnvironmentVariables, final CLIDownloadUtility cliDownloadService,
             final PhoneHomeDataService phoneHomeDataService, final ProjectDataService projectDataService, final CodeLocationDataService codeLocationDataService,
             final ScanStatusDataService scanStatusDataService) {
         super(restConnection);
         this.gson = restConnection.gson;
         this.logger = restConnection.logger;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
-        this.hubVersionRequestService = hubVersionRequestService;
         this.cliDownloadService = cliDownloadService;
         this.phoneHomeDataService = phoneHomeDataService;
         this.projectDataService = projectDataService;
@@ -156,8 +155,8 @@ public class CLIDataService extends HubService {
         final String localHostName = HostnameHelper.getMyHostname();
         logger.info("Running on machine : " + localHostName);
         printConfiguration(hubScanConfig, projectRequest);
-        final String hubVersion = hubVersionRequestService.getHubVersion();
-        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), hubVersion, localHostName);
+        final CurrentVersionView currentVersion = getResponseFromLinkResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version, localHostName);
         phoneHomeDataService.phoneHome(phoneHomeRequestBodyBuilder);
 
         if (!hubScanConfig.isDryRun()) {

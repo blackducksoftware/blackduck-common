@@ -39,7 +39,7 @@ import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionMod
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public abstract class AbstractPolicyTransformer extends AbstractNotificationTransformer {
@@ -48,14 +48,14 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     /**
      * policyFilter.size() == 0: match no rules policyFilter == null: match all rules
      */
-    public AbstractPolicyTransformer(final HubService hubResponseService,
+    public AbstractPolicyTransformer(final HubDataService hubResponseService,
             final PolicyNotificationFilter policyFilter,
             final MetaHandler metaService) {
         super(hubResponseService, metaService);
         this.policyFilter = policyFilter;
     }
 
-    public AbstractPolicyTransformer(final HubService hubResponseService, final IntLogger logger,
+    public AbstractPolicyTransformer(final HubDataService hubResponseService, final IntLogger logger,
             final PolicyNotificationFilter policyFilter,
             final MetaHandler metaService) {
         super(hubResponseService, logger, metaService);

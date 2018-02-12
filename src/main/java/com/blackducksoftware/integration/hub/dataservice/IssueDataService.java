@@ -31,9 +31,9 @@ import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.HubDataService;
 
-public class IssueDataService extends HubService {
+public class IssueDataService extends HubDataService {
 
     public IssueDataService(final RestConnection restConnection) {
         super(restConnection);

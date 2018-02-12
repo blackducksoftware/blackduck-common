@@ -21,27 +21,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.nonpublic;
+package com.blackducksoftware.integration.hub.dataservice;
 
 import java.io.IOException;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.google.gson.JsonObject;
 
-public class HubRegistrationService extends HubService {
-    public HubRegistrationService(final RestConnection restConnection) {
+public class HubRegistrationDataService extends HubDataService {
+    public HubRegistrationDataService(final RestConnection restConnection) {
         super(restConnection);
     }
 
-    public String getRegistrationId() throws IntegrationException, IOException {
+    public String getRegistrationId() throws IntegrationException {
         try (Response response = executeGetRequestFromPath("api/v1/registrations")) {
             final String jsonResponse = response.getContentString();
             final JsonObject jsonObject = getJsonParser().parse(jsonResponse).getAsJsonObject();
             final String registrationId = jsonObject.get("registrationId").getAsString();
             return registrationId;
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
         }
     }
 

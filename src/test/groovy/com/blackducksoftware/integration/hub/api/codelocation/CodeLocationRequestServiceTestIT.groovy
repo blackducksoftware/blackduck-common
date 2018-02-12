@@ -43,7 +43,7 @@ import com.blackducksoftware.integration.hub.exception.DoesNotExistException
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
-import com.blackducksoftware.integration.hub.service.HubService
+import com.blackducksoftware.integration.hub.service.HubDataService
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
@@ -109,7 +109,7 @@ class CodeLocationRequestServiceTestIT {
         }
     }
 
-    private ProjectVersionView getProjectVersion(HubService hubService, ProjectDataService projectDataService, final ProjectRequest projectRequest) throws IntegrationException {
+    private ProjectVersionView getProjectVersion(HubDataService hubService, ProjectDataService projectDataService, final ProjectRequest projectRequest) throws IntegrationException {
         ProjectView project = null
         try {
             project = projectDataService.getProjectByName(projectRequest.name)

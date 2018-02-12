@@ -37,30 +37,30 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Noti
 import com.blackducksoftware.integration.hub.dataservice.transform.ItemTransform;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public abstract class AbstractNotificationTransformer implements ItemTransform<List<NotificationContentItem>, NotificationView> {
     private final IntLogger logger;
-    private final HubService hubResponseService;
+    private final HubDataService hubResponseService;
     private final MetaHandler metaService;
 
-    public AbstractNotificationTransformer(final HubService hubResponseService,
+    public AbstractNotificationTransformer(final HubDataService hubResponseService,
             final MetaHandler metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = new IntBufferedLogger();
         this.metaService = metaService;
     }
 
-    public AbstractNotificationTransformer(final HubService hubResponseService, final IntLogger logger,
+    public AbstractNotificationTransformer(final HubDataService hubResponseService, final IntLogger logger,
             final MetaHandler metaService) {
         this.hubResponseService = hubResponseService;
         this.logger = logger;
         this.metaService = metaService;
     }
 
-    public HubService getHubService() {
+    public HubDataService getHubService() {
         return hubResponseService;
     }
 

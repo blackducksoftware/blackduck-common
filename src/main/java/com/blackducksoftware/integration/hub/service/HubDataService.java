@@ -46,7 +46,7 @@ import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
-public class HubService {
+public class HubDataService {
     public static final String BOMIMPORT_LINK = "/api/bom-import";
     public static final String SCANSUMMARIES_LINK = "/api/scan-summaries";
 
@@ -59,7 +59,7 @@ public class HubService {
     private final JsonParser jsonParser;
     private final Gson gson;
 
-    public HubService(final RestConnection restConnection) {
+    public HubDataService(final RestConnection restConnection) {
         this.restConnection = restConnection;
         this.hubBaseUrl = restConnection.baseUrl;
         this.hubRequestFactory = new HubRequestFactory(hubBaseUrl, restConnection.gson);
@@ -166,6 +166,14 @@ public class HubService {
 
     public <T extends HubResponse> T getResponseFromLinkResponseSafely(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
         return hubResponseTransformer.getResponseFromLinkSafely(hubView, linkSingleResponse);
+    }
+
+    public <T extends HubResponse> T getResponseFromLinkResponse(final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
+        return hubResponseTransformer.getResponseFromLinkResponse(linkSingleResponse);
+    }
+
+    public <T extends HubResponse> T getResponseFromLinkResponse(final LinkSingleResponse<T> linkSingleResponse, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        return hubResponseTransformer.getResponseFromLinkResponse(linkSingleResponse, requestWrapper);
     }
 
     public <T extends HubResponse> T getResponseFromPath(final String path, final Class<T> clazz) throws IntegrationException {

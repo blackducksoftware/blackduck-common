@@ -29,14 +29,13 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.dataservice.CLIDataService;
 import com.blackducksoftware.integration.hub.dataservice.CodeLocationDataService;
 import com.blackducksoftware.integration.hub.dataservice.ComponentDataService;
 import com.blackducksoftware.integration.hub.dataservice.ExtensionConfigDataService;
+import com.blackducksoftware.integration.hub.dataservice.HubRegistrationDataService;
 import com.blackducksoftware.integration.hub.dataservice.IssueDataService;
 import com.blackducksoftware.integration.hub.dataservice.LicenseDataService;
 import com.blackducksoftware.integration.hub.dataservice.NotificationDataService;
@@ -78,12 +77,12 @@ public class HubServicesFactory {
     }
 
     public CLIDataService createCLIDataService(final long timeoutInMilliseconds) {
-        return new CLIDataService(restConnection, ciEnvironmentVariables, createHubVersionService(), createCliDownloadUtility(), createPhoneHomeDataService(), createProjectDataService(),
+        return new CLIDataService(restConnection, ciEnvironmentVariables, createCliDownloadUtility(), createPhoneHomeDataService(), createProjectDataService(),
                 createCodeLocationDataService(), createScanStatusDataService(timeoutInMilliseconds));
     }
 
     public PhoneHomeDataService createPhoneHomeDataService() {
-        return new PhoneHomeDataService(restConnection.logger, createPhoneHomeClient(), createHubRegistrationService(), createHubVersionService());
+        return new PhoneHomeDataService(restConnection, createPhoneHomeClient(), createHubRegistrationService());
     }
 
     public PhoneHomeClient createPhoneHomeClient() {
@@ -126,10 +125,6 @@ public class HubServicesFactory {
         return new CodeLocationDataService(restConnection);
     }
 
-    public HubVersionService createHubVersionService() {
-        return new HubVersionService(restConnection);
-    }
-
     public CLIDownloadUtility createCliDownloadUtility() {
         return new CLIDownloadUtility(restConnection.logger, restConnection);
     }
@@ -143,12 +138,12 @@ public class HubServicesFactory {
         return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
     }
 
-    public HubRegistrationService createHubRegistrationService() {
-        return new HubRegistrationService(restConnection);
+    public HubRegistrationDataService createHubRegistrationService() {
+        return new HubRegistrationDataService(restConnection);
     }
 
-    public HubService createHubService() {
-        return new HubService(restConnection);
+    public HubDataService createHubService() {
+        return new HubDataService(restConnection);
     }
 
     public RestConnection getRestConnection() {

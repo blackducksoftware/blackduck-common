@@ -42,10 +42,10 @@ import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ScanStatusDataService extends HubService {
+public class ScanStatusDataService extends HubDataService {
     public static final long FIVE_SECONDS = 5 * 1000;
     public static final long DEFAULT_TIMEOUT = 300000L;
 

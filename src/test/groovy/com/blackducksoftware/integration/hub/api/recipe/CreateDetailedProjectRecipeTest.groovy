@@ -17,7 +17,7 @@ import com.blackducksoftware.integration.hub.global.HubServerConfig
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.rest.RestConnection
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
-import com.blackducksoftware.integration.hub.service.HubService
+import com.blackducksoftware.integration.hub.service.HubDataService
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.test.TestLogger
@@ -65,7 +65,7 @@ class CreateDetailedProjectRecipeTest {
          * fields are set correctly with the HubService, a general purpose API
          * wrapper to handle common GET requests and their response payloads
          */
-        HubService hubService = hubServicesFactory.createHubService()
+        HubDataService hubService = hubServicesFactory.createHubService()
         ProjectView projectView = hubService.getResponse(projectUrl, ProjectView.class)
         ProjectVersionView projectVersionView = hubService.getResponseFromLinkResponse(projectView, ProjectView.CANONICALVERSION_LINK_RESPONSE)
 

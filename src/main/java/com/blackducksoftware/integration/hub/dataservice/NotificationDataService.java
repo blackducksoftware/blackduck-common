@@ -52,22 +52,22 @@ import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResour
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
 import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class NotificationDataService extends HubService {
+public class NotificationDataService extends HubDataService {
     private final Map<String, Class<? extends NotificationView>> typeMap = new HashMap<>();
 
-    private final HubService hubResponseService;
+    private final HubDataService hubResponseService;
     private final PolicyNotificationFilter policyNotificationFilter;
     private final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor;
     private final MetaHandler metaService;
 
-    public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService) {
+    public NotificationDataService(final RestConnection restConnection, final HubDataService hubResponseService) {
         this(restConnection, hubResponseService, null);
     }
 
-    public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService,
+    public NotificationDataService(final RestConnection restConnection, final HubDataService hubResponseService,
             final PolicyNotificationFilter policyNotificationFilter) {
         super(restConnection);
         this.hubResponseService = hubResponseService;

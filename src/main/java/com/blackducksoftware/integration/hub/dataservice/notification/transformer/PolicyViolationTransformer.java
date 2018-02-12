@@ -40,16 +40,16 @@ import com.blackducksoftware.integration.hub.dataservice.notification.model.Noti
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationTransformer(final HubService hubResponseService,
+    public PolicyViolationTransformer(final HubDataService hubResponseService,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
         super(hubResponseService, policyFilter, metaService);
     }
 
-    public PolicyViolationTransformer(final HubService hubResponseService, final IntLogger logger,
+    public PolicyViolationTransformer(final HubDataService hubResponseService, final IntLogger logger,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
         super(hubResponseService, logger, policyFilter, metaService);
     }

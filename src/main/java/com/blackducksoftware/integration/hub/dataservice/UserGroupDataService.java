@@ -35,10 +35,10 @@ import com.blackducksoftware.integration.hub.api.generated.view.UserGroupView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class UserGroupDataService extends HubService {
+public class UserGroupDataService extends HubDataService {
     private final IntLogger logger;
 
     public UserGroupDataService(final RestConnection restConnection) {

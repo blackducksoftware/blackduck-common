@@ -37,14 +37,14 @@ import com.blackducksoftware.integration.hub.dataservice.extension.transformer.U
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ExtensionConfigDataService extends HubService {
+public class ExtensionConfigDataService extends HubDataService {
     private final UserConfigTransform userConfigTransform;
     private final ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor;
 
-    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final HubService hubService) {
+    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final HubDataService hubService) {
         super(restConnection);
         userConfigTransform = new UserConfigTransform(hubService);
         parallelProcessor = new ParallelResourceProcessor<>(logger);
