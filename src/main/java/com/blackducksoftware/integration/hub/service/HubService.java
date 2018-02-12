@@ -179,6 +179,10 @@ public class HubService {
         return hubResponseTransformer.getResponse(url, clazz);
     }
 
+    public <T extends HubResponse> T getResponse(final String url, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        return hubResponseTransformer.getResponse(url, clazz, requestWrapper);
+    }
+
     public Response executeGetRequest(final String uri) throws IntegrationException {
         final Request request = new Request(uri);
         return restConnection.executeRequest(request);
