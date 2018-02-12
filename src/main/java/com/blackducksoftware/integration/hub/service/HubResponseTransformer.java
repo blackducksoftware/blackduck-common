@@ -33,7 +33,7 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
-import com.blackducksoftware.integration.hub.rest.RequestWrapper;
+import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -67,7 +67,7 @@ public class HubResponseTransformer {
         return getResponseFromLink(hubView, metaLinkRef, clazz, null);
     }
 
-    public <T extends HubResponse> T getResponseFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final RequestWrapper requestWrapper) throws IntegrationException {
+    public <T extends HubResponse> T getResponseFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
         final String link = metaHandler.getFirstLink(hubView, metaLinkRef);
         return getResponse(link, clazz, requestWrapper);
     }
@@ -76,7 +76,7 @@ public class HubResponseTransformer {
         return getResponse(uri, clazz, null);
     }
 
-    public <T extends HubResponse> T getResponse(final String uri, final Class<T> clazz, final RequestWrapper requestWrapper) throws IntegrationException {
+    public <T extends HubResponse> T getResponse(final String uri, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
         final Request request = hubRequestFactory.createGetRequestFromWrapper(uri, requestWrapper);
         return getResponse(request, clazz);
     }

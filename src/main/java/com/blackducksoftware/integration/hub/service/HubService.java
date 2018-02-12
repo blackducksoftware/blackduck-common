@@ -37,7 +37,7 @@ import com.blackducksoftware.integration.hub.api.generated.component.ResourceMet
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
-import com.blackducksoftware.integration.hub.rest.RequestWrapper;
+import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -146,14 +146,14 @@ public class HubService {
     /**
      * WILL make further paged requests to get the full list of items
      */
-    public <T extends HubResponse> List<T> getAllResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final RequestWrapper requestWrapper) throws IntegrationException {
+    public <T extends HubResponse> List<T> getAllResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper) throws IntegrationException {
         return allHubResponsesTransformer.getAllResponsesFromLink(hubView, linkMultipleResponses.link, linkMultipleResponses.responseClass, requestWrapper);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
-    public <T extends HubResponse> List<T> getAllResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final RequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap)
+    public <T extends HubResponse> List<T> getAllResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap)
             throws IntegrationException {
         return allHubResponsesTransformer.getAllResponsesFromLink(hubView, linkMultipleResponses.link, linkMultipleResponses.responseClass, requestWrapper, typeMap);
     }
@@ -168,21 +168,21 @@ public class HubService {
     /**
      * WILL make further paged requests to get the full list of items
      */
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final LinkMultipleResponses<T> linkMultipleResponses, final RequestWrapper requestWrapper) throws IntegrationException {
+    public <T extends HubResponse> List<T> getAllResponsesFromApi(final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper) throws IntegrationException {
         return allHubResponsesTransformer.getAllResponsesFromApi(linkMultipleResponses.link, linkMultipleResponses.responseClass, requestWrapper);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
-    public <T extends HubResponse> List<T> getAllResponses(final String uri, final LinkMultipleResponses<T> linkMultipleResponses, final RequestWrapper requestWrapper) throws IntegrationException {
+    public <T extends HubResponse> List<T> getAllResponses(final String uri, final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper) throws IntegrationException {
         return allHubResponsesTransformer.getAllResponsesFromApi(uri, linkMultipleResponses.responseClass, requestWrapper);
     }
 
     /**
      * WILL make further paged requests to get the full list of items
      */
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final LinkMultipleResponses<T> linkMultipleResponses, final RequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+    public <T extends HubResponse> List<T> getAllResponsesFromApi(final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
         return allHubResponsesTransformer.getAllResponsesFromApi(linkMultipleResponses.link, linkMultipleResponses.responseClass, requestWrapper, typeMap);
     }
 
@@ -211,7 +211,7 @@ public class HubService {
     /**
      * WILL make further paged requests to get the full list of items
      */
-    public <T extends HubResponse> List<T> getAllResponses(final String url, final Class<T> clazz, final RequestWrapper requestWrapper) throws IntegrationException {
+    public <T extends HubResponse> List<T> getAllResponses(final String url, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
         return allHubResponsesTransformer.getAllResponses(url, clazz, requestWrapper);
     }
 

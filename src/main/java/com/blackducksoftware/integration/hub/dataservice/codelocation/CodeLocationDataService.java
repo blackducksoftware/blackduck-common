@@ -41,7 +41,7 @@ import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.RequestWrapper;
+import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 
@@ -70,7 +70,7 @@ public class CodeLocationDataService extends HubService {
     }
 
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationType codeLocationType) throws IntegrationException {
-        final RequestWrapper requestWrapper = new RequestWrapper();
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
         requestWrapper.addQueryParameter("codeLocationType", codeLocationType.toString());
         final List<CodeLocationView> allCodeLocations = getAllResponsesFromApi(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestWrapper);
         return allCodeLocations;
@@ -134,7 +134,7 @@ public class CodeLocationDataService extends HubService {
 
     public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
-            final RequestWrapper requestWrapper = new RequestWrapper();
+            final GetRequestWrapper requestWrapper = new GetRequestWrapper();
             requestWrapper.setQ("name:" + codeLocationName);
             final List<CodeLocationView> codeLocations = getAllResponsesFromApi(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestWrapper);
             for (final CodeLocationView codeLocation : codeLocations) {

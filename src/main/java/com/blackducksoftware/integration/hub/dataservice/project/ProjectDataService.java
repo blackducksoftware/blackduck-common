@@ -51,7 +51,7 @@ import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.RequestWrapper;
+import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -72,7 +72,7 @@ public class ProjectDataService extends HubService {
         if (StringUtils.isNotBlank(projectName)) {
             q = "name:" + projectName;
         }
-        final RequestWrapper requestWrapper = new RequestWrapper();
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
         requestWrapper.setQ(q);
         final List<ProjectView> allProjectItems = getAllResponsesFromApi(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestWrapper);
         return allProjectItems;
@@ -83,7 +83,7 @@ public class ProjectDataService extends HubService {
         if (StringUtils.isNotBlank(projectName)) {
             q = "name:" + projectName;
         }
-        final RequestWrapper requestWrapper = new RequestWrapper();
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
         requestWrapper.setQ(q);
         requestWrapper.setLimitPerRequest(limit);
         final List<ProjectView> projectItems = getAllResponsesFromApi(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestWrapper);
@@ -124,7 +124,7 @@ public class ProjectDataService extends HubService {
         if (StringUtils.isNotBlank(projectVersionName)) {
             q = String.format("versionName:%s", projectVersionName);
         }
-        final RequestWrapper requestWrapper = new RequestWrapper();
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
         requestWrapper.setQ(q);
         final List<ProjectVersionView> allProjectVersionMatchingItems = getAllResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, requestWrapper);
         for (final ProjectVersionView projectVersion : allProjectVersionMatchingItems) {

@@ -49,7 +49,7 @@ import com.blackducksoftware.integration.hub.dataservice.notification.transforme
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
-import com.blackducksoftware.integration.hub.rest.RequestWrapper;
+import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -114,7 +114,7 @@ public class NotificationDataService extends HubService {
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final RequestWrapper requestWrapper = new RequestWrapper();
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
         requestWrapper.addQueryParameter("startDate", startDateString);
         requestWrapper.addQueryParameter("endDate", endDateString);
 
@@ -132,7 +132,7 @@ public class NotificationDataService extends HubService {
         queryParameters.put("startDate", startDateString);
         queryParameters.put("endDate", endDateString);
 
-        final RequestWrapper requestWrapper = new RequestWrapper();
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
         requestWrapper.addQueryParameter("startDate", startDateString);
         requestWrapper.addQueryParameter("endDate", endDateString);
 

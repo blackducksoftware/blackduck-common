@@ -50,14 +50,14 @@ public class HubRequestFactory {
         }
     }
 
-    public Request createGetRequestFromWrapper(final String uri, final RequestWrapper requestWrapper) throws IntegrationException {
+    public Request createGetRequestFromWrapper(final String uri, final GetRequestWrapper requestWrapper) throws IntegrationException {
         if (requestWrapper == null) {
             return new Request(uri);
         }
         return new Request(uri, requestWrapper.getQueryParameters(), requestWrapper.getQ(), HttpMethod.GET, requestWrapper.getMimeType(), requestWrapper.getBodyEncoding(), requestWrapper.getAdditionalHeaders());
     }
 
-    public PagedRequest createGetPagedRequestFromWrapper(final String uri, final RequestWrapper requestWrapper) throws IntegrationException {
+    public PagedRequest createGetPagedRequestFromWrapper(final String uri, final GetRequestWrapper requestWrapper) throws IntegrationException {
         if (requestWrapper == null) {
             return new PagedRequest(uri);
         }
@@ -65,14 +65,20 @@ public class HubRequestFactory {
                 requestWrapper.getAdditionalHeaders(), requestWrapper.getLimitPerRequest(), 0);
     }
 
-    public Request createGetRequestFromPathFromWrapper(final String path, final RequestWrapper requestWrapper) throws IntegrationException {
+    public Request createGetRequestFromPathFromWrapper(final String path, final GetRequestWrapper requestWrapper) throws IntegrationException {
         final String uri = pieceTogetherURI(baseUrl, path);
+        if (requestWrapper == null) {
+            return new Request(uri);
+        }
         final Request request = new Request(uri, requestWrapper.getQueryParameters(), requestWrapper.getQ(), HttpMethod.GET, requestWrapper.getMimeType(), requestWrapper.getBodyEncoding(), requestWrapper.getAdditionalHeaders());
         return request;
     }
 
-    public PagedRequest createGetPagedRequestFromPathFromWrapper(final String path, final RequestWrapper requestWrapper) throws IntegrationException {
+    public PagedRequest createGetPagedRequestFromPathFromWrapper(final String path, final GetRequestWrapper requestWrapper) throws IntegrationException {
         final String uri = pieceTogetherURI(baseUrl, path);
+        if (requestWrapper == null) {
+            return new PagedRequest(uri);
+        }
         final PagedRequest pagedRequest = new PagedRequest(uri, requestWrapper.getQueryParameters(), requestWrapper.getQ(), HttpMethod.GET, requestWrapper.getMimeType(), requestWrapper.getBodyEncoding(),
                 requestWrapper.getAdditionalHeaders(), requestWrapper.getLimitPerRequest(), 0);
         return pagedRequest;
