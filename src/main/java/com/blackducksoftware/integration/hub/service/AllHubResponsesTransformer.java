@@ -36,8 +36,8 @@ import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.PagedRequest;
 import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
+import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -62,17 +62,17 @@ public class AllHubResponsesTransformer {
     }
 
     public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiPath, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromPathFromWrapper(apiPath, requestWrapper);
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromPath(apiPath, requestWrapper);
         return getAllResponses(pagedRequest, clazz, null);
     }
 
     public <T extends HubResponse> List<T> getAllResponsesFromApi(final String apiPath, final Class<T> clazz, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
-        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromPathFromWrapper(apiPath, requestWrapper);
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromPath(apiPath, requestWrapper);
         return getAllResponses(pagedRequest, clazz, typeMap);
     }
 
     public <T extends HubResponse> List<T> getAllResponses(final String uri, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromWrapper(uri, requestWrapper);
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequest(uri, requestWrapper);
         return getAllResponses(pagedRequest, clazz, null);
     }
 
@@ -89,14 +89,14 @@ public class AllHubResponsesTransformer {
 
     public <T extends HubResponse> List<T> getAllResponsesFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
         final String link = metaHandler.getFirstLink(hubView, metaLinkRef);
-        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromWrapper(link, requestWrapper);
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequest(link, requestWrapper);
         return getAllResponses(pagedRequest, clazz, null);
     }
 
     public <T extends HubResponse> List<T> getAllResponsesFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap)
             throws IntegrationException {
         final String link = metaHandler.getFirstLink(hubView, metaLinkRef);
-        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromWrapper(link, requestWrapper);
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequest(link, requestWrapper);
         return getAllResponses(pagedRequest, clazz, typeMap);
     }
 

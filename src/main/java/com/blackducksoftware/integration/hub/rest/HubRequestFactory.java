@@ -25,19 +25,21 @@ package com.blackducksoftware.integration.hub.rest;
 
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Map;
 
 import org.apache.http.client.utils.URIBuilder;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.request.PagedRequest;
 import com.blackducksoftware.integration.hub.request.Request;
+import com.google.gson.Gson;
 
 public class HubRequestFactory {
     private final URL baseUrl;
+    private final Gson gson;
 
-    public HubRequestFactory(final URL baseUrl) {
+    public HubRequestFactory(final URL baseUrl, final Gson gson) {
         this.baseUrl = baseUrl;
+        this.gson = gson;
     }
 
     private String pieceTogetherURI(final URL baseUrl, final String path) throws IntegrationException {
@@ -50,14 +52,14 @@ public class HubRequestFactory {
         }
     }
 
-    public Request createGetRequestFromWrapper(final String uri, final GetRequestWrapper requestWrapper) throws IntegrationException {
+    public Request createGetRequest(final String uri, final GetRequestWrapper requestWrapper) throws IntegrationException {
         if (requestWrapper == null) {
             return new Request(uri);
         }
         return new Request(uri, requestWrapper.getQueryParameters(), requestWrapper.getQ(), HttpMethod.GET, requestWrapper.getMimeType(), requestWrapper.getBodyEncoding(), requestWrapper.getAdditionalHeaders());
     }
 
-    public PagedRequest createGetPagedRequestFromWrapper(final String uri, final GetRequestWrapper requestWrapper) throws IntegrationException {
+    public PagedRequest createGetPagedRequest(final String uri, final GetRequestWrapper requestWrapper) throws IntegrationException {
         if (requestWrapper == null) {
             return new PagedRequest(uri);
         }
@@ -65,7 +67,7 @@ public class HubRequestFactory {
                 requestWrapper.getAdditionalHeaders(), requestWrapper.getLimitPerRequest(), 0);
     }
 
-    public Request createGetRequestFromPathFromWrapper(final String path, final GetRequestWrapper requestWrapper) throws IntegrationException {
+    public Request createGetRequestFromPath(final String path, final GetRequestWrapper requestWrapper) throws IntegrationException {
         final String uri = pieceTogetherURI(baseUrl, path);
         if (requestWrapper == null) {
             return new Request(uri);
@@ -74,7 +76,7 @@ public class HubRequestFactory {
         return request;
     }
 
-    public PagedRequest createGetPagedRequestFromPathFromWrapper(final String path, final GetRequestWrapper requestWrapper) throws IntegrationException {
+    public PagedRequest createGetPagedRequestFromPath(final String path, final GetRequestWrapper requestWrapper) throws IntegrationException {
         final String uri = pieceTogetherURI(baseUrl, path);
         if (requestWrapper == null) {
             return new PagedRequest(uri);
@@ -90,85 +92,36 @@ public class HubRequestFactory {
         return request;
     }
 
-    public Request createGetRequestFromPath(final String path, final Map<String, String> queryParameters) throws IntegrationException {
+    public Request createRequest(final String uri, final RequestWrapper requestWrapper) throws IntegrationException {
+        final Request request = new Request(uri, null, null, requestWrapper.getMethod(), requestWrapper.getMimeType(), requestWrapper.getBodyEncoding(), requestWrapper.getAdditionalHeaders());
+        if (null != requestWrapper.getHubComponent()) {
+            request.setBodyContent(gson.toJson(requestWrapper.getHubComponent()));
+        } else if (null != requestWrapper.getJsonObject()) {
+            request.setBodyContent(gson.toJson(requestWrapper.getJsonObject()));
+        } else if (null != requestWrapper.getBodyContent()) {
+            request.setBodyContent(requestWrapper.getBodyContent());
+        } else if (null != requestWrapper.getBodyContentMap()) {
+            request.setBodyContentMap(requestWrapper.getBodyContentMap());
+        } else if (null != requestWrapper.getBodyContentFile()) {
+            request.setBodyContentFile(requestWrapper.getBodyContentFile());
+        }
+        return request;
+    }
+
+    public Request createRequestFromPath(final String path, final RequestWrapper requestWrapper) throws IntegrationException {
         final String uri = pieceTogetherURI(baseUrl, path);
-        final Request request = new Request(uri, queryParameters, null, HttpMethod.GET, null, null, null);
-        return request;
-    }
-
-    public Request createGetRequest(final String uri, final String mimeType) {
-        final Request request = new Request(uri, null, null, HttpMethod.GET, mimeType, null, null);
-        return request;
-    }
-
-    public Request createGetRequest(final String uri, final Map<String, String> queryParameters) {
-        final Request request = new Request(uri, queryParameters, null, HttpMethod.GET, null, null, null);
-        return request;
-    }
-
-    public PagedRequest createGetPagedRequest(final String uri, final Map<String, String> queryParameters) {
-        final PagedRequest request = new PagedRequest(uri, queryParameters, null, HttpMethod.GET, null, null, null);
-        return request;
-    }
-
-    public PagedRequest createGetPagedRequestFromPath(final String path, final Map<String, String> queryParameters) throws IntegrationException {
-        final String uri = pieceTogetherURI(baseUrl, path);
-        final PagedRequest request = new PagedRequest(uri, queryParameters, null, HttpMethod.GET, null, null, null);
-        return request;
-    }
-
-    public PagedRequest createGetPagedRequest(final String uri, final String mimeType) {
-        final PagedRequest request = new PagedRequest(uri, null, null, HttpMethod.GET, mimeType, null, null);
-        return request;
-    }
-
-    public PagedRequest createGetPagedRequestWithQ(final String uri, final String q) {
-        final PagedRequest request = new PagedRequest(uri, null, q, HttpMethod.GET, null, null, null);
-        return request;
-    }
-
-    public PagedRequest createGetPagedRequestWithQ(final String uri, final String q, final int limit) {
-        final PagedRequest request = new PagedRequest(uri, null, q, HttpMethod.GET, null, null, null, limit, 0);
-        return request;
-    }
-
-    public PagedRequest createGetPagedRequestFromPathWithQ(final String path, final String q) throws IntegrationException {
-        final String uri = pieceTogetherURI(baseUrl, path);
-        final PagedRequest request = new PagedRequest(uri, null, q, HttpMethod.GET, null, null, null);
-        return request;
-    }
-
-    public PagedRequest createGetPagedRequestFromPathWithQ(final String path, final String q, final int limit) throws IntegrationException {
-        final String uri = pieceTogetherURI(baseUrl, path);
-        final PagedRequest request = new PagedRequest(uri, null, q, HttpMethod.GET, null, null, null, limit, 0);
-        return request;
-    }
-
-    public PagedRequest createGetPagedRequestFromPath(final String path, final String mimeType, final int limit) throws IntegrationException {
-        final String uri = pieceTogetherURI(baseUrl, path);
-        final PagedRequest request = new PagedRequest(uri, null, null, HttpMethod.GET, mimeType, null, null, limit, 0);
-        return request;
-    }
-
-    public Request createRequest(final String uri, final HttpMethod method) {
-        final Request request = new Request(uri, null, null, method, null, null, null);
-        return request;
-    }
-
-    public Request createRequest(final String uri, final HttpMethod method, final String mimeType) {
-        final Request request = new Request(uri, null, null, method, mimeType, null, null);
-        return request;
-    }
-
-    public Request createRequestFromPath(final String path, final HttpMethod method) throws IntegrationException {
-        final String uri = pieceTogetherURI(baseUrl, path);
-        final Request request = new Request(uri, null, null, method, null, null, null);
-        return request;
-    }
-
-    public Request createRequestFromPath(final String path, final HttpMethod method, final String mimeType) throws IntegrationException {
-        final String uri = pieceTogetherURI(baseUrl, path);
-        final Request request = new Request(uri, null, null, method, mimeType, null, null);
+        final Request request = new Request(uri, null, null, requestWrapper.getMethod(), requestWrapper.getMimeType(), requestWrapper.getBodyEncoding(), requestWrapper.getAdditionalHeaders());
+        if (null != requestWrapper.getHubComponent()) {
+            request.setBodyContent(gson.toJson(requestWrapper.getHubComponent()));
+        } else if (null != requestWrapper.getJsonObject()) {
+            request.setBodyContent(gson.toJson(requestWrapper.getJsonObject()));
+        } else if (null != requestWrapper.getBodyContent()) {
+            request.setBodyContent(requestWrapper.getBodyContent());
+        } else if (null != requestWrapper.getBodyContentMap()) {
+            request.setBodyContentMap(requestWrapper.getBodyContentMap());
+        } else if (null != requestWrapper.getBodyContentFile()) {
+            request.setBodyContentFile(requestWrapper.getBodyContentFile());
+        }
         return request;
     }
 

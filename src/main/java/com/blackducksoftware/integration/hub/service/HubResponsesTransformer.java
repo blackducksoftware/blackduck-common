@@ -24,15 +24,20 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import com.blackducksoftware.integration.hub.api.core.HubView;
+import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.PagedRequest;
 import com.blackducksoftware.integration.hub.request.Response;
+import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
+import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -42,12 +47,64 @@ import com.google.gson.JsonParser;
 public class HubResponsesTransformer {
     private final RestConnection restConnection;
     private final HubResponseTransformer hubResponseTransformer;
+    private final HubRequestFactory hubRequestFactory;
+    private final MetaHandler metaHandler;
     private final JsonParser jsonParser;
 
-    public HubResponsesTransformer(final RestConnection restConnection, final HubResponseTransformer hubResponseTransformer) {
+    public HubResponsesTransformer(final RestConnection restConnection, final HubResponseTransformer hubResponseTransformer, final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler) {
         this.restConnection = restConnection;
         this.hubResponseTransformer = hubResponseTransformer;
+        this.hubRequestFactory = hubRequestFactory;
+        this.metaHandler = metaHandler;
         this.jsonParser = restConnection.jsonParser;
+    }
+
+    public <T extends HubResponse> List<T> getResponsesFromApi(final String apiPath, final Class<T> clazz) throws IntegrationException {
+        return getResponsesFromApi(apiPath, clazz, null);
+    }
+
+    public <T extends HubResponse> List<T> getResponsesFromApi(final String apiPath, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromPath(apiPath, requestWrapper);
+        return getResponses(pagedRequest, clazz, null);
+    }
+
+    public <T extends HubResponse> List<T> getResponsesFromApi(final String apiPath, final Class<T> clazz, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromPath(apiPath, requestWrapper);
+        return getResponses(pagedRequest, clazz, typeMap);
+    }
+
+    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequest(uri, requestWrapper);
+        return getResponses(pagedRequest, clazz, null);
+    }
+
+    public <T extends HubResponse> List<T> getResponsesFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
+        if (!metaHandler.hasLink(hubView, metaLinkRef)) {
+            return Collections.emptyList();
+        }
+        return getResponsesFromLink(hubView, metaLinkRef, clazz, null);
+    }
+
+    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
+        return getResponsesFromLink(hubView, metaLinkRef, clazz, null);
+    }
+
+    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        final String link = metaHandler.getFirstLink(hubView, metaLinkRef);
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequest(link, requestWrapper);
+        return getResponses(pagedRequest, clazz, null);
+    }
+
+    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap)
+            throws IntegrationException {
+        final String link = metaHandler.getFirstLink(hubView, metaLinkRef);
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequest(link, requestWrapper);
+        return getResponses(pagedRequest, clazz, typeMap);
+    }
+
+    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> clazz) throws IntegrationException {
+        final PagedRequest pagedRequest = new PagedRequest(uri);
+        return getResponses(pagedRequest, clazz, null);
     }
 
     public <T extends HubResponse> List<T> getResponses(final JsonArray responsesArray, final Class<T> clazz) {

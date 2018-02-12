@@ -26,7 +26,6 @@ package com.blackducksoftware.integration.hub.api.nonpublic;
 import java.io.IOException;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
@@ -38,8 +37,7 @@ public class HubRegistrationService extends HubService {
     }
 
     public String getRegistrationId() throws IntegrationException, IOException {
-        final Request request = getHubRequestFactory().createGetRequestFromPath("api/v1/registrations");
-        try (Response response = getRestConnection().executeRequest(request)) {
+        try (Response response = executeGetRequestFromPath("api/v1/registrations")) {
             final String jsonResponse = response.getContentString();
             final JsonObject jsonObject = getJsonParser().parse(jsonResponse).getAsJsonObject();
             final String registrationId = jsonObject.get("registrationId").getAsString();
