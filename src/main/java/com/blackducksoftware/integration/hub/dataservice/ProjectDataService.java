@@ -102,7 +102,7 @@ public class ProjectDataService extends HubService {
 
     public String createHubProject(final ProjectRequest project) throws IntegrationException {
         final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, project);
-        return executeUpdateRequestFromPathAndRetrieveURL(ApiDiscovery.PROJECTS_LINK, requestWrapper);
+        return executePostRequestFromPathAndRetrieveURL(ApiDiscovery.PROJECTS_LINK, requestWrapper);
     }
 
     public void deleteHubProject(final ProjectView project) throws IntegrationException {
@@ -135,7 +135,7 @@ public class ProjectDataService extends HubService {
 
     public String createHubVersion(final String versionsUri, final ProjectVersionRequest version) throws IntegrationException {
         final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, version);
-        return executeUpdateRequestAndRetrieveURL(versionsUri, requestWrapper);
+        return executePostRequestAndRetrieveURL(versionsUri, requestWrapper);
     }
 
     public ProjectVersionWrapper getProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {

@@ -214,7 +214,7 @@ public class HubService {
         return restConnection.executeRequest(request);
     }
 
-    public String executeUpdateRequestAndRetrieveURL(final String uri, final UpdateRequestWrapper requestWrapper) throws IntegrationException {
+    public String executePostRequestAndRetrieveURL(final String uri, final UpdateRequestWrapper requestWrapper) throws IntegrationException {
         try (Response response = executeUpdateRequest(uri, requestWrapper)) {
             return response.getHeaderValue("location");
         } catch (final IOException e) {
@@ -222,7 +222,7 @@ public class HubService {
         }
     }
 
-    public String executeUpdateRequestFromPathAndRetrieveURL(final String path, final UpdateRequestWrapper requestWrapper) throws IntegrationException {
+    public String executePostRequestFromPathAndRetrieveURL(final String path, final UpdateRequestWrapper requestWrapper) throws IntegrationException {
         try (Response response = executeUpdateRequestFromPath(path, requestWrapper)) {
             return response.getHeaderValue("location");
         } catch (final IOException e) {

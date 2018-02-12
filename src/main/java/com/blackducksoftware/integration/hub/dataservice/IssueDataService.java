@@ -41,7 +41,7 @@ public class IssueDataService extends HubService {
 
     public String createIssue(final IssueView issueItem, final String uri) throws IntegrationException {
         final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, issueItem);
-        return executeUpdateRequestAndRetrieveURL(uri, requestWrapper);
+        return executePostRequestAndRetrieveURL(uri, requestWrapper);
     }
 
     public void updateIssue(final IssueView issueItem, final String uri) throws IntegrationException {

@@ -368,7 +368,7 @@ public class ReportDataService extends HubService {
         json.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
 
         final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, json);
-        return executeUpdateRequestAndRetrieveURL(reportUri, requestWrapper);
+        return executePostRequestAndRetrieveURL(reportUri, requestWrapper);
     }
 
     /**
