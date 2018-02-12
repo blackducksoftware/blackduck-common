@@ -31,8 +31,7 @@ import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscover
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
-import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV1View;
-import com.blackducksoftware.integration.hub.api.view.MetaHandler;
+import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV2View;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
@@ -63,7 +62,8 @@ public class ComponentDataService extends HubService {
         final ComponentSearchResultView componentSearchView = getExactComponentMatch(externalId);
 
         final ComponentView componentView = getResponse(componentSearchView.component, ComponentView.class);
-        final List<ComponentVersionView> componentVersionViews = getAllResponsesFromLink(componentView, "versions", ComponentVersionView.class);
+        final String link = getFirstLink(componentView, "versions");
+        final List<ComponentVersionView> componentVersionViews = getResponses(link, ComponentVersionView.class, true);
         return componentVersionViews;
     }
 
@@ -87,19 +87,18 @@ public class ComponentDataService extends HubService {
 
         final GetRequestWrapper requestWrapper = new GetRequestWrapper();
         requestWrapper.setQ(componentQuery);
-        final List<ComponentSearchResultView> allComponents = getAllResponsesFromApi(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestWrapper);
+        final List<ComponentSearchResultView> allComponents = getResponsesFromLinkResponse(ApiDiscovery.COMPONENTS_LINK_RESPONSE, true, requestWrapper);
         return allComponents;
     }
 
-    public List<VulnerabilityV1View> getVulnerabilitiesFromComponentVersion(final ExternalId externalId) throws IntegrationException {
+    public List<VulnerabilityV2View> getVulnerabilitiesFromComponentVersion(final ExternalId externalId) throws IntegrationException {
         final ComponentSearchResultView componentSearchView = getExactComponentMatch(externalId);
         final String componentVersionURL = componentSearchView.version;
         if (null != componentVersionURL) {
             final ComponentVersionView componentVersion = getResponse(componentVersionURL, ComponentVersionView.class);
-            final String vulnerabilitiesLink = getFirstLink(componentVersion, MetaHandler.VULNERABILITIES_LINK);
             final GetRequestWrapper requestWrapper = new GetRequestWrapper();
             requestWrapper.setMimeType(HubMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
-            final List<VulnerabilityV1View> vulnerabilityList = getAllResponses(vulnerabilitiesLink, VulnerabilityV1View.class, requestWrapper);
+            final List<VulnerabilityV2View> vulnerabilityList = getResponsesFromLinkResponse(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, true, requestWrapper);
             return vulnerabilityList;
         }
 

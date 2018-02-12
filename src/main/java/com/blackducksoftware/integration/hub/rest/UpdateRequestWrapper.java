@@ -7,10 +7,7 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.core.HubComponent;
 import com.google.gson.JsonObject;
 
-/**
- * For Requests that are NOT GET requests
- */
-public class RequestWrapper extends BaseRequestWrapper {
+public class UpdateRequestWrapper extends BaseRequestWrapper {
     private String bodyContent;
     private Map<String, String> bodyContentMap;
     private File bodyContentFile;
@@ -18,7 +15,7 @@ public class RequestWrapper extends BaseRequestWrapper {
     private JsonObject jsonObject;
     private final HttpMethod method;
 
-    public RequestWrapper(final HttpMethod method) throws IntegrationException {
+    public UpdateRequestWrapper(final HttpMethod method) throws IntegrationException {
         if (null == method) {
             throw new IntegrationException("The HttpMethod can not be null");
         }
@@ -28,27 +25,27 @@ public class RequestWrapper extends BaseRequestWrapper {
         this.method = method;
     }
 
-    public RequestWrapper(final HttpMethod method, final String bodyContent) throws IntegrationException {
+    public UpdateRequestWrapper(final HttpMethod method, final String bodyContent) throws IntegrationException {
         this(method);
         this.bodyContent = bodyContent;
     }
 
-    public RequestWrapper(final HttpMethod method, final HubComponent hubComponent) throws IntegrationException {
+    public UpdateRequestWrapper(final HttpMethod method, final HubComponent hubComponent) throws IntegrationException {
         this(method);
         this.hubComponent = hubComponent;
     }
 
-    public RequestWrapper(final HttpMethod method, final JsonObject jsonObject) throws IntegrationException {
+    public UpdateRequestWrapper(final HttpMethod method, final JsonObject jsonObject) throws IntegrationException {
         this(method);
         this.jsonObject = jsonObject;
     }
 
-    public RequestWrapper(final HttpMethod method, final Map<String, String> bodyContentMap) throws IntegrationException {
+    public UpdateRequestWrapper(final HttpMethod method, final Map<String, String> bodyContentMap) throws IntegrationException {
         this(method);
         this.bodyContentMap = bodyContentMap;
     }
 
-    public RequestWrapper(final HttpMethod method, final File bodyContentFile) throws IntegrationException {
+    public UpdateRequestWrapper(final HttpMethod method, final File bodyContentFile) throws IntegrationException {
         this(method);
         this.bodyContentFile = bodyContentFile;
     }

@@ -40,10 +40,9 @@ import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
-import com.blackducksoftware.integration.hub.rest.RequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 public class HubService {
@@ -54,7 +53,6 @@ public class HubService {
     private final MetaHandler metaHandler;
     private final HubResponseTransformer hubResponseTransformer;
     private final HubResponsesTransformer hubResponsesTransformer;
-    private final AllHubResponsesTransformer allHubResponsesTransformer;
     private final HubRequestFactory hubRequestFactory;
     private final URL hubBaseUrl;
     private final JsonParser jsonParser;
@@ -69,7 +67,6 @@ public class HubService {
         this.metaHandler = new MetaHandler(restConnection.logger);
         this.hubResponseTransformer = new HubResponseTransformer(restConnection, hubRequestFactory, metaHandler);
         this.hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer, hubRequestFactory, metaHandler);
-        this.allHubResponsesTransformer = new AllHubResponsesTransformer(restConnection, hubResponsesTransformer, hubRequestFactory, metaHandler);
     }
 
     public RestConnection getRestConnection() {
@@ -125,197 +122,61 @@ public class HubService {
     }
 
     public <T extends HubResponse> T getResponseFromLinkResponse(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
-        return hubResponseTransformer.getResponseFromLink(hubView, linkSingleResponse.link, linkSingleResponse.responseClass);
+        return hubResponseTransformer.getResponseFromLink(hubView, linkSingleResponse);
     }
 
     public <T extends HubResponse> T getResponseFromLinkResponseSafely(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
-        return hubResponseTransformer.getResponseFromLinkSafely(hubView, linkSingleResponse.link, linkSingleResponse.responseClass);
+        return hubResponseTransformer.getResponseFromLinkSafely(hubView, linkSingleResponse);
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getAllResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromLink(hubView, linkMultipleResponses.link, linkMultipleResponses.responseClass);
+    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
+        return hubResponsesTransformer.getResponsesFromLink(hubView, linkMultipleResponses, getAll);
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getAllResponsesFromLinkResponseSafely(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromLinkSafely(hubView, linkMultipleResponses.link, linkMultipleResponses.responseClass);
+    public <T extends HubResponse> List<T> getResponsesFromLinkResponseSafely(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
+        return hubResponsesTransformer.getResponsesFromLinkSafely(hubView, linkMultipleResponses, getAll);
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getAllResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromLink(hubView, linkMultipleResponses.link, linkMultipleResponses.responseClass, requestWrapper);
+    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        return hubResponsesTransformer.getResponsesFromLink(hubView, linkMultipleResponses, getAll, requestWrapper);
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getAllResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap)
+    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final GetRequestWrapper requestWrapper,
+            final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        return hubResponsesTransformer.getResponsesFromLink(hubView, linkMultipleResponses, getAll, requestWrapper, typeMap);
+    }
+
+    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
+        return hubResponsesTransformer.getResponsesFromLinkResponse(linkMultipleResponses, getAll);
+    }
+
+    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        return hubResponsesTransformer.getResponsesFromLinkResponse(linkMultipleResponses, getAll, requestWrapper);
+    }
+
+    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap)
             throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromLink(hubView, linkMultipleResponses.link, linkMultipleResponses.responseClass, requestWrapper, typeMap);
+        return hubResponsesTransformer.getResponsesFromLinkResponse(linkMultipleResponses, getAll, requestWrapper, typeMap);
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromApi(linkMultipleResponses.link, linkMultipleResponses.responseClass);
+    public <T extends HubResponse> List<T> getResponses(final String url, final Class<T> clazz, final boolean getAll, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        return hubResponsesTransformer.getResponses(url, clazz, getAll, requestWrapper);
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromApi(linkMultipleResponses.link, linkMultipleResponses.responseClass, requestWrapper);
-    }
-
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getAllResponses(final String uri, final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromApi(uri, linkMultipleResponses.responseClass, requestWrapper);
-    }
-
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getAllResponsesFromApi(final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromApi(linkMultipleResponses.link, linkMultipleResponses.responseClass, requestWrapper, typeMap);
-    }
-
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getAllResponsesFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromLinkSafely(hubView, metaLinkRef, clazz);
-    }
-
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getAllResponsesFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponsesFromLink(hubView, metaLinkRef, clazz);
-    }
-
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getAllResponses(final String url, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponses(url, clazz, requestWrapper);
-    }
-
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getAllResponses(final String url, final Class<T> clazz) throws IntegrationException {
-        return allHubResponsesTransformer.getAllResponses(url, clazz);
-    }
-
-    /**
-     * WILL NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
-        return hubResponsesTransformer.getResponsesFromLink(hubView, linkMultipleResponses.link, linkMultipleResponses.responseClass);
-    }
-
-    /**
-     * WILL NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getResponsesFromLinkResponseSafely(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
-        return hubResponsesTransformer.getResponsesFromLinkSafely(hubView, linkMultipleResponses.link, linkMultipleResponses.responseClass);
-    }
-
-    /**
-     * WILL NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        return hubResponsesTransformer.getResponsesFromLink(hubView, linkMultipleResponses.link, linkMultipleResponses.responseClass, requestWrapper);
-    }
-
-    /**
-     * WILL NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap)
-            throws IntegrationException {
-        return hubResponsesTransformer.getResponsesFromLink(hubView, linkMultipleResponses.link, linkMultipleResponses.responseClass, requestWrapper, typeMap);
-    }
-
-    /**
-     * WILL NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getResponsesFromApi(final LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
-        return hubResponsesTransformer.getResponsesFromApi(linkMultipleResponses.link, linkMultipleResponses.responseClass);
-    }
-
-    /**
-     * WILL NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getResponsesFromApi(final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        return hubResponsesTransformer.getResponsesFromApi(linkMultipleResponses.link, linkMultipleResponses.responseClass, requestWrapper);
-    }
-
-    /**
-     * WILL NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getResponses(final String uri, final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        return hubResponsesTransformer.getResponsesFromApi(uri, linkMultipleResponses.responseClass, requestWrapper);
-    }
-
-    /**
-     * WILL NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getResponsesFromApi(final LinkMultipleResponses<T> linkMultipleResponses, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
-        return hubResponsesTransformer.getResponsesFromApi(linkMultipleResponses.link, linkMultipleResponses.responseClass, requestWrapper, typeMap);
-    }
-
-    /**
-     * WILL NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getResponsesFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return hubResponsesTransformer.getResponsesFromLinkSafely(hubView, metaLinkRef, clazz);
-    }
-
-    /**
-     * WILL NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return hubResponsesTransformer.getResponsesFromLink(hubView, metaLinkRef, clazz);
-    }
-
-    /**
-     * WILL NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getResponses(final String url, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        return hubResponsesTransformer.getResponses(url, clazz, requestWrapper);
-    }
-
-    /**
-     * WILL NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubResponse> List<T> getResponses(final String url, final Class<T> clazz) throws IntegrationException {
-        return hubResponsesTransformer.getResponses(url, clazz);
-    }
-
-    public <T extends HubResponse> T getResponse(final String url, final Class<T> clazz) throws IntegrationException {
-        return hubResponseTransformer.getResponse(url, clazz);
+    public <T extends HubResponse> List<T> getResponses(final String url, final Class<T> clazz, final boolean getAll) throws IntegrationException {
+        return hubResponsesTransformer.getResponses(url, clazz, getAll);
     }
 
     public <T extends HubResponse> T getResponseFromPath(final String path, final Class<T> clazz) throws IntegrationException {
         return hubResponseTransformer.getResponseFromPath(path, clazz);
     }
 
-    public <T extends HubResponse> T getResponseAs(final JsonElement view, final Class<T> clazz) {
-        return hubResponseTransformer.getResponseAs(view, clazz);
+    public <T extends HubResponse> T getResponseFromPath(final String path, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        return hubResponseTransformer.getResponseFromPath(path, clazz, requestWrapper);
     }
 
-    public <T extends HubResponse> T getResponseAs(final String view, final Class<T> clazz) {
-        return hubResponseTransformer.getResponseAs(view, clazz);
+    public <T extends HubResponse> T getResponse(final String url, final Class<T> clazz) throws IntegrationException {
+        return hubResponseTransformer.getResponse(url, clazz);
     }
 
     public Response executeGetRequest(final String uri) throws IntegrationException {
@@ -338,18 +199,12 @@ public class HubService {
         return restConnection.executeRequest(request);
     }
 
-    /**
-     * For Requests that are NOT GET requests
-     */
-    public Response executeRequest(final String uri, final RequestWrapper requestWrapper) throws IntegrationException {
+    public Response executeUpdateRequest(final String uri, final UpdateRequestWrapper requestWrapper) throws IntegrationException {
         final Request request = getHubRequestFactory().createRequest(uri, requestWrapper);
         return restConnection.executeRequest(request);
     }
 
-    /**
-     * For Requests that are NOT GET requests
-     */
-    public Response executeRequestFromPath(final String path, final RequestWrapper requestWrapper) throws IntegrationException {
+    public Response executeUpdateRequestFromPath(final String path, final UpdateRequestWrapper requestWrapper) throws IntegrationException {
         final Request request = getHubRequestFactory().createRequestFromPath(path, requestWrapper);
         return restConnection.executeRequest(request);
     }

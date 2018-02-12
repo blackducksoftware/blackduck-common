@@ -28,7 +28,7 @@ import java.io.File;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.RequestWrapper;
+import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 
@@ -38,7 +38,7 @@ public class DryRunUploadService extends HubService {
     }
 
     public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws Exception {
-        final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.POST, dryRunFile);
+        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, dryRunFile);
         final Request request = getHubRequestFactory().createRequestFromPath("api/v1/scans", requestWrapper);
         try (Response response = getRestConnection().executeRequest(request)) {
             final String responseString = response.getContentString();

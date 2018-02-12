@@ -44,7 +44,7 @@ public class PolicyStatusDataService extends HubService {
     public VersionBomPolicyStatusView getPolicyStatusForProjectAndVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = projectDataService.getProjectByName(projectName);
 
-        final List<ProjectVersionView> projectVersions = getAllResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE);
+        final List<ProjectVersionView> projectVersions = getResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE, true);
         final ProjectVersionView projectVersionView = findMatchingVersion(projectVersions, projectVersionName);
 
         return getPolicyStatusForVersion(projectVersionView);

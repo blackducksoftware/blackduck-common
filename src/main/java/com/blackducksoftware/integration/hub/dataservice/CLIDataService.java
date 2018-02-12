@@ -182,6 +182,8 @@ public class CLIDataService extends HubService {
                     scanSummary = getScanSummaryFromFile(scanSummaryFile);
                     scanSummaries.add(scanSummary);
                     scanSummaryFile.delete();
+
+                    // TODO update when ScanSummaryView is part of the swagger
                     final String codeLocationUrl = metaService.getFirstLinkSafely(scanSummary, MetaHandler.CODE_LOCATION_BOM_STATUS_LINK);
 
                     final CodeLocationView codeLocationView = codeLocationDataService.getResponse(codeLocationUrl, CodeLocationView.class);
@@ -248,7 +250,7 @@ public class CLIDataService extends HubService {
     }
 
     private List<CodeLocationView> getCodeLocationsNotJustScanned(final ProjectVersionView version, final List<CodeLocationView> codeLocationsFromCurentScan) throws IntegrationException {
-        final List<CodeLocationView> codeLocationsMappedToVersion = getAllResponsesFromLinkResponse(version, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+        final List<CodeLocationView> codeLocationsMappedToVersion = getResponsesFromLinkResponse(version, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE, true);
         return getCodeLocationsNotJustScanned(codeLocationsMappedToVersion, codeLocationsFromCurentScan);
     }
 

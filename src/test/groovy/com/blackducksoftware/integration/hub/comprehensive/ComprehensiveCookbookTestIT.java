@@ -63,8 +63,8 @@ import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
-import com.blackducksoftware.integration.hub.rest.RequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
+import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -93,7 +93,7 @@ public class ComprehensiveCookbookTestIT {
         deleteIfProjectExists(logger, hubServicesFactory, hubRequestFactory, metaHandler, testProjectName);
 
         // get the count of all projects now
-        final int projectCount = hubServicesFactory.createHubService().getAllResponsesFromApi(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        final int projectCount = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
 
         // create the project
         final ProjectRequest projectRequest = new ProjectRequest();
@@ -104,10 +104,10 @@ public class ComprehensiveCookbookTestIT {
         // should return the same project
         assertEquals(projectItem.toString(), projectItemFromName.toString());
 
-        final int projectCountAfterCreate = hubServicesFactory.createHubService().getAllResponsesFromApi(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        final int projectCountAfterCreate = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
         assertTrue(projectCountAfterCreate > projectCount);
 
-        final int projectVersionCount = hubServicesFactory.createHubService().getAllResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size();
+        final int projectVersionCount = hubServicesFactory.createHubService().getResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE, true).size();
 
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
         projectVersionRequest.distribution = ProjectVersionDistributionType.INTERNAL;
@@ -119,7 +119,7 @@ public class ComprehensiveCookbookTestIT {
         // should return the same project version
         assertEquals(projectVersionItem.toString(), projectVersionItemFromName.toString());
 
-        assertTrue(hubServicesFactory.createHubService().getAllResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size() > projectVersionCount);
+        assertTrue(hubServicesFactory.createHubService().getResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE, true).size() > projectVersionCount);
     }
 
     @Test
@@ -135,7 +135,7 @@ public class ComprehensiveCookbookTestIT {
         deleteIfProjectExists(logger, hubServicesFactory, hubRequestFactory, metaHandler, testProjectName);
 
         // get the count of all projects now
-        final int projectCount = hubServicesFactory.createHubService().getAllResponsesFromApi(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        final int projectCount = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
 
         final String versionName = "RestConnectionTest";
         final ProjectVersionDistributionType distribution = ProjectVersionDistributionType.INTERNAL;
@@ -155,7 +155,7 @@ public class ComprehensiveCookbookTestIT {
         // should return the same project
         assertEquals(projectItem.toString(), projectItemFromName.toString());
 
-        final int projectCountAfterCreate = hubServicesFactory.createHubService().getAllResponsesFromApi(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        final int projectCountAfterCreate = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
         assertTrue(projectCountAfterCreate > projectCount);
 
         final ProjectVersionView projectVersionItem = hubServicesFactory.createProjectDataService().getProjectVersion(projectItem, versionName);
@@ -185,7 +185,7 @@ public class ComprehensiveCookbookTestIT {
         scanStatusDataService.assertBomImportScanStartedThenFinished("ek_mtglist", "0.0.1");
 
         // make sure we have some code locations now
-        List<CodeLocationView> codeLocationItems = hubServicesFactory.createHubService().getAllResponsesFromApi(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE);
+        List<CodeLocationView> codeLocationItems = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true);
         assertTrue(codeLocationItems != null && codeLocationItems.size() > 0);
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             for (final CodeLocationView codeLocationItem : codeLocationItems) {
@@ -293,11 +293,11 @@ public class ComprehensiveCookbookTestIT {
     public void testGettingAllProjectsAndVersions() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final List<ProjectView> allProjects = hubServicesFactory.createHubService().getAllResponsesFromApi(ApiDiscovery.PROJECTS_LINK_RESPONSE);
+        final List<ProjectView> allProjects = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true);
         System.out.println(String.format("project count: %d", allProjects.size()));
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             for (final ProjectView projectItem : allProjects) {
-                final List<ProjectVersionView> allProjectVersions = hubServicesFactory.createHubService().getAllResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE);
+                final List<ProjectVersionView> allProjectVersions = hubServicesFactory.createHubService().getResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE, true);
                 System.out.println(projectItem.toString());
                 System.out.println(String.format("version count: %d", allProjectVersions.size()));
                 for (final ProjectVersionView projectVersionItem : allProjectVersions) {
@@ -311,7 +311,7 @@ public class ComprehensiveCookbookTestIT {
     public void testGettingAllCodeLocations() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final List<CodeLocationView> allCodeLocations = hubServicesFactory.createHubService().getAllResponsesFromApi(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE);
+        final List<CodeLocationView> allCodeLocations = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true);
         System.out.println(String.format("code location count: %d", allCodeLocations.size()));
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             for (final CodeLocationView codeLocationItem : allCodeLocations) {
@@ -324,7 +324,7 @@ public class ComprehensiveCookbookTestIT {
     public void testGettingAllUsers() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final List<UserView> userItems = hubServicesFactory.createHubService().getAllResponsesFromApi(ApiDiscovery.USERS_LINK_RESPONSE);
+        final List<UserView> userItems = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.USERS_LINK_RESPONSE, true);
         System.out.println(String.format("user count: %d", userItems.size()));
         assertTrue(userItems != null && userItems.size() > 0);
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
@@ -337,7 +337,7 @@ public class ComprehensiveCookbookTestIT {
     private void deleteIfProjectExists(final IntLogger logger, final HubServicesFactory hubServicesFactory, final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler, final String projectName) throws Exception {
         try {
             final ProjectView projectItem = hubServicesFactory.createProjectDataService().getProjectByName(projectName);
-            final Request deleteRequest = hubRequestFactory.createRequest(metaHandler.getHref(projectItem), new RequestWrapper(HttpMethod.DELETE));
+            final Request deleteRequest = hubRequestFactory.createRequest(metaHandler.getHref(projectItem), new UpdateRequestWrapper(HttpMethod.DELETE));
             try (Response response = hubServicesFactory.getRestConnection().executeRequest(deleteRequest)) {
             }
         } catch (final HubIntegrationException e) {

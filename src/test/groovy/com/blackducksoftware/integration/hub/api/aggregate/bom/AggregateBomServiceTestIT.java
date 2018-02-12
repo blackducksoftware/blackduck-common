@@ -57,7 +57,7 @@ public class AggregateBomServiceTestIT {
         final String testComponentVersionName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_VERSION");
 
         final ProjectView project = hubServices.createProjectDataService().getProjectByName(testProjectName);
-        final List<ProjectVersionView> projectVersions = hubService.getAllResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        final List<ProjectVersionView> projectVersions = hubService.getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
             if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {
@@ -67,7 +67,7 @@ public class AggregateBomServiceTestIT {
         assertNotNull(projectVersion);
 
         final String bomUrl = metaService.getFirstLink(projectVersion, "components");
-        final List<VersionBomComponentView> bomComponents = hubService.getAllResponses(bomUrl, VersionBomComponentView.class);
+        final List<VersionBomComponentView> bomComponents = hubService.getResponses(bomUrl, VersionBomComponentView.class, true);
         System.out.println("BOM size: " + bomComponents.size());
 
         // Look for testComponent in BOM
@@ -91,7 +91,7 @@ public class AggregateBomServiceTestIT {
         final String testComponentVersionName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_VERSION");
 
         final ProjectView project = hubServices.createProjectDataService().getProjectByName(testProjectName);
-        final List<ProjectVersionView> projectVersions = hubServices.createHubService().getAllResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        final List<ProjectVersionView> projectVersions = hubServices.createHubService().getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
             if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {
@@ -100,7 +100,7 @@ public class AggregateBomServiceTestIT {
         }
         assertNotNull(projectVersion);
 
-        final List<VersionBomComponentView> bomComponents = hubServices.createHubService().getAllResponsesFromLinkResponse(projectVersion, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        final List<VersionBomComponentView> bomComponents = hubServices.createHubService().getResponsesFromLinkResponse(projectVersion, ProjectVersionView.COMPONENTS_LINK_RESPONSE, true);
         System.out.println("BOM size: " + bomComponents.size());
 
         // Look for testComponent in BOM

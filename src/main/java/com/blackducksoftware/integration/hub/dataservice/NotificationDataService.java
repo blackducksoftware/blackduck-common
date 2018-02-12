@@ -119,7 +119,7 @@ public class NotificationDataService extends HubService {
         requestWrapper.addQueryParameter("startDate", startDateString);
         requestWrapper.addQueryParameter("endDate", endDateString);
 
-        final List<NotificationView> allNotificationItems = getAllResponsesFromApi(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestWrapper, typeMap);
+        final List<NotificationView> allNotificationItems = getResponsesFromLinkResponse(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, true, requestWrapper, typeMap);
         return allNotificationItems;
     }
 
@@ -137,7 +137,7 @@ public class NotificationDataService extends HubService {
         requestWrapper.addQueryParameter("startDate", startDateString);
         requestWrapper.addQueryParameter("endDate", endDateString);
 
-        final List<NotificationView> allNotificationItems = getAllResponsesFromLinkResponse(user, ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestWrapper, typeMap);
+        final List<NotificationView> allNotificationItems = getResponsesFromLinkResponse(user, ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, true, requestWrapper, typeMap);
         return allNotificationItems;
     }
 

@@ -55,8 +55,8 @@ import com.blackducksoftware.integration.hub.report.exception.RiskReportExceptio
 import com.blackducksoftware.integration.hub.report.pdf.PDFBoxWriter;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.RequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -149,7 +149,7 @@ public class ReportDataService extends HubService {
         reportData.setDistribution(version.distribution.toString());
         final List<BomComponent> components = new ArrayList<>();
         logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
-        final List<VersionBomComponentView> bomEntries = getAllResponsesFromLinkResponse(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        final List<VersionBomComponentView> bomEntries = getResponsesFromLinkResponse(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE, true);
         boolean policyFailure = false;
         for (final VersionBomComponentView bomEntry : bomEntries) {
             final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
@@ -274,7 +274,7 @@ public class ReportDataService extends HubService {
         if (bomEntry != null && bomEntry.approvalStatus != null) {
             final PolicyStatusApprovalStatusType status = bomEntry.approvalStatus;
             if (status == PolicyStatusApprovalStatusType.IN_VIOLATION) {
-                final List<PolicyRuleViewV2> rules = getAllResponsesFromLinkResponse(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE);
+                final List<PolicyRuleViewV2> rules = getResponsesFromLinkResponse(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE, true);
                 final List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (final PolicyRuleViewV2 policyRuleView : rules) {
                     final PolicyRule ruleViolated = new PolicyRule();
@@ -367,8 +367,8 @@ public class ReportDataService extends HubService {
         json.addProperty("reportFormat", reportFormat.toString());
         json.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
 
-        final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.POST, json);
-        try (Response response = executeRequest(reportUri, requestWrapper)) {
+        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, json);
+        try (Response response = executeUpdateRequest(reportUri, requestWrapper)) {
             return response.getHeaderValue("location");
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
@@ -385,13 +385,7 @@ public class ReportDataService extends HubService {
         ReportView reportInfo = null;
 
         while (timeFinished == null) {
-
-            try (Response response = executeGetRequest(reportUri)) {
-                final String jsonResponse = response.getContentString();
-                reportInfo = getResponseAs(jsonResponse, ReportView.class);
-            } catch (final IOException e) {
-                throw new IntegrationException(e.getMessage(), e);
-            }
+            reportInfo = getResponse(reportUri, ReportView.class);
             timeFinished = reportInfo.finishedAt;
             if (timeFinished != null) {
                 break;
@@ -431,7 +425,7 @@ public class ReportDataService extends HubService {
     }
 
     public void deleteHubReport(final String reportUri) throws IntegrationException {
-        try (Response response = executeRequest(reportUri, new RequestWrapper(HttpMethod.DELETE))) {
+        try (Response response = executeUpdateRequest(reportUri, new UpdateRequestWrapper(HttpMethod.DELETE))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

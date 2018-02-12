@@ -91,9 +91,9 @@ public class ScanStatusDataService extends HubService {
         final String timeoutMessage = "No pending code locations found within the specified wait time: %d minutes";
         while (!done(foundPendingScan, timeoutInMilliseconds, startedTime, timeoutMessage)) {
             try {
+                // TODO update when ScanSummaryView is part of the swagger
                 final CodeLocationView codeLocation = codeLocationDataService.getCodeLocationByName(codeLocationName);
-
-                final String scanSummariesLink = metaService.getFirstLinkSafely(codeLocation, MetaHandler.SCANS_LINK);
+                final String scanSummariesLink = metaService.getFirstLinkSafely(codeLocation, CodeLocationView.SCANS_LINK);
                 if (StringUtils.isNotBlank(scanSummariesLink)) {
                     final ScanSummaryView scanSummaryView = getResponse(scanSummariesLink, ScanSummaryView.class);
                     if (isPending(scanSummaryView.status)) {
@@ -126,11 +126,11 @@ public class ScanStatusDataService extends HubService {
     }
 
     public void assertScansFinished(final ProjectVersionView projectVersionView) throws HubTimeoutExceededException, IntegrationException {
-        final List<CodeLocationView> allCodeLocations = getAllResponsesFromLinkResponse(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+        final List<CodeLocationView> allCodeLocations = getResponsesFromLinkResponse(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE, true);
         final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
         for (final CodeLocationView codeLocationView : allCodeLocations) {
             final String scansLink = metaService.getFirstLinkSafely(codeLocationView, CodeLocationView.SCANS_LINK);
-            final List<ScanSummaryView> codeLocationScanSummaryViews = getAllResponses(scansLink, ScanSummaryView.class);
+            final List<ScanSummaryView> codeLocationScanSummaryViews = getResponses(scansLink, ScanSummaryView.class, true);
             scanSummaryViews.addAll(codeLocationScanSummaryViews);
         }
         assertScansFinished(scanSummaryViews);
@@ -209,7 +209,7 @@ public class ScanStatusDataService extends HubService {
 
             final List<ScanSummaryView> allScanSummaries = new ArrayList<>();
             for (final String scanSummaryLink : allScanSummariesLinks) {
-                allScanSummaries.addAll(getAllResponses(scanSummaryLink, ScanSummaryView.class));
+                allScanSummaries.addAll(getResponses(scanSummaryLink, ScanSummaryView.class, true));
             }
 
             pendingScans = new ArrayList<>();

@@ -32,6 +32,7 @@ import java.util.Map;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.core.HubView;
+import com.blackducksoftware.integration.hub.api.core.LinkMultipleResponses;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.PagedRequest;
@@ -59,52 +60,100 @@ public class HubResponsesTransformer {
         this.jsonParser = restConnection.jsonParser;
     }
 
-    public <T extends HubResponse> List<T> getResponsesFromApi(final String apiPath, final Class<T> clazz) throws IntegrationException {
-        return getResponsesFromApi(apiPath, clazz, null);
+    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
+        return getResponsesFromLinkResponse(linkMultipleResponses, getAll, null, null);
     }
 
-    public <T extends HubResponse> List<T> getResponsesFromApi(final String apiPath, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromPath(apiPath, requestWrapper);
-        return getResponses(pagedRequest, clazz, null);
+    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        return getResponsesFromLinkResponse(linkMultipleResponses, getAll, requestWrapper, null);
     }
 
-    public <T extends HubResponse> List<T> getResponsesFromApi(final String apiPath, final Class<T> clazz, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
-        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromPath(apiPath, requestWrapper);
-        return getResponses(pagedRequest, clazz, typeMap);
+    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final GetRequestWrapper requestWrapper,
+            final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequestFromPath(linkMultipleResponses.link, requestWrapper);
+        return getResponses(pagedRequest, linkMultipleResponses.responseClass, getAll, typeMap);
     }
 
-    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequest(uri, requestWrapper);
-        return getResponses(pagedRequest, clazz, null);
-    }
-
-    public <T extends HubResponse> List<T> getResponsesFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        if (!metaHandler.hasLink(hubView, metaLinkRef)) {
+    public <T extends HubResponse> List<T> getResponsesFromLinkSafely(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
+        if (!metaHandler.hasLink(hubView, linkMultipleResponses.link)) {
             return Collections.emptyList();
         }
-        return getResponsesFromLink(hubView, metaLinkRef, clazz, null);
+        return getResponsesFromLink(hubView, linkMultipleResponses, getAll);
     }
 
-    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return getResponsesFromLink(hubView, metaLinkRef, clazz, null);
+    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
+        return getResponsesFromLink(hubView, linkMultipleResponses, getAll, null, null);
     }
 
-    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        final String link = metaHandler.getFirstLink(hubView, metaLinkRef);
+    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        return getResponsesFromLink(hubView, linkMultipleResponses, getAll, requestWrapper, null);
+    }
+
+    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final GetRequestWrapper requestWrapper,
+            final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        final String link = metaHandler.getFirstLink(hubView, linkMultipleResponses.link);
         final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequest(link, requestWrapper);
-        return getResponses(pagedRequest, clazz, null);
+        return getResponses(pagedRequest, linkMultipleResponses.responseClass, getAll, typeMap);
     }
 
-    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final GetRequestWrapper requestWrapper, final Map<String, Class<? extends T>> typeMap)
-            throws IntegrationException {
-        final String link = metaHandler.getFirstLink(hubView, metaLinkRef);
-        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequest(link, requestWrapper);
-        return getResponses(pagedRequest, clazz, typeMap);
-    }
-
-    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> clazz) throws IntegrationException {
+    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> clazz, final boolean getAll) throws IntegrationException {
         final PagedRequest pagedRequest = new PagedRequest(uri);
-        return getResponses(pagedRequest, clazz, null);
+        return getResponses(pagedRequest, clazz, getAll, null);
+    }
+
+    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> clazz, final boolean getAll, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequest(uri, requestWrapper);
+        return getResponses(pagedRequest, clazz, getAll, null);
+    }
+
+    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> clazz, final boolean getAll, final GetRequestWrapper requestWrapper,
+            final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        final PagedRequest pagedRequest = hubRequestFactory.createGetPagedRequest(uri, requestWrapper);
+        return getResponses(pagedRequest, clazz, getAll, typeMap);
+    }
+
+    public <T extends HubResponse> List<T> getResponses(final PagedRequest pagedRequest, final Class<T> clazz, final boolean getAll) throws IntegrationException {
+        return getResponses(pagedRequest, clazz, getAll, null);
+    }
+
+    public <T extends HubResponse> List<T> getResponses(final PagedRequest pagedRequest, final Class<T> clazz, final boolean getAll, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
+        final List<T> allResponses = new LinkedList<>();
+        int totalCount = 0;
+        int currentOffset = pagedRequest.getOffset();
+        try (Response initialResponse = restConnection.executeRequest(pagedRequest)) {
+            final String initialJsonResponse = initialResponse.getContentString();
+            final JsonObject initialJsonObject = jsonParser.parse(initialJsonResponse).getAsJsonObject();
+            if (typeMap != null) {
+                allResponses.addAll(getResponses(initialJsonObject, clazz, typeMap));
+            } else {
+                allResponses.addAll(getResponses(initialJsonObject, clazz));
+            }
+            if (getAll) {
+                totalCount = initialJsonObject.get("totalCount").getAsInt();
+            } else {
+                return allResponses;
+            }
+            while (allResponses.size() < totalCount && currentOffset < totalCount) {
+                currentOffset += pagedRequest.getLimit();
+                final PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getUri(), pagedRequest.getQueryParameters(), pagedRequest.getQ(), pagedRequest.getMethod(), pagedRequest.getMimeType(), pagedRequest.getBodyEncoding(),
+                        pagedRequest.getAdditionalHeaders(), pagedRequest.getLimit(), currentOffset);
+                try (Response response = restConnection.executeRequest(offsetPagedRequest)) {
+                    final String jsonResponse = response.getContentString();
+                    final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
+                    if (typeMap != null) {
+                        allResponses.addAll(getResponses(jsonObject, clazz, typeMap));
+                    } else {
+                        allResponses.addAll(getResponses(jsonObject, clazz));
+                    }
+                } catch (final IOException e) {
+                    throw new HubIntegrationException(e);
+                }
+            }
+        } catch (final IOException e) {
+            throw new HubIntegrationException(e.getMessage(), e);
+        }
+        return allResponses;
+
     }
 
     public <T extends HubResponse> List<T> getResponses(final JsonArray responsesArray, final Class<T> clazz) {
@@ -132,34 +181,18 @@ public class HubResponsesTransformer {
         final JsonElement responsesElement = jsonObject.get("items");
         final JsonArray responsesArray = responsesElement.getAsJsonArray();
         for (final JsonElement element : responsesArray) {
-            final String type = element.getAsJsonObject().get("type").getAsString();
             Class<? extends T> actualClass = clazz;
-            if (typeMap.containsKey(type)) {
-                actualClass = typeMap.get(type);
+            final JsonObject elementObject = element.getAsJsonObject();
+            if (elementObject.has("type")) {
+                final String type = elementObject.get("type").getAsString();
+                if (typeMap.containsKey(type)) {
+                    actualClass = typeMap.get(type);
+                }
             }
             final T item = hubResponseTransformer.getResponseAs(element, actualClass);
             responseList.add(item);
         }
         return responseList;
-    }
-
-    public <T extends HubResponse> List<T> getResponses(final PagedRequest pagedRequest, final Class<T> clazz) throws IntegrationException {
-        return getResponses(pagedRequest, clazz, null);
-    }
-
-    public <T extends HubResponse> List<T> getResponses(final PagedRequest pagedRequest, final Class<T> clazz, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
-
-        try (Response response = restConnection.executeRequest(pagedRequest)) {
-            final String jsonResponse = response.getContentString();
-            final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
-            if (typeMap != null) {
-                return getResponses(jsonObject, clazz, typeMap);
-            } else {
-                return getResponses(jsonObject, clazz);
-            }
-        } catch (final IOException e) {
-            throw new HubIntegrationException(e);
-        }
     }
 
 }
