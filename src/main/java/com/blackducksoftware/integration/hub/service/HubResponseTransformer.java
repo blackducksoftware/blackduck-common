@@ -32,8 +32,8 @@ import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
+import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -77,7 +77,7 @@ public class HubResponseTransformer {
     }
 
     public <T extends HubResponse> T getResponse(final String uri, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        final Request request = hubRequestFactory.createGetRequestFromWrapper(uri, requestWrapper);
+        final Request request = hubRequestFactory.createGetRequest(uri, requestWrapper);
         return getResponse(request, clazz);
     }
 

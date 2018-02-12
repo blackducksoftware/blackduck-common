@@ -53,9 +53,9 @@ import com.blackducksoftware.integration.hub.report.api.PolicyRule;
 import com.blackducksoftware.integration.hub.report.api.ReportData;
 import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
 import com.blackducksoftware.integration.hub.report.pdf.PDFBoxWriter;
-import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
+import com.blackducksoftware.integration.hub.rest.RequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.HubService;
@@ -367,9 +367,8 @@ public class ReportDataService extends HubService {
         json.addProperty("reportFormat", reportFormat.toString());
         json.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
 
-        final Request request = getHubRequestFactory().createRequest(reportUri, HttpMethod.POST);
-        request.setBodyContent(getGson().toJson(json));
-        try (Response response = getRestConnection().executeRequest(request)) {
+        final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.POST, json);
+        try (Response response = executeRequest(reportUri, requestWrapper)) {
             return response.getHeaderValue("location");
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
@@ -387,8 +386,7 @@ public class ReportDataService extends HubService {
 
         while (timeFinished == null) {
 
-            final Request request = new Request(reportUri);
-            try (Response response = getRestConnection().executeRequest(request)) {
+            try (Response response = executeGetRequest(reportUri)) {
                 final String jsonResponse = response.getContentString();
                 reportInfo = getResponseAs(jsonResponse, ReportView.class);
             } catch (final IOException e) {
@@ -419,8 +417,7 @@ public class ReportDataService extends HubService {
     }
 
     private JsonElement getReportContentJson(final String reportContentUri) throws IntegrationException {
-        final Request request = new Request(reportContentUri);
-        try (Response response = getRestConnection().executeRequest(request)) {
+        try (Response response = executeGetRequest(reportContentUri)) {
             final String jsonResponse = response.getContentString();
 
             final JsonObject json = getJsonParser().parse(jsonResponse).getAsJsonObject();
@@ -434,8 +431,7 @@ public class ReportDataService extends HubService {
     }
 
     public void deleteHubReport(final String reportUri) throws IntegrationException {
-        final Request request = getHubRequestFactory().createRequest(reportUri, HttpMethod.DELETE);
-        try (Response response = getRestConnection().executeRequest(request)) {
+        try (Response response = executeRequest(reportUri, new RequestWrapper(HttpMethod.DELETE))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

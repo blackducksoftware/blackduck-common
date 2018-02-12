@@ -38,10 +38,10 @@ import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
+import com.blackducksoftware.integration.hub.rest.RequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 
@@ -61,9 +61,9 @@ public class CodeLocationDataService extends HubService {
         } catch (final IOException e) {
             throw new IntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub because : " + e.getMessage(), e);
         }
-        final Request request = getHubRequestFactory().createRequestFromPath(HubService.BOMIMPORT_LINK, HttpMethod.POST, mimeType);
-        request.setBodyContent(jsonPayload);
-        try (Response response = getRestConnection().executeRequest(request)) {
+        final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.POST, jsonPayload);
+        requestWrapper.setMimeType(mimeType);
+        try (Response response = executeRequestFromPath(HubService.BOMIMPORT_LINK, requestWrapper)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -104,9 +104,8 @@ public class CodeLocationDataService extends HubService {
     }
 
     public void updateCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws IntegrationException {
-        final Request request = getHubRequestFactory().createRequest(codeLocationItemUrl, HttpMethod.PUT);
-        request.setBodyContent(codeLocationItemJson);
-        try (Response response = getRestConnection().executeRequest(request)) {
+        final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.PUT, codeLocationItemJson);
+        try (Response response = executeRequest(codeLocationItemUrl, requestWrapper)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -125,8 +124,7 @@ public class CodeLocationDataService extends HubService {
     }
 
     public void deleteCodeLocation(final String codeLocationItemUrl) throws IntegrationException {
-        final Request request = getHubRequestFactory().createRequest(codeLocationItemUrl, HttpMethod.DELETE);
-        try (Response response = getRestConnection().executeRequest(request)) {
+        try (Response response = executeRequest(codeLocationItemUrl, new RequestWrapper(HttpMethod.DELETE))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

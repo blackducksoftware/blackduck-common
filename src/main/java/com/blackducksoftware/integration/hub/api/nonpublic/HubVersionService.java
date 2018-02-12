@@ -26,13 +26,11 @@ package com.blackducksoftware.integration.hub.api.nonpublic;
 import static com.blackducksoftware.integration.hub.RestConstants.QUERY_VERSION;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.response.VersionComparison;
-import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
+import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 
@@ -43,8 +41,7 @@ public class HubVersionService extends HubService {
     }
 
     public String getHubVersion() throws IntegrationException {
-        final Request request = getHubRequestFactory().createGetRequestFromPath("api/v1/current-version");
-        try (Response response = getRestConnection().executeRequest(request)) {
+        try (Response response = executeGetRequestFromPath("api/v1/current-version")) {
             final String hubVersionWithPossibleSurroundingQuotes = response.getContentString();
             final String hubVersion = hubVersionWithPossibleSurroundingQuotes.replace("\"", "");
             return hubVersion;
@@ -54,10 +51,9 @@ public class HubVersionService extends HubService {
     }
 
     public VersionComparison getHubVersionComparison(final String consumerVersion) throws IntegrationException, IOException {
-        final Map<String, String> queryParameters = new HashMap<>();
-        queryParameters.put(QUERY_VERSION, consumerVersion);
-        final Request request = getHubRequestFactory().createGetRequestFromPath("api/v1/current-version-comparison", queryParameters);
-        try (Response response = getRestConnection().executeRequest(request)) {
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
+        requestWrapper.addQueryParameter(QUERY_VERSION, consumerVersion);
+        try (Response response = executeGetRequestFromPath("api/v1/current-version-comparison", requestWrapper)) {
             final String jsonResponse = response.getContentString();
             final VersionComparison versionComparison = getGson().fromJson(jsonResponse, VersionComparison.class);
             return versionComparison;

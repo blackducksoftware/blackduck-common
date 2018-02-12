@@ -32,7 +32,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchR
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.LicenseView;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
-import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
@@ -71,8 +70,7 @@ public class LicenseDataService extends HubService {
 
     public String getLicenseText(final LicenseView licenseView) throws IntegrationException {
         final String licenseTextUrl = getFirstLinkSafely(licenseView, LicenseView.TEXT_LINK);
-        final Request request = new Request(licenseTextUrl);
-        try (Response response = getRestConnection().executeRequest(request)) {
+        try (Response response = executeGetRequest(licenseTextUrl)) {
             return response.getContentString();
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);

@@ -125,7 +125,6 @@ public class CLIDownloadUtility {
             headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
 
             final Request request = new Request(cliDownloadUrl.toURI().toString(), null, null, HttpMethod.GET, null, null, headers);
-
             try (Response response = restConnection.executeRequest(request)) {
                 if (304 == response.getStatusCode()) {
                     // CLI has not been modified

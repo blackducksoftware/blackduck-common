@@ -41,13 +41,9 @@ import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
 
 public class HubServerVerifier {
-
     private final URL hubURL;
-
     private final ProxyInfo hubProxyInfo;
-
     private final int timeoutSeconds;
-
     private final boolean alwaysTrustServerCertificate;
 
     public HubServerVerifier(final URL hubURL, final ProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) {
@@ -80,7 +76,7 @@ public class HubServerVerifier {
             } catch (final IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
-            final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubURL);
+            final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubURL, restConnection.gson);
             request = hubRequestFactory.createGetRequestFromPath("download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
             final String downloadUri = request.getUri();
             try (Response response = restConnection.executeRequest(request)) {

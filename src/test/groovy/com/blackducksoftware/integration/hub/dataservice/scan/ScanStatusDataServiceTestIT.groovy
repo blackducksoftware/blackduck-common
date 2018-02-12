@@ -28,6 +28,8 @@ import org.junit.Test
 import org.junit.experimental.categories.Category
 
 import com.blackducksoftware.integration.IntegrationTest
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
+import com.blackducksoftware.integration.hub.dataservice.ProjectDataService
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
@@ -51,13 +53,18 @@ class ScanStatusDataServiceTestIT {
         String alteredContents = contents.replace('"name": "rest-backend",', "\"name\": \"${uniqueName}\",")
         File uniquelyNamedBdio = File.createTempFile('uniquebdio', '.jsonld')
         uniquelyNamedBdio << alteredContents
-
-        hubServicesFactory.createCodeLocationDataService().importBomFile(uniquelyNamedBdio, 'application/ld+json');
-        // wait for the scan to start/finish
         try {
-            hubServicesFactory.createScanStatusDataService(FIVE_MINUTES).assertBomImportScanStartedThenFinished(uniqueName, version);
-        } catch (Exception e) {
-            Assert.fail("Nothing should have been thrown: " + e.getMessage())
+            hubServicesFactory.createCodeLocationDataService().importBomFile(uniquelyNamedBdio, 'application/ld+json');
+            // wait for the scan to start/finish
+            try {
+                hubServicesFactory.createScanStatusDataService(FIVE_MINUTES).assertBomImportScanStartedThenFinished(uniqueName, version);
+            } catch (Exception e) {
+                Assert.fail("Nothing should have been thrown: " + e.getMessage())
+            }
+        } finally {
+            ProjectDataService projectDataService = hubServicesFactory.createProjectDataService()
+            ProjectView project =  projectDataService.getProjectByName(uniqueName)
+            projectDataService.deleteHubProject(project)
         }
     }
 }
