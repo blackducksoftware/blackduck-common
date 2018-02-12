@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.component;
+package com.blackducksoftware.integration.hub.dataservice;
 
 import java.util.List;
 

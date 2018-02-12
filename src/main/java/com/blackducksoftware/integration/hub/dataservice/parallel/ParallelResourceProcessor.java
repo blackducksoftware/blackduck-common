@@ -36,7 +36,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
-import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
+import com.blackducksoftware.integration.hub.dataservice.transform.ItemTransform;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ParallelResourceProcessor<R, S> {
