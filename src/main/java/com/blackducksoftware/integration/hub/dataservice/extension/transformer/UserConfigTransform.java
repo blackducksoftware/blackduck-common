@@ -33,9 +33,9 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionConfigValueView;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
+import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.dataservice.extension.item.UserConfigItem;
 import com.blackducksoftware.integration.hub.dataservice.transform.ItemTransform;
-import com.blackducksoftware.integration.hub.service.HubDataService;
 
 public class UserConfigTransform implements ItemTransform<List<UserConfigItem>, ExternalExtensionUserView> {
     private final HubDataService hubService;

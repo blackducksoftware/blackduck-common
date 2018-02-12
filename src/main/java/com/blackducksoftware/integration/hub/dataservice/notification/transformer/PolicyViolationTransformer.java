@@ -35,23 +35,23 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.RuleViolationNotificationView;
+import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     public PolicyViolationTransformer(final HubDataService hubResponseService,
-            final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
-        super(hubResponseService, policyFilter, metaService);
+            final PolicyNotificationFilter policyFilter, final MetaHandler metaHandler) {
+        super(hubResponseService, policyFilter, metaHandler);
     }
 
     public PolicyViolationTransformer(final HubDataService hubResponseService, final IntLogger logger,
-            final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
-        super(hubResponseService, logger, policyFilter, metaService);
+            final PolicyNotificationFilter policyFilter, final MetaHandler metaHandler) {
+        super(hubResponseService, logger, policyFilter, metaHandler);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     }
 
     private ProjectVersionView getReleaseItem(final String projectVersionLink) throws IntegrationException {
-        final ProjectVersionView releaseItem = getHubService().getResponse(projectVersionLink, ProjectVersionView.class);
+        final ProjectVersionView releaseItem = getHubDataService().getResponse(projectVersionLink, ProjectVersionView.class);
         return releaseItem;
     }
 

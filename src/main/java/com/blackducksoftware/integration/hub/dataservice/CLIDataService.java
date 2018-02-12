@@ -48,7 +48,6 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
-import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.hub.util.HostnameHelper;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder;
@@ -66,7 +65,7 @@ public class CLIDataService extends HubDataService {
     private final ProjectDataService projectDataService;
     private final CodeLocationDataService codeLocationDataService;
     private final ScanStatusDataService scanStatusDataService;
-    private final MetaHandler metaService;
+    private final MetaHandler metaHandler;
 
     private ProjectVersionWrapper projectVersionWrapper;
 
@@ -82,7 +81,7 @@ public class CLIDataService extends HubDataService {
         this.projectDataService = projectDataService;
         this.codeLocationDataService = codeLocationDataService;
         this.scanStatusDataService = scanStatusDataService;
-        this.metaService = new MetaHandler(logger);
+        this.metaHandler = new MetaHandler(logger);
     }
 
     public ProjectVersionWrapper installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished,
@@ -183,7 +182,7 @@ public class CLIDataService extends HubDataService {
                     scanSummaryFile.delete();
 
                     // TODO update when ScanSummaryView is part of the swagger
-                    final String codeLocationUrl = metaService.getFirstLinkSafely(scanSummary, MetaHandler.CODE_LOCATION_BOM_STATUS_LINK);
+                    final String codeLocationUrl = metaHandler.getFirstLinkSafely(scanSummary, MetaHandler.CODE_LOCATION_BOM_STATUS_LINK);
 
                     final CodeLocationView codeLocationView = codeLocationDataService.getResponse(codeLocationUrl, CodeLocationView.class);
                     codeLocationViews.add(codeLocationView);

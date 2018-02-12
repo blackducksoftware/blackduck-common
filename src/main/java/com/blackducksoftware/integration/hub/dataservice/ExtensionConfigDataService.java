@@ -37,7 +37,6 @@ import com.blackducksoftware.integration.hub.dataservice.extension.transformer.U
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ExtensionConfigDataService extends HubDataService {

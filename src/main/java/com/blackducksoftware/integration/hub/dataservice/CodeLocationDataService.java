@@ -43,7 +43,6 @@ import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
-import com.blackducksoftware.integration.hub.service.HubDataService;
 
 public class CodeLocationDataService extends HubDataService {
     public CodeLocationDataService(final RestConnection restConnection) {

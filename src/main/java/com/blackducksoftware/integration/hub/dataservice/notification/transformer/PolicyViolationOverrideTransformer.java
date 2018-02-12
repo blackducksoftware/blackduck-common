@@ -39,25 +39,25 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotificationView;
+import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationOverrideTransformer extends AbstractPolicyTransformer {
     public PolicyViolationOverrideTransformer(final HubDataService hubResponseService,
-            final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
+            final PolicyNotificationFilter policyFilter, final MetaHandler metaHandler) {
         super(hubResponseService,
-                policyFilter, metaService);
+                policyFilter, metaHandler);
     }
 
     public PolicyViolationOverrideTransformer(final HubDataService hubResponseService, final IntLogger logger,
-            final PolicyNotificationFilter policyFilter, final MetaHandler metaService) {
+            final PolicyNotificationFilter policyFilter, final MetaHandler metaHandler) {
         super(hubResponseService, logger,
-                policyFilter, metaService);
+                policyFilter, metaHandler);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
         componentVersionList.add(componentStatus);
 
         try {
-            releaseItem = getHubService().getResponse(policyOverride.content.projectVersionLink, ProjectVersionView.class);
+            releaseItem = getHubDataService().getResponse(policyOverride.content.projectVersionLink, ProjectVersionView.class);
         } catch (final IntegrationException e) {
             throw new HubItemTransformException(e);
         }

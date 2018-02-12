@@ -25,12 +25,12 @@ package com.blackducksoftware.integration.hub.api.scan;
 
 import java.io.File;
 
+import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubDataService;
 
 public class DryRunUploadService extends HubDataService {
     public DryRunUploadService(final RestConnection restConnection) {

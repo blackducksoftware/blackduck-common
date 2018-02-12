@@ -52,7 +52,6 @@ import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResour
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
 import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class NotificationDataService extends HubDataService {
@@ -61,7 +60,7 @@ public class NotificationDataService extends HubDataService {
     private final HubDataService hubResponseService;
     private final PolicyNotificationFilter policyNotificationFilter;
     private final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor;
-    private final MetaHandler metaService;
+    private final MetaHandler metaHandler;
 
     public NotificationDataService(final RestConnection restConnection, final HubDataService hubResponseService) {
         this(restConnection, hubResponseService, null);
@@ -73,7 +72,7 @@ public class NotificationDataService extends HubDataService {
         this.hubResponseService = hubResponseService;
         this.policyNotificationFilter = policyNotificationFilter;
         this.parallelProcessor = new ParallelResourceProcessor<>(restConnection.logger);
-        this.metaService = new MetaHandler(restConnection.logger);
+        this.metaHandler = new MetaHandler(restConnection.logger);
         populateTransformerMap(restConnection.logger);
         typeMap.put("VULNERABILITY", VulnerabilityNotificationView.class);
         typeMap.put("RULE_VIOLATION", RuleViolationNotificationView.class);
@@ -83,12 +82,12 @@ public class NotificationDataService extends HubDataService {
 
     private void populateTransformerMap(final IntLogger logger) {
         parallelProcessor.addTransform(RuleViolationNotificationView.class,
-                new PolicyViolationTransformer(hubResponseService, logger, policyNotificationFilter, metaService));
+                new PolicyViolationTransformer(hubResponseService, logger, policyNotificationFilter, metaHandler));
         parallelProcessor.addTransform(PolicyOverrideNotificationView.class,
-                new PolicyViolationOverrideTransformer(hubResponseService, logger, policyNotificationFilter, metaService));
-        parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubResponseService, metaService, logger));
+                new PolicyViolationOverrideTransformer(hubResponseService, logger, policyNotificationFilter, metaHandler));
+        parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubResponseService, metaHandler, logger));
         parallelProcessor.addTransform(RuleViolationClearedNotificationView.class,
-                new PolicyViolationClearedTransformer(hubResponseService, logger, policyNotificationFilter, metaService));
+                new PolicyViolationClearedTransformer(hubResponseService, logger, policyNotificationFilter, metaHandler));
     }
 
     public NotificationResults getAllNotificationResults(final Date startDate, final Date endDate) throws IntegrationException {

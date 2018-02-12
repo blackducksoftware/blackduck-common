@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.service;
+package com.blackducksoftware.integration.hub.dataservice;
 
 import java.io.IOException;
 import java.net.URL;
@@ -43,6 +43,8 @@ import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
+import com.blackducksoftware.integration.hub.service.HubResponseTransformer;
+import com.blackducksoftware.integration.hub.service.HubResponsesTransformer;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 

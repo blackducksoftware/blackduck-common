@@ -35,7 +35,6 @@ import com.blackducksoftware.integration.hub.api.generated.response.CurrentVersi
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeCallable;
 import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeResponse;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;

@@ -35,11 +35,11 @@ import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
+import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.service.HubDataService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public abstract class AbstractPolicyTransformer extends AbstractNotificationTransformer {
@@ -50,15 +50,15 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
      */
     public AbstractPolicyTransformer(final HubDataService hubResponseService,
             final PolicyNotificationFilter policyFilter,
-            final MetaHandler metaService) {
-        super(hubResponseService, metaService);
+            final MetaHandler metaHandler) {
+        super(hubResponseService, metaHandler);
         this.policyFilter = policyFilter;
     }
 
     public AbstractPolicyTransformer(final HubDataService hubResponseService, final IntLogger logger,
             final PolicyNotificationFilter policyFilter,
-            final MetaHandler metaService) {
-        super(hubResponseService, logger, metaService);
+            final MetaHandler metaHandler) {
+        super(hubResponseService, logger, metaHandler);
         this.policyFilter = policyFilter;
     }
 
@@ -72,7 +72,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         }
         final List<PolicyRuleView> rules = new ArrayList<>();
         for (final String ruleUrlViolated : ruleUrlsViolated) {
-            final PolicyRuleView ruleViolated = getHubService().getResponse(ruleUrlViolated, PolicyRuleView.class);
+            final PolicyRuleView ruleViolated = getHubDataService().getResponse(ruleUrlViolated, PolicyRuleView.class);
             rules.add(ruleViolated);
         }
         return rules;
@@ -83,7 +83,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
         if (policyFilter != null && policyFilter.getRuleLinksToInclude() != null) {
             if (rulesViolated != null) {
                 for (final PolicyRuleView ruleViolated : rulesViolated) {
-                    final String ruleHref = getMetaService().getHref(ruleViolated);
+                    final String ruleHref = getMetaHandler().getHref(ruleViolated);
                     if (policyFilter.getRuleLinksToInclude().contains(ruleHref)) {
                         filteredRules.add(ruleViolated);
                     }
@@ -102,7 +102,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     protected PolicyRuleView getPolicyRule(final String ruleUrl) throws IntegrationException {
-        final PolicyRuleView rule = getHubService().getResponse(ruleUrl, PolicyRuleView.class);
+        final PolicyRuleView rule = getHubDataService().getResponse(ruleUrl, PolicyRuleView.class);
         return rule;
     }
 
@@ -148,7 +148,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     protected PolicyStatusView getBomComponentVersionPolicyStatus(final String policyStatusUrl) throws IntegrationException {
-        final PolicyStatusView bomComponentVersionPolicyStatus = getHubService().getResponse(policyStatusUrl, PolicyStatusView.class);
+        final PolicyStatusView bomComponentVersionPolicyStatus = getHubDataService().getResponse(policyStatusUrl, PolicyStatusView.class);
 
         return bomComponentVersionPolicyStatus;
     }

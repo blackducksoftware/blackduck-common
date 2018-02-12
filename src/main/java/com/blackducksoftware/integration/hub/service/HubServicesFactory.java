@@ -35,6 +35,7 @@ import com.blackducksoftware.integration.hub.dataservice.CLIDataService;
 import com.blackducksoftware.integration.hub.dataservice.CodeLocationDataService;
 import com.blackducksoftware.integration.hub.dataservice.ComponentDataService;
 import com.blackducksoftware.integration.hub.dataservice.ExtensionConfigDataService;
+import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.dataservice.HubRegistrationDataService;
 import com.blackducksoftware.integration.hub.dataservice.IssueDataService;
 import com.blackducksoftware.integration.hub.dataservice.LicenseDataService;

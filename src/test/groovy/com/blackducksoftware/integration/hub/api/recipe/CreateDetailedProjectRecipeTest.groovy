@@ -12,12 +12,12 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVe
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
+import com.blackducksoftware.integration.hub.dataservice.HubDataService
 import com.blackducksoftware.integration.hub.dataservice.ProjectDataService
 import com.blackducksoftware.integration.hub.global.HubServerConfig
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.rest.RestConnection
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
-import com.blackducksoftware.integration.hub.service.HubDataService
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.test.TestLogger
