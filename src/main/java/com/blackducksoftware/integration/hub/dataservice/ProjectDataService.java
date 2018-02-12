@@ -47,10 +47,10 @@ import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.dataservice.component.model.VersionBomComponentModel;
 import com.blackducksoftware.integration.hub.dataservice.project.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.request.PagedRequest;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
+import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
@@ -72,9 +72,9 @@ public class ProjectDataService extends HubService {
         if (StringUtils.isNotBlank(projectName)) {
             q = "name:" + projectName;
         }
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPathWithQ(ApiDiscovery.PROJECTS_LINK, q);
-
-        final List<ProjectView> allProjectItems = getAllResponses(pagedRequest, ProjectView.class);
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
+        requestWrapper.setQ(q);
+        final List<ProjectView> allProjectItems = getAllResponsesFromApi(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestWrapper);
         return allProjectItems;
     }
 
@@ -83,9 +83,10 @@ public class ProjectDataService extends HubService {
         if (StringUtils.isNotBlank(projectName)) {
             q = "name:" + projectName;
         }
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestFromPathWithQ(ApiDiscovery.PROJECTS_LINK, q, limit);
-
-        final List<ProjectView> projectItems = getResponses(pagedRequest, ProjectView.class);
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
+        requestWrapper.setQ(q);
+        requestWrapper.setLimitPerRequest(limit);
+        final List<ProjectView> projectItems = getAllResponsesFromApi(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestWrapper);
         return projectItems;
     }
 
@@ -119,14 +120,13 @@ public class ProjectDataService extends HubService {
     }
 
     public ProjectVersionView getProjectVersion(final ProjectView project, final String projectVersionName) throws IntegrationException {
-        final String versionsUri = getFirstLink(project, ProjectView.VERSIONS_LINK);
         String q = "";
         if (StringUtils.isNotBlank(projectVersionName)) {
             q = String.format("versionName:%s", projectVersionName);
         }
-        final PagedRequest pagedRequest = getHubRequestFactory().createGetPagedRequestWithQ(versionsUri, q);
-
-        final List<ProjectVersionView> allProjectVersionMatchingItems = getAllResponses(pagedRequest, ProjectVersionView.class);
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
+        requestWrapper.setQ(q);
+        final List<ProjectVersionView> allProjectVersionMatchingItems = getAllResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, requestWrapper);
         for (final ProjectVersionView projectVersion : allProjectVersionMatchingItems) {
             if (projectVersionName.equals(projectVersion.versionName)) {
                 return projectVersion;
@@ -173,21 +173,18 @@ public class ProjectDataService extends HubService {
     public ProjectVersionWrapper getProjectVersionAndCreateIfNeeded(final ProjectRequest projectRequest) throws IntegrationException {
         ProjectView project = null;
         ProjectVersionView projectVersion = null;
-
         try {
             project = getProjectByName(projectRequest.name);
         } catch (final DoesNotExistException e) {
             final String projectURL = createHubProject(projectRequest);
             project = getResponse(projectURL, ProjectView.class);
         }
-
         try {
             projectVersion = getProjectVersion(project, projectRequest.versionRequest.versionName);
         } catch (final DoesNotExistException e) {
             final String versionURL = createHubVersion(project, projectRequest.versionRequest);
             projectVersion = getResponse(versionURL, ProjectVersionView.class);
         }
-
         final ProjectVersionWrapper projectVersionWrapper = new ProjectVersionWrapper();
         projectVersionWrapper.setProjectView(project);
         projectVersionWrapper.setProjectVersionView(projectVersion);
@@ -200,7 +197,7 @@ public class ProjectDataService extends HubService {
     }
 
     public List<AssignedUserView> getAssignedUsersToProject(final ProjectView project) throws IntegrationException {
-        final List<AssignedUserView> assignedUsers = getAllResponsesFromLink(project, ProjectView.USERS_LINK, AssignedUserView.class);
+        final List<AssignedUserView> assignedUsers = getAllResponsesFromLinkResponse(project, ProjectView.USERS_LINK_RESPONSE);
         return assignedUsers;
     }
 
@@ -211,7 +208,7 @@ public class ProjectDataService extends HubService {
 
     public List<UserView> getUsersForProject(final ProjectView project) throws IntegrationException {
         logger.debug("Attempting to get the assigned users for Project: " + project.name);
-        final List<AssignedUserView> assignedUsers = getAllResponsesFromLink(project, ProjectView.USERS_LINK, AssignedUserView.class);
+        final List<AssignedUserView> assignedUsers = getAllResponsesFromLinkResponse(project, ProjectView.USERS_LINK_RESPONSE);
 
         final List<UserView> resolvedUserViews = new ArrayList<>();
         for (final AssignedUserView assigned : assignedUsers) {
@@ -229,7 +226,7 @@ public class ProjectDataService extends HubService {
     }
 
     public List<AssignedUserGroupView> getAssignedGroupsToProject(final ProjectView project) throws IntegrationException {
-        final List<AssignedUserGroupView> assignedGroups = getAllResponsesFromLink(project, ProjectView.USERGROUPS_LINK, AssignedUserGroupView.class);
+        final List<AssignedUserGroupView> assignedGroups = getAllResponsesFromLinkResponse(project, ProjectView.USERGROUPS_LINK_RESPONSE);
         return assignedGroups;
     }
 
@@ -240,7 +237,7 @@ public class ProjectDataService extends HubService {
 
     public List<UserGroupView> getGroupsForProject(final ProjectView project) throws IntegrationException {
         logger.debug("Attempting to get the assigned users for Project: " + project.name);
-        final List<AssignedUserGroupView> assignedGroups = getAllResponsesFromLink(project, ProjectView.USERGROUPS_LINK, AssignedUserGroupView.class);
+        final List<AssignedUserGroupView> assignedGroups = getAllResponsesFromLinkResponse(project, ProjectView.USERGROUPS_LINK_RESPONSE);
 
         final List<UserGroupView> resolvedGroupViews = new ArrayList<>();
         for (final AssignedUserGroupView assigned : assignedGroups) {
@@ -275,14 +272,14 @@ public class ProjectDataService extends HubService {
     public List<VersionBomComponentView> getComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = getProjectByName(projectName);
         final ProjectVersionView projectVersionView = getProjectVersion(projectItem, projectVersionName);
-        final List<VersionBomComponentView> versionBomComponentViews = getAllResponsesFromLink(projectVersionView, ProjectVersionView.COMPONENTS_LINK, VersionBomComponentView.class);
+        final List<VersionBomComponentView> versionBomComponentViews = getAllResponsesFromLinkResponse(projectVersionView, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         return versionBomComponentViews;
     }
 
     public List<VulnerableComponentView> getVulnerableComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = getProjectByName(projectName);
         final ProjectVersionView projectVersionView = getProjectVersion(projectItem, projectVersionName);
-        final List<VulnerableComponentView> vulnerableBomComponentViews = getAllResponsesFromLink(projectVersionView, ProjectVersionView.VULNERABLE_COMPONENTS_LINK, VulnerableComponentView.class);
+        final List<VulnerableComponentView> vulnerableBomComponentViews = getAllResponsesFromLinkResponse(projectVersionView, ProjectVersionView.VULNERABLE_COMPONENTS_LINK_RESPONSE);
         return vulnerableBomComponentViews;
     }
 
@@ -293,8 +290,7 @@ public class ProjectDataService extends HubService {
     }
 
     public List<VersionBomComponentModel> getComponentsWithMatchedFilesForProjectVersion(final ProjectVersionView version) throws IntegrationException {
-        final String componentsLink = getFirstLink(version, ProjectVersionView.COMPONENTS_LINK);
-        final List<VersionBomComponentView> bomComponents = getAllResponses(componentsLink, VersionBomComponentView.class);
+        final List<VersionBomComponentView> bomComponents = getAllResponsesFromLinkResponse(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         final List<VersionBomComponentModel> modelBomComponents = new ArrayList<>(bomComponents.size());
         for (final VersionBomComponentView component : bomComponents) {
             modelBomComponents.add(new VersionBomComponentModel(component, getMatchedFiles(component)));
@@ -304,9 +300,9 @@ public class ProjectDataService extends HubService {
 
     private List<MatchedFileView> getMatchedFiles(final VersionBomComponentView component) throws IntegrationException {
         List<MatchedFileView> matchedFiles = new ArrayList<>(0);
-        final String matchedFilesLink = getFirstLinkSafely(component, VersionBomComponentView.MATCHED_FILES_LINK);
-        if (matchedFilesLink != null) {
-            matchedFiles = getAllResponses(matchedFilesLink, MatchedFileView.class);
+        final List<MatchedFileView> tempMatchedFiles = getAllResponsesFromLinkResponseSafely(component, VersionBomComponentView.MATCHED_FILES_LINK_RESPONSE);
+        if (tempMatchedFiles != null && tempMatchedFiles.isEmpty()) {
+            matchedFiles = tempMatchedFiles;
         }
         return matchedFiles;
     }

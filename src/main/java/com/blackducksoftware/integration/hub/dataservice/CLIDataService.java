@@ -248,7 +248,7 @@ public class CLIDataService extends HubService {
     }
 
     private List<CodeLocationView> getCodeLocationsNotJustScanned(final ProjectVersionView version, final List<CodeLocationView> codeLocationsFromCurentScan) throws IntegrationException {
-        final List<CodeLocationView> codeLocationsMappedToVersion = getAllResponsesFromLink(version, ProjectVersionView.CODELOCATIONS_LINK, CodeLocationView.class);
+        final List<CodeLocationView> codeLocationsMappedToVersion = getAllResponsesFromLinkResponse(version, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         return getCodeLocationsNotJustScanned(codeLocationsMappedToVersion, codeLocationsFromCurentScan);
     }
 
