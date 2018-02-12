@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.phonehome;
+package com.blackducksoftware.integration.hub.dataservice;
 
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +32,8 @@ import java.util.concurrent.ThreadFactory;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
 import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
+import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeCallable;
+import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeResponse;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;

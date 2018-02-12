@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.report;
+package com.blackducksoftware.integration.hub.dataservice;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -46,7 +46,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.ReportView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.report.RiskReportWriter;
 import com.blackducksoftware.integration.hub.report.api.BomComponent;

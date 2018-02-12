@@ -38,7 +38,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.api.scan.DryRunUploadResponse
 import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
-import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService
+import com.blackducksoftware.integration.hub.dataservice.ProjectDataService
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
