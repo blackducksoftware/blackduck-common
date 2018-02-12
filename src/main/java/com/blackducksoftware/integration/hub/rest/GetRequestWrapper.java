@@ -33,7 +33,6 @@ import org.apache.http.entity.ContentType;
 import com.blackducksoftware.integration.util.Stringable;
 
 public class GetRequestWrapper extends Stringable {
-
     private final Map<String, String> queryParameters = new HashMap<>();
     private final Map<String, String> additionalHeaders = new HashMap<>();
     private String q;
