@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -121,14 +122,6 @@ public class HubService {
         return metaHandler.getHref(view);
     }
 
-    public <T extends HubResponse> T getResponseFromLinkResponse(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
-        return hubResponseTransformer.getResponseFromLink(hubView, linkSingleResponse);
-    }
-
-    public <T extends HubResponse> T getResponseFromLinkResponseSafely(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
-        return hubResponseTransformer.getResponseFromLinkSafely(hubView, linkSingleResponse);
-    }
-
     public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
         return hubResponsesTransformer.getResponsesFromLink(hubView, linkMultipleResponses, getAll);
     }
@@ -165,6 +158,14 @@ public class HubService {
 
     public <T extends HubResponse> List<T> getResponses(final String url, final Class<T> clazz, final boolean getAll) throws IntegrationException {
         return hubResponsesTransformer.getResponses(url, clazz, getAll);
+    }
+
+    public <T extends HubResponse> T getResponseFromLinkResponse(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
+        return hubResponseTransformer.getResponseFromLink(hubView, linkSingleResponse);
+    }
+
+    public <T extends HubResponse> T getResponseFromLinkResponseSafely(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
+        return hubResponseTransformer.getResponseFromLinkSafely(hubView, linkSingleResponse);
     }
 
     public <T extends HubResponse> T getResponseFromPath(final String path, final Class<T> clazz) throws IntegrationException {
@@ -211,6 +212,22 @@ public class HubService {
     public Response executeUpdateRequestFromPath(final String path, final UpdateRequestWrapper requestWrapper) throws IntegrationException {
         final Request request = getHubRequestFactory().createRequestFromPath(path, requestWrapper);
         return restConnection.executeRequest(request);
+    }
+
+    public String executeUpdateRequestAndRetrieveURL(final String uri, final UpdateRequestWrapper requestWrapper) throws IntegrationException {
+        try (Response response = executeUpdateRequest(uri, requestWrapper)) {
+            return response.getHeaderValue("location");
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
+    }
+
+    public String executeUpdateRequestFromPathAndRetrieveURL(final String path, final UpdateRequestWrapper requestWrapper) throws IntegrationException {
+        try (Response response = executeUpdateRequestFromPath(path, requestWrapper)) {
+            return response.getHeaderValue("location");
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
     }
 
 }

@@ -368,11 +368,7 @@ public class ReportDataService extends HubService {
         json.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
 
         final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, json);
-        try (Response response = executeUpdateRequest(reportUri, requestWrapper)) {
-            return response.getHeaderValue("location");
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
+        return executeUpdateRequestAndRetrieveURL(reportUri, requestWrapper);
     }
 
     /**

@@ -41,11 +41,7 @@ public class IssueDataService extends HubService {
 
     public String createIssue(final IssueView issueItem, final String uri) throws IntegrationException {
         final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, issueItem);
-        try (Response response = executeUpdateRequest(uri, requestWrapper)) {
-            return response.getHeaderValue("location");
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
+        return executeUpdateRequestAndRetrieveURL(uri, requestWrapper);
     }
 
     public void updateIssue(final IssueView issueItem, final String uri) throws IntegrationException {
