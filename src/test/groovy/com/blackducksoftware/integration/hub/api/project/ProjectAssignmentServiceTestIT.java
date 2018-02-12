@@ -40,23 +40,23 @@ import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequ
 import com.blackducksoftware.integration.hub.api.generated.view.AssignedUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
-import com.blackducksoftware.integration.hub.service.HubServicesFactory;
+import com.blackducksoftware.integration.hub.service.HubDataServicesFactory;
 
 @Category(IntegrationTest.class)
 public class ProjectAssignmentServiceTestIT {
-    private static HubServicesFactory hubServicesFactory;
+    private static HubDataServicesFactory hubDataServicesFactory;
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
     private static ProjectView project = null;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         if (project != null) {
-            hubServicesFactory.createProjectDataService().deleteHubProject(project);
+            hubDataServicesFactory.createProjectDataService().deleteHubProject(project);
         }
     }
 
@@ -67,11 +67,11 @@ public class ProjectAssignmentServiceTestIT {
 
         final ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.name = testProjectName;
-        final String projectUrl = hubServicesFactory.createProjectDataService().createHubProject(projectRequest);
+        final String projectUrl = hubDataServicesFactory.createProjectDataService().createHubProject(projectRequest);
         System.out.println("projectUrl: " + projectUrl);
 
-        project = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);
-        final List<AssignedUserView> assignedUsers = hubServicesFactory.createProjectDataService().getAssignedUsersToProject(project);
+        project = hubDataServicesFactory.createHubDataService().getResponse(projectUrl, ProjectView.class);
+        final List<AssignedUserView> assignedUsers = hubDataServicesFactory.createProjectDataService().getAssignedUsersToProject(project);
         assertFalse(assignedUsers.isEmpty());
         assertEquals(1, assignedUsers.size());
         assertEquals("sysadmin", assignedUsers.get(0).name);

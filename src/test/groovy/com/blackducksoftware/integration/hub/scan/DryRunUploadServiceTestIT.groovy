@@ -34,7 +34,7 @@ import com.blackducksoftware.integration.hub.api.scan.DryRunUploadResponse
 import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
-import com.blackducksoftware.integration.hub.service.HubServicesFactory
+import com.blackducksoftware.integration.hub.service.HubDataServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
 import com.blackducksoftware.integration.log.PrintStreamIntLogger
@@ -55,7 +55,7 @@ class DryRunUploadServiceTestIT {
 
     @Test
     public void testDryRunUpload(){
-        HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
+        HubDataServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.getRestConnection())
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)

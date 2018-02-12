@@ -32,7 +32,7 @@ import org.junit.rules.TemporaryFolder
 import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.hub.dataservice.ReportDataService
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
-import com.blackducksoftware.integration.hub.service.HubServicesFactory
+import com.blackducksoftware.integration.hub.service.HubDataServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 
 @Category(IntegrationTest.class)
@@ -47,7 +47,7 @@ class RiskReportDataServiceTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
+        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
         ReportDataService riskReportDataService = hubServicesFactory.createReportDataService(30000)
         File folderForReport = folderForReport.getRoot()
@@ -61,7 +61,7 @@ class RiskReportDataServiceTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
+        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
         ReportDataService riskReportDataService = hubServicesFactory.createReportDataService(30000)
         File folderForReport = folderForReport.getRoot()
@@ -84,7 +84,7 @@ class RiskReportDataServiceTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
+        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
         ReportDataService riskReportDataService = hubServicesFactory.createReportDataService(30000)
         File folderForReport = folderForReport.getRoot()

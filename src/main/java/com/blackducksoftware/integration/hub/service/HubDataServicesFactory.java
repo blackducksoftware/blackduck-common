@@ -54,11 +54,11 @@ import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 
-public class HubServicesFactory {
+public class HubDataServicesFactory {
     private final CIEnvironmentVariables ciEnvironmentVariables;
     private final RestConnection restConnection;
 
-    public HubServicesFactory(final RestConnection restConnection) {
+    public HubDataServicesFactory(final RestConnection restConnection) {
         this.ciEnvironmentVariables = new CIEnvironmentVariables();
         ciEnvironmentVariables.putAll(System.getenv());
 
@@ -103,15 +103,15 @@ public class HubServicesFactory {
     }
 
     public NotificationDataService createNotificationDataService() {
-        return new NotificationDataService(restConnection, createHubService());
+        return new NotificationDataService(restConnection);
     }
 
     public NotificationDataService createNotificationDataService(final PolicyNotificationFilter policyNotificationFilter) {
-        return new NotificationDataService(restConnection, createHubService(), policyNotificationFilter);
+        return new NotificationDataService(restConnection, policyNotificationFilter);
     }
 
     public ExtensionConfigDataService createExtensionConfigDataService() {
-        return new ExtensionConfigDataService(restConnection.logger, restConnection, createHubService());
+        return new ExtensionConfigDataService(restConnection.logger, restConnection);
     }
 
     public LicenseDataService createLicenseDataService() {
@@ -143,7 +143,7 @@ public class HubServicesFactory {
         return new HubRegistrationDataService(restConnection);
     }
 
-    public HubDataService createHubService() {
+    public HubDataService createHubDataService() {
         return new HubDataService(restConnection);
     }
 

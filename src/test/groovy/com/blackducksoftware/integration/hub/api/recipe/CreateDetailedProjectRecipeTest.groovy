@@ -18,7 +18,7 @@ import com.blackducksoftware.integration.hub.global.HubServerConfig
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.rest.RestConnection
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
-import com.blackducksoftware.integration.hub.service.HubServicesFactory
+import com.blackducksoftware.integration.hub.service.HubDataServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.test.TestLogger
 
@@ -51,7 +51,7 @@ class CreateDetailedProjectRecipeTest {
          * HubServicesFactory, the wrapper to get/use all the Hub API's
          */
         RestConnection restConnection = hubServerConfig.createCredentialsRestConnection(intLogger)
-        HubServicesFactory hubServicesFactory = new HubServicesFactory(restConnection)
+        HubDataServicesFactory hubServicesFactory = new HubDataServicesFactory(restConnection)
 
         /*
          * let's create the project/version in the Hub

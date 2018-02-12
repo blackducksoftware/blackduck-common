@@ -44,7 +44,7 @@ import com.blackducksoftware.integration.hub.exception.DoesNotExistException
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
-import com.blackducksoftware.integration.hub.service.HubServicesFactory
+import com.blackducksoftware.integration.hub.service.HubDataServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
 import com.blackducksoftware.integration.log.PrintStreamIntLogger
@@ -65,7 +65,7 @@ class CodeLocationRequestServiceTestIT {
 
     @After
     public void testCleanup(){
-        HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
+        HubDataServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         ProjectView project = services.createProjectDataService().getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
         services.createProjectDataService().deleteHubProject(project)
     }
@@ -75,7 +75,7 @@ class CodeLocationRequestServiceTestIT {
         final String projectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
         final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
-        HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
+        HubDataServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.getRestConnection())
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)

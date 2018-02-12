@@ -43,9 +43,9 @@ public class ExtensionConfigDataService extends HubDataService {
     private final UserConfigTransform userConfigTransform;
     private final ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor;
 
-    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final HubDataService hubService) {
+    public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection) {
         super(restConnection);
-        userConfigTransform = new UserConfigTransform(hubService);
+        userConfigTransform = new UserConfigTransform(this);
         parallelProcessor = new ParallelResourceProcessor<>(logger);
         parallelProcessor.addTransform(ExternalExtensionUserView.class, userConfigTransform);
     }
