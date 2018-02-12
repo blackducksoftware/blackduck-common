@@ -39,7 +39,7 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicySta
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportFormatType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.RiskCountType;
-import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
@@ -149,8 +149,7 @@ public class ReportDataService extends HubService {
         reportData.setDistribution(version.distribution.toString());
         final List<BomComponent> components = new ArrayList<>();
         logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
-        final String componentsLink = getFirstLink(version, ProjectVersionView.COMPONENTS_LINK);
-        final List<VersionBomComponentView> bomEntries = getAllResponses(componentsLink, VersionBomComponentView.class);
+        final List<VersionBomComponentView> bomEntries = getAllResponsesFromLinkResponse(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         boolean policyFailure = false;
         for (final VersionBomComponentView bomEntry : bomEntries) {
             final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
@@ -275,10 +274,9 @@ public class ReportDataService extends HubService {
         if (bomEntry != null && bomEntry.approvalStatus != null) {
             final PolicyStatusApprovalStatusType status = bomEntry.approvalStatus;
             if (status == PolicyStatusApprovalStatusType.IN_VIOLATION) {
-                final String policyRuleLink = getFirstLink(bomEntry, MetaHandler.POLICY_RULES_LINK);
-                final List<PolicyRuleView> rules = getAllResponses(policyRuleLink, PolicyRuleView.class);
+                final List<PolicyRuleViewV2> rules = getAllResponsesFromLinkResponse(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE);
                 final List<PolicyRule> rulesViolated = new ArrayList<>();
-                for (final PolicyRuleView policyRuleView : rules) {
+                for (final PolicyRuleViewV2 policyRuleView : rules) {
                     final PolicyRule ruleViolated = new PolicyRule();
                     ruleViolated.setName(policyRuleView.name);
                     ruleViolated.setDescription(policyRuleView.description);

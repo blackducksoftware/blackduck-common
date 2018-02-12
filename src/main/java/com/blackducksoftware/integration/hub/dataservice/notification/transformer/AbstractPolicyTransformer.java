@@ -148,8 +148,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     protected PolicyStatusView getBomComponentVersionPolicyStatus(final String policyStatusUrl) throws IntegrationException {
-        PolicyStatusView bomComponentVersionPolicyStatus;
-        bomComponentVersionPolicyStatus = getHubService().getResponse(policyStatusUrl, PolicyStatusView.class);
+        final PolicyStatusView bomComponentVersionPolicyStatus = getHubService().getResponse(policyStatusUrl, PolicyStatusView.class);
 
         return bomComponentVersionPolicyStatus;
     }
