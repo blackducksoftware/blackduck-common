@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.dataservice.notification;
+package com.blackducksoftware.integration.hub.dataservice;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,6 +41,7 @@ import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotification
 import com.blackducksoftware.integration.hub.api.view.RuleViolationClearedNotificationView;
 import com.blackducksoftware.integration.hub.api.view.RuleViolationNotificationView;
 import com.blackducksoftware.integration.hub.api.view.VulnerabilityNotificationView;
+import com.blackducksoftware.integration.hub.dataservice.notification.NotificationResults;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
 import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationClearedTransformer;

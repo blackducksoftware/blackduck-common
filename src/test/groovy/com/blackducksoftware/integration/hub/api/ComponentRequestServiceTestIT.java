@@ -32,7 +32,7 @@ import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.bdio.SimpleBdioFactory;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
-import com.blackducksoftware.integration.hub.dataservice.component.ComponentDataService;
+import com.blackducksoftware.integration.hub.dataservice.ComponentDataService;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 

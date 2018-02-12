@@ -37,7 +37,7 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.LicenseOw
 import com.blackducksoftware.integration.hub.api.generated.view.ComplexLicenseView;
 import com.blackducksoftware.integration.hub.bdio.SimpleBdioFactory;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
-import com.blackducksoftware.integration.hub.dataservice.license.LicenseDataService;
+import com.blackducksoftware.integration.hub.dataservice.LicenseDataService;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
