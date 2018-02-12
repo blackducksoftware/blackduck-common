@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.enumeration.ScanSummaryStatusType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
@@ -80,32 +78,6 @@ public class ScanStatusDataService extends HubDataService {
     public void assertBomImportScanStartedThenFinished(final String projectName, final String projectVersion) throws HubTimeoutExceededException, IntegrationException {
         final List<ScanSummaryView> pendingScans = waitForPendingScansToStart(projectName, projectVersion, timeoutInMilliseconds);
         waitForScansToComplete(pendingScans, timeoutInMilliseconds);
-    }
-
-    public void assertCodeLocationFinished(final String codeLocationName) throws HubTimeoutExceededException, IntegrationException {
-        final List<ScanSummaryView> pendingScans = new ArrayList<>();
-
-        boolean foundPendingScan = false;
-        final long startedTime = System.currentTimeMillis();
-        final String timeoutMessage = "No pending code locations found within the specified wait time: %d minutes";
-        while (!done(foundPendingScan, timeoutInMilliseconds, startedTime, timeoutMessage)) {
-            try {
-                // TODO update when ScanSummaryView is part of the swagger
-                final CodeLocationView codeLocation = codeLocationDataService.getCodeLocationByName(codeLocationName);
-                final String scanSummariesLink = metaHandler.getFirstLinkSafely(codeLocation, CodeLocationView.SCANS_LINK);
-                if (StringUtils.isNotBlank(scanSummariesLink)) {
-                    final ScanSummaryView scanSummaryView = getResponse(scanSummariesLink, ScanSummaryView.class);
-                    if (isPending(scanSummaryView.status)) {
-                        pendingScans.add(scanSummaryView);
-                    }
-                }
-                foundPendingScan = pendingScans.size() > 0;
-            } catch (final IntegrationException e) {
-                // ignore, since we might not have found a project or version, etc
-                // so just keep waiting until the timeout
-                logger.debug("Could not find a pending code location: " + e.getMessage());
-            }
-        }
     }
 
     /**

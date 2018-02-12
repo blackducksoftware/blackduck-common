@@ -182,7 +182,7 @@ public class CLIDataService extends HubDataService {
                     scanSummaryFile.delete();
 
                     // TODO update when ScanSummaryView is part of the swagger
-                    final String codeLocationUrl = metaHandler.getFirstLinkSafely(scanSummary, MetaHandler.CODE_LOCATION_BOM_STATUS_LINK);
+                    final String codeLocationUrl = metaHandler.getFirstLinkSafely(scanSummary, ScanSummaryView.CODELOCATION_LINK);
 
                     final CodeLocationView codeLocationView = codeLocationDataService.getResponse(codeLocationUrl, CodeLocationView.class);
                     codeLocationViews.add(codeLocationView);
