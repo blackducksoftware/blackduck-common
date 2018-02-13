@@ -25,7 +25,7 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
          * Let's try and find a project that doesn't exist, which should throw a DoesNotExistException
          */
         uniqueName = PROJECT_NAME_NOT_FOUND + System.currentTimeMillis()
-        ProjectDataService projectDataService = hubServicesFactory.createProjectDataService()
+        ProjectDataService projectDataService = hubDataServicesFactory.createProjectDataService()
         try {
             ProjectView projectView = projectDataService.getProjectByName(uniqueName)
             fail('Should have throws a DoesNotExistException')
@@ -42,7 +42,7 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
          */
         uniqueName = PROJECT_NAME_NOT_FOUND + System.currentTimeMillis()
         ProjectRequest projectRequest = createProjectRequest(uniqueName, PROJECT_VERSION_NAME)
-        ProjectDataService projectDataService = hubServicesFactory.createProjectDataService()
+        ProjectDataService projectDataService = hubDataServicesFactory.createProjectDataService()
         String projectUrl = projectDataService.createHubProject(projectRequest)
 
         /*

@@ -35,12 +35,12 @@ import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.service.model.ItemTransform;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionModel;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.parallel.processor.ItemTransformer;
 
-public abstract class AbstractNotificationTransformer implements ItemTransform<List<NotificationContentItem>, NotificationView> {
+public abstract class AbstractNotificationTransformer implements ItemTransformer<NotificationContentItem, NotificationView> {
     private final IntLogger logger;
     private final HubDataService hubResponseService;
     private final MetaHandler metaHandler;

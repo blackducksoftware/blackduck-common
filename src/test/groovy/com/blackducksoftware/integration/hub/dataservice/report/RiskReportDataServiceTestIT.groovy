@@ -47,7 +47,7 @@ class RiskReportDataServiceTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
-        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
+        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
         ReportDataService riskReportDataService = hubServicesFactory.createReportDataService(30000)
         File folderForReport = folderForReport.getRoot()
@@ -61,7 +61,7 @@ class RiskReportDataServiceTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
-        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
+        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
         ReportDataService riskReportDataService = hubServicesFactory.createReportDataService(30000)
         File folderForReport = folderForReport.getRoot()
@@ -84,7 +84,7 @@ class RiskReportDataServiceTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
-        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
+        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
         ReportDataService riskReportDataService = hubServicesFactory.createReportDataService(30000)
         File folderForReport = folderForReport.getRoot()

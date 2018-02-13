@@ -27,10 +27,10 @@ import java.io.IOException;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
+import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
 
 public class IssueDataService extends HubDataService {
 
@@ -39,13 +39,11 @@ public class IssueDataService extends HubDataService {
     }
 
     public String createIssue(final IssueView issueItem, final String uri) throws IntegrationException {
-        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, issueItem);
-        return executePostRequestAndRetrieveURL(uri, requestWrapper);
+        return executePostRequestAndRetrieveURL(uri, new RequestWrapper(HttpMethod.POST).setBodyContentObject(issueItem));
     }
 
     public void updateIssue(final IssueView issueItem, final String uri) throws IntegrationException {
-        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.PUT, issueItem);
-        try (Response response = executeUpdateRequest(uri, requestWrapper)) {
+        try (Response response = executeUpdateRequest(uri, new RequestWrapper(HttpMethod.PUT).setBodyContentObject(issueItem))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -57,7 +55,7 @@ public class IssueDataService extends HubDataService {
     }
 
     public void deleteIssue(final String issueItemUri) throws IntegrationException {
-        try (Response response = executeUpdateRequest(issueItemUri, new UpdateRequestWrapper(HttpMethod.DELETE))) {
+        try (Response response = executeUpdateRequest(issueItemUri, new RequestWrapper(HttpMethod.DELETE))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

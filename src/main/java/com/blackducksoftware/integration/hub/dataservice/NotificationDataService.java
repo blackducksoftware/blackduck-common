@@ -43,16 +43,16 @@ import com.blackducksoftware.integration.hub.api.view.RuleViolationNotificationV
 import com.blackducksoftware.integration.hub.api.view.VulnerabilityNotificationView;
 import com.blackducksoftware.integration.hub.notification.NotificationContentItem;
 import com.blackducksoftware.integration.hub.notification.NotificationResults;
-import com.blackducksoftware.integration.hub.notification.ParallelResourceProcessor;
-import com.blackducksoftware.integration.hub.notification.ParallelResourceProcessorResults;
 import com.blackducksoftware.integration.hub.notification.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationClearedTransformer;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationOverrideTransformer;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationTransformer;
 import com.blackducksoftware.integration.hub.notification.VulnerabilityTransformer;
-import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
+import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessor;
+import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessorResults;
 
 public class NotificationDataService extends HubDataService {
     private final Map<String, Class<? extends NotificationView>> typeMap = new HashMap<>();
@@ -78,12 +78,12 @@ public class NotificationDataService extends HubDataService {
     }
 
     private void populateTransformerMap(final IntLogger logger) {
-        parallelProcessor.addTransform(RuleViolationNotificationView.class,
+        parallelProcessor.addTransformer(RuleViolationNotificationView.class,
                 new PolicyViolationTransformer(this, logger, policyNotificationFilter, metaHandler));
-        parallelProcessor.addTransform(PolicyOverrideNotificationView.class,
+        parallelProcessor.addTransformer(PolicyOverrideNotificationView.class,
                 new PolicyViolationOverrideTransformer(this, logger, policyNotificationFilter, metaHandler));
-        parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(this, metaHandler, logger));
-        parallelProcessor.addTransform(RuleViolationClearedNotificationView.class,
+        parallelProcessor.addTransformer(VulnerabilityNotificationView.class, new VulnerabilityTransformer(this, metaHandler, logger));
+        parallelProcessor.addTransformer(RuleViolationClearedNotificationView.class,
                 new PolicyViolationClearedTransformer(this, logger, policyNotificationFilter, metaHandler));
     }
 
@@ -111,10 +111,7 @@ public class NotificationDataService extends HubDataService {
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
-        requestWrapper.addQueryParameter("startDate", startDateString);
-        requestWrapper.addQueryParameter("endDate", endDateString);
-
+        final RequestWrapper requestWrapper = new RequestWrapper().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
         final List<NotificationView> allNotificationItems = getResponsesFromLinkResponse(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, true, requestWrapper, typeMap);
         return allNotificationItems;
     }
@@ -129,10 +126,7 @@ public class NotificationDataService extends HubDataService {
         queryParameters.put("startDate", startDateString);
         queryParameters.put("endDate", endDateString);
 
-        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
-        requestWrapper.addQueryParameter("startDate", startDateString);
-        requestWrapper.addQueryParameter("endDate", endDateString);
-
+        final RequestWrapper requestWrapper = new RequestWrapper().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
         final List<NotificationView> allNotificationItems = getResponsesFromLinkResponse(user, ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, true, requestWrapper, typeMap);
         return allNotificationItems;
     }

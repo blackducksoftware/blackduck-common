@@ -34,7 +34,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV2View;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
+import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 
@@ -84,9 +84,7 @@ public class ComponentDataService extends HubDataService {
         final String hubOriginId = externalId.createHubOriginId();
         final String componentQuery = String.format("id:%s|%s", forge, hubOriginId);
 
-        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
-        requestWrapper.setQ(componentQuery);
-        final List<ComponentSearchResultView> allComponents = getResponsesFromLinkResponse(ApiDiscovery.COMPONENTS_LINK_RESPONSE, true, requestWrapper);
+        final List<ComponentSearchResultView> allComponents = getResponsesFromLinkResponse(ApiDiscovery.COMPONENTS_LINK_RESPONSE, true, new RequestWrapper().setQ(componentQuery));
         return allComponents;
     }
 
@@ -95,9 +93,8 @@ public class ComponentDataService extends HubDataService {
         final String componentVersionURL = componentSearchView.version;
         if (null != componentVersionURL) {
             final ComponentVersionView componentVersion = getResponse(componentVersionURL, ComponentVersionView.class);
-            final GetRequestWrapper requestWrapper = new GetRequestWrapper();
-            requestWrapper.setMimeType(HubMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
-            final List<VulnerabilityV2View> vulnerabilityList = getResponsesFromLinkResponse(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, true, requestWrapper);
+            final List<VulnerabilityV2View> vulnerabilityList = getResponsesFromLinkResponse(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, true,
+                    new RequestWrapper().setMimeType(HubMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1));
             return vulnerabilityList;
         }
 
