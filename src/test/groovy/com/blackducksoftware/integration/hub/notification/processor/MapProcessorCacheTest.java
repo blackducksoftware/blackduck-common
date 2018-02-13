@@ -34,7 +34,9 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
+import com.blackducksoftware.integration.hub.notification.MapProcessorCache;
+import com.blackducksoftware.integration.hub.notification.NotificationCategoryEnum;
+import com.blackducksoftware.integration.hub.notification.NotificationEvent;
 
 public class MapProcessorCacheTest {
 

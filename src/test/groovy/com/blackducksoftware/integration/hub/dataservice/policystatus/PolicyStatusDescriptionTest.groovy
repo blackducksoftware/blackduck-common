@@ -31,6 +31,7 @@ import com.blackducksoftware.integration.hub.api.generated.component.ComponentVe
 import com.blackducksoftware.integration.hub.api.generated.component.NameValuePairView
 import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView
+import com.blackducksoftware.integration.hub.service.model.PolicyStatusDescription
 
 class PolicyStatusDescriptionTest {
 

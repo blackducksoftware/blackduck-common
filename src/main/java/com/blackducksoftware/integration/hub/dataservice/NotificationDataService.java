@@ -41,39 +41,35 @@ import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotification
 import com.blackducksoftware.integration.hub.api.view.RuleViolationClearedNotificationView;
 import com.blackducksoftware.integration.hub.api.view.RuleViolationNotificationView;
 import com.blackducksoftware.integration.hub.api.view.VulnerabilityNotificationView;
-import com.blackducksoftware.integration.hub.dataservice.notification.NotificationResults;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationClearedTransformer;
-import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationOverrideTransformer;
-import com.blackducksoftware.integration.hub.dataservice.notification.transformer.PolicyViolationTransformer;
-import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityTransformer;
-import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
-import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
+import com.blackducksoftware.integration.hub.notification.NotificationContentItem;
+import com.blackducksoftware.integration.hub.notification.NotificationResults;
+import com.blackducksoftware.integration.hub.notification.ParallelResourceProcessor;
+import com.blackducksoftware.integration.hub.notification.ParallelResourceProcessorResults;
+import com.blackducksoftware.integration.hub.notification.PolicyNotificationFilter;
+import com.blackducksoftware.integration.hub.notification.PolicyViolationClearedTransformer;
+import com.blackducksoftware.integration.hub.notification.PolicyViolationOverrideTransformer;
+import com.blackducksoftware.integration.hub.notification.PolicyViolationTransformer;
+import com.blackducksoftware.integration.hub.notification.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class NotificationDataService extends HubService {
+public class NotificationDataService extends HubDataService {
     private final Map<String, Class<? extends NotificationView>> typeMap = new HashMap<>();
 
-    private final HubService hubResponseService;
     private final PolicyNotificationFilter policyNotificationFilter;
     private final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor;
-    private final MetaHandler metaService;
+    private final MetaHandler metaHandler;
 
-    public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService) {
-        this(restConnection, hubResponseService, null);
+    public NotificationDataService(final RestConnection restConnection) {
+        this(restConnection, null);
     }
 
-    public NotificationDataService(final RestConnection restConnection, final HubService hubResponseService,
-            final PolicyNotificationFilter policyNotificationFilter) {
+    public NotificationDataService(final RestConnection restConnection, final PolicyNotificationFilter policyNotificationFilter) {
         super(restConnection);
-        this.hubResponseService = hubResponseService;
         this.policyNotificationFilter = policyNotificationFilter;
         this.parallelProcessor = new ParallelResourceProcessor<>(restConnection.logger);
-        this.metaService = new MetaHandler(restConnection.logger);
+        this.metaHandler = new MetaHandler(restConnection.logger);
         populateTransformerMap(restConnection.logger);
         typeMap.put("VULNERABILITY", VulnerabilityNotificationView.class);
         typeMap.put("RULE_VIOLATION", RuleViolationNotificationView.class);
@@ -83,12 +79,12 @@ public class NotificationDataService extends HubService {
 
     private void populateTransformerMap(final IntLogger logger) {
         parallelProcessor.addTransform(RuleViolationNotificationView.class,
-                new PolicyViolationTransformer(hubResponseService, logger, policyNotificationFilter, metaService));
+                new PolicyViolationTransformer(this, logger, policyNotificationFilter, metaHandler));
         parallelProcessor.addTransform(PolicyOverrideNotificationView.class,
-                new PolicyViolationOverrideTransformer(hubResponseService, logger, policyNotificationFilter, metaService));
-        parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubResponseService, metaService, logger));
+                new PolicyViolationOverrideTransformer(this, logger, policyNotificationFilter, metaHandler));
+        parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(this, metaHandler, logger));
         parallelProcessor.addTransform(RuleViolationClearedNotificationView.class,
-                new PolicyViolationClearedTransformer(hubResponseService, logger, policyNotificationFilter, metaService));
+                new PolicyViolationClearedTransformer(this, logger, policyNotificationFilter, metaHandler));
     }
 
     public NotificationResults getAllNotificationResults(final Date startDate, final Date endDate) throws IntegrationException {
@@ -119,7 +115,7 @@ public class NotificationDataService extends HubService {
         requestWrapper.addQueryParameter("startDate", startDateString);
         requestWrapper.addQueryParameter("endDate", endDateString);
 
-        final List<NotificationView> allNotificationItems = getAllResponsesFromApi(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestWrapper, typeMap);
+        final List<NotificationView> allNotificationItems = getResponsesFromLinkResponse(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, true, requestWrapper, typeMap);
         return allNotificationItems;
     }
 
@@ -137,7 +133,7 @@ public class NotificationDataService extends HubService {
         requestWrapper.addQueryParameter("startDate", startDateString);
         requestWrapper.addQueryParameter("endDate", endDateString);
 
-        final List<NotificationView> allNotificationItems = getAllResponsesFromLinkResponse(user, ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestWrapper, typeMap);
+        final List<NotificationView> allNotificationItems = getResponsesFromLinkResponse(user, ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, true, requestWrapper, typeMap);
         return allNotificationItems;
     }
 

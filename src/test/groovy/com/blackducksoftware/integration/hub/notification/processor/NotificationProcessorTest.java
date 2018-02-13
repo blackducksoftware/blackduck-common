@@ -48,12 +48,14 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersion
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV1View;
 import com.blackducksoftware.integration.hub.api.response.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.VulnerabilityContentItem;
-import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
+import com.blackducksoftware.integration.hub.notification.ItemTypeEnum;
+import com.blackducksoftware.integration.hub.notification.NotificationCategoryEnum;
+import com.blackducksoftware.integration.hub.notification.NotificationContentItem;
+import com.blackducksoftware.integration.hub.notification.NotificationEvent;
+import com.blackducksoftware.integration.hub.notification.PolicyOverrideContentItem;
+import com.blackducksoftware.integration.hub.notification.PolicyViolationClearedContentItem;
+import com.blackducksoftware.integration.hub.notification.PolicyViolationContentItem;
+import com.blackducksoftware.integration.hub.notification.VulnerabilityContentItem;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
 

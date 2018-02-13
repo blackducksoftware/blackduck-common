@@ -31,7 +31,7 @@ import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.dataservice.ProjectDataService
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
-import com.blackducksoftware.integration.hub.service.HubServicesFactory
+import com.blackducksoftware.integration.hub.service.HubDataServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 
 @Category(IntegrationTest.class)
@@ -42,7 +42,7 @@ class ScanStatusDataServiceTestIT {
 
     @Test
     void testBdioImportForNewProject() {
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
+        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
 
         // import the bdio

@@ -35,10 +35,9 @@ import com.blackducksoftware.integration.hub.api.generated.view.UserGroupView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class UserGroupDataService extends HubService {
+public class UserGroupDataService extends HubDataService {
     private final IntLogger logger;
 
     public UserGroupDataService(final RestConnection restConnection) {
@@ -48,7 +47,7 @@ public class UserGroupDataService extends HubService {
 
     public UserView getUserByUserName(final String userName) throws IntegrationException {
 
-        final List<UserView> allUsers = getAllResponsesFromApi(ApiDiscovery.USERS_LINK_RESPONSE);
+        final List<UserView> allUsers = getResponsesFromLinkResponse(ApiDiscovery.USERS_LINK_RESPONSE, true);
         for (final UserView user : allUsers) {
             if (user.userName.equalsIgnoreCase(userName)) {
                 return user;
@@ -64,7 +63,7 @@ public class UserGroupDataService extends HubService {
 
     public List<ProjectView> getProjectsForUser(final UserView userView) throws IntegrationException {
         logger.debug("Attempting to get the assigned projects for User: " + userView.userName);
-        final List<AssignedProjectView> assignedProjectViews = getAllResponsesFromLinkResponse(userView, UserView.PROJECTS_LINK_RESPONSE);
+        final List<AssignedProjectView> assignedProjectViews = getResponsesFromLinkResponse(userView, UserView.PROJECTS_LINK_RESPONSE, true);
 
         final List<ProjectView> resolvedProjectViews = new ArrayList<>();
         for (final AssignedProjectView assigned : assignedProjectViews) {
@@ -83,11 +82,11 @@ public class UserGroupDataService extends HubService {
     }
 
     public List<RoleAssignmentView> getRolesForUser(final UserView userView) throws IntegrationException {
-        return getAllResponsesFromLinkResponse(userView, UserView.ROLES_LINK_RESPONSE);
+        return getResponsesFromLinkResponse(userView, UserView.ROLES_LINK_RESPONSE, true);
     }
 
     public UserGroupView getGroupByName(final String groupName) throws IntegrationException {
-        final List<UserGroupView> allGroups = getAllResponsesFromApi(ApiDiscovery.USERGROUPS_LINK_RESPONSE);
+        final List<UserGroupView> allGroups = getResponsesFromLinkResponse(ApiDiscovery.USERGROUPS_LINK_RESPONSE, true);
         for (final UserGroupView group : allGroups) {
             if (group.name.equalsIgnoreCase(groupName)) {
                 return group;

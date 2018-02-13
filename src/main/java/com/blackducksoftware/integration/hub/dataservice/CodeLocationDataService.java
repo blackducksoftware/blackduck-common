@@ -41,11 +41,10 @@ import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.RequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
 
-public class CodeLocationDataService extends HubService {
+public class CodeLocationDataService extends HubDataService {
     public CodeLocationDataService(final RestConnection restConnection) {
         super(restConnection);
     }
@@ -61,9 +60,9 @@ public class CodeLocationDataService extends HubService {
         } catch (final IOException e) {
             throw new IntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub because : " + e.getMessage(), e);
         }
-        final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.POST, jsonPayload);
+        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, jsonPayload);
         requestWrapper.setMimeType(mimeType);
-        try (Response response = executeRequestFromPath(HubService.BOMIMPORT_LINK, requestWrapper)) {
+        try (Response response = executeUpdateRequestFromPath(HubDataService.BOMIMPORT_LINK, requestWrapper)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -72,7 +71,7 @@ public class CodeLocationDataService extends HubService {
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationType codeLocationType) throws IntegrationException {
         final GetRequestWrapper requestWrapper = new GetRequestWrapper();
         requestWrapper.addQueryParameter("codeLocationType", codeLocationType.toString());
-        final List<CodeLocationView> allCodeLocations = getAllResponsesFromApi(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestWrapper);
+        final List<CodeLocationView> allCodeLocations = getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true, requestWrapper);
         return allCodeLocations;
     }
 
@@ -104,8 +103,8 @@ public class CodeLocationDataService extends HubService {
     }
 
     public void updateCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws IntegrationException {
-        final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.PUT, codeLocationItemJson);
-        try (Response response = executeRequest(codeLocationItemUrl, requestWrapper)) {
+        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.PUT, codeLocationItemJson);
+        try (Response response = executeUpdateRequest(codeLocationItemUrl, requestWrapper)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -124,7 +123,7 @@ public class CodeLocationDataService extends HubService {
     }
 
     public void deleteCodeLocation(final String codeLocationItemUrl) throws IntegrationException {
-        try (Response response = executeRequest(codeLocationItemUrl, new RequestWrapper(HttpMethod.DELETE))) {
+        try (Response response = executeUpdateRequest(codeLocationItemUrl, new UpdateRequestWrapper(HttpMethod.DELETE))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -134,7 +133,7 @@ public class CodeLocationDataService extends HubService {
         if (StringUtils.isNotBlank(codeLocationName)) {
             final GetRequestWrapper requestWrapper = new GetRequestWrapper();
             requestWrapper.setQ("name:" + codeLocationName);
-            final List<CodeLocationView> codeLocations = getAllResponsesFromApi(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestWrapper);
+            final List<CodeLocationView> codeLocations = getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true, requestWrapper);
             for (final CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.name)) {
                     return codeLocation;
@@ -161,6 +160,6 @@ public class CodeLocationDataService extends HubService {
     }
 
     public ScanSummaryView getScanSummaryViewById(final String scanSummaryId) throws IntegrationException {
-        return getResponseFromPath(HubService.SCANSUMMARIES_LINK + "/" + scanSummaryId, ScanSummaryView.class);
+        return getResponseFromPath(HubDataService.SCANSUMMARIES_LINK + "/" + scanSummaryId, ScanSummaryView.class);
     }
 }

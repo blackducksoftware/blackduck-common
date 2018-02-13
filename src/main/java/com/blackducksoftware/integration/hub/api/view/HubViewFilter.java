@@ -30,10 +30,10 @@ import com.blackducksoftware.integration.hub.api.core.HubView;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 
 public class HubViewFilter<T extends HubView> {
-    public List<T> getAccessibleItems(final MetaHandler metaService, final List<T> hubItems) throws HubIntegrationException {
+    public List<T> getAccessibleItems(final MetaHandler metaHandler, final List<T> hubItems) throws HubIntegrationException {
         final List<T> accessibleItems = new ArrayList<>();
         for (final T hubItem : hubItems) {
-            final List<String> allow = metaService.getAllowedMethods(hubItem);
+            final List<String> allow = metaHandler.getAllowedMethods(hubItem);
             if (allow != null && !allow.isEmpty() && allow.contains("GET") && allow.contains("PUT")) {
                 accessibleItems.add(hubItem);
             }

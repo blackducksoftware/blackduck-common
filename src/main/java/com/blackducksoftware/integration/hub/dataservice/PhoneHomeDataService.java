@@ -30,10 +30,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
-import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeCallable;
-import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeResponse;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
+import com.blackducksoftware.integration.hub.api.generated.response.CurrentVersionView;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.model.PhoneHomeCallable;
+import com.blackducksoftware.integration.hub.service.model.PhoneHomeResponse;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;
@@ -42,17 +43,16 @@ import com.blackducksoftware.integration.phonehome.enums.BlackDuckName;
 import com.blackducksoftware.integration.phonehome.enums.PhoneHomeSource;
 import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName;
 
-public class PhoneHomeDataService {
+public class PhoneHomeDataService extends HubDataService {
     private final IntLogger logger;
-    private final HubRegistrationService hubRegistrationRequestService;
-    private final HubVersionService hubVersionRequestService;
+    private final HubRegistrationDataService hubRegistrationRequestService;
     private final PhoneHomeClient phoneHomeClient;
     private final ExecutorService executorService;
 
-    public PhoneHomeDataService(final IntLogger logger, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationRequestService, final HubVersionService hubVersionRequestService) {
-        this.logger = logger;
+    public PhoneHomeDataService(final RestConnection restConnection, final PhoneHomeClient phoneHomeClient, final HubRegistrationDataService hubRegistrationRequestService) {
+        super(restConnection);
+        this.logger = restConnection.logger;
         this.hubRegistrationRequestService = hubRegistrationRequestService;
-        this.hubVersionRequestService = hubVersionRequestService;
         this.phoneHomeClient = phoneHomeClient;
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
@@ -103,7 +103,7 @@ public class PhoneHomeDataService {
     public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder() {
         final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = new PhoneHomeRequestBodyBuilder();
         try {
-            final String hubVersion = hubVersionRequestService.getHubVersion();
+            final CurrentVersionView currentVersion = getResponseFromLinkResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
             String registrationId = null;
             try {
                 // We need to wrap this because this will most likely fail unless they are running as an admin
@@ -114,7 +114,7 @@ public class PhoneHomeDataService {
             phoneHomeRequestBodyBuilder.setRegistrationId(registrationId);
             phoneHomeRequestBodyBuilder.setHostName(hubHostName.toString());
             phoneHomeRequestBodyBuilder.setBlackDuckName(BlackDuckName.HUB);
-            phoneHomeRequestBodyBuilder.setBlackDuckVersion(hubVersion);
+            phoneHomeRequestBodyBuilder.setBlackDuckVersion(currentVersion.version);
             phoneHomeRequestBodyBuilder.setSource(PhoneHomeSource.INTEGRATIONS);
         } catch (final Exception e) {
             logger.debug("Couldn't detail phone home request builder: " + e.getMessage());

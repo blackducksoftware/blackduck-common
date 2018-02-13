@@ -28,6 +28,7 @@ import java.io.IOException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.core.HubView;
+import com.blackducksoftware.integration.hub.api.core.LinkSingleResponse;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.Request;
@@ -55,21 +56,21 @@ public class HubResponseTransformer {
         this.gson = restConnection.gson;
     }
 
-    public <T extends HubResponse> T getResponseFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        if (!metaHandler.hasLink(hubView, metaLinkRef)) {
-            return getResponseFromLink(hubView, metaLinkRef, clazz, null);
+    public <T extends HubResponse> T getResponseFromLinkSafely(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
+        if (!metaHandler.hasLink(hubView, linkSingleResponse.link)) {
+            return getResponseFromLink(hubView, linkSingleResponse, null);
         } else {
             return null;
         }
     }
 
-    public <T extends HubResponse> T getResponseFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return getResponseFromLink(hubView, metaLinkRef, clazz, null);
+    public <T extends HubResponse> T getResponseFromLink(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
+        return getResponseFromLink(hubView, linkSingleResponse, null);
     }
 
-    public <T extends HubResponse> T getResponseFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
-        final String link = metaHandler.getFirstLink(hubView, metaLinkRef);
-        return getResponse(link, clazz, requestWrapper);
+    public <T extends HubResponse> T getResponseFromLink(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        final String link = metaHandler.getFirstLink(hubView, linkSingleResponse.link);
+        return getResponse(link, linkSingleResponse.responseClass, requestWrapper);
     }
 
     public <T extends HubResponse> T getResponse(final String uri, final Class<T> clazz) throws IntegrationException {
@@ -82,8 +83,21 @@ public class HubResponseTransformer {
     }
 
     public <T extends HubResponse> T getResponseFromPath(final String path, final Class<T> clazz) throws IntegrationException {
-        final Request request = hubRequestFactory.createGetRequestFromPath(path);
+        return getResponseFromPath(path, clazz, null);
+    }
+
+    public <T extends HubResponse> T getResponseFromPath(final String path, final Class<T> clazz, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        final Request request = hubRequestFactory.createGetRequestFromPath(path, requestWrapper);
         return getResponse(request, clazz);
+    }
+
+    public <T extends HubResponse> T getResponseFromLinkResponse(final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
+        return getResponseFromLinkResponse(linkSingleResponse, null);
+    }
+
+    public <T extends HubResponse> T getResponseFromLinkResponse(final LinkSingleResponse<T> linkSingleResponse, final GetRequestWrapper requestWrapper) throws IntegrationException {
+        final Request request = hubRequestFactory.createGetRequestFromPath(linkSingleResponse.link, requestWrapper);
+        return getResponse(request, linkSingleResponse.responseClass);
     }
 
     public <T extends HubResponse> T getResponse(final Request request, final Class<T> clazz) throws IntegrationException {

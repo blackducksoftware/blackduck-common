@@ -12,8 +12,8 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVe
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
+import com.blackducksoftware.integration.hub.dataservice.HubDataService
 import com.blackducksoftware.integration.hub.dataservice.ProjectDataService
-import com.blackducksoftware.integration.hub.service.HubService
 
 @Category(IntegrationTest.class)
 class CreateDetailedProjectRecipeTest extends BasicRecipe {
@@ -31,7 +31,7 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
          * fields are set correctly with the HubService, a general purpose API
          * wrapper to handle common GET requests and their response payloads
          */
-        HubService hubService = hubServicesFactory.createHubService()
+        HubDataService hubService = hubServicesFactory.createHubService()
         ProjectView projectView = hubService.getResponse(projectUrl, ProjectView.class)
         ProjectVersionView projectVersionView = hubService.getResponseFromLinkResponse(projectView, ProjectView.CANONICALVERSION_LINK_RESPONSE)
 

@@ -34,20 +34,20 @@ import org.apache.commons.io.FileUtils;
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
+import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
+import com.blackducksoftware.integration.hub.api.generated.response.CurrentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.builder.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
-import com.blackducksoftware.integration.hub.dataservice.project.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.util.HostnameHelper;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder;
@@ -55,35 +55,33 @@ import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 import com.google.gson.Gson;
 
-public class CLIDataService extends HubService {
+public class CLIDataService extends HubDataService {
 
     private final Gson gson;
     private final IntLogger logger;
     private final CIEnvironmentVariables ciEnvironmentVariables;
-    private final HubVersionService hubVersionRequestService;
     private final CLIDownloadUtility cliDownloadService;
     private final PhoneHomeDataService phoneHomeDataService;
     private final ProjectDataService projectDataService;
     private final CodeLocationDataService codeLocationDataService;
     private final ScanStatusDataService scanStatusDataService;
-    private final MetaHandler metaService;
+    private final MetaHandler metaHandler;
 
     private ProjectVersionWrapper projectVersionWrapper;
 
-    public CLIDataService(final RestConnection restConnection, final CIEnvironmentVariables ciEnvironmentVariables, final HubVersionService hubVersionRequestService, final CLIDownloadUtility cliDownloadService,
+    public CLIDataService(final RestConnection restConnection, final CIEnvironmentVariables ciEnvironmentVariables, final CLIDownloadUtility cliDownloadService,
             final PhoneHomeDataService phoneHomeDataService, final ProjectDataService projectDataService, final CodeLocationDataService codeLocationDataService,
             final ScanStatusDataService scanStatusDataService) {
         super(restConnection);
         this.gson = restConnection.gson;
         this.logger = restConnection.logger;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
-        this.hubVersionRequestService = hubVersionRequestService;
         this.cliDownloadService = cliDownloadService;
         this.phoneHomeDataService = phoneHomeDataService;
         this.projectDataService = projectDataService;
         this.codeLocationDataService = codeLocationDataService;
         this.scanStatusDataService = scanStatusDataService;
-        this.metaService = new MetaHandler(logger);
+        this.metaHandler = new MetaHandler(logger);
     }
 
     public ProjectVersionWrapper installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished,
@@ -156,8 +154,8 @@ public class CLIDataService extends HubService {
         final String localHostName = HostnameHelper.getMyHostname();
         logger.info("Running on machine : " + localHostName);
         printConfiguration(hubScanConfig, projectRequest);
-        final String hubVersion = hubVersionRequestService.getHubVersion();
-        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), hubVersion, localHostName);
+        final CurrentVersionView currentVersion = getResponseFromLinkResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version, localHostName);
         phoneHomeDataService.phoneHome(phoneHomeRequestBodyBuilder);
 
         if (!hubScanConfig.isDryRun()) {
@@ -182,7 +180,9 @@ public class CLIDataService extends HubService {
                     scanSummary = getScanSummaryFromFile(scanSummaryFile);
                     scanSummaries.add(scanSummary);
                     scanSummaryFile.delete();
-                    final String codeLocationUrl = metaService.getFirstLinkSafely(scanSummary, MetaHandler.CODE_LOCATION_BOM_STATUS_LINK);
+
+                    // TODO update when ScanSummaryView is part of the swagger
+                    final String codeLocationUrl = metaHandler.getFirstLinkSafely(scanSummary, ScanSummaryView.CODELOCATION_LINK);
 
                     final CodeLocationView codeLocationView = codeLocationDataService.getResponse(codeLocationUrl, CodeLocationView.class);
                     codeLocationViews.add(codeLocationView);
@@ -248,7 +248,7 @@ public class CLIDataService extends HubService {
     }
 
     private List<CodeLocationView> getCodeLocationsNotJustScanned(final ProjectVersionView version, final List<CodeLocationView> codeLocationsFromCurentScan) throws IntegrationException {
-        final List<CodeLocationView> codeLocationsMappedToVersion = getAllResponsesFromLinkResponse(version, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+        final List<CodeLocationView> codeLocationsMappedToVersion = getResponsesFromLinkResponse(version, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE, true);
         return getCodeLocationsNotJustScanned(codeLocationsMappedToVersion, codeLocationsFromCurentScan);
     }
 

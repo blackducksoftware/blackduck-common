@@ -92,7 +92,7 @@ public class HubRequestFactory {
         return request;
     }
 
-    public Request createRequest(final String uri, final RequestWrapper requestWrapper) throws IntegrationException {
+    public Request createRequest(final String uri, final UpdateRequestWrapper requestWrapper) throws IntegrationException {
         final Request request = new Request(uri, null, null, requestWrapper.getMethod(), requestWrapper.getMimeType(), requestWrapper.getBodyEncoding(), requestWrapper.getAdditionalHeaders());
         if (null != requestWrapper.getHubComponent()) {
             request.setBodyContent(gson.toJson(requestWrapper.getHubComponent()));
@@ -108,7 +108,7 @@ public class HubRequestFactory {
         return request;
     }
 
-    public Request createRequestFromPath(final String path, final RequestWrapper requestWrapper) throws IntegrationException {
+    public Request createRequestFromPath(final String path, final UpdateRequestWrapper requestWrapper) throws IntegrationException {
         final String uri = pieceTogetherURI(baseUrl, path);
         final Request request = new Request(uri, null, null, requestWrapper.getMethod(), requestWrapper.getMimeType(), requestWrapper.getBodyEncoding(), requestWrapper.getAdditionalHeaders());
         if (null != requestWrapper.getHubComponent()) {

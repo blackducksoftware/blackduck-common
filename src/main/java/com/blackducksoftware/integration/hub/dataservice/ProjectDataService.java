@@ -44,19 +44,18 @@ import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerableComponentView;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
-import com.blackducksoftware.integration.hub.dataservice.component.model.VersionBomComponentModel;
-import com.blackducksoftware.integration.hub.dataservice.project.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.RequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
+import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
+import com.blackducksoftware.integration.hub.service.model.VersionBomComponentModel;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ProjectDataService extends HubService {
+public class ProjectDataService extends HubDataService {
     private final IntLogger logger;
     private final ComponentDataService componentDataService;
 
@@ -74,11 +73,11 @@ public class ProjectDataService extends HubService {
         }
         final GetRequestWrapper requestWrapper = new GetRequestWrapper();
         requestWrapper.setQ(q);
-        final List<ProjectView> allProjectItems = getAllResponsesFromApi(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestWrapper);
+        final List<ProjectView> allProjectItems = getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true, requestWrapper);
         return allProjectItems;
     }
 
-    public List<ProjectView> getAllProjectMatches(final String projectName, final int limit) throws IntegrationException {
+    public List<ProjectView> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
         String q = null;
         if (StringUtils.isNotBlank(projectName)) {
             q = "name:" + projectName;
@@ -86,7 +85,7 @@ public class ProjectDataService extends HubService {
         final GetRequestWrapper requestWrapper = new GetRequestWrapper();
         requestWrapper.setQ(q);
         requestWrapper.setLimitPerRequest(limit);
-        final List<ProjectView> projectItems = getResponsesFromApi(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestWrapper);
+        final List<ProjectView> projectItems = getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, false, requestWrapper);
         return projectItems;
     }
 
@@ -101,17 +100,13 @@ public class ProjectDataService extends HubService {
     }
 
     public String createHubProject(final ProjectRequest project) throws IntegrationException {
-        final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.POST, project);
-        try (Response response = executeRequestFromPath(ApiDiscovery.PROJECTS_LINK, requestWrapper)) {
-            return response.getHeaderValue("location");
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
+        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, project);
+        return executePostRequestFromPathAndRetrieveURL(ApiDiscovery.PROJECTS_LINK, requestWrapper);
     }
 
     public void deleteHubProject(final ProjectView project) throws IntegrationException {
         final String uri = getHref(project);
-        try (Response response = executeRequest(uri, new RequestWrapper(HttpMethod.DELETE))) {
+        try (Response response = executeUpdateRequest(uri, new UpdateRequestWrapper(HttpMethod.DELETE))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -124,7 +119,7 @@ public class ProjectDataService extends HubService {
         }
         final GetRequestWrapper requestWrapper = new GetRequestWrapper();
         requestWrapper.setQ(q);
-        final List<ProjectVersionView> allProjectVersionMatchingItems = getAllResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, requestWrapper);
+        final List<ProjectVersionView> allProjectVersionMatchingItems = getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true, requestWrapper);
         for (final ProjectVersionView projectVersion : allProjectVersionMatchingItems) {
             if (projectVersionName.equals(projectVersion.versionName)) {
                 return projectVersion;
@@ -138,12 +133,8 @@ public class ProjectDataService extends HubService {
     }
 
     public String createHubVersion(final String versionsUri, final ProjectVersionRequest version) throws IntegrationException {
-        final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.POST, version);
-        try (Response response = executeRequest(versionsUri, requestWrapper)) {
-            return response.getHeaderValue("location");
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
+        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, version);
+        return executePostRequestAndRetrieveURL(versionsUri, requestWrapper);
     }
 
     public ProjectVersionWrapper getProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
@@ -193,7 +184,7 @@ public class ProjectDataService extends HubService {
     }
 
     public List<AssignedUserView> getAssignedUsersToProject(final ProjectView project) throws IntegrationException {
-        final List<AssignedUserView> assignedUsers = getAllResponsesFromLinkResponse(project, ProjectView.USERS_LINK_RESPONSE);
+        final List<AssignedUserView> assignedUsers = getResponsesFromLinkResponse(project, ProjectView.USERS_LINK_RESPONSE, true);
         return assignedUsers;
     }
 
@@ -204,7 +195,7 @@ public class ProjectDataService extends HubService {
 
     public List<UserView> getUsersForProject(final ProjectView project) throws IntegrationException {
         logger.debug("Attempting to get the assigned users for Project: " + project.name);
-        final List<AssignedUserView> assignedUsers = getAllResponsesFromLinkResponse(project, ProjectView.USERS_LINK_RESPONSE);
+        final List<AssignedUserView> assignedUsers = getResponsesFromLinkResponse(project, ProjectView.USERS_LINK_RESPONSE, true);
 
         final List<UserView> resolvedUserViews = new ArrayList<>();
         for (final AssignedUserView assigned : assignedUsers) {
@@ -222,7 +213,7 @@ public class ProjectDataService extends HubService {
     }
 
     public List<AssignedUserGroupView> getAssignedGroupsToProject(final ProjectView project) throws IntegrationException {
-        final List<AssignedUserGroupView> assignedGroups = getAllResponsesFromLinkResponse(project, ProjectView.USERGROUPS_LINK_RESPONSE);
+        final List<AssignedUserGroupView> assignedGroups = getResponsesFromLinkResponse(project, ProjectView.USERGROUPS_LINK_RESPONSE, true);
         return assignedGroups;
     }
 
@@ -233,7 +224,7 @@ public class ProjectDataService extends HubService {
 
     public List<UserGroupView> getGroupsForProject(final ProjectView project) throws IntegrationException {
         logger.debug("Attempting to get the assigned users for Project: " + project.name);
-        final List<AssignedUserGroupView> assignedGroups = getAllResponsesFromLinkResponse(project, ProjectView.USERGROUPS_LINK_RESPONSE);
+        final List<AssignedUserGroupView> assignedGroups = getResponsesFromLinkResponse(project, ProjectView.USERGROUPS_LINK_RESPONSE, true);
 
         final List<UserGroupView> resolvedGroupViews = new ArrayList<>();
         for (final AssignedUserGroupView assigned : assignedGroups) {
@@ -246,8 +237,8 @@ public class ProjectDataService extends HubService {
     }
 
     public void addComponentToProjectVersion(final String mediaType, final String projectVersionComponentsUri, final String componentVersionUrl) throws IntegrationException {
-        final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.POST, "{\"component\": \"" + componentVersionUrl + "\"}");
-        try (Response response = executeRequest(projectVersionComponentsUri, requestWrapper)) {
+        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, "{\"component\": \"" + componentVersionUrl + "\"}");
+        try (Response response = executeUpdateRequest(projectVersionComponentsUri, requestWrapper)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -267,14 +258,14 @@ public class ProjectDataService extends HubService {
     public List<VersionBomComponentView> getComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = getProjectByName(projectName);
         final ProjectVersionView projectVersionView = getProjectVersion(projectItem, projectVersionName);
-        final List<VersionBomComponentView> versionBomComponentViews = getAllResponsesFromLinkResponse(projectVersionView, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        final List<VersionBomComponentView> versionBomComponentViews = getResponsesFromLinkResponse(projectVersionView, ProjectVersionView.COMPONENTS_LINK_RESPONSE, true);
         return versionBomComponentViews;
     }
 
     public List<VulnerableComponentView> getVulnerableComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = getProjectByName(projectName);
         final ProjectVersionView projectVersionView = getProjectVersion(projectItem, projectVersionName);
-        final List<VulnerableComponentView> vulnerableBomComponentViews = getAllResponsesFromLinkResponse(projectVersionView, ProjectVersionView.VULNERABLE_COMPONENTS_LINK_RESPONSE);
+        final List<VulnerableComponentView> vulnerableBomComponentViews = getResponsesFromLinkResponse(projectVersionView, ProjectVersionView.VULNERABLE_COMPONENTS_LINK_RESPONSE, true);
         return vulnerableBomComponentViews;
     }
 
@@ -285,7 +276,7 @@ public class ProjectDataService extends HubService {
     }
 
     public List<VersionBomComponentModel> getComponentsWithMatchedFilesForProjectVersion(final ProjectVersionView version) throws IntegrationException {
-        final List<VersionBomComponentView> bomComponents = getAllResponsesFromLinkResponse(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        final List<VersionBomComponentView> bomComponents = getResponsesFromLinkResponse(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE, true);
         final List<VersionBomComponentModel> modelBomComponents = new ArrayList<>(bomComponents.size());
         for (final VersionBomComponentView component : bomComponents) {
             modelBomComponents.add(new VersionBomComponentModel(component, getMatchedFiles(component)));
@@ -295,7 +286,7 @@ public class ProjectDataService extends HubService {
 
     private List<MatchedFileView> getMatchedFiles(final VersionBomComponentView component) throws IntegrationException {
         List<MatchedFileView> matchedFiles = new ArrayList<>(0);
-        final List<MatchedFileView> tempMatchedFiles = getAllResponsesFromLinkResponseSafely(component, VersionBomComponentView.MATCHED_FILES_LINK_RESPONSE);
+        final List<MatchedFileView> tempMatchedFiles = getResponsesFromLinkResponseSafely(component, VersionBomComponentView.MATCHED_FILES_LINK_RESPONSE, true);
         if (tempMatchedFiles != null && tempMatchedFiles.isEmpty()) {
             matchedFiles = tempMatchedFiles;
         }
