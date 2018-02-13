@@ -55,7 +55,7 @@ class DryRunUploadServiceTestIT {
 
     @Test
     public void testDryRunUpload(){
-        HubDataServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
+        HubDataServicesFactory services = restConnectionTestHelper.createHubDataServicesFactory(logger)
         DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.getRestConnection())
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)

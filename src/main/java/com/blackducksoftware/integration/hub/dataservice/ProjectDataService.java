@@ -47,12 +47,11 @@ import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.dataservice.component.model.VersionBomComponentModel;
 import com.blackducksoftware.integration.hub.dataservice.project.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
+import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
-import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class ProjectDataService extends HubDataService {
@@ -71,9 +70,7 @@ public class ProjectDataService extends HubDataService {
         if (StringUtils.isNotBlank(projectName)) {
             q = "name:" + projectName;
         }
-        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
-        requestWrapper.setQ(q);
-        final List<ProjectView> allProjectItems = getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true, requestWrapper);
+        final List<ProjectView> allProjectItems = getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true, new RequestWrapper().setQ(q));
         return allProjectItems;
     }
 
@@ -82,9 +79,7 @@ public class ProjectDataService extends HubDataService {
         if (StringUtils.isNotBlank(projectName)) {
             q = "name:" + projectName;
         }
-        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
-        requestWrapper.setQ(q);
-        requestWrapper.setLimitPerRequest(limit);
+        final RequestWrapper requestWrapper = new RequestWrapper().setQ(q).setLimit(limit);
         final List<ProjectView> projectItems = getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, false, requestWrapper);
         return projectItems;
     }
@@ -100,13 +95,12 @@ public class ProjectDataService extends HubDataService {
     }
 
     public String createHubProject(final ProjectRequest project) throws IntegrationException {
-        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, project);
-        return executePostRequestFromPathAndRetrieveURL(ApiDiscovery.PROJECTS_LINK, requestWrapper);
+        return executePostRequestFromPathAndRetrieveURL(ApiDiscovery.PROJECTS_LINK, new RequestWrapper(HttpMethod.POST).setBodyContentObject(project));
     }
 
     public void deleteHubProject(final ProjectView project) throws IntegrationException {
         final String uri = getHref(project);
-        try (Response response = executeUpdateRequest(uri, new UpdateRequestWrapper(HttpMethod.DELETE))) {
+        try (Response response = executeUpdateRequest(uri, new RequestWrapper(HttpMethod.DELETE))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -117,9 +111,7 @@ public class ProjectDataService extends HubDataService {
         if (StringUtils.isNotBlank(projectVersionName)) {
             q = String.format("versionName:%s", projectVersionName);
         }
-        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
-        requestWrapper.setQ(q);
-        final List<ProjectVersionView> allProjectVersionMatchingItems = getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true, requestWrapper);
+        final List<ProjectVersionView> allProjectVersionMatchingItems = getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true, new RequestWrapper().setQ(q));
         for (final ProjectVersionView projectVersion : allProjectVersionMatchingItems) {
             if (projectVersionName.equals(projectVersion.versionName)) {
                 return projectVersion;
@@ -133,8 +125,7 @@ public class ProjectDataService extends HubDataService {
     }
 
     public String createHubVersion(final String versionsUri, final ProjectVersionRequest version) throws IntegrationException {
-        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, version);
-        return executePostRequestAndRetrieveURL(versionsUri, requestWrapper);
+        return executePostRequestAndRetrieveURL(versionsUri, new RequestWrapper(HttpMethod.POST).setBodyContentObject(version));
     }
 
     public ProjectVersionWrapper getProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
@@ -237,8 +228,7 @@ public class ProjectDataService extends HubDataService {
     }
 
     public void addComponentToProjectVersion(final String mediaType, final String projectVersionComponentsUri, final String componentVersionUrl) throws IntegrationException {
-        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, "{\"component\": \"" + componentVersionUrl + "\"}");
-        try (Response response = executeUpdateRequest(projectVersionComponentsUri, requestWrapper)) {
+        try (Response response = executeUpdateRequest(projectVersionComponentsUri, new RequestWrapper(HttpMethod.POST).setBodyContent("{\"component\": \"" + componentVersionUrl + "\"}"))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

@@ -58,13 +58,11 @@ import com.blackducksoftware.integration.hub.dataservice.ScanStatusDataService;
 import com.blackducksoftware.integration.hub.dataservice.project.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
-import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
-import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
 import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.hub.service.HubDataServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -87,10 +85,9 @@ public class ComprehensiveCookbookTestIT {
         final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
         final IntLogger logger = hubDataServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
-        final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubDataServicesFactory.getRestConnection().baseUrl, hubDataServicesFactory.getRestConnection().gson);
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, hubDataServicesFactory, hubRequestFactory, metaHandler, testProjectName);
+        deleteIfProjectExists(logger, hubDataServicesFactory, metaHandler, testProjectName);
 
         // get the count of all projects now
         final int projectCount = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
@@ -129,10 +126,9 @@ public class ComprehensiveCookbookTestIT {
         final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
         final IntLogger logger = hubDataServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
-        final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubDataServicesFactory.getRestConnection().baseUrl, hubDataServicesFactory.getRestConnection().gson);
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, hubDataServicesFactory, hubRequestFactory, metaHandler, testProjectName);
+        deleteIfProjectExists(logger, hubDataServicesFactory, metaHandler, testProjectName);
 
         // get the count of all projects now
         final int projectCount = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
@@ -170,13 +166,12 @@ public class ComprehensiveCookbookTestIT {
         final Date startDate = new Date();
         final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
         final IntLogger logger = hubDataServicesFactory.getRestConnection().logger;
-        final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubDataServicesFactory.getRestConnection().baseUrl, hubDataServicesFactory.getRestConnection().gson);
         final MetaHandler metaHandler = new MetaHandler(logger);
         final ScanStatusDataService scanStatusDataService = hubDataServicesFactory.createScanStatusDataService(FIVE_MINUTES);
         final PolicyStatusDataService policyStatusDataService = hubDataServicesFactory.createPolicyStatusDataService();
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, hubDataServicesFactory, hubRequestFactory, metaHandler, "ek_mtglist");
+        deleteIfProjectExists(logger, hubDataServicesFactory, metaHandler, "ek_mtglist");
 
         // import the bdio
         final File file = restConnectionTestHelper.getFile("bdio/mtglist_bdio.jsonld");
@@ -241,12 +236,11 @@ public class ComprehensiveCookbookTestIT {
         final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
         final IntLogger logger = hubDataServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
-        final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubDataServicesFactory.getRestConnection().baseUrl, hubDataServicesFactory.getRestConnection().gson);
         final CLIDataService cliDataService = hubDataServicesFactory.createCLIDataService(TWENTY_MINUTES);
         final PolicyStatusDataService policyStatusDataService = hubDataServicesFactory.createPolicyStatusDataService();
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, hubDataServicesFactory, hubRequestFactory, metaHandler, projectName);
+        deleteIfProjectExists(logger, hubDataServicesFactory, metaHandler, projectName);
 
         try {
             hubDataServicesFactory.createProjectDataService().getProjectByName(projectName);
@@ -334,11 +328,10 @@ public class ComprehensiveCookbookTestIT {
         }
     }
 
-    private void deleteIfProjectExists(final IntLogger logger, final HubDataServicesFactory hubDataServicesFactory, final HubRequestFactory hubRequestFactory, final MetaHandler metaHandler, final String projectName) throws Exception {
+    private void deleteIfProjectExists(final IntLogger logger, final HubDataServicesFactory hubDataServicesFactory, final MetaHandler metaHandler, final String projectName) throws Exception {
         try {
             final ProjectView projectItem = hubDataServicesFactory.createProjectDataService().getProjectByName(projectName);
-            final Request deleteRequest = hubRequestFactory.createRequest(metaHandler.getHref(projectItem), new UpdateRequestWrapper(HttpMethod.DELETE));
-            try (Response response = hubDataServicesFactory.getRestConnection().executeRequest(deleteRequest)) {
+            try (Response response = hubDataServicesFactory.getRestConnection().executeRequest(new RequestWrapper(HttpMethod.DELETE).createUpdateRequest(metaHandler.getHref(projectItem)))) {
             }
         } catch (final HubIntegrationException e) {
             logger.warn("Project didn't exist");

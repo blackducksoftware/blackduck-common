@@ -53,10 +53,10 @@ import com.blackducksoftware.integration.hub.report.api.PolicyRule;
 import com.blackducksoftware.integration.hub.report.api.ReportData;
 import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
 import com.blackducksoftware.integration.hub.report.pdf.PDFBoxWriter;
+import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
@@ -366,8 +366,7 @@ public class ReportDataService extends HubDataService {
         json.addProperty("reportFormat", reportFormat.toString());
         json.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
 
-        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, json);
-        return executePostRequestAndRetrieveURL(reportUri, requestWrapper);
+        return executePostRequestAndRetrieveURL(reportUri, new RequestWrapper(HttpMethod.POST).setBodyContentObject(json));
     }
 
     /**
@@ -420,7 +419,7 @@ public class ReportDataService extends HubDataService {
     }
 
     public void deleteHubReport(final String reportUri) throws IntegrationException {
-        try (Response response = executeUpdateRequest(reportUri, new UpdateRequestWrapper(HttpMethod.DELETE))) {
+        try (Response response = executeUpdateRequest(reportUri, new RequestWrapper(HttpMethod.DELETE))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

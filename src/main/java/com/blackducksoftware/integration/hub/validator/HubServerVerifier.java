@@ -29,11 +29,12 @@ import java.net.URL;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
+import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
 import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.HubRequestFactory;
 import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnection;
 import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnectionBuilder;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
@@ -76,9 +77,9 @@ public class HubServerVerifier {
             } catch (final IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
-            final HubRequestFactory hubRequestFactory = new HubRequestFactory(hubURL, restConnection.gson);
-            request = hubRequestFactory.createGetRequestFromPath("download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
-            final String downloadUri = request.getUri();
+            final String downloadUri = HubDataService.pieceTogetherUri(hubURL, "download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
+            final RequestWrapper requestWrapper = new RequestWrapper();
+            request = requestWrapper.createGetRequest(downloadUri);
             try (Response response = restConnection.executeRequest(request)) {
             } catch (final IntegrationRestException e) {
                 throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);

@@ -26,10 +26,9 @@ package com.blackducksoftware.integration.hub.api.scan;
 import java.io.File;
 
 import com.blackducksoftware.integration.hub.dataservice.HubDataService;
-import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.UpdateRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
 public class DryRunUploadService extends HubDataService {
@@ -38,9 +37,8 @@ public class DryRunUploadService extends HubDataService {
     }
 
     public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws Exception {
-        final UpdateRequestWrapper requestWrapper = new UpdateRequestWrapper(HttpMethod.POST, dryRunFile);
-        final Request request = getHubRequestFactory().createRequestFromPath("api/v1/scans", requestWrapper);
-        try (Response response = getRestConnection().executeRequest(request)) {
+        final String uri = HubDataService.pieceTogetherUri(getRestConnection().baseUrl, "api/v1/scans");
+        try (Response response = getRestConnection().executeRequest(new RequestWrapper(HttpMethod.POST).setBodyContentFile(dryRunFile).createUpdateRequest(uri))) {
             final String responseString = response.getContentString();
             final DryRunUploadResponse uploadResponse = getGson().fromJson(responseString, DryRunUploadResponse.class);
             uploadResponse.json = responseString;
