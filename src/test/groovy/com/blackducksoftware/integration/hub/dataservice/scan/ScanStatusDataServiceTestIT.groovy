@@ -42,7 +42,7 @@ class ScanStatusDataServiceTestIT {
 
     @Test
     void testBdioImportForNewProject() {
-        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
+        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
 
         // import the bdio

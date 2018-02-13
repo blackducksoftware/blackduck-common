@@ -31,7 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.ApiKeyFieldEnum;
+import com.blackducksoftware.integration.hub.ApiKeyField;
 import com.blackducksoftware.integration.hub.Credentials;
 import com.blackducksoftware.integration.hub.CredentialsBuilder;
 import com.blackducksoftware.integration.hub.global.HubServerConfigFieldEnum;
@@ -130,7 +130,7 @@ public class HubServerConfigValidator extends AbstractValidator {
             validationResults.addAllResults(credentialsResults.getResultMap());
 
             if (validationResults.hasErrors()) {
-                validationResults.addResult(ApiKeyFieldEnum.API_KEY, new ValidationResult(ValidationResultEnum.ERROR, "No api key was found."));
+                validationResults.addResult(ApiKeyField.API_KEY, new ValidationResult(ValidationResultEnum.ERROR, "No api key was found."));
             }
         }
 

@@ -65,7 +65,7 @@ class CreateDetailedProjectRecipeTest {
          * fields are set correctly with the HubService, a general purpose API
          * wrapper to handle common GET requests and their response payloads
          */
-        HubDataService hubService = hubServicesFactory.createHubService()
+        HubDataService hubService = hubServicesFactory.createHubDataService()
         ProjectView projectView = hubService.getResponse(projectUrl, ProjectView.class)
         ProjectVersionView projectVersionView = hubService.getResponseFromLinkResponse(projectView, ProjectView.CANONICALVERSION_LINK_RESPONSE)
 
@@ -96,7 +96,7 @@ class CreateDetailedProjectRecipeTest {
 
     @AfterClass
     static void cleanup() {
-        def hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
+        def hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
         def projectDataService = hubServicesFactory.createProjectDataService()
         ProjectView createdProject = projectDataService.getProjectByName(PROJECT_NAME)
         projectDataService.deleteHubProject(createdProject)

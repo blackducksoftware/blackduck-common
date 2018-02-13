@@ -50,7 +50,7 @@ import com.blackducksoftware.integration.hub.dataservice.notification.transforme
 import com.blackducksoftware.integration.hub.dataservice.notification.transformer.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessor;
 import com.blackducksoftware.integration.hub.dataservice.parallel.ParallelResourceProcessorResults;
-import com.blackducksoftware.integration.hub.rest.GetRequestWrapper;
+import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 
@@ -111,10 +111,7 @@ public class NotificationDataService extends HubDataService {
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
-        requestWrapper.addQueryParameter("startDate", startDateString);
-        requestWrapper.addQueryParameter("endDate", endDateString);
-
+        final RequestWrapper requestWrapper = new RequestWrapper().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
         final List<NotificationView> allNotificationItems = getResponsesFromLinkResponse(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, true, requestWrapper, typeMap);
         return allNotificationItems;
     }
@@ -129,10 +126,7 @@ public class NotificationDataService extends HubDataService {
         queryParameters.put("startDate", startDateString);
         queryParameters.put("endDate", endDateString);
 
-        final GetRequestWrapper requestWrapper = new GetRequestWrapper();
-        requestWrapper.addQueryParameter("startDate", startDateString);
-        requestWrapper.addQueryParameter("endDate", endDateString);
-
+        final RequestWrapper requestWrapper = new RequestWrapper().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
         final List<NotificationView> allNotificationItems = getResponsesFromLinkResponse(user, ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, true, requestWrapper, typeMap);
         return allNotificationItems;
     }

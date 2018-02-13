@@ -65,7 +65,7 @@ class CodeLocationRequestServiceTestIT {
 
     @After
     public void testCleanup(){
-        HubDataServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
+        HubDataServicesFactory services = restConnectionTestHelper.createHubDataServicesFactory(logger)
         ProjectView project = services.createProjectDataService().getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
         services.createProjectDataService().deleteHubProject(project)
     }
@@ -75,7 +75,7 @@ class CodeLocationRequestServiceTestIT {
         final String projectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
         final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
-        HubDataServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
+        HubDataServicesFactory services = restConnectionTestHelper.createHubDataServicesFactory(logger)
         DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.getRestConnection())
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
@@ -88,7 +88,7 @@ class CodeLocationRequestServiceTestIT {
         projectBuilder.setProjectName(projectName)
         projectBuilder.setVersionName(versionName)
 
-        ProjectVersionView version = getProjectVersion(services.createHubService(), services.createProjectDataService(), projectBuilder.build())
+        ProjectVersionView version = getProjectVersion(services.createHubDataService(), services.createProjectDataService(), projectBuilder.build())
 
         services.createCodeLocationDataService().mapCodeLocation(codeLocationView, version)
         codeLocationView = services.createCodeLocationDataService().getCodeLocationById(response.codeLocationId)
