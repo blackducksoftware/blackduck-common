@@ -46,11 +46,12 @@ class ScanStatusDataServiceTestIT {
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
 
         // import the bdio
-        final File file = restConnectionTestHelper.getFile('bdio/GRADLE_rest_backend_rest_backend_4_2_0_SNAPSHOT_bdio.jsonld')
+        final File file = restConnectionTestHelper.getFile('bdio/GRADLE_com_blackducksoftware_integration_hub_common_27_0_0_SNAPSHOT_hub_common_bdio.jsonld')
         String contents = file.text
-        String uniqueName = "rest-backend-${System.currentTimeMillis()}"
-        String version = '4.2.0-SNAPSHOT'
-        String alteredContents = contents.replace('"name": "rest-backend",', "\"name\": \"${uniqueName}\",")
+        String uniqueName = "hub-common-${System.currentTimeMillis()}"
+        String version = '27.0.0-SNAPSHOT'
+        String replacement = String.format('"name": "%s",', uniqueName)
+        String alteredContents = contents.replace('"name": "hub-common",', replacement)
         File uniquelyNamedBdio = File.createTempFile('uniquebdio', '.jsonld')
         uniquelyNamedBdio << alteredContents
         try {
