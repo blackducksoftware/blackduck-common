@@ -55,18 +55,18 @@ class DryRunUploadServiceTestIT {
 
     @Test
     public void testDryRunUpload(){
-        HubServicesFactory services = restConnectionTestHelper.createHubDataServicesFactory(logger)
+        HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.getRestConnection())
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
-        CodeLocationView codeLocationView = services.createCodeLocationDataService().getCodeLocationById(response.codeLocationId)
+        CodeLocationView codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
 
         //cleanup
-        services.createCodeLocationDataService().deleteCodeLocation(codeLocationView)
+        services.createCodeLocationService().deleteCodeLocation(codeLocationView)
         try{
-            services.createCodeLocationDataService().getCodeLocationById(response.codeLocationId)
+            services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
             Assert.fail('This should have thrown an exception')
         } catch (IntegrationRestException e){
             Assert.assertEquals(404, e.getHttpStatusCode())

@@ -42,7 +42,7 @@ class ScanStatusDataServiceTestIT {
 
     @Test
     void testBdioImportForNewProject() {
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
 
         // import the bdio
@@ -55,15 +55,15 @@ class ScanStatusDataServiceTestIT {
         File uniquelyNamedBdio = File.createTempFile('uniquebdio', '.jsonld')
         uniquelyNamedBdio << alteredContents
         try {
-            hubServicesFactory.createCodeLocationDataService().importBomFile(uniquelyNamedBdio);
+            hubServicesFactory.createCodeLocationService().importBomFile(uniquelyNamedBdio);
             // wait for the scan to start/finish
             try {
-                hubServicesFactory.createScanStatusDataService(FIVE_MINUTES).assertBomImportScanStartedThenFinished(uniqueName, version);
+                hubServicesFactory.createScanStatusService(FIVE_MINUTES).assertBomImportScanStartedThenFinished(uniqueName, version);
             } catch (Exception e) {
                 Assert.fail("Nothing should have been thrown: " + e.getMessage())
             }
         } finally {
-            ProjectService projectDataService = hubServicesFactory.createProjectDataService()
+            ProjectService projectDataService = hubServicesFactory.createProjectService()
             ProjectView project =  projectDataService.getProjectByName(uniqueName)
             projectDataService.deleteHubProject(project)
         }

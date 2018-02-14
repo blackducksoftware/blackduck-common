@@ -23,15 +23,15 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
          * let's create the project/version in the Hub
          */
         ProjectRequest projectRequest = createProjectRequest(PROJECT_NAME, PROJECT_VERSION_NAME)
-        ProjectService projectDataService = hubServicesFactory.createProjectDataService()
-        String projectUrl = projectDataService.createHubProject(projectRequest)
+        ProjectService projectService = hubServicesFactory.createProjectService()
+        String projectUrl = projectService.createHubProject(projectRequest)
 
         /*
          * using the url of the created project, we can now verify that the
          * fields are set correctly with the HubService, a general purpose API
          * wrapper to handle common GET requests and their response payloads
          */
-        HubService hubService = hubServicesFactory.createHubDataService()
+        HubService hubService = hubServicesFactory.createHubService()
         ProjectView projectView = hubService.getResponse(projectUrl, ProjectView.class)
         ProjectVersionView projectVersionView = hubService.getResponseFromLinkResponse(projectView, ProjectView.CANONICALVERSION_LINK_RESPONSE)
 
@@ -45,8 +45,8 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
 
     @After
     void cleanup() {
-        def projectDataService = hubServicesFactory.createProjectDataService()
-        ProjectView createdProject = projectDataService.getProjectByName(PROJECT_NAME)
-        projectDataService.deleteHubProject(createdProject)
+        def projectService = hubServicesFactory.createProjectService()
+        ProjectView createdProject = projectService.getProjectByName(PROJECT_NAME)
+        projectService.deleteHubProject(createdProject)
     }
 }

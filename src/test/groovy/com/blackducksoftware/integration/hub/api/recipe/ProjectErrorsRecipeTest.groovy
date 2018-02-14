@@ -25,9 +25,9 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
          * Let's try and find a project that doesn't exist, which should throw a DoesNotExistException
          */
         uniqueName = PROJECT_NAME_NOT_FOUND + System.currentTimeMillis()
-        ProjectService projectDataService = hubServicesFactory.createProjectDataService()
+        ProjectService projectService = hubServicesFactory.createProjectService()
         try {
-            ProjectView projectView = projectDataService.getProjectByName(uniqueName)
+            ProjectView projectView = projectService.getProjectByName(uniqueName)
             fail('Should have throws a DoesNotExistException')
         } catch (Exception e) {
             assertTrue(e instanceof DoesNotExistException)
@@ -42,14 +42,14 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
          */
         uniqueName = PROJECT_NAME_NOT_FOUND + System.currentTimeMillis()
         ProjectRequest projectRequest = createProjectRequest(uniqueName, PROJECT_VERSION_NAME)
-        ProjectService projectDataService = hubServicesFactory.createProjectDataService()
-        String projectUrl = projectDataService.createHubProject(projectRequest)
+        ProjectService projectService = hubServicesFactory.createProjectService()
+        String projectUrl = projectService.createHubProject(projectRequest)
 
         /*
          * Try to create a project with the same name, which should throw an Exception
          */
         try {
-            projectDataService.createHubProject(projectRequest)
+            projectService.createHubProject(projectRequest)
             fail('Should have thrown an IntegrationRestException')
         } catch (Exception e) {
             assertTrue(e instanceof IntegrationRestException)
@@ -60,10 +60,10 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
 
     @After
     void cleanup() {
-        def projectDataService = hubServicesFactory.createProjectDataService()
+        def projectService = hubServicesFactory.createProjectService()
         try {
-            ProjectView createdProject = projectDataService.getProjectByName(uniqueName)
-            projectDataService.deleteHubProject(createdProject)
+            ProjectView createdProject = projectService.getProjectByName(uniqueName)
+            projectService.deleteHubProject(createdProject)
         } catch (DoesNotExistException e) {
             //we may or may not have created a project, so there may not be something to delete
         }

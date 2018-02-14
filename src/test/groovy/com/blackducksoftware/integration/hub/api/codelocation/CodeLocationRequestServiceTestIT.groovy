@@ -65,9 +65,9 @@ class CodeLocationRequestServiceTestIT {
 
     @After
     public void testCleanup(){
-        HubServicesFactory services = restConnectionTestHelper.createHubDataServicesFactory(logger)
-        ProjectView project = services.createProjectDataService().getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
-        services.createProjectDataService().deleteHubProject(project)
+        HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
+        ProjectView project = services.createProjectService().getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
+        services.createProjectService().deleteHubProject(project)
     }
 
     @Test
@@ -75,12 +75,12 @@ class CodeLocationRequestServiceTestIT {
         final String projectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
         final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
-        HubServicesFactory services = restConnectionTestHelper.createHubDataServicesFactory(logger)
+        HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.getRestConnection())
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
-        CodeLocationView codeLocationView = services.createCodeLocationDataService().getCodeLocationById(response.codeLocationId)
+        CodeLocationView codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
 
@@ -88,40 +88,40 @@ class CodeLocationRequestServiceTestIT {
         projectBuilder.setProjectName(projectName)
         projectBuilder.setVersionName(versionName)
 
-        ProjectVersionView version = getProjectVersion(services.createHubDataService(), services.createProjectDataService(), projectBuilder.build())
+        ProjectVersionView version = getProjectVersion(services.createHubService(), services.createProjectService(), projectBuilder.build())
 
-        services.createCodeLocationDataService().mapCodeLocation(codeLocationView, version)
-        codeLocationView = services.createCodeLocationDataService().getCodeLocationById(response.codeLocationId)
+        services.createCodeLocationService().mapCodeLocation(codeLocationView, version)
+        codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isNotBlank(codeLocationView.mappedProjectVersion))
 
-        services.createCodeLocationDataService().unmapCodeLocation(codeLocationView)
-        codeLocationView = services.createCodeLocationDataService().getCodeLocationById(response.codeLocationId)
+        services.createCodeLocationService().unmapCodeLocation(codeLocationView)
+        codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
 
-        services.createCodeLocationDataService().deleteCodeLocation(codeLocationView)
+        services.createCodeLocationService().deleteCodeLocation(codeLocationView)
         try {
-            services.createCodeLocationDataService().getCodeLocationById(response.codeLocationId)
+            services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
             Assert.fail('This should have thrown an exception')
         } catch (IntegrationRestException e){
             Assert.assertEquals(404, e.getHttpStatusCode())
         }
     }
 
-    private ProjectVersionView getProjectVersion(HubService hubService, ProjectService projectDataService, final ProjectRequest projectRequest) throws IntegrationException {
+    private ProjectVersionView getProjectVersion(HubService hubService, ProjectService projectService, final ProjectRequest projectRequest) throws IntegrationException {
         ProjectView project = null
         try {
-            project = projectDataService.getProjectByName(projectRequest.name)
+            project = projectService.getProjectByName(projectRequest.name)
         } catch (final DoesNotExistException e) {
-            final String projectURL = projectDataService.createHubProject(projectRequest)
+            final String projectURL = projectService.createHubProject(projectRequest)
             project = hubService.getResponse(projectURL, ProjectView.class)
         }
         ProjectVersionView version = null
         try {
-            version = projectDataService.getProjectVersion(project, projectRequest.versionRequest.versionName)
+            version = projectService.getProjectVersion(project, projectRequest.versionRequest.versionName)
         } catch (final DoesNotExistException e) {
-            final String versionURL = projectDataService.createHubVersion(project, projectRequest.versionRequest)
+            final String versionURL = projectService.createHubVersion(project, projectRequest.versionRequest)
             version = hubService.getResponse(versionURL, ProjectVersionView.class)
         }
         return version
