@@ -9,7 +9,7 @@ import org.junit.experimental.categories.Category
 import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
-import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService
+import com.blackducksoftware.integration.hub.dataservice.ProjectDataService
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
 

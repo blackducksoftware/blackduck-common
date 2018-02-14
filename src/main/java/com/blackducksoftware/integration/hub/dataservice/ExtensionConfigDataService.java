@@ -32,12 +32,12 @@ import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensio
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.notification.ParallelResourceProcessor;
-import com.blackducksoftware.integration.hub.notification.ParallelResourceProcessorResults;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.model.UserConfigItem;
 import com.blackducksoftware.integration.hub.service.model.UserConfigTransform;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessor;
+import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessorResults;
 
 public class ExtensionConfigDataService extends HubDataService {
     private final UserConfigTransform userConfigTransform;
@@ -47,7 +47,7 @@ public class ExtensionConfigDataService extends HubDataService {
         super(restConnection);
         userConfigTransform = new UserConfigTransform(this);
         parallelProcessor = new ParallelResourceProcessor<>(logger);
-        parallelProcessor.addTransform(ExternalExtensionUserView.class, userConfigTransform);
+        parallelProcessor.addTransformer(ExternalExtensionUserView.class, userConfigTransform);
     }
 
     public Map<String, ExternalExtensionConfigValueView> getGlobalConfigMap(final String extensionUrl) throws IntegrationException {
