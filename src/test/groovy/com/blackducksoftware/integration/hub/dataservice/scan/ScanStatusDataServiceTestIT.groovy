@@ -54,7 +54,7 @@ class ScanStatusDataServiceTestIT {
         File uniquelyNamedBdio = File.createTempFile('uniquebdio', '.jsonld')
         uniquelyNamedBdio << alteredContents
         try {
-            hubServicesFactory.createCodeLocationDataService().importBomFile(uniquelyNamedBdio, 'application/ld+json');
+            hubServicesFactory.createCodeLocationDataService().importBomFile(uniquelyNamedBdio);
             // wait for the scan to start/finish
             try {
                 hubServicesFactory.createScanStatusDataService(FIVE_MINUTES).assertBomImportScanStartedThenFinished(uniqueName, version);
