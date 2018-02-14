@@ -37,9 +37,9 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
-import com.blackducksoftware.integration.hub.service.HubDataServicesFactory;
+import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
 @Category(IntegrationTest.class)
 public class AggregateBomServiceTestIT {
@@ -47,9 +47,9 @@ public class AggregateBomServiceTestIT {
 
     @Test
     public void testGetBomEntriesForUrl() throws IllegalArgumentException, IntegrationException {
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
         final MetaHandler metaHandler = new MetaHandler(restConnectionTestHelper.createIntLogger());
-        final HubDataService hubService = hubDataServicesFactory.createHubDataService();
+        final HubService hubService = hubDataServicesFactory.createHubDataService();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
         final String testProjectVersionName = "BomRequestServiceTest";
@@ -83,7 +83,7 @@ public class AggregateBomServiceTestIT {
 
     @Test
     public void testGetBomEntriesForProjectVersion() throws IllegalArgumentException, IntegrationException {
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
         final String testProjectVersionName = "BomRequestServiceTest";

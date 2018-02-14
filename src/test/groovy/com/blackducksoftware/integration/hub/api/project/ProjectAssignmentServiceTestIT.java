@@ -40,11 +40,11 @@ import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequ
 import com.blackducksoftware.integration.hub.api.generated.view.AssignedUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
-import com.blackducksoftware.integration.hub.service.HubDataServicesFactory;
+import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
 @Category(IntegrationTest.class)
 public class ProjectAssignmentServiceTestIT {
-    private static HubDataServicesFactory hubDataServicesFactory;
+    private static HubServicesFactory hubDataServicesFactory;
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
     private static ProjectView project = null;
 

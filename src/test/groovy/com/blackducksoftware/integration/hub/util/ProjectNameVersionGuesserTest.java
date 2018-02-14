@@ -26,6 +26,9 @@ package com.blackducksoftware.integration.hub.util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.hub.service.model.ProjectNameVersionGuess;
+import com.blackducksoftware.integration.hub.service.model.ProjectNameVersionGuesser;
+
 public class ProjectNameVersionGuesserTest {
     @Test
     public void testProjectNameVersionGuess() {

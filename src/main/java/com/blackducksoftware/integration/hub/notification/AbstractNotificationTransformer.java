@@ -32,34 +32,33 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersion
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.service.model.ProjectVersionModel;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.parallel.processor.ItemTransformer;
 
 public abstract class AbstractNotificationTransformer implements ItemTransformer<NotificationContentItem, NotificationView> {
     private final IntLogger logger;
-    private final HubDataService hubResponseService;
+    private final HubService hubResponseService;
     private final MetaHandler metaHandler;
 
-    public AbstractNotificationTransformer(final HubDataService hubResponseService,
+    public AbstractNotificationTransformer(final HubService hubResponseService,
             final MetaHandler metaHandler) {
         this.hubResponseService = hubResponseService;
         this.logger = new IntBufferedLogger();
         this.metaHandler = metaHandler;
     }
 
-    public AbstractNotificationTransformer(final HubDataService hubResponseService, final IntLogger logger,
+    public AbstractNotificationTransformer(final HubService hubResponseService, final IntLogger logger,
             final MetaHandler metaHandler) {
         this.hubResponseService = hubResponseService;
         this.logger = logger;
         this.metaHandler = metaHandler;
     }
 
-    public HubDataService getHubDataService() {
+    public HubService getHubDataService() {
         return hubResponseService;
     }
 

@@ -37,9 +37,9 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.LicenseOw
 import com.blackducksoftware.integration.hub.api.generated.view.ComplexLicenseView;
 import com.blackducksoftware.integration.hub.bdio.SimpleBdioFactory;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
-import com.blackducksoftware.integration.hub.dataservice.LicenseDataService;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
-import com.blackducksoftware.integration.hub.service.HubDataServicesFactory;
+import com.blackducksoftware.integration.hub.service.HubServicesFactory;
+import com.blackducksoftware.integration.hub.service.LicenseService;
 
 @Category(IntegrationTest.class)
 public class LicenseDataServiceTestIT {
@@ -47,8 +47,8 @@ public class LicenseDataServiceTestIT {
 
     @Test
     public void testGettingLicenseFromComponentVersion() throws Exception {
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
-        final LicenseDataService licenseDataService = hubDataServicesFactory.createLicenseDataService();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final LicenseService licenseDataService = hubDataServicesFactory.createLicenseDataService();
 
         final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
         final ExternalId guavaExternalId = simpleBdioFactory.createMavenExternalId("com.google.guava", "guava", "20.0");

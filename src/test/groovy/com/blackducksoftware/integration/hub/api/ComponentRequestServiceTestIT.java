@@ -32,9 +32,9 @@ import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.bdio.SimpleBdioFactory;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
-import com.blackducksoftware.integration.hub.dataservice.ComponentDataService;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
-import com.blackducksoftware.integration.hub.service.HubDataServicesFactory;
+import com.blackducksoftware.integration.hub.service.ComponentService;
+import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
 @Category(IntegrationTest.class)
 public class ComponentRequestServiceTestIT {
@@ -42,8 +42,8 @@ public class ComponentRequestServiceTestIT {
 
     @Test
     public void testGettingHubCommon() throws Exception {
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
-        final ComponentDataService componentRequestService = hubDataServicesFactory.createComponentDataService();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final ComponentService componentRequestService = hubDataServicesFactory.createComponentDataService();
         final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
 
         final ExternalId hubCommonExternalId = simpleBdioFactory.createMavenExternalId("com.blackducksoftware.integration", "hub-common", "2.1.0");

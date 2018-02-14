@@ -43,11 +43,11 @@ import org.junit.rules.TemporaryFolder;
 import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.response.CurrentVersionView;
-import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
+import com.blackducksoftware.integration.hub.configuration.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.TestingPropertyKey;
-import com.blackducksoftware.integration.hub.service.HubDataServicesFactory;
+import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.test.TestLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
@@ -449,7 +449,7 @@ public class CLIInstallerTestIT {
         exception.expect(IllegalArgumentException.class);
         final File installDir = folder.newFolder();
 
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
         final URL hubUrl = hubDataServicesFactory.getRestConnection().baseUrl;
 
         final CLIDownloadUtility cliDownloadService = hubDataServicesFactory.createCliDownloadUtility();
@@ -463,7 +463,7 @@ public class CLIInstallerTestIT {
         exception.expect(IllegalArgumentException.class);
         final File installDir = folder.newFolder();
 
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
         final URL hubUrl = hubDataServicesFactory.getRestConnection().baseUrl;
 
         final CurrentVersionView currentVersion = hubDataServicesFactory.createHubDataService().getResponseFromLinkResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
@@ -478,7 +478,7 @@ public class CLIInstallerTestIT {
         final TestLogger logger = new TestLogger();
         final File installDir = folder.newFolder();
         final CLILocation cliLocation = new CLILocation(logger, installDir);
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory(logger);
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory(logger);
         final URL hubUrl = hubDataServicesFactory.getRestConnection().baseUrl;
 
         final CurrentVersionView currentVersion = hubDataServicesFactory.createHubDataService().getResponseFromLinkResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
@@ -519,7 +519,7 @@ public class CLIInstallerTestIT {
         final CredentialsRestConnection restConnection = restConnectionTestHelper.getRestConnection(builder.build());
         restConnection.logger = logger;
 
-        final HubDataServicesFactory hubDataServicesFactory = new HubDataServicesFactory(restConnection);
+        final HubServicesFactory hubDataServicesFactory = new HubServicesFactory(restConnection);
         final URL hubUrl = restConnection.baseUrl;
 
         final CurrentVersionView currentVersion = hubDataServicesFactory.createHubDataService().getResponseFromLinkResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
@@ -562,7 +562,7 @@ public class CLIInstallerTestIT {
         final CredentialsRestConnection restConnection = restConnectionTestHelper.getRestConnection(builder.build());
         restConnection.logger = logger;
 
-        final HubDataServicesFactory hubDataServicesFactory = new HubDataServicesFactory(restConnection);
+        final HubServicesFactory hubDataServicesFactory = new HubServicesFactory(restConnection);
         final URL hubUrl = restConnection.baseUrl;
 
         final CurrentVersionView currentVersion = hubDataServicesFactory.createHubDataService().getResponseFromLinkResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);

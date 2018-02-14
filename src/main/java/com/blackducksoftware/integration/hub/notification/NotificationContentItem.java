@@ -30,7 +30,6 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
-import com.blackducksoftware.integration.hub.service.model.ProjectVersionModel;
 
 public class NotificationContentItem implements Comparable<NotificationContentItem> {
     private final ProjectVersionModel projectVersion;

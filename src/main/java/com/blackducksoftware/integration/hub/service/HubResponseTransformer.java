@@ -30,7 +30,6 @@ import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.core.HubView;
 import com.blackducksoftware.integration.hub.api.core.LinkSingleResponse;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.RequestWrapper;
@@ -84,7 +83,7 @@ public class HubResponseTransformer {
     }
 
     public <T extends HubResponse> T getResponseFromPath(final String path, final Class<T> clazz, final RequestWrapper requestWrapper) throws IntegrationException {
-        final String uri = HubDataService.pieceTogetherUri(restConnection.baseUrl, path);
+        final String uri = HubService.pieceTogetherUri(restConnection.baseUrl, path);
         return getResponse(requestWrapper.createGetRequest(uri), clazz);
     }
 
@@ -93,7 +92,7 @@ public class HubResponseTransformer {
     }
 
     public <T extends HubResponse> T getResponseFromLinkResponse(final LinkSingleResponse<T> linkSingleResponse, final RequestWrapper requestWrapper) throws IntegrationException {
-        final String uri = HubDataService.pieceTogetherUri(restConnection.baseUrl, linkSingleResponse.link);
+        final String uri = HubService.pieceTogetherUri(restConnection.baseUrl, linkSingleResponse.link);
         return getResponse(requestWrapper.createGetRequest(uri), linkSingleResponse.responseClass);
     }
 

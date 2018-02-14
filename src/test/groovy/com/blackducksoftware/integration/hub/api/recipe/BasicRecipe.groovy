@@ -5,11 +5,11 @@ import org.junit.Before
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
-import com.blackducksoftware.integration.hub.global.HubServerConfig
-import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder
+import com.blackducksoftware.integration.hub.configuration.HubServerConfig
 import com.blackducksoftware.integration.hub.rest.RestConnection
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
-import com.blackducksoftware.integration.hub.service.HubDataServicesFactory
+import com.blackducksoftware.integration.hub.service.HubServicesFactory
+import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.test.TestLogger
 
@@ -18,7 +18,7 @@ class BasicRecipe {
     static final String PROJECT_VERSION_NAME = '0.0.1-SNAPSHOT'
     static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper()
 
-    HubDataServicesFactory hubDataServicesFactory;
+    HubServicesFactory hubServicesFactory;
 
     @Before
     void startRecipe() {
@@ -42,7 +42,7 @@ class BasicRecipe {
          * HubServicesFactory, the wrapper to get/use all the Hub API's
          */
         RestConnection restConnection = hubServerConfig.createCredentialsRestConnection(intLogger)
-        hubDataServicesFactory = new HubDataServicesFactory(restConnection)
+        hubServicesFactory = new HubServicesFactory(restConnection)
     }
 
     ProjectRequest createProjectRequest(String projectName, String projectVersionName) {

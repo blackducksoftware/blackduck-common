@@ -9,9 +9,9 @@ import org.junit.experimental.categories.Category
 import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
-import com.blackducksoftware.integration.hub.dataservice.ProjectDataService
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
+import com.blackducksoftware.integration.hub.service.ProjectService
 
 @Category(IntegrationTest.class)
 class ProjectErrorsRecipeTest extends BasicRecipe {
@@ -25,7 +25,7 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
          * Let's try and find a project that doesn't exist, which should throw a DoesNotExistException
          */
         uniqueName = PROJECT_NAME_NOT_FOUND + System.currentTimeMillis()
-        ProjectDataService projectDataService = hubDataServicesFactory.createProjectDataService()
+        ProjectService projectDataService = hubServicesFactory.createProjectDataService()
         try {
             ProjectView projectView = projectDataService.getProjectByName(uniqueName)
             fail('Should have throws a DoesNotExistException')
@@ -42,7 +42,7 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
          */
         uniqueName = PROJECT_NAME_NOT_FOUND + System.currentTimeMillis()
         ProjectRequest projectRequest = createProjectRequest(uniqueName, PROJECT_VERSION_NAME)
-        ProjectDataService projectDataService = hubDataServicesFactory.createProjectDataService()
+        ProjectService projectDataService = hubServicesFactory.createProjectDataService()
         String projectUrl = projectDataService.createHubProject(projectRequest)
 
         /*

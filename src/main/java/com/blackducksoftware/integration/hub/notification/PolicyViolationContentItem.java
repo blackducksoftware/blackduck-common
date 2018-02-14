@@ -29,7 +29,6 @@ import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.service.model.ProjectVersionModel;
 
 public class PolicyViolationContentItem extends PolicyContentItem {
     private final List<PolicyRuleView> policyRuleList;

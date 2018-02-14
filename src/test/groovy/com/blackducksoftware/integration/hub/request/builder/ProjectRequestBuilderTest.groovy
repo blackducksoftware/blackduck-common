@@ -32,6 +32,7 @@ import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequ
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
 import com.blackducksoftware.integration.hub.rest.RestConnection
+import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 
 class ProjectRequestBuilderTest {
 

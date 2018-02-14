@@ -40,8 +40,8 @@ import com.blackducksoftware.integration.hub.api.response.VulnerabilitySourceQua
 import com.blackducksoftware.integration.hub.notification.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationClearedContentItem;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationContentItem;
+import com.blackducksoftware.integration.hub.notification.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.notification.VulnerabilityContentItem;
-import com.blackducksoftware.integration.hub.service.model.ProjectVersionModel;
 
 public class EventTestUtil {
     public static final String DESCRIPTION = "description";

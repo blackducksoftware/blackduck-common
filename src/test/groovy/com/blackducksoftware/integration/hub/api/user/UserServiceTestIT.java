@@ -37,7 +37,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.RoleAssignmentView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.TestingPropertyKey;
-import com.blackducksoftware.integration.hub.service.HubDataServicesFactory;
+import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
 @Category(IntegrationTest.class)
 public class UserServiceTestIT {
@@ -46,7 +46,7 @@ public class UserServiceTestIT {
     // TODO - Tested in-house; we need a dedicated Hub 4.3.x instance for testing before we can uncomment this.
     // @Test
     public void getProjectsForUserTestIT() throws IllegalArgumentException, IntegrationException {
-        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
 
         final List<ProjectView> projectsForUser = hubServicesFactory.createUserGroupDataService().getProjectsForUser(restConnectionTestHelper.getTestUsername());
         assertNotNull(projectsForUser);
@@ -54,7 +54,7 @@ public class UserServiceTestIT {
 
     @Test
     public void getRolesForUserTestIT() throws IllegalArgumentException, IntegrationException {
-        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
 
         final List<RoleAssignmentView> rolesForUser = hubServicesFactory.createUserGroupDataService().getRolesForUser(restConnectionTestHelper.getTestUsername());
         assertTrue(rolesForUser.size() > 0);

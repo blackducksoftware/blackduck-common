@@ -30,9 +30,9 @@ import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 
 import com.blackducksoftware.integration.IntegrationTest
-import com.blackducksoftware.integration.hub.dataservice.ReportDataService
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
-import com.blackducksoftware.integration.hub.service.HubDataServicesFactory
+import com.blackducksoftware.integration.hub.service.HubServicesFactory
+import com.blackducksoftware.integration.hub.service.ReportService
 import com.blackducksoftware.integration.log.IntLogger
 
 @Category(IntegrationTest.class)
@@ -47,9 +47,9 @@ class RiskReportDataServiceTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
-        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        ReportDataService riskReportDataService = hubServicesFactory.createReportDataService(30000)
+        ReportService riskReportDataService = hubServicesFactory.createReportDataService(30000)
         File folderForReport = folderForReport.getRoot()
         File pdfFile = riskReportDataService.createReportPdfFile(folderForReport, testProjectName, testProjectVersionName)
         Assert.assertNotNull(pdfFile)
@@ -61,9 +61,9 @@ class RiskReportDataServiceTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
-        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        ReportDataService riskReportDataService = hubServicesFactory.createReportDataService(30000)
+        ReportService riskReportDataService = hubServicesFactory.createReportDataService(30000)
         File folderForReport = folderForReport.getRoot()
         riskReportDataService.createReportFiles(folderForReport, testProjectName, testProjectVersionName)
 
@@ -84,9 +84,9 @@ class RiskReportDataServiceTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
-        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        ReportDataService riskReportDataService = hubServicesFactory.createReportDataService(30000)
+        ReportService riskReportDataService = hubServicesFactory.createReportDataService(30000)
         File folderForReport = folderForReport.getRoot()
         File noticeReportFile = riskReportDataService.createNoticesReportFile(folderForReport, testProjectName, testProjectVersionName);
         Assert.assertNotNull(noticeReportFile)

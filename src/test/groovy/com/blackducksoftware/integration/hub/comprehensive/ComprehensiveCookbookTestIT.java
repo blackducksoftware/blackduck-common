@@ -51,19 +51,19 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.builder.HubScanConfigBuilder;
-import com.blackducksoftware.integration.hub.dataservice.CLIDataService;
-import com.blackducksoftware.integration.hub.dataservice.PolicyStatusDataService;
-import com.blackducksoftware.integration.hub.dataservice.ScanStatusDataService;
+import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
+import com.blackducksoftware.integration.hub.configuration.HubScanConfigBuilder;
+import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
-import com.blackducksoftware.integration.hub.scan.HubScanConfig;
-import com.blackducksoftware.integration.hub.service.HubDataServicesFactory;
+import com.blackducksoftware.integration.hub.service.SignatureScannerService;
+import com.blackducksoftware.integration.hub.service.HubServicesFactory;
+import com.blackducksoftware.integration.hub.service.PolicyStatusService;
+import com.blackducksoftware.integration.hub.service.ScanStatusService;
+import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.log.IntLogger;
 
@@ -82,7 +82,7 @@ public class ComprehensiveCookbookTestIT {
     public void createProjectVersion() throws Exception {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
 
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
         final IntLogger logger = hubDataServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
 
@@ -123,7 +123,7 @@ public class ComprehensiveCookbookTestIT {
     public void createProjectVersionSingleCall() throws Exception {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
 
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
         final IntLogger logger = hubDataServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
 
@@ -164,11 +164,11 @@ public class ComprehensiveCookbookTestIT {
     @Test
     public void testPolicyStatusFromBdioImport() throws Exception {
         final Date startDate = new Date();
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
         final IntLogger logger = hubDataServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
-        final ScanStatusDataService scanStatusDataService = hubDataServicesFactory.createScanStatusDataService(FIVE_MINUTES);
-        final PolicyStatusDataService policyStatusDataService = hubDataServicesFactory.createPolicyStatusDataService();
+        final ScanStatusService scanStatusDataService = hubDataServicesFactory.createScanStatusDataService(FIVE_MINUTES);
+        final PolicyStatusService policyStatusDataService = hubDataServicesFactory.createPolicyStatusDataService();
 
         // delete the project, if it exists
         deleteIfProjectExists(logger, hubDataServicesFactory, metaHandler, "ek_mtglist");
@@ -233,11 +233,11 @@ public class ComprehensiveCookbookTestIT {
         final String projectName = restConnectionTestHelper.getProperty("TEST_SCAN_PROJECT");
         final String versionName = restConnectionTestHelper.getProperty("TEST_SCAN_VERSION");
 
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
         final IntLogger logger = hubDataServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
-        final CLIDataService cliDataService = hubDataServicesFactory.createCLIDataService(TWENTY_MINUTES);
-        final PolicyStatusDataService policyStatusDataService = hubDataServicesFactory.createPolicyStatusDataService();
+        final SignatureScannerService cliDataService = hubDataServicesFactory.createCLIDataService(TWENTY_MINUTES);
+        final PolicyStatusService policyStatusDataService = hubDataServicesFactory.createPolicyStatusDataService();
 
         // delete the project, if it exists
         deleteIfProjectExists(logger, hubDataServicesFactory, metaHandler, projectName);
@@ -285,7 +285,7 @@ public class ComprehensiveCookbookTestIT {
 
     @Test
     public void testGettingAllProjectsAndVersions() throws Exception {
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
 
         final List<ProjectView> allProjects = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true);
         System.out.println(String.format("project count: %d", allProjects.size()));
@@ -303,7 +303,7 @@ public class ComprehensiveCookbookTestIT {
 
     @Test
     public void testGettingAllCodeLocations() throws Exception {
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
 
         final List<CodeLocationView> allCodeLocations = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true);
         System.out.println(String.format("code location count: %d", allCodeLocations.size()));
@@ -316,7 +316,7 @@ public class ComprehensiveCookbookTestIT {
 
     @Test
     public void testGettingAllUsers() throws Exception {
-        final HubDataServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
 
         final List<UserView> userItems = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.USERS_LINK_RESPONSE, true);
         System.out.println(String.format("user count: %d", userItems.size()));
@@ -328,7 +328,7 @@ public class ComprehensiveCookbookTestIT {
         }
     }
 
-    private void deleteIfProjectExists(final IntLogger logger, final HubDataServicesFactory hubDataServicesFactory, final MetaHandler metaHandler, final String projectName) throws Exception {
+    private void deleteIfProjectExists(final IntLogger logger, final HubServicesFactory hubDataServicesFactory, final MetaHandler metaHandler, final String projectName) throws Exception {
         try {
             final ProjectView projectItem = hubDataServicesFactory.createProjectDataService().getProjectByName(projectName);
             try (Response response = hubDataServicesFactory.getRestConnection().executeRequest(new RequestWrapper(HttpMethod.DELETE).createUpdateRequest(metaHandler.getHref(projectItem)))) {

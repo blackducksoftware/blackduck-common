@@ -29,9 +29,9 @@ import org.junit.experimental.categories.Category
 
 import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
-import com.blackducksoftware.integration.hub.dataservice.ProjectDataService
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
-import com.blackducksoftware.integration.hub.service.HubDataServicesFactory
+import com.blackducksoftware.integration.hub.service.HubServicesFactory
+import com.blackducksoftware.integration.hub.service.ProjectService
 import com.blackducksoftware.integration.log.IntLogger
 
 @Category(IntegrationTest.class)
@@ -42,7 +42,7 @@ class ScanStatusDataServiceTestIT {
 
     @Test
     void testBdioImportForNewProject() {
-        final HubDataServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
 
         // import the bdio
@@ -62,7 +62,7 @@ class ScanStatusDataServiceTestIT {
                 Assert.fail("Nothing should have been thrown: " + e.getMessage())
             }
         } finally {
-            ProjectDataService projectDataService = hubServicesFactory.createProjectDataService()
+            ProjectService projectDataService = hubServicesFactory.createProjectDataService()
             ProjectView project =  projectDataService.getProjectByName(uniqueName)
             projectDataService.deleteHubProject(project)
         }

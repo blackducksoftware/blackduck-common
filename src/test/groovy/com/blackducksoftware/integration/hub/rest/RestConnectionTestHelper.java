@@ -35,10 +35,10 @@ import java.util.logging.Logger;
 import org.apache.http.client.HttpClient;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
+import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
+import com.blackducksoftware.integration.hub.configuration.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.global.HubServerConfig;
-import com.blackducksoftware.integration.hub.service.HubDataServicesFactory;
+import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
@@ -129,11 +129,11 @@ public class RestConnectionTestHelper {
         return serverConfig.createCredentialsRestConnection(new PrintStreamIntLogger(System.out, logLevel));
     }
 
-    public HubDataServicesFactory createHubDataServicesFactory() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+    public HubServicesFactory createHubDataServicesFactory() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         return createHubDataServicesFactory(LogLevel.TRACE);
     }
 
-    public HubDataServicesFactory createHubDataServicesFactory(final LogLevel logLevel) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+    public HubServicesFactory createHubDataServicesFactory(final LogLevel logLevel) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         return createHubDataServicesFactory(createIntLogger(logLevel));
     }
 
@@ -145,10 +145,10 @@ public class RestConnectionTestHelper {
         return new PrintStreamIntLogger(System.out, logLevel);
     }
 
-    public HubDataServicesFactory createHubDataServicesFactory(final IntLogger logger) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+    public HubServicesFactory createHubDataServicesFactory(final IntLogger logger) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         final RestConnection restConnection = getIntegrationHubRestConnection();
         restConnection.logger = logger;
-        final HubDataServicesFactory hubServicesFactory = new HubDataServicesFactory(restConnection);
+        final HubServicesFactory hubServicesFactory = new HubServicesFactory(restConnection);
         return hubServicesFactory;
     }
 

@@ -34,7 +34,6 @@ import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.core.HubView;
 import com.blackducksoftware.integration.hub.api.core.LinkMultipleResponses;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.PagedRequest;
 import com.blackducksoftware.integration.hub.request.RequestWrapper;
@@ -68,7 +67,7 @@ public class HubResponsesTransformer {
 
     public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final RequestWrapper requestWrapper,
             final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
-        final String uri = HubDataService.pieceTogetherUri(restConnection.baseUrl, linkMultipleResponses.link);
+        final String uri = HubService.pieceTogetherUri(restConnection.baseUrl, linkMultipleResponses.link);
 
         return getResponses(requestWrapper.createPagedRequest(uri), linkMultipleResponses.responseClass, getAll, typeMap);
     }

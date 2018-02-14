@@ -35,18 +35,17 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.RuleViolationNotificationView;
-import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
-import com.blackducksoftware.integration.hub.service.model.ProjectVersionModel;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationTransformer(final HubDataService hubResponseService,
+    public PolicyViolationTransformer(final HubService hubResponseService,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaHandler) {
         super(hubResponseService, policyFilter, metaHandler);
     }
 
-    public PolicyViolationTransformer(final HubDataService hubResponseService, final IntLogger logger,
+    public PolicyViolationTransformer(final HubService hubResponseService, final IntLogger logger,
             final PolicyNotificationFilter policyFilter, final MetaHandler metaHandler) {
         super(hubResponseService, logger, policyFilter, metaHandler);
     }

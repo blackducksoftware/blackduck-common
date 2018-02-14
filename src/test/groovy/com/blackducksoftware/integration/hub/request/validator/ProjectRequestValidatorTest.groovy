@@ -28,10 +28,11 @@ import java.text.SimpleDateFormat
 import org.junit.Assert
 import org.junit.Test
 
-import com.blackducksoftware.integration.hub.request.ProjectRequestField
-import com.blackducksoftware.integration.hub.request.ProjectVersionRequestField
-import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.rest.RestConnection
+import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
+import com.blackducksoftware.integration.hub.service.model.ProjectRequestField
+import com.blackducksoftware.integration.hub.service.model.ProjectRequestValidator
+import com.blackducksoftware.integration.hub.service.model.ProjectVersionRequestField
 import com.blackducksoftware.integration.validator.ValidationResults
 
 class ProjectRequestValidatorTest {

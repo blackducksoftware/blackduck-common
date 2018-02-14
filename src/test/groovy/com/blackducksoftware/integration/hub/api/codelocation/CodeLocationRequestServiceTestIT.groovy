@@ -38,13 +38,13 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.api.scan.DryRunUploadResponse
 import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
-import com.blackducksoftware.integration.hub.dataservice.HubDataService
-import com.blackducksoftware.integration.hub.dataservice.ProjectDataService
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException
-import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
-import com.blackducksoftware.integration.hub.service.HubDataServicesFactory
+import com.blackducksoftware.integration.hub.service.HubService
+import com.blackducksoftware.integration.hub.service.HubServicesFactory
+import com.blackducksoftware.integration.hub.service.ProjectService
+import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
 import com.blackducksoftware.integration.log.PrintStreamIntLogger
@@ -65,7 +65,7 @@ class CodeLocationRequestServiceTestIT {
 
     @After
     public void testCleanup(){
-        HubDataServicesFactory services = restConnectionTestHelper.createHubDataServicesFactory(logger)
+        HubServicesFactory services = restConnectionTestHelper.createHubDataServicesFactory(logger)
         ProjectView project = services.createProjectDataService().getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
         services.createProjectDataService().deleteHubProject(project)
     }
@@ -75,7 +75,7 @@ class CodeLocationRequestServiceTestIT {
         final String projectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
         final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
-        HubDataServicesFactory services = restConnectionTestHelper.createHubDataServicesFactory(logger)
+        HubServicesFactory services = restConnectionTestHelper.createHubDataServicesFactory(logger)
         DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.getRestConnection())
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
@@ -109,7 +109,7 @@ class CodeLocationRequestServiceTestIT {
         }
     }
 
-    private ProjectVersionView getProjectVersion(HubDataService hubService, ProjectDataService projectDataService, final ProjectRequest projectRequest) throws IntegrationException {
+    private ProjectVersionView getProjectVersion(HubService hubService, ProjectService projectDataService, final ProjectRequest projectRequest) throws IntegrationException {
         ProjectView project = null
         try {
             project = projectDataService.getProjectByName(projectRequest.name)

@@ -25,19 +25,19 @@ package com.blackducksoftware.integration.hub.api.scan;
 
 import java.io.File;
 
-import com.blackducksoftware.integration.hub.dataservice.HubDataService;
 import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.HubService;
 
-public class DryRunUploadService extends HubDataService {
+public class DryRunUploadService extends HubService {
     public DryRunUploadService(final RestConnection restConnection) {
         super(restConnection);
     }
 
     public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws Exception {
-        final String uri = HubDataService.pieceTogetherUri(getRestConnection().baseUrl, "api/v1/scans");
+        final String uri = HubService.pieceTogetherUri(getRestConnection().baseUrl, "api/v1/scans");
         try (Response response = getRestConnection().executeRequest(new RequestWrapper(HttpMethod.POST).setBodyContentFile(dryRunFile).createUpdateRequest(uri))) {
             final String responseString = response.getContentString();
             final DryRunUploadResponse uploadResponse = getGson().fromJson(responseString, DryRunUploadResponse.class);

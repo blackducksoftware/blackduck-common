@@ -34,7 +34,7 @@ import org.mockito.Mockito;
 
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.notification.NotificationContentItem;
-import com.blackducksoftware.integration.hub.service.model.ProjectVersionModel;
+import com.blackducksoftware.integration.hub.notification.ProjectVersionModel;
 
 public class NotificationContentItemTest {
 
