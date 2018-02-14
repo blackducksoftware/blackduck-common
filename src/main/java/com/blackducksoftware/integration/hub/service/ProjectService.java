@@ -45,6 +45,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.VersionBomCompon
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerableComponentView;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
+import com.blackducksoftware.integration.hub.request.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
@@ -70,7 +71,7 @@ public class ProjectService extends HubService {
         if (StringUtils.isNotBlank(projectName)) {
             q = "name:" + projectName;
         }
-        final List<ProjectView> allProjectItems = getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true, new RequestWrapper().setQ(q));
+        final List<ProjectView> allProjectItems = getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true, new GetRequestWrapper().setQ(q));
         return allProjectItems;
     }
 
@@ -79,7 +80,7 @@ public class ProjectService extends HubService {
         if (StringUtils.isNotBlank(projectName)) {
             q = "name:" + projectName;
         }
-        final RequestWrapper requestWrapper = new RequestWrapper().setQ(q).setLimit(limit);
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper().setQ(q).setLimit(limit);
         final List<ProjectView> projectItems = getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, false, requestWrapper);
         return projectItems;
     }
@@ -100,7 +101,7 @@ public class ProjectService extends HubService {
 
     public void deleteHubProject(final ProjectView project) throws IntegrationException {
         final String uri = getHref(project);
-        try (Response response = executeUpdateRequest(uri, new RequestWrapper(HttpMethod.DELETE))) {
+        try (Response response = executeRequest(uri, new RequestWrapper(HttpMethod.DELETE))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -111,7 +112,7 @@ public class ProjectService extends HubService {
         if (StringUtils.isNotBlank(projectVersionName)) {
             q = String.format("versionName:%s", projectVersionName);
         }
-        final List<ProjectVersionView> allProjectVersionMatchingItems = getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true, new RequestWrapper().setQ(q));
+        final List<ProjectVersionView> allProjectVersionMatchingItems = getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true, new GetRequestWrapper().setQ(q));
         for (final ProjectVersionView projectVersion : allProjectVersionMatchingItems) {
             if (projectVersionName.equals(projectVersion.versionName)) {
                 return projectVersion;
@@ -228,7 +229,7 @@ public class ProjectService extends HubService {
     }
 
     public void addComponentToProjectVersion(final String mediaType, final String projectVersionComponentsUri, final String componentVersionUrl) throws IntegrationException {
-        try (Response response = executeUpdateRequest(projectVersionComponentsUri, new RequestWrapper(HttpMethod.POST).setBodyContent("{\"component\": \"" + componentVersionUrl + "\"}"))) {
+        try (Response response = executeRequest(projectVersionComponentsUri, new RequestWrapper(HttpMethod.POST).setBodyContent("{\"component\": \"" + componentVersionUrl + "\"}"))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

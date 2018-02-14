@@ -31,8 +31,8 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
+import com.blackducksoftware.integration.hub.request.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.request.Request;
-import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnection;
 import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnectionBuilder;
@@ -78,7 +78,7 @@ public class HubServerVerifier {
                 throw new IntegrationException(e.getMessage(), e);
             }
             final String downloadUri = HubService.pieceTogetherUri(hubURL, "download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
-            final RequestWrapper requestWrapper = new RequestWrapper();
+            final GetRequestWrapper requestWrapper = new GetRequestWrapper();
             request = requestWrapper.createGetRequest(downloadUri);
             try (Response response = restConnection.executeRequest(request)) {
             } catch (final IntegrationRestException e) {

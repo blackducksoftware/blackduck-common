@@ -48,7 +48,7 @@ import com.blackducksoftware.integration.hub.notification.PolicyViolationCleared
 import com.blackducksoftware.integration.hub.notification.PolicyViolationOverrideTransformer;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationTransformer;
 import com.blackducksoftware.integration.hub.notification.VulnerabilityTransformer;
-import com.blackducksoftware.integration.hub.request.RequestWrapper;
+import com.blackducksoftware.integration.hub.request.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessor;
@@ -111,7 +111,7 @@ public class NotificationService extends HubService {
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final RequestWrapper requestWrapper = new RequestWrapper().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
         final List<NotificationView> allNotificationItems = getResponsesFromLinkResponse(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, true, requestWrapper, typeMap);
         return allNotificationItems;
     }
@@ -126,7 +126,7 @@ public class NotificationService extends HubService {
         queryParameters.put("startDate", startDateString);
         queryParameters.put("endDate", endDateString);
 
-        final RequestWrapper requestWrapper = new RequestWrapper().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
         final List<NotificationView> allNotificationItems = getResponsesFromLinkResponse(user, ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, true, requestWrapper, typeMap);
         return allNotificationItems;
     }

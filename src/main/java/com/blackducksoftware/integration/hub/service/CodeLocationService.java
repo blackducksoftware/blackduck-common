@@ -38,6 +38,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
+import com.blackducksoftware.integration.hub.request.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
@@ -61,14 +62,14 @@ public class CodeLocationService extends HubService {
         }
 
         final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.POST).setBodyContent(jsonPayload).setMimeType(mimeType);
-        try (Response response = executeUpdateRequestFromPath(HubService.BOMIMPORT_LINK, requestWrapper)) {
+        try (Response response = executeRequestFromPath(HubService.BOMIMPORT_LINK, requestWrapper)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
     }
 
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationType codeLocationType) throws IntegrationException {
-        final RequestWrapper requestWrapper = new RequestWrapper().addQueryParameter("codeLocationType", codeLocationType.toString());
+        final GetRequestWrapper requestWrapper = new GetRequestWrapper().addQueryParameter("codeLocationType", codeLocationType.toString());
         final List<CodeLocationView> allCodeLocations = getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true, requestWrapper);
         return allCodeLocations;
     }
@@ -102,7 +103,7 @@ public class CodeLocationService extends HubService {
 
     public void updateCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws IntegrationException {
         final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.PUT).setBodyContent(codeLocationItemJson);
-        try (Response response = executeUpdateRequest(codeLocationItemUrl, requestWrapper)) {
+        try (Response response = executeRequest(codeLocationItemUrl, requestWrapper)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -121,7 +122,7 @@ public class CodeLocationService extends HubService {
     }
 
     public void deleteCodeLocation(final String codeLocationItemUrl) throws IntegrationException {
-        try (Response response = executeUpdateRequest(codeLocationItemUrl, new RequestWrapper(HttpMethod.DELETE))) {
+        try (Response response = executeRequest(codeLocationItemUrl, new RequestWrapper(HttpMethod.DELETE))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -129,7 +130,7 @@ public class CodeLocationService extends HubService {
 
     public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
-            final List<CodeLocationView> codeLocations = getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true, new RequestWrapper().setQ("name:" + codeLocationName));
+            final List<CodeLocationView> codeLocations = getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true, new GetRequestWrapper().setQ("name:" + codeLocationName));
             for (final CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.name)) {
                     return codeLocation;

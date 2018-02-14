@@ -43,7 +43,7 @@ public class IssueService extends HubService {
     }
 
     public void updateIssue(final IssueView issueItem, final String uri) throws IntegrationException {
-        try (Response response = executeUpdateRequest(uri, new RequestWrapper(HttpMethod.PUT).setBodyContentObject(issueItem))) {
+        try (Response response = executeRequest(uri, new RequestWrapper(HttpMethod.PUT).setBodyContentObject(issueItem))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -55,7 +55,7 @@ public class IssueService extends HubService {
     }
 
     public void deleteIssue(final String issueItemUri) throws IntegrationException {
-        try (Response response = executeUpdateRequest(issueItemUri, new RequestWrapper(HttpMethod.DELETE))) {
+        try (Response response = executeRequest(issueItemUri, new RequestWrapper(HttpMethod.DELETE))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

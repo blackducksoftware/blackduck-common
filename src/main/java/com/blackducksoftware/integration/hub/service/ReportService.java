@@ -419,7 +419,7 @@ public class ReportService extends HubService {
     }
 
     public void deleteHubReport(final String reportUri) throws IntegrationException {
-        try (Response response = executeUpdateRequest(reportUri, new RequestWrapper(HttpMethod.DELETE))) {
+        try (Response response = executeRequest(reportUri, new RequestWrapper(HttpMethod.DELETE))) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

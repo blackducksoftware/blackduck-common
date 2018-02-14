@@ -59,10 +59,10 @@ import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
-import com.blackducksoftware.integration.hub.service.SignatureScannerService;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.hub.service.PolicyStatusService;
 import com.blackducksoftware.integration.hub.service.ScanStatusService;
+import com.blackducksoftware.integration.hub.service.SignatureScannerService;
 import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -331,7 +331,7 @@ public class ComprehensiveCookbookTestIT {
     private void deleteIfProjectExists(final IntLogger logger, final HubServicesFactory hubDataServicesFactory, final MetaHandler metaHandler, final String projectName) throws Exception {
         try {
             final ProjectView projectItem = hubDataServicesFactory.createProjectDataService().getProjectByName(projectName);
-            try (Response response = hubDataServicesFactory.getRestConnection().executeRequest(new RequestWrapper(HttpMethod.DELETE).createUpdateRequest(metaHandler.getHref(projectItem)))) {
+            try (Response response = hubDataServicesFactory.getRestConnection().executeRequest(new RequestWrapper(HttpMethod.DELETE).createRequest(metaHandler.getHref(projectItem)))) {
             }
         } catch (final HubIntegrationException e) {
             logger.warn("Project didn't exist");

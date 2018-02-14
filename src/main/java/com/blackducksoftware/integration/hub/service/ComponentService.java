@@ -33,7 +33,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV2View;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.request.RequestWrapper;
+import com.blackducksoftware.integration.hub.request.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.model.HubMediaTypes;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -84,7 +84,7 @@ public class ComponentService extends HubService {
         final String hubOriginId = externalId.createHubOriginId();
         final String componentQuery = String.format("id:%s|%s", forge, hubOriginId);
 
-        final List<ComponentSearchResultView> allComponents = getResponsesFromLinkResponse(ApiDiscovery.COMPONENTS_LINK_RESPONSE, true, new RequestWrapper().setQ(componentQuery));
+        final List<ComponentSearchResultView> allComponents = getResponsesFromLinkResponse(ApiDiscovery.COMPONENTS_LINK_RESPONSE, true, new GetRequestWrapper().setQ(componentQuery));
         return allComponents;
     }
 
@@ -94,7 +94,7 @@ public class ComponentService extends HubService {
         if (null != componentVersionURL) {
             final ComponentVersionView componentVersion = getResponse(componentVersionURL, ComponentVersionView.class);
             final List<VulnerabilityV2View> vulnerabilityList = getResponsesFromLinkResponse(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, true,
-                    new RequestWrapper().setMimeType(HubMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1));
+                    new GetRequestWrapper().setMimeType(HubMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1));
             return vulnerabilityList;
         }
 

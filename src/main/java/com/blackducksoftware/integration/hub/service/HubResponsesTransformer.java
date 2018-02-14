@@ -35,8 +35,8 @@ import com.blackducksoftware.integration.hub.api.core.HubView;
 import com.blackducksoftware.integration.hub.api.core.LinkMultipleResponses;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.request.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.request.PagedRequest;
-import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonArray;
@@ -58,14 +58,14 @@ public class HubResponsesTransformer {
     }
 
     public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
-        return getResponsesFromLinkResponse(linkMultipleResponses, getAll, new RequestWrapper(), null);
+        return getResponsesFromLinkResponse(linkMultipleResponses, getAll, new GetRequestWrapper(), null);
     }
 
-    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final RequestWrapper requestWrapper) throws IntegrationException {
+    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final GetRequestWrapper requestWrapper) throws IntegrationException {
         return getResponsesFromLinkResponse(linkMultipleResponses, getAll, requestWrapper, null);
     }
 
-    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final RequestWrapper requestWrapper,
+    public <T extends HubResponse> List<T> getResponsesFromLinkResponse(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final GetRequestWrapper requestWrapper,
             final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
         final String uri = HubService.pieceTogetherUri(restConnection.baseUrl, linkMultipleResponses.link);
 
@@ -80,28 +80,28 @@ public class HubResponsesTransformer {
     }
 
     public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
-        return getResponsesFromLink(hubView, linkMultipleResponses, getAll, new RequestWrapper(), null);
+        return getResponsesFromLink(hubView, linkMultipleResponses, getAll, new GetRequestWrapper(), null);
     }
 
-    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final RequestWrapper requestWrapper) throws IntegrationException {
+    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final GetRequestWrapper requestWrapper) throws IntegrationException {
         return getResponsesFromLink(hubView, linkMultipleResponses, getAll, requestWrapper, null);
     }
 
-    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final RequestWrapper requestWrapper,
+    public <T extends HubResponse> List<T> getResponsesFromLink(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll, final GetRequestWrapper requestWrapper,
             final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
         final String link = metaHandler.getFirstLink(hubView, linkMultipleResponses.link);
         return getResponses(requestWrapper.createPagedRequest(link), linkMultipleResponses.responseClass, getAll, typeMap);
     }
 
     public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> clazz, final boolean getAll) throws IntegrationException {
-        return getResponses(new RequestWrapper().createPagedRequest(uri), clazz, getAll, null);
+        return getResponses(new GetRequestWrapper().createPagedRequest(uri), clazz, getAll, null);
     }
 
-    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> clazz, final boolean getAll, final RequestWrapper requestWrapper) throws IntegrationException {
+    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> clazz, final boolean getAll, final GetRequestWrapper requestWrapper) throws IntegrationException {
         return getResponses(requestWrapper.createPagedRequest(uri), clazz, getAll, null);
     }
 
-    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> clazz, final boolean getAll, final RequestWrapper requestWrapper,
+    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> clazz, final boolean getAll, final GetRequestWrapper requestWrapper,
             final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
         return getResponses(requestWrapper.createPagedRequest(uri), clazz, getAll, typeMap);
     }
@@ -129,7 +129,7 @@ public class HubResponsesTransformer {
             }
             while (allResponses.size() < totalCount && currentOffset < totalCount) {
                 currentOffset += pagedRequest.getLimit();
-                final PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getUri(), pagedRequest.getQueryParameters(), pagedRequest.getQ(), pagedRequest.getMethod(), pagedRequest.getMimeType(), pagedRequest.getBodyEncoding(),
+                final PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getUri(), pagedRequest.getQueryParameters(), pagedRequest.getMethod(), pagedRequest.getMimeType(), pagedRequest.getBodyEncoding(),
                         pagedRequest.getAdditionalHeaders(), pagedRequest.getLimit(), currentOffset);
                 try (Response response = restConnection.executeRequest(offsetPagedRequest)) {
                     final String jsonResponse = response.getContentString();
