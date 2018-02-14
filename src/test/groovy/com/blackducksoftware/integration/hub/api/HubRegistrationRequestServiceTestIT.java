@@ -31,7 +31,7 @@ import org.junit.experimental.categories.Category;
 
 import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
-import com.blackducksoftware.integration.hub.service.HubRegistrationDataService;
+import com.blackducksoftware.integration.hub.service.HubRegistrationService;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 
 @Category(IntegrationTest.class)
@@ -40,8 +40,8 @@ public class HubRegistrationRequestServiceTestIT {
 
     @Test
     public void testGettingAllProjects() throws Exception {
-        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
-        final HubRegistrationDataService hubRegistrationRequestService = hubDataServicesFactory.createHubRegistrationService();
+        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final HubRegistrationService hubRegistrationRequestService = hubDataServicesFactory.createHubRegistrationService();
         final String registrationId = hubRegistrationRequestService.getRegistrationId();
         assertTrue(StringUtils.isNotBlank(registrationId));
         System.out.println(registrationId);

@@ -82,56 +82,56 @@ public class ComprehensiveCookbookTestIT {
     public void createProjectVersion() throws Exception {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
 
-        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
-        final IntLogger logger = hubDataServicesFactory.getRestConnection().logger;
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, hubDataServicesFactory, metaHandler, testProjectName);
+        deleteIfProjectExists(logger, hubServicesFactory, metaHandler, testProjectName);
 
         // get the count of all projects now
-        final int projectCount = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
+        final int projectCount = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
 
         // create the project
         final ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.name = testProjectName;
-        final String projectUrl = hubDataServicesFactory.createProjectDataService().createHubProject(projectRequest);
-        final ProjectView projectItem = hubDataServicesFactory.createHubDataService().getResponse(projectUrl, ProjectView.class);
-        final ProjectView projectItemFromName = hubDataServicesFactory.createProjectDataService().getProjectByName(testProjectName);
+        final String projectUrl = hubServicesFactory.createProjectService().createHubProject(projectRequest);
+        final ProjectView projectItem = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);
+        final ProjectView projectItemFromName = hubServicesFactory.createProjectService().getProjectByName(testProjectName);
         // should return the same project
         assertEquals(projectItem.toString(), projectItemFromName.toString());
 
-        final int projectCountAfterCreate = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
+        final int projectCountAfterCreate = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
         assertTrue(projectCountAfterCreate > projectCount);
 
-        final int projectVersionCount = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE, true).size();
+        final int projectVersionCount = hubServicesFactory.createHubService().getResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE, true).size();
 
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
         projectVersionRequest.distribution = ProjectVersionDistributionType.INTERNAL;
         projectVersionRequest.phase = ProjectVersionPhaseType.DEVELOPMENT;
         projectVersionRequest.versionName = "RestConnectionTest";
-        final String projectVersionUrl = hubDataServicesFactory.createProjectDataService().createHubVersion(projectItem, projectVersionRequest);
-        final ProjectVersionView projectVersionItem = hubDataServicesFactory.createHubDataService().getResponse(projectVersionUrl, ProjectVersionView.class);
-        final ProjectVersionView projectVersionItemFromName = hubDataServicesFactory.createProjectDataService().getProjectVersion(projectItem, "RestConnectionTest");
+        final String projectVersionUrl = hubServicesFactory.createProjectService().createHubVersion(projectItem, projectVersionRequest);
+        final ProjectVersionView projectVersionItem = hubServicesFactory.createHubService().getResponse(projectVersionUrl, ProjectVersionView.class);
+        final ProjectVersionView projectVersionItemFromName = hubServicesFactory.createProjectService().getProjectVersion(projectItem, "RestConnectionTest");
         // should return the same project version
         assertEquals(projectVersionItem.toString(), projectVersionItemFromName.toString());
 
-        assertTrue(hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE, true).size() > projectVersionCount);
+        assertTrue(hubServicesFactory.createHubService().getResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE, true).size() > projectVersionCount);
     }
 
     @Test
     public void createProjectVersionSingleCall() throws Exception {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
 
-        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
-        final IntLogger logger = hubDataServicesFactory.getRestConnection().logger;
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, hubDataServicesFactory, metaHandler, testProjectName);
+        deleteIfProjectExists(logger, hubServicesFactory, metaHandler, testProjectName);
 
         // get the count of all projects now
-        final int projectCount = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
+        final int projectCount = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
 
         final String versionName = "RestConnectionTest";
         final ProjectVersionDistributionType distribution = ProjectVersionDistributionType.INTERNAL;
@@ -145,16 +145,16 @@ public class ComprehensiveCookbookTestIT {
         final ProjectRequest projectRequest = projectBuilder.build();
 
         // create the project
-        final String projectUrl = hubDataServicesFactory.createProjectDataService().createHubProject(projectRequest);
-        final ProjectView projectItem = hubDataServicesFactory.createHubDataService().getResponse(projectUrl, ProjectView.class);
-        final ProjectView projectItemFromName = hubDataServicesFactory.createProjectDataService().getProjectByName(testProjectName);
+        final String projectUrl = hubServicesFactory.createProjectService().createHubProject(projectRequest);
+        final ProjectView projectItem = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);
+        final ProjectView projectItemFromName = hubServicesFactory.createProjectService().getProjectByName(testProjectName);
         // should return the same project
         assertEquals(projectItem.toString(), projectItemFromName.toString());
 
-        final int projectCountAfterCreate = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
+        final int projectCountAfterCreate = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true).size();
         assertTrue(projectCountAfterCreate > projectCount);
 
-        final ProjectVersionView projectVersionItem = hubDataServicesFactory.createProjectDataService().getProjectVersion(projectItem, versionName);
+        final ProjectVersionView projectVersionItem = hubServicesFactory.createProjectService().getProjectVersion(projectItem, versionName);
 
         assertNotNull(projectVersionItem);
         assertEquals(versionName, projectVersionItem.versionName);
@@ -164,23 +164,23 @@ public class ComprehensiveCookbookTestIT {
     @Test
     public void testPolicyStatusFromBdioImport() throws Exception {
         final Date startDate = new Date();
-        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
-        final IntLogger logger = hubDataServicesFactory.getRestConnection().logger;
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
-        final ScanStatusService scanStatusDataService = hubDataServicesFactory.createScanStatusDataService(FIVE_MINUTES);
-        final PolicyStatusService policyStatusDataService = hubDataServicesFactory.createPolicyStatusDataService();
+        final ScanStatusService scanStatusService = hubServicesFactory.createScanStatusService(FIVE_MINUTES);
+        final PolicyStatusService policyStatusService = hubServicesFactory.createPolicyStatusService();
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, hubDataServicesFactory, metaHandler, "ek_mtglist");
+        deleteIfProjectExists(logger, hubServicesFactory, metaHandler, "ek_mtglist");
 
         // import the bdio
         final File file = restConnectionTestHelper.getFile("bdio/mtglist_bdio.jsonld");
-        hubDataServicesFactory.createCodeLocationDataService().importBomFile(file, "application/ld+json");
+        hubServicesFactory.createCodeLocationService().importBomFile(file, "application/ld+json");
         // wait for the scan to start/finish
-        scanStatusDataService.assertBomImportScanStartedThenFinished("ek_mtglist", "0.0.1");
+        scanStatusService.assertBomImportScanStartedThenFinished("ek_mtglist", "0.0.1");
 
         // make sure we have some code locations now
-        List<CodeLocationView> codeLocationItems = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true);
+        List<CodeLocationView> codeLocationItems = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true);
         assertTrue(codeLocationItems != null && codeLocationItems.size() > 0);
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             for (final CodeLocationView codeLocationItem : codeLocationItems) {
@@ -190,7 +190,7 @@ public class ComprehensiveCookbookTestIT {
         System.out.println("Number of code locations: " + codeLocationItems.size());
 
         // since we imported bdio, we should also have some BOM_IMPORT code locations
-        codeLocationItems = hubDataServicesFactory.createCodeLocationDataService().getAllCodeLocationsForCodeLocationType(CodeLocationType.BOM_IMPORT);
+        codeLocationItems = hubServicesFactory.createCodeLocationService().getAllCodeLocationsForCodeLocationType(CodeLocationType.BOM_IMPORT);
         assertTrue(codeLocationItems != null && codeLocationItems.size() > 0);
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             for (final CodeLocationView item : codeLocationItems) {
@@ -199,7 +199,7 @@ public class ComprehensiveCookbookTestIT {
         }
 
         // verify the policy
-        final VersionBomPolicyStatusView policyStatusItem = policyStatusDataService.getPolicyStatusForProjectAndVersion("ek_mtglist", "0.0.1");
+        final VersionBomPolicyStatusView policyStatusItem = policyStatusService.getPolicyStatusForProjectAndVersion("ek_mtglist", "0.0.1");
         assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
         System.out.println(policyStatusItem);
 
@@ -233,17 +233,17 @@ public class ComprehensiveCookbookTestIT {
         final String projectName = restConnectionTestHelper.getProperty("TEST_SCAN_PROJECT");
         final String versionName = restConnectionTestHelper.getProperty("TEST_SCAN_VERSION");
 
-        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
-        final IntLogger logger = hubDataServicesFactory.getRestConnection().logger;
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
-        final SignatureScannerService cliDataService = hubDataServicesFactory.createCLIDataService(TWENTY_MINUTES);
-        final PolicyStatusService policyStatusDataService = hubDataServicesFactory.createPolicyStatusDataService();
+        final SignatureScannerService cliService = hubServicesFactory.createSignatureScannerService(TWENTY_MINUTES);
+        final PolicyStatusService policyStatusService = hubServicesFactory.createPolicyStatusService();
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, hubDataServicesFactory, metaHandler, projectName);
+        deleteIfProjectExists(logger, hubServicesFactory, metaHandler, projectName);
 
         try {
-            hubDataServicesFactory.createProjectDataService().getProjectByName(projectName);
+            hubServicesFactory.createProjectService().getProjectByName(projectName);
             fail("The project should not exist.");
         } catch (final HubIntegrationException e) {
         }
@@ -271,27 +271,27 @@ public class ComprehensiveCookbookTestIT {
 
         final ProjectRequest projectRequest = projectRequestBuilder.build();
 
-        final ProjectVersionWrapper projectVersionWrapper = cliDataService.installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, true, (String) null, null, null);
+        final ProjectVersionWrapper projectVersionWrapper = cliService.installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, true, (String) null, null, null);
 
         assertNotNull(projectVersionWrapper);
         assertNotNull(projectVersionWrapper.getProjectView());
         assertNotNull(projectVersionWrapper.getProjectVersionView());
 
         // verify the policy
-        final VersionBomPolicyStatusView policyStatusItem = policyStatusDataService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView());
+        final VersionBomPolicyStatusView policyStatusItem = policyStatusService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView());
         assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
         System.out.println(policyStatusItem);
     }
 
     @Test
     public void testGettingAllProjectsAndVersions() throws Exception {
-        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final List<ProjectView> allProjects = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true);
+        final List<ProjectView> allProjects = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.PROJECTS_LINK_RESPONSE, true);
         System.out.println(String.format("project count: %d", allProjects.size()));
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             for (final ProjectView projectItem : allProjects) {
-                final List<ProjectVersionView> allProjectVersions = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE, true);
+                final List<ProjectVersionView> allProjectVersions = hubServicesFactory.createHubService().getResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE, true);
                 System.out.println(projectItem.toString());
                 System.out.println(String.format("version count: %d", allProjectVersions.size()));
                 for (final ProjectVersionView projectVersionItem : allProjectVersions) {
@@ -303,9 +303,9 @@ public class ComprehensiveCookbookTestIT {
 
     @Test
     public void testGettingAllCodeLocations() throws Exception {
-        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final List<CodeLocationView> allCodeLocations = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true);
+        final List<CodeLocationView> allCodeLocations = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true);
         System.out.println(String.format("code location count: %d", allCodeLocations.size()));
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             for (final CodeLocationView codeLocationItem : allCodeLocations) {
@@ -316,9 +316,9 @@ public class ComprehensiveCookbookTestIT {
 
     @Test
     public void testGettingAllUsers() throws Exception {
-        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final List<UserView> userItems = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(ApiDiscovery.USERS_LINK_RESPONSE, true);
+        final List<UserView> userItems = hubServicesFactory.createHubService().getResponsesFromLinkResponse(ApiDiscovery.USERS_LINK_RESPONSE, true);
         System.out.println(String.format("user count: %d", userItems.size()));
         assertTrue(userItems != null && userItems.size() > 0);
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
@@ -328,10 +328,10 @@ public class ComprehensiveCookbookTestIT {
         }
     }
 
-    private void deleteIfProjectExists(final IntLogger logger, final HubServicesFactory hubDataServicesFactory, final MetaHandler metaHandler, final String projectName) throws Exception {
+    private void deleteIfProjectExists(final IntLogger logger, final HubServicesFactory hubServicesFactory, final MetaHandler metaHandler, final String projectName) throws Exception {
         try {
-            final ProjectView projectItem = hubDataServicesFactory.createProjectDataService().getProjectByName(projectName);
-            try (Response response = hubDataServicesFactory.getRestConnection().executeRequest(new RequestWrapper(HttpMethod.DELETE).createRequest(metaHandler.getHref(projectItem)))) {
+            final ProjectView projectItem = hubServicesFactory.createProjectService().getProjectByName(projectName);
+            try (Response response = hubServicesFactory.getRestConnection().executeRequest(new RequestWrapper(HttpMethod.DELETE).createRequest(metaHandler.getHref(projectItem)))) {
             }
         } catch (final HubIntegrationException e) {
             logger.warn("Project didn't exist");

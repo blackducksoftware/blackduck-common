@@ -30,8 +30,8 @@ import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 
-public class HubRegistrationDataService extends HubService {
-    public HubRegistrationDataService(final RestConnection restConnection) {
+public class HubRegistrationService extends HubService {
+    public HubRegistrationService(final RestConnection restConnection) {
         super(restConnection);
     }
 

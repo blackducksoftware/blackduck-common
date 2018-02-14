@@ -58,16 +58,16 @@ public class HubServicesFactory {
         ciEnvironmentVariables.putAll(environmentVariables);
     }
 
-    public SignatureScannerService createCLIDataService() {
-        return createCLIDataService(120000l);
+    public SignatureScannerService createSignatureScannerService() {
+        return createSignatureScannerService(120000l);
     }
 
-    public SignatureScannerService createCLIDataService(final long timeoutInMilliseconds) {
-        return new SignatureScannerService(restConnection, ciEnvironmentVariables, createCliDownloadUtility(), createPhoneHomeDataService(), createProjectDataService(),
-                createCodeLocationDataService(), createScanStatusDataService(timeoutInMilliseconds));
+    public SignatureScannerService createSignatureScannerService(final long timeoutInMilliseconds) {
+        return new SignatureScannerService(restConnection, ciEnvironmentVariables, createCliDownloadUtility(), createPhoneHomeService(), createProjectService(),
+                createCodeLocationService(), createScanStatusService(timeoutInMilliseconds));
     }
 
-    public PhoneHomeService createPhoneHomeDataService() {
+    public PhoneHomeService createPhoneHomeService() {
         return new PhoneHomeService(restConnection, createPhoneHomeClient(), createHubRegistrationService());
     }
 
@@ -75,39 +75,39 @@ public class HubServicesFactory {
         return new PhoneHomeClient(restConnection.logger, restConnection.timeout, restConnection.getProxyInfo(), restConnection.alwaysTrustServerCertificate);
     }
 
-    public ReportService createReportDataService(final long timeoutInMilliseconds) throws IntegrationException {
-        return new ReportService(restConnection, createProjectDataService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
+    public ReportService createReportService(final long timeoutInMilliseconds) throws IntegrationException {
+        return new ReportService(restConnection, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
     }
 
-    public PolicyStatusService createPolicyStatusDataService() {
-        return new PolicyStatusService(restConnection, createProjectDataService());
+    public PolicyStatusService createPolicyStatusService() {
+        return new PolicyStatusService(restConnection, createProjectService());
     }
 
-    public ScanStatusService createScanStatusDataService(final long timeoutInMilliseconds) {
-        return new ScanStatusService(restConnection, createProjectDataService(), createCodeLocationDataService(), timeoutInMilliseconds);
+    public ScanStatusService createScanStatusService(final long timeoutInMilliseconds) {
+        return new ScanStatusService(restConnection, createProjectService(), createCodeLocationService(), timeoutInMilliseconds);
     }
 
-    public NotificationService createNotificationDataService() {
+    public NotificationService createNotificationService() {
         return new NotificationService(restConnection);
     }
 
-    public NotificationService createNotificationDataService(final PolicyNotificationFilter policyNotificationFilter) {
+    public NotificationService createNotificationService(final PolicyNotificationFilter policyNotificationFilter) {
         return new NotificationService(restConnection, policyNotificationFilter);
     }
 
-    public ExtensionConfigService createExtensionConfigDataService() {
+    public ExtensionConfigService createExtensionConfigService() {
         return new ExtensionConfigService(restConnection.logger, restConnection);
     }
 
-    public LicenseService createLicenseDataService() {
-        return new LicenseService(restConnection, createComponentDataService());
+    public LicenseService createLicenseService() {
+        return new LicenseService(restConnection, createComponentService());
     }
 
-    public CodeLocationService createBdioUploadDataService() {
+    public CodeLocationService createBdioUploadService() {
         return new CodeLocationService(restConnection);
     }
 
-    public CodeLocationService createCodeLocationDataService() {
+    public CodeLocationService createCodeLocationService() {
         return new CodeLocationService(restConnection);
     }
 
@@ -124,11 +124,11 @@ public class HubServicesFactory {
         return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
     }
 
-    public HubRegistrationDataService createHubRegistrationService() {
-        return new HubRegistrationDataService(restConnection);
+    public HubRegistrationService createHubRegistrationService() {
+        return new HubRegistrationService(restConnection);
     }
 
-    public HubService createHubDataService() {
+    public HubService createHubService() {
         return new HubService(restConnection);
     }
 
@@ -136,19 +136,19 @@ public class HubServicesFactory {
         return restConnection;
     }
 
-    public ComponentService createComponentDataService() {
+    public ComponentService createComponentService() {
         return new ComponentService(restConnection);
     }
 
-    public IssueService createIssueDataService() {
+    public IssueService createIssueService() {
         return new IssueService(restConnection);
     }
 
-    public ProjectService createProjectDataService() {
-        return new ProjectService(restConnection, createComponentDataService());
+    public ProjectService createProjectService() {
+        return new ProjectService(restConnection, createComponentService());
     }
 
-    public UserGroupService createUserGroupDataService() {
+    public UserGroupService createUserGroupService() {
         return new UserGroupService(restConnection);
     }
 

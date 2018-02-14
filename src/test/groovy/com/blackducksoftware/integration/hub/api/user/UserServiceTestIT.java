@@ -46,17 +46,17 @@ public class UserServiceTestIT {
     // TODO - Tested in-house; we need a dedicated Hub 4.3.x instance for testing before we can uncomment this.
     // @Test
     public void getProjectsForUserTestIT() throws IllegalArgumentException, IntegrationException {
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final List<ProjectView> projectsForUser = hubServicesFactory.createUserGroupDataService().getProjectsForUser(restConnectionTestHelper.getTestUsername());
+        final List<ProjectView> projectsForUser = hubServicesFactory.createUserGroupService().getProjectsForUser(restConnectionTestHelper.getTestUsername());
         assertNotNull(projectsForUser);
     }
 
     @Test
     public void getRolesForUserTestIT() throws IllegalArgumentException, IntegrationException {
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final List<RoleAssignmentView> rolesForUser = hubServicesFactory.createUserGroupDataService().getRolesForUser(restConnectionTestHelper.getTestUsername());
+        final List<RoleAssignmentView> rolesForUser = hubServicesFactory.createUserGroupService().getRolesForUser(restConnectionTestHelper.getTestUsername());
         assertTrue(rolesForUser.size() > 0);
     }
 }

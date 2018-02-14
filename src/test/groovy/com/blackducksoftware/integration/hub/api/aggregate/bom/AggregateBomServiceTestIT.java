@@ -47,16 +47,16 @@ public class AggregateBomServiceTestIT {
 
     @Test
     public void testGetBomEntriesForUrl() throws IllegalArgumentException, IntegrationException {
-        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final MetaHandler metaHandler = new MetaHandler(restConnectionTestHelper.createIntLogger());
-        final HubService hubService = hubDataServicesFactory.createHubDataService();
+        final HubService hubService = hubServicesFactory.createHubService();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
         final String testProjectVersionName = "BomRequestServiceTest";
         final String testComponentName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT");
         final String testComponentVersionName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_VERSION");
 
-        final ProjectView project = hubDataServicesFactory.createProjectDataService().getProjectByName(testProjectName);
+        final ProjectView project = hubServicesFactory.createProjectService().getProjectByName(testProjectName);
         final List<ProjectVersionView> projectVersions = hubService.getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
@@ -83,15 +83,15 @@ public class AggregateBomServiceTestIT {
 
     @Test
     public void testGetBomEntriesForProjectVersion() throws IllegalArgumentException, IntegrationException {
-        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
         final String testProjectVersionName = "BomRequestServiceTest";
         final String testComponentName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT");
         final String testComponentVersionName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_VERSION");
 
-        final ProjectView project = hubDataServicesFactory.createProjectDataService().getProjectByName(testProjectName);
-        final List<ProjectVersionView> projectVersions = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true);
+        final ProjectView project = hubServicesFactory.createProjectService().getProjectByName(testProjectName);
+        final List<ProjectVersionView> projectVersions = hubServicesFactory.createHubService().getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
             if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {
@@ -100,7 +100,7 @@ public class AggregateBomServiceTestIT {
         }
         assertNotNull(projectVersion);
 
-        final List<VersionBomComponentView> bomComponents = hubDataServicesFactory.createHubDataService().getResponsesFromLinkResponse(projectVersion, ProjectVersionView.COMPONENTS_LINK_RESPONSE, true);
+        final List<VersionBomComponentView> bomComponents = hubServicesFactory.createHubService().getResponsesFromLinkResponse(projectVersion, ProjectVersionView.COMPONENTS_LINK_RESPONSE, true);
         System.out.println("BOM size: " + bomComponents.size());
 
         // Look for testComponent in BOM

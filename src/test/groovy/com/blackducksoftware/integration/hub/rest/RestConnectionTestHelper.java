@@ -129,12 +129,12 @@ public class RestConnectionTestHelper {
         return serverConfig.createCredentialsRestConnection(new PrintStreamIntLogger(System.out, logLevel));
     }
 
-    public HubServicesFactory createHubDataServicesFactory() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        return createHubDataServicesFactory(LogLevel.TRACE);
+    public HubServicesFactory createHubServicesFactory() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+        return createHubServicesFactory(LogLevel.TRACE);
     }
 
-    public HubServicesFactory createHubDataServicesFactory(final LogLevel logLevel) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        return createHubDataServicesFactory(createIntLogger(logLevel));
+    public HubServicesFactory createHubServicesFactory(final LogLevel logLevel) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+        return createHubServicesFactory(createIntLogger(logLevel));
     }
 
     public IntLogger createIntLogger() {
@@ -145,7 +145,7 @@ public class RestConnectionTestHelper {
         return new PrintStreamIntLogger(System.out, logLevel);
     }
 
-    public HubServicesFactory createHubDataServicesFactory(final IntLogger logger) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+    public HubServicesFactory createHubServicesFactory(final IntLogger logger) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
         final RestConnection restConnection = getIntegrationHubRestConnection();
         restConnection.logger = logger;
         final HubServicesFactory hubServicesFactory = new HubServicesFactory(restConnection);

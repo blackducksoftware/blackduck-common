@@ -47,12 +47,12 @@ public class LicenseDataServiceTestIT {
 
     @Test
     public void testGettingLicenseFromComponentVersion() throws Exception {
-        final HubServicesFactory hubDataServicesFactory = restConnectionTestHelper.createHubDataServicesFactory();
-        final LicenseService licenseDataService = hubDataServicesFactory.createLicenseDataService();
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final LicenseService licenseService = hubServicesFactory.createLicenseService();
 
         final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
         final ExternalId guavaExternalId = simpleBdioFactory.createMavenExternalId("com.google.guava", "guava", "20.0");
-        final ComplexLicenseView complexLicense = licenseDataService.getComplexLicenseItemFromComponent(guavaExternalId);
+        final ComplexLicenseView complexLicense = licenseService.getComplexLicenseItemFromComponent(guavaExternalId);
 
         assertEquals(LicenseCodeSharingType.PERMISSIVE, complexLicense.codeSharing);
         assertTrue(StringUtils.isNotBlank(complexLicense.license));

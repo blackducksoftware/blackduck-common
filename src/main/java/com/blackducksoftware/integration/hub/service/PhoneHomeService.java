@@ -45,14 +45,14 @@ import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName;
 
 public class PhoneHomeService extends HubService {
     private final IntLogger logger;
-    private final HubRegistrationDataService hubRegistrationRequestService;
+    private final HubRegistrationService hubRegistrationService;
     private final PhoneHomeClient phoneHomeClient;
     private final ExecutorService executorService;
 
-    public PhoneHomeService(final RestConnection restConnection, final PhoneHomeClient phoneHomeClient, final HubRegistrationDataService hubRegistrationRequestService) {
+    public PhoneHomeService(final RestConnection restConnection, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService) {
         super(restConnection);
         this.logger = restConnection.logger;
-        this.hubRegistrationRequestService = hubRegistrationRequestService;
+        this.hubRegistrationService = hubRegistrationService;
         this.phoneHomeClient = phoneHomeClient;
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
@@ -107,10 +107,10 @@ public class PhoneHomeService extends HubService {
             String registrationId = null;
             try {
                 // We need to wrap this because this will most likely fail unless they are running as an admin
-                registrationId = hubRegistrationRequestService.getRegistrationId();
+                registrationId = hubRegistrationService.getRegistrationId();
             } catch (final IntegrationException e) {
             }
-            final URL hubHostName = hubRegistrationRequestService.getHubBaseUrl();
+            final URL hubHostName = hubRegistrationService.getHubBaseUrl();
             phoneHomeRequestBodyBuilder.setRegistrationId(registrationId);
             phoneHomeRequestBodyBuilder.setHostName(hubHostName.toString());
             phoneHomeRequestBodyBuilder.setBlackDuckName(BlackDuckName.HUB);
