@@ -103,10 +103,6 @@ public class HubServicesFactory {
         return new LicenseService(restConnection, createComponentService());
     }
 
-    public CodeLocationService createBdioUploadService() {
-        return new CodeLocationService(restConnection);
-    }
-
     public CodeLocationService createCodeLocationService() {
         return new CodeLocationService(restConnection);
     }
