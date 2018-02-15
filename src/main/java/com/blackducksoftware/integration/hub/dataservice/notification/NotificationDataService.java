@@ -23,6 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.notification;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
@@ -50,7 +52,7 @@ import com.blackducksoftware.integration.hub.model.view.VulnerabilityNotificatio
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class NotificationDataService {
+public class NotificationDataService implements Closeable {
     private final HubService hubResponseService;
 
     private final NotificationService notificationRequestService;
@@ -110,4 +112,8 @@ public class NotificationDataService {
         return results;
     }
 
+    @Override
+    public void close() throws IOException {
+        parallelProcessor.close();
+    }
 }

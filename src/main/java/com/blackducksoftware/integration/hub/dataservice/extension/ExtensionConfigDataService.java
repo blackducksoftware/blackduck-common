@@ -23,6 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.extension;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +45,7 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ExtensionConfigDataService extends HubService {
+public class ExtensionConfigDataService extends HubService implements Closeable {
     private final ExtensionConfigService extensionConfigRequestService;
     private final UserConfigTransform userConfigTransform;
     private final ExtensionUserOptionService extensionUserOptionRequestService;
@@ -90,4 +92,8 @@ public class ExtensionConfigDataService extends HubService {
         return itemMap;
     }
 
+    @Override
+    public void close() throws IOException {
+        parallelProcessor.close();
+    }
 }
