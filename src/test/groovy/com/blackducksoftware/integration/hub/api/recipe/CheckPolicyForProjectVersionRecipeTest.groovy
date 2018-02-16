@@ -46,7 +46,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
          * to create a Policy Rule we can construct a PolicyRuleViewV2 and Post it to the Hub
          */
         String policyRuleUrl = policyRuleService.createPolicyRule(policyRuleViewV2)
-        policyRuleView = policyRuleService.getResponse(policyRuleUrl, PolicyRuleView.class);
+        policyRuleView = hubServicesFactory.createHubService().getResponse(policyRuleUrl, PolicyRuleView.class);
     }
 
 
