@@ -23,6 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.parallel;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -39,7 +41,7 @@ import java.util.concurrent.ThreadFactory;
 import com.blackducksoftware.integration.hub.dataservice.ItemTransform;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ParallelResourceProcessor<R, S> {
+public class ParallelResourceProcessor<R, S> implements Closeable {
     private final Map<Class<?>, ItemTransform<List<R>, S>> transformerMap = new HashMap<>();;
 
     private final ExecutorService executorService;
@@ -122,6 +124,13 @@ public class ParallelResourceProcessor<R, S> {
         @Override
         public List<R> call() throws Exception {
             return converter.transform(item);
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (executorService != null) {
+            executorService.shutdown();
         }
     }
 }
