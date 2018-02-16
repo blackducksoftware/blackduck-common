@@ -21,26 +21,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.scan;
+package com.blackducksoftware.integration.hub.service;
 
 import java.io.File;
 
-import com.blackducksoftware.integration.hub.request.RequestWrapper;
+import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 
-public class DryRunUploadService extends HubService {
-    public DryRunUploadService(final RestConnection restConnection) {
-        super(restConnection);
+public class DryRunUploadService extends DataService {
+    public DryRunUploadService(final HubService hubService) {
+        super(hubService);
     }
 
     public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws Exception {
-        final String uri = HubService.pieceTogetherUri(getRestConnection().baseUrl, "api/v1/scans");
-        try (Response response = getRestConnection().executeRequest(new RequestWrapper(HttpMethod.POST).setBodyContentFile(dryRunFile).createRequest(uri))) {
+        final String uri = hubService.getUriFromPath("api/v1/scans");
+        final Request request = RequestFactory.createCommonPostRequestBuilder(dryRunFile).uri(uri).build();
+        try (Response response = hubService.executeRequest(request)) {
             final String responseString = response.getContentString();
-            final DryRunUploadResponse uploadResponse = getGson().fromJson(responseString, DryRunUploadResponse.class);
+            final DryRunUploadResponse uploadResponse = hubService.getGson().fromJson(responseString, DryRunUploadResponse.class);
             uploadResponse.json = responseString;
             return uploadResponse;
         }

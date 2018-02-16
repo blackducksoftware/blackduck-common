@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.api.scan;
+package com.blackducksoftware.integration.hub.service;
 
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 

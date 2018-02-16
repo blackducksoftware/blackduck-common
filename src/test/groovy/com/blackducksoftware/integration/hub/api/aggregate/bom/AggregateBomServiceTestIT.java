@@ -57,7 +57,7 @@ public class AggregateBomServiceTestIT {
         final String testComponentVersionName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_VERSION");
 
         final ProjectView project = hubServicesFactory.createProjectService().getProjectByName(testProjectName);
-        final List<ProjectVersionView> projectVersions = hubService.getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true);
+        final List<ProjectVersionView> projectVersions = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
             if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {
@@ -91,7 +91,7 @@ public class AggregateBomServiceTestIT {
         final String testComponentVersionName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_VERSION");
 
         final ProjectView project = hubServicesFactory.createProjectService().getProjectByName(testProjectName);
-        final List<ProjectVersionView> projectVersions = hubServicesFactory.createHubService().getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true);
+        final List<ProjectVersionView> projectVersions = hubServicesFactory.createHubService().getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
             if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {
@@ -100,7 +100,7 @@ public class AggregateBomServiceTestIT {
         }
         assertNotNull(projectVersion);
 
-        final List<VersionBomComponentView> bomComponents = hubServicesFactory.createHubService().getResponsesFromLinkResponse(projectVersion, ProjectVersionView.COMPONENTS_LINK_RESPONSE, true);
+        final List<VersionBomComponentView> bomComponents = hubServicesFactory.createHubService().getAllResponses(projectVersion, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         System.out.println("BOM size: " + bomComponents.size());
 
         // Look for testComponent in BOM

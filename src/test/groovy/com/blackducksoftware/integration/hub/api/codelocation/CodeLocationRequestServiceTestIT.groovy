@@ -36,11 +36,11 @@ import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequ
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadResponse
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
+import com.blackducksoftware.integration.hub.service.DryRunUploadResponse
+import com.blackducksoftware.integration.hub.service.DryRunUploadService
 import com.blackducksoftware.integration.hub.service.HubService
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.hub.service.ProjectService
@@ -76,7 +76,7 @@ class CodeLocationRequestServiceTestIT {
         final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.getRestConnection())
+        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createHubService())
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 

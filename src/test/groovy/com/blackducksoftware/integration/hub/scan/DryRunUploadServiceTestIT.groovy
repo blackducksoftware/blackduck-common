@@ -30,10 +30,10 @@ import org.junit.experimental.categories.Category
 
 import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadResponse
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
+import com.blackducksoftware.integration.hub.service.DryRunUploadResponse
+import com.blackducksoftware.integration.hub.service.DryRunUploadService
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
@@ -56,7 +56,7 @@ class DryRunUploadServiceTestIT {
     @Test
     public void testDryRunUpload(){
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.getRestConnection())
+        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createHubService())
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
