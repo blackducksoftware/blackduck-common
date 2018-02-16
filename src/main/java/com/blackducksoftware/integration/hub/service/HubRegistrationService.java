@@ -27,18 +27,17 @@ import java.io.IOException;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.google.gson.JsonObject;
 
-public class HubRegistrationService extends HubService {
-    public HubRegistrationService(final RestConnection restConnection) {
-        super(restConnection);
+public class HubRegistrationService extends DataService {
+    public HubRegistrationService(final HubService hubService) {
+        super(hubService);
     }
 
     public String getRegistrationId() throws IntegrationException {
-        try (Response response = executeGetRequestFromPath("api/v1/registrations")) {
+        try (Response response = hubService.executeGetRequestFromPath("api/v1/registrations")) {
             final String jsonResponse = response.getContentString();
-            final JsonObject jsonObject = getJsonParser().parse(jsonResponse).getAsJsonObject();
+            final JsonObject jsonObject = hubService.getJsonParser().parse(jsonResponse).getAsJsonObject();
             final String registrationId = jsonObject.get("registrationId").getAsString();
             return registrationId;
         } catch (final IOException e) {

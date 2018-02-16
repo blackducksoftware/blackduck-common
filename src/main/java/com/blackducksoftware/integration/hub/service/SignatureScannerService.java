@@ -38,7 +38,6 @@ import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscover
 import com.blackducksoftware.integration.hub.api.generated.response.CurrentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
@@ -46,42 +45,32 @@ import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.model.HostnameHelper;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
-import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder;
 import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
-import com.google.gson.Gson;
 
-public class SignatureScannerService extends HubService {
-
-    private final Gson gson;
-    private final IntLogger logger;
+public class SignatureScannerService extends DataService {
     private final CIEnvironmentVariables ciEnvironmentVariables;
     private final CLIDownloadUtility cliDownloadService;
     private final PhoneHomeService phoneHomeDataService;
     private final ProjectService projectDataService;
     private final CodeLocationService codeLocationDataService;
     private final ScanStatusService scanStatusDataService;
-    private final MetaHandler metaHandler;
 
     private ProjectVersionWrapper projectVersionWrapper;
 
-    public SignatureScannerService(final RestConnection restConnection, final CIEnvironmentVariables ciEnvironmentVariables, final CLIDownloadUtility cliDownloadService,
+    public SignatureScannerService(final HubService hubService, final CIEnvironmentVariables ciEnvironmentVariables, final CLIDownloadUtility cliDownloadService,
             final PhoneHomeService phoneHomeDataService, final ProjectService projectDataService, final CodeLocationService codeLocationDataService,
             final ScanStatusService scanStatusDataService) {
-        super(restConnection);
-        this.gson = restConnection.gson;
-        this.logger = restConnection.logger;
+        super(hubService);
         this.ciEnvironmentVariables = ciEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
         this.phoneHomeDataService = phoneHomeDataService;
         this.projectDataService = projectDataService;
         this.codeLocationDataService = codeLocationDataService;
         this.scanStatusDataService = scanStatusDataService;
-        this.metaHandler = new MetaHandler(logger);
     }
 
     public ProjectVersionWrapper installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished,
@@ -108,9 +97,9 @@ public class SignatureScannerService extends HubService {
     private SimpleScanUtility createScanService(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
         final HubScanConfig controlledConfig = getControlledScanConfig(hubScanConfig);
         if (hubScanConfig.isDryRun()) {
-            return new SimpleScanUtility(logger, gson, hubServerConfig, ciEnvironmentVariables, controlledConfig, projectRequest.name, projectRequest.versionRequest.versionName);
+            return new SimpleScanUtility(logger, hubService.getGson(), hubServerConfig, ciEnvironmentVariables, controlledConfig, projectRequest.name, projectRequest.versionRequest.versionName);
         } else {
-            return new SimpleScanUtility(logger, gson, hubServerConfig, ciEnvironmentVariables, controlledConfig, null, null);
+            return new SimpleScanUtility(logger, hubService.getGson(), hubServerConfig, ciEnvironmentVariables, controlledConfig, null, null);
         }
     }
 
@@ -154,7 +143,7 @@ public class SignatureScannerService extends HubService {
         final String localHostName = HostnameHelper.getMyHostname();
         logger.info("Running on machine : " + localHostName);
         printConfiguration(hubScanConfig, projectRequest);
-        final CurrentVersionView currentVersion = getResponseFromLinkResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        final CurrentVersionView currentVersion = hubService.getResponseFromPath(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
         cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version, localHostName);
         phoneHomeDataService.phoneHome(phoneHomeRequestBodyBuilder);
 
@@ -182,9 +171,9 @@ public class SignatureScannerService extends HubService {
                     scanSummaryFile.delete();
 
                     // TODO update when ScanSummaryView is part of the swagger
-                    final String codeLocationUrl = metaHandler.getFirstLinkSafely(scanSummary, ScanSummaryView.CODELOCATION_LINK);
+                    final String codeLocationUrl = hubService.getFirstLinkSafely(scanSummary, ScanSummaryView.CODELOCATION_LINK);
 
-                    final CodeLocationView codeLocationView = codeLocationDataService.getResponse(codeLocationUrl, CodeLocationView.class);
+                    final CodeLocationView codeLocationView = hubService.getResponse(codeLocationUrl, CodeLocationView.class);
                     codeLocationViews.add(codeLocationView);
                     codeLocationDataService.mapCodeLocation(codeLocationView, projectVersionWrapper.getProjectVersionView());
                 } catch (final IOException ex) {
@@ -203,7 +192,7 @@ public class SignatureScannerService extends HubService {
 
     private ScanSummaryView getScanSummaryFromFile(final File scanSummaryFile) throws IOException {
         final String scanSummaryJson = FileUtils.readFileToString(scanSummaryFile, Charset.forName("UTF8"));
-        final ScanSummaryView scanSummaryView = gson.fromJson(scanSummaryJson, ScanSummaryView.class);
+        final ScanSummaryView scanSummaryView = hubService.getGson().fromJson(scanSummaryJson, ScanSummaryView.class);
         scanSummaryView.json = scanSummaryJson;
         return scanSummaryView;
     }
@@ -248,7 +237,7 @@ public class SignatureScannerService extends HubService {
     }
 
     private List<CodeLocationView> getCodeLocationsNotJustScanned(final ProjectVersionView version, final List<CodeLocationView> codeLocationsFromCurentScan) throws IntegrationException {
-        final List<CodeLocationView> codeLocationsMappedToVersion = getResponsesFromLinkResponse(version, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE, true);
+        final List<CodeLocationView> codeLocationsMappedToVersion = hubService.getAllResponses(version, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         return getCodeLocationsNotJustScanned(codeLocationsMappedToVersion, codeLocationsFromCurentScan);
     }
 

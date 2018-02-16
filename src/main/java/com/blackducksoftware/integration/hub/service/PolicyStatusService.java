@@ -30,27 +30,26 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class PolicyStatusService extends HubService {
+public class PolicyStatusService extends DataService {
     private final ProjectService projectDataService;
 
-    public PolicyStatusService(final RestConnection restConnection, final ProjectService projectDataService) {
-        super(restConnection);
+    public PolicyStatusService(final HubService hubService, final ProjectService projectDataService) {
+        super(hubService);
         this.projectDataService = projectDataService;
     }
 
     public VersionBomPolicyStatusView getPolicyStatusForProjectAndVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = projectDataService.getProjectByName(projectName);
 
-        final List<ProjectVersionView> projectVersions = getResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE, true);
+        final List<ProjectVersionView> projectVersions = hubService.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE);
         final ProjectVersionView projectVersionView = findMatchingVersion(projectVersions, projectVersionName);
 
         return getPolicyStatusForVersion(projectVersionView);
     }
 
     public VersionBomPolicyStatusView getPolicyStatusForVersion(final ProjectVersionView version) throws IntegrationException {
-        return getResponseFromLinkResponse(version, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
+        return hubService.getResponse(version, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
     }
 
     private ProjectVersionView findMatchingVersion(final List<ProjectVersionView> projectVersions, final String projectVersionName) throws HubIntegrationException {

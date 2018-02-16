@@ -27,35 +27,38 @@ import java.io.IOException;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
-import com.blackducksoftware.integration.hub.request.RequestWrapper;
+import com.blackducksoftware.integration.hub.request.BodyContent;
+import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 
-public class IssueService extends HubService {
-
-    public IssueService(final RestConnection restConnection) {
-        super(restConnection);
+public class IssueService extends DataService {
+    public IssueService(final HubService hubService) {
+        super(hubService);
     }
 
     public String createIssue(final IssueView issueItem, final String uri) throws IntegrationException {
-        return executePostRequestAndRetrieveURL(uri, new RequestWrapper(HttpMethod.POST).setBodyContentObject(issueItem));
+        final Request request = RequestFactory.createCommonPostRequestBuilder(issueItem).uri(uri).build();
+        return hubService.executePostRequestAndRetrieveURL(request);
     }
 
     public void updateIssue(final IssueView issueItem, final String uri) throws IntegrationException {
-        try (Response response = executeRequest(uri, new RequestWrapper(HttpMethod.PUT).setBodyContentObject(issueItem))) {
+        final Request request = new Request.Builder(uri).method(HttpMethod.PUT).bodyContent(new BodyContent(issueItem)).build();
+        try (Response response = hubService.executeRequest(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
     }
 
     public void deleteIssue(final IssueView issueItem) throws IntegrationException {
-        final String codeLocationItemUrl = getHref(issueItem);
+        final String codeLocationItemUrl = hubService.getHref(issueItem);
         deleteIssue(codeLocationItemUrl);
     }
 
     public void deleteIssue(final String issueItemUri) throws IntegrationException {
-        try (Response response = executeRequest(issueItemUri, new RequestWrapper(HttpMethod.DELETE))) {
+        final Request request = new Request.Builder(issueItemUri).method(HttpMethod.DELETE).build();
+        try (Response response = hubService.executeRequest(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

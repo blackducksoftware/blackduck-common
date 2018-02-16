@@ -48,29 +48,29 @@ import com.blackducksoftware.integration.hub.notification.PolicyViolationCleared
 import com.blackducksoftware.integration.hub.notification.PolicyViolationOverrideTransformer;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationTransformer;
 import com.blackducksoftware.integration.hub.notification.VulnerabilityTransformer;
-import com.blackducksoftware.integration.hub.request.GetRequestWrapper;
+import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessor;
 import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessorResults;
 
-public class NotificationService extends HubService {
+public class NotificationService extends DataService {
     private final Map<String, Class<? extends NotificationView>> typeMap = new HashMap<>();
 
     private final PolicyNotificationFilter policyNotificationFilter;
     private final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor;
     private final MetaHandler metaHandler;
 
-    public NotificationService(final RestConnection restConnection) {
-        this(restConnection, null);
+    public NotificationService(final HubService hubService) {
+        this(hubService, null);
     }
 
-    public NotificationService(final RestConnection restConnection, final PolicyNotificationFilter policyNotificationFilter) {
-        super(restConnection);
+    public NotificationService(final HubService hubService, final PolicyNotificationFilter policyNotificationFilter) {
+        super(hubService);
         this.policyNotificationFilter = policyNotificationFilter;
-        this.parallelProcessor = new ParallelResourceProcessor<>(restConnection.logger);
-        this.metaHandler = new MetaHandler(restConnection.logger);
-        populateTransformerMap(restConnection.logger);
+        this.parallelProcessor = new ParallelResourceProcessor<>(logger);
+        this.metaHandler = new MetaHandler(logger);
+        populateTransformerMap(logger);
         typeMap.put("VULNERABILITY", VulnerabilityNotificationView.class);
         typeMap.put("RULE_VIOLATION", RuleViolationNotificationView.class);
         typeMap.put("POLICY_OVERRIDE", PolicyOverrideNotificationView.class);
@@ -79,12 +79,12 @@ public class NotificationService extends HubService {
 
     private void populateTransformerMap(final IntLogger logger) {
         parallelProcessor.addTransformer(RuleViolationNotificationView.class,
-                new PolicyViolationTransformer(this, logger, policyNotificationFilter, metaHandler));
+                new PolicyViolationTransformer(hubService, logger, policyNotificationFilter, metaHandler));
         parallelProcessor.addTransformer(PolicyOverrideNotificationView.class,
-                new PolicyViolationOverrideTransformer(this, logger, policyNotificationFilter, metaHandler));
-        parallelProcessor.addTransformer(VulnerabilityNotificationView.class, new VulnerabilityTransformer(this, metaHandler, logger));
+                new PolicyViolationOverrideTransformer(hubService, logger, policyNotificationFilter, metaHandler));
+        parallelProcessor.addTransformer(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubService, metaHandler, logger));
         parallelProcessor.addTransformer(RuleViolationClearedNotificationView.class,
-                new PolicyViolationClearedTransformer(this, logger, policyNotificationFilter, metaHandler));
+                new PolicyViolationClearedTransformer(hubService, logger, policyNotificationFilter, metaHandler));
     }
 
     public NotificationResults getAllNotificationResults(final Date startDate, final Date endDate) throws IntegrationException {
@@ -111,8 +111,8 @@ public class NotificationService extends HubService {
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final GetRequestWrapper requestWrapper = new GetRequestWrapper().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
-        final List<NotificationView> allNotificationItems = getResponsesFromLinkResponse(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, true, requestWrapper, typeMap);
+        final Request.Builder requestBuilder = new Request.Builder().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
+        final List<NotificationView> allNotificationItems = hubService.getResponsesFromPath(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, true, typeMap);
         return allNotificationItems;
     }
 
@@ -126,8 +126,9 @@ public class NotificationService extends HubService {
         queryParameters.put("startDate", startDateString);
         queryParameters.put("endDate", endDateString);
 
-        final GetRequestWrapper requestWrapper = new GetRequestWrapper().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
-        final List<NotificationView> allNotificationItems = getResponsesFromLinkResponse(user, ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, true, requestWrapper, typeMap);
+        final Request.Builder requestBuilder = new Request.Builder().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
+        final List<NotificationView> allNotificationItems = hubService.getResponses(user, ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, true, typeMap);
+
         return allNotificationItems;
     }
 

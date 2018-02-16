@@ -34,20 +34,19 @@ import com.blackducksoftware.integration.hub.api.generated.view.RoleAssignmentVi
 import com.blackducksoftware.integration.hub.api.generated.view.UserGroupView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class UserGroupService extends HubService {
+public class UserGroupService {
     private final IntLogger logger;
+    private final HubService hubService;
 
-    public UserGroupService(final RestConnection restConnection) {
-        super(restConnection);
-        this.logger = restConnection.logger;
+    public UserGroupService(final HubService hubService) {
+        this.logger = hubService.getRestConnection().logger;
+        this.hubService = hubService;
     }
 
     public UserView getUserByUserName(final String userName) throws IntegrationException {
-
-        final List<UserView> allUsers = getResponsesFromLinkResponse(ApiDiscovery.USERS_LINK_RESPONSE, true);
+        final List<UserView> allUsers = hubService.getAllResponsesFromPath(ApiDiscovery.USERS_LINK_RESPONSE);
         for (final UserView user : allUsers) {
             if (user.userName.equalsIgnoreCase(userName)) {
                 return user;
@@ -63,11 +62,11 @@ public class UserGroupService extends HubService {
 
     public List<ProjectView> getProjectsForUser(final UserView userView) throws IntegrationException {
         logger.debug("Attempting to get the assigned projects for User: " + userView.userName);
-        final List<AssignedProjectView> assignedProjectViews = getResponsesFromLinkResponse(userView, UserView.PROJECTS_LINK_RESPONSE, true);
+        final List<AssignedProjectView> assignedProjectViews = hubService.getAllResponses(userView, UserView.PROJECTS_LINK_RESPONSE);
 
         final List<ProjectView> resolvedProjectViews = new ArrayList<>();
         for (final AssignedProjectView assigned : assignedProjectViews) {
-            final ProjectView project = getResponse(assigned.project, ProjectView.class);
+            final ProjectView project = hubService.getResponse(assigned.project, ProjectView.class);
             if (project != null) {
                 resolvedProjectViews.add(project);
             }
@@ -82,11 +81,11 @@ public class UserGroupService extends HubService {
     }
 
     public List<RoleAssignmentView> getRolesForUser(final UserView userView) throws IntegrationException {
-        return getResponsesFromLinkResponse(userView, UserView.ROLES_LINK_RESPONSE, true);
+        return hubService.getAllResponses(userView, UserView.ROLES_LINK_RESPONSE);
     }
 
     public UserGroupView getGroupByName(final String groupName) throws IntegrationException {
-        final List<UserGroupView> allGroups = getResponsesFromLinkResponse(ApiDiscovery.USERGROUPS_LINK_RESPONSE, true);
+        final List<UserGroupView> allGroups = hubService.getAllResponsesFromPath(ApiDiscovery.USERGROUPS_LINK_RESPONSE);
         for (final UserGroupView group : allGroups) {
             if (group.name.equalsIgnoreCase(groupName)) {
                 return group;

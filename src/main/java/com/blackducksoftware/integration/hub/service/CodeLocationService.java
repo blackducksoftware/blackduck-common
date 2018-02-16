@@ -38,15 +38,15 @@ import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.request.GetRequestWrapper;
-import com.blackducksoftware.integration.hub.request.RequestWrapper;
+import com.blackducksoftware.integration.hub.request.BodyContent;
+import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 
-public class CodeLocationService extends HubService {
-    public CodeLocationService(final RestConnection restConnection) {
-        super(restConnection);
+public class CodeLocationService extends DataService {
+    public CodeLocationService(final HubService hubService) {
+        super(hubService);
     }
 
     public void importBomFile(final File file) throws IntegrationException {
@@ -61,16 +61,17 @@ public class CodeLocationService extends HubService {
             throw new IntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub because : " + e.getMessage(), e);
         }
 
-        final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.POST).setBodyContent(jsonPayload).setMimeType(mimeType);
-        try (Response response = executeRequestFromPath(HubService.BOMIMPORT_LINK, requestWrapper)) {
+        final String uri = hubService.getUriFromPath(HubService.BOMIMPORT_LINK);
+        final Request request = RequestFactory.createCommonPostRequestBuilder(jsonPayload).uri(uri).mimeType(mimeType).build();
+        try (Response response = hubService.executeRequest(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
     }
 
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationType codeLocationType) throws IntegrationException {
-        final GetRequestWrapper requestWrapper = new GetRequestWrapper().addQueryParameter("codeLocationType", codeLocationType.toString());
-        final List<CodeLocationView> allCodeLocations = getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true, requestWrapper);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("codeLocationType", codeLocationType.toString());
+        final List<CodeLocationView> allCodeLocations = hubService.getAllResponsesFromPath(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
         return allCodeLocations;
     }
 
@@ -81,33 +82,32 @@ public class CodeLocationService extends HubService {
     }
 
     public void unmapCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
-        final String codeLocationItemUrl = getHref(codeLocationItem);
+        final String codeLocationItemUrl = hubService.getHref(codeLocationItem);
         final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationItem, "");
-        updateCodeLocation(codeLocationItemUrl, getGson().toJson(requestCodeLocationView));
+        updateCodeLocation(codeLocationItemUrl, hubService.getGson().toJson(requestCodeLocationView));
     }
 
     public void mapCodeLocation(final CodeLocationView codeLocationItem, final ProjectVersionView version) throws IntegrationException {
-        mapCodeLocation(codeLocationItem, getHref(version));
+        mapCodeLocation(codeLocationItem, hubService.getHref(version));
     }
 
     public void mapCodeLocation(final CodeLocationView codeLocationItem, final String versionUrl) throws IntegrationException {
-        final String codeLocationItemUrl = getHref(codeLocationItem);
+        final String codeLocationItemUrl = hubService.getHref(codeLocationItem);
         final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationItem, versionUrl);
-        updateCodeLocation(codeLocationItemUrl, getGson().toJson(requestCodeLocationView));
+        updateCodeLocation(codeLocationItemUrl, hubService.getGson().toJson(requestCodeLocationView));
     }
 
     public void updateCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
-        final String codeLocationItemUrl = getHref(codeLocationItem);
-        updateCodeLocation(codeLocationItemUrl, getGson().toJson(codeLocationItem));
+        final String codeLocationItemUrl = hubService.getHref(codeLocationItem);
+        updateCodeLocation(codeLocationItemUrl, hubService.getGson().toJson(codeLocationItem));
     }
 
     public void updateCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws IntegrationException {
-        final RequestWrapper requestWrapper = new RequestWrapper(HttpMethod.PUT).setBodyContent(codeLocationItemJson);
-        try (Response response = executeRequest(codeLocationItemUrl, requestWrapper)) {
+        final Request request = new Request.Builder(codeLocationItemUrl).method(HttpMethod.PUT).bodyContent(new BodyContent(codeLocationItemJson)).build();
+        try (Response response = hubService.executeRequest(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
-
     }
 
     public void deleteCodeLocations(final List<CodeLocationView> codeLocationItems) throws IntegrationException {
@@ -117,12 +117,13 @@ public class CodeLocationService extends HubService {
     }
 
     public void deleteCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
-        final String codeLocationItemUrl = getHref(codeLocationItem);
+        final String codeLocationItemUrl = hubService.getHref(codeLocationItem);
         deleteCodeLocation(codeLocationItemUrl);
     }
 
     public void deleteCodeLocation(final String codeLocationItemUrl) throws IntegrationException {
-        try (Response response = executeRequest(codeLocationItemUrl, new RequestWrapper(HttpMethod.DELETE))) {
+        final Request deleteRequest = new Request.Builder(codeLocationItemUrl).method(HttpMethod.DELETE).build();
+        try (Response response = hubService.executeRequest(deleteRequest)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -130,7 +131,8 @@ public class CodeLocationService extends HubService {
 
     public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
-            final List<CodeLocationView> codeLocations = getResponsesFromLinkResponse(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, true, new GetRequestWrapper().setQ("name:" + codeLocationName));
+            final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("q", "name:" + codeLocationName);
+            final List<CodeLocationView> codeLocations = hubService.getAllResponsesFromPath(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
             for (final CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.name)) {
                     return codeLocation;
@@ -142,7 +144,8 @@ public class CodeLocationService extends HubService {
     }
 
     public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {
-        return getResponseFromPath(ApiDiscovery.CODELOCATIONS_LINK + "/" + codeLocationId, CodeLocationView.class);
+        final String uri = ApiDiscovery.CODELOCATIONS_LINK + "/" + codeLocationId;
+        return hubService.getResponse(uri, CodeLocationView.class);
     }
 
     private CodeLocationView createRequestCodeLocationView(final CodeLocationView codeLocationItem, final String versionUrl) {
@@ -157,6 +160,8 @@ public class CodeLocationService extends HubService {
     }
 
     public ScanSummaryView getScanSummaryViewById(final String scanSummaryId) throws IntegrationException {
-        return getResponseFromPath(HubService.SCANSUMMARIES_LINK + "/" + scanSummaryId, ScanSummaryView.class);
+        final String uri = HubService.SCANSUMMARIES_LINK + "/" + scanSummaryId;
+        return hubService.getResponse(uri, ScanSummaryView.class);
     }
+
 }

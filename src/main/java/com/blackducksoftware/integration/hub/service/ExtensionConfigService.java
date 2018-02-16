@@ -32,42 +32,40 @@ import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensio
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.model.UserConfigItem;
 import com.blackducksoftware.integration.hub.service.model.UserConfigTransform;
-import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessor;
 import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessorResults;
 
-public class ExtensionConfigService extends HubService {
+public class ExtensionConfigService extends DataService {
     private final UserConfigTransform userConfigTransform;
     private final ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor;
 
-    public ExtensionConfigService(final IntLogger logger, final RestConnection restConnection) {
-        super(restConnection);
-        userConfigTransform = new UserConfigTransform(this);
+    public ExtensionConfigService(final HubService hubService) {
+        super(hubService);
+        userConfigTransform = new UserConfigTransform(hubService);
         parallelProcessor = new ParallelResourceProcessor<>(logger);
         parallelProcessor.addTransformer(ExternalExtensionUserView.class, userConfigTransform);
     }
 
     public Map<String, ExternalExtensionConfigValueView> getGlobalConfigMap(final String extensionUrl) throws IntegrationException {
         Map<String, ExternalExtensionConfigValueView> globalConfigMap = new HashMap<>();
-        final ExternalExtensionView extension = getResponse(extensionUrl, ExternalExtensionView.class);
-        final String globalOptionsLink = getFirstLink(extension, MetaHandler.GLOBAL_OPTIONS_LINK);
+        final ExternalExtensionView extension = hubService.getResponse(extensionUrl, ExternalExtensionView.class);
+        final String globalOptionsLink = hubService.getFirstLink(extension, MetaHandler.GLOBAL_OPTIONS_LINK);
         globalConfigMap = createGlobalConfigMap(globalOptionsLink);
         return globalConfigMap;
     }
 
     public ParallelResourceProcessorResults<UserConfigItem> getUserConfigList(final String extensionUrl) throws IntegrationException {
-        final ExternalExtensionView extension = getResponse(extensionUrl, ExternalExtensionView.class);
-        final String userOptionsLink = getFirstLink(extension, MetaHandler.USER_OPTIONS_LINK);
-        final List<ExternalExtensionUserView> userOptionList = getResponses(userOptionsLink, ExternalExtensionUserView.class, true);
+        final ExternalExtensionView extension = hubService.getResponse(extensionUrl, ExternalExtensionView.class);
+        final String userOptionsLink = hubService.getFirstLink(extension, MetaHandler.USER_OPTIONS_LINK);
+        final List<ExternalExtensionUserView> userOptionList = hubService.getResponses(userOptionsLink, ExternalExtensionUserView.class, true);
         final ParallelResourceProcessorResults<UserConfigItem> itemList = parallelProcessor.process(userOptionList);
         return itemList;
     }
 
     private Map<String, ExternalExtensionConfigValueView> createGlobalConfigMap(final String globalConfigUrl) throws IntegrationException {
-        final List<ExternalExtensionConfigValueView> itemList = getResponses(globalConfigUrl, ExternalExtensionConfigValueView.class, true);
+        final List<ExternalExtensionConfigValueView> itemList = hubService.getResponses(globalConfigUrl, ExternalExtensionConfigValueView.class, true);
         final Map<String, ExternalExtensionConfigValueView> itemMap = createConfigMap(itemList);
         return itemMap;
     }

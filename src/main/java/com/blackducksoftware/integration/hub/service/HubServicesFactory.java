@@ -63,12 +63,12 @@ public class HubServicesFactory {
     }
 
     public SignatureScannerService createSignatureScannerService(final long timeoutInMilliseconds) {
-        return new SignatureScannerService(restConnection, ciEnvironmentVariables, createCliDownloadUtility(), createPhoneHomeService(), createProjectService(),
+        return new SignatureScannerService(createHubService(), ciEnvironmentVariables, createCliDownloadUtility(), createPhoneHomeService(), createProjectService(),
                 createCodeLocationService(), createScanStatusService(timeoutInMilliseconds));
     }
 
     public PhoneHomeService createPhoneHomeService() {
-        return new PhoneHomeService(restConnection, createPhoneHomeClient(), createHubRegistrationService());
+        return new PhoneHomeService(createHubService(), createPhoneHomeClient(), createHubRegistrationService());
     }
 
     public PhoneHomeClient createPhoneHomeClient() {
@@ -76,39 +76,39 @@ public class HubServicesFactory {
     }
 
     public ReportService createReportService(final long timeoutInMilliseconds) throws IntegrationException {
-        return new ReportService(restConnection, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
+        return new ReportService(createHubService(), createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
     }
 
     public PolicyStatusService createPolicyStatusService() {
-        return new PolicyStatusService(restConnection, createProjectService());
+        return new PolicyStatusService(createHubService(), createProjectService());
     }
 
     public ScanStatusService createScanStatusService(final long timeoutInMilliseconds) {
-        return new ScanStatusService(restConnection, createProjectService(), createCodeLocationService(), timeoutInMilliseconds);
+        return new ScanStatusService(createHubService(), createProjectService(), createCodeLocationService(), timeoutInMilliseconds);
     }
 
     public NotificationService createNotificationService() {
-        return new NotificationService(restConnection);
+        return new NotificationService(createHubService());
     }
 
     public NotificationService createNotificationService(final PolicyNotificationFilter policyNotificationFilter) {
-        return new NotificationService(restConnection, policyNotificationFilter);
+        return new NotificationService(createHubService(), policyNotificationFilter);
     }
 
     public ExtensionConfigService createExtensionConfigService() {
-        return new ExtensionConfigService(restConnection.logger, restConnection);
+        return new ExtensionConfigService(createHubService());
     }
 
     public LicenseService createLicenseService() {
-        return new LicenseService(restConnection, createComponentService());
+        return new LicenseService(createHubService(), createComponentService());
     }
 
     public CodeLocationService createBdioUploadService() {
-        return new CodeLocationService(restConnection);
+        return new CodeLocationService(createHubService());
     }
 
     public CodeLocationService createCodeLocationService() {
-        return new CodeLocationService(restConnection);
+        return new CodeLocationService(createHubService());
     }
 
     public CLIDownloadUtility createCliDownloadUtility() {
@@ -119,13 +119,12 @@ public class HubServicesFactory {
         return new IntegrationEscapeUtil();
     }
 
-    public SimpleScanUtility createSimpleScanUtility(final RestConnection restConnection, final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final String projectName,
-            final String versionName) {
+    public SimpleScanUtility createSimpleScanUtility(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final String projectName, final String versionName) {
         return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
     }
 
     public HubRegistrationService createHubRegistrationService() {
-        return new HubRegistrationService(restConnection);
+        return new HubRegistrationService(createHubService());
     }
 
     public HubService createHubService() {
@@ -137,19 +136,19 @@ public class HubServicesFactory {
     }
 
     public ComponentService createComponentService() {
-        return new ComponentService(restConnection);
+        return new ComponentService(createHubService());
     }
 
     public IssueService createIssueService() {
-        return new IssueService(restConnection);
+        return new IssueService(createHubService());
     }
 
     public ProjectService createProjectService() {
-        return new ProjectService(restConnection, createComponentService());
+        return new ProjectService(createHubService(), createComponentService());
     }
 
     public UserGroupService createUserGroupService() {
-        return new UserGroupService(restConnection);
+        return new UserGroupService(createHubService());
     }
 
     @Override

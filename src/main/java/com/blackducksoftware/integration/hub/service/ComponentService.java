@@ -23,7 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
+import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
@@ -33,17 +36,13 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV2View;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.request.GetRequestWrapper;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.service.model.HubMediaTypes;
-import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 
-public class ComponentService extends HubService {
-    private final IntLogger logger;
-
-    public ComponentService(final RestConnection restConnection) {
-        super(restConnection);
-        this.logger = restConnection.logger;
+public class ComponentService extends DataService {
+    public ComponentService(final HubService hubService) {
+        super(hubService);
     }
 
     public ComponentVersionView getExactComponentVersionFromComponent(final ExternalId externalId) throws IntegrationException {
@@ -60,9 +59,14 @@ public class ComponentService extends HubService {
     public List<ComponentVersionView> getAllComponentVersionsFromComponent(final ExternalId externalId) throws IntegrationException {
         final ComponentSearchResultView componentSearchView = getExactComponentMatch(externalId);
 
-        final ComponentView componentView = getResponse(componentSearchView.component, ComponentView.class);
-        final String link = getFirstLink(componentView, "versions");
-        final List<ComponentVersionView> componentVersionViews = getResponses(link, ComponentVersionView.class, true);
+        // TODO this can be cleaned up when hub-common-api is updated
+        final ComponentView componentView = hubService.getResponse(componentSearchView.component, ComponentView.class);
+        final String link = hubService.getFirstLinkSafely(componentView, "versions");
+        if (StringUtils.isBlank(link)) {
+            return Collections.emptyList();
+        }
+
+        final List<ComponentVersionView> componentVersionViews = hubService.getAllResponses(link, ComponentVersionView.class);
         return componentVersionViews;
     }
 
@@ -84,7 +88,8 @@ public class ComponentService extends HubService {
         final String hubOriginId = externalId.createHubOriginId();
         final String componentQuery = String.format("id:%s|%s", forge, hubOriginId);
 
-        final List<ComponentSearchResultView> allComponents = getResponsesFromLinkResponse(ApiDiscovery.COMPONENTS_LINK_RESPONSE, true, new GetRequestWrapper().setQ(componentQuery));
+        final Request.Builder requestBuilder = new Request.Builder().addQueryParameter("q", componentQuery);
+        final List<ComponentSearchResultView> allComponents = hubService.getAllResponsesFromPath(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
         return allComponents;
     }
 
@@ -92,9 +97,9 @@ public class ComponentService extends HubService {
         final ComponentSearchResultView componentSearchView = getExactComponentMatch(externalId);
         final String componentVersionURL = componentSearchView.version;
         if (null != componentVersionURL) {
-            final ComponentVersionView componentVersion = getResponse(componentVersionURL, ComponentVersionView.class);
-            final List<VulnerabilityV2View> vulnerabilityList = getResponsesFromLinkResponse(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, true,
-                    new GetRequestWrapper().setMimeType(HubMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1));
+            final ComponentVersionView componentVersion = hubService.getResponse(componentVersionURL, ComponentVersionView.class);
+            final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().mimeType(HubMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
+            final List<VulnerabilityV2View> vulnerabilityList = hubService.getAllResponses(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, requestBuilder);
             return vulnerabilityList;
         }
 

@@ -33,20 +33,19 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersion
 import com.blackducksoftware.integration.hub.api.generated.view.LicenseView;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class LicenseService extends HubService {
+public class LicenseService extends DataService {
     private final ComponentService componentDataService;
 
-    public LicenseService(final RestConnection restConnection, final ComponentService componentDataService) {
-        super(restConnection);
+    public LicenseService(final HubService hubService, final ComponentService componentDataService) {
+        super(hubService);
         this.componentDataService = componentDataService;
     }
 
     public ComplexLicenseView getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
         final ComponentSearchResultView componentSearchView = componentDataService.getExactComponentMatch(externalId);
         final String componentVersionUrl = componentSearchView.version;
-        final ComponentVersionView componentVersion = getResponse(componentVersionUrl, ComponentVersionView.class);
+        final ComponentVersionView componentVersion = hubService.getResponse(componentVersionUrl, ComponentVersionView.class);
 
         return componentVersion.license;
     }
@@ -63,13 +62,13 @@ public class LicenseService extends HubService {
         if (licenseUrl == null) {
             return null;
         }
-        final LicenseView licenseView = getResponse(licenseUrl, LicenseView.class);
+        final LicenseView licenseView = hubService.getResponse(licenseUrl, LicenseView.class);
         return licenseView;
     }
 
     public String getLicenseText(final LicenseView licenseView) throws IntegrationException {
-        final String licenseTextUrl = getFirstLinkSafely(licenseView, LicenseView.TEXT_LINK);
-        try (Response response = executeGetRequest(licenseTextUrl)) {
+        final String licenseTextUrl = hubService.getFirstLinkSafely(licenseView, LicenseView.TEXT_LINK);
+        try (Response response = hubService.executeGetRequest(licenseTextUrl)) {
             return response.getContentString();
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);

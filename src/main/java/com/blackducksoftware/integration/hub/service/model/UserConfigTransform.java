@@ -57,7 +57,7 @@ public class UserConfigTransform implements ItemTransformer<UserConfigItem, Exte
     }
 
     private Map<String, ExternalExtensionConfigValueView> getUserConfigOptions(final String userConfigUrl) throws IntegrationException {
-        final List<ExternalExtensionConfigValueView> userItemList = hubService.getResponses(userConfigUrl, ExternalExtensionConfigValueView.class, true);
+        final List<ExternalExtensionConfigValueView> userItemList = hubService.getAllResponses(userConfigUrl, ExternalExtensionConfigValueView.class);
         final Map<String, ExternalExtensionConfigValueView> itemMap = createConfigMap(userItemList);
         return itemMap;
     }

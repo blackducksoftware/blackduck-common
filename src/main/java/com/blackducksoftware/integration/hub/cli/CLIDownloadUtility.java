@@ -51,10 +51,10 @@ import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.certificate.CertificateHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.request.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
@@ -124,7 +124,10 @@ public class CLIDownloadUtility {
             final Map<String, String> headers = new HashMap<>();
             headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
 
-            final Request request = new GetRequestWrapper().addAdditionalHeader("If-Modified-Since", String.valueOf(cliTimestamp)).createGetRequest(cliDownloadUrl.toURI().toString());
+            final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(cliDownloadUrl.toURI().toString());
+            requestBuilder.additionalHeaders(headers);
+
+            final Request request = requestBuilder.build();
             try (Response response = restConnection.executeRequest(request)) {
                 if (304 == response.getStatusCode()) {
                     // CLI has not been modified

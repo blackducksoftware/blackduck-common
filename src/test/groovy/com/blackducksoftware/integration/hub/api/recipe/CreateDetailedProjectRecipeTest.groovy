@@ -33,7 +33,7 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
          */
         HubService hubService = hubServicesFactory.createHubService()
         ProjectView projectView = hubService.getResponse(projectUrl, ProjectView.class)
-        ProjectVersionView projectVersionView = hubService.getResponseFromLinkResponse(projectView, ProjectView.CANONICALVERSION_LINK_RESPONSE)
+        ProjectVersionView projectVersionView = hubService.getResponse(projectView, ProjectView.CANONICALVERSION_LINK_RESPONSE)
 
         assertEquals(PROJECT_NAME, projectView.name)
         assertEquals('A sample testing project to demonstrate hub-common capabilities.', projectView.description)

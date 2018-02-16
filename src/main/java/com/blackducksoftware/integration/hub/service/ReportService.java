@@ -53,33 +53,30 @@ import com.blackducksoftware.integration.hub.report.api.PolicyRule;
 import com.blackducksoftware.integration.hub.report.api.ReportData;
 import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
 import com.blackducksoftware.integration.hub.report.pdf.PDFBoxWriter;
-import com.blackducksoftware.integration.hub.request.RequestWrapper;
+import com.blackducksoftware.integration.hub.request.BodyContent;
+import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
-import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class ReportService extends HubService {
+public class ReportService extends DataService {
     public final static long DEFAULT_TIMEOUT = 1000 * 60 * 5;
 
-    private final IntLogger logger;
     private final ProjectService projectDataService;
     private final IntegrationEscapeUtil escapeUtil;
-
     private final long timeoutInMilliseconds;
 
-    public ReportService(final RestConnection restConnection, final ProjectService projectDataService, final IntegrationEscapeUtil escapeUtil) {
-        this(restConnection, projectDataService, escapeUtil, DEFAULT_TIMEOUT);
+    public ReportService(final HubService hubService, final ProjectService projectDataService, final IntegrationEscapeUtil escapeUtil) {
+        this(hubService, projectDataService, escapeUtil, DEFAULT_TIMEOUT);
     }
 
-    public ReportService(final RestConnection restConnection, final ProjectService projectDataService, final IntegrationEscapeUtil escapeUtil, final long timeoutInMilliseconds) {
-        super(restConnection);
-        this.logger = restConnection.logger;
+    public ReportService(final HubService hubService, final ProjectService projectDataService, final IntegrationEscapeUtil escapeUtil, final long timeoutInMilliseconds) {
+        super(hubService);
         this.projectDataService = projectDataService;
         this.escapeUtil = escapeUtil;
 
@@ -137,8 +134,8 @@ public class ReportService extends HubService {
     }
 
     public ReportData getRiskReportData(final ProjectView project, final ProjectVersionView version) throws IntegrationException {
-        final String originalProjectUrl = getHref(project);
-        final String originalVersionUrl = getHref(version);
+        final String originalProjectUrl = hubService.getHref(project);
+        final String originalVersionUrl = hubService.getHref(version);
         final ReportData reportData = new ReportData();
         reportData.setProjectName(project.name);
         reportData.setProjectURL(getReportProjectUrl(originalProjectUrl));
@@ -148,7 +145,7 @@ public class ReportService extends HubService {
         reportData.setDistribution(version.distribution.toString());
         final List<BomComponent> components = new ArrayList<>();
         logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
-        final List<VersionBomComponentView> bomEntries = getResponsesFromLinkResponse(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE, true);
+        final List<VersionBomComponentView> bomEntries = hubService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         boolean policyFailure = false;
         for (final VersionBomComponentView bomEntry : bomEntries) {
             final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
@@ -163,7 +160,7 @@ public class ReportService extends HubService {
                 if (!policyFailure) {
                     // FIXME if we could check if the Hub has the policy module we could remove a lot of the mess
                     try {
-                        final PolicyStatusView bomPolicyStatus = getResponse(componentPolicyStatusURL, PolicyStatusView.class);
+                        final PolicyStatusView bomPolicyStatus = hubService.getResponse(componentPolicyStatusURL, PolicyStatusView.class);
                         policyStatus = bomPolicyStatus.approvalStatus.toString();
                     } catch (final IntegrationException e) {
                         policyFailure = true;
@@ -273,7 +270,7 @@ public class ReportService extends HubService {
         if (bomEntry != null && bomEntry.approvalStatus != null) {
             final PolicyStatusApprovalStatusType status = bomEntry.approvalStatus;
             if (status == PolicyStatusApprovalStatusType.IN_VIOLATION) {
-                final List<PolicyRuleViewV2> rules = getResponsesFromLinkResponse(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE, true);
+                final List<PolicyRuleViewV2> rules = hubService.getAllResponses(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE);
                 final List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (final PolicyRuleViewV2 policyRuleView : rules) {
                     final PolicyRule ruleViolated = new PolicyRule();
@@ -287,7 +284,7 @@ public class ReportService extends HubService {
     }
 
     private String getBaseUrl() {
-        return getHubBaseUrl().toString();
+        return hubService.getHubBaseUrl().toString();
     }
 
     private String getReportProjectUrl(final String projectURL) {
@@ -325,7 +322,7 @@ public class ReportService extends HubService {
      *
      */
     public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws IntegrationException {
-        if (hasLink(version, ProjectVersionView.LICENSEREPORTS_LINK)) {
+        if (hubService.hasLink(version, ProjectVersionView.LICENSEREPORTS_LINK)) {
             try {
                 logger.debug("Starting the Notices Report generation.");
                 final String reportUrl = startGeneratingHubNoticesReport(version, reportFormat);
@@ -333,7 +330,7 @@ public class ReportService extends HubService {
                 logger.debug("Waiting for the Notices Report to complete.");
                 final ReportView reportInfo = isReportFinishedGenerating(reportUrl);
 
-                final String contentLink = getFirstLink(reportInfo, ReportView.CONTENT_LINK);
+                final String contentLink = hubService.getFirstLink(reportInfo, ReportView.CONTENT_LINK);
 
                 if (contentLink == null) {
                     throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
@@ -360,13 +357,14 @@ public class ReportService extends HubService {
     }
 
     public String startGeneratingHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws IntegrationException {
-        final String reportUri = getFirstLink(version, ProjectVersionView.LICENSEREPORTS_LINK);
+        final String reportUri = hubService.getFirstLink(version, ProjectVersionView.LICENSEREPORTS_LINK);
 
         final JsonObject json = new JsonObject();
         json.addProperty("reportFormat", reportFormat.toString());
         json.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
 
-        return executePostRequestAndRetrieveURL(reportUri, new RequestWrapper(HttpMethod.POST).setBodyContentObject(json));
+        final Request request = RequestFactory.createCommonPostRequestBuilder(new BodyContent(json)).uri(reportUri).build();
+        return hubService.executePostRequestAndRetrieveURL(request);
     }
 
     /**
@@ -379,7 +377,7 @@ public class ReportService extends HubService {
         ReportView reportInfo = null;
 
         while (timeFinished == null) {
-            reportInfo = getResponse(reportUri, ReportView.class);
+            reportInfo = hubService.getResponse(reportUri, ReportView.class);
             timeFinished = reportInfo.finishedAt;
             if (timeFinished != null) {
                 break;
@@ -405,10 +403,10 @@ public class ReportService extends HubService {
     }
 
     private JsonElement getReportContentJson(final String reportContentUri) throws IntegrationException {
-        try (Response response = executeGetRequest(reportContentUri)) {
+        try (Response response = hubService.executeGetRequest(reportContentUri)) {
             final String jsonResponse = response.getContentString();
 
-            final JsonObject json = getJsonParser().parse(jsonResponse).getAsJsonObject();
+            final JsonObject json = hubService.getJsonParser().parse(jsonResponse).getAsJsonObject();
             final JsonElement content = json.get("reportContent");
             final JsonArray reportConentArray = content.getAsJsonArray();
             final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
@@ -419,7 +417,8 @@ public class ReportService extends HubService {
     }
 
     public void deleteHubReport(final String reportUri) throws IntegrationException {
-        try (Response response = executeRequest(reportUri, new RequestWrapper(HttpMethod.DELETE))) {
+        final Request request = new Request.Builder(reportUri).method(HttpMethod.DELETE).build();
+        try (Response response = hubService.executeRequest(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
