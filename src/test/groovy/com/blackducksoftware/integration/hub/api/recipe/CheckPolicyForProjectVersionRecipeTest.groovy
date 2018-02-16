@@ -49,6 +49,14 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         policyRuleView = hubServicesFactory.createHubService().getResponse(policyRuleUrl, PolicyRuleView.class)
     }
 
+    @After
+    void cleanup() {
+        deleteProject(projectVersionWrapper.getProjectView().name)
+
+        PolicyRuleService policyRuleService = hubServicesFactory.createPolicyRuleService()
+        policyRuleService.deletePolicyRule(policyRuleView)
+    }
+
 
     @Test
     void testCheckingThePolicyForAProjectVersion() {
@@ -65,13 +73,6 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatus.overallStatus)
     }
 
-    @After
-    void cleanup() {
-        deleteProject(projectVersionWrapper.getProjectView().name)
-
-        PolicyRuleService policyRuleService = hubServicesFactory.createPolicyRuleService()
-        policyRuleService.deletePolicyRule(policyRuleView)
-    }
 
     private PolicyRuleViewV2 constructTestPolicy(ComponentService componentService, MetaHandler metaHandler) {
         ExternalId externalId = constructExternalId()

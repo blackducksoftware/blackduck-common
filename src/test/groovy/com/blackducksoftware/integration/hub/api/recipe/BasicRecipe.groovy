@@ -18,14 +18,14 @@ import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.test.TestLogger
 
 class BasicRecipe {
-    static final String PROJECT_NAME = 'My Recipe Project'
-    static final String PROJECT_VERSION_NAME = '0.0.1-SNAPSHOT'
-    static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper()
+    public static final String PROJECT_NAME = 'My Recipe Project'
+    public static final String PROJECT_VERSION_NAME = '0.0.1-SNAPSHOT'
+    public static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper()
 
-    HubServicesFactory hubServicesFactory
+    public HubServicesFactory hubServicesFactory
 
     @Before
-    void startRecipe() {
+    public void startRecipe() {
         /*
          * the integration logger used to display log messages from our code
          * within a 3rd party integration environment
@@ -49,7 +49,7 @@ class BasicRecipe {
         hubServicesFactory = new HubServicesFactory(restConnection)
     }
 
-    ProjectRequest createProjectRequest(String projectName, String projectVersionName) {
+    public ProjectRequest createProjectRequest(String projectName, String projectVersionName) {
         /*
          * the ProjectRequestBuilder is a simple wrapper around creating a
          * ProjectRequest that will also include a ProjectVersionRequest to
@@ -66,13 +66,13 @@ class BasicRecipe {
         projectRequestBuilder.build()
     }
 
-    void deleteProject(String projectName) {
+    public void deleteProject(String projectName) {
         ProjectService projectDataService = hubServicesFactory.createProjectService()
         ProjectView project =  projectDataService.getProjectByName(projectName)
         projectDataService.deleteHubProject(project)
     }
 
-    void deleteCodeLocation(String codeLocationName) {
+    public void deleteCodeLocation(String codeLocationName) {
         CodeLocationService codeLocationService = hubServicesFactory.createCodeLocationService()
         CodeLocationView codeLocationView = codeLocationService.getCodeLocationByName(codeLocationName)
         codeLocationService.deleteCodeLocation(codeLocationView)
