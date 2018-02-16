@@ -23,9 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.notification;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -52,20 +52,14 @@ import com.blackducksoftware.integration.hub.model.view.VulnerabilityNotificatio
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class NotificationDataService implements Closeable {
+public class NotificationDataService {
     private final HubService hubResponseService;
-
     private final NotificationService notificationRequestService;
-
     private final ProjectVersionService projectVersionRequestService;
-
     private final PolicyService policyRequestService;
-
     private final PolicyNotificationFilter policyNotificationFilter;
-
-    private final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor;
-
     private final MetaHandler metaService;
+    private final IntLogger logger;
 
     public NotificationDataService(final IntLogger logger, final HubService hubResponseService, final NotificationService notificationRequestService, final ProjectVersionService projectVersionRequestService,
             final PolicyService policyRequestService) {
@@ -74,17 +68,17 @@ public class NotificationDataService implements Closeable {
 
     public NotificationDataService(final IntLogger logger, final HubService hubResponseService, final NotificationService notificationRequestService, final ProjectVersionService projectVersionRequestService,
             final PolicyService policyRequestService, final PolicyNotificationFilter policyNotificationFilter) {
+        this.logger = logger;
         this.hubResponseService = hubResponseService;
         this.notificationRequestService = notificationRequestService;
         this.projectVersionRequestService = projectVersionRequestService;
         this.policyRequestService = policyRequestService;
         this.policyNotificationFilter = policyNotificationFilter;
-        this.parallelProcessor = new ParallelResourceProcessor<>(logger);
         this.metaService = new MetaHandler(logger);
-        populateTransformerMap(logger);
     }
 
-    private void populateTransformerMap(final IntLogger logger) {
+    private ParallelResourceProcessor<NotificationContentItem, NotificationView> createProcessor(final IntLogger logger) {
+        final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor = new ParallelResourceProcessor<>(logger);
         parallelProcessor.addTransform(RuleViolationNotificationView.class,
                 new PolicyViolationTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
         parallelProcessor.addTransform(PolicyOverrideNotificationView.class,
@@ -92,28 +86,44 @@ public class NotificationDataService implements Closeable {
         parallelProcessor.addTransform(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubResponseService, notificationRequestService, projectVersionRequestService, policyRequestService, metaService, logger));
         parallelProcessor.addTransform(RuleViolationClearedNotificationView.class,
                 new PolicyViolationClearedTransformer(hubResponseService, logger, notificationRequestService, projectVersionRequestService, policyRequestService, policyNotificationFilter, metaService));
+        return parallelProcessor;
     }
 
     public NotificationResults getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
+        final List<Exception> exceptionList = new LinkedList<>();
+        NotificationResults results;
         final List<NotificationView> itemList = notificationRequestService.getAllNotifications(startDate, endDate);
-        final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
-        contentList.addAll(processorResults.getResults());
-        final NotificationResults results = new NotificationResults(contentList, processorResults.getExceptions());
+        try (ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor = createProcessor(logger)) {
+            final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
+            contentList.addAll(processorResults.getResults());
+            exceptionList.addAll(processorResults.getExceptions());
+        } catch (final IOException ex) {
+            logger.debug("Error closing processor", ex);
+            exceptionList.add(ex);
+        } finally {
+            results = new NotificationResults(contentList, exceptionList);
+        }
+
         return results;
     }
 
     public NotificationResults getUserNotifications(final Date startDate, final Date endDate, final UserView user) throws IntegrationException {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
+        final List<Exception> exceptionList = new LinkedList<>();
+        final NotificationResults results;
         final List<NotificationView> itemList = notificationRequestService.getUserNotifications(startDate, endDate, user);
-        final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
-        contentList.addAll(processorResults.getResults());
-        final NotificationResults results = new NotificationResults(contentList, processorResults.getExceptions());
-        return results;
-    }
+        try (ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor = createProcessor(logger)) {
+            final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
+            contentList.addAll(processorResults.getResults());
+            exceptionList.addAll(processorResults.getExceptions());
+        } catch (final IOException ex) {
+            logger.debug("Error closing processor", ex);
+            exceptionList.add(ex);
+        } finally {
+            results = new NotificationResults(contentList, exceptionList);
+        }
 
-    @Override
-    public void close() throws IOException {
-        parallelProcessor.close();
+        return results;
     }
 }

@@ -23,8 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.dataservice.extension;
 
-import java.io.Closeable;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,11 +46,11 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
 
-public class ExtensionConfigDataService extends HubService implements Closeable {
+public class ExtensionConfigDataService extends HubService {
     private final ExtensionConfigService extensionConfigRequestService;
     private final UserConfigTransform userConfigTransform;
     private final ExtensionUserOptionService extensionUserOptionRequestService;
-    private final ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor;
+    private final IntLogger logger;
 
     public ExtensionConfigDataService(final IntLogger logger, final RestConnection restConnection, final UserService userRequestService, final ExtensionConfigService extensionConfigRequestService,
             final ExtensionUserOptionService extensionUserOptionRequestService) {
@@ -57,9 +58,14 @@ public class ExtensionConfigDataService extends HubService implements Closeable 
         this.extensionConfigRequestService = extensionConfigRequestService;
         this.extensionUserOptionRequestService = extensionUserOptionRequestService;
         userConfigTransform = new UserConfigTransform(userRequestService, extensionConfigRequestService);
-        parallelProcessor = new ParallelResourceProcessor<>(logger);
+        this.logger = logger;
+    }
+
+    private ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> createProcessor() {
+        final ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor = new ParallelResourceProcessor<>(logger);
         parallelProcessor.addTransform(ExternalExtensionUserView.class, userConfigTransform);
 
+        return parallelProcessor;
     }
 
     public Map<String, ExternalExtensionConfigValueView> getGlobalConfigMap(final String extensionUrl) throws IntegrationException {
@@ -74,8 +80,13 @@ public class ExtensionConfigDataService extends HubService implements Closeable 
         final ExternalExtensionView extension = getView(extensionUrl, ExternalExtensionView.class);
         final String userOptionsLink = getFirstLink(extension, MetaHandler.USER_OPTIONS_LINK);
         final List<ExternalExtensionUserView> userOptionList = extensionUserOptionRequestService.getUserOptions(userOptionsLink);
-        final ParallelResourceProcessorResults<UserConfigItem> itemList = parallelProcessor.process(userOptionList);
-        return itemList;
+        try (ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor = createProcessor()) {
+            final ParallelResourceProcessorResults<UserConfigItem> itemList = parallelProcessor.process(userOptionList);
+            return itemList;
+        } catch (final IOException ex) {
+            logger.debug("Error closing processor", ex);
+            return new ParallelResourceProcessorResults<>(Collections.emptyList(), Arrays.asList(ex));
+        }
     }
 
     private Map<String, ExternalExtensionConfigValueView> createGlobalConfigMap(final String globalConfigUrl) throws IntegrationException {
@@ -90,10 +101,5 @@ public class ExtensionConfigDataService extends HubService implements Closeable 
             itemMap.put(item.name, item);
         }
         return itemMap;
-    }
-
-    @Override
-    public void close() throws IOException {
-        parallelProcessor.close();
     }
 }
