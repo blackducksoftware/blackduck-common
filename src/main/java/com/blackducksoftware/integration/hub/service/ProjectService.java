@@ -229,6 +229,19 @@ public class ProjectService extends HubService {
         return resolvedGroupViews;
     }
 
+    public void addComponentToProjectVersion(final ExternalId componentExternalId, final String projectName, final String projectVersionName) throws IntegrationException {
+        final ProjectView projectView = getProjectByName(projectName);
+        final ProjectVersionView projectVersionView = getProjectVersion(projectView, projectVersionName);
+        addComponentToProjectVersion(componentExternalId, projectVersionView);
+    }
+
+    public void addComponentToProjectVersion(final ExternalId componentExternalId, final ProjectVersionView projectVersionView) throws IntegrationException {
+        final String projectVersionComponentsUrl = getFirstLink(projectVersionView, ProjectVersionView.COMPONENTS_LINK);
+        final ComponentSearchResultView componentSearchResultView = componentDataService.getExactComponentMatch(componentExternalId);
+        final String componentVersionUrl = componentSearchResultView.version;
+        addComponentToProjectVersion("application/json", projectVersionComponentsUrl, componentVersionUrl);
+    }
+
     public void addComponentToProjectVersion(final String mediaType, final String projectVersionComponentsUri, final String componentVersionUrl) throws IntegrationException {
         try (Response response = executeRequest(projectVersionComponentsUri, new RequestWrapper(HttpMethod.POST).setBodyContent("{\"component\": \"" + componentVersionUrl + "\"}"))) {
         } catch (final IOException e) {
@@ -236,20 +249,13 @@ public class ProjectService extends HubService {
         }
     }
 
-    public void addComponentToProjectVersion(final ExternalId componentExternalId, final String projectName, final String projectVersionName) throws IntegrationException {
-        final ProjectView projectView = getProjectByName(projectName);
-        final ProjectVersionView projectVersionView = getProjectVersion(projectView, projectVersionName);
-        final String projectVersionComponentsUrl = getFirstLink(projectVersionView, ProjectVersionView.COMPONENTS_LINK);
-
-        final ComponentSearchResultView componentSearchResultView = componentDataService.getExactComponentMatch(componentExternalId);
-        final String componentVersionUrl = componentSearchResultView.version;
-
-        addComponentToProjectVersion("application/json", projectVersionComponentsUrl, componentVersionUrl);
-    }
-
     public List<VersionBomComponentView> getComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = getProjectByName(projectName);
         final ProjectVersionView projectVersionView = getProjectVersion(projectItem, projectVersionName);
+        return getComponentsForProjectVersion(projectVersionView);
+    }
+
+    public List<VersionBomComponentView> getComponentsForProjectVersion(final ProjectVersionView projectVersionView) throws IntegrationException {
         final List<VersionBomComponentView> versionBomComponentViews = getResponsesFromLinkResponse(projectVersionView, ProjectVersionView.COMPONENTS_LINK_RESPONSE, true);
         return versionBomComponentViews;
     }
@@ -257,6 +263,10 @@ public class ProjectService extends HubService {
     public List<VulnerableComponentView> getVulnerableComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectItem = getProjectByName(projectName);
         final ProjectVersionView projectVersionView = getProjectVersion(projectItem, projectVersionName);
+        return getVulnerableComponentsForProjectVersion(projectVersionView);
+    }
+
+    public List<VulnerableComponentView> getVulnerableComponentsForProjectVersion(final ProjectVersionView projectVersionView) throws IntegrationException {
         final List<VulnerableComponentView> vulnerableBomComponentViews = getResponsesFromLinkResponse(projectVersionView, ProjectVersionView.VULNERABLE_COMPONENTS_LINK_RESPONSE, true);
         return vulnerableBomComponentViews;
     }

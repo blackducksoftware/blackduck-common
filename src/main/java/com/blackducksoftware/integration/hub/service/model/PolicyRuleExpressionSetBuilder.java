@@ -108,7 +108,7 @@ public class PolicyRuleExpressionSetBuilder {
     public void addSingleCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final PolicyRuleConditionType policyRuleConditionType, final String value) throws HubIntegrationException {
         final List<String> values = new ArrayList<>(1);
         values.add(value);
-        addMultiCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, values);
+        addMultiCondition(policyRuleConditionOperator, policyRuleConditionType, values);
     }
 
     public void addMultiCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final PolicyRuleConditionType policyRuleConditionType, final List<String> values) throws HubIntegrationException {
