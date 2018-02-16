@@ -32,6 +32,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.core.LinkSingleResponse;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
@@ -144,8 +145,9 @@ public class CodeLocationService extends DataService {
     }
 
     public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {
-        final String uri = ApiDiscovery.CODELOCATIONS_LINK + "/" + codeLocationId;
-        return hubService.getResponse(uri, CodeLocationView.class);
+        final String link = ApiDiscovery.CODELOCATIONS_LINK + "/" + codeLocationId;
+        final LinkSingleResponse<CodeLocationView> codeLocationResponse = new LinkSingleResponse<>(link, CodeLocationView.class);
+        return hubService.getResponseFromPath(codeLocationResponse);
     }
 
     private CodeLocationView createRequestCodeLocationView(final CodeLocationView codeLocationItem, final String versionUrl) {
