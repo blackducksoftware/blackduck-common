@@ -53,7 +53,6 @@ import com.blackducksoftware.integration.hub.report.api.PolicyRule;
 import com.blackducksoftware.integration.hub.report.api.ReportData;
 import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
 import com.blackducksoftware.integration.hub.report.pdf.PDFBoxWriter;
-import com.blackducksoftware.integration.hub.request.BodyContent;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
@@ -363,7 +362,7 @@ public class ReportService extends DataService {
         json.addProperty("reportFormat", reportFormat.toString());
         json.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
 
-        final Request request = RequestFactory.createCommonPostRequestBuilder(new BodyContent(json)).uri(reportUri).build();
+        final Request request = RequestFactory.createCommonPostRequestBuilder(json).uri(reportUri).build();
         return hubService.executePostRequestAndRetrieveURL(request);
     }
 

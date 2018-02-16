@@ -33,21 +33,13 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
-import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.RuleViolationNotificationView;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubService;
-import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationTransformer(final HubService hubResponseService,
-            final PolicyNotificationFilter policyFilter, final MetaHandler metaHandler) {
-        super(hubResponseService, policyFilter, metaHandler);
-    }
-
-    public PolicyViolationTransformer(final HubService hubResponseService, final IntLogger logger,
-            final PolicyNotificationFilter policyFilter, final MetaHandler metaHandler) {
-        super(hubResponseService, logger, policyFilter, metaHandler);
+    public PolicyViolationTransformer(final HubService hubResponseService, final PolicyNotificationFilter policyFilter) {
+        super(hubResponseService, policyFilter);
     }
 
     @Override
@@ -105,7 +97,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     }
 
     private ProjectVersionView getReleaseItem(final String projectVersionLink) throws IntegrationException {
-        final ProjectVersionView releaseItem = getHubDataService().getResponse(projectVersionLink, ProjectVersionView.class);
+        final ProjectVersionView releaseItem = hubService.getResponse(projectVersionLink, ProjectVersionView.class);
         return releaseItem;
     }
 
