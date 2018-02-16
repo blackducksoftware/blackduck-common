@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.service.model;
 import java.util.Collections;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.enumeration.PolicyRuleCategoryType;
 import com.blackducksoftware.integration.hub.api.enumeration.PolicyRuleConditionType;
 import com.blackducksoftware.integration.hub.api.generated.component.PolicyRuleExpression;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
@@ -58,13 +59,10 @@ public class PolicyRuleModel {
             if (condition == PolicyRuleConditionType.UNKNOWN_RULE_CONDTION) {
                 continue;
             }
-            if (condition != PolicyRuleConditionType.PROJECT_TIER
-                    && condition != PolicyRuleConditionType.VERSION_PHASE
-                    && condition != PolicyRuleConditionType.VERSION_DISTRIBUTION) {
+            if (condition.policyRuleCategory == PolicyRuleCategoryType.COMPONENT) {
                 hasNonProjectLevelCondition = true;
             }
         }
-
         return !hasNonProjectLevelCondition;
     }
 }
