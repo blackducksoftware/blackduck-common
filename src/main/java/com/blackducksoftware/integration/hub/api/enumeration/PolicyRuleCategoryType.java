@@ -21,17 +21,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.service;
+package com.blackducksoftware.integration.hub.api.enumeration;
 
-import com.blackducksoftware.integration.log.IntLogger;
-
-public class DataService {
-    HubService hubService;
-    IntLogger logger;
-
-    public DataService(final HubService hubService) {
-        this.hubService = hubService;
-        this.logger = hubService.getRestConnection().logger;
-    }
-
+public enum PolicyRuleCategoryType {
+    PROJECT,
+    COMPONENT;
 }
