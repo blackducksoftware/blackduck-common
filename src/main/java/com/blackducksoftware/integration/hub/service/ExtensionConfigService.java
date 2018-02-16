@@ -74,7 +74,6 @@ public class ExtensionConfigService extends DataService {
             logger.debug("Error closing processor", ex);
             return new ParallelResourceProcessorResults<>(Collections.emptyList(), Arrays.asList(ex));
         }
-        return itemList;
     }
 
     private Map<String, ExternalExtensionConfigValueView> createGlobalConfigMap(final String globalConfigUrl) throws IntegrationException {

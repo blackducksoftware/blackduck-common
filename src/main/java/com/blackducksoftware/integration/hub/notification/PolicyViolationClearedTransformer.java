@@ -33,23 +33,13 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
-import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.RuleViolationClearedNotificationView;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubService;
-import com.blackducksoftware.integration.log.IntLogger;
 
 public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer {
-    public PolicyViolationClearedTransformer(final HubService hubResponseService,
-            final PolicyNotificationFilter policyFilter, final MetaHandler metaHandler) {
-        super(hubResponseService,
-                policyFilter, metaHandler);
-    }
-
-    public PolicyViolationClearedTransformer(final HubService hubResponseService, final IntLogger logger,
-            final PolicyNotificationFilter policyFilter, final MetaHandler metaHandler) {
-        super(hubResponseService, logger,
-                policyFilter, metaHandler);
+    public PolicyViolationClearedTransformer(final HubService hubService, final PolicyNotificationFilter policyFilter) {
+        super(hubService, policyFilter);
     }
 
     @Override
@@ -62,7 +52,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         final String projectVersionLink = policyViolation.content.projectVersionLink;
         ProjectVersionView releaseItem;
         try {
-            releaseItem = getHubDataService().getResponse(projectVersionLink, ProjectVersionView.class);
+            releaseItem = hubService.getResponse(projectVersionLink, ProjectVersionView.class);
         } catch (final IntegrationException e1) {
             throw new HubItemTransformException("Error getting release item while transforming notification " + item
                     + "; projectVersionLink: " + projectVersionLink + ": " + e1.getMessage(), e1);
