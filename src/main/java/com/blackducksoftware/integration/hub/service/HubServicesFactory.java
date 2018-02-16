@@ -79,8 +79,8 @@ public class HubServicesFactory {
         return new ReportService(restConnection, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
     }
 
-    public PolicyStatusService createPolicyStatusService() {
-        return new PolicyStatusService(restConnection, createProjectService());
+    public PolicyRuleService createPolicyRuleService() {
+        return new PolicyRuleService(restConnection);
     }
 
     public ScanStatusService createScanStatusService(final long timeoutInMilliseconds) {

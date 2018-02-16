@@ -60,7 +60,7 @@ import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
-import com.blackducksoftware.integration.hub.service.PolicyStatusService;
+import com.blackducksoftware.integration.hub.service.ProjectService;
 import com.blackducksoftware.integration.hub.service.ScanStatusService;
 import com.blackducksoftware.integration.hub.service.SignatureScannerService;
 import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder;
@@ -168,7 +168,7 @@ public class ComprehensiveCookbookTestIT {
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
         final ScanStatusService scanStatusService = hubServicesFactory.createScanStatusService(FIVE_MINUTES);
-        final PolicyStatusService policyStatusService = hubServicesFactory.createPolicyStatusService();
+        final ProjectService projectService = hubServicesFactory.createProjectService();
 
         // delete the project, if it exists
         deleteIfProjectExists(logger, hubServicesFactory, metaHandler, "ek_mtglist");
@@ -199,7 +199,7 @@ public class ComprehensiveCookbookTestIT {
         }
 
         // verify the policy
-        final VersionBomPolicyStatusView policyStatusItem = policyStatusService.getPolicyStatusForProjectAndVersion("ek_mtglist", "0.0.1");
+        final VersionBomPolicyStatusView policyStatusItem = projectService.getPolicyStatusForProjectAndVersion("ek_mtglist", "0.0.1");
         assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
         System.out.println(policyStatusItem);
 
@@ -237,7 +237,7 @@ public class ComprehensiveCookbookTestIT {
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
         final SignatureScannerService cliService = hubServicesFactory.createSignatureScannerService(TWENTY_MINUTES);
-        final PolicyStatusService policyStatusService = hubServicesFactory.createPolicyStatusService();
+        final ProjectService projectService = hubServicesFactory.createProjectService();
 
         // delete the project, if it exists
         deleteIfProjectExists(logger, hubServicesFactory, metaHandler, projectName);
@@ -278,7 +278,7 @@ public class ComprehensiveCookbookTestIT {
         assertNotNull(projectVersionWrapper.getProjectVersionView());
 
         // verify the policy
-        final VersionBomPolicyStatusView policyStatusItem = policyStatusService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView());
+        final VersionBomPolicyStatusView policyStatusItem = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView());
         assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
         System.out.println(policyStatusItem);
     }

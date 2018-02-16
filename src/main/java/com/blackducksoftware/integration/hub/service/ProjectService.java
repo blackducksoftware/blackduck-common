@@ -42,9 +42,11 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserGroupView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
+import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView;
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerableComponentView;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.GetRequestWrapper;
 import com.blackducksoftware.integration.hub.request.RequestWrapper;
 import com.blackducksoftware.integration.hub.request.Response;
@@ -113,10 +115,9 @@ public class ProjectService extends HubService {
             q = String.format("versionName:%s", projectVersionName);
         }
         final List<ProjectVersionView> allProjectVersionMatchingItems = getResponsesFromLinkResponse(project, ProjectView.VERSIONS_LINK_RESPONSE, true, new GetRequestWrapper().setQ(q));
-        for (final ProjectVersionView projectVersion : allProjectVersionMatchingItems) {
-            if (projectVersionName.equals(projectVersion.versionName)) {
-                return projectVersion;
-            }
+        final ProjectVersionView projectVersion = findMatchingVersion(allProjectVersionMatchingItems, projectVersionName);
+        if (null != projectVersion) {
+            return projectVersion;
         }
         throw new DoesNotExistException(String.format("Could not find the version: %s for project: %s", projectVersionName, project.name));
     }
@@ -282,6 +283,28 @@ public class ProjectService extends HubService {
             matchedFiles = tempMatchedFiles;
         }
         return matchedFiles;
+    }
+
+    public VersionBomPolicyStatusView getPolicyStatusForProjectAndVersion(final String projectName, final String projectVersionName) throws IntegrationException {
+        final ProjectView projectItem = getProjectByName(projectName);
+
+        final List<ProjectVersionView> projectVersions = getResponsesFromLinkResponse(projectItem, ProjectView.VERSIONS_LINK_RESPONSE, true);
+        final ProjectVersionView projectVersionView = findMatchingVersion(projectVersions, projectVersionName);
+
+        return getPolicyStatusForVersion(projectVersionView);
+    }
+
+    public VersionBomPolicyStatusView getPolicyStatusForVersion(final ProjectVersionView version) throws IntegrationException {
+        return getResponseFromLinkResponse(version, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
+    }
+
+    private ProjectVersionView findMatchingVersion(final List<ProjectVersionView> projectVersions, final String projectVersionName) throws HubIntegrationException {
+        for (final ProjectVersionView version : projectVersions) {
+            if (projectVersionName.equals(version.versionName)) {
+                return version;
+            }
+        }
+        return null;
     }
 
 }

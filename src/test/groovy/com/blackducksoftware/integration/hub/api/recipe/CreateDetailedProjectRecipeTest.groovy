@@ -43,6 +43,7 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
         assertEquals(ProjectVersionDistributionType.OPENSOURCE, projectVersionView.distribution)
     }
 
+
     @After
     void cleanup() {
         def projectService = hubServicesFactory.createProjectService()
