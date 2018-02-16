@@ -24,8 +24,8 @@ import com.blackducksoftware.integration.hub.service.model.PolicyRuleExpressionS
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper
 
 class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
-    ProjectVersionWrapper projectVersionWrapper;
-    PolicyRuleView policyRuleView;
+    ProjectVersionWrapper projectVersionWrapper
+    PolicyRuleView policyRuleView
 
     @Before
     void setup() {
@@ -46,7 +46,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
          * to create a Policy Rule we can construct a PolicyRuleViewV2 and Post it to the Hub
          */
         String policyRuleUrl = policyRuleService.createPolicyRule(policyRuleViewV2)
-        policyRuleView = hubServicesFactory.createHubService().getResponse(policyRuleUrl, PolicyRuleView.class);
+        policyRuleView = hubServicesFactory.createHubService().getResponse(policyRuleUrl, PolicyRuleView.class)
     }
 
 
@@ -67,8 +67,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
 
     @After
     void cleanup() {
-        def projectService = hubServicesFactory.createProjectService()
-        projectService.deleteHubProject(projectVersionWrapper.getProjectView())
+        deleteProject(projectVersionWrapper.getProjectView().name)
 
         PolicyRuleService policyRuleService = hubServicesFactory.createPolicyRuleService()
         policyRuleService.deletePolicyRule(policyRuleView)

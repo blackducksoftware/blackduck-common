@@ -75,54 +75,54 @@ public class CodeLocationService extends DataService {
         return allCodeLocations;
     }
 
-    public void unmapCodeLocations(final List<CodeLocationView> codeLocationItems) throws IntegrationException {
-        for (final CodeLocationView codeLocationItem : codeLocationItems) {
-            unmapCodeLocation(codeLocationItem);
+    public void unmapCodeLocations(final List<CodeLocationView> codeLocationViews) throws IntegrationException {
+        for (final CodeLocationView codeLocationView : codeLocationViews) {
+            unmapCodeLocation(codeLocationView);
         }
     }
 
-    public void unmapCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
-        final String codeLocationItemUrl = hubService.getHref(codeLocationItem);
-        final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationItem, "");
-        updateCodeLocation(codeLocationItemUrl, hubService.getGson().toJson(requestCodeLocationView));
+    public void unmapCodeLocation(final CodeLocationView codeLocationView) throws IntegrationException {
+        final String codeLocationViewUrl = hubService.getHref(codeLocationView);
+        final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationView, "");
+        updateCodeLocation(codeLocationViewUrl, hubService.getGson().toJson(requestCodeLocationView));
     }
 
-    public void mapCodeLocation(final CodeLocationView codeLocationItem, final ProjectVersionView version) throws IntegrationException {
-        mapCodeLocation(codeLocationItem, hubService.getHref(version));
+    public void mapCodeLocation(final CodeLocationView codeLocationView, final ProjectVersionView version) throws IntegrationException {
+        mapCodeLocation(codeLocationView, hubService.getHref(version));
     }
 
-    public void mapCodeLocation(final CodeLocationView codeLocationItem, final String versionUrl) throws IntegrationException {
-        final String codeLocationItemUrl = hubService.getHref(codeLocationItem);
-        final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationItem, versionUrl);
-        updateCodeLocation(codeLocationItemUrl, hubService.getGson().toJson(requestCodeLocationView));
+    public void mapCodeLocation(final CodeLocationView codeLocationView, final String versionUrl) throws IntegrationException {
+        final String codeLocationViewUrl = hubService.getHref(codeLocationView);
+        final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationView, versionUrl);
+        updateCodeLocation(codeLocationViewUrl, hubService.getGson().toJson(requestCodeLocationView));
     }
 
-    public void updateCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
-        final String codeLocationItemUrl = hubService.getHref(codeLocationItem);
-        updateCodeLocation(codeLocationItemUrl, hubService.getGson().toJson(codeLocationItem));
+    public void updateCodeLocation(final CodeLocationView codeLocationView) throws IntegrationException {
+        final String codeLocationViewUrl = hubService.getHref(codeLocationView);
+        updateCodeLocation(codeLocationViewUrl, hubService.getGson().toJson(codeLocationView));
     }
 
-    public void updateCodeLocation(final String codeLocationItemUrl, final String codeLocationItemJson) throws IntegrationException {
-        final Request request = new Request.Builder(codeLocationItemUrl).method(HttpMethod.PUT).bodyContent(new BodyContent(codeLocationItemJson)).build();
+    public void updateCodeLocation(final String codeLocationViewUrl, final String codeLocationViewJson) throws IntegrationException {
+        final Request request = new Request.Builder(codeLocationViewUrl).method(HttpMethod.PUT).bodyContent(new BodyContent(codeLocationViewJson)).build();
         try (Response response = hubService.executeRequest(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
     }
 
-    public void deleteCodeLocations(final List<CodeLocationView> codeLocationItems) throws IntegrationException {
-        for (final CodeLocationView codeLocationItem : codeLocationItems) {
-            deleteCodeLocation(codeLocationItem);
+    public void deleteCodeLocations(final List<CodeLocationView> codeLocationViews) throws IntegrationException {
+        for (final CodeLocationView codeLocationView : codeLocationViews) {
+            deleteCodeLocation(codeLocationView);
         }
     }
 
-    public void deleteCodeLocation(final CodeLocationView codeLocationItem) throws IntegrationException {
-        final String codeLocationItemUrl = hubService.getHref(codeLocationItem);
-        deleteCodeLocation(codeLocationItemUrl);
+    public void deleteCodeLocation(final CodeLocationView codeLocationView) throws IntegrationException {
+        final String codeLocationViewUrl = hubService.getHref(codeLocationView);
+        deleteCodeLocation(codeLocationViewUrl);
     }
 
-    public void deleteCodeLocation(final String codeLocationItemUrl) throws IntegrationException {
-        final Request deleteRequest = new Request.Builder(codeLocationItemUrl).method(HttpMethod.DELETE).build();
+    public void deleteCodeLocation(final String codeLocationViewUrl) throws IntegrationException {
+        final Request deleteRequest = new Request.Builder(codeLocationViewUrl).method(HttpMethod.DELETE).build();
         try (Response response = hubService.executeRequest(deleteRequest)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
@@ -148,14 +148,14 @@ public class CodeLocationService extends DataService {
         return hubService.getResponse(uri, CodeLocationView.class);
     }
 
-    private CodeLocationView createRequestCodeLocationView(final CodeLocationView codeLocationItem, final String versionUrl) {
+    private CodeLocationView createRequestCodeLocationView(final CodeLocationView codeLocationView, final String versionUrl) {
         final CodeLocationView requestCodeLocationView = new CodeLocationView();
-        requestCodeLocationView.createdAt = codeLocationItem.createdAt;
+        requestCodeLocationView.createdAt = codeLocationView.createdAt;
         requestCodeLocationView.mappedProjectVersion = versionUrl;
-        requestCodeLocationView.name = codeLocationItem.name;
-        requestCodeLocationView.type = codeLocationItem.type;
-        requestCodeLocationView.updatedAt = codeLocationItem.updatedAt;
-        requestCodeLocationView.url = codeLocationItem.url;
+        requestCodeLocationView.name = codeLocationView.name;
+        requestCodeLocationView.type = codeLocationView.type;
+        requestCodeLocationView.updatedAt = codeLocationView.updatedAt;
+        requestCodeLocationView.url = codeLocationView.url;
         return requestCodeLocationView;
     }
 

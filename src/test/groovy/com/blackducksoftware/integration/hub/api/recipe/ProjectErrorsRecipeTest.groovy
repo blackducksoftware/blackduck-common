@@ -17,14 +17,13 @@ import com.blackducksoftware.integration.hub.service.ProjectService
 class ProjectErrorsRecipeTest extends BasicRecipe {
     static final String PROJECT_NAME_NOT_FOUND = 'Project Name That Should Never Exist'
 
-    private String uniqueName
+    private final String uniqueName = PROJECT_NAME_NOT_FOUND + System.currentTimeMillis()
 
     @Test
     void testTryingToFindProjectThatDoesNotExist() {
         /*
          * Let's try and find a project that doesn't exist, which should throw a DoesNotExistException
          */
-        uniqueName = PROJECT_NAME_NOT_FOUND + System.currentTimeMillis()
         ProjectService projectService = hubServicesFactory.createProjectService()
         try {
             ProjectView projectView = projectService.getProjectByName(uniqueName)
@@ -40,7 +39,6 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
         /*
          * First, create a project with a unique name
          */
-        uniqueName = PROJECT_NAME_NOT_FOUND + System.currentTimeMillis()
         ProjectRequest projectRequest = createProjectRequest(uniqueName, PROJECT_VERSION_NAME)
         ProjectService projectService = hubServicesFactory.createProjectService()
         String projectUrl = projectService.createHubProject(projectRequest)
