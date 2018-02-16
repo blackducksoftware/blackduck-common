@@ -23,6 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,13 +42,17 @@ import com.blackducksoftware.integration.parallel.processor.ParallelResourceProc
 
 public class ExtensionConfigService extends DataService {
     private final UserConfigTransform userConfigTransform;
-    private final ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor;
 
     public ExtensionConfigService(final HubService hubService) {
         super(hubService);
         userConfigTransform = new UserConfigTransform(hubService);
-        parallelProcessor = new ParallelResourceProcessor<>(logger);
+    }
+
+    private ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> createProcessor() {
+        final ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor = new ParallelResourceProcessor<>(logger);
         parallelProcessor.addTransformer(ExternalExtensionUserView.class, userConfigTransform);
+
+        return parallelProcessor;
     }
 
     public Map<String, ExternalExtensionConfigValueView> getGlobalConfigMap(final String extensionUrl) throws IntegrationException {
@@ -60,7 +67,13 @@ public class ExtensionConfigService extends DataService {
         final ExternalExtensionView extension = hubService.getResponse(extensionUrl, ExternalExtensionView.class);
         final String userOptionsLink = hubService.getFirstLink(extension, MetaHandler.USER_OPTIONS_LINK);
         final List<ExternalExtensionUserView> userOptionList = hubService.getResponses(userOptionsLink, ExternalExtensionUserView.class, true);
-        final ParallelResourceProcessorResults<UserConfigItem> itemList = parallelProcessor.process(userOptionList);
+        try (ParallelResourceProcessor<UserConfigItem, ExternalExtensionUserView> parallelProcessor = createProcessor()) {
+            final ParallelResourceProcessorResults<UserConfigItem> itemList = parallelProcessor.process(userOptionList);
+            return itemList;
+        } catch (final IOException ex) {
+            logger.debug("Error closing processor", ex);
+            return new ParallelResourceProcessorResults<>(Collections.emptyList(), Arrays.asList(ex));
+        }
         return itemList;
     }
 
@@ -77,5 +90,4 @@ public class ExtensionConfigService extends DataService {
         }
         return itemMap;
     }
-
 }
