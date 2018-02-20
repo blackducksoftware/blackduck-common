@@ -240,7 +240,12 @@ public class ProjectService extends DataService {
     public void addComponentToProjectVersion(final ExternalId componentExternalId, final ProjectVersionView projectVersionView) throws IntegrationException {
         final String projectVersionComponentsUrl = hubService.getFirstLink(projectVersionView, ProjectVersionView.COMPONENTS_LINK);
         final ComponentSearchResultView componentSearchResultView = componentDataService.getExactComponentMatch(componentExternalId);
-        final String componentVersionUrl = componentSearchResultView.version;
+        String componentVersionUrl = null;
+        if (StringUtils.isNotBlank(componentSearchResultView.variant)) {
+            componentVersionUrl = componentSearchResultView.variant;
+        } else {
+            componentVersionUrl = componentSearchResultView.version;
+        }
         addComponentToProjectVersion("application/json", projectVersionComponentsUrl, componentVersionUrl);
     }
 
