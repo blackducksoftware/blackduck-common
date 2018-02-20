@@ -54,16 +54,12 @@ import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.hub.service.model.VersionBomComponentModel;
-import com.blackducksoftware.integration.log.IntLogger;
 
-public class ProjectService {
-    private final HubService hubService;
-    private final IntLogger logger;
+public class ProjectService extends DataService {
     private final ComponentService componentDataService;
 
     public ProjectService(final HubService hubService, final ComponentService componentDataService) {
-        this.logger = hubService.getRestConnection().logger;
-        this.hubService = hubService;
+        super(hubService);
         this.componentDataService = componentDataService;
     }
 
