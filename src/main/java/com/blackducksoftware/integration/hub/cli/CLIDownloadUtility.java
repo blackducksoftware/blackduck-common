@@ -30,11 +30,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -47,14 +51,12 @@ import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.certificate.CertificateHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
-
-import okhttp3.HttpUrl;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public class CLIDownloadUtility {
     private final IntLogger logger;
@@ -119,29 +121,31 @@ public class CLIDownloadUtility {
             }
             final long cliTimestamp = hubVersionFile.lastModified();
 
-            Response response = null;
-            InputStream cliStream = null;
-            try {
-                try {
-                    final HttpUrl httpUrl = restConnection.createHttpUrl(cliDownloadUrl);
-                    final Map<String, String> headers = new HashMap<>();
-                    headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
-                    final Request request = restConnection.createGetRequest(httpUrl, headers);
-                    response = restConnection.handleExecuteClientCall(request);
-                } catch (final IntegrationException e) {
-                    logger.error("Skipping installation of " + cliDownloadUrl + " to " + directoryToInstallTo + ": " + e.toString());
-                    return;
-                }
-                if (response.code() == 304) {
+            final Map<String, String> headers = new HashMap<>();
+            headers.put("If-Modified-Since", String.valueOf(cliTimestamp));
+
+            final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(cliDownloadUrl.toURI().toString());
+            requestBuilder.additionalHeaders(headers);
+
+            final Request request = requestBuilder.build();
+            try (Response response = restConnection.executeRequest(request)) {
+                if (304 == response.getStatusCode()) {
                     // CLI has not been modified
                     return;
                 }
-                final String lastModified = response.header("Last-Modified");
+                final String lastModified = response.getHeaderValue("Last-Modified");
                 Long lastModifiedLong = 0L;
 
                 if (StringUtils.isNotBlank(lastModified)) {
                     // Should parse the Date just like URLConnection did
-                    lastModifiedLong = Date.parse(lastModified);
+                    try {
+                        final SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+                        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+                        final Date parsed = format.parse(lastModified);
+                        lastModifiedLong = parsed.getTime();
+                    } catch (final ParseException pe) {
+                        throw new HubIntegrationException("Could not parse the last modified date : " + pe.getMessage());
+                    }
                 }
 
                 if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
@@ -161,27 +165,24 @@ public class CLIDownloadUtility {
 
                 logger.info("Unpacking " + cliDownloadUrl.toString() + " to " + directoryToInstallTo + " on " + localHostName);
 
-                final ResponseBody responseBody = response.body();
-                cliStream = responseBody.byteStream();
-                final CountingInputStream cis = new CountingInputStream(cliStream);
-                try {
-                    unzip(cliInstallDirectory, cis, logger);
-                    updateJreSecurity(logger, cliLocation, ciEnvironmentVariables);
-                } catch (final IOException e) {
-                    throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", cliDownloadUrl, cis.getByteCount(), responseBody.contentLength()), e);
-                } finally {
-                    cis.close();
+                try (InputStream cliStream = response.getContent()) {
+                    long byteCount = 0;
+                    try (CountingInputStream cis = new CountingInputStream(cliStream)) {
+                        byteCount = cis.getByteCount();
+                        unzip(cliInstallDirectory, cis, logger);
+                        updateJreSecurity(logger, cliLocation, ciEnvironmentVariables);
+                    } catch (final IOException e) {
+                        throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", cliDownloadUrl, byteCount, response.getContentLength()), e);
+                    }
                 }
-            } finally {
-                if (cliStream != null) {
-                    cliStream.close();
-                }
-                if (response != null) {
-                    response.close();
-                }
+            } catch (final IntegrationException e) {
+                logger.error("Skipping installation of " + cliDownloadUrl + " to " + directoryToInstallTo + ": " + e.toString());
+                return;
             }
         } catch (final IOException e) {
             throw new HubIntegrationException("Failed to install " + cliDownloadUrl + " to " + directoryToInstallTo, e);
+        } catch (final URISyntaxException e) {
+            throw new HubIntegrationException("Failed to convert " + cliDownloadUrl + " to a URI : " + e.getMessage(), e);
         }
     }
 
@@ -260,11 +261,8 @@ public class CLIDownloadUtility {
     }
 
     private void copyInputStreamToFile(final InputStream in, final File f) throws IOException {
-        final FileOutputStream fos = new FileOutputStream(f);
-        try {
+        try (FileOutputStream fos = new FileOutputStream(f)) {
             org.apache.commons.io.IOUtils.copy(in, fos);
-        } finally {
-            org.apache.commons.io.IOUtils.closeQuietly(fos);
         }
     }
 

@@ -31,14 +31,13 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.dataservice.user.UserDataService;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
-import com.blackducksoftware.integration.hub.model.view.RoleView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
+import com.blackducksoftware.integration.hub.api.generated.view.RoleAssignmentView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.TestingPropertyKey;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
+import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 
 @Category(IntegrationTest.class)
 public class UserServiceTestIT {
@@ -49,9 +48,7 @@ public class UserServiceTestIT {
     public void getProjectsForUserTestIT() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final UserDataService userDS = hubServicesFactory.createUserDataService();
-
-        final List<ProjectView> projectsForUser = userDS.getProjectsForUser(restConnectionTestHelper.getTestUsername());
+        final List<ProjectView> projectsForUser = hubServicesFactory.createUserGroupService().getProjectsForUser(restConnectionTestHelper.getTestUsername());
         assertNotNull(projectsForUser);
     }
 
@@ -59,9 +56,7 @@ public class UserServiceTestIT {
     public void getRolesForUserTestIT() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
 
-        final UserDataService userDS = hubServicesFactory.createUserDataService();
-
-        final List<RoleView> rolesForUser = userDS.getRolesForUser(restConnectionTestHelper.getTestUsername());
+        final List<RoleAssignmentView> rolesForUser = hubServicesFactory.createUserGroupService().getRolesForUser(restConnectionTestHelper.getTestUsername());
         assertTrue(rolesForUser.size() > 0);
     }
 }

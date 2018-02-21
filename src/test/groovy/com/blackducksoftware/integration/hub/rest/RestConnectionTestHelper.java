@@ -32,16 +32,16 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.http.client.HttpClient;
+
 import com.blackducksoftware.integration.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
+import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
+import com.blackducksoftware.integration.hub.configuration.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.global.HubServerConfig;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
-
-import okhttp3.OkHttpClient;
 
 public class RestConnectionTestHelper {
     private Properties testProperties;
@@ -59,7 +59,7 @@ public class RestConnectionTestHelper {
     }
 
     private void initProperties() {
-        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+        Logger.getLogger(HttpClient.class.getName()).setLevel(Level.FINE);
         testProperties = new Properties();
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         try (final InputStream is = classLoader.getResourceAsStream("test.properties")) {

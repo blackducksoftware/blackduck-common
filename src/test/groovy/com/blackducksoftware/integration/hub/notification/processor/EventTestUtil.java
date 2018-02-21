@@ -23,113 +23,77 @@
  */
 package com.blackducksoftware.integration.hub.notification.processor;
 
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.VulnerabilityContentItem;
-import com.blackducksoftware.integration.hub.model.enumeration.AllowEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.VulnerabilitySeverityEnum;
-import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
-import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.model.view.VulnerabilityView;
-import com.blackducksoftware.integration.hub.model.view.components.MetaView;
-import com.blackducksoftware.integration.hub.model.view.components.VulnerabilitySourceQualifiedId;
+import com.blackducksoftware.integration.hub.api.generated.component.ResourceMetadata;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.VulnerabilityV2Cvss2AccessComplexityType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.VulnerabilityV2SourceType;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV1View;
+import com.blackducksoftware.integration.hub.api.response.VulnerabilitySourceQualifiedId;
+import com.blackducksoftware.integration.hub.notification.PolicyOverrideContentItem;
+import com.blackducksoftware.integration.hub.notification.PolicyViolationClearedContentItem;
+import com.blackducksoftware.integration.hub.notification.PolicyViolationContentItem;
+import com.blackducksoftware.integration.hub.notification.ProjectVersionModel;
+import com.blackducksoftware.integration.hub.notification.VulnerabilityContentItem;
 
 public class EventTestUtil {
     public static final String DESCRIPTION = "description";
-
     public static final String LOW_VULN_PREFIX = "low";
-
     public static final String MEDIUM_VULN_PREFIX = "medium";
-
     public static final String HIGH_VULN_PREFIX = "high";
-
     public static final String UPDATED_BY = "me";
-
     public static final String CREATED_BY = "you";
-
     public static final String UPDATED_AT = "now";
-
     public static final String CREATED_AT = "then";
-
     public static final String RULE_NAME_2 = "Rule 2";
-
     public static final String RULE_NAME_1 = "Rule 1";
-
     public static final String LOW_VULN_ID1 = "low_vuln_id1";
-
     public static final String LOW_VULN_ID2 = "low_vuln_id2";
-
     public static final String MEDIUM_VULN_ID2 = "medium_vuln_id2";
-
     public static final String LOW_VULN_ID = "low_vuln_id";
-
     public static final String MEDIUM_VULN_ID = "medium_vuln_id";
-
     public static final String HIGH_VULN_ID = "high_vuln_id";
-
     public static final String VULN_SOURCE = "vuln_source";
-
     public static final String POLICY_RULE_2_HREF_URL = "http://a.hub.server/policy/rule2/url";
-
     public static final String POLICY_RULE_1_HREF_URL = "http://a.hub.server/policy/rule1/url";
-
     public static final String VERSIONS_URL_SEGMENT = "/versions/";
-
     public static final String COMPONENT_URL_PREFIX = "http://localhost/api/components/";
-
     public static final String PROJECT_VERSION_URL_PREFIX = "http://a.hub.server/project/";
-
     public static final String PROJECT_VERSION_URL_SEGMENT = "/version/";
-
     public static final String COMPONENT_VERSION_URL = "http://a.hub.server/components/component/version";
-
     public static final String LAST_NAME = "LastName";
-
     public static final String FIRST_NAME = "FirstName";
-
     public static final String PREFIX_RULE = "Rule ";
-
     public static final String VERSION = "Version";
-
     public static final String COMPONENT = "Component";
-
     public static final String VERSION2 = "Version2";
-
     public static final String COMPONENT2 = "Component2";
-
     public static final String PROJECT_VERSION_NAME = "ProjectVersionName";
-
     public static final String PROJECT_NAME = "ProjectName";
-
     public static final String PROJECT_VERSION_NAME2 = "ProjectVersionName2";
-
     public static final String PROJECT_NAME2 = "ProjectName2";
-
     public static final String COMPONENT_ID = "component_id";
-
     public static final String COMPONENT_VERSION_ID = "component_version_id";
+    public static final List<String> ALLOW_LIST = Collections.emptyList();
 
-    public static final List<AllowEnum> ALLOW_LIST = Collections.emptyList();
-
-    public List<VulnerabilityView> createVulnerabiltyItemList(final List<VulnerabilitySourceQualifiedId> vulnSourceList) {
-        final List<VulnerabilityView> vulnerabilityList = new ArrayList<>(vulnSourceList.size());
+    public List<VulnerabilityV1View> createVulnerabiltyItemList(final List<VulnerabilitySourceQualifiedId> vulnSourceList) {
+        final List<VulnerabilityV1View> vulnerabilityList = new ArrayList<>(vulnSourceList.size());
         for (final VulnerabilitySourceQualifiedId vulnSource : vulnSourceList) {
             final String vulnId = vulnSource.vulnerabilityId;
-            VulnerabilitySeverityEnum severity = null;
+            VulnerabilityV2Cvss2AccessComplexityType severity = null;
             if (vulnId.startsWith(HIGH_VULN_PREFIX)) {
-                severity = VulnerabilitySeverityEnum.HIGH;
+                severity = VulnerabilityV2Cvss2AccessComplexityType.HIGH;
             } else if (vulnId.startsWith(MEDIUM_VULN_PREFIX)) {
-                severity = VulnerabilitySeverityEnum.MEDIUM;
+                severity = VulnerabilityV2Cvss2AccessComplexityType.MEDIUM;
             } else if (vulnId.startsWith(LOW_VULN_PREFIX)) {
-                severity = VulnerabilitySeverityEnum.LOW;
+                severity = VulnerabilityV2Cvss2AccessComplexityType.LOW;
             }
             if (severity != null) {
                 vulnerabilityList.add(createVulnerability(vulnId, severity));
@@ -138,16 +102,16 @@ public class EventTestUtil {
         return vulnerabilityList;
     }
 
-    public VulnerabilityView createVulnerability(final String vulnId, final VulnerabilitySeverityEnum severity) {
-        final VulnerabilityView item = new VulnerabilityView();
+    public VulnerabilityV1View createVulnerability(final String vulnId, final VulnerabilityV2Cvss2AccessComplexityType severity) {
+        final VulnerabilityV1View item = new VulnerabilityV1View();
         item.vulnerabilityName = vulnId;
         item.description = "A vulnerability";
-        item.vulnerabilityPublishedDate = "today";
-        item.vulnerabilityUpdatedDate = "a minute ago";
-        item.baseScore = 10.0;
-        item.impactSubscore = 5.0;
-        item.exploitabilitySubscore = 1.0;
-        item.source = "";
+        item.vulnerabilityPublishedDate = new Date();
+        item.vulnerabilityUpdatedDate = new Date();
+        item.baseScore = new BigDecimal("10.0");
+        item.impactSubscore = new BigDecimal("5.0");
+        item.exploitabilitySubscore = new BigDecimal("1.0");
+        item.source = VulnerabilityV2SourceType.NVD;
         item.severity = severity.name();
         item.accessVector = "";
         item.accessComplexity = "";
@@ -179,8 +143,8 @@ public class EventTestUtil {
         return "{ \"_meta\": { \"href\": \"" + href + "\" }}";
     }
 
-    public MetaView createPolicyRuleMeta(final String href) {
-        final MetaView meta = new MetaView();
+    public ResourceMetadata createPolicyRuleMeta(final String href) {
+        final ResourceMetadata meta = new ResourceMetadata();
         meta.href = href;
         return meta;
     }

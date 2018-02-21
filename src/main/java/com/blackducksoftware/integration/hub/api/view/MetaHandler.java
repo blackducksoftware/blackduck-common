@@ -26,11 +26,10 @@ package com.blackducksoftware.integration.hub.api.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.api.core.HubView;
+import com.blackducksoftware.integration.hub.api.generated.component.ResourceLink;
+import com.blackducksoftware.integration.hub.api.generated.component.ResourceMetadata;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.HubView;
-import com.blackducksoftware.integration.hub.model.enumeration.AllowEnum;
-import com.blackducksoftware.integration.hub.model.view.components.LinkView;
-import com.blackducksoftware.integration.hub.model.view.components.MetaView;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class MetaHandler {
@@ -70,15 +69,15 @@ public class MetaHandler {
     }
 
     public boolean hasLink(final HubView view, final String linkKey) throws HubIntegrationException {
-        final MetaView meta = view.meta;
+        final ResourceMetadata meta = view.meta;
         if (meta == null) {
             return false;
         }
-        final List<LinkView> links = meta.links;
+        final List<ResourceLink> links = meta.links;
         if (links == null) {
             return false;
         }
-        for (final LinkView link : links) {
+        for (final ResourceLink link : links) {
             if (link.rel.equals(linkKey)) {
                 return true;
             }
@@ -87,11 +86,11 @@ public class MetaHandler {
     }
 
     public String getFirstLink(final HubView view, final String linkKey) throws HubIntegrationException {
-        final List<LinkView> links = getLinkViews(view);
+        final List<ResourceLink> links = getLinkViews(view);
         final StringBuilder linksAvailable = new StringBuilder();
         linksAvailable.append("Could not find the link '" + linkKey + "', these are the available links : ");
         int i = 0;
-        for (final LinkView link : links) {
+        for (final ResourceLink link : links) {
             if (link.rel.equals(linkKey)) {
                 return link.href;
             }
@@ -116,12 +115,12 @@ public class MetaHandler {
     }
 
     public List<String> getLinks(final HubView view, final String linkKey) throws HubIntegrationException {
-        final List<LinkView> links = getLinkViews(view);
+        final List<ResourceLink> links = getLinkViews(view);
         final List<String> linkHrefs = new ArrayList<>();
         final StringBuilder linksAvailable = new StringBuilder();
         linksAvailable.append("Could not find the link '" + linkKey + "', these are the available links : ");
         int i = 0;
-        for (final LinkView link : links) {
+        for (final ResourceLink link : links) {
             if (link.rel.equals(linkKey)) {
                 linkHrefs.add(link.href);
             }
@@ -138,30 +137,30 @@ public class MetaHandler {
         throw new HubIntegrationException(linksAvailable.toString());
     }
 
-    public MetaView getMetaView(final HubView view) throws HubIntegrationException {
-        final MetaView meta = view.meta;
+    public ResourceMetadata getMetaView(final HubView view) throws HubIntegrationException {
+        final ResourceMetadata meta = view.meta;
         if (meta == null) {
             throw new HubIntegrationException("Could not find meta information for this view : " + view.json);
         }
         return meta;
     }
 
-    public List<LinkView> getLinkViews(final HubView view) throws HubIntegrationException {
-        final MetaView meta = getMetaView(view);
-        final List<LinkView> links = meta.links;
+    public List<ResourceLink> getLinkViews(final HubView view) throws HubIntegrationException {
+        final ResourceMetadata meta = getMetaView(view);
+        final List<ResourceLink> links = meta.links;
         if (links == null) {
             throw new HubIntegrationException("Could not find any links for this view : " + view.json);
         }
         return links;
     }
 
-    public List<AllowEnum> getAllowedMethods(final HubView view) throws HubIntegrationException {
-        final MetaView meta = getMetaView(view);
+    public List<String> getAllowedMethods(final HubView view) throws HubIntegrationException {
+        final ResourceMetadata meta = getMetaView(view);
         return meta.allow;
     }
 
     public String getHref(final HubView view) throws HubIntegrationException {
-        final MetaView meta = getMetaView(view);
+        final ResourceMetadata meta = getMetaView(view);
         final String href = meta.href;
         if (href == null) {
             if (logger != null) {

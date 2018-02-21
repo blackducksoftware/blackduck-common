@@ -30,24 +30,24 @@ import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.experimental.categories.Category
 
-import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.exception.IntegrationException
-import com.blackducksoftware.integration.hub.api.project.ProjectService
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadResponse
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
+import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
+import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException
-import com.blackducksoftware.integration.hub.model.request.ProjectRequest
-import com.blackducksoftware.integration.hub.model.view.CodeLocationView
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView
-import com.blackducksoftware.integration.hub.model.view.ProjectView
-import com.blackducksoftware.integration.hub.request.builder.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
+import com.blackducksoftware.integration.hub.service.DryRunUploadResponse
+import com.blackducksoftware.integration.hub.service.DryRunUploadService
+import com.blackducksoftware.integration.hub.service.HubService
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
+import com.blackducksoftware.integration.hub.service.ProjectService
+import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
 import com.blackducksoftware.integration.log.PrintStreamIntLogger
+import com.blackducksoftware.integration.test.annotation.IntegrationTest
 
 @Category(IntegrationTest.class)
 class CodeLocationRequestServiceTestIT {
@@ -66,9 +66,8 @@ class CodeLocationRequestServiceTestIT {
     @After
     public void testCleanup(){
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        ProjectService projectRequestService = services.createProjectService()
-        ProjectView project = projectRequestService.getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
-        projectRequestService.deleteHubProject(project)
+        ProjectView project = services.createProjectService().getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
+        services.createProjectService().deleteHubProject(project)
     }
 
     @Test
@@ -77,12 +76,11 @@ class CodeLocationRequestServiceTestIT {
         final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.getRestConnection())
+        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createHubService())
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
-        CodeLocationService codeLocationRequestService = services.createCodeLocationService()
-        CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.codeLocationId)
+        CodeLocationView codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
 
@@ -90,41 +88,41 @@ class CodeLocationRequestServiceTestIT {
         projectBuilder.setProjectName(projectName)
         projectBuilder.setVersionName(versionName)
 
-        ProjectVersionView version = getProjectVersion(services.createProjectService(), services.createProjectVersionService(), projectBuilder.build())
+        ProjectVersionView version = getProjectVersion(services.createHubService(), services.createProjectService(), projectBuilder.build())
 
-        codeLocationRequestService.mapCodeLocation(codeLocationView, version)
-        codeLocationView = codeLocationRequestService.getCodeLocationById(response.codeLocationId)
+        services.createCodeLocationService().mapCodeLocation(codeLocationView, version)
+        codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isNotBlank(codeLocationView.mappedProjectVersion))
 
-        codeLocationRequestService.unmapCodeLocation(codeLocationView)
-        codeLocationView = codeLocationRequestService.getCodeLocationById(response.codeLocationId)
+        services.createCodeLocationService().unmapCodeLocation(codeLocationView)
+        codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
 
-        codeLocationRequestService.deleteCodeLocation(codeLocationView)
+        services.createCodeLocationService().deleteCodeLocation(codeLocationView)
         try {
-            codeLocationRequestService.getCodeLocationById(response.codeLocationId)
+            services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
             Assert.fail('This should have thrown an exception')
         } catch (IntegrationRestException e){
             Assert.assertEquals(404, e.getHttpStatusCode())
         }
     }
 
-    private ProjectVersionView getProjectVersion(ProjectService projectRequestService, ProjectVersionService projectVersionRequestService,  final ProjectRequest projectRequest) throws IntegrationException {
+    private ProjectVersionView getProjectVersion(HubService hubService, ProjectService projectService, final ProjectRequest projectRequest) throws IntegrationException {
         ProjectView project = null
         try {
-            project = projectRequestService.getProjectByName(projectRequest.getName())
+            project = projectService.getProjectByName(projectRequest.name)
         } catch (final DoesNotExistException e) {
-            final String projectURL = projectRequestService.createHubProject(projectRequest)
-            project = projectRequestService.getView(projectURL, ProjectView.class)
+            final String projectURL = projectService.createHubProject(projectRequest)
+            project = hubService.getResponse(projectURL, ProjectView.class)
         }
         ProjectVersionView version = null
         try {
-            version = projectVersionRequestService.getProjectVersion(project, projectRequest.getVersionRequest().getVersionName())
+            version = projectService.getProjectVersion(project, projectRequest.versionRequest.versionName)
         } catch (final DoesNotExistException e) {
-            final String versionURL = projectVersionRequestService.createHubVersion(project, projectRequest.getVersionRequest())
-            version = projectVersionRequestService.getView(versionURL, ProjectVersionView.class)
+            final String versionURL = projectService.createHubVersion(project, projectRequest.versionRequest)
+            version = hubService.getResponse(versionURL, ProjectVersionView.class)
         }
         return version
     }

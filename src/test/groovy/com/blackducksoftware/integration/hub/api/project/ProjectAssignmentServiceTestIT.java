@@ -34,33 +34,29 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
-import com.blackducksoftware.integration.hub.model.view.AssignedUserView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
+import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
+import com.blackducksoftware.integration.hub.api.generated.view.AssignedUserView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
+import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 
 @Category(IntegrationTest.class)
 public class ProjectAssignmentServiceTestIT {
     private static HubServicesFactory hubServicesFactory;
-    private static ProjectService projectService;
-    private static ProjectAssignmentService projectAssignmentService;
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
     private static ProjectView project = null;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        projectService = hubServicesFactory.createProjectService();
-        projectAssignmentService = hubServicesFactory.createProjectAssignmentService();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         if (project != null) {
-            projectService.deleteHubProject(project);
+            hubServicesFactory.createProjectService().deleteHubProject(project);
         }
     }
 
@@ -69,11 +65,13 @@ public class ProjectAssignmentServiceTestIT {
         final Long timestamp = (new Date()).getTime();
         final String testProjectName = "hub-common-it-ProjectAssignmentServiceTest-" + timestamp;
 
-        final String projectUrl = projectService.createHubProject(new ProjectRequest(testProjectName));
+        final ProjectRequest projectRequest = new ProjectRequest();
+        projectRequest.name = testProjectName;
+        final String projectUrl = hubServicesFactory.createProjectService().createHubProject(projectRequest);
         System.out.println("projectUrl: " + projectUrl);
 
-        project = projectService.getView(projectUrl, ProjectView.class);
-        final List<AssignedUserView> assignedUsers = projectAssignmentService.getProjectUsers(project);
+        project = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);
+        final List<AssignedUserView> assignedUsers = hubServicesFactory.createProjectService().getAssignedUsersToProject(project);
         assertFalse(assignedUsers.isEmpty());
         assertEquals(1, assignedUsers.size());
         assertEquals("sysadmin", assignedUsers.get(0).name);

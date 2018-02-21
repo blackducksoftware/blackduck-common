@@ -33,38 +33,33 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionDistributionEnum;
-import com.blackducksoftware.integration.hub.model.enumeration.ProjectVersionPhaseEnum;
-import com.blackducksoftware.integration.hub.model.request.ProjectRequest;
-import com.blackducksoftware.integration.hub.model.request.ProjectVersionRequest;
-import com.blackducksoftware.integration.hub.model.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
+import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
+import com.blackducksoftware.integration.hub.api.generated.component.ProjectVersionRequest;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
+import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 
 @Category(IntegrationTest.class)
 public class ProjectServiceTestIT {
-    private static HubServicesFactory hubServices;
-    private static ProjectService projectRequestService;
-    private static ProjectVersionService projectVersionRequestService;
+    private static HubServicesFactory hubServicesFactory;
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
     private static ProjectView project = null;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        hubServices = restConnectionTestHelper.createHubServicesFactory();
-        projectRequestService = hubServices.createProjectService();
-        projectVersionRequestService = hubServices.createProjectVersionService();
+        hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         if (project != null) {
-            projectRequestService.deleteHubProject(project);
+            hubServicesFactory.createProjectService().deleteHubProject(project);
         }
     }
 
@@ -76,35 +71,51 @@ public class ProjectServiceTestIT {
         final String testProjectVersion2Name = "2";
         final String testProjectVersion3Name = "3";
 
-        final String projectUrl = projectRequestService.createHubProject(new ProjectRequest(testProjectName));
+        final ProjectRequest projectRequest = new ProjectRequest();
+        projectRequest.name = testProjectName;
+        final String projectUrl = hubServicesFactory.createProjectService().createHubProject(projectRequest);
         System.out.println("projectUrl: " + projectUrl);
 
-        project = projectRequestService.getView(projectUrl, ProjectView.class);
-        projectVersionRequestService.createHubVersion(project, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion1Name));
-        projectVersionRequestService.createHubVersion(project, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion2Name));
-        projectVersionRequestService.createHubVersion(project, new ProjectVersionRequest(ProjectVersionDistributionEnum.INTERNAL, ProjectVersionPhaseEnum.DEVELOPMENT, testProjectVersion3Name));
+        project = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);
+        final ProjectVersionRequest projectVersionRequest1 = new ProjectVersionRequest();
+        projectVersionRequest1.distribution = ProjectVersionDistributionType.INTERNAL;
+        projectVersionRequest1.phase = ProjectVersionPhaseType.DEVELOPMENT;
+        projectVersionRequest1.versionName = testProjectVersion1Name;
 
-        final ProjectVersionView projectVersion1 = projectVersionRequestService.getProjectVersion(project, testProjectVersion1Name);
+        final ProjectVersionRequest projectVersionRequest2 = new ProjectVersionRequest();
+        projectVersionRequest2.distribution = ProjectVersionDistributionType.INTERNAL;
+        projectVersionRequest2.phase = ProjectVersionPhaseType.DEVELOPMENT;
+        projectVersionRequest2.versionName = testProjectVersion2Name;
+
+        final ProjectVersionRequest projectVersionRequest3 = new ProjectVersionRequest();
+        projectVersionRequest3.distribution = ProjectVersionDistributionType.INTERNAL;
+        projectVersionRequest3.phase = ProjectVersionPhaseType.DEVELOPMENT;
+        projectVersionRequest3.versionName = testProjectVersion3Name;
+
+        hubServicesFactory.createProjectService().createHubVersion(project, projectVersionRequest1);
+        hubServicesFactory.createProjectService().createHubVersion(project, projectVersionRequest2);
+        hubServicesFactory.createProjectService().createHubVersion(project, projectVersionRequest3);
+
+        final ProjectVersionView projectVersion1 = hubServicesFactory.createProjectService().getProjectVersion(project, testProjectVersion1Name);
         assertEquals(testProjectVersion1Name, projectVersion1.versionName);
 
-        final ProjectVersionView projectVersion2 = projectVersionRequestService.getProjectVersion(project, testProjectVersion2Name);
+        final ProjectVersionView projectVersion2 = hubServicesFactory.createProjectService().getProjectVersion(project, testProjectVersion2Name);
         assertEquals(testProjectVersion2Name, projectVersion2.versionName);
 
-        final ProjectVersionView projectVersion3 = projectVersionRequestService.getProjectVersion(project, testProjectVersion3Name);
+        final ProjectVersionView projectVersion3 = hubServicesFactory.createProjectService().getProjectVersion(project, testProjectVersion3Name);
         assertEquals(testProjectVersion3Name, projectVersion3.versionName);
 
-        projectRequestService.deleteHubProject(project);
+        hubServicesFactory.createProjectService().deleteHubProject(project);
         project = null;
 
         try {
-            project = projectRequestService.getView(projectUrl, ProjectView.class);
+            project = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);
             if (project != null) {
                 fail("This project should have been deleted");
             }
         } catch (final IntegrationRestException e) {
             // expected
         }
-
     }
 
 }

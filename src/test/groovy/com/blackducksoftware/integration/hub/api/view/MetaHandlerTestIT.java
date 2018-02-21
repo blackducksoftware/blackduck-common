@@ -34,11 +34,11 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import com.blackducksoftware.integration.IntegrationTest;
+import com.blackducksoftware.integration.hub.api.core.HubView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.HubView;
-import com.blackducksoftware.integration.hub.model.view.ProjectView;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
+import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 import com.google.gson.Gson;
 
 @Category(IntegrationTest.class)

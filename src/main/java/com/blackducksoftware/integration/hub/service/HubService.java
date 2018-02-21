@@ -24,55 +24,60 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import com.blackducksoftware.integration.hub.api.core.HubView;
+import com.blackducksoftware.integration.hub.api.core.LinkMultipleResponses;
+import com.blackducksoftware.integration.hub.api.core.LinkSingleResponse;
+import com.blackducksoftware.integration.hub.api.generated.component.ResourceLink;
+import com.blackducksoftware.integration.hub.api.generated.component.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.HubView;
-import com.blackducksoftware.integration.hub.model.enumeration.AllowEnum;
-import com.blackducksoftware.integration.hub.model.view.components.LinkView;
-import com.blackducksoftware.integration.hub.model.view.components.MetaView;
-import com.blackducksoftware.integration.hub.request.HubPagedRequest;
-import com.blackducksoftware.integration.hub.request.HubRequest;
-import com.blackducksoftware.integration.hub.request.HubRequestFactory;
+import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.model.PagedRequest;
+import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import okhttp3.Response;
-
 public class HubService {
+    public static final String BOMIMPORT_LINK = "/api/bom-import";
+    public static final String SCANSUMMARIES_LINK = "/api/scan-summaries";
+
+    private final RestConnection restConnection;
     private final MetaHandler metaHandler;
-    private final HubViewTransformer hubViewManager;
-    private final HubViewsTransformer hubViewsTransformer;
-    private final AllHubViewsTransformer allHubViewsTransformer;
-    private final HubRequestFactory hubRequestFactory;
+    private final HubResponseTransformer hubResponseTransformer;
+    private final HubResponsesTransformer hubResponsesTransformer;
     private final URL hubBaseUrl;
     private final JsonParser jsonParser;
     private final Gson gson;
 
     public HubService(final RestConnection restConnection) {
-        this.hubRequestFactory = new HubRequestFactory(restConnection);
-        this.hubBaseUrl = restConnection.hubBaseUrl;
+        this.restConnection = restConnection;
+        this.hubBaseUrl = restConnection.baseUrl;
         this.jsonParser = restConnection.jsonParser;
         this.gson = restConnection.gson;
         this.metaHandler = new MetaHandler(restConnection.logger);
-        this.hubViewManager = new HubViewTransformer(hubRequestFactory, metaHandler, jsonParser, gson);
-        this.hubViewsTransformer = new HubViewsTransformer(hubViewManager, jsonParser);
-        this.allHubViewsTransformer = new AllHubViewsTransformer(hubViewsTransformer, hubRequestFactory, metaHandler, jsonParser);
+        this.hubResponseTransformer = new HubResponseTransformer(restConnection);
+        this.hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer);
+    }
+
+    public RestConnection getRestConnection() {
+        return restConnection;
     }
 
     public URL getHubBaseUrl() {
         return hubBaseUrl;
-    }
-
-    public HubRequestFactory getHubRequestFactory() {
-        return hubRequestFactory;
     }
 
     public JsonParser getJsonParser() {
@@ -81,14 +86,6 @@ public class HubService {
 
     public Gson getGson() {
         return gson;
-    }
-
-    public String readResponseString(final Response response) throws IntegrationException {
-        try {
-            return response.body().string();
-        } catch (final IOException e) {
-            throw new IntegrationException(e);
-        }
     }
 
     public boolean hasLink(final HubView view, final String linkKey) throws HubIntegrationException {
@@ -107,15 +104,15 @@ public class HubService {
         return metaHandler.getLinks(view, linkKey);
     }
 
-    public MetaView getMetaView(final HubView view) throws HubIntegrationException {
+    public ResourceMetadata getMetaView(final HubView view) throws HubIntegrationException {
         return metaHandler.getMetaView(view);
     }
 
-    public List<LinkView> getLinkViews(final HubView view) throws HubIntegrationException {
+    public List<ResourceLink> getLinkViews(final HubView view) throws HubIntegrationException {
         return metaHandler.getLinkViews(view);
     }
 
-    public List<AllowEnum> getAllowedMethods(final HubView view) throws HubIntegrationException {
+    public List<String> getAllowedMethods(final HubView view) throws HubIntegrationException {
         return metaHandler.getAllowedMethods(view);
     }
 
@@ -123,156 +120,156 @@ public class HubService {
         return metaHandler.getHref(view);
     }
 
-    public <T extends HubView> T getViewFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return hubViewManager.getViewFromLinkSafely(hubView, metaLinkRef, clazz);
+    public String getUriFromPath(final String path) throws IntegrationException {
+        return HubService.pieceTogetherUri(hubBaseUrl, path);
     }
 
-    public <T extends HubView> T getViewFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return hubViewManager.getViewFromLinkSafely(hubView, metaLinkRef, clazz, mediaType);
+    // ------------------------------------------------
+    // getting responses from a 'path', which we define as something that looks like '/api/codelocations'
+    // ------------------------------------------------
+    public <T extends HubResponse> List<T> getAllResponsesFromPath(final LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
+        return getResponsesFromPath(linkMultipleResponses, true);
     }
 
-    public <T extends HubView> T getViewFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return hubViewManager.getViewFromLink(hubView, metaLinkRef, clazz);
+    public <T extends HubResponse> List<T> getAllResponsesFromPath(final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder) throws IntegrationException {
+        return getResponsesFromPath(linkMultipleResponses, requestBuilder, true);
     }
 
-    public <T extends HubView> T getViewFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return hubViewManager.getViewFromLink(hubView, metaLinkRef, clazz, mediaType);
+    public <T extends HubResponse> List<T> getResponsesFromPath(final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
+        final String uri = HubService.pieceTogetherUri(hubBaseUrl, linkMultipleResponses.link);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
+        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), linkMultipleResponses.responseClass, getAll, null);
     }
 
-    public <T extends HubView> T getView(final HubRequest request, final Class<T> clazz) throws IntegrationException {
-        return hubViewManager.getView(request, clazz);
+    public <T extends HubResponse> List<T> getResponsesFromPath(final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder, final boolean getAll) throws IntegrationException {
+        return getResponsesFromPath(linkMultipleResponses, requestBuilder, getAll, null);
     }
 
-    public <T extends HubView> T getView(final String url, final Class<T> clazz) throws IntegrationException {
-        return hubViewManager.getView(url, clazz);
+    public <T extends HubResponse> List<T> getResponsesFromPath(final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
+            throws IntegrationException {
+        final String uri = HubService.pieceTogetherUri(hubBaseUrl, linkMultipleResponses.link);
+        requestBuilder.uri(uri);
+        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), linkMultipleResponses.responseClass, getAll, typeMap);
     }
 
-    public <T extends HubView> T getView(final String url, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return hubViewManager.getView(url, clazz, mediaType);
+    public <T extends HubResponse> T getResponseFromPath(final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
+        final String uri = HubService.pieceTogetherUri(hubBaseUrl, linkSingleResponse.link);
+        final Request request = RequestFactory.createCommonGetRequest(uri);
+        return hubResponseTransformer.getResponse(request, linkSingleResponse.responseClass);
     }
 
-    public <T extends HubView> T getView(final HubRequest request, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return hubViewManager.getView(request, clazz, mediaType);
+    // ------------------------------------------------
+    // getting responses from a HubView
+    // ------------------------------------------------
+    public <T extends HubResponse> List<T> getAllResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
+        return getResponses(hubView, linkMultipleResponses, true);
     }
 
-    public <T extends HubView> T getViewAs(final JsonElement view, final Class<T> clazz) {
-        return hubViewManager.getViewAs(view, clazz);
+    public <T extends HubResponse> List<T> getAllResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder) throws IntegrationException {
+        return getResponses(hubView, linkMultipleResponses, requestBuilder, true);
     }
 
-    public <T extends HubView> T getViewAs(final String view, final Class<T> clazz) {
-        return hubViewManager.getViewAs(view, clazz);
+    public <T extends HubResponse> List<T> getResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
+        final String uri = metaHandler.getFirstLinkSafely(hubView, linkMultipleResponses.link);
+        if (StringUtils.isBlank(uri)) {
+            return Collections.emptyList();
+        }
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
+        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), linkMultipleResponses.responseClass, getAll, null);
     }
 
-    /**
-     * Will NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getViews(final JsonArray viewsArray, final Class<T> clazz) {
-        return hubViewsTransformer.getViews(viewsArray, clazz);
+    public <T extends HubResponse> List<T> getResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder, final boolean getAll) throws IntegrationException {
+        final String uri = metaHandler.getFirstLinkSafely(hubView, linkMultipleResponses.link);
+        if (StringUtils.isBlank(uri)) {
+            return Collections.emptyList();
+        }
+        requestBuilder.uri(uri);
+        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), linkMultipleResponses.responseClass, getAll, null);
     }
 
-    /**
-     * Will NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getViews(final JsonObject jsonObject, final Class<T> clazz) throws IntegrationException {
-        return hubViewsTransformer.getViews(jsonObject, clazz);
+    public <T extends HubResponse> List<T> getResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
+            throws IntegrationException {
+        final String uri = metaHandler.getFirstLinkSafely(hubView, linkMultipleResponses.link);
+        if (StringUtils.isBlank(uri)) {
+            return Collections.emptyList();
+        }
+        requestBuilder.uri(uri);
+        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), linkMultipleResponses.responseClass, getAll, typeMap);
     }
 
-    /**
-     * Will NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getViews(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
-        return hubViewsTransformer.getViews(hubPagedRequest, clazz);
+    public <T extends HubResponse> T getResponse(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
+        final String uri = metaHandler.getFirstLinkSafely(hubView, linkSingleResponse.link);
+        if (StringUtils.isBlank(uri)) {
+            return null;
+        }
+        final Request request = RequestFactory.createCommonGetRequest(uri);
+        return hubResponseTransformer.getResponse(request, linkSingleResponse.responseClass);
     }
 
-    /**
-     * Will NOT make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getViews(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return hubViewsTransformer.getViews(hubPagedRequest, clazz, mediaType);
+    // ------------------------------------------------
+    // getting responses from a uri
+    // ------------------------------------------------
+    public <T extends HubResponse> List<T> getAllResponses(final String uri, final Class<T> responseClass) throws IntegrationException {
+        return getResponses(uri, responseClass, true);
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getAllViewsFromApi(final String apiSegment, final Class<T> clazz) throws IntegrationException {
-        return allHubViewsTransformer.getAllViewsFromApi(apiSegment, clazz);
+    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> responseClass, final boolean getAll) throws IntegrationException {
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
+        requestBuilder.uri(uri);
+        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), responseClass, getAll, null);
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getAllViewsFromApi(final String apiSegment, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return allHubViewsTransformer.getAllViewsFromApi(apiSegment, clazz, mediaType);
+    public <T extends HubResponse> T getResponse(final String uri, final Class<T> responseClass) throws IntegrationException {
+        final Request request = RequestFactory.createCommonGetRequest(uri);
+        return hubResponseTransformer.getResponse(request, responseClass);
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getAllViewsFromApi(final String apiSegment, final Class<T> clazz, final int viewsPerPage) throws IntegrationException {
-        return allHubViewsTransformer.getAllViewsFromApi(apiSegment, clazz, viewsPerPage);
+    // ------------------------------------------------
+    // handling plain requests
+    // ------------------------------------------------
+    public Response executeGetRequest(final String uri) throws IntegrationException {
+        return restConnection.executeRequest(RequestFactory.createCommonGetRequest(uri));
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getAllViewsFromApi(final String apiSegment, final Class<T> clazz, final int viewsPerPage, final String mediaType) throws IntegrationException {
-        return allHubViewsTransformer.getAllViewsFromApi(apiSegment, clazz, viewsPerPage, mediaType);
+    public Response executeGetRequestFromPath(final String path) throws IntegrationException {
+        final String uri = HubService.pieceTogetherUri(restConnection.baseUrl, path);
+        return restConnection.executeRequest(RequestFactory.createCommonGetRequest(uri));
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getAllViewsFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return allHubViewsTransformer.getAllViewsFromLinkSafely(hubView, metaLinkRef, clazz);
+    public Response executeRequest(final Request request) throws IntegrationException {
+        return restConnection.executeRequest(request);
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getAllViewsFromLinkSafely(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return allHubViewsTransformer.getAllViewsFromLinkSafely(hubView, metaLinkRef, clazz, mediaType);
+    // ------------------------------------------------
+    // posting and getting location header
+    // ------------------------------------------------
+    public String executePostRequestFromPathAndRetrieveURL(final String path, final Request.Builder requestBuilder) throws IntegrationException {
+        final String uri = HubService.pieceTogetherUri(restConnection.baseUrl, path);
+        requestBuilder.uri(uri);
+        return executePostRequestAndRetrieveURL(requestBuilder.build());
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getAllViewsFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz) throws IntegrationException {
-        return allHubViewsTransformer.getAllViewsFromLink(hubView, metaLinkRef, clazz);
+    public String executePostRequestAndRetrieveURL(final Request request) throws IntegrationException {
+        try (Response response = executeRequest(request)) {
+            return response.getHeaderValue("location");
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
     }
 
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getAllViewsFromLink(final HubView hubView, final String metaLinkRef, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return allHubViewsTransformer.getAllViewsFromLink(hubView, metaLinkRef, clazz, mediaType);
-    }
-
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getAllViews(final HubPagedRequest hubPagedRequest, final Class<T> clazz) throws IntegrationException {
-        return allHubViewsTransformer.getAllViews(hubPagedRequest, clazz);
-    }
-
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getAllViews(final String url, final Class<T> clazz) throws IntegrationException {
-        return allHubViewsTransformer.getAllViews(url, clazz);
-    }
-
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getAllViews(final String url, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return allHubViewsTransformer.getAllViews(url, clazz, mediaType);
-    }
-
-    /**
-     * WILL make further paged requests to get the full list of items
-     */
-    public <T extends HubView> List<T> getAllViews(final HubPagedRequest hubPagedRequest, final Class<T> clazz, final String mediaType) throws IntegrationException {
-        return allHubViewsTransformer.getAllViews(hubPagedRequest, clazz, mediaType);
+    // ------------------------------------------------
+    // utility
+    // ------------------------------------------------
+    public static String pieceTogetherUri(final URL baseUrl, final String path) throws IntegrationException {
+        String uri;
+        try {
+            final URIBuilder uriBuilder = new URIBuilder(baseUrl.toURI());
+            uriBuilder.setPath(path);
+            uri = uriBuilder.build().toString();
+        } catch (final URISyntaxException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
+        return uri;
     }
 
 }

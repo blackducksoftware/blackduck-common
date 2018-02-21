@@ -34,17 +34,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.response.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.NotificationContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyOverrideContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationClearedContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyViolationContentItem;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.VulnerabilityContentItem;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.model.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.model.view.components.VulnerabilitySourceQualifiedId;
-import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEvent;
-import com.blackducksoftware.integration.hub.notification.processor.event.NotificationEventConstants;
+import com.blackducksoftware.integration.hub.notification.ItemTypeEnum;
+import com.blackducksoftware.integration.hub.notification.MapProcessorCache;
+import com.blackducksoftware.integration.hub.notification.NotificationCategoryEnum;
+import com.blackducksoftware.integration.hub.notification.NotificationContentItem;
+import com.blackducksoftware.integration.hub.notification.NotificationEvent;
+import com.blackducksoftware.integration.hub.notification.NotificationEventConstants;
+import com.blackducksoftware.integration.hub.notification.NotificationSubProcessor;
+import com.blackducksoftware.integration.hub.notification.PolicyOverrideContentItem;
+import com.blackducksoftware.integration.hub.notification.PolicyViolationClearedContentItem;
+import com.blackducksoftware.integration.hub.notification.PolicyViolationContentItem;
+import com.blackducksoftware.integration.hub.notification.VulnerabilityContentItem;
 
 public class MockEventProcessor extends NotificationSubProcessor {
     private final Logger logger = LoggerFactory.getLogger(MockEventProcessor.class);

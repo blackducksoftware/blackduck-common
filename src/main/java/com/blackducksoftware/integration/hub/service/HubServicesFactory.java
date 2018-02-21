@@ -29,47 +29,12 @@ import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.api.aggregate.bom.AggregateBomService;
-import com.blackducksoftware.integration.hub.api.bom.BomComponentIssueService;
-import com.blackducksoftware.integration.hub.api.bom.BomImportService;
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService;
-import com.blackducksoftware.integration.hub.api.component.ComponentService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionConfigService;
-import com.blackducksoftware.integration.hub.api.extension.ExtensionUserOptionService;
-import com.blackducksoftware.integration.hub.api.group.GroupService;
-import com.blackducksoftware.integration.hub.api.license.LicenseService;
-import com.blackducksoftware.integration.hub.api.matchedfiles.MatchedFilesService;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubRegistrationService;
-import com.blackducksoftware.integration.hub.api.nonpublic.HubVersionService;
-import com.blackducksoftware.integration.hub.api.notification.NotificationService;
-import com.blackducksoftware.integration.hub.api.policy.PolicyService;
-import com.blackducksoftware.integration.hub.api.project.ProjectAssignmentService;
-import com.blackducksoftware.integration.hub.api.project.ProjectService;
-import com.blackducksoftware.integration.hub.api.project.version.ProjectVersionService;
-import com.blackducksoftware.integration.hub.api.report.ReportService;
-import com.blackducksoftware.integration.hub.api.scan.ScanSummaryService;
-import com.blackducksoftware.integration.hub.api.user.UserService;
-import com.blackducksoftware.integration.hub.api.vulnerability.VulnerabilityService;
-import com.blackducksoftware.integration.hub.api.vulnerablebomcomponent.VulnerableBomComponentService;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
-import com.blackducksoftware.integration.hub.dataservice.cli.CLIDataService;
-import com.blackducksoftware.integration.hub.dataservice.component.ComponentDataService;
-import com.blackducksoftware.integration.hub.dataservice.extension.ExtensionConfigDataService;
-import com.blackducksoftware.integration.hub.dataservice.license.LicenseDataService;
-import com.blackducksoftware.integration.hub.dataservice.notification.NotificationDataService;
-import com.blackducksoftware.integration.hub.dataservice.notification.model.PolicyNotificationFilter;
-import com.blackducksoftware.integration.hub.dataservice.phonehome.PhoneHomeDataService;
-import com.blackducksoftware.integration.hub.dataservice.policystatus.PolicyStatusDataService;
-import com.blackducksoftware.integration.hub.dataservice.project.ProjectDataService;
-import com.blackducksoftware.integration.hub.dataservice.report.RiskReportDataService;
-import com.blackducksoftware.integration.hub.dataservice.scan.ScanStatusDataService;
-import com.blackducksoftware.integration.hub.dataservice.user.UserDataService;
-import com.blackducksoftware.integration.hub.dataservice.vulnerability.VulnerabilityDataService;
-import com.blackducksoftware.integration.hub.global.HubServerConfig;
+import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
+import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
+import com.blackducksoftware.integration.hub.notification.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.scan.HubScanConfig;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
@@ -93,122 +58,53 @@ public class HubServicesFactory {
         ciEnvironmentVariables.putAll(environmentVariables);
     }
 
-    public CLIDataService createCLIDataService() {
-        return createCLIDataService(120000l);
+    public SignatureScannerService createSignatureScannerService() {
+        return createSignatureScannerService(120000l);
     }
 
-    public CLIDataService createCLIDataService(final long timeoutInMilliseconds) {
-        return new CLIDataService(restConnection.logger, restConnection.gson, ciEnvironmentVariables, createHubVersionService(), createCliDownloadUtility(), createPhoneHomeDataService(), createProjectService(),
-                createProjectVersionService(), createCodeLocationService(), createScanSummaryService(), createScanStatusDataService(timeoutInMilliseconds));
+    public SignatureScannerService createSignatureScannerService(final long timeoutInMilliseconds) {
+        return new SignatureScannerService(createHubService(), ciEnvironmentVariables, createCliDownloadUtility(), createPhoneHomeService(), createProjectService(),
+                createCodeLocationService(), createScanStatusService(timeoutInMilliseconds));
     }
 
-    public PhoneHomeDataService createPhoneHomeDataService() {
-        return new PhoneHomeDataService(restConnection.logger, createPhoneHomeClient(), createHubRegistrationService(), createHubVersionService());
+    public PhoneHomeService createPhoneHomeService() {
+        return new PhoneHomeService(createHubService(), createPhoneHomeClient(), createHubRegistrationService());
     }
 
     public PhoneHomeClient createPhoneHomeClient() {
         return new PhoneHomeClient(restConnection.logger, restConnection.timeout, restConnection.getProxyInfo(), restConnection.alwaysTrustServerCertificate);
     }
 
-    public RiskReportDataService createRiskReportDataService(final long timeoutInMilliseconds) throws IntegrationException {
-        return new RiskReportDataService(restConnection.logger, restConnection, createProjectService(), createProjectVersionService(), createReportService(timeoutInMilliseconds), createAggregateBomService(), createCheckedHubSupport(),
-                createIntegrationEscapeUtil());
+    public ReportService createReportService(final long timeoutInMilliseconds) throws IntegrationException {
+        return new ReportService(createHubService(), createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
     }
 
-    public PolicyStatusDataService createPolicyStatusDataService() {
-        return new PolicyStatusDataService(restConnection, createProjectService(), createProjectVersionService());
+    public PolicyRuleService createPolicyRuleService() {
+        return new PolicyRuleService(createHubService());
     }
 
-    public ScanStatusDataService createScanStatusDataService(final long timeoutInMilliseconds) {
-        return new ScanStatusDataService(restConnection.logger, createProjectService(), createProjectVersionService(), createCodeLocationService(), createScanSummaryService(), timeoutInMilliseconds);
-    }
-
-    public NotificationDataService createNotificationDataService() {
-        return new NotificationDataService(restConnection.logger, createHubService(), createNotificationService(), createProjectVersionService(), createPolicyService());
-    }
-
-    public NotificationDataService createNotificationDataService(final PolicyNotificationFilter policyNotificationFilter) {
-        return new NotificationDataService(restConnection.logger, createHubService(), createNotificationService(), createProjectVersionService(), createPolicyService(), policyNotificationFilter);
-    }
-
-    public ExtensionConfigDataService createExtensionConfigDataService() {
-        return new ExtensionConfigDataService(restConnection.logger, restConnection, createUserService(), createExtensionConfigService(), createExtensionUserOptionService());
-    }
-
-    public VulnerabilityDataService createVulnerabilityDataService() {
-        return new VulnerabilityDataService(restConnection.logger, createComponentService(), createVulnerabilityService());
-    }
-
-    public LicenseDataService createLicenseDataService() {
-        return new LicenseDataService(createComponentService(), createLicenseService());
-    }
-
-    public BomImportService createBomImportService() {
-        return new BomImportService(restConnection);
-    }
-
-    public CodeLocationService createCodeLocationService() {
-        return new CodeLocationService(restConnection);
-    }
-
-    public ComponentService createComponentService() {
-        return new ComponentService(restConnection);
-    }
-
-    public HubVersionService createHubVersionService() {
-        return new HubVersionService(restConnection);
+    public ScanStatusService createScanStatusService(final long timeoutInMilliseconds) {
+        return new ScanStatusService(createHubService(), createProjectService(), createCodeLocationService(), timeoutInMilliseconds);
     }
 
     public NotificationService createNotificationService() {
-        return new NotificationService(restConnection);
+        return new NotificationService(createHubService());
     }
 
-    public PolicyService createPolicyService() {
-        return new PolicyService(restConnection);
-    }
-
-    public ProjectService createProjectService() {
-        return new ProjectService(restConnection);
-    }
-
-    public ProjectVersionService createProjectVersionService() {
-        return new ProjectVersionService(restConnection);
-    }
-
-    public LicenseService createLicenseService() {
-        return new LicenseService(restConnection);
-    }
-
-    public ScanSummaryService createScanSummaryService() {
-        return new ScanSummaryService(restConnection);
-    }
-
-    public UserService createUserService() {
-        return new UserService(restConnection);
-    }
-
-    public GroupService createGroupService() {
-        return new GroupService(restConnection);
-    }
-
-    public VulnerabilityService createVulnerabilityService() {
-        return new VulnerabilityService(restConnection);
+    public NotificationService createNotificationService(final PolicyNotificationFilter policyNotificationFilter) {
+        return new NotificationService(createHubService(), policyNotificationFilter);
     }
 
     public ExtensionConfigService createExtensionConfigService() {
-        return new ExtensionConfigService(restConnection);
+        return new ExtensionConfigService(createHubService());
     }
 
-    public ExtensionUserOptionService createExtensionUserOptionService() {
-        return new ExtensionUserOptionService(restConnection);
+    public LicenseService createLicenseService() {
+        return new LicenseService(createHubService(), createComponentService());
     }
 
-    public VulnerableBomComponentService createVulnerableBomComponentService() {
-        return new VulnerableBomComponentService(restConnection);
-    }
-
-    public MatchedFilesService createMatchedFilesService() {
-        return new MatchedFilesService(restConnection);
+    public CodeLocationService createCodeLocationService() {
+        return new CodeLocationService(createHubService());
     }
 
     public CLIDownloadUtility createCliDownloadUtility() {
@@ -219,55 +115,36 @@ public class HubServicesFactory {
         return new IntegrationEscapeUtil();
     }
 
-    public SimpleScanUtility createSimpleScanUtility(final RestConnection restConnection, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final HubScanConfig hubScanConfig, final String projectName,
-            final String versionName) {
-        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, hubSupportHelper, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
+    public SimpleScanUtility createSimpleScanUtility(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final String projectName, final String versionName) {
+        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
     }
 
     public HubRegistrationService createHubRegistrationService() {
-        return new HubRegistrationService(restConnection);
-    }
-
-    public ReportService createReportService(final long timeoutInMilliseconds) {
-        return new ReportService(restConnection, restConnection.logger, timeoutInMilliseconds);
-    }
-
-    public AggregateBomService createAggregateBomService() {
-        return new AggregateBomService(restConnection);
+        return new HubRegistrationService(createHubService());
     }
 
     public HubService createHubService() {
         return new HubService(restConnection);
     }
 
-    public ProjectAssignmentService createProjectAssignmentService() {
-        return new ProjectAssignmentService(restConnection);
-    }
-
     public RestConnection getRestConnection() {
         return restConnection;
     }
 
-    public HubSupportHelper createCheckedHubSupport() throws IntegrationException {
-        final HubSupportHelper supportHelper = new HubSupportHelper();
-        supportHelper.checkHubSupport(createHubVersionService(), restConnection.logger);
-        return supportHelper;
+    public ComponentService createComponentService() {
+        return new ComponentService(createHubService());
     }
 
-    public ComponentDataService createComponentDataService() {
-        return new ComponentDataService(restConnection.logger, createProjectService(), createProjectVersionService(), createComponentService(), createAggregateBomService(), createMatchedFilesService());
+    public IssueService createIssueService() {
+        return new IssueService(createHubService());
     }
 
-    public BomComponentIssueService createBomComponentIssueService() {
-        return new BomComponentIssueService(restConnection);
+    public ProjectService createProjectService() {
+        return new ProjectService(createHubService(), createComponentService());
     }
 
-    public ProjectDataService createProjectDataService() {
-        return new ProjectDataService(restConnection, createProjectService(), createProjectVersionService(), createProjectAssignmentService());
-    }
-
-    public UserDataService createUserDataService() {
-        return new UserDataService(restConnection.logger, createProjectService(), createUserService());
+    public UserGroupService createUserGroupService() {
+        return new UserGroupService(createHubService());
     }
 
     @Override

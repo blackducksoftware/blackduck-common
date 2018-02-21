@@ -28,17 +28,16 @@ import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.experimental.categories.Category
 
-import com.blackducksoftware.integration.IntegrationTest
-import com.blackducksoftware.integration.hub.api.codelocation.CodeLocationService
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadResponse
-import com.blackducksoftware.integration.hub.api.scan.DryRunUploadService
-import com.blackducksoftware.integration.hub.model.view.CodeLocationView
+import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
+import com.blackducksoftware.integration.hub.service.DryRunUploadResponse
+import com.blackducksoftware.integration.hub.service.DryRunUploadService
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
 import com.blackducksoftware.integration.log.PrintStreamIntLogger
+import com.blackducksoftware.integration.test.annotation.IntegrationTest
 
 @Category(IntegrationTest.class)
 class DryRunUploadServiceTestIT {
@@ -57,18 +56,17 @@ class DryRunUploadServiceTestIT {
     @Test
     public void testDryRunUpload(){
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.getRestConnection())
+        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createHubService())
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 
-        CodeLocationService codeLocationRequestService = services.createCodeLocationService()
-        CodeLocationView codeLocationView = codeLocationRequestService.getCodeLocationById(response.codeLocationId)
+        CodeLocationView codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
 
         //cleanup
-        codeLocationRequestService.deleteCodeLocation(codeLocationView)
+        services.createCodeLocationService().deleteCodeLocation(codeLocationView)
         try{
-            codeLocationRequestService.getCodeLocationById(response.codeLocationId)
+            services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
             Assert.fail('This should have thrown an exception')
         } catch (IntegrationRestException e){
             Assert.assertEquals(404, e.getHttpStatusCode())

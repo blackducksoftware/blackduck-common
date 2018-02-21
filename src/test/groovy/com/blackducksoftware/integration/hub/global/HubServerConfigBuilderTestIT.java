@@ -35,9 +35,10 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import com.blackducksoftware.integration.IntegrationTest;
-import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
+import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
+import com.blackducksoftware.integration.hub.configuration.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
+import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 
 @Category(IntegrationTest.class)
 public class HubServerConfigBuilderTestIT {

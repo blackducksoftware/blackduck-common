@@ -47,17 +47,15 @@ import org.joda.time.format.DateTimeFormatter;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.HubSupportHelper;
-import com.blackducksoftware.integration.hub.ScannerSplitStream;
-import com.blackducksoftware.integration.hub.StreamRedirectThread;
-import com.blackducksoftware.integration.hub.capability.HubCapabilitiesEnum;
-import com.blackducksoftware.integration.hub.certificate.HubCertificateHandler;
+import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
+import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
+import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ScanFailedException;
-import com.blackducksoftware.integration.hub.global.HubServerConfig;
-import com.blackducksoftware.integration.hub.model.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
-import com.blackducksoftware.integration.hub.scan.HubScanConfig;
+import com.blackducksoftware.integration.hub.service.model.HubCertificateHandler;
+import com.blackducksoftware.integration.hub.service.model.ScannerSplitStream;
+import com.blackducksoftware.integration.hub.service.model.StreamRedirectThread;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 import com.google.gson.Gson;
@@ -68,7 +66,6 @@ public class SimpleScanUtility {
     private final Gson gson;
     private final IntLogger logger;
     private final HubServerConfig hubServerConfig;
-    private final HubSupportHelper hubSupportHelper;
     private final CIEnvironmentVariables ciEnvironmentVariables;
     private final HubScanConfig hubScanConfig;
     private final String project;
@@ -77,12 +74,11 @@ public class SimpleScanUtility {
 
     private File logDirectory;
 
-    public SimpleScanUtility(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final HubSupportHelper hubSupportHelper, final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig,
+    public SimpleScanUtility(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig,
             final String project, final String version) {
         this.gson = gson;
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
-        this.hubSupportHelper = hubSupportHelper;
         this.ciEnvironmentVariables = ciEnvironmentVariables;
         this.hubScanConfig = hubScanConfig;
         this.project = project;
@@ -151,9 +147,7 @@ public class SimpleScanUtility {
         cmd.add("-jar");
         cmd.add(pathToScanExecutable);
 
-        if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_INSECURE_OPTION)) {
-            cmd.add("--no-prompt");
-        }
+        cmd.add("--no-prompt");
 
         if (!hubScanConfig.isDryRun()) {
             cmd.add("--scheme");
@@ -164,10 +158,6 @@ public class SimpleScanUtility {
 
             cmd.add("--username");
             cmd.add(hubServerConfig.getGlobalCredentials().getUsername());
-            if (!hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_PASSWORD_ENVIRONMENT_VARIABLE)) {
-                cmd.add("--password");
-                cmd.add(hubServerConfig.getGlobalCredentials().getDecryptedPassword());
-            }
 
             final int hubPort = hubServerConfig.getHubUrl().getPort();
             if (hubPort > 0) {
@@ -203,13 +193,11 @@ public class SimpleScanUtility {
             cmd.add(logDirectoryPath);
         }
 
-        if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_STATUS_DIRECTORY_OPTION)) {
-            // Only add the statusWriteDir option if the Hub supports the statusWriteDir option
-            // The scanStatusDirectoryPath is the same as the log directory path
-            // The CLI will create a subdirectory for the status files
-            cmd.add("--statusWriteDir");
-            cmd.add(logDirectoryPath);
-        }
+        // Only add the statusWriteDir option if the Hub supports the statusWriteDir option
+        // The scanStatusDirectoryPath is the same as the log directory path
+        // The CLI will create a subdirectory for the status files
+        cmd.add("--statusWriteDir");
+        cmd.add(logDirectoryPath);
 
         if (StringUtils.isNotBlank(project) && StringUtils.isNotBlank(version)) {
             cmd.add("--project");
@@ -218,12 +206,12 @@ public class SimpleScanUtility {
             cmd.add(version);
         }
 
-        if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CODE_LOCATION_ALIAS) && StringUtils.isNotBlank(hubScanConfig.getCodeLocationAlias())) {
+        if (StringUtils.isNotBlank(hubScanConfig.getCodeLocationAlias())) {
             cmd.add("--name");
             cmd.add(hubScanConfig.getCodeLocationAlias());
         }
 
-        if (hubSupportHelper.hasCapability(HubCapabilitiesEnum.CLI_SNIPPET_MODE) && hubScanConfig.isSnippetModeEnabled()) {
+        if (hubScanConfig.isSnippetModeEnabled()) {
             cmd.add("--snippet-matching");
         }
 

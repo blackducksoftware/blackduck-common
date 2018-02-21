@@ -32,8 +32,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.blackducksoftware.integration.hub.dataservice.model.ProjectVersionModel;
-import com.blackducksoftware.integration.hub.model.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.notification.NotificationContentItem;
+import com.blackducksoftware.integration.hub.notification.ProjectVersionModel;
 
 public class NotificationContentItemTest {
 
