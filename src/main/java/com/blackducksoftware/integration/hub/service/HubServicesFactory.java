@@ -68,7 +68,7 @@ public class HubServicesFactory {
     }
 
     public PhoneHomeService createPhoneHomeService() {
-        return new PhoneHomeService(createHubService(), createPhoneHomeClient(), createHubRegistrationService());
+        return new PhoneHomeService(createHubService(), createPhoneHomeClient(), createHubRegistrationService(), ciEnvironmentVariables);
     }
 
     public PhoneHomeClient createPhoneHomeClient() {
