@@ -49,7 +49,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     private String username;
     private String password;
     private int passwordLength;
-    private String apiKey;
+    private String apiToken;
     private String proxyHost;
     private String proxyPort;
     private String proxyUsername;
@@ -90,8 +90,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         }
 
         final ProxyInfo proxyInfo = getHubProxyInfo();
-        if (StringUtils.isNotBlank(apiKey)) {
-            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), apiKey, proxyInfo, alwaysTrustServerCertificate);
+        if (StringUtils.isNotBlank(apiToken)) {
+            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), apiToken, proxyInfo, alwaysTrustServerCertificate);
         } else {
             final Credentials credentials = getHubCredentials();
             return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, alwaysTrustServerCertificate);
@@ -123,7 +123,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         validator.setHubUrl(hubUrl);
         validator.setUsername(username);
         validator.setPassword(password);
-        validator.setApiKey(apiKey);
+        validator.setApiToken(apiToken);
         validator.setTimeout(timeoutSeconds);
         validator.setProxyHost(proxyHost);
         validator.setProxyPort(proxyPort);
@@ -136,22 +136,22 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     }
 
     public void setFromProperties(final Properties properties) {
-        final String hubUrl = properties.getProperty("hub.url");
-        final String hubUsername = properties.getProperty("hub.username");
-        final String hubPassword = properties.getProperty("hub.password");
-        final String hubApiKey = properties.getProperty("hub.api.key");
-        final String hubTimeout = properties.getProperty("hub.timeout");
-        final String hubProxyHost = properties.getProperty("hub.proxy.host");
-        final String hubProxyPort = properties.getProperty("hub.proxy.port");
-        final String hubIgnoredProxyHosts = properties.getProperty("hub.ignored.proxy.hosts");
-        final String hubProxyUsername = properties.getProperty("hub.proxy.username");
-        final String hubProxyPassword = properties.getProperty("hub.proxy.password");
-        final boolean hubAlwaysTrustServerCertificate = Boolean.parseBoolean(properties.getProperty("hub.trust.cert"));
+        final String hubUrl = properties.getProperty("blackduck.hub.url");
+        final String hubUsername = properties.getProperty("blackduck.hub.username");
+        final String hubPassword = properties.getProperty("blackduck.hub.password");
+        final String hubApiToken = properties.getProperty("blackduck.hub.api.token");
+        final String hubTimeout = properties.getProperty("blackduck.hub.timeout");
+        final String hubProxyHost = properties.getProperty("blackduck.hub.proxy.host");
+        final String hubProxyPort = properties.getProperty("blackduck.hub.proxy.port");
+        final String hubIgnoredProxyHosts = properties.getProperty("blackduck.hub.ignored.proxy.hosts");
+        final String hubProxyUsername = properties.getProperty("blackduck.hub.proxy.username");
+        final String hubProxyPassword = properties.getProperty("blackduck.hub.proxy.password");
+        final boolean hubAlwaysTrustServerCertificate = Boolean.parseBoolean(properties.getProperty("blackduck.hub.trust.cert"));
 
         setHubUrl(hubUrl);
         setUsername(hubUsername);
         setPassword(hubPassword);
-        setApiKey(hubApiKey);
+        setApiToken(hubApiToken);
         setTimeout(hubTimeout);
         setProxyHost(hubProxyHost);
         setProxyPort(hubProxyPort);
@@ -188,8 +188,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         this.passwordLength = passwordLength;
     }
 
-    public void setApiKey(final String apiKey) {
-        this.apiKey = apiKey;
+    public void setApiToken(final String apiToken) {
+        this.apiToken = apiToken;
     }
 
     public void setProxyHost(final String proxyHost) {

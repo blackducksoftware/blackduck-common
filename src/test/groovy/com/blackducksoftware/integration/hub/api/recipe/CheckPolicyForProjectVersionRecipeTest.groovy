@@ -1,7 +1,5 @@
 package com.blackducksoftware.integration.hub.api.recipe
 
-import static org.junit.Assert.*
-
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

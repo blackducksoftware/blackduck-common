@@ -1,12 +1,9 @@
 package com.blackducksoftware.integration.hub.api.recipe
 
-import static org.junit.Assert.*
-
 import org.junit.After
 import org.junit.Test
 import org.junit.experimental.categories.Category
 
-import com.blackducksoftware.integration.IntegrationTest
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
@@ -14,6 +11,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.service.HubService
 import com.blackducksoftware.integration.hub.service.ProjectService
+import com.blackducksoftware.integration.test.annotation.IntegrationTest
 
 @Category(IntegrationTest.class)
 class CreateDetailedProjectRecipeTest extends BasicRecipe {

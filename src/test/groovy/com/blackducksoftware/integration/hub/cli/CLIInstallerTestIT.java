@@ -40,7 +40,6 @@ import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-import com.blackducksoftware.integration.IntegrationTest;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.response.CurrentVersionView;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfigBuilder;
@@ -49,6 +48,7 @@ import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.TestingPropertyKey;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.test.TestLogger;
+import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 @Category(IntegrationTest.class)

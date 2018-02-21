@@ -15,7 +15,7 @@ import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.hub.service.ProjectService
 import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 import com.blackducksoftware.integration.log.IntLogger
-import com.blackducksoftware.integration.test.TestLogger
+import com.blackducksoftware.integration.test.tool.TestLogger
 
 class BasicRecipe {
     public static final String PROJECT_NAME = 'My Recipe Project'
