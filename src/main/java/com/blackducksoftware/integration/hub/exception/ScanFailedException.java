@@ -24,23 +24,25 @@
 package com.blackducksoftware.integration.hub.exception;
 
 public class ScanFailedException extends HubIntegrationException {
+    private static final long serialVersionUID = 1L;
+
     public ScanFailedException() {
         super();
     }
 
-    public ScanFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public ScanFailedException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public ScanFailedException(String message, Throwable cause) {
+    public ScanFailedException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public ScanFailedException(String message) {
+    public ScanFailedException(final String message) {
         super(message);
     }
 
-    public ScanFailedException(Throwable cause) {
+    public ScanFailedException(final Throwable cause) {
         super(cause);
     }
 

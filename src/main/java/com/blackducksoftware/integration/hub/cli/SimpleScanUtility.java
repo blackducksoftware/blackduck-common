@@ -156,8 +156,10 @@ public class SimpleScanUtility {
             cmd.add(hubServerConfig.getHubUrl().getHost());
             logger.debug("Using this Hub hostname : '" + hubServerConfig.getHubUrl().getHost() + "'");
 
-            cmd.add("--username");
-            cmd.add(hubServerConfig.getGlobalCredentials().getUsername());
+            if (StringUtils.isEmpty(hubServerConfig.getApiToken())) {
+                cmd.add("--username");
+                cmd.add(hubServerConfig.getGlobalCredentials().getUsername());
+            }
 
             final int hubPort = hubServerConfig.getHubUrl().getPort();
             if (hubPort > 0) {
@@ -251,7 +253,11 @@ public class SimpleScanUtility {
             final ProcessBuilder processBuilder = new ProcessBuilder(cmd).redirectError(PIPE).redirectOutput(PIPE);
 
             if (!hubScanConfig.isDryRun()) {
-                processBuilder.environment().put("BD_HUB_PASSWORD", hubServerConfig.getGlobalCredentials().getDecryptedPassword());
+                if (!StringUtils.isEmpty(hubServerConfig.getApiToken())) {
+                    processBuilder.environment().put("BD_HUB_TOKEN", hubServerConfig.getApiToken());
+                } else {
+                    processBuilder.environment().put("BD_HUB_PASSWORD", hubServerConfig.getGlobalCredentials().getDecryptedPassword());
+                }
             }
             processBuilder.environment().put("BD_HUB_NO_PROMPT", "true");
 
@@ -432,22 +438,12 @@ public class SimpleScanUtility {
 
     public File[] getScanSummaryFiles() {
         final File scanStatusDirectory = getStatusDirectory();
-        return scanStatusDirectory.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(final File dir, final String name) {
-                return FilenameUtils.wildcardMatchOnSystem(name, "*.json");
-            }
-        });
+        return scanStatusDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
     }
 
     public File[] getDryRunFiles() {
         final File dataDirectory = getDataDirectory();
-        return dataDirectory.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(final File dir, final String name) {
-                return FilenameUtils.wildcardMatchOnSystem(name, "*.json");
-            }
-        });
+        return dataDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
     }
 
 }

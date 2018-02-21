@@ -24,6 +24,8 @@
 package com.blackducksoftware.integration.hub.exception;
 
 public class FailureConditionException extends HubIntegrationException {
+    private static final long serialVersionUID = 1L;
+
     public FailureConditionException() {
         super();
     }

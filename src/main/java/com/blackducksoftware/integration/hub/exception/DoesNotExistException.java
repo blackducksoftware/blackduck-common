@@ -24,23 +24,25 @@
 package com.blackducksoftware.integration.hub.exception;
 
 public class DoesNotExistException extends HubIntegrationException {
+    private static final long serialVersionUID = 1L;
+
     public DoesNotExistException() {
         super();
     }
 
-    public DoesNotExistException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public DoesNotExistException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public DoesNotExistException(String message, Throwable cause) {
+    public DoesNotExistException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public DoesNotExistException(String message) {
+    public DoesNotExistException(final String message) {
         super(message);
     }
 
-    public DoesNotExistException(Throwable cause) {
+    public DoesNotExistException(final Throwable cause) {
         super(cause);
     }
 

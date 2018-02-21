@@ -24,23 +24,25 @@
 package com.blackducksoftware.integration.hub.exception;
 
 public class HubItemTransformException extends HubIntegrationException {
+    private static final long serialVersionUID = 1L;
+
     public HubItemTransformException() {
         super();
     }
 
-    public HubItemTransformException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public HubItemTransformException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public HubItemTransformException(String message, Throwable cause) {
+    public HubItemTransformException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public HubItemTransformException(String message) {
+    public HubItemTransformException(final String message) {
         super(message);
     }
 
-    public HubItemTransformException(Throwable cause) {
+    public HubItemTransformException(final Throwable cause) {
         super(cause);
     }
 
