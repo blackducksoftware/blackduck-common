@@ -1,6 +1,7 @@
 package com.blackducksoftware.integration.hub.api.recipe
 
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
@@ -68,7 +69,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         projectService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView())
 
         VersionBomPolicyStatusView policyStatus = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView())
-        assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatus.overallStatus)
+        Assert.assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatus.overallStatus)
     }
 
 

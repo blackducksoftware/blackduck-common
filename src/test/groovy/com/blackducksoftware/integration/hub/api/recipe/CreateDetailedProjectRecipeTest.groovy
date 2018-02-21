@@ -1,5 +1,7 @@
 package com.blackducksoftware.integration.hub.api.recipe
 
+import static org.junit.Assert.*
+
 import org.junit.After
 import org.junit.Test
 import org.junit.experimental.categories.Category
