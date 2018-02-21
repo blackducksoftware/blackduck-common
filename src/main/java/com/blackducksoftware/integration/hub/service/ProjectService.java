@@ -54,16 +54,12 @@ import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.hub.service.model.VersionBomComponentModel;
-import com.blackducksoftware.integration.log.IntLogger;
 
-public class ProjectService {
-    private final HubService hubService;
-    private final IntLogger logger;
+public class ProjectService extends DataService {
     private final ComponentService componentDataService;
 
     public ProjectService(final HubService hubService, final ComponentService componentDataService) {
-        this.logger = hubService.getRestConnection().logger;
-        this.hubService = hubService;
+        super(hubService);
         this.componentDataService = componentDataService;
     }
 
@@ -244,7 +240,12 @@ public class ProjectService {
     public void addComponentToProjectVersion(final ExternalId componentExternalId, final ProjectVersionView projectVersionView) throws IntegrationException {
         final String projectVersionComponentsUrl = hubService.getFirstLink(projectVersionView, ProjectVersionView.COMPONENTS_LINK);
         final ComponentSearchResultView componentSearchResultView = componentDataService.getExactComponentMatch(componentExternalId);
-        final String componentVersionUrl = componentSearchResultView.version;
+        String componentVersionUrl = null;
+        if (StringUtils.isNotBlank(componentSearchResultView.variant)) {
+            componentVersionUrl = componentSearchResultView.variant;
+        } else {
+            componentVersionUrl = componentSearchResultView.version;
+        }
         addComponentToProjectVersion("application/json", projectVersionComponentsUrl, componentVersionUrl);
     }
 
