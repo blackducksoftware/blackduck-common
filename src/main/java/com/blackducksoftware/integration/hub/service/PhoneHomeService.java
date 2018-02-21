@@ -40,16 +40,19 @@ import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder;
 import com.blackducksoftware.integration.phonehome.enums.BlackDuckName;
 import com.blackducksoftware.integration.phonehome.enums.PhoneHomeSource;
 import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName;
+import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class PhoneHomeService extends DataService {
     private final HubRegistrationService hubRegistrationService;
     private final PhoneHomeClient phoneHomeClient;
     private final ExecutorService executorService;
+    private final CIEnvironmentVariables ciEnvironmentVariables;
 
-    public PhoneHomeService(final HubService hubService, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService) {
+    public PhoneHomeService(final HubService hubService, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final CIEnvironmentVariables ciEnvironmentVariables) {
         super(hubService);
         this.hubRegistrationService = hubRegistrationService;
         this.phoneHomeClient = phoneHomeClient;
+        this.ciEnvironmentVariables = ciEnvironmentVariables;
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
     }
@@ -77,7 +80,7 @@ public class PhoneHomeService extends DataService {
             logger.debug("Skipping phone-home");
         } else {
             try {
-                phoneHomeClient.postPhoneHomeRequest(phoneHomeRequestBody);
+                phoneHomeClient.postPhoneHomeRequest(phoneHomeRequestBody, ciEnvironmentVariables);
             } catch (final Exception e) {
                 logger.debug("Problem with phone-home : " + e.getMessage(), e);
             }
@@ -138,7 +141,7 @@ public class PhoneHomeService extends DataService {
     }
 
     public PhoneHomeResponse startPhoneHome(final PhoneHomeRequestBody phoneHomeRequestBody) {
-        final PhoneHomeCallable task = new PhoneHomeCallable(logger, phoneHomeClient, phoneHomeRequestBody);
+        final PhoneHomeCallable task = new PhoneHomeCallable(logger, phoneHomeClient, phoneHomeRequestBody, ciEnvironmentVariables);
         final Future<Boolean> resultTask = executorService.submit(task);
         return new PhoneHomeResponse(resultTask);
     }

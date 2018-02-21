@@ -28,23 +28,26 @@ import java.util.concurrent.Callable;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;
+import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class PhoneHomeCallable implements Callable<Boolean> {
     private final IntLogger logger;
     private final PhoneHomeClient client;
     private final PhoneHomeRequestBody requestBody;
+    private final CIEnvironmentVariables ciEnvironmentVariables;
 
-    public PhoneHomeCallable(final IntLogger logger, final PhoneHomeClient client, final PhoneHomeRequestBody requestBody) {
+    public PhoneHomeCallable(final IntLogger logger, final PhoneHomeClient client, final PhoneHomeRequestBody requestBody, final CIEnvironmentVariables ciEnvironmentVariables) {
         this.logger = logger;
         this.client = client;
         this.requestBody = requestBody;
+        this.ciEnvironmentVariables = ciEnvironmentVariables;
     }
 
     @Override
     public Boolean call() throws Exception {
         Boolean result = Boolean.FALSE;
         try {
-            client.postPhoneHomeRequest(requestBody);
+            client.postPhoneHomeRequest(requestBody, ciEnvironmentVariables);
             result = Boolean.TRUE;
         } catch (final Exception ex) {
             logger.debug("Phone home error.", ex);
