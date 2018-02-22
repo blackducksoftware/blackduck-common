@@ -63,8 +63,7 @@ public class HubServicesFactory {
     }
 
     public SignatureScannerService createSignatureScannerService(final long timeoutInMilliseconds) {
-        return new SignatureScannerService(createHubService(), ciEnvironmentVariables, createCliDownloadUtility(), createPhoneHomeService(), createProjectService(),
-                createCodeLocationService(), createScanStatusService(timeoutInMilliseconds));
+        return new SignatureScannerService(createHubService(), ciEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService(), createScanStatusService(timeoutInMilliseconds));
     }
 
     public PhoneHomeService createPhoneHomeService() {

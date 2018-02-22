@@ -47,47 +47,30 @@ import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.service.model.HostnameHelper;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
-import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder;
-import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class SignatureScannerService extends DataService {
     private final CIEnvironmentVariables ciEnvironmentVariables;
     private final CLIDownloadUtility cliDownloadService;
-    private final PhoneHomeService phoneHomeDataService;
     private final ProjectService projectDataService;
     private final CodeLocationService codeLocationDataService;
     private final ScanStatusService scanStatusDataService;
 
     private ProjectVersionWrapper projectVersionWrapper;
 
-    public SignatureScannerService(final HubService hubService, final CIEnvironmentVariables ciEnvironmentVariables, final CLIDownloadUtility cliDownloadService,
-            final PhoneHomeService phoneHomeDataService, final ProjectService projectDataService, final CodeLocationService codeLocationDataService,
-            final ScanStatusService scanStatusDataService) {
+    public SignatureScannerService(final HubService hubService, final CIEnvironmentVariables ciEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
+            final CodeLocationService codeLocationDataService, final ScanStatusService scanStatusDataService) {
         super(hubService);
         this.ciEnvironmentVariables = ciEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
-        this.phoneHomeDataService = phoneHomeDataService;
         this.projectDataService = projectDataService;
         this.codeLocationDataService = codeLocationDataService;
         this.scanStatusDataService = scanStatusDataService;
     }
 
-    public ProjectVersionWrapper installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished,
-            final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
-        return installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, shouldWaitForScansFinished, thirdPartyName.getName(), thirdPartyVersion, pluginVersion);
-    }
-
-    public ProjectVersionWrapper installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished,
-            final String thirdPartyName,
-            final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
-        PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = null;
-        try {
-            phoneHomeRequestBodyBuilder = phoneHomeDataService.createInitialPhoneHomeRequestBodyBuilder(thirdPartyName, thirdPartyVersion, pluginVersion);
-        } catch (final Exception e) {
-            logger.debug(e.getMessage());
-        }
-        preScan(hubServerConfig, hubScanConfig, projectRequest, phoneHomeRequestBodyBuilder);
+    public ProjectVersionWrapper installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished)
+            throws IntegrationException {
+        preScan(hubServerConfig, hubScanConfig, projectRequest);
         final SimpleScanUtility simpleScanService = createScanService(hubServerConfig, hubScanConfig, projectRequest);
         final File[] scanSummaryFiles = runScan(simpleScanService);
         postScan(hubScanConfig, scanSummaryFiles, projectRequest, shouldWaitForScansFinished, simpleScanService);
@@ -139,13 +122,12 @@ public class SignatureScannerService extends DataService {
         hubScanConfig.print(logger);
     }
 
-    private void preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder) throws IntegrationException {
+    private void preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
         final String localHostName = HostnameHelper.getMyHostname();
         logger.info("Running on machine : " + localHostName);
         printConfiguration(hubScanConfig, projectRequest);
         final CurrentVersionView currentVersion = hubService.getResponseFromPath(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
         cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version, localHostName);
-        phoneHomeDataService.phoneHome(phoneHomeRequestBodyBuilder);
 
         if (!hubScanConfig.isDryRun()) {
             projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);
