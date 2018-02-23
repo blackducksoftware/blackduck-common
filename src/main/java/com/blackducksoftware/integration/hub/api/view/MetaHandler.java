@@ -33,35 +33,6 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class MetaHandler {
-    public static final String PROJECTS_LINK = "projects";
-    public static final String PROJECT_LINK = "project";
-    public static final String VERSIONS_LINK = "versions";
-    public static final String VERSION_LINK = "versions";
-    public static final String CANONICAL_VERSION_LINK = "canonicalVersion";
-    public static final String VERSION_REPORT_LINK = "versionReport";
-    public static final String VERSION_NOTICES_REPORT_LINK = "licenseReports";
-    public static final String COMPONENTS_LINK = "components";
-    public static final String POLICY_RULES_LINK = "policy-rules";
-    public static final String POLICY_RULE_LINK = "policy-rule";
-    public static final String POLICY_STATUS_LINK = "policy-status";
-    public static final String RISK_PROFILE_LINK = "riskProfile";
-    public static final String VULNERABILITIES_LINK = "vulnerabilities";
-    public static final String VULNERABLE_COMPONENTS_LINK = "vulnerable-components";
-    public static final String MATCHED_FILES_LINK = "matched-files";
-    public static final String CONTENT_LINK = "content";
-    public static final String DOWNLOAD_LINK = "download";
-    public static final String CODE_LOCATION_LINK = "codelocations";
-    public static final String CODE_LOCATION_BOM_STATUS_LINK = "codelocation";
-    public static final String SCANS_LINK = "scans";
-    public static final String NOTIFICATIONS_LINK = "notifications";
-    public static final String USERS_LINK = "users";
-    public static final String GROUPS_LINK = "usergroups";
-    public static final String GLOBAL_OPTIONS_LINK = "global-options";
-    public static final String USER_OPTIONS_LINK = "user-options";
-    public static final String LICENSE_LINK = "license";
-    public static final String TEXT_LINK = "text";
-    public static final String ROLES_LINK = "roles";
-
     private final IntLogger logger;
 
     public MetaHandler(final IntLogger logger) {

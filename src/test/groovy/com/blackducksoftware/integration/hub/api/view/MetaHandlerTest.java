@@ -62,8 +62,8 @@ public class MetaHandlerTest {
         final MetaHandler metaHandler = getMetaHandler();
         final HubView hubItem = getTestHubItem();
 
-        assertFalse(metaHandler.hasLink(hubItem, MetaHandler.USERS_LINK));
-        assertTrue(metaHandler.hasLink(hubItem, MetaHandler.CANONICAL_VERSION_LINK));
+        assertFalse(metaHandler.hasLink(hubItem, "users"));
+        assertTrue(metaHandler.hasLink(hubItem, "canonicalVersion"));
     }
 
     @Test
@@ -80,11 +80,11 @@ public class MetaHandlerTest {
         final HubView hubItem = getTestHubItem();
 
         try {
-            metaHandler.getFirstLink(hubItem, MetaHandler.USERS_LINK);
+            metaHandler.getFirstLink(hubItem, "users");
         } catch (final HubIntegrationException e) {
-            assertTrue(e.getMessage().contains("Could not find the link '" + MetaHandler.USERS_LINK + "', these are the available links : '" + MetaHandler.CANONICAL_VERSION_LINK + "'"));
+            assertTrue(e.getMessage().contains("Could not find the link '" + "users" + "', these are the available links : '" + "canonicalVersion" + "'"));
         }
-        final String linkValue = metaHandler.getFirstLink(hubItem, MetaHandler.CANONICAL_VERSION_LINK);
+        final String linkValue = metaHandler.getFirstLink(hubItem, "canonicalVersion");
         assertTrue(linkValue.startsWith("http"));
     }
 
@@ -94,13 +94,13 @@ public class MetaHandlerTest {
         final HubView hubItem = getTestHubItem();
 
         try {
-            metaHandler.getLinks(hubItem, MetaHandler.USERS_LINK);
+            metaHandler.getLinks(hubItem, "users");
             Assert.fail("Should have thrown an exception");
         } catch (final HubIntegrationException e) {
-            assertTrue(e.getMessage().contains("Could not find the link '" + MetaHandler.USERS_LINK + "', these are the available links : '" + MetaHandler.CANONICAL_VERSION_LINK + "'"));
+            assertTrue(e.getMessage().contains("Could not find the link '" + "users" + "', these are the available links : '" + "canonicalVersion" + "'"));
         }
 
-        final List<String> links = metaHandler.getLinks(hubItem, MetaHandler.CANONICAL_VERSION_LINK);
+        final List<String> links = metaHandler.getLinks(hubItem, "canonicalVersion");
         assertNotNull(links);
         assertTrue(!links.isEmpty());
         int nonHttpLinkCount = 0;

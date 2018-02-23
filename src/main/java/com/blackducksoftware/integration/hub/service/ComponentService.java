@@ -23,10 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
-import java.util.Collections;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
@@ -58,15 +55,9 @@ public class ComponentService extends DataService {
 
     public List<ComponentVersionView> getAllComponentVersionsFromComponent(final ExternalId externalId) throws IntegrationException {
         final ComponentSearchResultView componentSearchView = getExactComponentMatch(externalId);
-
-        // TODO this can be cleaned up when hub-common-api is updated
         final ComponentView componentView = hubService.getResponse(componentSearchView.component, ComponentView.class);
-        final String link = hubService.getFirstLinkSafely(componentView, "versions");
-        if (StringUtils.isBlank(link)) {
-            return Collections.emptyList();
-        }
 
-        final List<ComponentVersionView> componentVersionViews = hubService.getAllResponses(link, ComponentVersionView.class);
+        final List<ComponentVersionView> componentVersionViews = hubService.getAllResponses(componentView, ComponentView.VERSIONS_LINK_RESPONSE);
         return componentVersionViews;
     }
 
