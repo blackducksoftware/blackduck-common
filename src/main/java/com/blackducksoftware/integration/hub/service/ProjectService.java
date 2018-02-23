@@ -96,7 +96,7 @@ public class ProjectService extends DataService {
 
     public String createHubProject(final ProjectRequest project) throws IntegrationException {
         final Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(project);
-        return hubService.executePostRequestFromPathAndRetrieveURL(ApiDiscovery.PROJECTS_LINK, requestBuilder);
+        return hubService.executePostRequestAndRetrieveURL(ApiDiscovery.PROJECTS_LINK, requestBuilder);
     }
 
     public void deleteHubProject(final ProjectView project) throws IntegrationException {

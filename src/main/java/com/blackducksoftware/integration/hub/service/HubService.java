@@ -234,7 +234,7 @@ public class HubService {
         return restConnection.executeRequest(RequestFactory.createCommonGetRequest(uri));
     }
 
-    public Response executeGetRequestFromPath(final String path) throws IntegrationException {
+    public Response executeGetRequest(final HubPath path) throws IntegrationException {
         final String uri = HubService.pieceTogetherUri(restConnection.baseUrl, path);
         return restConnection.executeRequest(RequestFactory.createCommonGetRequest(uri));
     }
@@ -246,7 +246,7 @@ public class HubService {
     // ------------------------------------------------
     // posting and getting location header
     // ------------------------------------------------
-    public String executePostRequestFromPathAndRetrieveURL(final HubPath path, final Request.Builder requestBuilder) throws IntegrationException {
+    public String executePostRequestAndRetrieveURL(final HubPath path, final Request.Builder requestBuilder) throws IntegrationException {
         final String uri = HubService.pieceTogetherUri(restConnection.baseUrl, path);
         requestBuilder.uri(uri);
         return executePostRequestAndRetrieveURL(requestBuilder.build());
