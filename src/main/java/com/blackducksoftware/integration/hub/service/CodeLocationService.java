@@ -32,7 +32,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.core.LinkSingleResponse;
+import com.blackducksoftware.integration.hub.api.core.HubPath;
+import com.blackducksoftware.integration.hub.api.core.HubPathSingleResponse;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
@@ -62,7 +63,7 @@ public class CodeLocationService extends DataService {
             throw new IntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub because : " + e.getMessage(), e);
         }
 
-        final String uri = hubService.getUriFromPath(HubService.BOMIMPORT_LINK);
+        final String uri = hubService.getUri(HubService.BOMIMPORT_PATH);
         final Request request = RequestFactory.createCommonPostRequestBuilder(jsonPayload).uri(uri).mimeType(mimeType).build();
         try (Response response = hubService.executeRequest(request)) {
         } catch (final IOException e) {
@@ -72,7 +73,7 @@ public class CodeLocationService extends DataService {
 
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationType codeLocationType) throws IntegrationException {
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("codeLocationType", codeLocationType.toString());
-        final List<CodeLocationView> allCodeLocations = hubService.getAllResponsesFromPath(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
+        final List<CodeLocationView> allCodeLocations = hubService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
         return allCodeLocations;
     }
 
@@ -133,7 +134,7 @@ public class CodeLocationService extends DataService {
     public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
             final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("q", "name:" + codeLocationName);
-            final List<CodeLocationView> codeLocations = hubService.getAllResponsesFromPath(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
+            final List<CodeLocationView> codeLocations = hubService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
             for (final CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.name)) {
                     return codeLocation;
@@ -145,9 +146,9 @@ public class CodeLocationService extends DataService {
     }
 
     public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {
-        final String link = ApiDiscovery.CODELOCATIONS_LINK + "/" + codeLocationId;
-        final LinkSingleResponse<CodeLocationView> codeLocationResponse = new LinkSingleResponse<>(link, CodeLocationView.class);
-        return hubService.getResponseFromPath(codeLocationResponse);
+        final HubPath hubPath = new HubPath(ApiDiscovery.CODELOCATIONS_LINK.getPath() + "/" + codeLocationId);
+        final HubPathSingleResponse<CodeLocationView> codeLocationResponse = new HubPathSingleResponse<>(hubPath, CodeLocationView.class);
+        return hubService.getResponse(codeLocationResponse);
     }
 
     private CodeLocationView createRequestCodeLocationView(final CodeLocationView codeLocationView, final String versionUrl) {
@@ -162,7 +163,7 @@ public class CodeLocationService extends DataService {
     }
 
     public ScanSummaryView getScanSummaryViewById(final String scanSummaryId) throws IntegrationException {
-        final String uri = HubService.SCANSUMMARIES_LINK + "/" + scanSummaryId;
+        final String uri = HubService.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
         return hubService.getResponse(uri, ScanSummaryView.class);
     }
 

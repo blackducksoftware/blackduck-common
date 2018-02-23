@@ -45,7 +45,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.ReportView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
-import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.report.RiskReportWriter;
 import com.blackducksoftware.integration.hub.report.api.BomComponent;
@@ -218,8 +217,8 @@ public class ReportService extends DataService {
     }
 
     private String getComponentPolicyURL(final String versionURL, final String componentURL) {
-        final String componentVersionSegments = componentURL.substring(componentURL.indexOf(MetaHandler.COMPONENTS_LINK));
-        return versionURL + "/" + componentVersionSegments + "/" + MetaHandler.POLICY_STATUS_LINK;
+        final String componentVersionSegments = componentURL.substring(componentURL.indexOf("components"));
+        return versionURL + "/" + componentVersionSegments + "/" + "policy-status";
     }
 
     private BomComponent createBomComponentFromBomComponentView(final VersionBomComponentView bomEntry) {

@@ -453,7 +453,7 @@ public class CLIInstallerTestIT {
         final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
 
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
-        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponseFromPath(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
 
         cliDownloadService.performInstallation(installDir, ciEnvironmentVariables, hubUrl.toString(), currentVersion.version, null);
     }
@@ -466,7 +466,7 @@ public class CLIInstallerTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
 
-        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponseFromPath(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
         final String hubVersion = currentVersion.version;
 
@@ -481,7 +481,7 @@ public class CLIInstallerTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory(logger);
         final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
 
-        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponseFromPath(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
         final String hubVersion = currentVersion.version;
         cliDownloadService.performInstallation(installDir, ciEnvironmentVariables, hubUrl.toString(), hubVersion, "TestHost");
@@ -522,7 +522,7 @@ public class CLIInstallerTestIT {
         final HubServicesFactory hubServicesFactory = new HubServicesFactory(restConnection);
         final URL hubUrl = restConnection.baseUrl;
 
-        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponseFromPath(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
         final String hubVersion = currentVersion.version;
 
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
@@ -565,7 +565,7 @@ public class CLIInstallerTestIT {
         final HubServicesFactory hubServicesFactory = new HubServicesFactory(restConnection);
         final URL hubUrl = restConnection.baseUrl;
 
-        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponseFromPath(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
         final String hubVersion = currentVersion.version;
 
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();

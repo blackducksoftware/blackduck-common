@@ -44,7 +44,7 @@ public class PolicyRuleService {
 
     public String createPolicyRule(final PolicyRuleViewV2 policyRuleViewV2) throws IntegrationException {
         final Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(policyRuleViewV2);
-        return hubService.executePostRequestFromPathAndRetrieveURL(ApiDiscovery.POLICY_RULES_LINK, requestBuilder);
+        return hubService.executePostRequestAndRetrieveURL(ApiDiscovery.POLICY_RULES_LINK, requestBuilder);
     }
 
     public void updatePolicyRule(final PolicyRuleView policyRuleView) throws IntegrationException {

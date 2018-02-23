@@ -102,7 +102,7 @@ public class PhoneHomeService extends DataService {
     public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder() {
         final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = new PhoneHomeRequestBodyBuilder();
         try {
-            final CurrentVersionView currentVersion = hubService.getResponseFromPath(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+            final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
             String registrationId = null;
             try {
                 // We need to wrap this because this will most likely fail unless they are running as an admin

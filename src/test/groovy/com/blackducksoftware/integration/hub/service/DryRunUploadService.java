@@ -25,6 +25,7 @@ package com.blackducksoftware.integration.hub.service;
 
 import java.io.File;
 
+import com.blackducksoftware.integration.hub.api.core.HubPath;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
@@ -35,7 +36,7 @@ public class DryRunUploadService extends DataService {
     }
 
     public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws Exception {
-        final String uri = hubService.getUriFromPath("api/v1/scans");
+        final String uri = hubService.getUri(new HubPath("/api/v1/scans"));
         final Request request = RequestFactory.createCommonPostRequestBuilder(dryRunFile).uri(uri).build();
         try (Response response = hubService.executeRequest(request)) {
             final String responseString = response.getContentString();

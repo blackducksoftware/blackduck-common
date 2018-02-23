@@ -69,7 +69,7 @@ public class ProjectService extends DataService {
             q = "name:" + projectName;
         }
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("q", q);
-        final List<ProjectView> allProjectItems = hubService.getAllResponsesFromPath(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder);
+        final List<ProjectView> allProjectItems = hubService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder);
 
         return allProjectItems;
     }
@@ -80,7 +80,7 @@ public class ProjectService extends DataService {
             q = "name:" + projectName;
         }
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("q", q).addQueryParameter("limit", String.valueOf(limit));
-        final List<ProjectView> projectItems = hubService.getResponsesFromPath(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder, false);
+        final List<ProjectView> projectItems = hubService.getResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder, false);
         return projectItems;
     }
 
@@ -96,7 +96,7 @@ public class ProjectService extends DataService {
 
     public String createHubProject(final ProjectRequest project) throws IntegrationException {
         final Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(project);
-        return hubService.executePostRequestFromPathAndRetrieveURL(ApiDiscovery.PROJECTS_LINK, requestBuilder);
+        return hubService.executePostRequestAndRetrieveURL(ApiDiscovery.PROJECTS_LINK, requestBuilder);
     }
 
     public void deleteHubProject(final ProjectView project) throws IntegrationException {
