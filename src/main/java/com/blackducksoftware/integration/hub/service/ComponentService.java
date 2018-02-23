@@ -80,7 +80,7 @@ public class ComponentService extends DataService {
         final String componentQuery = String.format("id:%s|%s", forge, hubOriginId);
 
         final Request.Builder requestBuilder = new Request.Builder().addQueryParameter("q", componentQuery);
-        final List<ComponentSearchResultView> allComponents = hubService.getAllResponsesFromPath(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
+        final List<ComponentSearchResultView> allComponents = hubService.getAllResponses(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
         return allComponents;
     }
 

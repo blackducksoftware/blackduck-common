@@ -85,7 +85,7 @@ public class NotificationService extends DataService {
         final String endDateString = sdf.format(endDate);
 
         final Request.Builder requestBuilder = new Request.Builder().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
-        final List<NotificationView> allNotificationItems = hubService.getResponsesFromPath(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, true, typeMap);
+        final List<NotificationView> allNotificationItems = hubService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, true, typeMap);
         return allNotificationItems;
     }
 

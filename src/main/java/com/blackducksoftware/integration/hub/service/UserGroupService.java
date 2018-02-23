@@ -46,7 +46,7 @@ public class UserGroupService {
     }
 
     public UserView getUserByUserName(final String userName) throws IntegrationException {
-        final List<UserView> allUsers = hubService.getAllResponsesFromPath(ApiDiscovery.USERS_LINK_RESPONSE);
+        final List<UserView> allUsers = hubService.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
         for (final UserView user : allUsers) {
             if (user.userName.equalsIgnoreCase(userName)) {
                 return user;
@@ -85,7 +85,7 @@ public class UserGroupService {
     }
 
     public UserGroupView getGroupByName(final String groupName) throws IntegrationException {
-        final List<UserGroupView> allGroups = hubService.getAllResponsesFromPath(ApiDiscovery.USERGROUPS_LINK_RESPONSE);
+        final List<UserGroupView> allGroups = hubService.getAllResponses(ApiDiscovery.USERGROUPS_LINK_RESPONSE);
         for (final UserGroupView group : allGroups) {
             if (group.name.equalsIgnoreCase(groupName)) {
                 return group;

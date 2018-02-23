@@ -73,7 +73,7 @@ public class CodeLocationService extends DataService {
 
     public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationType codeLocationType) throws IntegrationException {
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("codeLocationType", codeLocationType.toString());
-        final List<CodeLocationView> allCodeLocations = hubService.getAllResponsesFromPath(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
+        final List<CodeLocationView> allCodeLocations = hubService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
         return allCodeLocations;
     }
 
@@ -134,7 +134,7 @@ public class CodeLocationService extends DataService {
     public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
             final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("q", "name:" + codeLocationName);
-            final List<CodeLocationView> codeLocations = hubService.getAllResponsesFromPath(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
+            final List<CodeLocationView> codeLocations = hubService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
             for (final CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.name)) {
                     return codeLocation;
@@ -148,7 +148,7 @@ public class CodeLocationService extends DataService {
     public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {
         final HubPath hubPath = new HubPath(ApiDiscovery.CODELOCATIONS_LINK.getPath() + "/" + codeLocationId);
         final HubPathSingleResponse<CodeLocationView> codeLocationResponse = new HubPathSingleResponse<>(hubPath, CodeLocationView.class);
-        return hubService.getResponseFromPath(codeLocationResponse);
+        return hubService.getResponse(codeLocationResponse);
     }
 
     private CodeLocationView createRequestCodeLocationView(final CodeLocationView codeLocationView, final String versionUrl) {

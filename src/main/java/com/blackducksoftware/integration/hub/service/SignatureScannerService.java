@@ -126,7 +126,7 @@ public class SignatureScannerService extends DataService {
         final String localHostName = HostnameHelper.getMyHostname();
         logger.info("Running on machine : " + localHostName);
         printConfiguration(hubScanConfig, projectRequest);
-        final CurrentVersionView currentVersion = hubService.getResponseFromPath(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
         cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version, localHostName);
 
         if (!hubScanConfig.isDryRun()) {
