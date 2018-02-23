@@ -54,8 +54,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
 public class HubService {
-    public static final String BOMIMPORT_LINK = "/api/bom-import";
-    public static final String SCANSUMMARIES_LINK = "/api/scan-summaries";
+    public static final HubPath BOMIMPORT_PATH = new HubPath("/api/bom-import");
+    public static final HubPath SCANSUMMARIES_PATH = new HubPath("/api/scan-summaries");
 
     private final RestConnection restConnection;
     private final MetaHandler metaHandler;
@@ -123,7 +123,7 @@ public class HubService {
         return metaHandler.getHref(view);
     }
 
-    public String getUriFromPath(final String path) throws IntegrationException {
+    public String getUri(final HubPath path) throws IntegrationException {
         return HubService.pieceTogetherUri(hubBaseUrl, path);
     }
 

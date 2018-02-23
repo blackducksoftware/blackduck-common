@@ -63,7 +63,7 @@ public class CodeLocationService extends DataService {
             throw new IntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub because : " + e.getMessage(), e);
         }
 
-        final String uri = hubService.getUriFromPath(HubService.BOMIMPORT_LINK);
+        final String uri = hubService.getUri(HubService.BOMIMPORT_PATH);
         final Request request = RequestFactory.createCommonPostRequestBuilder(jsonPayload).uri(uri).mimeType(mimeType).build();
         try (Response response = hubService.executeRequest(request)) {
         } catch (final IOException e) {
@@ -163,7 +163,7 @@ public class CodeLocationService extends DataService {
     }
 
     public ScanSummaryView getScanSummaryViewById(final String scanSummaryId) throws IntegrationException {
-        final String uri = HubService.SCANSUMMARIES_LINK + "/" + scanSummaryId;
+        final String uri = HubService.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
         return hubService.getResponse(uri, ScanSummaryView.class);
     }
 
