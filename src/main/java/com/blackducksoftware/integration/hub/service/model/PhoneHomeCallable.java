@@ -47,8 +47,10 @@ public class PhoneHomeCallable implements Callable<Boolean> {
     public Boolean call() throws Exception {
         Boolean result = Boolean.FALSE;
         try {
+            logger.debug("starting phone home");
             client.postPhoneHomeRequest(requestBody, ciEnvironmentVariables);
             result = Boolean.TRUE;
+            logger.debug("completed phone home");
         } catch (final Exception ex) {
             logger.debug("Phone home error.", ex);
         }
