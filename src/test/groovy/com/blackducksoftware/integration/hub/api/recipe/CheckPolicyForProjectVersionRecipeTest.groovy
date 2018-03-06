@@ -4,6 +4,7 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.experimental.categories.Category
 
 import com.blackducksoftware.integration.hub.api.enumeration.PolicyRuleConditionOperatorType
 import com.blackducksoftware.integration.hub.api.generated.component.PolicyRuleExpressionSetView
@@ -21,7 +22,9 @@ import com.blackducksoftware.integration.hub.service.PolicyRuleService
 import com.blackducksoftware.integration.hub.service.ProjectService
 import com.blackducksoftware.integration.hub.service.model.PolicyRuleExpressionSetBuilder
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper
+import com.blackducksoftware.integration.test.annotation.IntegrationTest
 
+@Category(IntegrationTest.class)
 class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
     ProjectVersionWrapper projectVersionWrapper
     PolicyRuleView policyRuleView
