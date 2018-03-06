@@ -78,7 +78,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
 
     private PolicyRuleViewV2 constructTestPolicy(ComponentService componentService, MetaHandler metaHandler) {
         ExternalId externalId = constructExternalId()
-        ComponentVersionView componentVersionView =  componentService.getExactComponentVersionFromComponent(externalId)
+        ComponentVersionView componentVersionView =  componentService.getComponentVersion(externalId)
 
         /**
          * using the PolicyRuleExpressionSetBuilder we can build the expression set for a PolicyRuleViewV2
