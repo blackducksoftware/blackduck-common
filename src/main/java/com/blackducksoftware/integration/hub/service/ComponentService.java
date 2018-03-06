@@ -42,8 +42,8 @@ public class ComponentService extends DataService {
         super(hubService);
     }
 
-    public ComponentVersionView getExactComponentVersionFromComponent(final ExternalId externalId) throws IntegrationException {
-        for (final ComponentVersionView componentVersion : this.getAllComponentVersionsFromComponent(externalId)) {
+    public ComponentVersionView getComponentVersion(final ExternalId externalId) throws IntegrationException {
+        for (final ComponentVersionView componentVersion : this.getAllComponentVersions(externalId)) {
             if (componentVersion.versionName.equals(externalId.version)) {
                 return componentVersion;
             }
@@ -53,7 +53,7 @@ public class ComponentService extends DataService {
         throw new HubIntegrationException(errMsg);
     }
 
-    public List<ComponentVersionView> getAllComponentVersionsFromComponent(final ExternalId externalId) throws IntegrationException {
+    public List<ComponentVersionView> getAllComponentVersions(final ExternalId externalId) throws IntegrationException {
         final ComponentSearchResultView componentSearchView = getExactComponentMatch(externalId);
         final ComponentView componentView = hubService.getResponse(componentSearchView.component, ComponentView.class);
 
