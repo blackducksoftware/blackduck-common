@@ -23,9 +23,19 @@
  */
 package com.blackducksoftware.integration.hub.api.view;
 
-import com.blackducksoftware.integration.hub.api.response.RuleViolationNotificationContent;
+import com.blackducksoftware.integration.hub.api.core.HubView;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 
-public class RuleViolationNotificationView extends ReducedNotificationView {
-    public RuleViolationNotificationContent content;
+// This is named a ReducedNotificationView because it removes the 'content' member from NotificationView which is generated.
+// This is a short term fix to release dependent projects.  A larger more appropriate fix to extract content will be made in a future release.
+// In a future release this object will be removed and the parallel processing will extract the content from the notifications.
+public abstract class ReducedNotificationView extends HubView {
+    public String contentType;
+    public java.util.Date createdAt;
+    public NotificationType type;
 
+    public ReducedNotificationView() {
+        // gson requires a default constructor.
+        // this class is abstract because it must be sub-classed to define the content member.
+    }
 }

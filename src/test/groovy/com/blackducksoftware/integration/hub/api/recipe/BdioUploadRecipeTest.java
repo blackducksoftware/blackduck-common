@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
@@ -15,7 +16,9 @@ import com.blackducksoftware.integration.hub.service.CodeLocationService;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.hub.service.ProjectService;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
+import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 
+@Category(IntegrationTest.class)
 public class BdioUploadRecipeTest extends BasicRecipe {
     private final String codeLocationName = "hub_common_27_0_0_SNAPSHOT_upload_recipe";
     private final String uniqueProjectName = "hub-common_with_project_in_bdio";

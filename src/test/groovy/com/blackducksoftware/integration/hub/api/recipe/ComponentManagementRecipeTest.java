@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
@@ -14,7 +15,9 @@ import com.blackducksoftware.integration.hub.bdio.model.Forge;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.service.ProjectService;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
+import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 
+@Category(IntegrationTest.class)
 public class ComponentManagementRecipeTest extends BasicRecipe {
     private ProjectVersionWrapper projectVersionWrapper;
 
