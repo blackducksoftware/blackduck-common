@@ -121,10 +121,8 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     /**
      * In Hub versions prior to 3.2, the rule URLs contained in notifications are internal. To match the configured rule URLs, the "internal" segment of the URL from the notification must be removed. This is the workaround recommended by
      * Rob P. In Hub 3.2 on, these URLs will exclude the "internal" segment.
-     *
-     * @param origRuleUrl
-     * @return
      */
+    //TODO ekerwin - can this now be removed as we are only supporting Hub versions >= 4.4.0?
     protected String fixRuleUrl(final String origRuleUrl) {
         String fixedRuleUrl = origRuleUrl;
         if (origRuleUrl.contains("/internal/")) {

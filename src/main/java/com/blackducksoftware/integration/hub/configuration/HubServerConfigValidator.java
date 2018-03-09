@@ -157,7 +157,6 @@ public class HubServerConfigValidator extends AbstractValidator {
         try {
             final HubServerVerifier hubServerVerifier = new HubServerVerifier(hubURL, proxyInfo, alwaysTrustServerCertificate, NumberUtils.toInt(timeoutSeconds, 120));
             hubServerVerifier.verifyIsHubServer();
-
         } catch (final IntegrationRestException e) {
             if (e.getHttpStatusCode() == 407) {
                 result.addResult(ProxyInfoField.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.ERROR, e.getHttpStatusMessage()));
