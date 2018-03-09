@@ -136,6 +136,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         validator.setProxyPassword(proxyPassword);
         validator.setProxyPasswordLength(proxyPasswordLength);
         validator.setAlwaysTrustServerCertificate(alwaysTrustServerCertificate);
+        validator.setProxyNtlmDomain(proxyNtlmDomain);
+        validator.setProxyNtlmWorkstation(proxyNtlmWorkstation);
         return validator;
     }
 
