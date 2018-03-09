@@ -23,9 +23,6 @@
  */
 package com.blackducksoftware.integration.hub.service.model;
 
-import static com.blackducksoftware.integration.hub.RestConstants.QUERY_LIMIT;
-import static com.blackducksoftware.integration.hub.RestConstants.QUERY_OFFSET;
-
 import com.blackducksoftware.integration.hub.request.Request;
 
 public class PagedRequest {
@@ -47,8 +44,8 @@ public class PagedRequest {
 
     public Request createRequest() {
         final Request request = requestBuilder.build();
-        request.getQueryParameters().put(QUERY_LIMIT, String.valueOf(getLimit()));
-        request.getQueryParameters().put(QUERY_OFFSET, String.valueOf(getOffset()));
+        request.getQueryParameters().put("limit", String.valueOf(getLimit()));
+        request.getQueryParameters().put("offset", String.valueOf(getOffset()));
         return request;
     }
 

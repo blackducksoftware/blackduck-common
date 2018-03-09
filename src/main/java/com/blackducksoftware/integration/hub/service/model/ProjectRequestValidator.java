@@ -27,9 +27,9 @@ import java.text.SimpleDateFormat;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.blackducksoftware.integration.hub.RestConstants;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 import com.blackducksoftware.integration.validator.ValidationResult;
 import com.blackducksoftware.integration.validator.ValidationResultEnum;
@@ -88,7 +88,7 @@ public class ProjectRequestValidator extends AbstractValidator {
 
         if (StringUtils.isNotBlank(releasedOn)) {
             try {
-                final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
+                final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
                 sdf.parse(releasedOn);
             } catch (final Exception e) {
                 result.addResult(ProjectVersionRequestField.RELEASEDON, new ValidationResult(ValidationResultEnum.ERROR, e.getMessage(), e));

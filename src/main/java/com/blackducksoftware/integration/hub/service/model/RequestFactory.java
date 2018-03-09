@@ -23,9 +23,6 @@
  */
 package com.blackducksoftware.integration.hub.service.model;
 
-import static com.blackducksoftware.integration.hub.RestConstants.QUERY_LIMIT;
-import static com.blackducksoftware.integration.hub.RestConstants.QUERY_OFFSET;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,15 +34,15 @@ import com.blackducksoftware.integration.hub.rest.HttpMethod;
 public class RequestFactory {
     public static Request.Builder createCommonGetRequestBuilder(final String uri) {
         final Map<String, String> queryParameters = new HashMap<>();
-        queryParameters.put(QUERY_OFFSET, String.valueOf(0));
-        queryParameters.put(QUERY_LIMIT, String.valueOf(100));
+        queryParameters.put("offset", String.valueOf(0));
+        queryParameters.put("limit", String.valueOf(100));
         return new Request.Builder(uri).queryParameters(queryParameters);
     }
 
     public static Request.Builder createCommonGetRequestBuilder() {
         final Map<String, String> queryParameters = new HashMap<>();
-        queryParameters.put(QUERY_OFFSET, String.valueOf(0));
-        queryParameters.put(QUERY_LIMIT, String.valueOf(100));
+        queryParameters.put("offset", String.valueOf(0));
+        queryParameters.put("limit", String.valueOf(100));
         return new Request.Builder().queryParameters(queryParameters);
     }
 
