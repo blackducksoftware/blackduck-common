@@ -28,10 +28,10 @@ import java.text.SimpleDateFormat
 import org.junit.Assert
 import org.junit.Test
 
+import com.blackducksoftware.integration.hub.RestConstants
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
-import com.blackducksoftware.integration.hub.rest.RestConnection
 import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 
 class ProjectRequestBuilderTest {
@@ -81,7 +81,7 @@ class ProjectRequestBuilderTest {
 
     @Test
     public void testValidValues(){
-        final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
+        final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         final String releasedOn = sdf.format(new Date());
 
         String projectName = 'Project'
