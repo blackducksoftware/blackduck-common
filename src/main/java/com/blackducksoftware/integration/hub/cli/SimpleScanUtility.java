@@ -131,6 +131,8 @@ public class SimpleScanUtility {
             final int proxyPort = hubProxyInfo.getPort();
             final String proxyUsername = hubProxyInfo.getUsername();
             final String proxyPassword = hubProxyInfo.getDecryptedPassword();
+            final String proxyNtlmDomain = hubProxyInfo.getNtlmDomain();
+            final String proxyNtlmWorkstation = hubProxyInfo.getNtlmWorkstation();
             cmd.add("-Dhttp.proxyHost=" + proxyHost);
             cmd.add("-Dhttp.proxyPort=" + Integer.toString(proxyPort));
             if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
@@ -140,6 +142,12 @@ public class SimpleScanUtility {
                 // CLI will ignore the proxy host and port if there are no credentials
                 cmd.add("-Dhttp.proxyUser=user");
                 cmd.add("-Dhttp.proxyPassword=password");
+            }
+            if (StringUtils.isNotBlank(proxyNtlmDomain)) {
+                cmd.add("-Dhttp.auth.ntlm.domain=" + proxyNtlmDomain);
+            }
+            if (StringUtils.isNotBlank(proxyNtlmWorkstation)) {
+                cmd.add("-Dblackduck.http.auth.ntlm.workstation=" + proxyNtlmWorkstation);
             }
         }
 
