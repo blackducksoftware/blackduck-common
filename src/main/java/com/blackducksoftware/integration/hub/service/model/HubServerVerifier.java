@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.RestConstants;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
@@ -62,7 +63,7 @@ public class HubServerVerifier {
 			Request request = new Request.Builder(hubURL.toURI().toString()).build();
 			try (Response response = restConnection.executeRequest(request)) {
 			} catch (final IntegrationRestException e) {
-				if (e.getHttpStatusCode() == 401 || e.getHttpStatusCode() == 403) {
+				if (e.getHttpStatusCode() == RestConstants.UNAUTHORIZED_401 || e.getHttpStatusCode() == RestConstants.FORBIDDEN_403) {
 					// This could be a Hub server
 				} else {
 					throw e;
