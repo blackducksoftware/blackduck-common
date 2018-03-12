@@ -35,6 +35,7 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.RestConstants;
 import com.blackducksoftware.integration.hub.api.core.HubPathMultipleResponses;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotificationView;
@@ -50,7 +51,6 @@ import com.blackducksoftware.integration.hub.notification.PolicyViolationOverrid
 import com.blackducksoftware.integration.hub.notification.PolicyViolationTransformer;
 import com.blackducksoftware.integration.hub.notification.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.request.Request;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessor;
 import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessorResults;
@@ -80,7 +80,7 @@ public class NotificationService extends DataService {
     }
 
     public List<ReducedNotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
-        final SimpleDateFormat sdf = new SimpleDateFormat(RestConnection.JSON_DATE_FORMAT);
+        final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);

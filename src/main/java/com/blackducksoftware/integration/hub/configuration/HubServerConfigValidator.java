@@ -67,8 +67,8 @@ public class HubServerConfigValidator extends AbstractValidator {
     private String proxyPassword;
     private int proxyPasswordLength;
     private String ignoredProxyHosts;
-    private String ntlmDomain;
-    private String ntlmWorkstation;
+    private String proxyNtlmDomain;
+    private String proxyNtlmWorkstation;
 
     private boolean alwaysTrustServerCertificate;
     private ProxyInfo proxyInfo;
@@ -102,8 +102,8 @@ public class HubServerConfigValidator extends AbstractValidator {
         validator.setIgnoredProxyHosts(ignoredProxyHosts);
         validator.setUsername(proxyUsername);
         validator.setPassword(proxyPassword);
-        validator.setNtlmDomain(ntlmDomain);
-        validator.setNtlmWorkstation(ntlmWorkstation);
+        validator.setNtlmDomain(proxyNtlmDomain);
+        validator.setNtlmWorkstation(proxyNtlmWorkstation);
         if (proxyPasswordLength > 0) {
             validator.setPasswordLength(proxyPasswordLength);
         }
@@ -119,12 +119,12 @@ public class HubServerConfigValidator extends AbstractValidator {
                     credBuilder.setPasswordLength(proxyPasswordLength);
                     final Credentials credResult = credBuilder.build();
 
-                    proxyInfo = new ProxyInfo(proxyHost, port, credResult, ignoredProxyHosts, ntlmDomain, ntlmWorkstation);
+                    proxyInfo = new ProxyInfo(proxyHost, port, credResult, ignoredProxyHosts, proxyNtlmDomain, proxyNtlmWorkstation);
 
                 } else {
                     // password is blank or already encrypted so we just pass in the
                     // values given to us
-                    proxyInfo = new ProxyInfo(proxyHost, port, null, ignoredProxyHosts, ntlmDomain, ntlmWorkstation);
+                    proxyInfo = new ProxyInfo(proxyHost, port, null, ignoredProxyHosts, proxyNtlmDomain, proxyNtlmWorkstation);
                 }
             }
         }
@@ -300,6 +300,22 @@ public class HubServerConfigValidator extends AbstractValidator {
      */
     public void setProxyPasswordLength(final int proxyPasswordLength) {
         this.proxyPasswordLength = proxyPasswordLength;
+    }
+
+    public String getProxyNtlmDomain() {
+        return proxyNtlmDomain;
+    }
+
+    public void setProxyNtlmDomain(final String ntlmDomain) {
+        this.proxyNtlmDomain = ntlmDomain;
+    }
+
+    public String getProxyNtlmWorkstation() {
+        return proxyNtlmWorkstation;
+    }
+
+    public void setProxyNtlmWorkstation(final String ntlmWorkstation) {
+        this.proxyNtlmWorkstation = ntlmWorkstation;
     }
 
     public String getIgnoredProxyHosts() {

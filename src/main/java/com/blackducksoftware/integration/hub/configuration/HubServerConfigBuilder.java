@@ -54,6 +54,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     private String proxyPort;
     private String proxyUsername;
     private String proxyPassword;
+    private String proxyNtlmDomain;
+    private String proxyNtlmWorkstation;
     private int proxyPasswordLength;
     private String ignoredProxyHosts;
     private boolean alwaysTrustServerCertificate;
@@ -120,6 +122,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         proxyBuilder.setUsername(proxyUsername);
         proxyBuilder.setPassword(proxyPassword);
         proxyBuilder.setPasswordLength(proxyPasswordLength);
+        proxyBuilder.setNtlmDomain(proxyNtlmDomain);
+        proxyBuilder.setNtlmWorkstation(proxyNtlmWorkstation);
         return proxyBuilder.buildObject();
     }
 
@@ -137,6 +141,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         validator.setProxyPassword(proxyPassword);
         validator.setProxyPasswordLength(proxyPasswordLength);
         validator.setAlwaysTrustServerCertificate(alwaysTrustServerCertificate);
+        validator.setProxyNtlmDomain(proxyNtlmDomain);
+        validator.setProxyNtlmWorkstation(proxyNtlmWorkstation);
         return validator;
     }
 
@@ -222,6 +228,14 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
      */
     public void setProxyPasswordLength(final int proxyPasswordLength) {
         this.proxyPasswordLength = proxyPasswordLength;
+    }
+
+    public void setProxyNtlmDomain(final String proxyNtlmDomain) {
+        this.proxyNtlmDomain = proxyNtlmDomain;
+    }
+
+    public void setProxyNtlmWorkstation(final String proxyNtlmWorkstation) {
+        this.proxyNtlmWorkstation = proxyNtlmWorkstation;
     }
 
     public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
