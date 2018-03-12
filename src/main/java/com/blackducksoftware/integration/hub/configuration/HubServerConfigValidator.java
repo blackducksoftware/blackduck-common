@@ -38,6 +38,7 @@ import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfoField;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.model.HubServerVerifier;
+import com.blackducksoftware.integration.hub.service.model.UriCombiner;
 import com.blackducksoftware.integration.hub.validator.CredentialsValidator;
 import com.blackducksoftware.integration.hub.validator.ProxyInfoValidator;
 import com.blackducksoftware.integration.validator.AbstractValidator;
@@ -72,6 +73,16 @@ public class HubServerConfigValidator extends AbstractValidator {
     private boolean alwaysTrustServerCertificate;
     private ProxyInfo proxyInfo;
 
+    private final HubServerVerifier hubServerVerifier;
+
+    public HubServerConfigValidator() {
+    		this.hubServerVerifier = new HubServerVerifier(new UriCombiner());
+    }
+
+    public HubServerConfigValidator(HubServerVerifier hubServerVerifier) {
+    		this.hubServerVerifier = hubServerVerifier;
+    }
+    
     @Override
     public ValidationResults assertValid() {
         final ValidationResults proxyResult = assertProxyValid();
@@ -155,8 +166,7 @@ public class HubServerConfigValidator extends AbstractValidator {
         }
 
         try {
-            final HubServerVerifier hubServerVerifier = new HubServerVerifier(hubURL, proxyInfo, alwaysTrustServerCertificate, NumberUtils.toInt(timeoutSeconds, 120));
-            hubServerVerifier.verifyIsHubServer();
+            hubServerVerifier.verifyIsHubServer(hubURL, proxyInfo, alwaysTrustServerCertificate, NumberUtils.toInt(timeoutSeconds, 120));
         } catch (final IntegrationRestException e) {
             if (e.getHttpStatusCode() == 407) {
                 result.addResult(ProxyInfoField.PROXYUSERNAME, new ValidationResult(ValidationResultEnum.ERROR, e.getHttpStatusMessage()));

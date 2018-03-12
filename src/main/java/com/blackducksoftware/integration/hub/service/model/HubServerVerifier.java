@@ -36,59 +36,59 @@ import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnection;
 import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnectionBuilder;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
-import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
 
 public class HubServerVerifier {
-    private final URL hubURL;
-    private final ProxyInfo hubProxyInfo;
-    private final int timeoutSeconds;
-    private final boolean alwaysTrustServerCertificate;
+	private final UriCombiner uriCombiner;
 
-    public HubServerVerifier(final URL hubURL, final ProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) {
-        this.hubURL = hubURL;
-        this.hubProxyInfo = hubProxyInfo;
-        this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
-        this.timeoutSeconds = timeoutSeconds;
-    }
+	public HubServerVerifier(UriCombiner uriCombiner) {
+		this.uriCombiner = uriCombiner;
+	}
 
-    public void verifyIsHubServer() throws IntegrationException {
-        final UnauthenticatedRestConnectionBuilder connectionBuilder = new UnauthenticatedRestConnectionBuilder();
-        connectionBuilder.setLogger(new PrintStreamIntLogger(System.out, LogLevel.INFO));
-        connectionBuilder.setBaseUrl(hubURL.toString());
-        connectionBuilder.setTimeout(timeoutSeconds);
-        connectionBuilder.setAlwaysTrustServerCertificate(alwaysTrustServerCertificate);
-        if (hubProxyInfo != null) {
-            connectionBuilder.applyProxyInfo(hubProxyInfo);
-        }
-        final UnauthenticatedRestConnection restConnection = connectionBuilder.build();
+	public void verifyIsHubServer(final URL hubURL, final ProxyInfo hubProxyInfo,
+			final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
+		final UnauthenticatedRestConnectionBuilder connectionBuilder = new UnauthenticatedRestConnectionBuilder();
+		connectionBuilder.setLogger(new PrintStreamIntLogger(System.out, LogLevel.INFO));
+		connectionBuilder.setBaseUrl(hubURL.toString());
+		connectionBuilder.setTimeout(timeoutSeconds);
+		connectionBuilder.setAlwaysTrustServerCertificate(alwaysTrustServerCertificate);
+		if (hubProxyInfo != null) {
+			connectionBuilder.applyProxyInfo(hubProxyInfo);
+		}
+		final UnauthenticatedRestConnection restConnection = connectionBuilder.build();
 
-        try {
-            Request request = new Request.Builder(hubURL.toURI().toString()).build();
-            try (Response response = restConnection.executeRequest(request)) {
-            } catch (final IntegrationRestException e) {
-                if (e.getHttpStatusCode() == 401 || e.getHttpStatusCode() == 403) {
-                    // This could be a Hub server
-                } else {
-                    throw e;
-                }
-            } catch (final IOException e) {
-                throw new IntegrationException(e.getMessage(), e);
-            }
-            final String downloadUri = HubService.pieceTogetherUri(hubURL, "download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
-            request = RequestFactory.createCommonGetRequest(downloadUri);
-            try (Response response = restConnection.executeRequest(request)) {
-            } catch (final IntegrationRestException e) {
-                throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
-            } catch (final IntegrationException e) {
-                throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getMessage(), e);
-            } catch (final IOException e) {
-                throw new IntegrationException(e.getMessage(), e);
-            }
-        } catch (final URISyntaxException e) {
-            throw new IntegrationException("The Url does not appear to be a Hub server :" + hubURL.toString() + ", because: " + e.getMessage(), e);
-        }
-    }
+		try {
+			Request request = new Request.Builder(hubURL.toURI().toString()).build();
+			try (Response response = restConnection.executeRequest(request)) {
+			} catch (final IntegrationRestException e) {
+				if (e.getHttpStatusCode() == 401 || e.getHttpStatusCode() == 403) {
+					// This could be a Hub server
+				} else {
+					throw e;
+				}
+			} catch (final IOException e) {
+				throw new IntegrationException(e.getMessage(), e);
+			}
+			final String downloadUri = uriCombiner.pieceTogetherUri(hubURL,
+					"download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
+			request = RequestFactory.createCommonGetRequest(downloadUri);
+			try (Response response = restConnection.executeRequest(request)) {
+			} catch (final IntegrationRestException e) {
+				throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri
+						+ ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
+			} catch (final IntegrationException e) {
+				throw new HubIntegrationException(
+						"The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getMessage(),
+						e);
+			} catch (final IOException e) {
+				throw new IntegrationException(e.getMessage(), e);
+			}
+		} catch (final URISyntaxException e) {
+			throw new IntegrationException(
+					"The Url does not appear to be a Hub server :" + hubURL.toString() + ", because: " + e.getMessage(),
+					e);
+		}
+	}
 
 }
