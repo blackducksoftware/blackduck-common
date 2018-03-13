@@ -49,6 +49,7 @@ import com.blackducksoftware.integration.hub.notification.PolicyNotificationFilt
 import com.blackducksoftware.integration.hub.notification.PolicyViolationClearedTransformer;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationOverrideTransformer;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationTransformer;
+import com.blackducksoftware.integration.hub.notification.ReducedNotificationViewResults;
 import com.blackducksoftware.integration.hub.notification.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -79,6 +80,7 @@ public class NotificationService extends DataService {
         return results;
     }
 
+    // TODO wrap response in an object that knows the final datetime of the latest notification
     public List<ReducedNotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -89,6 +91,22 @@ public class NotificationService extends DataService {
         final HubPathMultipleResponses<ReducedNotificationView> notificationLinkResponse = new HubPathMultipleResponses<>(ApiDiscovery.NOTIFICATIONS_LINK, ReducedNotificationView.class);
         final List<ReducedNotificationView> allNotificationItems = hubService.getResponses(notificationLinkResponse, requestBuilder, true, typeMap);
         return allNotificationItems;
+    }
+
+    public ReducedNotificationViewResults getAllNotificationViewResults(final Date startDate, final Date endDate) throws IntegrationException {
+        final List<ReducedNotificationView> allNotificationItems = getAllNotifications(startDate, endDate);
+        if (allNotificationItems == null || allNotificationItems.isEmpty()) {
+            return new ReducedNotificationViewResults(allNotificationItems, null, null);
+        }
+
+        final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        // we know that the first notification in the list is the most current
+        final Date latestCreatedAtDate = allNotificationItems.get(0).createdAt;
+        final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
+
+        return new ReducedNotificationViewResults(allNotificationItems, latestCreatedAtDate, latestCreatedAtString);
     }
 
     private NotificationResults processNotificationsInParallel(final List<ReducedNotificationView> itemList) {
