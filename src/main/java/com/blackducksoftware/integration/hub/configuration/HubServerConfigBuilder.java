@@ -60,9 +60,15 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     private String ignoredProxyHosts;
     private boolean alwaysTrustServerCertificate;
     private IntLogger logger;
+    private final HubServerConfigValidator validator;
 
     public HubServerConfigBuilder() {
-        timeoutSeconds = String.valueOf(DEFAULT_TIMEOUT_SECONDS);
+        this.timeoutSeconds = String.valueOf(DEFAULT_TIMEOUT_SECONDS);
+        this.validator = new HubServerConfigValidator();
+    }
+
+    public HubServerConfigBuilder(HubServerConfigValidator validator) {
+    		this.validator = validator;
     }
 
     @Override
@@ -123,7 +129,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
     @Override
     public AbstractValidator createValidator() {
-        final HubServerConfigValidator validator = new HubServerConfigValidator();
         validator.setHubUrl(hubUrl);
         validator.setUsername(username);
         validator.setPassword(password);

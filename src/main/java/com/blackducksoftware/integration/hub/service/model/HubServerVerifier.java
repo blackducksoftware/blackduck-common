@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.RestConstants;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
@@ -36,24 +37,18 @@ import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnection;
 import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnectionBuilder;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
-import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
 
 public class HubServerVerifier {
-    private final URL hubURL;
-    private final ProxyInfo hubProxyInfo;
-    private final int timeoutSeconds;
-    private final boolean alwaysTrustServerCertificate;
+    private final UriCombiner uriCombiner;
 
-    public HubServerVerifier(final URL hubURL, final ProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) {
-        this.hubURL = hubURL;
-        this.hubProxyInfo = hubProxyInfo;
-        this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
-        this.timeoutSeconds = timeoutSeconds;
+    public HubServerVerifier(final UriCombiner uriCombiner) {
+        this.uriCombiner = uriCombiner;
     }
 
-    public void verifyIsHubServer() throws IntegrationException {
+    public void verifyIsHubServer(final URL hubURL, final ProxyInfo hubProxyInfo,
+            final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
         final UnauthenticatedRestConnectionBuilder connectionBuilder = new UnauthenticatedRestConnectionBuilder();
         connectionBuilder.setLogger(new PrintStreamIntLogger(System.out, LogLevel.INFO));
         connectionBuilder.setBaseUrl(hubURL.toString());
@@ -68,7 +63,7 @@ public class HubServerVerifier {
             Request request = new Request.Builder(hubURL.toURI().toString()).build();
             try (Response response = restConnection.executeRequest(request)) {
             } catch (final IntegrationRestException e) {
-                if (e.getHttpStatusCode() == 401 || e.getHttpStatusCode() == 403) {
+                if (e.getHttpStatusCode() == RestConstants.UNAUTHORIZED_401 || e.getHttpStatusCode() == RestConstants.FORBIDDEN_403) {
                     // This could be a Hub server
                 } else {
                     throw e;
@@ -76,7 +71,7 @@ public class HubServerVerifier {
             } catch (final IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
-            final String downloadUri = HubService.pieceTogetherUri(hubURL, "download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
+            final String downloadUri = uriCombiner.pieceTogetherUri(hubURL, "download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
             request = RequestFactory.createCommonGetRequest(downloadUri);
             try (Response response = restConnection.executeRequest(request)) {
             } catch (final IntegrationRestException e) {
