@@ -71,24 +71,18 @@ public class HubServerVerifier {
             } catch (final IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
-            final String downloadUri = uriCombiner.pieceTogetherUri(hubURL,
-                    "download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
+            final String downloadUri = uriCombiner.pieceTogetherUri(hubURL, "download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
             request = RequestFactory.createCommonGetRequest(downloadUri);
             try (Response response = restConnection.executeRequest(request)) {
             } catch (final IntegrationRestException e) {
-                throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri
-                        + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
+                throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
             } catch (final IntegrationException e) {
-                throw new HubIntegrationException(
-                        "The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getMessage(),
-                        e);
+                throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getMessage(), e);
             } catch (final IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
         } catch (final URISyntaxException e) {
-            throw new IntegrationException(
-                    "The Url does not appear to be a Hub server :" + hubURL.toString() + ", because: " + e.getMessage(),
-                    e);
+            throw new IntegrationException("The Url does not appear to be a Hub server :" + hubURL.toString() + ", because: " + e.getMessage(), e);
         }
     }
 
