@@ -80,7 +80,6 @@ public class NotificationService extends DataService {
         return results;
     }
 
-    // TODO wrap response in an object that knows the final datetime of the latest notification
     public List<ReducedNotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
