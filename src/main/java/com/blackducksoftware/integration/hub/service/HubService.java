@@ -133,43 +133,34 @@ public class HubService {
     }
 
     // ------------------------------------------------
-    // getting responses from a 'path', which we define as something that looks like
-    // '/api/codelocations'
+    // getting responses from a 'path', which we define as something that looks like '/api/codelocations'
     // ------------------------------------------------
-    public <T extends HubResponse> List<T> getAllResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses)
-            throws IntegrationException {
+    public <T extends HubResponse> List<T> getAllResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses) throws IntegrationException {
         return getResponses(hubPathMultipleResponses, true);
     }
 
-    public <T extends HubResponse> List<T> getAllResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses,
-            final Request.Builder requestBuilder) throws IntegrationException {
+    public <T extends HubResponse> List<T> getAllResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses, final Request.Builder requestBuilder) throws IntegrationException {
         return getResponses(hubPathMultipleResponses, requestBuilder, true);
     }
 
-    public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses,
-            final boolean getAll) throws IntegrationException {
+    public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses, final boolean getAll) throws IntegrationException {
         final String uri = uriCombiner.pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath);
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
-        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder),
-                hubPathMultipleResponses.responseClass, getAll, null);
+        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), hubPathMultipleResponses.responseClass, getAll, null);
     }
 
-    public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses,
-            final Request.Builder requestBuilder, final boolean getAll) throws IntegrationException {
+    public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses, final Request.Builder requestBuilder, final boolean getAll) throws IntegrationException {
         return getResponses(hubPathMultipleResponses, requestBuilder, getAll, null);
     }
 
-    public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses,
-            final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
+    public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses, final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
             throws IntegrationException {
         final String uri = uriCombiner.pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath);
         requestBuilder.uri(uri);
-        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder),
-                hubPathMultipleResponses.responseClass, getAll, typeMap);
+        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), hubPathMultipleResponses.responseClass, getAll, typeMap);
     }
 
-    public <T extends HubResponse> T getResponse(final HubPathSingleResponse<T> hubPathSingleResponse)
-            throws IntegrationException {
+    public <T extends HubResponse> T getResponse(final HubPathSingleResponse<T> hubPathSingleResponse) throws IntegrationException {
         final String uri = uriCombiner.pieceTogetherUri(hubBaseUrl, hubPathSingleResponse.hubPath);
         final Request request = RequestFactory.createCommonGetRequest(uri);
         return hubResponseTransformer.getResponse(request, hubPathSingleResponse.responseClass);
@@ -178,54 +169,43 @@ public class HubService {
     // ------------------------------------------------
     // getting responses from a HubView
     // ------------------------------------------------
-    public <T extends HubResponse> List<T> getAllResponses(final HubView hubView,
-            final LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
+    public <T extends HubResponse> List<T> getAllResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
         return getResponses(hubView, linkMultipleResponses, true);
     }
 
-    public <T extends HubResponse> List<T> getAllResponses(final HubView hubView,
-            final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder)
-            throws IntegrationException {
+    public <T extends HubResponse> List<T> getAllResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder) throws IntegrationException {
         return getResponses(hubView, linkMultipleResponses, requestBuilder, true);
     }
 
-    public <T extends HubResponse> List<T> getResponses(final HubView hubView,
-            final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
+    public <T extends HubResponse> List<T> getResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final boolean getAll) throws IntegrationException {
         final String uri = metaHandler.getFirstLinkSafely(hubView, linkMultipleResponses.link);
         if (StringUtils.isBlank(uri)) {
             return Collections.emptyList();
         }
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
-        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder),
-                linkMultipleResponses.responseClass, getAll, null);
+        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), linkMultipleResponses.responseClass, getAll, null);
     }
 
-    public <T extends HubResponse> List<T> getResponses(final HubView hubView,
-            final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder,
-            final boolean getAll) throws IntegrationException {
+    public <T extends HubResponse> List<T> getResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder, final boolean getAll) throws IntegrationException {
         final String uri = metaHandler.getFirstLinkSafely(hubView, linkMultipleResponses.link);
         if (StringUtils.isBlank(uri)) {
             return Collections.emptyList();
         }
         requestBuilder.uri(uri);
-        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder),
-                linkMultipleResponses.responseClass, getAll, null);
+        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), linkMultipleResponses.responseClass, getAll, null);
     }
 
-    public <T extends HubResponse> List<T> getResponses(final HubView hubView,
-            final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder,
-            final boolean getAll, final Map<String, Class<? extends T>> typeMap) throws IntegrationException {
-        final String uri = metaHandler.getFirstLinkSafely(hubView, linkMultipleResponses.link);
-        if (StringUtils.isBlank(uri)) {
-            return Collections.emptyList();
-        }
-        requestBuilder.uri(uri);
-        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder),
-                linkMultipleResponses.responseClass, getAll, typeMap);
-    }
-
-    public <T extends HubResponse> T getResponse(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse)
+    public <T extends HubResponse> List<T> getResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
             throws IntegrationException {
+        final String uri = metaHandler.getFirstLinkSafely(hubView, linkMultipleResponses.link);
+        if (StringUtils.isBlank(uri)) {
+            return Collections.emptyList();
+        }
+        requestBuilder.uri(uri);
+        return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), linkMultipleResponses.responseClass, getAll, typeMap);
+    }
+
+    public <T extends HubResponse> T getResponse(final HubView hubView, final LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
         final String uri = metaHandler.getFirstLinkSafely(hubView, linkSingleResponse.link);
         if (StringUtils.isBlank(uri)) {
             return null;
@@ -237,20 +217,17 @@ public class HubService {
     // ------------------------------------------------
     // getting responses from a uri
     // ------------------------------------------------
-    public <T extends HubResponse> List<T> getAllResponses(final String uri, final Class<T> responseClass)
-            throws IntegrationException {
+    public <T extends HubResponse> List<T> getAllResponses(final String uri, final Class<T> responseClass) throws IntegrationException {
         return getResponses(uri, responseClass, true);
     }
 
-    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> responseClass,
-            final boolean getAll) throws IntegrationException {
+    public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> responseClass, final boolean getAll) throws IntegrationException {
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
         requestBuilder.uri(uri);
         return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), responseClass, getAll, null);
     }
 
-    public <T extends HubResponse> T getResponse(final String uri, final Class<T> responseClass)
-            throws IntegrationException {
+    public <T extends HubResponse> T getResponse(final String uri, final Class<T> responseClass) throws IntegrationException {
         final Request request = RequestFactory.createCommonGetRequest(uri);
         return hubResponseTransformer.getResponse(request, responseClass);
     }
@@ -274,8 +251,7 @@ public class HubService {
     // ------------------------------------------------
     // posting and getting location header
     // ------------------------------------------------
-    public String executePostRequestAndRetrieveURL(final HubPath path, final Request.Builder requestBuilder)
-            throws IntegrationException {
+    public String executePostRequestAndRetrieveURL(final HubPath path, final Request.Builder requestBuilder) throws IntegrationException {
         final String uri = uriCombiner.pieceTogetherUri(restConnection.baseUrl, path);
         requestBuilder.uri(uri);
         return executePostRequestAndRetrieveURL(requestBuilder.build());
