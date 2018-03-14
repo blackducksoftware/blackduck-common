@@ -28,6 +28,7 @@ public enum PolicySeverityType {
     CRITICAL,
     MAJOR,
     MINOR,
-    TRIVIAL;
+    TRIVIAL,
+    UNSPECIFIED;
 
 }
