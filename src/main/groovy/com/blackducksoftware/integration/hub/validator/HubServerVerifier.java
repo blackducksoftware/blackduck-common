@@ -1,7 +1,7 @@
 /**
  * Hub Common
  *
- * Copyright (C) 2017 Black Duck Software, Inc.
+ * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -74,7 +74,7 @@ public class HubServerVerifier {
         try {
             response = restConnection.handleExecuteClientCall(request);
         } catch (final IntegrationRestException e) {
-            if (e.getHttpStatusCode() == 401 && e.getHttpStatusCode() == 403) {
+            if (e.getHttpStatusCode() == 401 || e.getHttpStatusCode() == 403) {
                 // This could be a Hub server
             } else {
                 throw e;
