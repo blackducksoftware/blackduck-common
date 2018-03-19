@@ -74,7 +74,7 @@ public class HubServerVerifier {
         try {
             response = restConnection.handleExecuteClientCall(request);
         } catch (final IntegrationRestException e) {
-            if (e.getHttpStatusCode() == 401 && e.getHttpStatusCode() == 403) {
+            if (e.getHttpStatusCode() == 401 || e.getHttpStatusCode() == 403) {
                 // This could be a Hub server
             } else {
                 throw e;
