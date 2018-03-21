@@ -27,7 +27,7 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.hub.api.enumeration.PolicySeverityType;
 import com.blackducksoftware.integration.hub.api.generated.component.NameValuePairView;
@@ -46,8 +46,8 @@ public class ComponentVersionPolicyViolationCount {
             name = PolicySeverityType.valueOf(nameValuePair.name);
         }
 
-        if (StringUtils.isNumeric(nameValuePair.value)) {
-            value = Integer.valueOf(nameValuePair.value);
+        if (nameValuePair.value != null && NumberUtils.isCreatable(nameValuePair.value.toString())) {
+            value = NumberUtils.createNumber(nameValuePair.value.toString()).intValue();
         }
     }
 

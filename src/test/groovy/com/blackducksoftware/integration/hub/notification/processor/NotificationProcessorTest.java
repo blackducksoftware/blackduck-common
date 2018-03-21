@@ -78,7 +78,7 @@ public class NotificationProcessorTest {
     public MockProcessor createMockedNotificationProcessor(final List<VulnerabilityV1View> vulnerabilityList) throws Exception {
         final ComponentVersionView compVersion = Mockito.mock(ComponentVersionView.class);
         compVersion.json = createComponentJson();
-        compVersion.meta = createComponentMeta();
+        compVersion._meta = createComponentMeta();
         final MockProcessor processor = new MockProcessor(metaService);
         return processor;
     }

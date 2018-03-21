@@ -40,7 +40,7 @@ public class MetaHandler {
     }
 
     public boolean hasLink(final HubView view, final String linkKey) throws HubIntegrationException {
-        final ResourceMetadata meta = view.meta;
+        final ResourceMetadata meta = view._meta;
         if (meta == null) {
             return false;
         }
@@ -71,7 +71,7 @@ public class MetaHandler {
             linksAvailable.append("'" + link.rel + "'");
             i++;
         }
-        linksAvailable.append(". For View : " + view.meta.href);
+        linksAvailable.append(". For View : " + view._meta.href);
         throw new HubIntegrationException(linksAvailable.toString());
     }
 
@@ -104,12 +104,12 @@ public class MetaHandler {
         if (!linkHrefs.isEmpty()) {
             return linkHrefs;
         }
-        linksAvailable.append(". For View : " + view.meta.href);
+        linksAvailable.append(". For View : " + view._meta.href);
         throw new HubIntegrationException(linksAvailable.toString());
     }
 
     public ResourceMetadata getMetaView(final HubView view) throws HubIntegrationException {
-        final ResourceMetadata meta = view.meta;
+        final ResourceMetadata meta = view._meta;
         if (meta == null) {
             throw new HubIntegrationException("Could not find meta information for this view : " + view.json);
         }

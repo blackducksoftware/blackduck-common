@@ -126,7 +126,7 @@ public class EventTestUtil {
     public PolicyRuleView createPolicyRule(final String name, final String description, final String createdBy, final String updatedBy, final String href) {
         final PolicyRuleView rule = new PolicyRuleView();
         rule.json = createPolicyRuleJSon(href);
-        rule.meta = createPolicyRuleMeta(href);
+        rule._meta = createPolicyRuleMeta(href);
         rule.name = name;
         rule.description = description;
         rule.enabled = true;
