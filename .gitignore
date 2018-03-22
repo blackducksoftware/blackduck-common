@@ -6,6 +6,9 @@
 .classpath
 .project
 bin/
+*.iml
+.idea/
+out/
 
 # build tool
 .gradle/
