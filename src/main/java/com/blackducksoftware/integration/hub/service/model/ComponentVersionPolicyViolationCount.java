@@ -44,7 +44,7 @@ public class ComponentVersionPolicyViolationCount extends Stringable {
         final Set<PolicySeverityType> policySeverityTypes = EnumSet.allOf(PolicySeverityType.class);
         final Set<String> policyStatusTypeValues = policySeverityTypes.stream().map(Object::toString).collect(Collectors.toSet());
         if (policyStatusTypeValues.contains(nameValuePair.name)) {
-            this.name = PolicySeverityType.valueOf(nameValuePair.name);
+            name = PolicySeverityType.valueOf(nameValuePair.name);
         }
 
         if (nameValuePair.value != null) {
