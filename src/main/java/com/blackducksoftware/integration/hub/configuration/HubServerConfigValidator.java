@@ -36,9 +36,9 @@ import com.blackducksoftware.integration.hub.Credentials;
 import com.blackducksoftware.integration.hub.CredentialsBuilder;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfoField;
+import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.model.HubServerVerifier;
-import com.blackducksoftware.integration.hub.service.model.UriCombiner;
 import com.blackducksoftware.integration.hub.validator.CredentialsValidator;
 import com.blackducksoftware.integration.hub.validator.ProxyInfoValidator;
 import com.blackducksoftware.integration.validator.AbstractValidator;
@@ -48,11 +48,11 @@ import com.blackducksoftware.integration.validator.ValidationResults;
 
 public class HubServerConfigValidator extends AbstractValidator {
     public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
-    public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
-    public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
+    public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL: ";
+    public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server: ";
     public static final String ERROR_MSG_UNREACHABLE_CAUSE = ", because: ";
     public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
-    public static final String ERROR_MSG_URL_NOT_HUB_PREFIX = "The Url does not appear to be a Hub server :";
+    public static final String ERROR_MSG_URL_NOT_HUB_PREFIX = "The Url does not appear to be a Hub server: ";
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
 
     private String hubUrl;
@@ -76,13 +76,13 @@ public class HubServerConfigValidator extends AbstractValidator {
     private final HubServerVerifier hubServerVerifier;
 
     public HubServerConfigValidator() {
-    		this.hubServerVerifier = new HubServerVerifier(new UriCombiner());
+        this.hubServerVerifier = new HubServerVerifier(new UriCombiner());
     }
 
-    public HubServerConfigValidator(HubServerVerifier hubServerVerifier) {
-    		this.hubServerVerifier = hubServerVerifier;
+    public HubServerConfigValidator(final HubServerVerifier hubServerVerifier) {
+        this.hubServerVerifier = hubServerVerifier;
     }
-    
+
     @Override
     public ValidationResults assertValid() {
         final ValidationResults proxyResult = assertProxyValid();

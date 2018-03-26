@@ -46,9 +46,9 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.hub.service.model.PagedRequest;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
-import com.blackducksoftware.integration.hub.service.model.UriCombiner;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
@@ -129,7 +129,7 @@ public class HubService {
     }
 
     public String getUri(final HubPath path) throws IntegrationException {
-        return uriCombiner.pieceTogetherUri(hubBaseUrl, path);
+        return uriCombiner.pieceTogetherUri(hubBaseUrl, path.getPath());
     }
 
     // ------------------------------------------------
@@ -144,7 +144,7 @@ public class HubService {
     }
 
     public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses, final boolean getAll) throws IntegrationException {
-        final String uri = uriCombiner.pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath);
+        final String uri = uriCombiner.pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath.getPath());
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
         return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), hubPathMultipleResponses.responseClass, getAll, null);
     }
@@ -155,13 +155,13 @@ public class HubService {
 
     public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses, final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
             throws IntegrationException {
-        final String uri = uriCombiner.pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath);
+        final String uri = uriCombiner.pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath.getPath());
         requestBuilder.uri(uri);
         return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), hubPathMultipleResponses.responseClass, getAll, typeMap);
     }
 
     public <T extends HubResponse> T getResponse(final HubPathSingleResponse<T> hubPathSingleResponse) throws IntegrationException {
-        final String uri = uriCombiner.pieceTogetherUri(hubBaseUrl, hubPathSingleResponse.hubPath);
+        final String uri = uriCombiner.pieceTogetherUri(hubBaseUrl, hubPathSingleResponse.hubPath.getPath());
         final Request request = RequestFactory.createCommonGetRequest(uri);
         return hubResponseTransformer.getResponse(request, hubPathSingleResponse.responseClass);
     }
@@ -240,7 +240,7 @@ public class HubService {
     }
 
     public Response executeGetRequest(final HubPath path) throws IntegrationException {
-        final String uri = uriCombiner.pieceTogetherUri(restConnection.baseUrl, path);
+        final String uri = uriCombiner.pieceTogetherUri(restConnection.baseUrl, path.getPath());
         return restConnection.executeRequest(RequestFactory.createCommonGetRequest(uri));
     }
 
@@ -252,7 +252,7 @@ public class HubService {
     // posting and getting location header
     // ------------------------------------------------
     public String executePostRequestAndRetrieveURL(final HubPath path, final Request.Builder requestBuilder) throws IntegrationException {
-        final String uri = uriCombiner.pieceTogetherUri(restConnection.baseUrl, path);
+        final String uri = uriCombiner.pieceTogetherUri(restConnection.baseUrl, path.getPath());
         requestBuilder.uri(uri);
         return executePostRequestAndRetrieveURL(requestBuilder.build());
     }

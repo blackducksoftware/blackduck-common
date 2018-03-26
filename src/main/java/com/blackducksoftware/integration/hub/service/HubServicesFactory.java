@@ -35,7 +35,7 @@ import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.notification.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.service.model.UriCombiner;
+import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
@@ -127,7 +127,7 @@ public class HubServicesFactory {
         return new HubService(restConnection);
     }
 
-    public HubService createHubService(UriCombiner uriCombiner) {
+    public HubService createHubService(final UriCombiner uriCombiner) {
         return new HubService(restConnection, uriCombiner);
     }
 

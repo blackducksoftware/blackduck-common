@@ -36,6 +36,7 @@ import com.blackducksoftware.integration.hub.rest.ApiTokenRestConnectionBuilder;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnectionBuilder;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.Stringable;
 
@@ -48,23 +49,26 @@ public class HubServerConfig extends Stringable implements Serializable {
     private final String apiToken;
     private final ProxyInfo proxyInfo;
     private final boolean alwaysTrustServerCertificate;
+    private final UriCombiner uriCombiner;
 
-    public HubServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
+    public HubServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate, final UriCombiner uriCombiner) {
         this.hubUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.credentials = credentials;
         this.apiToken = null;
         this.proxyInfo = proxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
+        this.uriCombiner = uriCombiner;
     }
 
-    public HubServerConfig(final URL url, final int timeoutSeconds, final String apiToken, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
+    public HubServerConfig(final URL url, final int timeoutSeconds, final String apiToken, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate, final UriCombiner uriCombiner) {
         this.hubUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.credentials = null;
         this.apiToken = apiToken;
         this.proxyInfo = proxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
+        this.uriCombiner = uriCombiner;
     }
 
     public boolean shouldUseProxyForHub() {
@@ -73,30 +77,33 @@ public class HubServerConfig extends Stringable implements Serializable {
 
     public void print(final IntLogger logger) {
         if (getHubUrl() != null) {
-            logger.alwaysLog("--> Hub Server Url : " + getHubUrl());
+            logger.alwaysLog("--> Hub Server Url: " + getHubUrl());
         }
         if (getGlobalCredentials() != null && StringUtils.isNotBlank(getGlobalCredentials().getUsername())) {
-            logger.alwaysLog("--> Hub User : " + getGlobalCredentials().getUsername());
+            logger.alwaysLog("--> Hub User: " + getGlobalCredentials().getUsername());
         }
         if (StringUtils.isNotBlank(apiToken)) {
             logger.alwaysLog("--> Hub API Token Used");
         }
         if (alwaysTrustServerCertificate) {
-            logger.alwaysLog("--> Trust Hub certificate : " + isAlwaysTrustServerCertificate());
+            logger.alwaysLog("--> Trust Hub certificate: " + isAlwaysTrustServerCertificate());
         }
         if (proxyInfo != null) {
             if (StringUtils.isNotBlank(proxyInfo.getHost())) {
-                logger.alwaysLog("--> Proxy Host : " + proxyInfo.getHost());
+                logger.alwaysLog("--> Proxy Host: " + proxyInfo.getHost());
             }
             if (proxyInfo.getPort() > 0) {
-                logger.alwaysLog("--> Proxy Port : " + proxyInfo.getPort());
+                logger.alwaysLog("--> Proxy Port: " + proxyInfo.getPort());
             }
             if (StringUtils.isNotBlank(proxyInfo.getIgnoredProxyHosts())) {
-                logger.alwaysLog("--> No Proxy Hosts : " + proxyInfo.getIgnoredProxyHosts());
+                logger.alwaysLog("--> No Proxy Hosts: " + proxyInfo.getIgnoredProxyHosts());
             }
             if (StringUtils.isNotBlank(proxyInfo.getUsername())) {
-                logger.alwaysLog("--> Proxy Username : " + proxyInfo.getUsername());
+                logger.alwaysLog("--> Proxy Username: " + proxyInfo.getUsername());
             }
+        }
+        if (uriCombiner != null) {
+            logger.alwaysLog("--> UriCombiner: " + uriCombiner);
         }
     }
 
@@ -116,6 +123,7 @@ public class HubServerConfig extends Stringable implements Serializable {
         builder.applyCredentials(getGlobalCredentials());
         builder.setAlwaysTrustServerCertificate(isAlwaysTrustServerCertificate());
         builder.applyProxyInfo(getProxyInfo());
+        builder.setUriCombiner(uriCombiner);
 
         return builder.build();
     }
@@ -128,6 +136,7 @@ public class HubServerConfig extends Stringable implements Serializable {
         builder.setApiToken(getApiToken());
         builder.setAlwaysTrustServerCertificate(isAlwaysTrustServerCertificate());
         builder.applyProxyInfo(getProxyInfo());
+        builder.setUriCombiner(uriCombiner);
 
         return builder.build();
     }
