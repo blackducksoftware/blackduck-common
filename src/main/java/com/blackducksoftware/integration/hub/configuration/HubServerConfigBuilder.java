@@ -230,7 +230,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     }
 
     /**
-     * IMPORTANT : The proxy password length should only be set if the proxy password is already encrypted
+     * IMPORTANT: The proxy password length should only be set if the proxy password is already encrypted
      */
     public void setProxyPasswordLength(final int proxyPasswordLength) {
         this.proxyPasswordLength = proxyPasswordLength;
@@ -250,6 +250,10 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
     public void setAlwaysTrustServerCertificate(final boolean alwaysTrustServerCertificate) {
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
+    }
+
+    public void setUriCombiner(final UriCombiner uriCombiner) {
+        this.uriCombiner = uriCombiner;
     }
 
     public IntLogger getLogger() {
