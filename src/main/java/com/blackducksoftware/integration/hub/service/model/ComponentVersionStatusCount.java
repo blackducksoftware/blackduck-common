@@ -27,7 +27,7 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.hub.api.generated.component.NameValuePairView;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
@@ -47,8 +47,11 @@ public class ComponentVersionStatusCount extends Stringable {
             name = PolicyStatusApprovalStatusType.valueOf(nameValuePair.name);
         }
 
-        if (StringUtils.isNumeric(nameValuePair.value)) {
-            value = Integer.valueOf(nameValuePair.value);
+        if (nameValuePair.value != null) {
+            final String valueString = nameValuePair.value.toString();
+            if (NumberUtils.isCreatable(valueString)) {
+                value = NumberUtils.createNumber(valueString).intValue();
+            }
         }
     }
 

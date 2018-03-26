@@ -77,7 +77,7 @@ public class HubResponsesTransformer {
             }
             while (allResponses.size() < totalCount && currentOffset < totalCount) {
                 currentOffset += pagedRequest.getLimit();
-                final PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), pagedRequest.getLimit(), currentOffset);
+                final PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), currentOffset, pagedRequest.getLimit());
                 try (Response response = restConnection.executeRequest(offsetPagedRequest.createRequest())) {
                     final String jsonResponse = response.getContentString();
                     final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();

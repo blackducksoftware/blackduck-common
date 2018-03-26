@@ -23,6 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.service.model;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import com.blackducksoftware.integration.hub.request.Request;
 
 public class PagedRequest {
@@ -32,8 +34,19 @@ public class PagedRequest {
 
     public PagedRequest(final Request.Builder requestBuilder) {
         this.requestBuilder = requestBuilder;
-        this.offset = 0;
-        this.limit = 100;
+        int offset = 0;
+        int limit = 100;
+        if (requestBuilder.getQueryParameters() != null) {
+            if (requestBuilder.getQueryParameters().containsKey("offset")) {
+                offset = NumberUtils.toInt(requestBuilder.getQueryParameters().get("offset"), 0);
+            }
+            if (requestBuilder.getQueryParameters().containsKey("limit")) {
+                limit = NumberUtils.toInt(requestBuilder.getQueryParameters().get("limit"), 100);
+            }
+        }
+
+        this.offset = offset;
+        this.limit = limit;
     }
 
     public PagedRequest(final Request.Builder requestBuilder, final int offset, final int limit) {
