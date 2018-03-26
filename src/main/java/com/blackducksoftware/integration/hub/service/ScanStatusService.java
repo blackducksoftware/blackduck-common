@@ -72,7 +72,7 @@ public class ScanStatusService extends DataService {
      * If the timeouts are exceeded, a HubTimeoutExceededException will be thrown.
      *
      */
-    public void assertBomImportScanStartedThenFinished(final String projectName, final String projectVersion) throws HubTimeoutExceededException, IntegrationException {
+    public void assertBomImportScanStartedThenFinished(final String projectName, final String projectVersion) throws InterruptedException, HubTimeoutExceededException, IntegrationException {
         final List<ScanSummaryView> pendingScans = waitForPendingScansToStart(projectName, projectVersion, this.timeoutInMilliseconds);
         waitForScansToComplete(pendingScans, this.timeoutInMilliseconds);
     }
@@ -83,17 +83,17 @@ public class ScanStatusService extends DataService {
      * If the timeout is exceeded, a HubTimeoutExceededException will be thrown.
      *
      */
-    public void assertScansFinished(final List<ScanSummaryView> pendingScans) throws HubTimeoutExceededException, IntegrationException {
+    public void assertScansFinished(final List<ScanSummaryView> pendingScans) throws InterruptedException, HubTimeoutExceededException, IntegrationException {
         waitForScansToComplete(pendingScans, this.timeoutInMilliseconds);
     }
 
-    public void assertScansFinished(final String projectName, final String projectVersion) throws IntegrationException {
+    public void assertScansFinished(final String projectName, final String projectVersion) throws InterruptedException, IntegrationException {
         final ProjectView projectItem = this.projectDataService.getProjectByName(projectName);
         final ProjectVersionView projectVersionView = this.projectDataService.getProjectVersion(projectItem, projectVersion);
         assertScansFinished(projectVersionView);
     }
 
-    public void assertScansFinished(final ProjectVersionView projectVersionView) throws HubTimeoutExceededException, IntegrationException {
+    public void assertScansFinished(final ProjectVersionView projectVersionView) throws InterruptedException, HubTimeoutExceededException, IntegrationException {
         final List<CodeLocationView> allCodeLocations = this.hubService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
         for (final CodeLocationView codeLocationView : allCodeLocations) {
@@ -104,7 +104,7 @@ public class ScanStatusService extends DataService {
         assertScansFinished(scanSummaryViews);
     }
 
-    private List<ScanSummaryView> waitForPendingScansToStart(final String projectName, final String projectVersion, final long scanStartedTimeoutInMilliseconds) throws HubIntegrationException {
+    private List<ScanSummaryView> waitForPendingScansToStart(final String projectName, final String projectVersion, final long scanStartedTimeoutInMilliseconds) throws InterruptedException, HubIntegrationException {
         List<ScanSummaryView> pendingScans = getPendingScans(projectName, projectVersion);
         final long startedTime = System.currentTimeMillis();
         boolean pendingScansOk = pendingScans.size() > 0;
@@ -118,7 +118,7 @@ public class ScanStatusService extends DataService {
         return pendingScans;
     }
 
-    private void waitForScansToComplete(List<ScanSummaryView> pendingScans, final long scanStartedTimeoutInMilliseconds) throws HubTimeoutExceededException, IntegrationException {
+    private void waitForScansToComplete(List<ScanSummaryView> pendingScans, final long scanStartedTimeoutInMilliseconds) throws InterruptedException, HubTimeoutExceededException, IntegrationException {
         pendingScans = getPendingScans(pendingScans);
         final long startedTime = System.currentTimeMillis();
         boolean pendingScansOk = pendingScans.isEmpty();
@@ -130,13 +130,9 @@ public class ScanStatusService extends DataService {
         }
     }
 
-    private void sleep(final String interruptedMessage, final String ongoingMessage) throws HubIntegrationException {
-        try {
-            this.logger.info(ongoingMessage);
-            Thread.sleep(FIVE_SECONDS);
-        } catch (final InterruptedException e) {
-            throw new HubIntegrationException(interruptedMessage + e.getMessage(), e);
-        }
+    private void sleep(final String interruptedMessage, final String ongoingMessage) throws InterruptedException {
+        this.logger.info(ongoingMessage);
+        Thread.sleep(FIVE_SECONDS);
     }
 
     private boolean done(final boolean conditionToCheck, final long timeoutInMilliseconds, final long startedTime, final String timeoutMessage) throws HubTimeoutExceededException {

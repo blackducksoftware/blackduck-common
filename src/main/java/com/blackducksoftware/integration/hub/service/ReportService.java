@@ -80,22 +80,22 @@ public class ReportService extends DataService {
         this.timeoutInMilliseconds = timeout;
     }
 
-    public String getNoticesReportData(final String projectName, final String projectVersionName) throws IntegrationException {
+    public String getNoticesReportData(final String projectName, final String projectVersionName) throws InterruptedException, IntegrationException {
         final ProjectView project = this.projectDataService.getProjectByName(projectName);
         final ProjectVersionView version = this.projectDataService.getProjectVersion(project, projectVersionName);
         return getNoticesReportData(project, version);
     }
 
-    public String getNoticesReportData(final ProjectView project, final ProjectVersionView version) throws IntegrationException {
+    public String getNoticesReportData(final ProjectView project, final ProjectVersionView version) throws InterruptedException, IntegrationException {
         this.logger.trace("Getting the Notices Report Contents using the Report Rest Server");
         return generateHubNoticesReport(version, ReportFormatType.TEXT);
     }
 
-    public File createNoticesReportFile(final File outputDirectory, final String projectName, final String projectVersionName) throws IntegrationException {
+    public File createNoticesReportFile(final File outputDirectory, final String projectName, final String projectVersionName) throws InterruptedException, IntegrationException {
         return createNoticesReportFile(outputDirectory, getNoticesReportData(projectName, projectVersionName), projectName, projectVersionName);
     }
 
-    public File createNoticesReportFile(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws IntegrationException {
+    public File createNoticesReportFile(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws InterruptedException, IntegrationException {
         return createNoticesReportFile(outputDirectory, getNoticesReportData(project, version), project.name, version.versionName);
     }
 
@@ -313,7 +313,7 @@ public class ReportService extends DataService {
      * Assumes the BOM has already been updated
      *
      */
-    public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws IntegrationException {
+    public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws InterruptedException, IntegrationException {
         if (this.hubService.hasLink(version, ProjectVersionView.LICENSEREPORTS_LINK)) {
             try {
                 this.logger.debug("Starting the Notices Report generation.");
@@ -362,7 +362,7 @@ public class ReportService extends DataService {
     /**
      * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done being generated. Throws HubIntegrationException after 30 minutes if the report has not been generated yet.
      */
-    public ReportView isReportFinishedGenerating(final String reportUri) throws IntegrationException {
+    public ReportView isReportFinishedGenerating(final String reportUri) throws InterruptedException, IntegrationException {
         final long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         Date timeFinished = null;
@@ -379,11 +379,7 @@ public class ReportService extends DataService {
                 throw new HubIntegrationException("The Report has not finished generating in : " + formattedTime);
             }
             // Retry every 5 seconds
-            try {
-                Thread.sleep(5000);
-            } catch (final InterruptedException e) {
-                throw new HubIntegrationException("The thread waiting for the report generation was interrupted", e);
-            }
+            Thread.sleep(5000);
             elapsedTime = System.currentTimeMillis() - startTime;
         }
         return reportInfo;

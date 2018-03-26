@@ -23,28 +23,6 @@
  */
 package com.blackducksoftware.integration.hub.cli;
 
-import static java.lang.ProcessBuilder.Redirect.PIPE;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
@@ -59,6 +37,27 @@ import com.blackducksoftware.integration.hub.service.model.StreamRedirectThread;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 import com.google.gson.Gson;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static java.lang.ProcessBuilder.Redirect.PIPE;
 
 public class SimpleScanUtility {
     public static final int DEFAULT_MEMORY = 4096;
@@ -85,7 +84,7 @@ public class SimpleScanUtility {
         this.version = version;
     }
 
-    public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+    public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, InterruptedException, HubIntegrationException {
         final CLILocation cliLocation = new CLILocation(logger, hubScanConfig.getToolsDir());
         setupAndExecuteScan(cliLocation);
     }
@@ -99,10 +98,10 @@ public class SimpleScanUtility {
      *
      * @throws ScanFailedException
      */
-    public void setupAndExecuteScan(final CLILocation cliLocation) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        String pathToJavaExecutable;
-        String pathToOneJar;
-        String pathToScanExecutable;
+    public void setupAndExecuteScan(final CLILocation cliLocation) throws IllegalArgumentException, EncryptionException, InterruptedException, HubIntegrationException {
+        final String pathToJavaExecutable;
+        final String pathToOneJar;
+        final String pathToScanExecutable;
         try {
             pathToJavaExecutable = cliLocation.getProvidedJavaExec().getCanonicalPath();
             pathToOneJar = cliLocation.getOneJarFile().getCanonicalPath();
@@ -251,7 +250,7 @@ public class SimpleScanUtility {
      * @throws IOException
      * @throws HubIntegrationException
      */
-    private void executeScan() throws IllegalArgumentException, EncryptionException, IOException, HubIntegrationException {
+    private void executeScan() throws IllegalArgumentException, EncryptionException, IOException, InterruptedException, ScanFailedException {
         printCommand();
 
         final File standardOutFile = getStandardOutputFile();
@@ -287,8 +286,13 @@ public class SimpleScanUtility {
                 // the join method on the redirect thread will wait until the thread is dead
                 // the thread will die when it reaches the end of stream and the run method is finished
                 redirectThread.join();
-            } catch (final InterruptedException e) {
-                throw new HubIntegrationException("The thread waiting for the cli to complete was interrupted: " + e.getMessage(), e);
+            } finally {
+                if (hubCliProcess.isAlive()) {
+                    hubCliProcess.destroy();
+                }
+                if (redirectThread.isAlive()) {
+                    redirectThread.interrupt();
+                }
             }
 
             splitOutputStream.flush();
@@ -324,7 +328,7 @@ public class SimpleScanUtility {
 
         final List<ScanSummaryView> scanSummaryItems = new ArrayList<>();
         for (final File currentStatusFile : statusFiles) {
-            String fileContent;
+            final String fileContent;
             try {
                 fileContent = FileUtils.readFileToString(currentStatusFile, "UTF8");
             } catch (final IOException e) {
