@@ -23,30 +23,6 @@
  */
 package com.blackducksoftware.integration.hub.cli;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.CountingInputStream;
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.certificate.CertificateHandler;
@@ -57,6 +33,20 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.CountingInputStream;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class CLIDownloadUtility {
     private final IntLogger logger;
@@ -73,8 +63,8 @@ public class CLIDownloadUtility {
             throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
         }
 
-        final CLILocation cliLocation = new CLILocation(logger, directoryToInstallTo);
-        final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(logger, hubUrl);
+        final CLILocation cliLocation = new CLILocation(this.logger, directoryToInstallTo);
+        final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(this.logger, hubUrl);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
             try {
                 customInstall(cliLocation, ciEnvironmentVariables, new URL(cliDownloadUrl), hubVersion, localHostName);
@@ -82,13 +72,13 @@ public class CLIDownloadUtility {
                 throw new HubIntegrationException(String.format("The cli could not be downloaded from %s: %s", cliDownloadUrl, e.getMessage()), e);
             }
         } else {
-            logger.error("Could not find the correct Hub CLI download URL.");
+            this.logger.error("Could not find the correct Hub CLI download URL.");
         }
     }
 
     public void customInstall(final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables, final URL cliDownloadUrl, final String hubVersion, final String localHostName)
             throws HubIntegrationException, EncryptionException {
-        String directoryToInstallTo;
+        final String directoryToInstallTo;
         try {
             directoryToInstallTo = cliLocation.getCanonicalPath();
         } catch (final IOException e) {
@@ -113,10 +103,10 @@ public class CLIDownloadUtility {
             }
 
             if (cliMismatch) {
-                logger.debug("Attempting to download the Hub CLI.");
-                final FileWriter writer = new FileWriter(hubVersionFile);
-                writer.write(hubVersion);
-                writer.close();
+                this.logger.debug("Attempting to download the Hub CLI.");
+                try (final FileWriter writer = new FileWriter(hubVersionFile)) {
+                    writer.write(hubVersion);
+                }
                 hubVersionFile.setLastModified(0L);
             }
             final long cliTimestamp = hubVersionFile.lastModified();
@@ -128,7 +118,7 @@ public class CLIDownloadUtility {
             requestBuilder.additionalHeaders(headers);
 
             final Request request = requestBuilder.build();
-            try (Response response = restConnection.executeRequest(request)) {
+            try (Response response = this.restConnection.executeRequest(request)) {
                 if (304 == response.getStatusCode()) {
                     // CLI has not been modified
                     return;
@@ -150,7 +140,7 @@ public class CLIDownloadUtility {
 
                 if (cliInstallDirectory.exists() && cliInstallDirectory.listFiles().length > 0) {
                     if (!cliMismatch && lastModifiedLong == cliTimestamp) {
-                        logger.debug("The current Hub CLI is up to date.");
+                        this.logger.debug("The current Hub CLI is up to date.");
                         return;
                     }
                     for (final File file : cliInstallDirectory.listFiles()) {
@@ -160,23 +150,23 @@ public class CLIDownloadUtility {
                     cliInstallDirectory.mkdir();
                 }
 
-                logger.debug("Updating the Hub CLI.");
+                this.logger.debug("Updating the Hub CLI.");
                 hubVersionFile.setLastModified(lastModifiedLong);
 
-                logger.info("Unpacking " + cliDownloadUrl.toString() + " to " + directoryToInstallTo + " on " + localHostName);
+                this.logger.info("Unpacking " + cliDownloadUrl.toString() + " to " + directoryToInstallTo + " on " + localHostName);
 
                 try (InputStream cliStream = response.getContent()) {
                     long byteCount = 0;
                     try (CountingInputStream cis = new CountingInputStream(cliStream)) {
                         byteCount = cis.getByteCount();
-                        unzip(cliInstallDirectory, cis, logger);
-                        updateJreSecurity(logger, cliLocation, ciEnvironmentVariables);
+                        unzip(cliInstallDirectory, cis, this.logger);
+                        updateJreSecurity(this.logger, cliLocation, ciEnvironmentVariables);
                     } catch (final IOException e) {
                         throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", cliDownloadUrl, byteCount, response.getContentLength()), e);
                     }
                 }
             } catch (final IntegrationException e) {
-                logger.error("Skipping installation of " + cliDownloadUrl + " to " + directoryToInstallTo + ": " + e.toString());
+                this.logger.error("Skipping installation of " + cliDownloadUrl + " to " + directoryToInstallTo + ": " + e.toString());
                 return;
             }
         } catch (final IOException e) {
