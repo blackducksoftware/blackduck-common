@@ -23,14 +23,6 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
@@ -48,6 +40,13 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.service.model.HostnameHelper;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SignatureScannerService extends DataService {
     private final CIEnvironmentVariables ciEnvironmentVariables;
@@ -69,7 +68,7 @@ public class SignatureScannerService extends DataService {
     }
 
     public ProjectVersionWrapper installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished)
-            throws IntegrationException {
+            throws InterruptedException, IntegrationException {
         preScan(hubServerConfig, hubScanConfig, projectRequest);
         final SimpleScanUtility simpleScanService = createScanService(hubServerConfig, hubScanConfig, projectRequest);
         final File[] scanSummaryFiles = runScan(simpleScanService);
@@ -89,7 +88,7 @@ public class SignatureScannerService extends DataService {
     /**
      * This should only be invoked directly when dryRun == true. Otherwise, installAndRunControlledScan should be used.
      */
-    public File[] runControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
+    public File[] runControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws InterruptedException, IntegrationException {
         final SimpleScanUtility simpleScanService = createScanService(hubServerConfig, hubScanConfig, projectRequest);
         final File[] scanSummaryFiles = runScan(simpleScanService);
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
@@ -98,7 +97,7 @@ public class SignatureScannerService extends DataService {
         return scanSummaryFiles;
     }
 
-    private File[] runScan(final SimpleScanUtility simpleScanService) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+    private File[] runScan(final SimpleScanUtility simpleScanService) throws IllegalArgumentException, EncryptionException, InterruptedException, HubIntegrationException {
         simpleScanService.setupAndExecuteScan();
         final File[] scanSummaryFiles = simpleScanService.getScanSummaryFiles();
         return scanSummaryFiles;
@@ -135,7 +134,7 @@ public class SignatureScannerService extends DataService {
     }
 
     private void postScan(final HubScanConfig hubScanConfig, final File[] scanSummaryFiles, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished, final SimpleScanUtility simpleScanService)
-            throws IntegrationException {
+            throws InterruptedException, IntegrationException {
         logger.trace("Scan is dry run ${hubScanConfig.isDryRun()}");
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
             cleanUpLogFiles(simpleScanService);
@@ -146,7 +145,7 @@ public class SignatureScannerService extends DataService {
             final List<ScanSummaryView> scanSummaries = new ArrayList<>();
             logger.trace("Found ${scanSummaryFiles.length} scan summary files");
             for (final File scanSummaryFile : scanSummaryFiles) {
-                ScanSummaryView scanSummary;
+                final ScanSummaryView scanSummary;
                 try {
                     scanSummary = getScanSummaryFromFile(scanSummaryFile);
                     scanSummaries.add(scanSummary);
