@@ -36,6 +36,7 @@ import com.blackducksoftware.integration.hub.Credentials;
 import com.blackducksoftware.integration.hub.CredentialsBuilder;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
 import com.blackducksoftware.integration.hub.proxy.ProxyInfoBuilder;
+import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
@@ -59,6 +60,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     private int proxyPasswordLength;
     private String ignoredProxyHosts;
     private boolean alwaysTrustServerCertificate;
+    private UriCombiner uriCombiner;
     private IntLogger logger;
     private final HubServerConfigValidator validator;
 
@@ -67,8 +69,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         this.validator = new HubServerConfigValidator();
     }
 
-    public HubServerConfigBuilder(HubServerConfigValidator validator) {
-    		this.validator = validator;
+    public HubServerConfigBuilder(final HubServerConfigValidator validator) {
+        this.validator = validator;
     }
 
     @Override
@@ -98,11 +100,15 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         }
 
         final ProxyInfo proxyInfo = getHubProxyInfo();
+        UriCombiner uriCombinerToUse = new UriCombiner();
+        if (uriCombiner != null) {
+            uriCombinerToUse = uriCombiner;
+        }
         if (StringUtils.isNotBlank(apiToken)) {
-            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), apiToken, proxyInfo, alwaysTrustServerCertificate);
+            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), apiToken, proxyInfo, alwaysTrustServerCertificate, uriCombinerToUse);
         } else {
             final Credentials credentials = getHubCredentials();
-            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, alwaysTrustServerCertificate);
+            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, alwaysTrustServerCertificate, uriCombinerToUse);
         }
     }
 
@@ -224,7 +230,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     }
 
     /**
-     * IMPORTANT : The proxy password length should only be set if the proxy password is already encrypted
+     * IMPORTANT: The proxy password length should only be set if the proxy password is already encrypted
      */
     public void setProxyPasswordLength(final int proxyPasswordLength) {
         this.proxyPasswordLength = proxyPasswordLength;
@@ -244,6 +250,10 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
     public void setAlwaysTrustServerCertificate(final boolean alwaysTrustServerCertificate) {
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
+    }
+
+    public void setUriCombiner(final UriCombiner uriCombiner) {
+        this.uriCombiner = uriCombiner;
     }
 
     public IntLogger getLogger() {
