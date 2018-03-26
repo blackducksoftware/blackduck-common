@@ -48,11 +48,11 @@ import com.blackducksoftware.integration.validator.ValidationResults;
 
 public class HubServerConfigValidator extends AbstractValidator {
     public static final String ERROR_MSG_URL_NOT_FOUND = "No Hub Url was found.";
-    public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL : ";
-    public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server : ";
+    public static final String ERROR_MSG_URL_NOT_VALID_PREFIX = "This is not a valid URL: ";
+    public static final String ERROR_MSG_UNREACHABLE_PREFIX = "Can not reach this server: ";
     public static final String ERROR_MSG_UNREACHABLE_CAUSE = ", because: ";
     public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
-    public static final String ERROR_MSG_URL_NOT_HUB_PREFIX = "The Url does not appear to be a Hub server :";
+    public static final String ERROR_MSG_URL_NOT_HUB_PREFIX = "The Url does not appear to be a Hub server: ";
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
 
     private String hubUrl;
