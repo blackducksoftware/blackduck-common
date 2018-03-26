@@ -47,8 +47,11 @@ public class ComponentVersionStatusCount extends Stringable {
             name = PolicyStatusApprovalStatusType.valueOf(nameValuePair.name);
         }
 
-        if (nameValuePair.value != null && NumberUtils.isCreatable(nameValuePair.value.toString())) {
-            value = NumberUtils.createNumber(nameValuePair.value.toString()).intValue();
+        if (nameValuePair.value != null) {
+            final String valueString = nameValuePair.value.toString();
+            if (NumberUtils.isCreatable(valueString)) {
+                value = NumberUtils.createNumber(valueString).intValue();
+            }
         }
     }
 

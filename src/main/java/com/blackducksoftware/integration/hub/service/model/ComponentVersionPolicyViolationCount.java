@@ -31,8 +31,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.hub.api.enumeration.PolicySeverityType;
 import com.blackducksoftware.integration.hub.api.generated.component.NameValuePairView;
+import com.blackducksoftware.integration.util.Stringable;
 
-public class ComponentVersionPolicyViolationCount {
+public class ComponentVersionPolicyViolationCount extends Stringable {
     public PolicySeverityType name;
     public int value;
 
@@ -43,11 +44,14 @@ public class ComponentVersionPolicyViolationCount {
         final Set<PolicySeverityType> policySeverityTypes = EnumSet.allOf(PolicySeverityType.class);
         final Set<String> policyStatusTypeValues = policySeverityTypes.stream().map(Object::toString).collect(Collectors.toSet());
         if (policyStatusTypeValues.contains(nameValuePair.name)) {
-            name = PolicySeverityType.valueOf(nameValuePair.name);
+            this.name = PolicySeverityType.valueOf(nameValuePair.name);
         }
 
-        if (nameValuePair.value != null && NumberUtils.isCreatable(nameValuePair.value.toString())) {
-            value = NumberUtils.createNumber(nameValuePair.value.toString()).intValue();
+        if (nameValuePair.value != null) {
+            final String valueString = nameValuePair.value.toString();
+            if (NumberUtils.isCreatable(valueString)) {
+                value = NumberUtils.createNumber(valueString).intValue();
+            }
         }
     }
 
