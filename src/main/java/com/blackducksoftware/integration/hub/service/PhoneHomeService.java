@@ -115,6 +115,9 @@ public class PhoneHomeService extends DataService {
             phoneHomeRequestBodyBuilder.setBlackDuckName(BlackDuckName.HUB);
             phoneHomeRequestBodyBuilder.setBlackDuckVersion(currentVersion.version);
             phoneHomeRequestBodyBuilder.setSource(PhoneHomeSource.INTEGRATIONS);
+
+            // this hostname won't get hashed
+            phoneHomeRequestBodyBuilder.addToMetaDataMap("hub.host.name", hubHostName.toString());
         } catch (final Exception e) {
             logger.debug("Couldn't detail phone home request builder: " + e.getMessage());
         }
