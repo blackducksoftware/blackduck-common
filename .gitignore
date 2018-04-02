@@ -3,6 +3,9 @@
 .project
 target/
 bin/
+*.iml
+.idea/
+out/
 pom.xml.bak
 .DS_Store
 test.properties
