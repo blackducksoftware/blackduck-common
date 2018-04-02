@@ -23,6 +23,14 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.io.FileUtils;
+
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
@@ -40,13 +48,6 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.service.model.HostnameHelper;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SignatureScannerService extends DataService {
     private final CIEnvironmentVariables ciEnvironmentVariables;
@@ -135,7 +136,7 @@ public class SignatureScannerService extends DataService {
 
     private void postScan(final HubScanConfig hubScanConfig, final File[] scanSummaryFiles, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished, final SimpleScanUtility simpleScanService)
             throws InterruptedException, IntegrationException {
-        logger.trace("Scan is dry run ${hubScanConfig.isDryRun()}");
+        logger.trace(String.format("Scan is dry run %s", hubScanConfig.isDryRun()));
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
             cleanUpLogFiles(simpleScanService);
         }
@@ -143,7 +144,7 @@ public class SignatureScannerService extends DataService {
         if (!hubScanConfig.isDryRun()) {
             final List<CodeLocationView> codeLocationViews = new ArrayList<>();
             final List<ScanSummaryView> scanSummaries = new ArrayList<>();
-            logger.trace("Found ${scanSummaryFiles.length} scan summary files");
+            logger.trace(String.format("Found %s scan summary files", scanSummaryFiles.length));
             for (final File scanSummaryFile : scanSummaryFiles) {
                 final ScanSummaryView scanSummary;
                 try {

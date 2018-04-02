@@ -23,6 +23,28 @@
  */
 package com.blackducksoftware.integration.hub.cli;
 
+import static java.lang.ProcessBuilder.Redirect.PIPE;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
@@ -37,27 +59,6 @@ import com.blackducksoftware.integration.hub.service.model.StreamRedirectThread;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 import com.google.gson.Gson;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static java.lang.ProcessBuilder.Redirect.PIPE;
 
 public class SimpleScanUtility {
     public static final int DEFAULT_MEMORY = 4096;
@@ -362,14 +363,13 @@ public class SimpleScanUtility {
             throw new IOException(String.format("Could not create the %s directory!", logDirectory.getAbsolutePath()));
         }
         final File bdIgnoreLogsFile = new File(hubScanConfig.getWorkingDirectory(), ".bdignore");
-        if (bdIgnoreLogsFile.exists()) {
-            bdIgnoreLogsFile.delete();
+        if (!bdIgnoreLogsFile.exists()) {
+            if (!bdIgnoreLogsFile.createNewFile()) {
+                throw new IOException(String.format("Could not create the %s file!", bdIgnoreLogsFile.getAbsolutePath()));
+            }
+            final String exclusionPattern = "/" + logDirectoryName + "/";
+            Files.write(bdIgnoreLogsFile.toPath(), exclusionPattern.getBytes());
         }
-        if (!bdIgnoreLogsFile.createNewFile()) {
-            throw new IOException(String.format("Could not create the %s file!", bdIgnoreLogsFile.getAbsolutePath()));
-        }
-        final String exclusionPattern = "/" + logDirectoryName + "/";
-        Files.write(bdIgnoreLogsFile.toPath(), exclusionPattern.getBytes());
     }
 
     /**
