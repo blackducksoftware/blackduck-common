@@ -101,11 +101,17 @@ public class CLIDataService {
         this.metaService = metaService
     }
 
-    public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished, final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
+    public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig,
+                                                          final HubScanConfig hubScanConfig,
+                                                          final ProjectRequest projectRequest, boolean shouldWaitForScansFinished,
+                                                          final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException, InterruptedException {
         installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, shouldWaitForScansFinished, thirdPartyName.toString(), thirdPartyVersion, pluginVersion);
     }
 
-    public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, boolean shouldWaitForScansFinished, final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException {
+    public ProjectVersionView installAndRunControlledScan(final HubServerConfig hubServerConfig,
+                                                          final HubScanConfig hubScanConfig,
+                                                          final ProjectRequest projectRequest, boolean shouldWaitForScansFinished,
+                                                          final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) throws IntegrationException, InterruptedException {
         PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = PhoneHomeRequestBody.DO_NOT_PHONE_HOME
         try {
             phoneHomeRequestBodyBuilder = phoneHomeDataService.createInitialPhoneHomeRequestBodyBuilder(thirdPartyName, thirdPartyVersion, pluginVersion)
@@ -128,7 +134,7 @@ public class CLIDataService {
     /**
      * This should only be invoked directly when dryRun == true. Otherwise, installAndRunControlledScan should be used.
      */
-    public File[] runControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig) throws IntegrationException {
+    public File[] runControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig) throws IntegrationException, InterruptedException {
         final SimpleScanService simpleScanService = createScanService(hubServerConfig, hubScanConfig)
         File [] scamSummaryFiles = runScan(simpleScanService)
         if(hubScanConfig.isCleanupLogsOnSuccess()) {
@@ -137,7 +143,7 @@ public class CLIDataService {
         scanSummaryFiles
     }
 
-    private File[] runScan(final SimpleScanService simpleScanService) {
+    private File[] runScan(final SimpleScanService simpleScanService) throws InterruptedException {
         simpleScanService.setupAndExecuteScan()
         File[] scanSummaryFiles = simpleScanService.getScanSummaryFiles()
         scanSummaryFiles
