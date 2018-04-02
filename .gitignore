@@ -7,7 +7,7 @@
 .project
 bin/
 *.iml
-
+.idea/
 out/
 
 # build tool
