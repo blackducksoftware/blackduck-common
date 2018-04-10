@@ -36,10 +36,7 @@ import com.blackducksoftware.integration.hub.service.model.PhoneHomeCallable;
 import com.blackducksoftware.integration.hub.service.model.PhoneHomeResponse;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;
-import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBodyBuilder;
-import com.blackducksoftware.integration.phonehome.enums.BlackDuckName;
-import com.blackducksoftware.integration.phonehome.enums.PhoneHomeSource;
-import com.blackducksoftware.integration.phonehome.enums.ThirdPartyName;
+import com.blackducksoftware.integration.phonehome.enums.ProductIdEnum;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
 public class PhoneHomeService extends DataService {
@@ -57,16 +54,12 @@ public class PhoneHomeService extends DataService {
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
     }
 
-    public void phoneHome(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
-        phoneHome(thirdPartyName.getName(), thirdPartyVersion, pluginVersion);
-    }
-
-    public void phoneHome(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
-        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder(thirdPartyName, thirdPartyVersion, pluginVersion);
+    public void phoneHome(final String artifactId, final String artifactVersion) {
+        final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder(artifactId, artifactVersion);
         phoneHome(phoneHomeRequestBodyBuilder);
     }
 
-    public void phoneHome(final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder) {
+    public void phoneHome(final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder) {
         try {
             final PhoneHomeRequestBody phoneHomeRequestBody = phoneHomeRequestBodyBuilder.build();
             phoneHome(phoneHomeRequestBody);
@@ -87,20 +80,15 @@ public class PhoneHomeService extends DataService {
         }
     }
 
-    public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
-        return createInitialPhoneHomeRequestBodyBuilder(thirdPartyName.getName(), thirdPartyVersion, pluginVersion);
-    }
-
-    public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
-        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
-        phoneHomeRequestBodyBuilder.setThirdPartyName(thirdPartyName);
-        phoneHomeRequestBodyBuilder.setThirdPartyVersion(thirdPartyVersion);
-        phoneHomeRequestBodyBuilder.setPluginVersion(pluginVersion);
+    public PhoneHomeRequestBody.Builder createInitialPhoneHomeRequestBodyBuilder(final String artifactId, final String artifactVersion) {
+        final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
+        phoneHomeRequestBodyBuilder.setArtifactId(artifactId);
+        phoneHomeRequestBodyBuilder.setArtifactVersion(artifactVersion);
         return phoneHomeRequestBodyBuilder;
     }
 
-    public PhoneHomeRequestBodyBuilder createInitialPhoneHomeRequestBodyBuilder() {
-        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = new PhoneHomeRequestBodyBuilder();
+    public PhoneHomeRequestBody.Builder createInitialPhoneHomeRequestBodyBuilder() {
+        final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder = new PhoneHomeRequestBody.Builder();
         try {
             final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
             String registrationId = null;
@@ -108,32 +96,25 @@ public class PhoneHomeService extends DataService {
                 // We need to wrap this because this will most likely fail unless they are running as an admin
                 registrationId = hubRegistrationService.getRegistrationId();
             } catch (final IntegrationException e) {
+                registrationId = "<unkown>";
             }
             final URL hubHostName = hubService.getHubBaseUrl();
-            phoneHomeRequestBodyBuilder.setRegistrationId(registrationId);
+            phoneHomeRequestBodyBuilder.setCustomerId(registrationId);
             phoneHomeRequestBodyBuilder.setHostName(hubHostName.toString());
-            phoneHomeRequestBodyBuilder.setBlackDuckName(BlackDuckName.HUB);
-            phoneHomeRequestBodyBuilder.setBlackDuckVersion(currentVersion.version);
-            phoneHomeRequestBodyBuilder.setSource(PhoneHomeSource.INTEGRATIONS);
-
-            // this hostname won't get hashed
-            phoneHomeRequestBodyBuilder.addToMetaDataMap("hub.host.name", hubHostName.toString());
+            phoneHomeRequestBodyBuilder.setProductId(ProductIdEnum.HUB);
+            phoneHomeRequestBodyBuilder.setProductVersion(currentVersion.version);
         } catch (final Exception e) {
             logger.debug("Couldn't detail phone home request builder: " + e.getMessage());
         }
         return phoneHomeRequestBodyBuilder;
     }
 
-    public PhoneHomeResponse startPhoneHome(final ThirdPartyName thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
-        return startPhoneHome(thirdPartyName.getName(), thirdPartyVersion, pluginVersion);
-    }
-
-    public PhoneHomeResponse startPhoneHome(final String thirdPartyName, final String thirdPartyVersion, final String pluginVersion) {
-        final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder(thirdPartyName, thirdPartyVersion, pluginVersion);
+    public PhoneHomeResponse startPhoneHome(final String artifactId, final String artifactVersion) {
+        final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder(artifactId, artifactVersion);
         return startPhoneHome(phoneHomeRequestBodyBuilder);
     }
 
-    public PhoneHomeResponse startPhoneHome(final PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder) {
+    public PhoneHomeResponse startPhoneHome(final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder) {
         try {
             final PhoneHomeRequestBody phoneHomeRequestBody = phoneHomeRequestBodyBuilder.build();
             return startPhoneHome(phoneHomeRequestBody);
