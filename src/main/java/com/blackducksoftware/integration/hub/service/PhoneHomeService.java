@@ -54,6 +54,10 @@ public class PhoneHomeService extends DataService {
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
     }
 
+    /**
+     * @param artifactId The name of the jar without the version. For example: <i>hub-common</i>.
+     * @param artifactVersion The version of the jar.
+     */
     public void phoneHome(final String artifactId, final String artifactVersion) {
         final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder(artifactId, artifactVersion);
         phoneHome(phoneHomeRequestBodyBuilder);
@@ -80,6 +84,10 @@ public class PhoneHomeService extends DataService {
         }
     }
 
+    /**
+     * @param artifactId The name of the jar without the version. For example: <i>hub-common</i>.
+     * @param artifactVersion The version of the jar.
+     */
     public PhoneHomeRequestBody.Builder createInitialPhoneHomeRequestBodyBuilder(final String artifactId, final String artifactVersion) {
         final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
         phoneHomeRequestBodyBuilder.setArtifactId(artifactId);
@@ -109,6 +117,10 @@ public class PhoneHomeService extends DataService {
         return phoneHomeRequestBodyBuilder;
     }
 
+    /**
+     * @param artifactId The name of the jar without the version. For example: <i>hub-common</i>.
+     * @param artifactVersion The version of the jar.
+     */
     public PhoneHomeResponse startPhoneHome(final String artifactId, final String artifactVersion) {
         final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder(artifactId, artifactVersion);
         return startPhoneHome(phoneHomeRequestBodyBuilder);
