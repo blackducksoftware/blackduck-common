@@ -37,6 +37,7 @@ import com.blackducksoftware.integration.hub.notification.PolicyNotificationFilt
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
+import com.blackducksoftware.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 
@@ -72,7 +73,8 @@ public class HubServicesFactory {
     }
 
     public PhoneHomeClient createPhoneHomeClient() {
-        return new PhoneHomeClient(restConnection.logger, restConnection.timeout, restConnection.getProxyInfo(), restConnection.alwaysTrustServerCertificate);
+        return new PhoneHomeClient(restConnection.logger, GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID, restConnection.timeout, restConnection.getProxyInfo(), restConnection.alwaysTrustServerCertificate,
+                restConnection.gson);
     }
 
     public ReportService createReportService(final long timeoutInMilliseconds) throws IntegrationException {
