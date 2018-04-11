@@ -104,7 +104,7 @@ public class PhoneHomeService extends DataService {
                 // We need to wrap this because this will most likely fail unless they are running as an admin
                 registrationId = hubRegistrationService.getRegistrationId();
             } catch (final IntegrationException e) {
-                registrationId = "<unkown>";
+                registrationId = PhoneHomeRequestBody.Builder.UNKNOWN_ID;
             }
             final URL hubHostName = hubService.getHubBaseUrl();
             phoneHomeRequestBodyBuilder.setCustomerId(registrationId);
