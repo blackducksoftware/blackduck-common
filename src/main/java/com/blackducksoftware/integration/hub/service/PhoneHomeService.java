@@ -34,6 +34,7 @@ import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscover
 import com.blackducksoftware.integration.hub.api.generated.response.CurrentVersionView;
 import com.blackducksoftware.integration.hub.service.model.PhoneHomeCallable;
 import com.blackducksoftware.integration.hub.service.model.PhoneHomeResponse;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;
 import com.blackducksoftware.integration.phonehome.enums.ProductIdEnum;
@@ -47,6 +48,15 @@ public class PhoneHomeService extends DataService {
 
     public PhoneHomeService(final HubService hubService, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final CIEnvironmentVariables ciEnvironmentVariables) {
         super(hubService);
+        this.hubRegistrationService = hubRegistrationService;
+        this.phoneHomeClient = phoneHomeClient;
+        this.ciEnvironmentVariables = ciEnvironmentVariables;
+        final ThreadFactory threadFactory = Executors.defaultThreadFactory();
+        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
+    }
+
+    public PhoneHomeService(final HubService hubService, IntLogger logger, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final CIEnvironmentVariables ciEnvironmentVariables) {
+        super(hubService, logger);
         this.hubRegistrationService = hubRegistrationService;
         this.phoneHomeClient = phoneHomeClient;
         this.ciEnvironmentVariables = ciEnvironmentVariables;

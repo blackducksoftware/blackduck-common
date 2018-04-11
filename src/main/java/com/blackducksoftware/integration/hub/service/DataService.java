@@ -30,8 +30,11 @@ public class DataService {
     IntLogger logger;
 
     public DataService(final HubService hubService) {
-        this.hubService = hubService;
-        this.logger = hubService.getRestConnection().logger;
+        this(hubService, hubService.getRestConnection().logger);
     }
 
+    public DataService(final HubService hubService, IntLogger logger) {
+        this.hubService = hubService;
+        this.logger = logger;
+    }
 }
