@@ -223,7 +223,10 @@ public class HubService {
 
     public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> responseClass, final boolean getAll) throws IntegrationException {
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
-        requestBuilder.uri(uri);
+        return getResponses(responseClass, requestBuilder, getAll);
+    }
+
+    public <T extends HubResponse> List<T> getResponses(final Class<T> responseClass, final Request.Builder requestBuilder, final boolean getAll) throws IntegrationException {
         return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), responseClass, getAll, null);
     }
 
