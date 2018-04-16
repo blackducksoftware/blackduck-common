@@ -29,7 +29,7 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.Notificat
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 
 // This is named ImprovedUserNotificationView because it adds the 'content' member with an actual type.
-public class ImprovedUserNotificationView extends ReducedNotificationView implements CommonNotificationState {
+public class ImprovedUserNotificationView extends ReducedUserNotificationView implements CommonNotificationState {
     public NotificationContent notificationContent;
 
     @Override
