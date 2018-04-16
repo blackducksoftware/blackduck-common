@@ -21,26 +21,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.response;
+package com.blackducksoftware.integration.hub.notification.content;
 
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import com.blackducksoftware.integration.hub.api.core.HubComponent;
 import com.google.gson.annotations.SerializedName;
 
-public class VulnerabilityNotificationContent extends HubResponse {
-    public int newVulnerabilityCount;
-    public int updatedVulnerabilityCount;
-    public int deletedVulnerabilityCount;
-    public List<VulnerabilitySourceQualifiedId> newVulnerabilityIds;
-    public List<VulnerabilitySourceQualifiedId> updatedVulnerabilityIds;
-    public List<VulnerabilitySourceQualifiedId> deletedVulnerabilityIds;
+public class ComponentVersionStatus extends HubComponent {
+    public String componentName;
 
+    // If version is specified, componentVersionLink will be populated
+    // otherwise it will be null
     @SerializedName("componentVersion")
     public String componentVersionLink;
 
-    public String componentName;
-    public String versionName;
-    public List<AffectedProjectVersion> affectedProjectVersions;
+    // If version is not specified, componentLink will be populated
+    // otherwise it will be null
+    @SerializedName("component")
+    public String componentLink;
+
+    @SerializedName("bomComponentVersionPolicyStatus")
+    public String bomComponentVersionPolicyStatusLink;
+
+    public List<String> policies;
+
+    public String componentIssueLink;
 
 }

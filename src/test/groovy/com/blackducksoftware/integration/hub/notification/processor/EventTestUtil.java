@@ -36,12 +36,12 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.Vulnerabi
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV1View;
-import com.blackducksoftware.integration.hub.api.response.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.notification.PolicyOverrideContentItem;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationClearedContentItem;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.notification.ProjectVersionModel;
 import com.blackducksoftware.integration.hub.notification.VulnerabilityContentItem;
+import com.blackducksoftware.integration.hub.notification.content.VulnerabilitySourceQualifiedId;
 
 public class EventTestUtil {
     public static final String DESCRIPTION = "description";

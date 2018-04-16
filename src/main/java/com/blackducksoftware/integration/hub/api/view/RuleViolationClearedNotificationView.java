@@ -23,7 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.api.view;
 
-import com.blackducksoftware.integration.hub.api.response.RuleViolationClearedNotificationContent;
+import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 
 public class RuleViolationClearedNotificationView extends ReducedNotificationView {
     public RuleViolationClearedNotificationContent content;

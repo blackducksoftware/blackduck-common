@@ -21,11 +21,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.view;
+package com.blackducksoftware.integration.hub.notification.content;
 
-import com.blackducksoftware.integration.hub.notification.content.VulnerabilityNotificationContent;
+import java.util.List;
 
-public class VulnerabilityNotificationView extends ReducedNotificationView {
-    public VulnerabilityNotificationContent content;
+import com.google.gson.annotations.SerializedName;
+
+public class RuleViolationNotificationContent extends NotificationContent {
+    public String projectName;
+    public String projectVersionName;
+    public int componentVersionsInViolation;
+    public List<ComponentVersionStatus> componentVersionStatuses;
+
+    @SerializedName("projectVersion")
+    public String projectVersionLink;
 
 }

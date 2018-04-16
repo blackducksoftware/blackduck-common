@@ -46,7 +46,6 @@ import com.blackducksoftware.integration.hub.api.generated.component.ResourceLin
 import com.blackducksoftware.integration.hub.api.generated.component.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.VulnerabilityV1View;
-import com.blackducksoftware.integration.hub.api.response.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.notification.ItemTypeEnum;
 import com.blackducksoftware.integration.hub.notification.NotificationCategoryEnum;
@@ -56,6 +55,7 @@ import com.blackducksoftware.integration.hub.notification.PolicyOverrideContentI
 import com.blackducksoftware.integration.hub.notification.PolicyViolationClearedContentItem;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.notification.VulnerabilityContentItem;
+import com.blackducksoftware.integration.hub.notification.content.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.log.IntBufferedLogger;
 import com.blackducksoftware.integration.log.IntLogger;
 

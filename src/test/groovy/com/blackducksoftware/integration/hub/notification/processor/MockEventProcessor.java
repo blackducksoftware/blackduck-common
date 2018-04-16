@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.api.response.VulnerabilitySourceQualifiedId;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.notification.ItemTypeEnum;
@@ -49,6 +48,7 @@ import com.blackducksoftware.integration.hub.notification.PolicyOverrideContentI
 import com.blackducksoftware.integration.hub.notification.PolicyViolationClearedContentItem;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationContentItem;
 import com.blackducksoftware.integration.hub.notification.VulnerabilityContentItem;
+import com.blackducksoftware.integration.hub.notification.content.VulnerabilitySourceQualifiedId;
 
 public class MockEventProcessor extends NotificationSubProcessor {
     private final Logger logger = LoggerFactory.getLogger(MockEventProcessor.class);
