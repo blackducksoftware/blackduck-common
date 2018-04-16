@@ -11,12 +11,4 @@ public interface ReducedCommonNotificationState {
 
     public String getJson();
 
-    public void setContentType(String contentType);
-
-    public void setCreatedAt(java.util.Date createdAt);
-
-    public void setType(NotificationType type);
-
-    public void setJson(String json);
-
 }

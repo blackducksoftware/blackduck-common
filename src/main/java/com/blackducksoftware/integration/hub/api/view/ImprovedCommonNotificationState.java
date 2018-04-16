@@ -5,6 +5,4 @@ import com.blackducksoftware.integration.hub.notification.content.NotificationCo
 public interface ImprovedCommonNotificationState extends ReducedCommonNotificationState {
     public NotificationContent getNotificationContent();
 
-    public void setNotificationContent(NotificationContent notificationContent);
-
 }

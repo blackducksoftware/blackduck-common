@@ -61,24 +61,4 @@ public abstract class ReducedNotificationView extends HubView implements Reduced
         return json;
     }
 
-    @Override
-    public void setContentType(final String contentType) {
-        this.contentType = contentType;
-    }
-
-    @Override
-    public void setCreatedAt(final Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public void setType(final NotificationType type) {
-        this.type = type;
-    }
-
-    @Override
-    public void setJson(final String json) {
-        this.json = json;
-    }
-
 }
