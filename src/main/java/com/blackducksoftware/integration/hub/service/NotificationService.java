@@ -42,9 +42,9 @@ import com.blackducksoftware.integration.hub.api.core.HubPathMultipleResponses;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
+import com.blackducksoftware.integration.hub.api.view.ImprovedCommonNotificationState;
 import com.blackducksoftware.integration.hub.api.view.ImprovedNotificationView;
 import com.blackducksoftware.integration.hub.api.view.ImprovedUserNotificationView;
-import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotificationView;
 import com.blackducksoftware.integration.hub.api.view.ReducedNotificationView;
 import com.blackducksoftware.integration.hub.api.view.ReducedUserNotificationView;
@@ -177,7 +177,7 @@ public class NotificationService extends DataService {
         return parallelProcessor;
     }
 
-    private void populateImprovedView(final CommonNotificationState improvedView, final String reducedViewJson) {
+    private void populateImprovedView(final ImprovedCommonNotificationState improvedView, final String reducedViewJson) {
         // have to populate the json field directly since the transformer normally does that and the transformer isn't used here
         improvedView.setJson(reducedViewJson);
         final Optional<NotificationContent> notificationContent = parseNotificationContent(reducedViewJson, improvedView.getType());

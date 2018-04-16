@@ -23,13 +23,15 @@
  */
 package com.blackducksoftware.integration.hub.api.view;
 
+import java.util.Date;
+
 import com.blackducksoftware.integration.hub.api.core.HubView;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 
 // This is named a ReducedNotificationView because it removes the 'content' member from NotificationView which is generated.
 // This is a short term fix to release dependent projects.  A larger more appropriate fix to extract content will be made in a future release.
 // In a future release this object will be removed and the parallel processing will extract the content from the notifications.
-public abstract class ReducedNotificationView extends HubView {
+public abstract class ReducedNotificationView extends HubView implements ReducedCommonNotificationState {
     public String contentType;
     public java.util.Date createdAt;
     public NotificationType type;
@@ -38,4 +40,45 @@ public abstract class ReducedNotificationView extends HubView {
         // gson requires a default constructor.
         // this class is abstract because it must be sub-classed to define the content member.
     }
+
+    @Override
+    public String getContentType() {
+        return contentType;
+    }
+
+    @Override
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    @Override
+    public NotificationType getType() {
+        return type;
+    }
+
+    @Override
+    public String getJson() {
+        return json;
+    }
+
+    @Override
+    public void setContentType(final String contentType) {
+        this.contentType = contentType;
+    }
+
+    @Override
+    public void setCreatedAt(final Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public void setType(final NotificationType type) {
+        this.type = type;
+    }
+
+    @Override
+    public void setJson(final String json) {
+        this.json = json;
+    }
+
 }

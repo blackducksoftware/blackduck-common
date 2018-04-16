@@ -23,13 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.api.view;
 
-import java.util.Date;
-
-import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 
 // This is named ImprovedUserNotificationView because it adds the 'content' member with an actual type.
-public class ImprovedUserNotificationView extends ReducedUserNotificationView implements CommonNotificationState {
+public class ImprovedUserNotificationView extends ReducedUserNotificationView implements ImprovedCommonNotificationState {
     public NotificationContent notificationContent;
 
     @Override
@@ -38,48 +35,8 @@ public class ImprovedUserNotificationView extends ReducedUserNotificationView im
     }
 
     @Override
-    public String getContentType() {
-        return contentType;
-    }
-
-    @Override
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    @Override
-    public NotificationType getType() {
-        return type;
-    }
-
-    @Override
-    public String getJson() {
-        return json;
-    }
-
-    @Override
     public void setNotificationContent(final NotificationContent notificationContent) {
         this.notificationContent = notificationContent;
-    }
-
-    @Override
-    public void setContentType(final String contentType) {
-        this.contentType = contentType;
-    }
-
-    @Override
-    public void setCreatedAt(final Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public void setType(final NotificationType type) {
-        this.type = type;
-    }
-
-    @Override
-    public void setJson(final String json) {
-        this.json = json;
     }
 
 }
