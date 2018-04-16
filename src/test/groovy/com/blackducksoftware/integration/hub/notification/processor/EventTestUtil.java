@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.generated.component.ResourceMetadata;
+import com.blackducksoftware.integration.hub.api.core.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.VulnerabilityV2Cvss2AccessComplexityType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.VulnerabilityV2SourceType;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
