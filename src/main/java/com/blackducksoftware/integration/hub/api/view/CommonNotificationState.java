@@ -20,7 +20,7 @@ public class CommonNotificationState extends Stringable {
     private final Date createdAt;
     private final NotificationType type;
     private final NotificationContent content;
-    public NotificationStateRequestStateType notificationState;
+    private final NotificationStateRequestStateType notificationState;
 
     public CommonNotificationState(final NotificationView notificationView, final NotificationContent content) {
         this.sourceView = notificationView;
@@ -28,6 +28,7 @@ public class CommonNotificationState extends Stringable {
         this.createdAt = notificationView.createdAt;
         this.type = notificationView.type;
         this.content = content;
+        this.notificationState = null;
     }
 
     public CommonNotificationState(final NotificationUserView notificationUserView, final NotificationContent content) {
@@ -57,6 +58,10 @@ public class CommonNotificationState extends Stringable {
 
     public NotificationContent getContent() {
         return content;
+    }
+
+    public NotificationStateRequestStateType getNotificationState() {
+        return notificationState;
     }
 
 }
