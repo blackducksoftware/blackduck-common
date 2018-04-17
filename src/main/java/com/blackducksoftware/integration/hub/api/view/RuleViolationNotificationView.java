@@ -23,9 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.api.view;
 
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
 
-public class RuleViolationNotificationView extends ReducedNotificationView {
+public class RuleViolationNotificationView extends NotificationView {
     public RuleViolationNotificationContent content;
 
 }

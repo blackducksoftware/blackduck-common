@@ -39,8 +39,8 @@ import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.core.HubView;
 import com.blackducksoftware.integration.hub.api.core.LinkMultipleResponses;
 import com.blackducksoftware.integration.hub.api.core.LinkSingleResponse;
-import com.blackducksoftware.integration.hub.api.generated.component.ResourceLink;
-import com.blackducksoftware.integration.hub.api.generated.component.ResourceMetadata;
+import com.blackducksoftware.integration.hub.api.core.ResourceLink;
+import com.blackducksoftware.integration.hub.api.core.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.Request;
@@ -223,10 +223,11 @@ public class HubService {
 
     public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> responseClass, final boolean getAll) throws IntegrationException {
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
-        return getResponses(requestBuilder, responseClass, getAll);
+        return getResponses(responseClass, requestBuilder, getAll);
     }
 
-    public <T extends HubResponse> List<T> getResponses(final Request.Builder requestBuilder, final Class<T> responseClass, final boolean getAll) throws IntegrationException {
+    // TODO we should likely swap responseClass and requestBuilder (but this would be a breaking change...)
+    public <T extends HubResponse> List<T> getResponses(final Class<T> responseClass, final Request.Builder requestBuilder, final boolean getAll) throws IntegrationException {
         return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), responseClass, getAll, null);
     }
 

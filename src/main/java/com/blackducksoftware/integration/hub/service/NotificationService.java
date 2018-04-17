@@ -41,23 +41,21 @@ import com.blackducksoftware.integration.hub.RestConstants;
 import com.blackducksoftware.integration.hub.api.core.HubPathMultipleResponses;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationUserView;
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
-import com.blackducksoftware.integration.hub.api.view.ImprovedCommonNotificationState;
-import com.blackducksoftware.integration.hub.api.view.ImprovedNotificationView;
-import com.blackducksoftware.integration.hub.api.view.ImprovedUserNotificationView;
+import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotificationView;
-import com.blackducksoftware.integration.hub.api.view.ReducedNotificationView;
-import com.blackducksoftware.integration.hub.api.view.ReducedUserNotificationView;
 import com.blackducksoftware.integration.hub.api.view.RuleViolationClearedNotificationView;
 import com.blackducksoftware.integration.hub.api.view.RuleViolationNotificationView;
 import com.blackducksoftware.integration.hub.api.view.VulnerabilityNotificationView;
 import com.blackducksoftware.integration.hub.notification.NotificationContentItem;
 import com.blackducksoftware.integration.hub.notification.NotificationResults;
+import com.blackducksoftware.integration.hub.notification.NotificationViewResults;
 import com.blackducksoftware.integration.hub.notification.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationClearedTransformer;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationOverrideTransformer;
 import com.blackducksoftware.integration.hub.notification.PolicyViolationTransformer;
-import com.blackducksoftware.integration.hub.notification.ReducedNotificationViewResults;
 import com.blackducksoftware.integration.hub.notification.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.notification.content.LicenseLimitNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
@@ -72,7 +70,7 @@ import com.blackducksoftware.integration.parallel.processor.ParallelResourceProc
 import com.google.gson.JsonObject;
 
 public class NotificationService extends DataService {
-    private final Map<String, Class<? extends ReducedNotificationView>> typeMap = new HashMap<>();
+    private final Map<String, Class<? extends NotificationView>> typeMap = new HashMap<>();
 
     private final PolicyNotificationFilter policyNotificationFilter;
 
@@ -90,55 +88,61 @@ public class NotificationService extends DataService {
     }
 
     public NotificationResults getAllNotificationResults(final Date startDate, final Date endDate) throws IntegrationException {
-        final List<ReducedNotificationView> itemList = getAllNotifications(startDate, endDate);
+        final List<NotificationView> itemList = getAllNotifications(startDate, endDate);
         final NotificationResults results = processNotificationsInParallel(itemList);
         return results;
     }
 
-    public List<ImprovedNotificationView> getImprovedNotifications(final List<ReducedNotificationView> reducedNotifications) {
-        final List<ImprovedNotificationView> improvedViews = reducedNotifications
+    public List<CommonNotificationState> getCommonNotifications(final List<NotificationView> notificationViews) {
+        final List<CommonNotificationState> commonStates = notificationViews
                 .stream()
-                .map(reducedView -> {
-                    final ImprovedNotificationView improvedView = hubService.getGson().fromJson(reducedView.json, ImprovedNotificationView.class);
-                    populateImprovedView(improvedView, reducedView.json);
-                    return improvedView;
+                .map(view -> {
+                    final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
+                    if (notificationContent.isPresent()) {
+                        return new CommonNotificationState(view, notificationContent.get());
+                    } else {
+                        return new CommonNotificationState(view, null);
+                    }
                 }).collect(Collectors.toList());
 
-        return improvedViews;
+        return commonStates;
     }
 
-    public List<ImprovedUserNotificationView> getImprovedUserNotifications(final List<ReducedUserNotificationView> reducedUserNotifications) {
-        final List<ImprovedUserNotificationView> improvedViews = reducedUserNotifications
+    public List<CommonNotificationState> getCommonUserNotifications(final List<NotificationUserView> notificationUserViews) {
+        final List<CommonNotificationState> commonStates = notificationUserViews
                 .stream()
-                .map(reducedView -> {
-                    final ImprovedUserNotificationView improvedView = hubService.getGson().fromJson(reducedView.json, ImprovedUserNotificationView.class);
-                    populateImprovedView(improvedView, reducedView.json);
-                    return improvedView;
+                .map(view -> {
+                    final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
+                    if (notificationContent.isPresent()) {
+                        return new CommonNotificationState(view, notificationContent.get());
+                    } else {
+                        return new CommonNotificationState(view, null);
+                    }
                 }).collect(Collectors.toList());
 
-        return improvedViews;
+        return commonStates;
     }
 
-    public List<ReducedNotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
+    public List<NotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
         final Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate);
-        final HubPathMultipleResponses<ReducedNotificationView> notificationLinkResponse = new HubPathMultipleResponses<>(ApiDiscovery.NOTIFICATIONS_LINK, ReducedNotificationView.class);
-        final List<ReducedNotificationView> allNotificationItems = hubService.getResponses(notificationLinkResponse, requestBuilder, true, typeMap);
+        final HubPathMultipleResponses<NotificationView> notificationLinkResponse = new HubPathMultipleResponses<>(ApiDiscovery.NOTIFICATIONS_LINK, NotificationView.class);
+        final List<NotificationView> allNotificationItems = hubService.getResponses(notificationLinkResponse, requestBuilder, true, typeMap);
         return allNotificationItems;
     }
 
-    public List<ReducedUserNotificationView> getAllUserNotifications(final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
+    public List<NotificationUserView> getAllUserNotifications(final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
         final Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate);
         final String userNotificationsUri = hubService.getFirstLink(user, UserView.NOTIFICATIONS_LINK);
         requestBuilder.uri(userNotificationsUri);
 
-        final List<ReducedUserNotificationView> allUserNotificationItems = hubService.getResponses(requestBuilder, ReducedUserNotificationView.class, true);
+        final List<NotificationUserView> allUserNotificationItems = hubService.getResponses(NotificationUserView.class, requestBuilder, true);
         return allUserNotificationItems;
     }
 
-    public ReducedNotificationViewResults getAllNotificationViewResults(final Date startDate, final Date endDate) throws IntegrationException {
-        final List<ReducedNotificationView> allNotificationItems = getAllNotifications(startDate, endDate);
+    public NotificationViewResults getAllNotificationViewResults(final Date startDate, final Date endDate) throws IntegrationException {
+        final List<NotificationView> allNotificationItems = getAllNotifications(startDate, endDate);
         if (allNotificationItems == null || allNotificationItems.isEmpty()) {
-            return new ReducedNotificationViewResults(allNotificationItems, null, null);
+            return new NotificationViewResults(allNotificationItems, null, null);
         }
 
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
@@ -148,14 +152,14 @@ public class NotificationService extends DataService {
         final Date latestCreatedAtDate = allNotificationItems.get(0).createdAt;
         final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
 
-        return new ReducedNotificationViewResults(allNotificationItems, latestCreatedAtDate, latestCreatedAtString);
+        return new NotificationViewResults(allNotificationItems, latestCreatedAtDate, latestCreatedAtString);
     }
 
-    private NotificationResults processNotificationsInParallel(final List<ReducedNotificationView> itemList) {
+    private NotificationResults processNotificationsInParallel(final List<NotificationView> itemList) {
         final SortedSet<NotificationContentItem> contentList = new TreeSet<>();
         final List<Exception> exceptionList = new LinkedList<>();
         NotificationResults results;
-        try (ParallelResourceProcessor<NotificationContentItem, ReducedNotificationView> parallelProcessor = createProcessor(logger)) {
+        try (ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor = createProcessor(logger)) {
             final ParallelResourceProcessorResults<NotificationContentItem> processorResults = parallelProcessor.process(itemList);
             contentList.addAll(processorResults.getResults());
             exceptionList.addAll(processorResults.getExceptions());
@@ -168,22 +172,13 @@ public class NotificationService extends DataService {
         return results;
     }
 
-    private ParallelResourceProcessor<NotificationContentItem, ReducedNotificationView> createProcessor(final IntLogger logger) {
-        final ParallelResourceProcessor<NotificationContentItem, ReducedNotificationView> parallelProcessor = new ParallelResourceProcessor<>(logger);
+    private ParallelResourceProcessor<NotificationContentItem, NotificationView> createProcessor(final IntLogger logger) {
+        final ParallelResourceProcessor<NotificationContentItem, NotificationView> parallelProcessor = new ParallelResourceProcessor<>(logger);
         parallelProcessor.addTransformer(RuleViolationNotificationView.class, new PolicyViolationTransformer(hubService, policyNotificationFilter));
         parallelProcessor.addTransformer(PolicyOverrideNotificationView.class, new PolicyViolationOverrideTransformer(hubService, policyNotificationFilter));
         parallelProcessor.addTransformer(VulnerabilityNotificationView.class, new VulnerabilityTransformer(hubService));
         parallelProcessor.addTransformer(RuleViolationClearedNotificationView.class, new PolicyViolationClearedTransformer(hubService, policyNotificationFilter));
         return parallelProcessor;
-    }
-
-    private void populateImprovedView(final ImprovedCommonNotificationState improvedView, final String reducedViewJson) {
-        // have to populate the json field directly since the transformer normally does that and the transformer isn't used here
-        improvedView.setJson(reducedViewJson);
-        final Optional<NotificationContent> notificationContent = parseNotificationContent(reducedViewJson, improvedView.getType());
-        if (notificationContent.isPresent()) {
-            improvedView.setNotificationContent(notificationContent.get());
-        }
     }
 
     private Optional<NotificationContent> parseNotificationContent(final String notificationJson, final NotificationType type) {
