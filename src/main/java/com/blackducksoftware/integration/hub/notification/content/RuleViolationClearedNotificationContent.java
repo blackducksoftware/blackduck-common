@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.notification.content;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
@@ -35,5 +36,23 @@ public class RuleViolationClearedNotificationContent extends NotificationContent
 
     @SerializedName("projectVersion")
     public String projectVersionLink;
+
+    @Override
+    public boolean providesProjectComponentDetails() {
+        return true;
+    }
+
+    @Override
+    public List<NotificationContentLinks> getNotificationContentLinks() {
+        final List<NotificationContentLinks> links = new ArrayList<>();
+        componentVersionStatuses.forEach(componentVersionStatus -> {
+            if (componentVersionStatus.componentVersionLink != null) {
+                links.add(NotificationContentLinks.createLinksWithComponentVersion(projectVersionLink, componentVersionStatus.componentVersionLink));
+            } else {
+                links.add(NotificationContentLinks.createLinksWithComponentOnly(projectVersionLink, componentVersionStatus.componentLink));
+            }
+        });
+        return links;
+    }
 
 }

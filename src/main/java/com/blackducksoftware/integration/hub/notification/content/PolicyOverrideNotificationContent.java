@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.notification.content;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
@@ -52,5 +53,21 @@ public class PolicyOverrideNotificationContent extends NotificationContent {
     public String bomComponentVersionPolicyStatusLink;
 
     public List<String> policies;
+
+    @Override
+    public boolean providesProjectComponentDetails() {
+        return true;
+    }
+
+    @Override
+    public List<NotificationContentLinks> getNotificationContentLinks() {
+        final List<NotificationContentLinks> links = new ArrayList<>();
+        if (componentVersionLink != null) {
+            links.add(NotificationContentLinks.createLinksWithComponentVersion(projectVersionLink, componentVersionLink));
+        } else {
+            links.add(NotificationContentLinks.createLinksWithComponentOnly(projectVersionLink, componentLink));
+        }
+        return links;
+    }
 
 }

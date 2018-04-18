@@ -23,6 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.notification.content;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.blackducksoftware.integration.hub.api.enumeration.LicenseLimitType;
 
 public class LicenseLimitNotificationContent extends NotificationContent {
@@ -32,5 +35,15 @@ public class LicenseLimitNotificationContent extends NotificationContent {
     public Long usedCodeSize;
     public Long hardLimit;
     public Long softLimit;
+
+    @Override
+    public boolean providesProjectComponentDetails() {
+        return false;
+    }
+
+    @Override
+    public List<NotificationContentLinks> getNotificationContentLinks() {
+        return Collections.emptyList();
+    }
 
 }
