@@ -93,6 +93,14 @@ public class NotificationService extends DataService {
         return results;
     }
 
+    public NotificationResults getAllUserNotificationResults(final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
+        final List<NotificationUserView> itemList = getAllUserNotifications(user, startDate, endDate);
+        // until NotificationResults is reworked, this smoke-and-mirrors approach gets it done (for now) :(
+        final List<NotificationView> notificationViews = itemList.stream().map(this::convertUserNotificationView).collect(Collectors.toList());
+        final NotificationResults results = processNotificationsInParallel(notificationViews);
+        return results;
+    }
+
     public List<CommonNotificationState> getCommonNotifications(final List<NotificationView> notificationViews) {
         final List<CommonNotificationState> commonStates = notificationViews
                 .stream()
@@ -204,6 +212,12 @@ public class NotificationService extends DataService {
         final String endDateString = sdf.format(endDate);
 
         return new Request.Builder().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
+    }
+
+    // this is a terrible hack to keep NotificationResults around a bit longer so that hub-jira can move forward
+    private NotificationView convertUserNotificationView(final NotificationUserView notificationUserView) {
+        final NotificationView notificationView = hubService.getGson().fromJson(notificationUserView.json, NotificationView.class);
+        return notificationView;
     }
 
 }
