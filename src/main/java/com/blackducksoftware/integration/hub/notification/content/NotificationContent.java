@@ -28,7 +28,13 @@ import java.util.List;
 import com.blackducksoftware.integration.hub.api.core.HubComponent;
 
 public abstract class NotificationContent extends HubComponent {
+    public abstract boolean providesPolicyDetails();
+
+    public abstract boolean providesVulnerabilityDetails();
+
     public abstract boolean providesProjectComponentDetails();
+
+    public abstract boolean providesLicenseDetails();
 
     public abstract List<NotificationContentLinks> getNotificationContentLinks();
 

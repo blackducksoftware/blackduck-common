@@ -37,8 +37,23 @@ public class LicenseLimitNotificationContent extends NotificationContent {
     public Long softLimit;
 
     @Override
+    public boolean providesPolicyDetails() {
+        return false;
+    }
+
+    @Override
+    public boolean providesVulnerabilityDetails() {
+        return false;
+    }
+
+    @Override
     public boolean providesProjectComponentDetails() {
         return false;
+    }
+
+    @Override
+    public boolean providesLicenseDetails() {
+        return true;
     }
 
     @Override

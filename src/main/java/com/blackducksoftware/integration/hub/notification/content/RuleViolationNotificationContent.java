@@ -38,19 +38,36 @@ public class RuleViolationNotificationContent extends NotificationContent {
     public String projectVersionLink;
 
     @Override
+    public boolean providesPolicyDetails() {
+        return true;
+    }
+
+    @Override
+    public boolean providesVulnerabilityDetails() {
+        return false;
+    }
+
+    @Override
     public boolean providesProjectComponentDetails() {
         return true;
+    }
+
+    @Override
+    public boolean providesLicenseDetails() {
+        return false;
     }
 
     @Override
     public List<NotificationContentLinks> getNotificationContentLinks() {
         final List<NotificationContentLinks> links = new ArrayList<>();
         componentVersionStatuses.forEach(componentVersionStatus -> {
-            if (componentVersionStatus.componentVersionLink != null) {
-                links.add(NotificationContentLinks.createLinksWithComponentVersion(projectVersionLink, componentVersionStatus.componentVersionLink));
-            } else {
-                links.add(NotificationContentLinks.createLinksWithComponentOnly(projectVersionLink, componentVersionStatus.componentLink));
-            }
+            componentVersionStatus.policies.forEach(policyLink -> {
+                if (componentVersionStatus.componentVersionLink != null) {
+                    links.add(NotificationContentLinks.createPolicyLinksWithComponentVersion(projectVersionLink, componentVersionStatus.componentVersionLink, policyLink));
+                } else {
+                    links.add(NotificationContentLinks.createPolicyLinksWithComponentOnly(projectVersionLink, componentVersionStatus.componentLink, policyLink));
+                }
+            });
         });
         return links;
     }

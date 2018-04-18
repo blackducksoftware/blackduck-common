@@ -55,18 +55,35 @@ public class PolicyOverrideNotificationContent extends NotificationContent {
     public List<String> policies;
 
     @Override
+    public boolean providesPolicyDetails() {
+        return true;
+    }
+
+    @Override
+    public boolean providesVulnerabilityDetails() {
+        return false;
+    }
+
+    @Override
     public boolean providesProjectComponentDetails() {
         return true;
     }
 
     @Override
+    public boolean providesLicenseDetails() {
+        return false;
+    }
+
+    @Override
     public List<NotificationContentLinks> getNotificationContentLinks() {
         final List<NotificationContentLinks> links = new ArrayList<>();
-        if (componentVersionLink != null) {
-            links.add(NotificationContentLinks.createLinksWithComponentVersion(projectVersionLink, componentVersionLink));
-        } else {
-            links.add(NotificationContentLinks.createLinksWithComponentOnly(projectVersionLink, componentLink));
-        }
+        policies.forEach(policyLink -> {
+            if (componentVersionLink != null) {
+                links.add(NotificationContentLinks.createPolicyLinksWithComponentVersion(projectVersionLink, componentVersionLink, policyLink));
+            } else {
+                links.add(NotificationContentLinks.createPolicyLinksWithComponentOnly(projectVersionLink, componentLink, policyLink));
+            }
+        });
         return links;
     }
 

@@ -25,6 +25,7 @@ package com.blackducksoftware.integration.hub.service;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,13 +37,22 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.RestConstants;
+import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubPathMultipleResponses;
+import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
+import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotificationView;
@@ -59,6 +69,7 @@ import com.blackducksoftware.integration.hub.notification.PolicyViolationTransfo
 import com.blackducksoftware.integration.hub.notification.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.notification.content.LicenseLimitNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
+import com.blackducksoftware.integration.hub.notification.content.NotificationContentLinks;
 import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
@@ -161,6 +172,37 @@ public class NotificationService extends DataService {
         final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
 
         return new NotificationViewResults(allNotificationItems, latestCreatedAtDate, latestCreatedAtString);
+    }
+
+    public List<UriSingleResponse<? extends HubResponse>> getAllLinks(final List<CommonNotificationState> commonNotifications) {
+        final List<UriSingleResponse<? extends HubResponse>> uriResponses = new ArrayList<>();
+        commonNotifications.forEach(notification -> {
+            final List<NotificationContentLinks> contentLinksList = notification.getContent().getNotificationContentLinks();
+            contentLinksList.forEach(contentLinks -> {
+                if (notification.getContent().providesProjectComponentDetails()) {
+                    addIfNotNull(uriResponses, contentLinks.getProjectVersionLink(), ProjectVersionView.class);
+                    addIfNotNull(uriResponses, contentLinks.getComponentLink(), ComponentView.class);
+                    addIfNotNull(uriResponses, contentLinks.getComponentVersionLink(), ComponentVersionView.class);
+                }
+
+                if (notification.getContent().providesPolicyDetails()) {
+                    addIfNotNull(uriResponses, contentLinks.getPolicyLink(), PolicyRuleView.class);
+                }
+
+                if (notification.getContent().providesVulnerabilityDetails()) {
+                    addIfNotNull(uriResponses, contentLinks.getComponentIssueLink(), IssueView.class);
+                }
+            });
+        });
+
+        return uriResponses;
+    }
+
+    private <T extends HubResponse> void addIfNotNull(final List<UriSingleResponse<? extends HubResponse>> uriResponses, final String uri, final Class<T> responseClass) {
+        if (StringUtils.isNotBlank(uri)) {
+            final UriSingleResponse<T> uriSingleResponse = new UriSingleResponse<T>(uri, responseClass);
+            uriResponses.add(uriSingleResponse);
+        }
     }
 
     private NotificationResults processNotificationsInParallel(final List<NotificationView> itemList) {

@@ -25,26 +25,31 @@ package com.blackducksoftware.integration.hub.notification.content;
 
 import com.blackducksoftware.integration.util.Stringable;
 
-/**
- * For Notification types [] there are 1 or more related project/version and component/version links
- */
 public class NotificationContentLinks extends Stringable {
     private final String projectVersionLink;
     private final String componentLink;
     private final String componentVersionLink;
+    private final String policyLink;
+    private final String componentIssueLink;
 
-    public static NotificationContentLinks createLinksWithComponentOnly(final String projectVersionLink, final String componentLink) {
-        return new NotificationContentLinks(projectVersionLink, componentLink, null);
+    public static NotificationContentLinks createPolicyLinksWithComponentOnly(final String projectVersionLink, final String componentLink, final String policyLink) {
+        return new NotificationContentLinks(projectVersionLink, componentLink, null, policyLink, null);
     }
 
-    public static NotificationContentLinks createLinksWithComponentVersion(final String projectVersionLink, final String componentVersionLink) {
-        return new NotificationContentLinks(projectVersionLink, null, componentVersionLink);
+    public static NotificationContentLinks createPolicyLinksWithComponentVersion(final String projectVersionLink, final String componentVersionLink, final String policyLink) {
+        return new NotificationContentLinks(projectVersionLink, null, componentVersionLink, policyLink, null);
     }
 
-    private NotificationContentLinks(final String projectVersionLink, final String componentLink, final String componentVersionLink) {
+    public static NotificationContentLinks createVulnerabilityLinks(final String projectVersionLink, final String componentVersionLink, final String componentIssueLink) {
+        return new NotificationContentLinks(projectVersionLink, null, componentVersionLink, null, componentIssueLink);
+    }
+
+    private NotificationContentLinks(final String projectVersionLink, final String componentLink, final String componentVersionLink, final String policyLink, final String componentIssueLink) {
         this.projectVersionLink = projectVersionLink;
         this.componentLink = componentLink;
         this.componentVersionLink = componentVersionLink;
+        this.policyLink = policyLink;
+        this.componentIssueLink = componentIssueLink;
     }
 
     public boolean hasComponentVersion() {
@@ -53,6 +58,14 @@ public class NotificationContentLinks extends Stringable {
 
     public boolean hasOnlyComponent() {
         return componentLink != null;
+    }
+
+    public boolean hasPolicy() {
+        return policyLink != null;
+    }
+
+    public boolean hasVulnerability() {
+        return componentIssueLink != null;
     }
 
     public String getProjectVersionLink() {
@@ -65,6 +78,14 @@ public class NotificationContentLinks extends Stringable {
 
     public String getComponentVersionLink() {
         return componentVersionLink;
+    }
+
+    public String getPolicyLink() {
+        return policyLink;
+    }
+
+    public String getComponentIssueLink() {
+        return componentIssueLink;
     }
 
 }
