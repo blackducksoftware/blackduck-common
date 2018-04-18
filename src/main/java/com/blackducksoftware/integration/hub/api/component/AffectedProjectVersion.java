@@ -21,11 +21,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.response;
+package com.blackducksoftware.integration.hub.api.component;
 
-import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import com.blackducksoftware.integration.hub.api.core.HubComponent;
 
-public class AffectedProjectVersion extends HubResponse {
+public class AffectedProjectVersion extends HubComponent {
     public String projectName;
     public String projectVersionName;
     public String projectVersion;
