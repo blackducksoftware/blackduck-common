@@ -8,7 +8,7 @@ import java.util.Set;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 
 public class HubBucket {
-    private final Map<String, HubBucketItem<? extends HubResponse>> bucket = new HashMap<>();
+    private final Map<String, HubBucketItem<HubResponse>> bucket = new HashMap<>();
 
     public boolean contains(final String uri) {
         return bucket.containsKey(uri);
@@ -18,11 +18,11 @@ public class HubBucket {
         return bucket.keySet();
     }
 
-    public HubBucketItem<? extends HubResponse> get(final String uri) {
+    public HubBucketItem<HubResponse> get(final String uri) {
         return bucket.get(uri);
     }
 
-    public Optional<? extends HubResponse> getResponse(final String uri) {
+    public Optional<HubResponse> getResponse(final String uri) {
         return bucket.get(uri).getHubResponse();
     }
 
@@ -38,7 +38,7 @@ public class HubBucket {
         bucket.put(uri, new HubBucketItem<>(uri, e));
     }
 
-    public HubBucketItem<? extends HubResponse> remove(final String uri) {
+    public HubBucketItem<HubResponse> remove(final String uri) {
         return bucket.remove(uri);
     }
 
