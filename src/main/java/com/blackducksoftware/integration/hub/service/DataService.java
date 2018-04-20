@@ -26,14 +26,14 @@ package com.blackducksoftware.integration.hub.service;
 import com.blackducksoftware.integration.log.IntLogger;
 
 public class DataService {
-    HubService hubService;
-    IntLogger logger;
+    protected HubService hubService;
+    protected IntLogger logger;
 
     public DataService(final HubService hubService) {
         this(hubService, hubService.getRestConnection().logger);
     }
 
-    public DataService(final HubService hubService, IntLogger logger) {
+    public DataService(final HubService hubService, final IntLogger logger) {
         this.hubService = hubService;
         this.logger = logger;
     }

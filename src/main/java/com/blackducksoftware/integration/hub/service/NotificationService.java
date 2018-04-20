@@ -37,8 +37,6 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.RestConstants;
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
@@ -46,13 +44,8 @@ import com.blackducksoftware.integration.hub.api.core.HubPathMultipleResponses;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
-import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
-import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
-import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
-import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotificationView;
@@ -117,11 +110,7 @@ public class NotificationService extends DataService {
                 .stream()
                 .map(view -> {
                     final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
-                    if (notificationContent.isPresent()) {
-                        return new CommonNotificationState(view, notificationContent.get());
-                    } else {
-                        return new CommonNotificationState(view, null);
-                    }
+                    return new CommonNotificationState(view, notificationContent.orElse(null));
                 }).collect(Collectors.toList());
 
         return commonStates;
@@ -132,11 +121,7 @@ public class NotificationService extends DataService {
                 .stream()
                 .map(view -> {
                     final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
-                    if (notificationContent.isPresent()) {
-                        return new CommonNotificationState(view, notificationContent.get());
-                    } else {
-                        return new CommonNotificationState(view, null);
-                    }
+                    return new CommonNotificationState(view, notificationContent.orElse(null));
                 }).collect(Collectors.toList());
 
         return commonStates;
@@ -179,30 +164,11 @@ public class NotificationService extends DataService {
         commonNotifications.forEach(notification -> {
             final List<NotificationContentLinks> contentLinksList = notification.getContent().getNotificationContentLinks();
             contentLinksList.forEach(contentLinks -> {
-                if (notification.getContent().providesProjectComponentDetails()) {
-                    addIfNotNull(uriResponses, contentLinks.getProjectVersionLink(), ProjectVersionView.class);
-                    addIfNotNull(uriResponses, contentLinks.getComponentLink(), ComponentView.class);
-                    addIfNotNull(uriResponses, contentLinks.getComponentVersionLink(), ComponentVersionView.class);
-                }
-
-                if (notification.getContent().providesPolicyDetails()) {
-                    addIfNotNull(uriResponses, contentLinks.getPolicyLink(), PolicyRuleView.class);
-                }
-
-                if (notification.getContent().providesVulnerabilityDetails()) {
-                    addIfNotNull(uriResponses, contentLinks.getComponentIssueLink(), IssueView.class);
-                }
+                uriResponses.addAll(contentLinks.getPresentLinks());
             });
         });
 
         return uriResponses;
-    }
-
-    private <T extends HubResponse> void addIfNotNull(final List<UriSingleResponse<? extends HubResponse>> uriResponses, final String uri, final Class<T> responseClass) {
-        if (StringUtils.isNotBlank(uri)) {
-            final UriSingleResponse<T> uriSingleResponse = new UriSingleResponse<T>(uri, responseClass);
-            uriResponses.add(uriSingleResponse);
-        }
     }
 
     private NotificationResults processNotificationsInParallel(final List<NotificationView> itemList) {

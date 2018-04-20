@@ -23,69 +23,130 @@
  */
 package com.blackducksoftware.integration.hub.notification.content;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.blackducksoftware.integration.hub.api.UriSingleResponse;
+import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
+import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.util.Stringable;
 
 public class NotificationContentLinks extends Stringable {
-    private final String projectVersionLink;
-    private final String componentLink;
-    private final String componentVersionLink;
-    private final String policyLink;
-    private final String componentIssueLink;
+    private final Optional<UriSingleResponse<ProjectVersionView>> projectVersion;
+    private final Optional<UriSingleResponse<ComponentView>> component;
+    private final Optional<UriSingleResponse<ComponentVersionView>> componentVersion;
+    private final Optional<UriSingleResponse<PolicyRuleView>> policy;
+    private final Optional<UriSingleResponse<IssueView>> componentIssue;
 
-    public static NotificationContentLinks createPolicyLinksWithComponentOnly(final String projectVersionLink, final String componentLink, final String policyLink) {
-        return new NotificationContentLinks(projectVersionLink, componentLink, null, policyLink, null);
+    public static NotificationContentLinks createPolicyLinksWithComponentOnly(final String projectVersionUri, final String componentUri, final String policyUri) {
+        return new NotificationContentLinks(projectVersion(projectVersionUri), component(componentUri), Optional.empty(), policy(policyUri), Optional.empty());
     }
 
-    public static NotificationContentLinks createPolicyLinksWithComponentVersion(final String projectVersionLink, final String componentVersionLink, final String policyLink) {
-        return new NotificationContentLinks(projectVersionLink, null, componentVersionLink, policyLink, null);
+    public static NotificationContentLinks createPolicyLinksWithComponentVersion(final String projectVersionUri, final String componentVersionUri, final String policyUri) {
+        return new NotificationContentLinks(projectVersion(projectVersionUri), Optional.empty(), componentVersion(componentVersionUri), policy(policyUri), Optional.empty());
     }
 
-    public static NotificationContentLinks createVulnerabilityLinks(final String projectVersionLink, final String componentVersionLink, final String componentIssueLink) {
-        return new NotificationContentLinks(projectVersionLink, null, componentVersionLink, null, componentIssueLink);
+    public static NotificationContentLinks createVulnerabilityLinks(final String projectVersionUri, final String componentVersionUri, final String componentIssueUri) {
+        return new NotificationContentLinks(projectVersion(projectVersionUri), Optional.empty(), componentVersion(componentVersionUri), Optional.empty(), componentIssue(componentIssueUri));
     }
 
-    private NotificationContentLinks(final String projectVersionLink, final String componentLink, final String componentVersionLink, final String policyLink, final String componentIssueLink) {
-        this.projectVersionLink = projectVersionLink;
-        this.componentLink = componentLink;
-        this.componentVersionLink = componentVersionLink;
-        this.policyLink = policyLink;
-        this.componentIssueLink = componentIssueLink;
+    private static Optional<UriSingleResponse<ProjectVersionView>> projectVersion(final String projectVersionUri) {
+        return optional(projectVersionUri, ProjectVersionView.class);
+    }
+
+    private static Optional<UriSingleResponse<ComponentView>> component(final String componentUri) {
+        return optional(componentUri, ComponentView.class);
+    }
+
+    private static Optional<UriSingleResponse<ComponentVersionView>> componentVersion(final String componentVersionUri) {
+        return optional(componentVersionUri, ComponentVersionView.class);
+    }
+
+    private static Optional<UriSingleResponse<PolicyRuleView>> policy(final String policyUri) {
+        return optional(policyUri, PolicyRuleView.class);
+    }
+
+    private static Optional<UriSingleResponse<IssueView>> componentIssue(final String componentIssueUri) {
+        return optional(componentIssueUri, IssueView.class);
+    }
+
+    private static <T extends HubResponse> Optional<UriSingleResponse<T>> optional(final String uri, final Class<T> responseClass) {
+        if (StringUtils.isBlank(uri)) {
+            return Optional.empty();
+        }
+        return Optional.of(new UriSingleResponse<T>(uri, responseClass));
+    }
+
+    private NotificationContentLinks(final Optional<UriSingleResponse<ProjectVersionView>> projectVersion, final Optional<UriSingleResponse<ComponentView>> component, final Optional<UriSingleResponse<ComponentVersionView>> componentVersion,
+            final Optional<UriSingleResponse<PolicyRuleView>> policy, final Optional<UriSingleResponse<IssueView>> componentIssue) {
+        this.projectVersion = projectVersion;
+        this.component = component;
+        this.componentVersion = componentVersion;
+        this.policy = policy;
+        this.componentIssue = componentIssue;
     }
 
     public boolean hasComponentVersion() {
-        return componentVersionLink != null;
+        return componentVersion.isPresent();
     }
 
     public boolean hasOnlyComponent() {
-        return componentLink != null;
+        return component.isPresent();
     }
 
     public boolean hasPolicy() {
-        return policyLink != null;
+        return policy.isPresent();
     }
 
     public boolean hasVulnerability() {
-        return componentIssueLink != null;
+        return componentIssue.isPresent();
     }
 
-    public String getProjectVersionLink() {
-        return projectVersionLink;
+    public List<UriSingleResponse<? extends HubResponse>> getPresentLinks() {
+        final List<UriSingleResponse<? extends HubResponse>> presentLinks = new ArrayList<>();
+        if (projectVersion.isPresent()) {
+            presentLinks.add(projectVersion.get());
+        }
+        if (component.isPresent()) {
+            presentLinks.add(component.get());
+        }
+        if (componentVersion.isPresent()) {
+            presentLinks.add(componentVersion.get());
+        }
+        if (policy.isPresent()) {
+            presentLinks.add(policy.get());
+        }
+        if (componentIssue.isPresent()) {
+            presentLinks.add(componentIssue.get());
+        }
+        return presentLinks;
     }
 
-    public String getComponentLink() {
-        return componentLink;
+    public Optional<UriSingleResponse<ProjectVersionView>> getProjectVersion() {
+        return projectVersion;
     }
 
-    public String getComponentVersionLink() {
-        return componentVersionLink;
+    public Optional<UriSingleResponse<ComponentView>> getComponent() {
+        return component;
     }
 
-    public String getPolicyLink() {
-        return policyLink;
+    public Optional<UriSingleResponse<ComponentVersionView>> getComponentVersion() {
+        return componentVersion;
     }
 
-    public String getComponentIssueLink() {
-        return componentIssueLink;
+    public Optional<UriSingleResponse<PolicyRuleView>> getPolicy() {
+        return policy;
+    }
+
+    public Optional<UriSingleResponse<IssueView>> getComponentIssue() {
+        return componentIssue;
     }
 
 }
