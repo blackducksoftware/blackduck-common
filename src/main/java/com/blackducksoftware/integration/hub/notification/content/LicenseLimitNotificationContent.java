@@ -21,20 +21,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.response;
+package com.blackducksoftware.integration.hub.notification.content;
 
+import java.util.Collections;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.core.HubResponse;
-import com.google.gson.annotations.SerializedName;
+import com.blackducksoftware.integration.hub.api.enumeration.LicenseLimitType;
 
-public class RuleViolationNotificationContent extends HubResponse {
-    public String projectName;
-    public String projectVersionName;
-    public int componentVersionsInViolation;
-    public List<ComponentVersionStatus> componentVersionStatuses;
+public class LicenseLimitNotificationContent extends NotificationContent {
+    public LicenseLimitType licenseViolationType;
+    public String message;
+    public String marketingPageUrl;
+    public Long usedCodeSize;
+    public Long hardLimit;
+    public Long softLimit;
 
-    @SerializedName("projectVersion")
-    public String projectVersionLink;
+    @Override
+    public boolean providesProjectComponentDetails() {
+        return false;
+    }
+
+    @Override
+    public List<NotificationContentLinks> getNotificationContentLinks() {
+        return Collections.emptyList();
+    }
 
 }

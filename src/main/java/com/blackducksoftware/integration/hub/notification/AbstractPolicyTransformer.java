@@ -29,12 +29,12 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.response.ComponentVersionStatus;
-import com.blackducksoftware.integration.hub.api.view.ReducedNotificationView;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
+import com.blackducksoftware.integration.hub.notification.content.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.service.HubService;
 
 public abstract class AbstractPolicyTransformer extends AbstractNotificationTransformer {
@@ -49,7 +49,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     public abstract void handleNotification(final List<ComponentVersionStatus> componentVersionList,
-            final String projectName, final ProjectVersionView releaseItem, final ReducedNotificationView item,
+            final String projectName, final ProjectVersionView releaseItem, final NotificationView item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException;
 
     protected List<PolicyRuleView> getRulesFromUrls(final List<String> ruleUrlsViolated) throws IntegrationException {
@@ -122,7 +122,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
      * In Hub versions prior to 3.2, the rule URLs contained in notifications are internal. To match the configured rule URLs, the "internal" segment of the URL from the notification must be removed. This is the workaround recommended by
      * Rob P. In Hub 3.2 on, these URLs will exclude the "internal" segment.
      */
-    //TODO ekerwin - can this now be removed as we are only supporting Hub versions >= 4.4.0?
+    // TODO ekerwin - can this now be removed as we are only supporting Hub versions >= 4.4.0?
     protected String fixRuleUrl(final String origRuleUrl) {
         String fixedRuleUrl = origRuleUrl;
         if (origRuleUrl.contains("/internal/")) {
@@ -140,5 +140,5 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     public abstract void createContents(final ProjectVersionModel projectVersion, final String componentName,
             final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
             List<PolicyRuleView> policyRuleList,
-            ReducedNotificationView item, List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException;
+            NotificationView item, List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException;
 }

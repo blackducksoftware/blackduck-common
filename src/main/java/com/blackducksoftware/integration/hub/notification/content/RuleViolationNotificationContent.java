@@ -21,37 +21,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.response;
+package com.blackducksoftware.integration.hub.notification.content;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.google.gson.annotations.SerializedName;
 
-public class PolicyOverrideNotificationContent extends HubResponse {
+public class RuleViolationNotificationContent extends NotificationContent {
     public String projectName;
     public String projectVersionName;
-    public String componentName;
-    public String componentVersionName;
-    public String firstName;
-    public String lastName;
+    public int componentVersionsInViolation;
+    public List<ComponentVersionStatus> componentVersionStatuses;
 
     @SerializedName("projectVersion")
     public String projectVersionLink;
 
-    // If version is specified, componentVersionLink will be populated
-    // otherwise it will be null
-    @SerializedName("componentVersion")
-    public String componentVersionLink;
+    @Override
+    public boolean providesProjectComponentDetails() {
+        return true;
+    }
 
-    // If version is not specified, componentLink will be populated
-    // otherwise it will be null
-    @SerializedName("component")
-    public String componentLink;
-
-    @SerializedName("bomComponentVersionPolicyStatus")
-    public String bomComponentVersionPolicyStatusLink;
-
-    public List<String> policies;
+    @Override
+    public List<NotificationContentLinks> getNotificationContentLinks() {
+        final List<NotificationContentLinks> links = new ArrayList<>();
+        componentVersionStatuses.forEach(componentVersionStatus -> {
+            if (componentVersionStatus.componentVersionLink != null) {
+                links.add(NotificationContentLinks.createLinksWithComponentVersion(projectVersionLink, componentVersionStatus.componentVersionLink));
+            } else {
+                links.add(NotificationContentLinks.createLinksWithComponentOnly(projectVersionLink, componentVersionStatus.componentLink));
+            }
+        });
+        return links;
+    }
 
 }

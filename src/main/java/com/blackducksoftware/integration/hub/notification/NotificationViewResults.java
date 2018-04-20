@@ -26,20 +26,20 @@ package com.blackducksoftware.integration.hub.notification;
 import java.util.Date;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.view.ReducedNotificationView;
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 
-public class ReducedNotificationViewResults {
-    private final List<ReducedNotificationView> notificationViews;
+public class NotificationViewResults {
+    private final List<NotificationView> notificationViews;
     private final Date latestNotificationCreatedAtDate;
     private final String latestNotificationCreatedAtString;
 
-    public ReducedNotificationViewResults(final List<ReducedNotificationView> notificationViews, final Date latestNotificationCreatedAtDate, final String latestNotificationCreatedAtString) {
+    public NotificationViewResults(final List<NotificationView> notificationViews, final Date latestNotificationCreatedAtDate, final String latestNotificationCreatedAtString) {
         this.notificationViews = notificationViews;
         this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate;
         this.latestNotificationCreatedAtString = latestNotificationCreatedAtString;
     }
 
-    public List<ReducedNotificationView> getNotificationViews() {
+    public List<NotificationView> getNotificationViews() {
         return notificationViews;
     }
 

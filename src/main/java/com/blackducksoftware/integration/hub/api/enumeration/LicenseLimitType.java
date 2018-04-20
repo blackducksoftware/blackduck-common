@@ -21,12 +21,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.view;
+package com.blackducksoftware.integration.hub.api.enumeration;
 
-import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
-import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
-
-public class PolicyOverrideNotificationView extends NotificationView {
-    public PolicyOverrideNotificationContent content;
+public enum LicenseLimitType {
+    MANAGED_CODEBASE_BYTES_NEW;
 
 }
