@@ -32,6 +32,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubPath;
 import com.blackducksoftware.integration.hub.api.core.HubPathMultipleResponses;
 import com.blackducksoftware.integration.hub.api.core.HubPathSingleResponse;
@@ -234,6 +235,14 @@ public class HubService {
     public <T extends HubResponse> T getResponse(final String uri, final Class<T> responseClass) throws IntegrationException {
         final Request request = RequestFactory.createCommonGetRequest(uri);
         return hubResponseTransformer.getResponse(request, responseClass);
+    }
+
+    // ------------------------------------------------
+    // getting responses from a UriSingleResponse
+    // ------------------------------------------------
+    public <T extends HubResponse> T getResponse(final UriSingleResponse<T> uriSingleResponse) throws IntegrationException {
+        final Request request = RequestFactory.createCommonGetRequest(uriSingleResponse.uri);
+        return hubResponseTransformer.getResponse(request, uriSingleResponse.responseClass);
     }
 
     // ------------------------------------------------

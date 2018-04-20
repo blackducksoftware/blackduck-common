@@ -21,12 +21,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.response;
+package com.blackducksoftware.integration.hub.notification.content;
 
-import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import java.util.List;
 
-public class VulnerabilitySourceQualifiedId extends HubResponse {
-    public String source;
-    public String vulnerabilityId;
+import com.blackducksoftware.integration.hub.api.core.HubComponent;
+
+public abstract class NotificationContent extends HubComponent {
+    public abstract boolean providesPolicyDetails();
+
+    public abstract boolean providesVulnerabilityDetails();
+
+    public abstract boolean providesProjectComponentDetails();
+
+    public abstract boolean providesLicenseDetails();
+
+    public abstract List<NotificationContentLinks> getNotificationContentLinks();
 
 }

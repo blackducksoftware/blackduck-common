@@ -21,14 +21,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.response;
+package com.blackducksoftware.integration.hub.notification.content;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.google.gson.annotations.SerializedName;
 
-public class PolicyOverrideNotificationContent extends HubResponse {
+public class PolicyOverrideNotificationContent extends NotificationContent {
     public String projectName;
     public String projectVersionName;
     public String componentName;
@@ -53,5 +53,38 @@ public class PolicyOverrideNotificationContent extends HubResponse {
     public String bomComponentVersionPolicyStatusLink;
 
     public List<String> policies;
+
+    @Override
+    public boolean providesPolicyDetails() {
+        return true;
+    }
+
+    @Override
+    public boolean providesVulnerabilityDetails() {
+        return false;
+    }
+
+    @Override
+    public boolean providesProjectComponentDetails() {
+        return true;
+    }
+
+    @Override
+    public boolean providesLicenseDetails() {
+        return false;
+    }
+
+    @Override
+    public List<NotificationContentLinks> getNotificationContentLinks() {
+        final List<NotificationContentLinks> links = new ArrayList<>();
+        policies.forEach(policyLink -> {
+            if (componentVersionLink != null) {
+                links.add(NotificationContentLinks.createPolicyLinksWithComponentVersion(projectVersionLink, componentVersionLink, policyLink));
+            } else {
+                links.add(NotificationContentLinks.createPolicyLinksWithComponentOnly(projectVersionLink, componentLink, policyLink));
+            }
+        });
+        return links;
+    }
 
 }

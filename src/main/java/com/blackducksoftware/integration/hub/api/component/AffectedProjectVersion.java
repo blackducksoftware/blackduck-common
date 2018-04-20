@@ -21,31 +21,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.response;
+package com.blackducksoftware.integration.hub.api.component;
 
-import java.util.List;
+import com.blackducksoftware.integration.hub.api.core.HubComponent;
 
-import com.blackducksoftware.integration.hub.api.core.HubResponse;
-import com.google.gson.annotations.SerializedName;
-
-public class ComponentVersionStatus extends HubResponse {
-    public String componentName;
-
-    // If version is specified, componentVersionLink will be populated
-    // otherwise it will be null
-    @SerializedName("componentVersion")
-    public String componentVersionLink;
-
-    // If version is not specified, componentLink will be populated
-    // otherwise it will be null
-    @SerializedName("component")
-    public String componentLink;
-
-    @SerializedName("bomComponentVersionPolicyStatus")
-    public String bomComponentVersionPolicyStatusLink;
-
-    public List<String> policies;
-
-    public String componentIssueLink;
+public class AffectedProjectVersion extends HubComponent {
+    public String projectName;
+    public String projectVersionName;
+    public String projectVersion;
+    public String componentIssueUrl;
 
 }

@@ -36,6 +36,7 @@ import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.notification.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.UriCombiner;
+import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
@@ -151,6 +152,10 @@ public class HubServicesFactory {
 
     public UserGroupService createUserGroupService() {
         return new UserGroupService(createHubService());
+    }
+
+    public HubBucketService createHubBucketService() {
+        return new HubBucketService(createHubService());
     }
 
     @Override
