@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.hub.service.bucket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 
@@ -13,15 +14,27 @@ public class HubBucket {
         return bucket.containsKey(uri);
     }
 
+    public Set<String> getAvailableUris() {
+        return bucket.keySet();
+    }
+
+    public HubBucketItem<? extends HubResponse> get(final String uri) {
+        return bucket.get(uri);
+    }
+
     public Optional<? extends HubResponse> getResponse(final String uri) {
         return bucket.get(uri).getHubResponse();
     }
 
-    public void addValidResponse(final String uri, final HubResponse hubResponse) {
+    public Optional<Exception> getError(final String uri) {
+        return bucket.get(uri).getE();
+    }
+
+    public void addValid(final String uri, final HubResponse hubResponse) {
         bucket.put(uri, new HubBucketItem<>(uri, hubResponse));
     }
 
-    public void addErrorResponse(final String uri, final Exception e) {
+    public void addError(final String uri, final Exception e) {
         bucket.put(uri, new HubBucketItem<>(uri, e));
     }
 
