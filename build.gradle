@@ -13,7 +13,7 @@ version = '30.1.0-SNAPSHOT'
 apply plugin: 'com.blackducksoftware.integration.library'
 
 dependencies {
-    compile 'com.blackducksoftware.integration:hub-common-rest:8.2.1'
+    compile 'com.blackducksoftware.integration:hub-common-rest:8.2.2'
     compile 'com.blackducksoftware.integration:hub-common-api:4.5.0.0'
     compile 'com.blackducksoftware.integration:hub-common-reporting:4.1.0'
     compile 'com.blackducksoftware.integration:integration-bdio:13.0.0'
