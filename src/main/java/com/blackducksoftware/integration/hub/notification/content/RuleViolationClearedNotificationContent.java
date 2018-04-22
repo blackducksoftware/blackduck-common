@@ -26,16 +26,13 @@ package com.blackducksoftware.integration.hub.notification.content;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.annotations.SerializedName;
-
 public class RuleViolationClearedNotificationContent extends NotificationContent {
     public String projectName;
     public String projectVersionName;
-    public int componentVersionsInViolation;
+    public String projectVersion;
+    public int componentVersionsCleared;
     public List<ComponentVersionStatus> componentVersionStatuses;
-
-    @SerializedName("projectVersion")
-    public String projectVersionLink;
+    public List<PolicyInfo> policyInfos;
 
     @Override
     public boolean providesPolicyDetails() {
@@ -62,10 +59,10 @@ public class RuleViolationClearedNotificationContent extends NotificationContent
         final List<NotificationContentLinks> links = new ArrayList<>();
         componentVersionStatuses.forEach(componentVersionStatus -> {
             componentVersionStatus.policies.forEach(policyLink -> {
-                if (componentVersionStatus.componentVersionLink != null) {
-                    links.add(NotificationContentLinks.createPolicyLinksWithComponentVersion(projectVersionLink, componentVersionStatus.componentVersionLink, policyLink));
+                if (componentVersionStatus.componentVersion != null) {
+                    links.add(NotificationContentLinks.createPolicyLinksWithComponentVersion(projectVersion, componentVersionStatus.componentVersion, policyLink));
                 } else {
-                    links.add(NotificationContentLinks.createPolicyLinksWithComponentOnly(projectVersionLink, componentVersionStatus.componentLink, policyLink));
+                    links.add(NotificationContentLinks.createPolicyLinksWithComponentOnly(projectVersion, componentVersionStatus.component, policyLink));
                 }
             });
         });
