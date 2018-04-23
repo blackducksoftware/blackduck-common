@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 
 public class HubBucket {
@@ -43,6 +44,19 @@ public class HubBucket {
 
     public HubBucketItem<HubResponse> get(final String uri) {
         return bucket.get(uri);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends HubResponse> T get(final UriSingleResponse<T> uriSingleResponse) {
+        final String uri = uriSingleResponse.uri;
+        if (contains(uri)) {
+            final HubBucketItem<HubResponse> bucketItem = get(uri);
+            if (bucketItem.hasValidResponse() && bucketItem.getHubResponse().isPresent() && bucketItem.getHubResponse().get().getClass().equals(uriSingleResponse.responseClass)) {
+                // the mapping of uri -> response type are assumed to be correct, so returning T is possible
+                return (T) bucketItem.getHubResponse().orElse(null);
+            }
+        }
+        return null;
     }
 
     public Optional<HubResponse> getResponse(final String uri) {
