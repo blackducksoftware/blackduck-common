@@ -62,7 +62,7 @@ import com.blackducksoftware.integration.hub.notification.PolicyViolationTransfo
 import com.blackducksoftware.integration.hub.notification.VulnerabilityTransformer;
 import com.blackducksoftware.integration.hub.notification.content.LicenseLimitNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.NotificationContentLinks;
+import com.blackducksoftware.integration.hub.notification.content.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
@@ -162,9 +162,9 @@ public class NotificationService extends DataService {
     public List<UriSingleResponse<? extends HubResponse>> getAllLinks(final List<CommonNotificationState> commonNotifications) {
         final List<UriSingleResponse<? extends HubResponse>> uriResponses = new ArrayList<>();
         commonNotifications.forEach(notification -> {
-            final List<NotificationContentLinks> contentLinksList = notification.getContent().getNotificationContentLinks();
-            contentLinksList.forEach(contentLinks -> {
-                uriResponses.addAll(contentLinks.getPresentLinks());
+            final List<NotificationContentDetail> details = notification.getContent().getNotificationContentDetails();
+            details.forEach(detail -> {
+                uriResponses.addAll(detail.getPresentLinks());
             });
         });
 
