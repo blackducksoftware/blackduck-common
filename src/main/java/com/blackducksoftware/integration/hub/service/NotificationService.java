@@ -62,28 +62,6 @@ public class NotificationService extends DataService {
         super(hubService);
     }
 
-    public List<CommonNotificationState> getCommonNotifications(final List<NotificationView> notificationViews) {
-        final List<CommonNotificationState> commonStates = notificationViews
-                .stream()
-                .map(view -> {
-                    final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
-                    return new CommonNotificationState(view, notificationContent.orElse(null));
-                }).collect(Collectors.toList());
-
-        return commonStates;
-    }
-
-    public List<CommonNotificationState> getCommonUserNotifications(final List<NotificationUserView> notificationUserViews) {
-        final List<CommonNotificationState> commonStates = notificationUserViews
-                .stream()
-                .map(view -> {
-                    final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
-                    return new CommonNotificationState(view, notificationContent.orElse(null));
-                }).collect(Collectors.toList());
-
-        return commonStates;
-    }
-
     public List<NotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
         final Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate);
         final HubPathMultipleResponses<NotificationView> notificationLinkResponse = new HubPathMultipleResponses<>(ApiDiscovery.NOTIFICATIONS_LINK, NotificationView.class);
@@ -114,6 +92,28 @@ public class NotificationService extends DataService {
         final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
 
         return new NotificationViewResults(allNotificationItems, latestCreatedAtDate, latestCreatedAtString);
+    }
+
+    public List<CommonNotificationState> getCommonNotifications(final List<NotificationView> notificationViews) {
+        final List<CommonNotificationState> commonStates = notificationViews
+                .stream()
+                .map(view -> {
+                    final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
+                    return new CommonNotificationState(view, notificationContent.orElse(null));
+                }).collect(Collectors.toList());
+
+        return commonStates;
+    }
+
+    public List<CommonNotificationState> getCommonUserNotifications(final List<NotificationUserView> notificationUserViews) {
+        final List<CommonNotificationState> commonStates = notificationUserViews
+                .stream()
+                .map(view -> {
+                    final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
+                    return new CommonNotificationState(view, notificationContent.orElse(null));
+                }).collect(Collectors.toList());
+
+        return commonStates;
     }
 
     public List<UriSingleResponse<? extends HubResponse>> getAllLinks(final List<CommonNotificationState> commonNotifications) {

@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 
 public class HubBucket {
@@ -43,6 +44,10 @@ public class HubBucket {
 
     public HubBucketItem<HubResponse> get(final String uri) {
         return bucket.get(uri);
+    }
+
+    public <T extends HubResponse> T get(final UriSingleResponse<T> uriSingleResponse) {
+        final HubBucketItem<T> bucketItem = (HubBucketItem<T>) bucket.get(uriSingleResponse.uri);
     }
 
     public Optional<HubResponse> getResponse(final String uri) {
