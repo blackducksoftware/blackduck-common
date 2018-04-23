@@ -25,6 +25,8 @@ package com.blackducksoftware.integration.hub.notification.content;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RuleViolationClearedNotificationContent extends NotificationContent {
     public String projectName;
@@ -55,18 +57,21 @@ public class RuleViolationClearedNotificationContent extends NotificationContent
     }
 
     @Override
-    public List<NotificationContentLinks> getNotificationContentLinks() {
-        final List<NotificationContentLinks> links = new ArrayList<>();
+    public List<NotificationContentDetail> getNotificationContentDetails() {
+        final Map<String, String> uriToName = policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
+        final List<NotificationContentDetail> details = new ArrayList<>();
         componentVersionStatuses.forEach(componentVersionStatus -> {
-            componentVersionStatus.policies.forEach(policyLink -> {
+            componentVersionStatus.policies.forEach(policyUri -> {
+                final String policyName = uriToName.get(policyUri);
                 if (componentVersionStatus.componentVersion != null) {
-                    links.add(NotificationContentLinks.createPolicyLinksWithComponentVersion(projectVersion, componentVersionStatus.componentVersion, policyLink));
+                    details.add(NotificationContentDetail.createPolicyDetailWithComponentVersion(projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.componentVersionName,
+                            componentVersionStatus.componentVersion, policyName, policyUri));
                 } else {
-                    links.add(NotificationContentLinks.createPolicyLinksWithComponentOnly(projectVersion, componentVersionStatus.component, policyLink));
+                    details.add(NotificationContentDetail.createPolicyDetailWithComponentOnly(projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.component, policyName, policyUri));
                 }
             });
         });
-        return links;
+        return details;
     }
 
 }
