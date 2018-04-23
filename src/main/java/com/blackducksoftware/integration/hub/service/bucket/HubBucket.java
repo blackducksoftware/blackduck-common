@@ -46,8 +46,17 @@ public class HubBucket {
         return bucket.get(uri);
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends HubResponse> T get(final UriSingleResponse<T> uriSingleResponse) {
-        final HubBucketItem<T> bucketItem = (HubBucketItem<T>) bucket.get(uriSingleResponse.uri);
+        final String uri = uriSingleResponse.uri;
+        if (contains(uri)) {
+            final HubBucketItem<HubResponse> bucketItem = get(uri);
+            if (bucketItem.hasValidResponse() && bucketItem.getHubResponse().isPresent() && bucketItem.getHubResponse().get().getClass().equals(uriSingleResponse.responseClass)) {
+                // the mapping of uri -> response type are assumed to be correct, so returning T is possible
+                return (T) bucketItem.getHubResponse().orElse(null);
+            }
+        }
+        return null;
     }
 
     public Optional<HubResponse> getResponse(final String uri) {
