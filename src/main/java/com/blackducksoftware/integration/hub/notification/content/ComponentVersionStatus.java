@@ -26,26 +26,20 @@ package com.blackducksoftware.integration.hub.notification.content;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.core.HubComponent;
-import com.google.gson.annotations.SerializedName;
 
 public class ComponentVersionStatus extends HubComponent {
     public String componentName;
-
-    // If version is specified, componentVersionLink will be populated
-    // otherwise it will be null
-    @SerializedName("componentVersion")
-    public String componentVersionLink;
-
-    // If version is not specified, componentLink will be populated
-    // otherwise it will be null
-    @SerializedName("component")
-    public String componentLink;
-
-    @SerializedName("bomComponentVersionPolicyStatus")
-    public String bomComponentVersionPolicyStatusLink;
-
+    public String componentVersionName;
+    public String bomComponentVersionPolicyStatus;
     public List<String> policies;
-
     public String componentIssueLink;
+
+    // If version is specified, componentVersion will be populated
+    // otherwise it will be null
+    public String componentVersion;
+
+    // If version is not specified, component will be populated
+    // otherwise it will be null
+    public String component;
 
 }

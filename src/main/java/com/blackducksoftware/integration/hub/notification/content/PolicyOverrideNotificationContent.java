@@ -26,33 +26,25 @@ package com.blackducksoftware.integration.hub.notification.content;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.annotations.SerializedName;
-
 public class PolicyOverrideNotificationContent extends NotificationContent {
     public String projectName;
     public String projectVersionName;
+    public String projectVersion;
     public String componentName;
     public String componentVersionName;
     public String firstName;
     public String lastName;
-
-    @SerializedName("projectVersion")
-    public String projectVersionLink;
-
-    // If version is specified, componentVersionLink will be populated
-    // otherwise it will be null
-    @SerializedName("componentVersion")
-    public String componentVersionLink;
-
-    // If version is not specified, componentLink will be populated
-    // otherwise it will be null
-    @SerializedName("component")
-    public String componentLink;
-
-    @SerializedName("bomComponentVersionPolicyStatus")
-    public String bomComponentVersionPolicyStatusLink;
-
+    public String bomComponentVersionPolicyStatus;
     public List<String> policies;
+    public List<PolicyInfo> policyInfos;
+
+    // If version is specified, componentVersion will be populated
+    // otherwise it will be null
+    public String componentVersion;
+
+    // If version is not specified, component will be populated
+    // otherwise it will be null
+    public String component;
 
     @Override
     public boolean providesPolicyDetails() {
@@ -75,16 +67,16 @@ public class PolicyOverrideNotificationContent extends NotificationContent {
     }
 
     @Override
-    public List<NotificationContentLinks> getNotificationContentLinks() {
-        final List<NotificationContentLinks> links = new ArrayList<>();
-        policies.forEach(policyLink -> {
-            if (componentVersionLink != null) {
-                links.add(NotificationContentLinks.createPolicyLinksWithComponentVersion(projectVersionLink, componentVersionLink, policyLink));
+    public List<NotificationContentDetail> getNotificationContentDetails() {
+        final List<NotificationContentDetail> details = new ArrayList<>();
+        policyInfos.forEach(policyInfo -> {
+            if (componentVersion != null) {
+                details.add(NotificationContentDetail.createPolicyDetailWithComponentVersion(projectName, projectVersionName, projectVersion, componentName, componentVersionName, componentVersion, policyInfo.policyName, policyInfo.policy));
             } else {
-                links.add(NotificationContentLinks.createPolicyLinksWithComponentOnly(projectVersionLink, componentLink, policyLink));
+                details.add(NotificationContentDetail.createPolicyDetailWithComponentOnly(projectName, projectVersionName, projectVersion, componentName, component, policyInfo.policyName, policyInfo.policy));
             }
         });
-        return links;
+        return details;
     }
 
 }
