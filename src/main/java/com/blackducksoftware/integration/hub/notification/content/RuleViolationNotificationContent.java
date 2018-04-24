@@ -31,9 +31,9 @@ import java.util.stream.Collectors;
 public class RuleViolationNotificationContent extends NotificationContent {
     public String projectName;
     public String projectVersionName;
+    public String projectVersion;
     public int componentVersionsInViolation;
     public List<ComponentVersionStatus> componentVersionStatuses;
-    public String projectVersion;
     public List<PolicyInfo> policyInfos;
 
     @Override
@@ -64,10 +64,11 @@ public class RuleViolationNotificationContent extends NotificationContent {
             componentVersionStatus.policies.forEach(policyUri -> {
                 final String policyName = uriToName.get(policyUri);
                 if (componentVersionStatus.componentVersion != null) {
-                    details.add(NotificationContentDetail.createPolicyDetailWithComponentVersion(projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.componentVersionName,
-                            componentVersionStatus.componentVersion, policyName, policyUri));
+                    details.add(NotificationContentDetail.createPolicyDetailWithComponentVersionAndIssue(projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.componentVersionName,
+                            componentVersionStatus.componentVersion, policyName, policyUri, componentVersionStatus.componentIssueLink));
                 } else {
-                    details.add(NotificationContentDetail.createPolicyDetailWithComponentOnly(projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.component, policyName, policyUri));
+                    details.add(NotificationContentDetail.createPolicyDetailWithComponentAndIssue(projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.component, policyName,
+                            policyUri, componentVersionStatus.componentIssueLink));
                 }
             });
         });

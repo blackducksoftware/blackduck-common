@@ -67,6 +67,19 @@ public class NotificationContentDetail extends Stringable {
                 Optional.of(policyName), policy(policyUri), Optional.empty(), Optional.empty());
     }
 
+    public static NotificationContentDetail createPolicyDetailWithComponentAndIssue(final String projectName, final String projectVersionName, final String projectVersionUri, final String componentName, final String componentUri,
+            final String policyName, final String policyUri, final String componentIssueUri) {
+        return new NotificationContentDetail(projectName, projectVersionName, projectVersion(projectVersionUri), Optional.of(componentName), component(componentUri), Optional.empty(), Optional.empty(), Optional.of(policyName),
+                policy(policyUri), Optional.empty(), componentIssue(componentIssueUri));
+    }
+
+    public static NotificationContentDetail createPolicyDetailWithComponentVersionAndIssue(final String projectName, final String projectVersionName, final String projectVersionUri, final String componentName,
+            final String componentVersionName,
+            final String componentVersionUri, final String policyName, final String policyUri, final String componentIssueUri) {
+        return new NotificationContentDetail(projectName, projectVersionName, projectVersion(projectVersionUri), Optional.of(componentName), Optional.empty(), Optional.of(componentVersionName), componentVersion(componentVersionUri),
+                Optional.of(policyName), policy(policyUri), Optional.empty(), componentIssue(componentIssueUri));
+    }
+
     public static NotificationContentDetail createVulnerabilityDetail(final String projectName, final String projectVersionName, final String projectVersionUri, final String componentName, final String componentVersionName,
             final String componentVersionUri, final String componentVersionOriginName, final String componentIssueUri) {
         return new NotificationContentDetail(projectName, projectVersionName, projectVersion(projectVersionUri), Optional.of(componentName), Optional.empty(), Optional.of(componentVersionName), componentVersion(componentVersionUri),
@@ -97,12 +110,12 @@ public class NotificationContentDetail extends Stringable {
         return component.isPresent();
     }
 
-    public boolean hasPolicy() {
+    public boolean isPolicy() {
         return policy.isPresent();
     }
 
-    public boolean hasVulnerability() {
-        return componentIssue.isPresent();
+    public boolean isVulnerability() {
+        return !isPolicy();
     }
 
     public List<UriSingleResponse<? extends HubResponse>> getPresentLinks() {
