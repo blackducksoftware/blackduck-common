@@ -49,7 +49,7 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
         final RuleViolationClearedNotificationView policyViolation = (RuleViolationClearedNotificationView) item;
         final String projectName = policyViolation.content.projectName;
         final List<ComponentVersionStatus> componentVersionList = policyViolation.content.componentVersionStatuses;
-        final String projectVersionLink = policyViolation.content.projectVersionLink;
+        final String projectVersionLink = policyViolation.content.projectVersion;
         ProjectVersionView releaseItem;
         try {
             releaseItem = hubService.getResponse(projectVersionLink, ProjectVersionView.class);
@@ -77,13 +77,13 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
                 final RuleViolationClearedNotificationView policyViolation = (RuleViolationClearedNotificationView) item;
                 final ProjectVersionModel projectVersion;
                 try {
-                    projectVersion = createFullProjectVersion(policyViolation.content.projectVersionLink,
+                    projectVersion = createFullProjectVersion(policyViolation.content.projectVersion,
                             projectName, releaseItem.versionName);
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
                 }
 
-                final String componentVersionLink = componentVersion.componentVersionLink;
+                final String componentVersionLink = componentVersion.componentVersion;
                 final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
                 final List<String> policyUrls = getMatchingRuleUrls(componentVersion.policies);
 
@@ -97,8 +97,8 @@ public class PolicyViolationClearedTransformer extends AbstractPolicyTransformer
                             policyRuleList.add(rule);
                         }
                         createContents(projectVersion, componentVersion.componentName, fullComponentVersion,
-                                componentVersion.componentLink,
-                                componentVersion.componentVersionLink,
+                                componentVersion.component,
+                                componentVersion.componentVersion,
                                 policyRuleList, item, templateData, componentVersion.componentIssueLink);
                     }
                 }

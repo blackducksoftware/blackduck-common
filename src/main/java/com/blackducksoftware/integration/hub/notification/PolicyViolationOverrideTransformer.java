@@ -54,14 +54,14 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
         final String projectName = policyOverride.content.projectName;
         final List<ComponentVersionStatus> componentVersionList = new ArrayList<>();
         final ComponentVersionStatus componentStatus = new ComponentVersionStatus();
-        componentStatus.bomComponentVersionPolicyStatusLink = policyOverride.content.bomComponentVersionPolicyStatusLink;
+        componentStatus.bomComponentVersionPolicyStatus = policyOverride.content.bomComponentVersionPolicyStatus;
         componentStatus.componentName = policyOverride.content.componentName;
-        componentStatus.componentVersionLink = policyOverride.content.componentVersionLink;
+        componentStatus.componentVersion = policyOverride.content.componentVersion;
 
         componentVersionList.add(componentStatus);
 
         try {
-            releaseItem = hubService.getResponse(policyOverride.content.projectVersionLink, ProjectVersionView.class);
+            releaseItem = hubService.getResponse(policyOverride.content.projectVersion, ProjectVersionView.class);
         } catch (final IntegrationException e) {
             throw new HubItemTransformException(e);
         }
@@ -81,17 +81,17 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
                 final PolicyOverrideNotificationView policyOverride = (PolicyOverrideNotificationView) item;
                 final ProjectVersionModel projectVersion;
                 try {
-                    projectVersion = createFullProjectVersion(policyOverride.content.projectVersionLink,
+                    projectVersion = createFullProjectVersion(policyOverride.content.projectVersion,
                             projectName, releaseItem.versionName);
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
                 }
 
-                final String componentLink = policyOverrideItem.content.componentLink;
-                final String componentVersionLink = policyOverrideItem.content.componentVersionLink;
+                final String componentLink = policyOverrideItem.content.component;
+                final String componentVersionLink = policyOverrideItem.content.componentVersion;
                 final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
 
-                final String bomComponentVersionPolicyStatusUrl = componentVersion.bomComponentVersionPolicyStatusLink;
+                final String bomComponentVersionPolicyStatusUrl = componentVersion.bomComponentVersionPolicyStatus;
                 if (StringUtils.isBlank(bomComponentVersionPolicyStatusUrl)) {
                     logger.warn(String.format("bomComponentVersionPolicyStatus is missing for component %s; skipping it",
                             componentVersion.componentName));

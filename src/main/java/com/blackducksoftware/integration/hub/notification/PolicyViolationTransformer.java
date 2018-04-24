@@ -48,7 +48,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
         final RuleViolationNotificationView policyViolation = (RuleViolationNotificationView) item;
         final String projectName = policyViolation.content.projectName;
         final List<ComponentVersionStatus> componentVersionList = policyViolation.content.componentVersionStatuses;
-        final String projectVersionLink = policyViolation.content.projectVersionLink;
+        final String projectVersionLink = policyViolation.content.projectVersion;
         ProjectVersionView releaseItem;
         try {
             releaseItem = getReleaseItem(projectVersionLink);
@@ -70,12 +70,12 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
                 final RuleViolationNotificationView policyViolation = (RuleViolationNotificationView) item;
                 ProjectVersionModel projectVersion;
                 try {
-                    projectVersion = createFullProjectVersion(policyViolation.content.projectVersionLink, projectName, releaseItem.versionName);
+                    projectVersion = createFullProjectVersion(policyViolation.content.projectVersion, projectName, releaseItem.versionName);
                 } catch (final IntegrationException e) {
                     throw new HubItemTransformException("Error getting ProjectVersion from Hub" + e.getMessage(), e);
                 }
 
-                final String componentVersionLink = componentVersion.componentVersionLink;
+                final String componentVersionLink = componentVersion.componentVersion;
                 final ComponentVersionView fullComponentVersion = getComponentVersion(componentVersionLink);
                 if ((componentVersion.policies == null) || (componentVersion.policies.size() == 0)) {
                     throw new HubItemTransformException("The polices list in the component version status is null or empty");
@@ -87,7 +87,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
                         final PolicyRuleView rule = getPolicyRule(ruleUrl);
                         policyRuleList.add(rule);
                     }
-                    createContents(projectVersion, componentVersion.componentName, fullComponentVersion, componentVersion.componentLink, componentVersion.componentVersionLink, policyRuleList, item, templateData,
+                    createContents(projectVersion, componentVersion.componentName, fullComponentVersion, componentVersion.component, componentVersion.componentVersion, policyRuleList, item, templateData,
                             componentVersion.componentIssueLink);
                 }
 

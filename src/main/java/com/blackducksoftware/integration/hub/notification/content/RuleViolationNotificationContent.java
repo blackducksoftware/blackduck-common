@@ -25,17 +25,16 @@ package com.blackducksoftware.integration.hub.notification.content;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.google.gson.annotations.SerializedName;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RuleViolationNotificationContent extends NotificationContent {
     public String projectName;
     public String projectVersionName;
+    public String projectVersion;
     public int componentVersionsInViolation;
     public List<ComponentVersionStatus> componentVersionStatuses;
-
-    @SerializedName("projectVersion")
-    public String projectVersionLink;
+    public List<PolicyInfo> policyInfos;
 
     @Override
     public boolean providesPolicyDetails() {
@@ -58,18 +57,22 @@ public class RuleViolationNotificationContent extends NotificationContent {
     }
 
     @Override
-    public List<NotificationContentLinks> getNotificationContentLinks() {
-        final List<NotificationContentLinks> links = new ArrayList<>();
+    public List<NotificationContentDetail> getNotificationContentDetails() {
+        final Map<String, String> uriToName = policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
+        final List<NotificationContentDetail> details = new ArrayList<>();
         componentVersionStatuses.forEach(componentVersionStatus -> {
-            componentVersionStatus.policies.forEach(policyLink -> {
-                if (componentVersionStatus.componentVersionLink != null) {
-                    links.add(NotificationContentLinks.createPolicyLinksWithComponentVersion(projectVersionLink, componentVersionStatus.componentVersionLink, policyLink));
+            componentVersionStatus.policies.forEach(policyUri -> {
+                final String policyName = uriToName.get(policyUri);
+                if (componentVersionStatus.componentVersion != null) {
+                    details.add(NotificationContentDetail.createPolicyDetailWithComponentVersionAndIssue(projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.componentVersionName,
+                            componentVersionStatus.componentVersion, policyName, policyUri, componentVersionStatus.componentIssueLink));
                 } else {
-                    links.add(NotificationContentLinks.createPolicyLinksWithComponentOnly(projectVersionLink, componentVersionStatus.componentLink, policyLink));
+                    details.add(NotificationContentDetail.createPolicyDetailWithComponentAndIssue(projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.component, policyName,
+                            policyUri, componentVersionStatus.componentIssueLink));
                 }
             });
         });
-        return links;
+        return details;
     }
 
 }
