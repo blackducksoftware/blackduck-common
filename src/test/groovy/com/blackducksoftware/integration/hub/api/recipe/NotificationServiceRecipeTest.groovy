@@ -13,27 +13,23 @@ import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.UriSingleResponse
 import com.blackducksoftware.integration.hub.api.core.HubResponse
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
-import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView
-import com.blackducksoftware.integration.hub.api.generated.view.ComponentView
-import com.blackducksoftware.integration.hub.api.generated.view.IssueView
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
-import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView
-import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState
 import com.blackducksoftware.integration.hub.service.CodeLocationService
 import com.blackducksoftware.integration.hub.service.NotificationService
 import com.blackducksoftware.integration.hub.service.ProjectService
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket
-import com.blackducksoftware.integration.hub.service.bucket.HubBucketItem
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService
 import com.blackducksoftware.integration.test.annotation.IntegrationTest
 
 @Category(IntegrationTest.class)
 class NotificationServiceRecipeTest extends BasicRecipe {
 
+    private static final String NOTIFICATION_PROJECT_NAME = "hub-notification-data-test"
+
     Date generateNotifications() {
-        ProjectRequest projectRequest = createProjectRequest(PROJECT_NAME, PROJECT_VERSION_NAME)
+        ProjectRequest projectRequest = createProjectRequest(NOTIFICATION_PROJECT_NAME, PROJECT_VERSION_NAME)
         ProjectService projectService = hubServicesFactory.createProjectService()
         String projectUrl = projectService.createHubProject(projectRequest)
         ZonedDateTime startTime = ZonedDateTime.now()
@@ -62,6 +58,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         ZonedDateTime endTime = ZonedDateTime.now()
         endTime = endTime.withZoneSameInstant(ZoneOffset.UTC)
         endTime = endTime.withSecond(0).withNano(0)
+        endTime = endTime.plusMinutes(1)
         final Date endDate = Date.from(endTime.toInstant())
         final List<NotificationView> notifications = notificationService.getAllNotifications(startDate, endDate)
         final List<CommonNotificationState> commonNotificationList = notificationService.getCommonNotifications(notifications)
@@ -72,40 +69,30 @@ class NotificationServiceRecipeTest extends BasicRecipe {
 
         commonNotificationList.each({
             if(!it.content.providesLicenseDetails()) {
-                ProjectVersionView projectVersion;
-                ComponentView component;
-                ComponentVersionView componentVersion;
-                PolicyRuleView policy;
-                IssueView componentIssue;
-                it.content.notificationContentLinks.each({
-
+                String projectName
+                String projectVersion
+                String componentName
+                String componentVersion
+                String policyName
+                boolean isVulnerability = false
+                it.content.notificationContentDetails.each({
+                    projectName = it.projectName
+                    projectVersion = it.projectVersionName
                     if(it.hasComponentVersion()) {
-                        HubBucketItem<ComponentVersionView> bucketItem = bucket.get(it.getComponentVersion().get().uri)
-                        if(bucketItem.hasValidResponse()) {
-                            componentVersion = bucketItem.hubResponse.get()
-                        }
+                        componentVersion = it.componentVersionName.get()
                     }
                     if(it.hasOnlyComponent()) {
-                        HubBucketItem<ComponentView> bucketItem = bucket.get(it.getComponent().get().uri)
-                        if(bucketItem.hasValidResponse()) {
-                            component = bucketItem.hubResponse.get()
-                        }
+                        componentName = it.componentName.get()
                     }
-                    if(it.hasPolicy()) {
-                        HubBucketItem<PolicyRuleView> bucketItem = bucket.get(it.getPolicy().get().uri)
-                        if(bucketItem.hasValidResponse()) {
-                            policy = bucketItem.hubResponse.get()
-                        }
+                    if(it.isPolicy()) {
+                        policyName = it.policyName.get()
                     }
-                    if(it.hasVulnerability()) {
-                        HubBucketItem<IssueView> bucketItem = bucket.get(it.getComponentIssue().get().uri)
-                        if(bucketItem.hasValidResponse()) {
-                            componentIssue = bucketItem.hubResponse.get()
-                        }
+                    if(it.isVulnerability()) {
+                        isVulnerability = true
                     }
                 })
 
-                println("Component: ${component} Component Version: ${componentVersion} Policy ${policy} Issue: ${componentIssue}")
+                println("ProjectName: ${projectName} Project Version: ${projectVersion} Component: ${componentName} Component Version: ${componentVersion} Policy: ${policyName} isVulnerability: ${isVulnerability}")
             }
         })
     }
@@ -113,7 +100,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
     @After
     void cleanup() {
         def projectService = hubServicesFactory.createProjectService()
-        ProjectView createdProject = projectService.getProjectByName(PROJECT_NAME)
+        ProjectView createdProject = projectService.getProjectByName(NOTIFICATION_PROJECT_NAME)
         projectService.deleteHubProject(createdProject)
     }
 }
