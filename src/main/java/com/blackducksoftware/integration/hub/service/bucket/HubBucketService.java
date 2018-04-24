@@ -24,10 +24,8 @@
 package com.blackducksoftware.integration.hub.service.bucket;
 
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -37,8 +35,16 @@ import com.blackducksoftware.integration.hub.service.DataService;
 import com.blackducksoftware.integration.hub.service.HubService;
 
 public class HubBucketService extends DataService {
+    private final Optional<ExecutorService> executorService;
+
     public HubBucketService(final HubService hubService) {
         super(hubService);
+        executorService = Optional.empty();
+    }
+
+    public HubBucketService(final HubService hubService, final ExecutorService executorService) {
+        super(hubService);
+        this.executorService = Optional.of(executorService);
     }
 
     public HubBucket startTheBucket(final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses) throws IntegrationException {
@@ -48,56 +54,20 @@ public class HubBucketService extends DataService {
     }
 
     public void addToTheBucket(final HubBucket hubBucket, final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses) throws IntegrationException {
-        final ThreadFactory threadFactory = Executors.defaultThreadFactory();
-        final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
-        final List<Callable<Void>> taskList = uriSingleResponses.stream().map(uriSingleResponse -> {
-            return new HubBucketFillTask(hubBucket, uriSingleResponse);
+        final List<HubBucketFillTask> taskList = uriSingleResponses.stream().map(uriSingleResponse -> {
+            return new HubBucketFillTask(hubService, hubBucket, uriSingleResponse);
         }).collect(Collectors.toList());
-        try {
-            executorService.invokeAll(taskList);
-        } catch (final InterruptedException ex) {
-            throw new IntegrationException("Exception adding to the HubBucket", ex);
-        } finally {
-            executorService.shutdown();
-        }
-    }
-
-    public void addToTheBucketSynchronous(final HubBucket hubBucket, final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses) {
-        for (final UriSingleResponse<? extends HubResponse> uriSingleResponse : uriSingleResponses) {
-            if (!hubBucket.contains(uriSingleResponse.uri)) {
-                try {
-                    final HubResponse hubResponse = hubService.getResponse(uriSingleResponse);
-                    hubBucket.addValid(uriSingleResponse.uri, hubResponse);
-                } catch (final Exception e) {
-                    // it is up to the consumer of the bucket to log or handle any/all Exceptions
-                    hubBucket.addError(uriSingleResponse.uri, e);
-                }
+        if (executorService.isPresent()) {
+            try {
+                // NOTE: it is up to the user of the bucket service to shutdown the executor
+                executorService.get().invokeAll(taskList);
+            } catch (final InterruptedException ex) {
+                throw new IntegrationException("Exception adding to the HubBucket", ex);
             }
+        } else {
+            taskList.forEach(task -> {
+                task.call();
+            });
         }
-    }
-
-    private class HubBucketFillTask implements Callable<Void> {
-        private final HubBucket hubBucket;
-        private final UriSingleResponse<? extends HubResponse> uriSingleResponse;
-
-        public HubBucketFillTask(final HubBucket hubBucket, final UriSingleResponse<? extends HubResponse> uriSingleResponse) {
-            this.hubBucket = hubBucket;
-            this.uriSingleResponse = uriSingleResponse;
-        }
-
-        @Override
-        public Void call() {
-            if (!hubBucket.contains(uriSingleResponse.uri)) {
-                try {
-                    final HubResponse hubResponse = hubService.getResponse(uriSingleResponse);
-                    hubBucket.addValid(uriSingleResponse.uri, hubResponse);
-                } catch (final Exception e) {
-                    // it is up to the consumer of the bucket to log or handle any/all Exceptions
-                    hubBucket.addError(uriSingleResponse.uri, e);
-                }
-            }
-            return null;
-        }
-
     }
 }

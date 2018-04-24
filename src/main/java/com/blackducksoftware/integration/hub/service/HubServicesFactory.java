@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -156,6 +157,10 @@ public class HubServicesFactory {
 
     public HubBucketService createHubBucketService() {
         return new HubBucketService(createHubService());
+    }
+
+    public HubBucketService createHubBucketService(final ExecutorService executorService) {
+        return new HubBucketService(createHubService(), executorService);
     }
 
     @Override
