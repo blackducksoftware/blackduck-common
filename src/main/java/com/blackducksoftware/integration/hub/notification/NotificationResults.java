@@ -23,7 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.notification;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -32,16 +32,16 @@ import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 
 public class NotificationResults {
-    private final List<CommonNotificationState> notificationContentItems;
+    private final Collection<CommonNotificationState> notificationContentItems;
     private final HubBucket hubBucket;
 
-    public NotificationResults(final List<CommonNotificationState> notificationContentItems, final HubBucket hubBucket) {
+    public NotificationResults(final Collection<CommonNotificationState> notificationContentItems, final HubBucket hubBucket) {
         super();
         this.notificationContentItems = notificationContentItems;
         this.hubBucket = hubBucket;
     }
 
-    public List<CommonNotificationState> getNotificationContentItems() {
+    public Collection<CommonNotificationState> getNotificationContentItems() {
         return notificationContentItems;
     }
 
