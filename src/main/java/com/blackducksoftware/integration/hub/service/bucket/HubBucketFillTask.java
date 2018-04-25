@@ -23,13 +23,11 @@
  */
 package com.blackducksoftware.integration.hub.service.bucket;
 
-import java.util.concurrent.Callable;
-
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.service.HubService;
 
-public class HubBucketFillTask implements Callable<Void> {
+public class HubBucketFillTask implements Runnable {
     private final HubService hubService;
     private final HubBucket hubBucket;
     private final UriSingleResponse<? extends HubResponse> uriSingleResponse;
@@ -41,7 +39,7 @@ public class HubBucketFillTask implements Callable<Void> {
     }
 
     @Override
-    public Void call() {
+    public void run() {
         if (!hubBucket.contains(uriSingleResponse.uri)) {
             try {
                 final HubResponse hubResponse = hubService.getResponse(uriSingleResponse);
@@ -51,6 +49,6 @@ public class HubBucketFillTask implements Callable<Void> {
                 hubBucket.addError(uriSingleResponse.uri, e);
             }
         }
-        return null;
     }
+
 }
