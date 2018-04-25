@@ -24,35 +24,29 @@
 package com.blackducksoftware.integration.hub.notification;
 
 import java.util.List;
-import java.util.SortedSet;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
+import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
+
 public class NotificationResults {
-    private final SortedSet<NotificationContentItem> notificationContentItems;
+    private final List<CommonNotificationState> notificationContentItems;
+    private final HubBucket hubBucket;
 
-    private final List<Exception> exceptions;
-
-    public NotificationResults(final SortedSet<NotificationContentItem> notificationContentItems, final List<Exception> exceptions) {
+    public NotificationResults(final List<CommonNotificationState> notificationContentItems, final HubBucket hubBucket) {
         super();
         this.notificationContentItems = notificationContentItems;
-        this.exceptions = exceptions;
+        this.hubBucket = hubBucket;
     }
 
-    public SortedSet<NotificationContentItem> getNotificationContentItems() {
+    public List<CommonNotificationState> getNotificationContentItems() {
         return notificationContentItems;
     }
 
-    public List<Exception> getExceptions() {
-        return exceptions;
-    }
-
-    public boolean isError() {
-        if ((exceptions != null) && (exceptions.size() > 0)) {
-            return true;
-        }
-        return false;
+    public HubBucket getHubBucket() {
+        return hubBucket;
     }
 
     @Override
