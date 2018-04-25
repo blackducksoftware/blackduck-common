@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -33,7 +34,6 @@ import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
-import com.blackducksoftware.integration.hub.notification.PolicyNotificationFilter;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
@@ -91,11 +91,11 @@ public class HubServicesFactory {
     }
 
     public NotificationService createNotificationService() {
-        return new NotificationService(createHubService());
+        return new NotificationService(createHubService(), createHubBucketService());
     }
 
-    public NotificationService createNotificationService(final PolicyNotificationFilter policyNotificationFilter) {
-        return new NotificationService(createHubService(), policyNotificationFilter);
+    public NotificationService createNotificationService(final ExecutorService executorService) {
+        return new NotificationService(createHubService(), createHubBucketService(executorService));
     }
 
     public ExtensionConfigService createExtensionConfigService() {
@@ -156,6 +156,10 @@ public class HubServicesFactory {
 
     public HubBucketService createHubBucketService() {
         return new HubBucketService(createHubService());
+    }
+
+    public HubBucketService createHubBucketService(final ExecutorService executorService) {
+        return new HubBucketService(createHubService(), executorService);
     }
 
     @Override

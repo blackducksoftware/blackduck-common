@@ -23,16 +23,16 @@
  */
 package com.blackducksoftware.integration.hub.service.bucket;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 
 public class HubBucket {
-    private final Map<String, HubBucketItem<HubResponse>> bucket = new HashMap<>();
+    private final Map<String, HubBucketItem<HubResponse>> bucket = new ConcurrentHashMap<>();
 
     public boolean contains(final String uri) {
         return bucket.containsKey(uri);
