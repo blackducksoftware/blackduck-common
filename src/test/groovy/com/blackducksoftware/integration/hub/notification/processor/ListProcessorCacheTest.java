@@ -35,10 +35,10 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
-import com.blackducksoftware.integration.hub.notification.ListProcessorCache;
-import com.blackducksoftware.integration.hub.notification.NotificationCategoryEnum;
-import com.blackducksoftware.integration.hub.notification.NotificationEvent;
-import com.blackducksoftware.integration.hub.notification.PolicyViolationContentItem;
+import com.blackducksoftware.integration.hub.throwaway.ListProcessorCache;
+import com.blackducksoftware.integration.hub.throwaway.NotificationCategoryEnum;
+import com.blackducksoftware.integration.hub.throwaway.NotificationEvent;
+import com.blackducksoftware.integration.hub.throwaway.PolicyViolationContentItem;
 
 public class ListProcessorCacheTest {
     private final EventTestUtil testUtil = new EventTestUtil();

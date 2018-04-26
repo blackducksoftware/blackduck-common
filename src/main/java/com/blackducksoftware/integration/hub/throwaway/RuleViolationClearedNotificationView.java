@@ -21,28 +21,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification;
+package com.blackducksoftware.integration.hub.throwaway;
 
-import java.util.List;
+import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 
-public class PolicyNotificationFilter {
-    private final List<String> ruleLinksToInclude;
-
-    public PolicyNotificationFilter(final List<String> ruleLinksToInclude) {
-        this.ruleLinksToInclude = ruleLinksToInclude;
-    }
-
-    public List<String> getRuleLinksToInclude() {
-        return ruleLinksToInclude;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("PolicyFilter [ruleLinksToInclude=");
-        builder.append(ruleLinksToInclude);
-        builder.append("]");
-        return builder.toString();
-    }
+public class RuleViolationClearedNotificationView extends ReducedNotificationView {
+    public RuleViolationClearedNotificationContent content;
 
 }

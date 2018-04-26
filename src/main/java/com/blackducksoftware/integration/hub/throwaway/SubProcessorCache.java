@@ -21,12 +21,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.view;
+package com.blackducksoftware.integration.hub.throwaway;
 
-import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
-import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
+import java.util.Collection;
 
-public class RuleViolationClearedNotificationView extends NotificationView {
-    public RuleViolationClearedNotificationContent content;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 
+public interface SubProcessorCache {
+
+    public void addEvent(final NotificationEvent event);
+
+    public void removeEvent(final NotificationEvent event);
+
+    public boolean hasEvent(final String eventKey);
+
+    public Collection<NotificationEvent> getEvents() throws HubIntegrationException;
 }

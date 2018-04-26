@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification;
+package com.blackducksoftware.integration.hub.throwaway;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -29,13 +29,13 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
-import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.view.RuleViolationNotificationView;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.notification.content.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.throwaway.ReducedNotificationView;
+import com.blackducksoftware.integration.hub.throwaway.RuleViolationNotificationView;
 
 public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     public PolicyViolationTransformer(final HubService hubResponseService, final PolicyNotificationFilter policyFilter) {
@@ -43,7 +43,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     }
 
     @Override
-    public List<NotificationContentItem> transform(final NotificationView item) throws HubItemTransformException {
+    public List<NotificationContentItem> transform(final ReducedNotificationView item) throws HubItemTransformException {
         final List<NotificationContentItem> templateData = new ArrayList<>();
         final RuleViolationNotificationView policyViolation = (RuleViolationNotificationView) item;
         final String projectName = policyViolation.content.projectName;
@@ -62,7 +62,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
     }
 
     @Override
-    public void handleNotification(final List<ComponentVersionStatus> componentVersionList, final String projectName, final ProjectVersionView releaseItem, final NotificationView item,
+    public void handleNotification(final List<ComponentVersionStatus> componentVersionList, final String projectName, final ProjectVersionView releaseItem, final ReducedNotificationView item,
             final List<NotificationContentItem> templateData)
             throws HubItemTransformException {
         for (final ComponentVersionStatus componentVersion : componentVersionList) {
@@ -104,7 +104,7 @@ public class PolicyViolationTransformer extends AbstractPolicyTransformer {
 
     @Override
     public void createContents(final ProjectVersionModel projectVersion, final String componentName, final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
-            final List<PolicyRuleView> policyRuleList, final NotificationView item, final List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException {
+            final List<PolicyRuleView> policyRuleList, final ReducedNotificationView item, final List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException {
         templateData.add(new PolicyViolationContentItem(item.createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl, policyRuleList, componentIssueUrl));
     }
 }

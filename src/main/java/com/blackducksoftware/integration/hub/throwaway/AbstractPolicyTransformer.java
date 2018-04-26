@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification;
+package com.blackducksoftware.integration.hub.throwaway;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -29,13 +29,13 @@ import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
-import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.notification.content.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.throwaway.ReducedNotificationView;
 
 public abstract class AbstractPolicyTransformer extends AbstractNotificationTransformer {
     private final PolicyNotificationFilter policyFilter;
@@ -49,7 +49,7 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     }
 
     public abstract void handleNotification(final List<ComponentVersionStatus> componentVersionList,
-            final String projectName, final ProjectVersionView releaseItem, final NotificationView item,
+            final String projectName, final ProjectVersionView releaseItem, final ReducedNotificationView item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException;
 
     protected List<PolicyRuleView> getRulesFromUrls(final List<String> ruleUrlsViolated) throws IntegrationException {
@@ -140,5 +140,5 @@ public abstract class AbstractPolicyTransformer extends AbstractNotificationTran
     public abstract void createContents(final ProjectVersionModel projectVersion, final String componentName,
             final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
             List<PolicyRuleView> policyRuleList,
-            NotificationView item, List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException;
+            ReducedNotificationView item, List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException;
 }

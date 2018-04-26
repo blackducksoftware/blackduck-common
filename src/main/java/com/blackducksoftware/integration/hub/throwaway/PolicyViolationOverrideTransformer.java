@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification;
+package com.blackducksoftware.integration.hub.throwaway;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -32,14 +32,14 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
-import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotificationView;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.notification.content.ComponentVersionStatus;
 import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.hub.throwaway.PolicyOverrideNotificationView;
+import com.blackducksoftware.integration.hub.throwaway.ReducedNotificationView;
 
 public class PolicyViolationOverrideTransformer extends AbstractPolicyTransformer {
     public PolicyViolationOverrideTransformer(final HubService hubService, final PolicyNotificationFilter policyFilter) {
@@ -47,7 +47,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
     }
 
     @Override
-    public List<NotificationContentItem> transform(final NotificationView item) throws HubItemTransformException {
+    public List<NotificationContentItem> transform(final ReducedNotificationView item) throws HubItemTransformException {
         final List<NotificationContentItem> templateData = new ArrayList<>();
         final ProjectVersionView releaseItem;
         final PolicyOverrideNotificationView policyOverride = (PolicyOverrideNotificationView) item;
@@ -72,7 +72,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
 
     @Override
     public void handleNotification(final List<ComponentVersionStatus> componentVersionList,
-            final String projectName, final ProjectVersionView releaseItem, final NotificationView item,
+            final String projectName, final ProjectVersionView releaseItem, final ReducedNotificationView item,
             final List<NotificationContentItem> templateData) throws HubItemTransformException {
 
         final PolicyOverrideNotificationView policyOverrideItem = (PolicyOverrideNotificationView) item;
@@ -122,7 +122,7 @@ public class PolicyViolationOverrideTransformer extends AbstractPolicyTransforme
     @Override
     public void createContents(final ProjectVersionModel projectVersion, final String componentName,
             final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl,
-            final List<PolicyRuleView> policyRuleList, final NotificationView item,
+            final List<PolicyRuleView> policyRuleList, final ReducedNotificationView item,
             final List<NotificationContentItem> templateData, final String componentIssueUrl) throws URISyntaxException {
         final PolicyOverrideNotificationView policyOverride = (PolicyOverrideNotificationView) item;
 

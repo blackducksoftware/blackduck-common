@@ -21,38 +21,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification;
+package com.blackducksoftware.integration.hub.throwaway;
 
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.List;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+public class PolicyNotificationFilter {
+    private final List<String> ruleLinksToInclude;
 
-public class ListProcessorCache implements SubProcessorCache {
-    private final LinkedList<NotificationEvent> eventList = new LinkedList<>();
+    public PolicyNotificationFilter(final List<String> ruleLinksToInclude) {
+        this.ruleLinksToInclude = ruleLinksToInclude;
+    }
 
-    @Override
-    public void addEvent(NotificationEvent event) {
-        eventList.add(event);
+    public List<String> getRuleLinksToInclude() {
+        return ruleLinksToInclude;
     }
 
     @Override
-    public void removeEvent(NotificationEvent event) {
-        eventList.remove(event);
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("PolicyFilter [ruleLinksToInclude=");
+        builder.append(ruleLinksToInclude);
+        builder.append("]");
+        return builder.toString();
     }
 
-    @Override
-    public Collection<NotificationEvent> getEvents() throws HubIntegrationException {
-        return eventList;
-    }
-
-    @Override
-    public boolean hasEvent(String eventKey) {
-        for (final NotificationEvent event : eventList) {
-            if (event.getEventKey().equals(eventKey)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

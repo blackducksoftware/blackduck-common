@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification;
+package com.blackducksoftware.integration.hub.throwaway;
 
 public class NotificationEventConstants {
     public static final String EVENT_KEY_NAME_VALUE_SEPARATOR = "=";

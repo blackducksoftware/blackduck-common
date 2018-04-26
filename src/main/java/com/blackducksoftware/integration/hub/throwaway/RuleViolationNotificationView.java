@@ -21,23 +21,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification;
+package com.blackducksoftware.integration.hub.throwaway;
 
-import java.util.Date;
+import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
 
-import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
-
-public class PolicyContentItem extends NotificationContentItem {
-    private final String componentUrl;
-
-    public PolicyContentItem(final Date createdAt, final ProjectVersionModel projectVersion, final String componentName,
-            final ComponentVersionView componentVersion, final String componentUrl, final String componentVersionUrl, final String componentIssueUrl) {
-        super(createdAt, projectVersion, componentName, componentVersion, componentVersionUrl, componentIssueUrl);
-        this.componentUrl = componentUrl;
-    }
-
-    public String getComponentUrl() {
-        return componentUrl;
-    }
+public class RuleViolationNotificationView extends ReducedNotificationView {
+    public RuleViolationNotificationContent content;
 
 }

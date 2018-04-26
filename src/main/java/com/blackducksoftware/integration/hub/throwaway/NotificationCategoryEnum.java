@@ -21,12 +21,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.api.view;
+package com.blackducksoftware.integration.hub.throwaway;
 
-import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
-import com.blackducksoftware.integration.hub.notification.content.VulnerabilityNotificationContent;
-
-public class VulnerabilityNotificationView extends NotificationView {
-    public VulnerabilityNotificationContent content;
-
+public enum NotificationCategoryEnum {
+    POLICY_VIOLATION,
+    POLICY_VIOLATION_CLEARED,
+    POLICY_VIOLATION_OVERRIDE,
+    HIGH_VULNERABILITY,
+    MEDIUM_VULNERABILITY,
+    LOW_VULNERABILITY,
+    VULNERABILITY;
 }

@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification;
+package com.blackducksoftware.integration.hub.throwaway;
 
 import java.net.URISyntaxException;
 import java.util.Date;
@@ -30,15 +30,31 @@ import java.util.List;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 
-public class PolicyViolationClearedContentItem extends PolicyViolationContentItem {
-    public PolicyViolationClearedContentItem(final Date createdAt, final ProjectVersionModel projectVersion,
+public class PolicyOverrideContentItem extends PolicyViolationContentItem {
+    private final String firstName;
+
+    private final String lastName;
+
+    public PolicyOverrideContentItem(final Date createdAt, final ProjectVersionModel projectVersion,
             final String componentName,
             final ComponentVersionView componentVersion, final String componentUrl,
             final String componentVersionUrl,
-            final List<PolicyRuleView> policyRuleList,
-            final String componentIssueUrl) throws URISyntaxException {
+            final List<PolicyRuleView> policyRuleList, final String firstName,
+            final String lastName,
+            final String componentIssueUrl)
+            throws URISyntaxException {
         super(createdAt, projectVersion, componentName, componentVersion, componentUrl, componentVersionUrl,
                 policyRuleList, componentIssueUrl);
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
 }

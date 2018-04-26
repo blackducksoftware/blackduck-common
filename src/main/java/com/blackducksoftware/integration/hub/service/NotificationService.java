@@ -26,9 +26,7 @@ package com.blackducksoftware.integration.hub.service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -44,10 +42,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationUser
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
-import com.blackducksoftware.integration.hub.api.view.PolicyOverrideNotificationView;
-import com.blackducksoftware.integration.hub.api.view.RuleViolationClearedNotificationView;
-import com.blackducksoftware.integration.hub.api.view.RuleViolationNotificationView;
-import com.blackducksoftware.integration.hub.api.view.VulnerabilityNotificationView;
 import com.blackducksoftware.integration.hub.notification.NotificationResults;
 import com.blackducksoftware.integration.hub.notification.NotificationViewResults;
 import com.blackducksoftware.integration.hub.notification.content.LicenseLimitNotificationContent;
@@ -63,16 +57,11 @@ import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.google.gson.JsonObject;
 
 public class NotificationService extends DataService {
-    private final Map<String, Class<? extends NotificationView>> typeMap = new HashMap<>();
     private final HubBucketService hubBucketService;
 
     public NotificationService(final HubService hubService, final HubBucketService hubBucketService) {
         super(hubService);
         this.hubBucketService = hubBucketService;
-        typeMap.put("VULNERABILITY", VulnerabilityNotificationView.class);
-        typeMap.put("RULE_VIOLATION", RuleViolationNotificationView.class);
-        typeMap.put("POLICY_OVERRIDE", PolicyOverrideNotificationView.class);
-        typeMap.put("RULE_VIOLATION_CLEARED", RuleViolationClearedNotificationView.class);
     }
 
     public NotificationResults getAllNotificationResults(final Date startDate, final Date endDate) throws IntegrationException {
@@ -92,7 +81,7 @@ public class NotificationService extends DataService {
     public List<NotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
         final Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate);
         final HubPathMultipleResponses<NotificationView> notificationLinkResponse = new HubPathMultipleResponses<>(ApiDiscovery.NOTIFICATIONS_LINK, NotificationView.class);
-        final List<NotificationView> allNotificationItems = hubService.getResponses(notificationLinkResponse, requestBuilder, true, typeMap);
+        final List<NotificationView> allNotificationItems = hubService.getResponses(notificationLinkResponse, requestBuilder, true);
         return allNotificationItems;
     }
 
@@ -190,4 +179,5 @@ public class NotificationService extends DataService {
 
         return new Request.Builder().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
     }
+
 }
