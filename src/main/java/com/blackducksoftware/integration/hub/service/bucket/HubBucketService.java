@@ -54,20 +54,22 @@ public class HubBucketService extends DataService {
     }
 
     public void addToTheBucket(final HubBucket hubBucket, final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses) throws IntegrationException {
-        final List<HubBucketFillTask> taskList = uriSingleResponses.stream().map(uriSingleResponse -> {
-            return new HubBucketFillTask(hubService, hubBucket, uriSingleResponse);
-        }).collect(Collectors.toList());
+        final List<HubBucketFillTask> taskList = uriSingleResponses
+                .stream()
+                .map(uriSingleResponse -> {
+                    return new HubBucketFillTask(hubService, hubBucket, uriSingleResponse);
+                })
+                .collect(Collectors.toList());
         if (executorService.isPresent()) {
-            try {
-                // NOTE: it is up to the user of the bucket service to shutdown the executor
-                executorService.get().invokeAll(taskList);
-            } catch (final InterruptedException ex) {
-                throw new IntegrationException("Exception adding to the HubBucket", ex);
-            }
+            // NOTE: it is up to the user of the bucket service to shutdown the executor
+            taskList.forEach(task -> {
+                executorService.get().execute(task);
+            });
         } else {
             taskList.forEach(task -> {
-                task.call();
+                task.run();
             });
         }
     }
+
 }
