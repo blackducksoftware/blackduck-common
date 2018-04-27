@@ -28,9 +28,12 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.Optional;
 
-public class HostnameHelper {
-    public static String getMyHostname() {
+import org.apache.commons.lang3.StringUtils;
+
+public class HostNameHelper {
+    public static Optional<String> getMyHostName() {
         String hostName = null;
 
         try {
@@ -60,10 +63,29 @@ public class HostnameHelper {
                 }
             } catch (final SocketException se) {
                 // ignore this
-                return hostName;
             }
         }
-        return hostName;
+
+        if (StringUtils.isBlank(hostName)) {
+            return Optional.empty();
+        } else {
+            return Optional.of(hostName);
+        }
+    }
+
+    public static String getAssertedValue(final Optional<String> hostName) throws IllegalArgumentException {
+        assertHostNamePopulated(hostName);
+        return hostName.get();
+    }
+
+    public static void assertHostNamePopulated(final String hostName) {
+        assertHostNamePopulated(Optional.ofNullable(hostName));
+    }
+
+    public static void assertHostNamePopulated(final Optional<String> hostName) {
+        if (!hostName.isPresent() || StringUtils.isBlank(hostName.get())) {
+            throw new IllegalArgumentException("You must provided the host name of the machine this is running on.");
+        }
     }
 
 }
