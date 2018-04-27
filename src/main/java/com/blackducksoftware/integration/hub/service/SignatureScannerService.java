@@ -124,17 +124,15 @@ public class SignatureScannerService extends DataService {
     }
 
     private void preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
-        final Optional<String> localHostName = HostNameHelper.getMyHostName();
-        HostNameHelper.assertHostNamePopulated(localHostName);
-        if (localHostName.isPresent()) {
-            logger.info("Running on machine : " + localHostName.get());
-            printConfiguration(hubScanConfig, projectRequest);
-            final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-            cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version, localHostName.get());
+        final Optional<String> optionalHostName = HostNameHelper.getMyHostName();
+        final String localHostName = HostNameHelper.getAssertedValue(optionalHostName);
+        logger.info("Running on machine : " + localHostName);
+        printConfiguration(hubScanConfig, projectRequest);
+        final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version, localHostName);
 
-            if (!hubScanConfig.isDryRun()) {
-                projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);
-            }
+        if (!hubScanConfig.isDryRun()) {
+            projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);
         }
     }
 

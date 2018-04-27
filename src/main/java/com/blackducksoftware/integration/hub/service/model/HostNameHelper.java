@@ -73,6 +73,11 @@ public class HostNameHelper {
         }
     }
 
+    public static String getAssertedValue(final Optional<String> hostName) throws IllegalArgumentException {
+        assertHostNamePopulated(hostName);
+        return hostName.get();
+    }
+
     public static void assertHostNamePopulated(final String hostName) {
         assertHostNamePopulated(Optional.ofNullable(hostName));
     }
