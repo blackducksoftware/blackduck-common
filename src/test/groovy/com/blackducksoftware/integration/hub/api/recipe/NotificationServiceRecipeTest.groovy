@@ -1,7 +1,5 @@
 package com.blackducksoftware.integration.hub.api.recipe
 
-import static org.junit.Assert.assertFalse
-
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.concurrent.ExecutorService
@@ -15,6 +13,7 @@ import org.junit.experimental.categories.Category
 import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
+import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState
 import com.blackducksoftware.integration.hub.notification.NotificationResults
 import com.blackducksoftware.integration.hub.service.CodeLocationService
@@ -28,9 +27,10 @@ import com.blackducksoftware.integration.test.annotation.IntegrationTest
 class NotificationServiceRecipeTest extends BasicRecipe {
 
     private static final String NOTIFICATION_PROJECT_NAME = "hub-notification-data-test"
+    private static final String NOTIFICATION_PROJECT_VERSION_NAME = "1.0.0"
 
     Date generateNotifications() {
-        ProjectRequest projectRequest = createProjectRequest(NOTIFICATION_PROJECT_NAME, PROJECT_VERSION_NAME)
+        ProjectRequest projectRequest = createProjectRequest(NOTIFICATION_PROJECT_NAME, NOTIFICATION_PROJECT_VERSION_NAME)
         ProjectService projectService = hubServicesFactory.createProjectService()
         String projectUrl = projectService.createHubProject(projectRequest)
         ZonedDateTime startTime = ZonedDateTime.now()
@@ -40,6 +40,16 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         uploadBdio('bdio/clean_notifications_bdio.jsonld')
         Thread.sleep(5000)
         uploadBdio('bdio/generate_notifications_bdio.jsonld')
+        List<VersionBomComponentView> components = Collections.emptyList()
+        int tryCount = 0;
+        while(components.empty || tryCount < 30) {
+            Thread.sleep(1000);
+            components = projectService.getComponentsForProjectVersion(NOTIFICATION_PROJECT_NAME, NOTIFICATION_PROJECT_VERSION_NAME)
+            tryCount++
+        }
+        if(!components.empty) {
+            Thread.sleep(60000) // arbitrary wait for notifications
+        }
         return Date.from(startTime.toInstant())
     }
 
@@ -52,7 +62,6 @@ class NotificationServiceRecipeTest extends BasicRecipe {
     @Test
     void fetchNotificationsSynchronous() {
         final Date startDate = generateNotifications()
-        Thread.sleep(25000)
         final NotificationService notificationService = hubServicesFactory.createNotificationService()
         final HubBucketService bucketService = hubServicesFactory.createHubBucketService()
 
@@ -65,7 +74,6 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final List<CommonNotificationState> commonNotificationList = results.getNotificationContentItems()
 
         final HubBucket bucket = results.getHubBucket()
-        assertFalse(bucket.availableUris.empty)
 
         commonNotificationList.each({
             if(!it.content.providesLicenseDetails()) {
@@ -100,7 +108,6 @@ class NotificationServiceRecipeTest extends BasicRecipe {
     @Test
     void fetchNotificationsAsynchronous() {
         final Date startDate = generateNotifications()
-        Thread.sleep(25000)
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
         final NotificationService notificationService = hubServicesFactory.createNotificationService(executorService)
@@ -114,7 +121,6 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final List<CommonNotificationState> commonNotificationList = results.getNotificationContentItems()
 
         final HubBucket bucket = results.getHubBucket()
-        assertFalse(bucket.availableUris.empty)
 
         commonNotificationList.each({
             if(!it.content.providesLicenseDetails()) {
