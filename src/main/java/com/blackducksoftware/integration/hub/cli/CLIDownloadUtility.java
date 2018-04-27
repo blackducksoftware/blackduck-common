@@ -55,6 +55,7 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.service.model.HostNameHelper;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
@@ -70,9 +71,7 @@ public class CLIDownloadUtility {
 
     public void performInstallation(final File directoryToInstallTo, final CIEnvironmentVariables ciEnvironmentVariables, final String hubUrl, final String hubVersion, final String localHostName)
             throws HubIntegrationException, EncryptionException {
-        if (StringUtils.isBlank(localHostName)) {
-            throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
-        }
+        HostNameHelper.assertHostNamePopulated(localHostName);
 
         final CLILocation cliLocation = new CLILocation(this.logger, directoryToInstallTo);
         final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(this.logger, hubUrl);
