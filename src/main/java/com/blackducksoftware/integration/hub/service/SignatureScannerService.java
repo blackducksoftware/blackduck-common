@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 
@@ -45,7 +46,7 @@ import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.service.model.HostnameHelper;
+import com.blackducksoftware.integration.hub.service.model.HostNameHelper;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
@@ -118,16 +119,21 @@ public class SignatureScannerService extends DataService {
                 projectVersionDistribution = projectRequest.versionRequest.distribution == null ? null : projectRequest.versionRequest.distribution.toString();
             }
         }
-        logger.alwaysLog(String.format("--> Using Hub Project Name : %s, Version : %s, Phase : %s, Distribution : %s", projectName, projectVersionName, projectVersionPhase, projectVersionDistribution));
+        logger.alwaysLog(String.format("--> Using Hub Project Name: %s, Version: %s, Phase: %s, Distribution: %s", projectName, projectVersionName, projectVersionPhase, projectVersionDistribution));
         hubScanConfig.print(logger);
     }
 
     private void preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
-        final String localHostName = HostnameHelper.getMyHostname();
+        final Optional<String> localHostName = HostNameHelper.getMyHostName();
         logger.info("Running on machine : " + localHostName);
         printConfiguration(hubScanConfig, projectRequest);
         final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version, localHostName);
+        if (localHostName.isPresent()) {
+            cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version, localHostName.get());
+        } else {
+            // TODO more specific?
+            throw new IntegrationException("Could not resolve the host name.");
+        }
 
         if (!hubScanConfig.isDryRun()) {
             projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);

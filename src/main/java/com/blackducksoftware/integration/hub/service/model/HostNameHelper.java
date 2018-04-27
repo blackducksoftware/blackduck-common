@@ -28,9 +28,10 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.Optional;
 
-public class HostnameHelper {
-    public static String getMyHostname() {
+public class HostNameHelper {
+    public static Optional<String> getMyHostName() {
         String hostName = null;
 
         try {
@@ -60,10 +61,9 @@ public class HostnameHelper {
                 }
             } catch (final SocketException se) {
                 // ignore this
-                return hostName;
             }
         }
-        return hostName;
+        return Optional.ofNullable(hostName);
     }
 
 }
