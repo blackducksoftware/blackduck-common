@@ -45,7 +45,7 @@ import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.service.model.HostnameHelper;
+import com.blackducksoftware.integration.hub.service.model.HostNameHelper;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.util.CIEnvironmentVariables;
 
@@ -123,7 +123,7 @@ public class SignatureScannerService extends DataService {
     }
 
     private void preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
-        final String localHostName = HostnameHelper.getMyHostname();
+        final String localHostName = HostNameHelper.getMyHostName().orElse(null);
         logger.info("Running on machine : " + localHostName);
         printConfiguration(hubScanConfig, projectRequest);
         final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
