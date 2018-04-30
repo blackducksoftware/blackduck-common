@@ -106,7 +106,7 @@ public class SignatureScannerService extends DataService {
     }
 
     private void printConfiguration(final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
-        logger.alwaysLog(String.format("--> Log Level : %s", logger.getLogLevel().name()));
+        logger.alwaysLog(String.format("--> Log Level: %s", logger.getLogLevel().name()));
         String projectName = null;
         String projectVersionName = null;
         String projectVersionPhase = null;
@@ -126,10 +126,11 @@ public class SignatureScannerService extends DataService {
     private void preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
         final Optional<String> localHostName = HostNameHelper.getMyHostName();
         if (localHostName.isPresent()) {
-            logger.info("Running on machine : " + localHostName);
+            final String hostNameString = localHostName.get();
+            logger.info("Running on machine: " + hostNameString);
             printConfiguration(hubScanConfig, projectRequest);
             final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-            cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version, localHostName.get());
+            cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version, hostNameString);
         } else {
             throw new IntegrationException("Unable to resolve the host name.");
         }
