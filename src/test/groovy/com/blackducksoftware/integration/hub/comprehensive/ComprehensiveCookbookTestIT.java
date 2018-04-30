@@ -31,6 +31,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -156,6 +157,7 @@ public class ComprehensiveCookbookTestIT {
 
     }
 
+    @Ignore // this is not running reliably with our test servers. Ignoring for now but it needs to be updated to be reliable.
     @Test
     public void testPolicyStatusFromBdioImport() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
@@ -198,6 +200,7 @@ public class ComprehensiveCookbookTestIT {
         System.out.println(policyStatusItem);
     }
 
+    @Ignore // this is not running reliably with our test servers. Ignoring for now but it needs to be updated to be reliable.
     @Test
     public void testPolicyStatusFromScan() throws Exception {
         final String projectName = restConnectionTestHelper.getProperty("TEST_SCAN_PROJECT");
