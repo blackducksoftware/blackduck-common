@@ -24,11 +24,14 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2;
+import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.request.BodyContent;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
@@ -40,6 +43,23 @@ public class PolicyRuleService {
 
     public PolicyRuleService(final HubService hubService) {
         this.hubService = hubService;
+    }
+
+    public PolicyRuleView getPolicyRuleViewByName(final String policyRuleName) throws IntegrationException {
+        final List<PolicyRuleView> allPolicyRules = hubService.getAllResponses(ApiDiscovery.POLICY_RULES_LINK_RESPONSE);
+        for (final PolicyRuleView policyRule : allPolicyRules) {
+            if (policyRuleName.equals(policyRule.name)) {
+                return policyRule;
+            }
+        }
+        throw new DoesNotExistException("This Policy Rule does not exist: " + policyRuleName);
+    }
+
+    public PolicyRuleViewV2 getPolicyRuleViewV2(final PolicyRuleView policyRuleView) throws IntegrationException {
+        // the href in PolicyRuleView is actually an href to a PolicyRuleViewV2
+        final String uri = hubService.getHref(policyRuleView);
+        final UriSingleResponse<PolicyRuleViewV2> uriSingleResponse = new UriSingleResponse<>(uri, PolicyRuleViewV2.class);
+        return hubService.getResponse(uriSingleResponse);
     }
 
     public String createPolicyRule(final PolicyRuleViewV2 policyRuleViewV2) throws IntegrationException {
