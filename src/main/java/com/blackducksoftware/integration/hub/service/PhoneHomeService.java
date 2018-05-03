@@ -29,6 +29,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.response.CurrentVersionView;
@@ -114,6 +116,9 @@ public class PhoneHomeService extends DataService {
                 // We need to wrap this because this will most likely fail unless they are running as an admin
                 registrationId = hubRegistrationService.getRegistrationId();
             } catch (final IntegrationException e) {
+            }
+            // We must check if the reg id is blank because of an edge case in which the hub can authenticate (while the webserver is coming up) without registration
+            if (StringUtils.isBlank(registrationId)) {
                 registrationId = PhoneHomeRequestBody.Builder.UNKNOWN_ID;
             }
             final URL hubHostName = hubService.getHubBaseUrl();
