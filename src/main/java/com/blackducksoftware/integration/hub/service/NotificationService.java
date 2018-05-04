@@ -94,6 +94,21 @@ public class NotificationService extends DataService {
         return allUserNotificationItems;
     }
 
+    /**
+     * @return The java.util.Date of the most recent notification. If there are no notifications, the current date will be returned. This can set an initial start time window for all future notifications.
+     * @throws IntegrationException
+     */
+    public Date getLatestNotificationDate() throws IntegrationException {
+        final Request.Builder requestBuilder = new Request.Builder();
+        requestBuilder.addQueryParameter("limit", "1");
+        final List<NotificationView> notifications = hubService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, false);
+        if (notifications.size() == 1) {
+            return notifications.get(0).createdAt;
+        } else {
+            return new Date();
+        }
+    }
+
     public NotificationViewResults getAllNotificationViewResults(final Date startDate, final Date endDate) throws IntegrationException {
         final List<NotificationView> allNotificationItems = getAllNotifications(startDate, endDate);
         if (allNotificationItems == null || allNotificationItems.isEmpty()) {
