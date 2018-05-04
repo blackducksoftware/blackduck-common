@@ -28,13 +28,13 @@ import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.enumeration.PolicyRuleCategoryType;
 import com.blackducksoftware.integration.hub.api.enumeration.PolicyRuleConditionType;
-import com.blackducksoftware.integration.hub.api.generated.component.PolicyRuleExpression;
-import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.generated.component.PolicyRuleExpressionView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2;
 
 public class PolicyRuleModel {
-    private final PolicyRuleView rule;
+    private final PolicyRuleViewV2 rule;
 
-    public PolicyRuleModel(final PolicyRuleView rule) {
+    public PolicyRuleModel(final PolicyRuleViewV2 rule) {
         this.rule = rule;
     }
 
@@ -43,7 +43,7 @@ public class PolicyRuleModel {
                 && !rule.expression.expressions.isEmpty();
     }
 
-    public List<PolicyRuleExpression> getExpressionList() {
+    public List<PolicyRuleExpressionView> getExpressionList() {
         if (hasExpressions()) {
             return rule.expression.expressions;
         } else {
@@ -54,7 +54,7 @@ public class PolicyRuleModel {
     public boolean hasOnlyProjectLevelConditions() {
         boolean hasNonProjectLevelCondition = false;
 
-        for (final PolicyRuleExpression expression : getExpressionList()) {
+        for (final PolicyRuleExpressionView expression : getExpressionList()) {
             final PolicyRuleConditionType condition = PolicyRuleConditionType.valueOf(expression.name);
             if (condition == PolicyRuleConditionType.UNKNOWN_RULE_CONDTION) {
                 continue;
@@ -65,4 +65,5 @@ public class PolicyRuleModel {
         }
         return !hasNonProjectLevelCondition;
     }
+
 }

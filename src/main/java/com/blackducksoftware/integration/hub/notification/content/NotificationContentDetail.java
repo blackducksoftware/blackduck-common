@@ -34,7 +34,7 @@ import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
 import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
-import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.util.Stringable;
 
@@ -50,7 +50,7 @@ public class NotificationContentDetail extends Stringable {
     private final Optional<UriSingleResponse<ComponentVersionView>> componentVersion;
 
     private final Optional<String> policyName;
-    private final Optional<UriSingleResponse<PolicyRuleView>> policy;
+    private final Optional<UriSingleResponse<PolicyRuleViewV2>> policy;
 
     private final Optional<String> componentVersionOriginName;
     private final Optional<UriSingleResponse<IssueView>> componentIssue;
@@ -90,7 +90,7 @@ public class NotificationContentDetail extends Stringable {
 
     private NotificationContentDetail(final String projectName, final String projectVersionName, final Optional<UriSingleResponse<ProjectVersionView>> projectVersion, final Optional<String> componentName,
             final Optional<UriSingleResponse<ComponentView>> component, final Optional<String> componentVersionName, final Optional<UriSingleResponse<ComponentVersionView>> componentVersion, final Optional<String> policyName,
-            final Optional<UriSingleResponse<PolicyRuleView>> policy, final Optional<String> componentVersionOriginName, final Optional<UriSingleResponse<IssueView>> componentIssue, final Optional<String> componentVersionOriginId) {
+            final Optional<UriSingleResponse<PolicyRuleViewV2>> policy, final Optional<String> componentVersionOriginName, final Optional<UriSingleResponse<IssueView>> componentIssue, final Optional<String> componentVersionOriginId) {
         this.projectName = projectName;
         this.projectVersionName = projectVersionName;
         this.projectVersion = projectVersion;
@@ -173,7 +173,7 @@ public class NotificationContentDetail extends Stringable {
         return policyName;
     }
 
-    public Optional<UriSingleResponse<PolicyRuleView>> getPolicy() {
+    public Optional<UriSingleResponse<PolicyRuleViewV2>> getPolicy() {
         return policy;
     }
 
@@ -202,8 +202,8 @@ public class NotificationContentDetail extends Stringable {
         return optional(componentVersionUri, ComponentVersionView.class);
     }
 
-    private static Optional<UriSingleResponse<PolicyRuleView>> policy(final String policyUri) {
-        return optional(policyUri, PolicyRuleView.class);
+    private static Optional<UriSingleResponse<PolicyRuleViewV2>> policy(final String policyUri) {
+        return optional(policyUri, PolicyRuleViewV2.class);
     }
 
     private static Optional<UriSingleResponse<IssueView>> componentIssue(final String componentIssueUri) {
