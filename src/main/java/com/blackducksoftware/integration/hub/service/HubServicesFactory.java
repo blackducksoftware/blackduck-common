@@ -39,16 +39,15 @@ import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
-import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 
 public class HubServicesFactory {
-    private final CIEnvironmentVariables ciEnvironmentVariables;
+    private final IntEnvironmentVariables ciEnvironmentVariables;
     private final RestConnection restConnection;
 
     public HubServicesFactory(final RestConnection restConnection) {
-        this.ciEnvironmentVariables = new CIEnvironmentVariables();
-        ciEnvironmentVariables.putAll(System.getenv());
+        this.ciEnvironmentVariables = new IntEnvironmentVariables();
 
         this.restConnection = restConnection;
     }
@@ -74,8 +73,8 @@ public class HubServicesFactory {
     }
 
     public PhoneHomeClient createPhoneHomeClient() {
-        return new PhoneHomeClient(restConnection.logger, GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID, restConnection.timeout, restConnection.getProxyInfo(), restConnection.alwaysTrustServerCertificate,
-                restConnection.gson);
+        return new PhoneHomeClient(GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID, restConnection.timeout, restConnection.getProxyInfo(), restConnection.alwaysTrustServerCertificate,
+                restConnection.logger, restConnection.gson);
     }
 
     public ReportService createReportService(final long timeoutInMilliseconds) throws IntegrationException {

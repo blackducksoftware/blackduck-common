@@ -57,7 +57,8 @@ import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import com.blackducksoftware.integration.util.HostNameHelper;
+import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 
 public class CLIDownloadUtility {
     private final IntLogger logger;
@@ -68,17 +69,13 @@ public class CLIDownloadUtility {
         this.restConnection = restConnection;
     }
 
-    public void performInstallation(final File directoryToInstallTo, final CIEnvironmentVariables ciEnvironmentVariables, final String hubUrl, final String hubVersion, final String localHostName)
+    public void performInstallation(final File directoryToInstallTo, final IntEnvironmentVariables ciEnvironmentVariables, final String hubUrl, final String hubVersion)
             throws HubIntegrationException, EncryptionException {
-        if (StringUtils.isBlank(localHostName)) {
-            throw new IllegalArgumentException("You must provided the hostName of the machine this is running on.");
-        }
-
         final CLILocation cliLocation = new CLILocation(this.logger, directoryToInstallTo);
         final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(this.logger, hubUrl);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
             try {
-                customInstall(cliLocation, ciEnvironmentVariables, new URL(cliDownloadUrl), hubVersion, localHostName);
+                customInstall(cliLocation, ciEnvironmentVariables, new URL(cliDownloadUrl), hubVersion);
             } catch (final MalformedURLException e) {
                 throw new HubIntegrationException(String.format("The cli could not be downloaded from %s: %s", cliDownloadUrl, e.getMessage()), e);
             }
@@ -87,8 +84,7 @@ public class CLIDownloadUtility {
         }
     }
 
-    public void customInstall(final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables, final URL cliDownloadUrl, final String hubVersion, final String localHostName)
-            throws HubIntegrationException, EncryptionException {
+    public void customInstall(final CLILocation cliLocation, final IntEnvironmentVariables ciEnvironmentVariables, final URL cliDownloadUrl, final String hubVersion) throws HubIntegrationException, EncryptionException {
         final String directoryToInstallTo;
         try {
             directoryToInstallTo = cliLocation.getCanonicalPath();
@@ -164,6 +160,7 @@ public class CLIDownloadUtility {
                 this.logger.debug("Updating the Hub CLI.");
                 hubVersionFile.setLastModified(lastModifiedLong);
 
+                final String localHostName = HostNameHelper.getMyHostName();
                 this.logger.info("Unpacking " + cliDownloadUrl.toString() + " to " + directoryToInstallTo + " on " + localHostName);
 
                 try (InputStream cliStream = response.getContent()) {
@@ -187,7 +184,7 @@ public class CLIDownloadUtility {
         }
     }
 
-    private void updateJreSecurity(final IntLogger logger, final CLILocation cliLocation, final CIEnvironmentVariables ciEnvironmentVariables) throws IOException {
+    private void updateJreSecurity(final IntLogger logger, final CLILocation cliLocation, final IntEnvironmentVariables ciEnvironmentVariables) throws IOException {
         final File securityDirectory = cliLocation.getJreSecurityDirectory();
         if (securityDirectory == null || !securityDirectory.isDirectory()) {
             // the cli might not have the jre included
@@ -196,9 +193,9 @@ public class CLIDownloadUtility {
             return;
         }
         File trustStoreFile = null;
-        if (ciEnvironmentVariables.containsKey(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
-            logger.trace("Found the variable : " + CIEnvironmentVariables.BDS_CACERTS_OVERRIDE + ", using value : " + ciEnvironmentVariables.getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE));
-            final String trustStorePath = ciEnvironmentVariables.getValue(CIEnvironmentVariables.BDS_CACERTS_OVERRIDE);
+        if (ciEnvironmentVariables.containsKey(IntEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
+            logger.trace("Found the variable : " + IntEnvironmentVariables.BDS_CACERTS_OVERRIDE + ", using value : " + ciEnvironmentVariables.getValue(IntEnvironmentVariables.BDS_CACERTS_OVERRIDE));
+            final String trustStorePath = ciEnvironmentVariables.getValue(IntEnvironmentVariables.BDS_CACERTS_OVERRIDE);
             trustStoreFile = new File(trustStorePath);
         } else {
             final CertificateHandler certificateHandler = new CertificateHandler(logger);

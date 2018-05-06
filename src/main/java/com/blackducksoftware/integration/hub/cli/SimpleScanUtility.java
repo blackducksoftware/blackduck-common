@@ -31,6 +31,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,10 +43,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -57,7 +56,7 @@ import com.blackducksoftware.integration.hub.service.model.HubCertificateHandler
 import com.blackducksoftware.integration.hub.service.model.ScannerSplitStream;
 import com.blackducksoftware.integration.hub.service.model.StreamRedirectThread;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 import com.google.gson.Gson;
 
 public class SimpleScanUtility {
@@ -66,7 +65,7 @@ public class SimpleScanUtility {
     private final Gson gson;
     private final IntLogger logger;
     private final HubServerConfig hubServerConfig;
-    private final CIEnvironmentVariables ciEnvironmentVariables;
+    private final IntEnvironmentVariables ciEnvironmentVariables;
     private final HubScanConfig hubScanConfig;
     private final String project;
     private final String version;
@@ -74,7 +73,7 @@ public class SimpleScanUtility {
 
     private File logDirectory;
 
-    public SimpleScanUtility(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final CIEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig,
+    public SimpleScanUtility(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final IntEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig,
             final String project, final String version) {
         this.gson = gson;
         this.logger = logger;
@@ -348,8 +347,8 @@ public class SimpleScanUtility {
      * This method can be overridden to provide a more appropriate directory name for the logs of a specific scan execution.
      */
     public String getSpecificScanExecutionLogDirectory() {
-        final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZoneUTC();
-        final String timeString = DateTime.now().withZone(DateTimeZone.UTC).toString(dateTimeFormatter);
+        final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZone(ZoneOffset.UTC);
+        final String timeString = Instant.now().atZone(ZoneOffset.UTC).format(dateTimeFormatter);
         return timeString;
     }
 
