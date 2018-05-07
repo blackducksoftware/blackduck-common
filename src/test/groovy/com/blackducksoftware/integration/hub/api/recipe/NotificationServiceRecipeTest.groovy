@@ -74,7 +74,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final NotificationResults results = notificationService.getAllNotificationResults(startDate, endDate)
         final List<CommonNotificationState> commonNotificationList = results.getNotificationContentItems()
 
-        Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate();
+        Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate().get();
 
         println("Start Date: ${startDate}, End Date: ${endDate}, latestNotification: ${latestNotificationEndDate}")
 
@@ -126,7 +126,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final NotificationResults results = notificationService.getAllNotificationResults(startDate,endDate)
         final List<CommonNotificationState> commonNotificationList = results.getNotificationContentItems()
 
-        Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate();
+        Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate().get();
         println("Start Date: ${startDate}, End Date: ${endDate}, latestNotification: ${latestNotificationEndDate}")
 
         final HubBucket bucket = results.getHubBucket()
