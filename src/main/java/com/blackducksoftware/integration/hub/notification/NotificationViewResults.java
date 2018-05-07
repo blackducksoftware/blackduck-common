@@ -25,29 +25,30 @@ package com.blackducksoftware.integration.hub.notification;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
-import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
+import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 
 public class NotificationViewResults {
-    private final List<NotificationView> notificationViews;
-    private final Date latestNotificationCreatedAtDate;
-    private final String latestNotificationCreatedAtString;
+    private final List<CommonNotificationState> commonNotificationStates;
+    private final Optional<Date> latestNotificationCreatedAtDate;
+    private final Optional<String> latestNotificationCreatedAtString;
 
-    public NotificationViewResults(final List<NotificationView> notificationViews, final Date latestNotificationCreatedAtDate, final String latestNotificationCreatedAtString) {
-        this.notificationViews = notificationViews;
+    public NotificationViewResults(final List<CommonNotificationState> notificationViews, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
+        this.commonNotificationStates = notificationViews;
         this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate;
         this.latestNotificationCreatedAtString = latestNotificationCreatedAtString;
     }
 
-    public List<NotificationView> getNotificationViews() {
-        return notificationViews;
+    public List<CommonNotificationState> getCommonNotificationStates() {
+        return commonNotificationStates;
     }
 
-    public Date getLatestNotificationCreatedAtDate() {
+    public Optional<Date> getLatestNotificationCreatedAtDate() {
         return latestNotificationCreatedAtDate;
     }
 
-    public String getLatestNotificationCreatedAtString() {
+    public Optional<String> getLatestNotificationCreatedAtString() {
         return latestNotificationCreatedAtString;
     }
 

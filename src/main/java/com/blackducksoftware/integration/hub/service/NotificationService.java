@@ -65,16 +65,14 @@ public class NotificationService extends DataService {
     }
 
     public NotificationResults getAllNotificationResults(final Date startDate, final Date endDate) throws IntegrationException {
-        final List<NotificationView> itemList = getAllNotifications(startDate, endDate);
-        final List<CommonNotificationState> commonNotifications = getCommonNotifications(itemList);
-        final NotificationResults results = createNotificationResults(commonNotifications);
+        final NotificationViewResults notificationViewResults = getAllNotificationViewResults(startDate, endDate);
+        final NotificationResults results = createNotificationResults(notificationViewResults);
         return results;
     }
 
     public NotificationResults getAllUserNotificationResults(final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
-        final List<NotificationUserView> itemList = getAllUserNotifications(user, startDate, endDate);
-        final List<CommonNotificationState> commonNotifications = getCommonUserNotifications(itemList);
-        final NotificationResults results = createNotificationResults(commonNotifications);
+        final NotificationViewResults notificationViewResults = getAllNotificationViewResults(user, startDate, endDate);
+        final NotificationResults results = createNotificationResults(notificationViewResults);
         return results;
     }
 
@@ -111,18 +109,29 @@ public class NotificationService extends DataService {
 
     public NotificationViewResults getAllNotificationViewResults(final Date startDate, final Date endDate) throws IntegrationException {
         final List<NotificationView> allNotificationItems = getAllNotifications(startDate, endDate);
-        if (allNotificationItems == null || allNotificationItems.isEmpty()) {
-            return new NotificationViewResults(allNotificationItems, null, null);
+        final List<CommonNotificationState> commonNotifications = getCommonNotifications(allNotificationItems);
+        return createNotificationViewResults(commonNotifications);
+    }
+
+    public NotificationViewResults getAllNotificationViewResults(final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
+        final List<NotificationUserView> allNotificationItems = getAllUserNotifications(user, startDate, endDate);
+        final List<CommonNotificationState> commonNotifications = getCommonUserNotifications(allNotificationItems);
+        return createNotificationViewResults(commonNotifications);
+    }
+
+    private NotificationViewResults createNotificationViewResults(final List<CommonNotificationState> commonNotifications) {
+        if (commonNotifications == null || commonNotifications.isEmpty()) {
+            return new NotificationViewResults(commonNotifications, Optional.empty(), Optional.empty());
         }
 
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         // we know that the first notification in the list is the most current
-        final Date latestCreatedAtDate = allNotificationItems.get(0).createdAt;
+        final Date latestCreatedAtDate = commonNotifications.get(0).getCreatedAt();
         final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
 
-        return new NotificationViewResults(allNotificationItems, latestCreatedAtDate, latestCreatedAtString);
+        return new NotificationViewResults(commonNotifications, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString));
     }
 
     public List<CommonNotificationState> getCommonNotifications(final List<NotificationView> notificationViews) {
@@ -159,14 +168,13 @@ public class NotificationService extends DataService {
         return uriResponses;
     }
 
-    private NotificationResults createNotificationResults(final List<CommonNotificationState> commonNotifications) throws IntegrationException {
+    private NotificationResults createNotificationResults(final NotificationViewResults notificationViewResults) throws IntegrationException {
         final NotificationResults results;
+        final List<CommonNotificationState> commonNotifications = notificationViewResults.getCommonNotificationStates();
         final List<UriSingleResponse<? extends HubResponse>> uriResponseList = getAllLinks(commonNotifications);
         final HubBucket bucket = hubBucketService.startTheBucket(uriResponseList);
-        final List<CommonNotificationState> contentList = commonNotifications.stream().sorted((notification1, notification2) -> {
-            return notification1.getCreatedAt().compareTo(notification2.getCreatedAt());
-        }).collect(Collectors.toList());
-        results = new NotificationResults(contentList, bucket);
+
+        results = new NotificationResults(notificationViewResults, bucket);
         return results;
     }
 
