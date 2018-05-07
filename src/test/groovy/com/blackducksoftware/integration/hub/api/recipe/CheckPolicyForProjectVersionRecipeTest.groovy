@@ -28,6 +28,7 @@ import com.blackducksoftware.integration.test.annotation.IntegrationTest
 class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
     ProjectVersionWrapper projectVersionWrapper
     PolicyRuleView policyRuleView
+    PolicyRuleViewV2 policyRuleViewV2
 
     @Before
     void setup() {
@@ -42,13 +43,13 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         projectVersionWrapper = projectService.getProjectVersionAndCreateIfNeeded(projectRequest)
 
         PolicyRuleService policyRuleService = hubServicesFactory.createPolicyRuleService()
-        PolicyRuleViewV2 policyRuleViewV2 = constructTestPolicy(hubServicesFactory.createComponentService(), new MetaHandler(hubServicesFactory.getRestConnection().logger))
+        policyRuleViewV2 = constructTestPolicy(hubServicesFactory.createComponentService(), new MetaHandler(hubServicesFactory.getRestConnection().logger))
 
         /**
          * to create a Policy Rule we can construct a PolicyRuleViewV2 and Post it to the Hub
          */
         String policyRuleUrl = policyRuleService.createPolicyRule(policyRuleViewV2)
-        policyRuleView = hubServicesFactory.createHubService().getResponse(policyRuleUrl, PolicyRuleView.class)
+        policyRuleViewV2 = hubServicesFactory.createHubService().getResponse(policyRuleUrl, PolicyRuleViewV2.class)
     }
 
     @After
@@ -56,7 +57,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         deleteProject(projectVersionWrapper.getProjectView().name)
 
         PolicyRuleService policyRuleService = hubServicesFactory.createPolicyRuleService()
-        policyRuleService.deletePolicyRule(policyRuleView)
+        policyRuleService.deletePolicyRule(policyRuleViewV2)
     }
 
 
