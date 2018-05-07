@@ -24,6 +24,9 @@
 package com.blackducksoftware.integration.hub.notification;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Optional;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -32,21 +35,32 @@ import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 
 public class NotificationResults {
-    private final Collection<CommonNotificationState> notificationContentItems;
+    private final NotificationViewResults notificationViewResults;
     private final HubBucket hubBucket;
 
-    public NotificationResults(final Collection<CommonNotificationState> notificationContentItems, final HubBucket hubBucket) {
+    public NotificationResults(final NotificationViewResults notificationViewResults, final HubBucket hubBucket) {
         super();
-        this.notificationContentItems = notificationContentItems;
+        this.notificationViewResults = notificationViewResults;
         this.hubBucket = hubBucket;
     }
 
     public Collection<CommonNotificationState> getNotificationContentItems() {
-        return notificationContentItems;
+        if (notificationViewResults == null) {
+            return Collections.emptyList();
+        }
+        return notificationViewResults.getCommonNotificationStates();
     }
 
     public HubBucket getHubBucket() {
         return hubBucket;
+    }
+
+    public Optional<Date> getLatestNotificationCreatedAtDate() {
+        return notificationViewResults.getLatestNotificationCreatedAtDate();
+    }
+
+    public Optional<String> getLatestNotificationCreatedAtString() {
+        return notificationViewResults.getLatestNotificationCreatedAtString();
     }
 
     @Override
