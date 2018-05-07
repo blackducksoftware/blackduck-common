@@ -25,6 +25,8 @@ package com.blackducksoftware.integration.hub.service;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -163,18 +165,18 @@ public class NotificationService extends DataService {
         final NotificationResults results;
         final List<UriSingleResponse<? extends HubResponse>> uriResponseList = getAllLinks(commonNotifications);
         final HubBucket bucket = hubBucketService.startTheBucket(uriResponseList);
-        final List<CommonNotificationState> contentList = commonNotifications.stream().sorted((notification1, notification2) -> {
-            return notification1.getCreatedAt().compareTo(notification2.getCreatedAt());
-        }).collect(Collectors.toList());
+
+        final Comparator<CommonNotificationState> dateComparator = Comparator.comparing(CommonNotificationState::getCreatedAt);
+        Collections.sort(commonNotifications, dateComparator.reversed());
 
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         // we know that the first notification in the list is the most current
-        final Date latestCreatedAtDate = contentList.get(0).getCreatedAt();
+        final Date latestCreatedAtDate = commonNotifications.get(0).getCreatedAt();
         final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
 
-        results = new NotificationResults(contentList, bucket, latestCreatedAtDate, latestCreatedAtString);
+        results = new NotificationResults(commonNotifications, bucket, latestCreatedAtDate, latestCreatedAtString);
         return results;
     }
 

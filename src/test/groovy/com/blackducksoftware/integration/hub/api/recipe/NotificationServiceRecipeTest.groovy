@@ -61,6 +61,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
 
     @Test
     void fetchNotificationsSynchronous() {
+        cleanup()
         final Date startDate = generateNotifications()
         final NotificationService notificationService = hubServicesFactory.createNotificationService()
         final HubBucketService bucketService = hubServicesFactory.createHubBucketService()
@@ -72,6 +73,10 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final Date endDate = Date.from(endTime.toInstant())
         final NotificationResults results = notificationService.getAllNotificationResults(startDate, endDate)
         final List<CommonNotificationState> commonNotificationList = results.getNotificationContentItems()
+
+        Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate();
+
+        println("Start Date: ${startDate}, End Date: ${endDate}, latestNotification: ${latestNotificationEndDate}")
 
         final HubBucket bucket = results.getHubBucket()
 
@@ -107,6 +112,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
 
     @Test
     void fetchNotificationsAsynchronous() {
+        cleanup()
         final Date startDate = generateNotifications()
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
@@ -119,6 +125,9 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final Date endDate = Date.from(endTime.toInstant())
         final NotificationResults results = notificationService.getAllNotificationResults(startDate,endDate)
         final List<CommonNotificationState> commonNotificationList = results.getNotificationContentItems()
+
+        Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate();
+        println("Start Date: ${startDate}, End Date: ${endDate}, latestNotification: ${latestNotificationEndDate}")
 
         final HubBucket bucket = results.getHubBucket()
 
@@ -154,8 +163,12 @@ class NotificationServiceRecipeTest extends BasicRecipe {
 
     @After
     void cleanup() {
-        def projectService = hubServicesFactory.createProjectService()
-        ProjectView createdProject = projectService.getProjectByName(NOTIFICATION_PROJECT_NAME)
-        projectService.deleteHubProject(createdProject)
+        try {
+            def projectService = hubServicesFactory.createProjectService()
+            ProjectView createdProject = projectService.getProjectByName(NOTIFICATION_PROJECT_NAME)
+            projectService.deleteHubProject(createdProject)
+        } catch (IntegrationException ex) {
+            println("Could not delete project ${NOTIFICATION_PROJECT_NAME} cause: ${ex}")
+        }
     }
 }
