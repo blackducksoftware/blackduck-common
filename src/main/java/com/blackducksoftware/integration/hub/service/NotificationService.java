@@ -166,7 +166,15 @@ public class NotificationService extends DataService {
         final List<CommonNotificationState> contentList = commonNotifications.stream().sorted((notification1, notification2) -> {
             return notification1.getCreatedAt().compareTo(notification2.getCreatedAt());
         }).collect(Collectors.toList());
-        results = new NotificationResults(contentList, bucket);
+
+        final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        // we know that the first notification in the list is the most current
+        final Date latestCreatedAtDate = contentList.get(0).getCreatedAt();
+        final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
+
+        results = new NotificationResults(contentList, bucket, latestCreatedAtDate, latestCreatedAtString);
         return results;
     }
 

@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.notification;
 
 import java.util.Collection;
+import java.util.Date;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -34,11 +35,15 @@ import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 public class NotificationResults {
     private final Collection<CommonNotificationState> notificationContentItems;
     private final HubBucket hubBucket;
+    private final Date latestNotificationCreatedAtDate;
+    private final String latestNotificationCreatedAtString;
 
-    public NotificationResults(final Collection<CommonNotificationState> notificationContentItems, final HubBucket hubBucket) {
+    public NotificationResults(final Collection<CommonNotificationState> notificationContentItems, final HubBucket hubBucket, final Date latestNotificationCreatedAtDate, final String latestNotificationCreatedAtString) {
         super();
         this.notificationContentItems = notificationContentItems;
         this.hubBucket = hubBucket;
+        this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate;
+        this.latestNotificationCreatedAtString = latestNotificationCreatedAtString;
     }
 
     public Collection<CommonNotificationState> getNotificationContentItems() {
@@ -47,6 +52,14 @@ public class NotificationResults {
 
     public HubBucket getHubBucket() {
         return hubBucket;
+    }
+
+    public Date getLatestNotificationCreatedAtDate() {
+        return latestNotificationCreatedAtDate;
+    }
+
+    public String getLatestNotificationCreatedAtString() {
+        return latestNotificationCreatedAtString;
     }
 
     @Override
