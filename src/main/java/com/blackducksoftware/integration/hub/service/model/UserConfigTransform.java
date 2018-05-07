@@ -34,7 +34,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensio
 import com.blackducksoftware.integration.hub.api.generated.view.ExternalExtensionUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.service.HubService;
-import com.blackducksoftware.integration.parallel.processor.ItemTransformer;
+import com.blackducksoftware.integration.hub.throwaway.ItemTransformer;
 
 public class UserConfigTransform implements ItemTransformer<UserConfigItem, ExternalExtensionUserView> {
     private final HubService hubService;

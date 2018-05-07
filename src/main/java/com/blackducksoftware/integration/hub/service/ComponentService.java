@@ -35,6 +35,7 @@ import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.service.model.HubMediaTypes;
+import com.blackducksoftware.integration.hub.service.model.HubQuery;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 
 public class ComponentService extends DataService {
@@ -77,9 +78,9 @@ public class ComponentService extends DataService {
     public List<ComponentSearchResultView> getAllComponents(final ExternalId externalId) throws IntegrationException {
         final String forge = externalId.forge.getName();
         final String hubOriginId = externalId.createHubOriginId();
-        final String componentQuery = String.format("id:%s|%s", forge, hubOriginId);
+        final HubQuery hubQuery = new HubQuery(String.format("id:%s|%s", forge, hubOriginId));
 
-        final Request.Builder requestBuilder = new Request.Builder().addQueryParameter("q", componentQuery);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
         final List<ComponentSearchResultView> allComponents = hubService.getAllResponses(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
         return allComponents;
     }

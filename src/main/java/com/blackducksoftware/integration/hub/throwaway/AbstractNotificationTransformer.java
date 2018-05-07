@@ -33,9 +33,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubItemTransformException;
 import com.blackducksoftware.integration.hub.service.HubService;
-import com.blackducksoftware.integration.hub.throwaway.ReducedNotificationView;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.parallel.processor.ItemTransformer;
 
 public abstract class AbstractNotificationTransformer implements ItemTransformer<NotificationContentItem, ReducedNotificationView> {
     final IntLogger logger;
