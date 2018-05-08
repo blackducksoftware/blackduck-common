@@ -26,8 +26,9 @@ package com.blackducksoftware.integration.hub.service.bucket;
 import java.util.Optional;
 
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import com.blackducksoftware.integration.util.Stringable;
 
-public class HubBucketItem<T extends HubResponse> {
+public class HubBucketItem<T extends HubResponse> extends Stringable {
     private final String uri;
     private final Optional<T> hubResponse;
     private final Optional<Exception> e;
