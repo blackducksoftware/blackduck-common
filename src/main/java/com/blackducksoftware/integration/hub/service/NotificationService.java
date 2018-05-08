@@ -98,8 +98,7 @@ public class NotificationService extends DataService {
      * @throws IntegrationException
      */
     public Date getLatestNotificationDate() throws IntegrationException {
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder();
-        RequestFactory.addLimit(requestBuilder, 1);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(1, RequestFactory.DEFAULT_OFFSET);
         final List<NotificationView> notifications = hubService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, false);
         if (notifications.size() == 1) {
             return notifications.get(0).createdAt;

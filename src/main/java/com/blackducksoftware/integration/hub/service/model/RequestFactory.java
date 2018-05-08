@@ -52,6 +52,10 @@ public class RequestFactory {
         return createCommonGetRequestBuilder(null, hubQuery, DEFAULT_LIMIT, DEFAULT_OFFSET);
     }
 
+    public static Request.Builder createCommonGetRequestBuilder(final int limit, final int offset) {
+        return createCommonGetRequestBuilder(null, null, limit, offset);
+    }
+
     public static Request.Builder createCommonGetRequestBuilder(final String uri, final HubQuery hubQuery) {
         return createCommonGetRequestBuilder(uri, hubQuery, DEFAULT_LIMIT, DEFAULT_OFFSET);
     }

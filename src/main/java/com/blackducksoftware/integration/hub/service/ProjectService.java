@@ -80,7 +80,7 @@ public class ProjectService extends DataService {
         if (StringUtils.isNotBlank(projectName)) {
             hubQuery = new HubQuery("name:" + projectName);
         }
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery, limit, 0);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery, limit, RequestFactory.DEFAULT_OFFSET);
 
         final List<ProjectView> projectItems = hubService.getResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder, false);
         return projectItems;
