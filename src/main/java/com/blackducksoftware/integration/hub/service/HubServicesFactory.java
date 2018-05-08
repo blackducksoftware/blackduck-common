@@ -47,21 +47,21 @@ import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 import com.google.gson.Gson;
 
 public class HubServicesFactory {
-    private final IntEnvironmentVariables ciEnvironmentVariables;
+    private final IntEnvironmentVariables intEnvironmentVariables;
     private final RestConnection restConnection;
 
     public HubServicesFactory(final RestConnection restConnection) {
-        this.ciEnvironmentVariables = new IntEnvironmentVariables();
+        this.intEnvironmentVariables = new IntEnvironmentVariables();
 
         this.restConnection = restConnection;
     }
 
     public void addEnvironmentVariable(final String key, final String value) {
-        ciEnvironmentVariables.put(key, value);
+        intEnvironmentVariables.put(key, value);
     }
 
     public void addEnvironmentVariables(final Map<String, String> environmentVariables) {
-        ciEnvironmentVariables.putAll(environmentVariables);
+        intEnvironmentVariables.putAll(environmentVariables);
     }
 
     public SignatureScannerService createSignatureScannerService() {
@@ -69,11 +69,11 @@ public class HubServicesFactory {
     }
 
     public SignatureScannerService createSignatureScannerService(final long timeoutInMilliseconds) {
-        return new SignatureScannerService(createHubService(), ciEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService(), createScanStatusService(timeoutInMilliseconds));
+        return new SignatureScannerService(createHubService(), intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService(), createScanStatusService(timeoutInMilliseconds));
     }
 
     public PhoneHomeService createPhoneHomeService() {
-        return new PhoneHomeService(createHubService(), createPhoneHomeClient(), createHubRegistrationService(), ciEnvironmentVariables);
+        return new PhoneHomeService(createHubService(), createPhoneHomeClient(), createHubRegistrationService(), intEnvironmentVariables);
     }
 
     public PhoneHomeClient createPhoneHomeClient() {
@@ -127,7 +127,7 @@ public class HubServicesFactory {
     }
 
     public SimpleScanUtility createSimpleScanUtility(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final String projectName, final String versionName) {
-        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
+        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, intEnvironmentVariables, hubScanConfig, projectName, versionName);
     }
 
     public HubRegistrationService createHubRegistrationService() {

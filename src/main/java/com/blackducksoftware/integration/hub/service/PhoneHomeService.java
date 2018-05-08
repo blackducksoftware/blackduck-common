@@ -46,22 +46,22 @@ public class PhoneHomeService extends DataService {
     private final HubRegistrationService hubRegistrationService;
     private final PhoneHomeClient phoneHomeClient;
     private final ExecutorService executorService;
-    private final IntEnvironmentVariables ciEnvironmentVariables;
+    private final IntEnvironmentVariables intEnvironmentVariables;
 
-    public PhoneHomeService(final HubService hubService, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final IntEnvironmentVariables ciEnvironmentVariables) {
+    public PhoneHomeService(final HubService hubService, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final IntEnvironmentVariables intEnvironmentVariables) {
         super(hubService);
         this.hubRegistrationService = hubRegistrationService;
         this.phoneHomeClient = phoneHomeClient;
-        this.ciEnvironmentVariables = ciEnvironmentVariables;
+        this.intEnvironmentVariables = intEnvironmentVariables;
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
     }
 
-    public PhoneHomeService(final HubService hubService, final IntLogger logger, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final IntEnvironmentVariables ciEnvironmentVariables) {
+    public PhoneHomeService(final HubService hubService, final IntLogger logger, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final IntEnvironmentVariables intEnvironmentVariables) {
         super(hubService, logger);
         this.hubRegistrationService = hubRegistrationService;
         this.phoneHomeClient = phoneHomeClient;
-        this.ciEnvironmentVariables = ciEnvironmentVariables;
+        this.intEnvironmentVariables = intEnvironmentVariables;
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
     }
@@ -91,7 +91,7 @@ public class PhoneHomeService extends DataService {
             logger.debug("Skipping phone-home");
         } else {
             try {
-                phoneHomeClient.postPhoneHomeRequest(phoneHomeRequestBody, ciEnvironmentVariables.getVariables());
+                phoneHomeClient.postPhoneHomeRequest(phoneHomeRequestBody, intEnvironmentVariables.getVariables());
             } catch (final Exception e) {
                 logger.debug("Problem with phone-home : " + e.getMessage(), e);
             }
@@ -158,7 +158,7 @@ public class PhoneHomeService extends DataService {
     }
 
     public PhoneHomeResponse startPhoneHome(final PhoneHomeRequestBody phoneHomeRequestBody) {
-        final PhoneHomeCallable task = new PhoneHomeCallable(logger, phoneHomeClient, phoneHomeRequestBody, ciEnvironmentVariables);
+        final PhoneHomeCallable task = new PhoneHomeCallable(logger, phoneHomeClient, phoneHomeRequestBody, intEnvironmentVariables);
         final Future<Boolean> resultTask = executorService.submit(task);
         return new PhoneHomeResponse(resultTask);
     }

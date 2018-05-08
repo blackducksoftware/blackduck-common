@@ -34,13 +34,13 @@ public class PhoneHomeCallable implements Callable<Boolean> {
     private final IntLogger logger;
     private final PhoneHomeClient client;
     private final PhoneHomeRequestBody requestBody;
-    private final IntEnvironmentVariables ciEnvironmentVariables;
+    private final IntEnvironmentVariables intEnvironmentVariables;
 
-    public PhoneHomeCallable(final IntLogger logger, final PhoneHomeClient client, final PhoneHomeRequestBody requestBody, final IntEnvironmentVariables ciEnvironmentVariables) {
+    public PhoneHomeCallable(final IntLogger logger, final PhoneHomeClient client, final PhoneHomeRequestBody requestBody, final IntEnvironmentVariables intEnvironmentVariables) {
         this.logger = logger;
         this.client = client;
         this.requestBody = requestBody;
-        this.ciEnvironmentVariables = ciEnvironmentVariables;
+        this.intEnvironmentVariables = intEnvironmentVariables;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class PhoneHomeCallable implements Callable<Boolean> {
         Boolean result = Boolean.FALSE;
         try {
             logger.debug("starting phone home");
-            client.postPhoneHomeRequest(requestBody, ciEnvironmentVariables.getVariables());
+            client.postPhoneHomeRequest(requestBody, intEnvironmentVariables.getVariables());
             result = Boolean.TRUE;
             logger.debug("completed phone home");
         } catch (final Exception ex) {

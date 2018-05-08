@@ -65,7 +65,7 @@ public class SimpleScanUtility {
     private final Gson gson;
     private final IntLogger logger;
     private final HubServerConfig hubServerConfig;
-    private final IntEnvironmentVariables ciEnvironmentVariables;
+    private final IntEnvironmentVariables intEnvironmentVariables;
     private final HubScanConfig hubScanConfig;
     private final String project;
     private final String version;
@@ -73,12 +73,12 @@ public class SimpleScanUtility {
 
     private File logDirectory;
 
-    public SimpleScanUtility(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final IntEnvironmentVariables ciEnvironmentVariables, final HubScanConfig hubScanConfig,
+    public SimpleScanUtility(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final IntEnvironmentVariables intEnvironmentVariables, final HubScanConfig hubScanConfig,
             final String project, final String version) {
         this.gson = gson;
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
-        this.ciEnvironmentVariables = ciEnvironmentVariables;
+        this.intEnvironmentVariables = intEnvironmentVariables;
         this.hubScanConfig = hubScanConfig;
         this.project = project;
         this.version = version;
@@ -268,7 +268,7 @@ public class SimpleScanUtility {
             }
             processBuilder.environment().put("BD_HUB_NO_PROMPT", "true");
 
-            final String bdioEnvVar = ciEnvironmentVariables.getValue("BD_HUB_DECLARED_COMPONENTS");
+            final String bdioEnvVar = intEnvironmentVariables.getValue("BD_HUB_DECLARED_COMPONENTS");
             if (StringUtils.isNotBlank(bdioEnvVar)) {
                 processBuilder.environment().put("BD_HUB_DECLARED_COMPONENTS", bdioEnvVar);
             }
