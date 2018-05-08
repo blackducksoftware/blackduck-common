@@ -39,6 +39,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.util.Stringable;
 
 public class NotificationContentDetail extends Stringable {
+    private final String contentDetailKey;
     private final String projectName;
     private final String projectVersionName;
     private final Optional<UriSingleResponse<ProjectVersionView>> projectVersion;
@@ -103,6 +104,11 @@ public class NotificationContentDetail extends Stringable {
         this.componentVersionOriginName = componentVersionOriginName;
         this.componentIssue = componentIssue;
         this.componentVersionOriginId = componentVersionOriginId;
+        this.contentDetailKey = createContentDetailKey();
+    }
+
+    private String createContentDetailKey() {
+        return null;
     }
 
     public boolean hasComponentVersion() {
@@ -139,6 +145,10 @@ public class NotificationContentDetail extends Stringable {
             presentLinks.add(componentIssue.get());
         }
         return presentLinks;
+    }
+
+    public String getContentDetailKey() {
+        return contentDetailKey;
     }
 
     public String getProjectName() {
@@ -216,5 +226,4 @@ public class NotificationContentDetail extends Stringable {
         }
         return Optional.of(new UriSingleResponse<>(uri, responseClass));
     }
-
 }
