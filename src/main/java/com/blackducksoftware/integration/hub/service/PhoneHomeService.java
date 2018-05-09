@@ -40,35 +40,37 @@ import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;
 import com.blackducksoftware.integration.phonehome.enums.ProductIdEnum;
-import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 
 public class PhoneHomeService extends DataService {
     private final HubRegistrationService hubRegistrationService;
     private final PhoneHomeClient phoneHomeClient;
     private final ExecutorService executorService;
-    private final CIEnvironmentVariables ciEnvironmentVariables;
+    private final IntEnvironmentVariables intEnvironmentVariables;
 
-    public PhoneHomeService(final HubService hubService, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final CIEnvironmentVariables ciEnvironmentVariables) {
+    public PhoneHomeService(final HubService hubService, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final IntEnvironmentVariables intEnvironmentVariables) {
         super(hubService);
         this.hubRegistrationService = hubRegistrationService;
         this.phoneHomeClient = phoneHomeClient;
-        this.ciEnvironmentVariables = ciEnvironmentVariables;
+        this.intEnvironmentVariables = intEnvironmentVariables;
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
     }
 
-    public PhoneHomeService(final HubService hubService, IntLogger logger, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final CIEnvironmentVariables ciEnvironmentVariables) {
+    public PhoneHomeService(final HubService hubService, final IntLogger logger, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final IntEnvironmentVariables intEnvironmentVariables) {
         super(hubService, logger);
         this.hubRegistrationService = hubRegistrationService;
         this.phoneHomeClient = phoneHomeClient;
-        this.ciEnvironmentVariables = ciEnvironmentVariables;
+        this.intEnvironmentVariables = intEnvironmentVariables;
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
     }
 
     /**
-     * @param artifactId The name of the jar without the version. For example: <i>hub-common</i>.
-     * @param artifactVersion The version of the jar.
+     * @param artifactId
+     *            The name of the jar without the version. For example: <i>hub-common</i>.
+     * @param artifactVersion
+     *            The version of the jar.
      */
     public void phoneHome(final String artifactId, final String artifactVersion) {
         final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder(artifactId, artifactVersion);
@@ -89,7 +91,7 @@ public class PhoneHomeService extends DataService {
             logger.debug("Skipping phone-home");
         } else {
             try {
-                phoneHomeClient.postPhoneHomeRequest(phoneHomeRequestBody, ciEnvironmentVariables);
+                phoneHomeClient.postPhoneHomeRequest(phoneHomeRequestBody, intEnvironmentVariables.getVariables());
             } catch (final Exception e) {
                 logger.debug("Problem with phone-home : " + e.getMessage(), e);
             }
@@ -97,8 +99,10 @@ public class PhoneHomeService extends DataService {
     }
 
     /**
-     * @param artifactId The name of the jar without the version. For example: <i>hub-common</i>.
-     * @param artifactVersion The version of the jar.
+     * @param artifactId
+     *            The name of the jar without the version. For example: <i>hub-common</i>.
+     * @param artifactVersion
+     *            The version of the jar.
      */
     public PhoneHomeRequestBody.Builder createInitialPhoneHomeRequestBodyBuilder(final String artifactId, final String artifactVersion) {
         final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder();
@@ -133,8 +137,10 @@ public class PhoneHomeService extends DataService {
     }
 
     /**
-     * @param artifactId The name of the jar without the version. For example: <i>hub-common</i>.
-     * @param artifactVersion The version of the jar.
+     * @param artifactId
+     *            The name of the jar without the version. For example: <i>hub-common</i>.
+     * @param artifactVersion
+     *            The version of the jar.
      */
     public PhoneHomeResponse startPhoneHome(final String artifactId, final String artifactVersion) {
         final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder = createInitialPhoneHomeRequestBodyBuilder(artifactId, artifactVersion);
@@ -152,7 +158,7 @@ public class PhoneHomeService extends DataService {
     }
 
     public PhoneHomeResponse startPhoneHome(final PhoneHomeRequestBody phoneHomeRequestBody) {
-        final PhoneHomeCallable task = new PhoneHomeCallable(logger, phoneHomeClient, phoneHomeRequestBody, ciEnvironmentVariables);
+        final PhoneHomeCallable task = new PhoneHomeCallable(logger, phoneHomeClient, phoneHomeRequestBody, intEnvironmentVariables);
         final Future<Boolean> resultTask = executorService.submit(task);
         return new PhoneHomeResponse(resultTask);
     }
