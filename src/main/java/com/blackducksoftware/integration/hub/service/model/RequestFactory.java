@@ -25,6 +25,7 @@ package com.blackducksoftware.integration.hub.service.model;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -48,7 +49,7 @@ public class RequestFactory {
         return createCommonGetRequestBuilder(uri, null, DEFAULT_LIMIT, DEFAULT_OFFSET);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(final HubQuery hubQuery) {
+    public static Request.Builder createCommonGetRequestBuilder(final Optional<HubQuery> hubQuery) {
         return createCommonGetRequestBuilder(null, hubQuery, DEFAULT_LIMIT, DEFAULT_OFFSET);
     }
 
@@ -56,7 +57,7 @@ public class RequestFactory {
         return createCommonGetRequestBuilder(null, null, limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(final String uri, final HubQuery hubQuery) {
+    public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<HubQuery> hubQuery) {
         return createCommonGetRequestBuilder(uri, hubQuery, DEFAULT_LIMIT, DEFAULT_OFFSET);
     }
 
@@ -64,11 +65,11 @@ public class RequestFactory {
         return createCommonGetRequestBuilder(uri, null, limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(final HubQuery hubQuery, final int limit, final int offset) {
+    public static Request.Builder createCommonGetRequestBuilder(final Optional<HubQuery> hubQuery, final int limit, final int offset) {
         return createCommonGetRequestBuilder(null, hubQuery, limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(final String uri, final HubQuery hubQuery, final int limit, final int offset) {
+    public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<HubQuery> hubQuery, final int limit, final int offset) {
         final Request.Builder requestBuilder = new Request.Builder();
         if (StringUtils.isNotBlank(uri)) {
             requestBuilder.uri(uri);
@@ -93,9 +94,9 @@ public class RequestFactory {
         return requestBuilder;
     }
 
-    public static Request.Builder addHubQuery(final Request.Builder requestBuilder, final HubQuery hubQuery) {
-        if (hubQuery != null && StringUtils.isNotBlank(hubQuery.getParameter())) {
-            requestBuilder.addQueryParameter(Q_PARAMETER, hubQuery.getParameter());
+    public static Request.Builder addHubQuery(final Request.Builder requestBuilder, final Optional<HubQuery> hubQuery) {
+        if (hubQuery.isPresent() && StringUtils.isNotBlank(hubQuery.get().getParameter())) {
+            requestBuilder.addQueryParameter(Q_PARAMETER, hubQuery.get().getParameter());
         }
         return requestBuilder;
     }

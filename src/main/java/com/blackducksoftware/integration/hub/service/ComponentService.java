@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
@@ -78,7 +79,8 @@ public class ComponentService extends DataService {
     public List<ComponentSearchResultView> getAllComponents(final ExternalId externalId) throws IntegrationException {
         final String forge = externalId.forge.getName();
         final String hubOriginId = externalId.createHubOriginId();
-        final HubQuery hubQuery = new HubQuery(String.format("id:%s|%s", forge, hubOriginId));
+        final String componentQuery = String.format("%s|%s", forge, hubOriginId);
+        final Optional<HubQuery> hubQuery = HubQuery.createQuery("id", componentQuery);
 
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
         final List<ComponentSearchResultView> allComponents = hubService.getAllResponses(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);

@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -134,7 +135,7 @@ public class CodeLocationService extends DataService {
 
     public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
-            final HubQuery hubQuery = new HubQuery("name:" + codeLocationName);
+            final Optional<HubQuery> hubQuery = HubQuery.createQuery("name", codeLocationName);
             final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
             final List<CodeLocationView> codeLocations = hubService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
             for (final CodeLocationView codeLocation : codeLocations) {

@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -65,10 +66,7 @@ public class ProjectService extends DataService {
     }
 
     public List<ProjectView> getAllProjectMatches(final String projectName) throws IntegrationException {
-        HubQuery hubQuery = null;
-        if (StringUtils.isNotBlank(projectName)) {
-            hubQuery = new HubQuery("name:" + projectName);
-        }
+        final Optional<HubQuery> hubQuery = HubQuery.createQuery("name", projectName);
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
 
         final List<ProjectView> allProjectItems = hubService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder);
@@ -76,10 +74,7 @@ public class ProjectService extends DataService {
     }
 
     public List<ProjectView> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
-        HubQuery hubQuery = null;
-        if (StringUtils.isNotBlank(projectName)) {
-            hubQuery = new HubQuery("name:" + projectName);
-        }
+        final Optional<HubQuery> hubQuery = HubQuery.createQuery("name", projectName);
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery, limit, RequestFactory.DEFAULT_OFFSET);
 
         final List<ProjectView> projectItems = hubService.getResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder, false);
@@ -111,10 +106,7 @@ public class ProjectService extends DataService {
     }
 
     public ProjectVersionView getProjectVersion(final ProjectView project, final String projectVersionName) throws IntegrationException {
-        HubQuery hubQuery = null;
-        if (StringUtils.isNotBlank(projectVersionName)) {
-            hubQuery = new HubQuery(String.format("versionName:%s", projectVersionName));
-        }
+        final Optional<HubQuery> hubQuery = HubQuery.createQuery("versionName", projectVersionName);
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
 
         final List<ProjectVersionView> allProjectVersionMatchingItems = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE, requestBuilder);
