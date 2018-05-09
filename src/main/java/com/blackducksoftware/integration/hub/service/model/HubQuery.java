@@ -23,10 +23,30 @@
  */
 package com.blackducksoftware.integration.hub.service.model;
 
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+
 public class HubQuery {
     private final String q;
 
-    public HubQuery(final String parameter) {
+    public static Optional<HubQuery> createQuery(final String parameter) {
+        if (StringUtils.isNotBlank(parameter)) {
+            return Optional.of(new HubQuery(parameter));
+        }
+
+        return Optional.empty();
+    }
+
+    public static Optional<HubQuery> createQuery(final String prefix, final String parameter) {
+        if (StringUtils.isNotBlank(parameter)) {
+            return Optional.of(new HubQuery(prefix + ":" + parameter));
+        }
+
+        return Optional.empty();
+    }
+
+    private HubQuery(final String parameter) {
         this.q = parameter;
     }
 
