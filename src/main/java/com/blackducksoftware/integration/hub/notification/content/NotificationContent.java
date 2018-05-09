@@ -38,4 +38,6 @@ public abstract class NotificationContent extends HubComponent {
 
     public abstract List<NotificationContentDetail> getNotificationContentDetails();
 
+    public abstract String getNotificationGroup();
+
 }
