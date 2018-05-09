@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -78,16 +78,16 @@ public class HubServicesFactory {
 
     public PhoneHomeClient createPhoneHomeClient() {
         final String googleAnalyticsTrackingId = GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID;
-        final CloseableHttpClient httpClient = restConnection.getClient();
+        final HttpClientBuilder httpClientBuilder = restConnection.getClientBuilder();
         final Gson gson = restConnection.gson;
-        return new PhoneHomeClient(googleAnalyticsTrackingId, httpClient, gson);
+        return new PhoneHomeClient(googleAnalyticsTrackingId, httpClientBuilder, gson);
     }
 
     public PhoneHomeClient createPhoneHomeClient(final Logger logger) {
         final String googleAnalyticsTrackingId = GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID;
-        final CloseableHttpClient httpClient = restConnection.getClient();
+        final HttpClientBuilder httpClientBuilder = restConnection.getClientBuilder();
         final Gson gson = restConnection.gson;
-        return new PhoneHomeClient(googleAnalyticsTrackingId, httpClient, logger, gson);
+        return new PhoneHomeClient(googleAnalyticsTrackingId, httpClientBuilder, logger, gson);
     }
 
     public ReportService createReportService(final long timeoutInMilliseconds) throws IntegrationException {

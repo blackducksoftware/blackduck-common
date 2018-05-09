@@ -445,35 +445,6 @@ public class CLIInstallerTestIT {
     }
 
     @Test
-    public void testPerformInstallationNullHost() throws Exception {
-        exception.expect(IllegalArgumentException.class);
-        final File installDir = folder.newFolder();
-
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
-
-        final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
-        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-
-        cliDownloadService.performInstallation(installDir, IntEnvironmentVariables, hubUrl.toString(), currentVersion.version);
-    }
-
-    @Test
-    public void testPerformInstallationUpdatingEmptyHost() throws Exception {
-        exception.expect(IllegalArgumentException.class);
-        final File installDir = folder.newFolder();
-
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
-
-        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-        final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
-        final String hubVersion = currentVersion.version;
-
-        cliDownloadService.performInstallation(installDir, IntEnvironmentVariables, hubUrl.toString(), hubVersion);
-    }
-
-    @Test
     public void testPerformInstallation() throws Exception {
         final TestLogger logger = new TestLogger();
         final File installDir = folder.newFolder();
