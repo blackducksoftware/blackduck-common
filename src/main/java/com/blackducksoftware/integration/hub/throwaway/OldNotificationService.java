@@ -46,8 +46,6 @@ import com.blackducksoftware.integration.hub.service.HubResponseTransformer;
 import com.blackducksoftware.integration.hub.service.HubResponsesTransformer;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessor;
-import com.blackducksoftware.integration.parallel.processor.ParallelResourceProcessorResults;
 import com.google.gson.JsonObject;
 
 public class OldNotificationService extends DataService {

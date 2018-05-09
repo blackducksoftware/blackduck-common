@@ -50,6 +50,7 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.rest.HttpMethod;
+import com.blackducksoftware.integration.hub.service.model.HubQuery;
 import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
@@ -64,22 +65,23 @@ public class ProjectService extends DataService {
     }
 
     public List<ProjectView> getAllProjectMatches(final String projectName) throws IntegrationException {
-        String q = null;
+        HubQuery hubQuery = null;
         if (StringUtils.isNotBlank(projectName)) {
-            q = "name:" + projectName;
+            hubQuery = new HubQuery("name:" + projectName);
         }
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("q", q);
-        final List<ProjectView> allProjectItems = hubService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
 
+        final List<ProjectView> allProjectItems = hubService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder);
         return allProjectItems;
     }
 
     public List<ProjectView> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
-        String q = null;
+        HubQuery hubQuery = null;
         if (StringUtils.isNotBlank(projectName)) {
-            q = "name:" + projectName;
+            hubQuery = new HubQuery("name:" + projectName);
         }
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("q", q).addQueryParameter("limit", String.valueOf(limit));
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery, limit, RequestFactory.DEFAULT_OFFSET);
+
         final List<ProjectView> projectItems = hubService.getResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder, false);
         return projectItems;
     }
@@ -109,11 +111,12 @@ public class ProjectService extends DataService {
     }
 
     public ProjectVersionView getProjectVersion(final ProjectView project, final String projectVersionName) throws IntegrationException {
-        String q = "";
+        HubQuery hubQuery = null;
         if (StringUtils.isNotBlank(projectVersionName)) {
-            q = String.format("versionName:%s", projectVersionName);
+            hubQuery = new HubQuery(String.format("versionName:%s", projectVersionName));
         }
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("q", q);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
+
         final List<ProjectVersionView> allProjectVersionMatchingItems = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE, requestBuilder);
         final ProjectVersionView projectVersion = findMatchingVersion(allProjectVersionMatchingItems, projectVersionName);
         if (null != projectVersion) {
