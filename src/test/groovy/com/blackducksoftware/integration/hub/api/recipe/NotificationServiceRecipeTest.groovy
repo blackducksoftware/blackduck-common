@@ -82,6 +82,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
 
         commonNotificationList.each({
             if(!it.content.providesLicenseDetails()) {
+                String contentDetailKey
                 String projectName
                 String projectVersion
                 String componentName
@@ -89,23 +90,28 @@ class NotificationServiceRecipeTest extends BasicRecipe {
                 String policyName
                 boolean isVulnerability = false
                 it.content.notificationContentDetails.each({
+                    contentDetailKey = it.contentDetailKey
                     projectName = it.projectName
                     projectVersion = it.projectVersionName
                     if(it.hasComponentVersion()) {
+                        componentName = it.componentName.get()
                         componentVersion = it.componentVersionName.get()
                     }
+
                     if(it.hasOnlyComponent()) {
                         componentName = it.componentName.get()
                     }
+
                     if(it.isPolicy()) {
                         policyName = it.policyName.get()
                     }
+
                     if(it.isVulnerability()) {
                         isVulnerability = true
                     }
                 })
 
-                println("ProjectName: ${projectName} Project Version: ${projectVersion} Component: ${componentName} Component Version: ${componentVersion} Policy: ${policyName} isVulnerability: ${isVulnerability}")
+                println("ContentDetailKey: ${contentDetailKey} ProjectName: ${projectName} Project Version: ${projectVersion} Component: ${componentName} Component Version: ${componentVersion} Policy: ${policyName} isVulnerability: ${isVulnerability}")
             }
         })
     }
@@ -133,6 +139,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
 
         commonNotificationList.each({
             if(!it.content.providesLicenseDetails()) {
+                String contentDetailKey
                 String projectName
                 String projectVersion
                 String componentName
@@ -140,23 +147,28 @@ class NotificationServiceRecipeTest extends BasicRecipe {
                 String policyName
                 boolean isVulnerability = false
                 it.content.notificationContentDetails.each({
+                    contentDetailKey = it.contentDetailKey
                     projectName = it.projectName
                     projectVersion = it.projectVersionName
                     if(it.hasComponentVersion()) {
+                        componentName = it.componentName.get()
                         componentVersion = it.componentVersionName.get()
                     }
+
                     if(it.hasOnlyComponent()) {
                         componentName = it.componentName.get()
                     }
+
                     if(it.isPolicy()) {
                         policyName = it.policyName.get()
                     }
+
                     if(it.isVulnerability()) {
                         isVulnerability = true
                     }
                 })
 
-                println("ProjectName: ${projectName} Project Version: ${projectVersion} Component: ${componentName} Component Version: ${componentVersion} Policy: ${policyName} isVulnerability: ${isVulnerability}")
+                println("ContentDetailKey: ${contentDetailKey} ProjectName: ${projectName} Project Version: ${projectVersion} Component: ${componentName} Component Version: ${componentVersion} Policy: ${policyName} isVulnerability: ${isVulnerability}")
             }
         })
     }

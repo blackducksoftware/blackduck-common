@@ -61,4 +61,9 @@ public class LicenseLimitNotificationContent extends NotificationContent {
         return Collections.emptyList();
     }
 
+    @Override
+    public String getNotificationGroup() {
+        return NotificationContentDetail.CONTENT_KEY_GROUP_LICENSE;
+    }
+
 }
