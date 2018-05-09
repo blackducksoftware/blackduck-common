@@ -71,12 +71,18 @@ public class PolicyOverrideNotificationContent extends NotificationContent {
         final List<NotificationContentDetail> details = new ArrayList<>();
         policyInfos.forEach(policyInfo -> {
             if (componentVersion != null) {
-                details.add(NotificationContentDetail.createPolicyDetailWithComponentVersion(projectName, projectVersionName, projectVersion, componentName, componentVersionName, componentVersion, policyInfo.policyName, policyInfo.policy));
+                details.add(NotificationContentDetail.createPolicyDetailWithComponentVersion(this, projectName, projectVersionName, projectVersion, componentName, componentVersionName, componentVersion, policyInfo.policyName,
+                        policyInfo.policy));
             } else {
-                details.add(NotificationContentDetail.createPolicyDetailWithComponentOnly(projectName, projectVersionName, projectVersion, componentName, component, policyInfo.policyName, policyInfo.policy));
+                details.add(NotificationContentDetail.createPolicyDetailWithComponentOnly(this, projectName, projectVersionName, projectVersion, componentName, component, policyInfo.policyName, policyInfo.policy));
             }
         });
         return details;
+    }
+
+    @Override
+    public String getNotificationGroup() {
+        return NotificationContentDetail.CONTENT_KEY_GROUP_POLICY;
     }
 
 }
