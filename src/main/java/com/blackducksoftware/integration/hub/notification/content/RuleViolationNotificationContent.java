@@ -64,15 +64,21 @@ public class RuleViolationNotificationContent extends NotificationContent {
             componentVersionStatus.policies.forEach(policyUri -> {
                 final String policyName = uriToName.get(policyUri);
                 if (componentVersionStatus.componentVersion != null) {
-                    details.add(NotificationContentDetail.createPolicyDetailWithComponentVersionAndIssue(projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.componentVersionName,
-                            componentVersionStatus.componentVersion, policyName, policyUri, componentVersionStatus.componentIssueLink));
+                    details.add(
+                            NotificationContentDetail.createPolicyDetailWithComponentVersionAndIssue(this, projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.componentVersionName,
+                                    componentVersionStatus.componentVersion, policyName, policyUri, componentVersionStatus.componentIssueLink));
                 } else {
-                    details.add(NotificationContentDetail.createPolicyDetailWithComponentAndIssue(projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.component, policyName,
+                    details.add(NotificationContentDetail.createPolicyDetailWithComponentAndIssue(this, projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.component, policyName,
                             policyUri, componentVersionStatus.componentIssueLink));
                 }
             });
         });
         return details;
+    }
+
+    @Override
+    public String getNotificationGroup() {
+        return NotificationContentDetail.CONTENT_KEY_GROUP_POLICY;
     }
 
 }
