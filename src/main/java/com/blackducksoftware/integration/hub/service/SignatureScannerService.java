@@ -45,12 +45,11 @@ import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.service.model.HostnameHelper;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
-import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 
 public class SignatureScannerService extends DataService {
-    private final CIEnvironmentVariables ciEnvironmentVariables;
+    private final IntEnvironmentVariables intEnvironmentVariables;
     private final CLIDownloadUtility cliDownloadService;
     private final ProjectService projectDataService;
     private final CodeLocationService codeLocationDataService;
@@ -58,10 +57,10 @@ public class SignatureScannerService extends DataService {
 
     private ProjectVersionWrapper projectVersionWrapper;
 
-    public SignatureScannerService(final HubService hubService, final CIEnvironmentVariables ciEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
+    public SignatureScannerService(final HubService hubService, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
             final CodeLocationService codeLocationDataService, final ScanStatusService scanStatusDataService) {
         super(hubService);
-        this.ciEnvironmentVariables = ciEnvironmentVariables;
+        this.intEnvironmentVariables = intEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
         this.projectDataService = projectDataService;
         this.codeLocationDataService = codeLocationDataService;
@@ -80,9 +79,9 @@ public class SignatureScannerService extends DataService {
     private SimpleScanUtility createScanService(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
         final HubScanConfig controlledConfig = getControlledScanConfig(hubScanConfig);
         if (hubScanConfig.isDryRun()) {
-            return new SimpleScanUtility(logger, hubService.getGson(), hubServerConfig, ciEnvironmentVariables, controlledConfig, projectRequest.name, projectRequest.versionRequest.versionName);
+            return new SimpleScanUtility(logger, hubService.getGson(), hubServerConfig, intEnvironmentVariables, controlledConfig, projectRequest.name, projectRequest.versionRequest.versionName);
         } else {
-            return new SimpleScanUtility(logger, hubService.getGson(), hubServerConfig, ciEnvironmentVariables, controlledConfig, null, null);
+            return new SimpleScanUtility(logger, hubService.getGson(), hubServerConfig, intEnvironmentVariables, controlledConfig, null, null);
         }
     }
 
@@ -123,11 +122,9 @@ public class SignatureScannerService extends DataService {
     }
 
     private void preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
-        final String localHostName = HostnameHelper.getMyHostname();
-        logger.info("Running on machine : " + localHostName);
         printConfiguration(hubScanConfig, projectRequest);
         final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), ciEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version, localHostName);
+        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), intEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version);
 
         if (!hubScanConfig.isDryRun()) {
             projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);

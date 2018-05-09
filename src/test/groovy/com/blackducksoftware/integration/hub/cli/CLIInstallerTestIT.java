@@ -49,7 +49,7 @@ import com.blackducksoftware.integration.hub.rest.TestingPropertyKey;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.test.TestLogger;
 import com.blackducksoftware.integration.test.annotation.IntegrationTest;
-import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 
 @Category(IntegrationTest.class)
 public class CLIInstallerTestIT {
@@ -61,7 +61,7 @@ public class CLIInstallerTestIT {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    private final CIEnvironmentVariables ciEnvironmentVariables = new CIEnvironmentVariables();
+    private final IntEnvironmentVariables IntEnvironmentVariables = new IntEnvironmentVariables();
 
     private File setupFakeCliStructure() throws Exception {
         folder.create();
@@ -445,35 +445,6 @@ public class CLIInstallerTestIT {
     }
 
     @Test
-    public void testPerformInstallationNullHost() throws Exception {
-        exception.expect(IllegalArgumentException.class);
-        final File installDir = folder.newFolder();
-
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
-
-        final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
-        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-
-        cliDownloadService.performInstallation(installDir, ciEnvironmentVariables, hubUrl.toString(), currentVersion.version, null);
-    }
-
-    @Test
-    public void testPerformInstallationUpdatingEmptyHost() throws Exception {
-        exception.expect(IllegalArgumentException.class);
-        final File installDir = folder.newFolder();
-
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
-
-        final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-        final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
-        final String hubVersion = currentVersion.version;
-
-        cliDownloadService.performInstallation(installDir, ciEnvironmentVariables, hubUrl.toString(), hubVersion, "");
-    }
-
-    @Test
     public void testPerformInstallation() throws Exception {
         final TestLogger logger = new TestLogger();
         final File installDir = folder.newFolder();
@@ -484,7 +455,7 @@ public class CLIInstallerTestIT {
         final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
         final String hubVersion = currentVersion.version;
-        cliDownloadService.performInstallation(installDir, ciEnvironmentVariables, hubUrl.toString(), hubVersion, "TestHost");
+        cliDownloadService.performInstallation(installDir, IntEnvironmentVariables, hubUrl.toString(), hubVersion);
 
         final File file = new File(installDir, CLILocation.VERSION_FILE_NAME);
 
@@ -526,7 +497,7 @@ public class CLIInstallerTestIT {
         final String hubVersion = currentVersion.version;
 
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
-        cliDownloadService.performInstallation(installDir, ciEnvironmentVariables, hubUrl.toString(), hubVersion, "TestHost");
+        cliDownloadService.performInstallation(installDir, IntEnvironmentVariables, hubUrl.toString(), hubVersion);
 
         final File file = new File(installDir, CLILocation.VERSION_FILE_NAME);
 
@@ -569,7 +540,7 @@ public class CLIInstallerTestIT {
         final String hubVersion = currentVersion.version;
 
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
-        cliDownloadService.performInstallation(installDir, ciEnvironmentVariables, hubUrl.toString(), hubVersion, "TestHost");
+        cliDownloadService.performInstallation(installDir, IntEnvironmentVariables, hubUrl.toString(), hubVersion);
 
         final File file = new File(installDir, CLILocation.VERSION_FILE_NAME);
 

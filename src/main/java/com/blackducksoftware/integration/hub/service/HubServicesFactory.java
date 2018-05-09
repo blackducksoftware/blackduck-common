@@ -28,6 +28,8 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.slf4j.Logger;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
@@ -37,28 +39,29 @@ import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
-import com.blackducksoftware.integration.util.CIEnvironmentVariables;
+import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
+import com.google.gson.Gson;
 
 public class HubServicesFactory {
-    private final CIEnvironmentVariables ciEnvironmentVariables;
+    private final IntEnvironmentVariables intEnvironmentVariables;
     private final RestConnection restConnection;
 
     public HubServicesFactory(final RestConnection restConnection) {
-        this.ciEnvironmentVariables = new CIEnvironmentVariables();
-        ciEnvironmentVariables.putAll(System.getenv());
+        this.intEnvironmentVariables = new IntEnvironmentVariables();
 
         this.restConnection = restConnection;
     }
 
     public void addEnvironmentVariable(final String key, final String value) {
-        ciEnvironmentVariables.put(key, value);
+        intEnvironmentVariables.put(key, value);
     }
 
     public void addEnvironmentVariables(final Map<String, String> environmentVariables) {
-        ciEnvironmentVariables.putAll(environmentVariables);
+        intEnvironmentVariables.putAll(environmentVariables);
     }
 
     public SignatureScannerService createSignatureScannerService() {
@@ -66,16 +69,25 @@ public class HubServicesFactory {
     }
 
     public SignatureScannerService createSignatureScannerService(final long timeoutInMilliseconds) {
-        return new SignatureScannerService(createHubService(), ciEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService(), createScanStatusService(timeoutInMilliseconds));
+        return new SignatureScannerService(createHubService(), intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService(), createScanStatusService(timeoutInMilliseconds));
     }
 
     public PhoneHomeService createPhoneHomeService() {
-        return new PhoneHomeService(createHubService(), createPhoneHomeClient(), createHubRegistrationService(), ciEnvironmentVariables);
+        return new PhoneHomeService(createHubService(), createPhoneHomeClient(), createHubRegistrationService(), intEnvironmentVariables);
     }
 
     public PhoneHomeClient createPhoneHomeClient() {
-        return new PhoneHomeClient(restConnection.logger, GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID, restConnection.timeout, restConnection.getProxyInfo(), restConnection.alwaysTrustServerCertificate,
-                restConnection.gson);
+        final String googleAnalyticsTrackingId = GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID;
+        final HttpClientBuilder httpClientBuilder = restConnection.getClientBuilder();
+        final Gson gson = restConnection.gson;
+        return new PhoneHomeClient(googleAnalyticsTrackingId, httpClientBuilder, gson);
+    }
+
+    public PhoneHomeClient createPhoneHomeClient(final Logger logger) {
+        final String googleAnalyticsTrackingId = GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID;
+        final HttpClientBuilder httpClientBuilder = restConnection.getClientBuilder();
+        final Gson gson = restConnection.gson;
+        return new PhoneHomeClient(googleAnalyticsTrackingId, httpClientBuilder, logger, gson);
     }
 
     public ReportService createReportService(final long timeoutInMilliseconds) throws IntegrationException {
@@ -98,10 +110,6 @@ public class HubServicesFactory {
         return new NotificationService(createHubService(), createHubBucketService(executorService));
     }
 
-    public ExtensionConfigService createExtensionConfigService() {
-        return new ExtensionConfigService(createHubService());
-    }
-
     public LicenseService createLicenseService() {
         return new LicenseService(createHubService(), createComponentService());
     }
@@ -119,7 +127,7 @@ public class HubServicesFactory {
     }
 
     public SimpleScanUtility createSimpleScanUtility(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final String projectName, final String versionName) {
-        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, ciEnvironmentVariables, hubScanConfig, projectName, versionName);
+        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, intEnvironmentVariables, hubScanConfig, projectName, versionName);
     }
 
     public HubRegistrationService createHubRegistrationService() {
@@ -132,10 +140,6 @@ public class HubServicesFactory {
 
     public HubService createHubService(final UriCombiner uriCombiner) {
         return new HubService(restConnection, uriCombiner);
-    }
-
-    public RestConnection getRestConnection() {
-        return restConnection;
     }
 
     public ComponentService createComponentService() {
@@ -160,6 +164,18 @@ public class HubServicesFactory {
 
     public HubBucketService createHubBucketService(final ExecutorService executorService) {
         return new HubBucketService(createHubService(), executorService);
+    }
+
+    public RestConnection getRestConnection() {
+        return restConnection;
+    }
+
+    public IntLogger getLogger() {
+        return restConnection.logger;
+    }
+
+    public Gson getGson() {
+        return restConnection.gson;
     }
 
     @Override

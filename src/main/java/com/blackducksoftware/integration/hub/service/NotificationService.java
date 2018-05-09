@@ -54,6 +54,7 @@ import com.blackducksoftware.integration.hub.notification.content.VulnerabilityN
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
+import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.google.gson.JsonObject;
 
 public class NotificationService extends DataService {
@@ -97,8 +98,7 @@ public class NotificationService extends DataService {
      * @throws IntegrationException
      */
     public Date getLatestNotificationDate() throws IntegrationException {
-        final Request.Builder requestBuilder = new Request.Builder();
-        requestBuilder.addQueryParameter("limit", "1");
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(1, RequestFactory.DEFAULT_OFFSET);
         final List<NotificationView> notifications = hubService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, false);
         if (notifications.size() == 1) {
             return notifications.get(0).createdAt;
@@ -200,7 +200,7 @@ public class NotificationService extends DataService {
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        return new Request.Builder().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
+        return RequestFactory.createCommonGetRequestBuilder().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
     }
 
 }
