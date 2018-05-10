@@ -42,11 +42,11 @@ public class RequestFactory {
     public static final int DEFAULT_OFFSET = 0;
 
     public static Request.Builder createCommonGetRequestBuilder() {
-        return createCommonGetRequestBuilder(null, null, DEFAULT_LIMIT, DEFAULT_OFFSET);
+        return createCommonGetRequestBuilder(null, Optional.empty(), DEFAULT_LIMIT, DEFAULT_OFFSET);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(final String uri) {
-        return createCommonGetRequestBuilder(uri, null, DEFAULT_LIMIT, DEFAULT_OFFSET);
+        return createCommonGetRequestBuilder(uri, Optional.empty(), DEFAULT_LIMIT, DEFAULT_OFFSET);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(final Optional<HubQuery> hubQuery) {
@@ -54,7 +54,7 @@ public class RequestFactory {
     }
 
     public static Request.Builder createCommonGetRequestBuilder(final int limit, final int offset) {
-        return createCommonGetRequestBuilder(null, null, limit, offset);
+        return createCommonGetRequestBuilder(null, Optional.empty(), limit, offset);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<HubQuery> hubQuery) {
@@ -62,7 +62,7 @@ public class RequestFactory {
     }
 
     public static Request.Builder createCommonGetRequestBuilder(final String uri, final int limit, final int offset) {
-        return createCommonGetRequestBuilder(uri, null, limit, offset);
+        return createCommonGetRequestBuilder(uri, Optional.empty(), limit, offset);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(final Optional<HubQuery> hubQuery, final int limit, final int offset) {
@@ -95,7 +95,7 @@ public class RequestFactory {
     }
 
     public static Request.Builder addHubQuery(final Request.Builder requestBuilder, final Optional<HubQuery> hubQuery) {
-        if (hubQuery.isPresent() && StringUtils.isNotBlank(hubQuery.get().getParameter())) {
+        if (hubQuery.isPresent()) {
             requestBuilder.addQueryParameter(Q_PARAMETER, hubQuery.get().getParameter());
         }
         return requestBuilder;
