@@ -23,7 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.service.bucket;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -51,6 +53,20 @@ public class HubBucketService extends DataService {
         final HubBucket hubBucket = new HubBucket();
         addToTheBucket(hubBucket, uriSingleResponses);
         return hubBucket;
+    }
+
+    public <T extends HubResponse> void addToTheBucket(final HubBucket hubBucket, final String uri, final Class<T> responseClass) throws IntegrationException {
+        final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses = new ArrayList<>();
+        uriSingleResponses.add(new UriSingleResponse<>(uri, responseClass));
+
+        addToTheBucket(hubBucket, uriSingleResponses);
+    }
+
+    public void addToTheBucket(final HubBucket hubBucket, final Map<String, Class<? extends HubResponse>> uriToResponseClass) throws IntegrationException {
+        final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses = new ArrayList<>();
+        uriToResponseClass.forEach((key, value) -> {
+            uriSingleResponses.add(new UriSingleResponse<>(key, value));
+        });
     }
 
     public void addToTheBucket(final HubBucket hubBucket, final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses) throws IntegrationException {
