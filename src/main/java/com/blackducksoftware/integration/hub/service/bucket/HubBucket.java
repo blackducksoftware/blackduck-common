@@ -46,6 +46,11 @@ public class HubBucket {
         return bucket.get(uri);
     }
 
+    public <T extends HubResponse> T get(final String uri, final Class<T> responseClass) {
+        final UriSingleResponse<T> uriSingleResponse = new UriSingleResponse<>(uri, responseClass);
+        return get(uriSingleResponse);
+    }
+
     public <T extends HubResponse> T get(final UriSingleResponse<T> uriSingleResponse) {
         final String uri = uriSingleResponse.uri;
         if (contains(uri)) {
