@@ -68,7 +68,7 @@ public class LicenseLimitNotificationContent extends NotificationContent {
     }
 
     @Override
-    public List<ProjectVersionDescription> getProjectVersionDescriptions() {
+    public List<ProjectVersionDescription> getAffectedProjectVersionDescriptions() {
         return Collections.emptyList();
     }
 

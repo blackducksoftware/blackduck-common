@@ -85,7 +85,7 @@ public class RuleViolationClearedNotificationContent extends NotificationContent
     }
 
     @Override
-    public List<ProjectVersionDescription> getProjectVersionDescriptions() {
+    public List<ProjectVersionDescription> getAffectedProjectVersionDescriptions() {
         final ProjectVersionDescription projectVersionDescription = new ProjectVersionDescription(projectName, projectVersionName, projectVersion);
         return Arrays.asList(projectVersionDescription);
     }
