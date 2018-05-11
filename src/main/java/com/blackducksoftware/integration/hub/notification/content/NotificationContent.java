@@ -41,6 +41,6 @@ public abstract class NotificationContent extends HubComponent {
 
     public abstract String getNotificationGroup();
 
-    public abstract List<ProjectVersionDescription> getProjectVersionDescriptions();
+    public abstract List<ProjectVersionDescription> getAffectedProjectVersionDescriptions();
 
 }
