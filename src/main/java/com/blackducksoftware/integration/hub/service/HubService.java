@@ -46,10 +46,9 @@ import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.hub.service.model.PagedRequest;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.rest.connection.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
@@ -64,18 +63,12 @@ public class HubService {
     private final URL hubBaseUrl;
     private final JsonParser jsonParser;
     private final Gson gson;
-    private final UriCombiner uriCombiner;
 
     public HubService(final RestConnection restConnection) {
-        this(restConnection, new UriCombiner());
-    }
-
-    public HubService(final RestConnection restConnection, final UriCombiner uriCombiner) {
         this.restConnection = restConnection;
         this.hubBaseUrl = restConnection.baseUrl;
         this.jsonParser = restConnection.jsonParser;
         this.gson = restConnection.gson;
-        this.uriCombiner = uriCombiner;
         this.metaHandler = new MetaHandler(restConnection.logger);
         this.hubResponseTransformer = new HubResponseTransformer(restConnection);
         this.hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer);

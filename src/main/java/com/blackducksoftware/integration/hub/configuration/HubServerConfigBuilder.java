@@ -32,19 +32,18 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.builder.AbstractBuilder;
 import com.blackducksoftware.integration.exception.IntegrationCertificateException;
-import com.blackducksoftware.integration.hub.Credentials;
-import com.blackducksoftware.integration.hub.CredentialsBuilder;
-import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
-import com.blackducksoftware.integration.hub.proxy.ProxyInfoBuilder;
-import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
+import com.blackducksoftware.integration.rest.credentials.Credentials;
+import com.blackducksoftware.integration.rest.credentials.CredentialsBuilder;
+import com.blackducksoftware.integration.rest.proxy.ProxyInfo;
+import com.blackducksoftware.integration.rest.proxy.ProxyInfoBuilder;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 
 public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
-
+    private final HubServerConfigValidator validator;
     private String hubUrl;
     private String timeoutSeconds;
     private String username;
@@ -60,9 +59,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     private int proxyPasswordLength;
     private String ignoredProxyHosts;
     private boolean alwaysTrustServerCertificate;
-    private UriCombiner uriCombiner;
     private IntLogger logger;
-    private final HubServerConfigValidator validator;
 
     public HubServerConfigBuilder() {
         this.timeoutSeconds = String.valueOf(DEFAULT_TIMEOUT_SECONDS);
@@ -100,15 +97,11 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         }
 
         final ProxyInfo proxyInfo = getHubProxyInfo();
-        UriCombiner uriCombinerToUse = new UriCombiner();
-        if (uriCombiner != null) {
-            uriCombinerToUse = uriCombiner;
-        }
         if (StringUtils.isNotBlank(apiToken)) {
-            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), apiToken, proxyInfo, alwaysTrustServerCertificate, uriCombinerToUse);
+            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), apiToken, proxyInfo, alwaysTrustServerCertificate);
         } else {
             final Credentials credentials = getHubCredentials();
-            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, alwaysTrustServerCertificate, uriCombinerToUse);
+            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, alwaysTrustServerCertificate);
         }
     }
 
@@ -250,10 +243,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
     public void setAlwaysTrustServerCertificate(final boolean alwaysTrustServerCertificate) {
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
-    }
-
-    public void setUriCombiner(final UriCombiner uriCombiner) {
-        this.uriCombiner = uriCombiner;
     }
 
     public IntLogger getLogger() {
