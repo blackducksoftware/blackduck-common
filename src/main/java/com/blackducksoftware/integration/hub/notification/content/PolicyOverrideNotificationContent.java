@@ -24,7 +24,10 @@
 package com.blackducksoftware.integration.hub.notification.content;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import com.blackducksoftware.integration.hub.service.model.ProjectVersionDescription;
 
 public class PolicyOverrideNotificationContent extends NotificationContent {
     public String projectName;
@@ -83,6 +86,12 @@ public class PolicyOverrideNotificationContent extends NotificationContent {
     @Override
     public String getNotificationGroup() {
         return NotificationContentDetail.CONTENT_KEY_GROUP_POLICY;
+    }
+
+    @Override
+    public List<ProjectVersionDescription> getProjectVersionDescriptions() {
+        final ProjectVersionDescription projectVersionDescription = new ProjectVersionDescription(projectName, projectVersionName, projectVersion);
+        return Arrays.asList(projectVersionDescription);
     }
 
 }

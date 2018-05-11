@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.notification.content;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.core.HubComponent;
+import com.blackducksoftware.integration.hub.service.model.ProjectVersionDescription;
 
 public abstract class NotificationContent extends HubComponent {
     public abstract boolean providesPolicyDetails();
@@ -39,5 +40,7 @@ public abstract class NotificationContent extends HubComponent {
     public abstract List<NotificationContentDetail> getNotificationContentDetails();
 
     public abstract String getNotificationGroup();
+
+    public abstract List<ProjectVersionDescription> getProjectVersionDescriptions();
 
 }
