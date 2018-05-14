@@ -1,15 +1,5 @@
 package com.blackducksoftware.integration.hub.api.recipe
 
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.ThreadFactory
-
-import org.junit.After
-import org.junit.Test
-import org.junit.experimental.categories.Category
-
 import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
@@ -22,6 +12,15 @@ import com.blackducksoftware.integration.hub.service.ProjectService
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService
 import com.blackducksoftware.integration.test.annotation.IntegrationTest
+import org.junit.After
+import org.junit.Test
+import org.junit.experimental.categories.Category
+
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.ThreadFactory
 
 @Category(IntegrationTest.class)
 class NotificationServiceRecipeTest extends BasicRecipe {
@@ -42,12 +41,12 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         uploadBdio('bdio/generate_notifications_bdio.jsonld')
         List<VersionBomComponentView> components = Collections.emptyList()
         int tryCount = 0;
-        while(components.empty || tryCount < 30) {
+        while (components.empty || tryCount < 30) {
             Thread.sleep(1000);
             components = projectService.getComponentsForProjectVersion(NOTIFICATION_PROJECT_NAME, NOTIFICATION_PROJECT_VERSION_NAME)
             tryCount++
         }
-        if(!components.empty) {
+        if (!components.empty) {
             Thread.sleep(60000) // arbitrary wait for notifications
         }
         return Date.from(startTime.toInstant())
@@ -72,7 +71,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         endTime = endTime.plusMinutes(1)
         final Date endDate = Date.from(endTime.toInstant())
         final NotificationResults results = notificationService.getAllNotificationResults(startDate, endDate)
-        final List<CommonNotificationState> commonNotificationList = results.getNotificationContentItems()
+        final List<CommonNotificationState> commonNotificationList = results.getCommonNotificationStates()
 
         Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate().get();
 
@@ -81,7 +80,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final HubBucket bucket = results.getHubBucket()
 
         commonNotificationList.each({
-            if(!it.content.providesLicenseDetails()) {
+            if (!it.content.providesLicenseDetails()) {
                 String contentDetailKey
                 String projectName
                 String projectVersion
@@ -93,20 +92,20 @@ class NotificationServiceRecipeTest extends BasicRecipe {
                     contentDetailKey = it.contentDetailKey
                     projectName = it.projectName
                     projectVersion = it.projectVersionName
-                    if(it.hasComponentVersion()) {
+                    if (it.hasComponentVersion()) {
                         componentName = it.componentName.get()
                         componentVersion = it.componentVersionName.get()
                     }
 
-                    if(it.hasOnlyComponent()) {
+                    if (it.hasOnlyComponent()) {
                         componentName = it.componentName.get()
                     }
 
-                    if(it.isPolicy()) {
+                    if (it.isPolicy()) {
                         policyName = it.policyName.get()
                     }
 
-                    if(it.isVulnerability()) {
+                    if (it.isVulnerability()) {
                         isVulnerability = true
                     }
                 })
@@ -129,8 +128,8 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         endTime = endTime.withSecond(0).withNano(0)
         endTime = endTime.plusMinutes(1)
         final Date endDate = Date.from(endTime.toInstant())
-        final NotificationResults results = notificationService.getAllNotificationResults(startDate,endDate)
-        final List<CommonNotificationState> commonNotificationList = results.getNotificationContentItems()
+        final NotificationResults results = notificationService.getAllNotificationResults(startDate, endDate)
+        final List<CommonNotificationState> commonNotificationList = results.getCommonNotificationStates()
 
         Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate().get();
         println("Start Date: ${startDate}, End Date: ${endDate}, latestNotification: ${latestNotificationEndDate}")
@@ -138,7 +137,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final HubBucket bucket = results.getHubBucket()
 
         commonNotificationList.each({
-            if(!it.content.providesLicenseDetails()) {
+            if (!it.content.providesLicenseDetails()) {
                 String contentDetailKey
                 String projectName
                 String projectVersion
@@ -150,20 +149,20 @@ class NotificationServiceRecipeTest extends BasicRecipe {
                     contentDetailKey = it.contentDetailKey
                     projectName = it.projectName
                     projectVersion = it.projectVersionName
-                    if(it.hasComponentVersion()) {
+                    if (it.hasComponentVersion()) {
                         componentName = it.componentName.get()
                         componentVersion = it.componentVersionName.get()
                     }
 
-                    if(it.hasOnlyComponent()) {
+                    if (it.hasOnlyComponent()) {
                         componentName = it.componentName.get()
                     }
 
-                    if(it.isPolicy()) {
+                    if (it.isPolicy()) {
                         policyName = it.policyName.get()
                     }
 
-                    if(it.isVulnerability()) {
+                    if (it.isVulnerability()) {
                         isVulnerability = true
                     }
                 })
