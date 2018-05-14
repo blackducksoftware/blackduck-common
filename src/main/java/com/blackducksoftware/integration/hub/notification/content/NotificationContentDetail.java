@@ -65,50 +65,39 @@ public class NotificationContentDetail extends Stringable {
     public final static String CONTENT_KEY_SEPARATOR = "|";
 
     public static NotificationContentDetail createPolicyDetailWithComponentOnly(final NotificationContent notificationContent, final String projectName, final String projectVersionName, final String projectVersionUri,
-            final String componentName, final String componentUri,
-            final String policyName, final String policyUri) {
+            final String componentName, final String componentUri, final String policyName, final String policyUri) {
         return new NotificationContentDetail(notificationContent, projectName, projectVersionName, projectVersion(projectVersionUri), Optional.of(componentName), component(componentUri), Optional.empty(), Optional.empty(),
-                Optional.of(policyName),
-                policy(policyUri), Optional.empty(), Optional.empty(), Optional.empty());
-    }
-
-    public static NotificationContentDetail createPolicyDetailWithComponentVersion(final NotificationContent notificationContent, final String projectName, final String projectVersionName, final String projectVersionUri,
-            final String componentName, final String componentVersionName,
-            final String componentVersionUri, final String policyName, final String policyUri) {
-        return new NotificationContentDetail(notificationContent, projectName, projectVersionName, projectVersion(projectVersionUri), Optional.of(componentName), Optional.empty(), Optional.of(componentVersionName),
-                componentVersion(componentVersionUri),
                 Optional.of(policyName), policy(policyUri), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
-    public static NotificationContentDetail createPolicyDetailWithComponentAndIssue(final NotificationContent notificationContent, final String projectName, final String projectVersionName, final String projectVersionUri,
-            final String componentName, final String componentUri,
-            final String policyName, final String policyUri, final String componentIssueUri) {
-        return new NotificationContentDetail(notificationContent, projectName, projectVersionName, projectVersion(projectVersionUri), Optional.of(componentName), component(componentUri), Optional.empty(), Optional.empty(),
-                Optional.of(policyName),
-                policy(policyUri), Optional.empty(), componentIssue(componentIssueUri), Optional.empty());
+    public static NotificationContentDetail createPolicyDetailWithComponentVersion(final NotificationContent notificationContent, final String projectName, final String projectVersionName, final String projectVersionUri,
+            final String componentName, final String componentVersionName, final String componentVersionUri, final String policyName, final String policyUri) {
+        return new NotificationContentDetail(notificationContent, projectName, projectVersionName, projectVersion(projectVersionUri), Optional.of(componentName), Optional.empty(), Optional.of(componentVersionName),
+                componentVersion(componentVersionUri), Optional.of(policyName), policy(policyUri), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
-    public static NotificationContentDetail createPolicyDetailWithComponentVersionAndIssue(final NotificationContent notificationContent, final String projectName, final String projectVersionName, final String projectVersionUri,
-            final String componentName,
-            final String componentVersionName,
-            final String componentVersionUri, final String policyName, final String policyUri, final String componentIssueUri) {
-        return new NotificationContentDetail(notificationContent, projectName, projectVersionName, projectVersion(projectVersionUri), Optional.of(componentName), Optional.empty(), Optional.of(componentVersionName),
-                componentVersion(componentVersionUri),
+    public static NotificationContentDetail createPolicyDetailWithComponentAndIssue(final NotificationContent notificationContent, final String projectName, final String projectVersionName, final String projectVersionUri,
+            final String componentName, final String componentUri, final String policyName, final String policyUri, final String componentIssueUri) {
+        return new NotificationContentDetail(notificationContent, projectName, projectVersionName, projectVersion(projectVersionUri), Optional.of(componentName), component(componentUri), Optional.empty(), Optional.empty(),
                 Optional.of(policyName), policy(policyUri), Optional.empty(), componentIssue(componentIssueUri), Optional.empty());
     }
 
-    public static NotificationContentDetail createVulnerabilityDetail(final NotificationContent notificationContent, final String projectName, final String projectVersionName, final String projectVersionUri, final String componentName,
-            final String componentVersionName,
-            final String componentVersionUri, final String componentVersionOriginName, final String componentIssueUri, final String componentVersionOriginId) {
+    public static NotificationContentDetail createPolicyDetailWithComponentVersionAndIssue(final NotificationContent notificationContent, final String projectName, final String projectVersionName, final String projectVersionUri,
+            final String componentName, final String componentVersionName, final String componentVersionUri, final String policyName, final String policyUri, final String componentIssueUri) {
         return new NotificationContentDetail(notificationContent, projectName, projectVersionName, projectVersion(projectVersionUri), Optional.of(componentName), Optional.empty(), Optional.of(componentVersionName),
-                componentVersion(componentVersionUri),
-                Optional.empty(), Optional.empty(), Optional.of(componentVersionOriginName), componentIssue(componentIssueUri), Optional.of(componentVersionOriginId));
+                componentVersion(componentVersionUri), Optional.of(policyName), policy(policyUri), Optional.empty(), componentIssue(componentIssueUri), Optional.empty());
+    }
+
+    public static NotificationContentDetail createVulnerabilityDetail(final NotificationContent notificationContent, final String projectName, final String projectVersionName, final String projectVersionUri, final String componentName,
+            final String componentVersionName, final String componentVersionUri, final String componentVersionOriginName, final String componentIssueUri, final String componentVersionOriginId) {
+        return new NotificationContentDetail(notificationContent, projectName, projectVersionName, projectVersion(projectVersionUri), Optional.of(componentName), Optional.empty(), Optional.ofNullable(componentVersionName),
+                componentVersion(componentVersionUri), Optional.empty(), Optional.empty(), Optional.ofNullable(componentVersionOriginName), componentIssue(componentIssueUri), Optional.ofNullable(componentVersionOriginId));
     }
 
     private NotificationContentDetail(final NotificationContent notificationContent, final String projectName, final String projectVersionName, final Optional<UriSingleResponse<ProjectVersionView>> projectVersion,
-            final Optional<String> componentName,
-            final Optional<UriSingleResponse<ComponentView>> component, final Optional<String> componentVersionName, final Optional<UriSingleResponse<ComponentVersionView>> componentVersion, final Optional<String> policyName,
-            final Optional<UriSingleResponse<PolicyRuleViewV2>> policy, final Optional<String> componentVersionOriginName, final Optional<UriSingleResponse<IssueView>> componentIssue, final Optional<String> componentVersionOriginId) {
+            final Optional<String> componentName, final Optional<UriSingleResponse<ComponentView>> component, final Optional<String> componentVersionName, final Optional<UriSingleResponse<ComponentVersionView>> componentVersion,
+            final Optional<String> policyName, final Optional<UriSingleResponse<PolicyRuleViewV2>> policy, final Optional<String> componentVersionOriginName, final Optional<UriSingleResponse<IssueView>> componentIssue,
+            final Optional<String> componentVersionOriginId) {
         this.notificationContent = notificationContent;
         this.projectName = projectName;
         this.projectVersionName = projectVersionName;
