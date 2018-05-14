@@ -36,12 +36,11 @@ import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
+import com.blackducksoftware.integration.rest.connection.RestConnection;
 import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 import com.google.gson.Gson;
@@ -136,10 +135,6 @@ public class HubServicesFactory {
 
     public HubService createHubService() {
         return new HubService(restConnection);
-    }
-
-    public HubService createHubService(final UriCombiner uriCombiner) {
-        return new HubService(restConnection, uriCombiner);
     }
 
     public ComponentService createComponentService() {

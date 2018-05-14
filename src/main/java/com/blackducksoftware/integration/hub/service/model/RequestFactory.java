@@ -29,9 +29,9 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.request.BodyContent;
-import com.blackducksoftware.integration.hub.request.Request;
-import com.blackducksoftware.integration.hub.rest.HttpMethod;
+import com.blackducksoftware.integration.rest.HttpMethod;
+import com.blackducksoftware.integration.rest.request.BodyContent;
+import com.blackducksoftware.integration.rest.request.Request;
 
 public class RequestFactory {
     public static final String LIMIT_PARAMETER = "limit";

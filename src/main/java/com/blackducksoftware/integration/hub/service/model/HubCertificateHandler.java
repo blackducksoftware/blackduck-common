@@ -26,9 +26,9 @@ package com.blackducksoftware.integration.hub.service.model;
 import java.io.File;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.certificate.CertificateHandler;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.rest.certificate.CertificateHandler;
 
 public class HubCertificateHandler {
     private final CertificateHandler handler;

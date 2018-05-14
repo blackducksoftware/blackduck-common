@@ -41,14 +41,14 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVe
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
-import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
+import com.blackducksoftware.integration.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 
 @Category(IntegrationTest.class)
 public class ProjectServiceTestIT {
-    private static HubServicesFactory hubServicesFactory;
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
+    private static HubServicesFactory hubServicesFactory;
     private static ProjectView project = null;
 
     @BeforeClass

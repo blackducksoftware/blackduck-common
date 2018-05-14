@@ -172,9 +172,6 @@ public class NotificationContentDetail extends Stringable {
         if (policy.isPresent()) {
             presentLinks.add(policy.get());
         }
-        if (componentIssue.isPresent()) {
-            presentLinks.add(componentIssue.get());
-        }
         return presentLinks;
     }
 

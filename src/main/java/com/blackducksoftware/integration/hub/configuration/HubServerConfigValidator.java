@@ -32,15 +32,14 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.ApiTokenField;
-import com.blackducksoftware.integration.hub.Credentials;
-import com.blackducksoftware.integration.hub.CredentialsBuilder;
-import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
-import com.blackducksoftware.integration.hub.proxy.ProxyInfoField;
-import com.blackducksoftware.integration.hub.rest.UriCombiner;
-import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.hub.service.model.HubServerVerifier;
-import com.blackducksoftware.integration.hub.validator.CredentialsValidator;
-import com.blackducksoftware.integration.hub.validator.ProxyInfoValidator;
+import com.blackducksoftware.integration.rest.credentials.Credentials;
+import com.blackducksoftware.integration.rest.credentials.CredentialsBuilder;
+import com.blackducksoftware.integration.rest.credentials.CredentialsValidator;
+import com.blackducksoftware.integration.rest.exception.IntegrationRestException;
+import com.blackducksoftware.integration.rest.proxy.ProxyInfo;
+import com.blackducksoftware.integration.rest.proxy.ProxyInfoField;
+import com.blackducksoftware.integration.rest.proxy.ProxyInfoValidator;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 import com.blackducksoftware.integration.validator.ValidationResult;
 import com.blackducksoftware.integration.validator.ValidationResultEnum;
@@ -54,7 +53,7 @@ public class HubServerConfigValidator extends AbstractValidator {
     public static final String ERROR_MSG_URL_NOT_VALID = "The Hub Url is not a valid URL.";
     public static final String ERROR_MSG_URL_NOT_HUB_PREFIX = "The Url does not appear to be a Hub server: ";
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
-
+    private final HubServerVerifier hubServerVerifier;
     private String hubUrl;
     private String timeoutSeconds;
     private String username;
@@ -69,14 +68,11 @@ public class HubServerConfigValidator extends AbstractValidator {
     private String ignoredProxyHosts;
     private String proxyNtlmDomain;
     private String proxyNtlmWorkstation;
-
     private boolean alwaysTrustServerCertificate;
     private ProxyInfo proxyInfo;
 
-    private final HubServerVerifier hubServerVerifier;
-
     public HubServerConfigValidator() {
-        this.hubServerVerifier = new HubServerVerifier(new UriCombiner());
+        this.hubServerVerifier = new HubServerVerifier();
     }
 
     public HubServerConfigValidator(final HubServerVerifier hubServerVerifier) {
@@ -200,10 +196,6 @@ public class HubServerConfigValidator extends AbstractValidator {
         }
     }
 
-    public void setHubUrl(final String hubUrl) {
-        this.hubUrl = StringUtils.trimToNull(hubUrl);
-    }
-
     public void setTimeout(final String timeoutSeconds) {
         this.timeoutSeconds = timeoutSeconds;
     }
@@ -218,6 +210,10 @@ public class HubServerConfigValidator extends AbstractValidator {
 
     public String getHubUrl() {
         return hubUrl;
+    }
+
+    public void setHubUrl(final String hubUrl) {
+        this.hubUrl = StringUtils.trimToNull(hubUrl);
     }
 
     public String getUsername() {
@@ -267,12 +263,12 @@ public class HubServerConfigValidator extends AbstractValidator {
         return proxyPort;
     }
 
-    public void setProxyPort(final int proxyPort) {
-        setProxyPort(String.valueOf(proxyPort));
-    }
-
     public void setProxyPort(final String proxyPort) {
         this.proxyPort = proxyPort;
+    }
+
+    public void setProxyPort(final int proxyPort) {
+        setProxyPort(String.valueOf(proxyPort));
     }
 
     public String getProxyUsername() {

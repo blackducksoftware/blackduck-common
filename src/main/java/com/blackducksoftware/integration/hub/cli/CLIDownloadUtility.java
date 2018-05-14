@@ -50,13 +50,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.certificate.CertificateHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.request.Request;
-import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.rest.certificate.CertificateHandler;
+import com.blackducksoftware.integration.rest.connection.RestConnection;
+import com.blackducksoftware.integration.rest.request.Request;
+import com.blackducksoftware.integration.rest.request.Response;
 import com.blackducksoftware.integration.util.HostNameHelper;
 import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 

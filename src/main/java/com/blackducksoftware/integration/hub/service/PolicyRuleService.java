@@ -30,11 +30,11 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
-import com.blackducksoftware.integration.hub.request.BodyContent;
-import com.blackducksoftware.integration.hub.request.Request;
-import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.HttpMethod;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.rest.HttpMethod;
+import com.blackducksoftware.integration.rest.request.BodyContent;
+import com.blackducksoftware.integration.rest.request.Request;
+import com.blackducksoftware.integration.rest.request.Response;
 
 public class PolicyRuleService {
     private final HubService hubService;
