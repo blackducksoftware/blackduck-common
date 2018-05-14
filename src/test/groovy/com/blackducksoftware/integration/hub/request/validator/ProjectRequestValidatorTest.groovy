@@ -19,26 +19,24 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
- * under the License.
- */
+ * under the License.*/
 package com.blackducksoftware.integration.hub.request.validator
 
-import java.text.SimpleDateFormat
-
-import org.junit.Assert
-import org.junit.Test
-
-import com.blackducksoftware.integration.hub.RestConstants
 import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.service.model.ProjectRequestField
 import com.blackducksoftware.integration.hub.service.model.ProjectRequestValidator
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionRequestField
+import com.blackducksoftware.integration.rest.RestConstants
 import com.blackducksoftware.integration.validator.ValidationResults
+import org.junit.Assert
+import org.junit.Test
+
+import java.text.SimpleDateFormat
 
 class ProjectRequestValidatorTest {
 
     @Test
-    public void testInvalidValues(){
+    public void testInvalidValues() {
         ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()
         projectRequestBuilder.setProjectName(null)
         projectRequestBuilder.setProjectLevelAdjustments(null)
@@ -105,7 +103,7 @@ class ProjectRequestValidatorTest {
     }
 
     @Test
-    public void testNoVersion(){
+    public void testNoVersion() {
         String projectName = 'Project'
 
         ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()
@@ -125,7 +123,7 @@ class ProjectRequestValidatorTest {
     }
 
     @Test
-    public void testNoProject(){
+    public void testNoProject() {
         String versionName = 'Version'
 
         ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()
@@ -145,7 +143,7 @@ class ProjectRequestValidatorTest {
     }
 
     @Test
-    public void testValidValues(){
+    public void testValidValues() {
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         final String releasedOn = sdf.format(new Date());
 
@@ -183,7 +181,7 @@ class ProjectRequestValidatorTest {
     }
 
     @Test
-    public void testConciseValidValues(){
+    public void testConciseValidValues() {
         String projectName = 'Project'
         String versionName = 'Version'
 

@@ -24,29 +24,24 @@
 package com.blackducksoftware.integration.hub.service.model;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.RestConstants;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
-import com.blackducksoftware.integration.hub.request.Request;
-import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnection;
-import com.blackducksoftware.integration.hub.rest.UnauthenticatedRestConnectionBuilder;
-import com.blackducksoftware.integration.hub.rest.UriCombiner;
-import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
+import com.blackducksoftware.integration.rest.RestConstants;
+import com.blackducksoftware.integration.rest.connection.UnauthenticatedRestConnection;
+import com.blackducksoftware.integration.rest.connection.UnauthenticatedRestConnectionBuilder;
+import com.blackducksoftware.integration.rest.exception.IntegrationRestException;
+import com.blackducksoftware.integration.rest.proxy.ProxyInfo;
+import com.blackducksoftware.integration.rest.request.Request;
+import com.blackducksoftware.integration.rest.request.Response;
 
 public class HubServerVerifier {
-    private final UriCombiner uriCombiner;
-
-    public HubServerVerifier(final UriCombiner uriCombiner) {
-        this.uriCombiner = uriCombiner;
-    }
 
     public void verifyIsHubServer(final URL hubURL, final ProxyInfo hubProxyInfo,
             final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
@@ -72,7 +67,13 @@ public class HubServerVerifier {
             } catch (final IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
-            final String downloadUri = uriCombiner.pieceTogetherUri(hubURL, "download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
+            URL downloadURL;
+            try {
+                downloadURL = new URL(hubURL, "download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
+            } catch (MalformedURLException e) {
+                throw new HubIntegrationException("Error constructing the download URL : " + e.getMessage(), e);
+            }
+            String downloadUri = downloadURL.toString();
             request = RequestFactory.createCommonGetRequest(downloadUri);
             try (Response response = restConnection.executeRequest(request)) {
             } catch (final IntegrationRestException e) {

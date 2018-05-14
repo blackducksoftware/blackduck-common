@@ -32,7 +32,6 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.RestConstants;
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubPathMultipleResponses;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
@@ -51,10 +50,11 @@ import com.blackducksoftware.integration.hub.notification.content.PolicyOverride
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.VulnerabilityNotificationContent;
-import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.rest.RestConstants;
+import com.blackducksoftware.integration.rest.request.Request;
 import com.google.gson.JsonObject;
 
 public class NotificationService extends DataService {
@@ -89,7 +89,7 @@ public class NotificationService extends DataService {
         final String userNotificationsUri = hubService.getFirstLink(user, UserView.NOTIFICATIONS_LINK);
         requestBuilder.uri(userNotificationsUri);
 
-        final List<NotificationUserView> allUserNotificationItems = hubService.getResponses(NotificationUserView.class, requestBuilder, true);
+        final List<NotificationUserView> allUserNotificationItems = hubService.getResponses(requestBuilder, NotificationUserView.class, true);
         return allUserNotificationItems;
     }
 
@@ -136,22 +136,22 @@ public class NotificationService extends DataService {
 
     public List<CommonNotificationState> getCommonNotifications(final List<NotificationView> notificationViews) {
         final List<CommonNotificationState> commonStates = notificationViews
-                .stream()
-                .map(view -> {
-                    final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
-                    return new CommonNotificationState(view, notificationContent.orElse(null));
-                }).collect(Collectors.toList());
+                                                                   .stream()
+                                                                   .map(view -> {
+                                                                       final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
+                                                                       return new CommonNotificationState(view, notificationContent.orElse(null));
+                                                                   }).collect(Collectors.toList());
 
         return commonStates;
     }
 
     public List<CommonNotificationState> getCommonUserNotifications(final List<NotificationUserView> notificationUserViews) {
         final List<CommonNotificationState> commonStates = notificationUserViews
-                .stream()
-                .map(view -> {
-                    final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
-                    return new CommonNotificationState(view, notificationContent.orElse(null));
-                }).collect(Collectors.toList());
+                                                                   .stream()
+                                                                   .map(view -> {
+                                                                       final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
+                                                                       return new CommonNotificationState(view, notificationContent.orElse(null));
+                                                                   }).collect(Collectors.toList());
 
         return commonStates;
     }

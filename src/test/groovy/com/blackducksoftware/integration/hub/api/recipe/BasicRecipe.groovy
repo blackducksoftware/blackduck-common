@@ -1,21 +1,20 @@
 package com.blackducksoftware.integration.hub.api.recipe
 
-import org.junit.Before
-
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig
-import com.blackducksoftware.integration.hub.rest.RestConnection
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.service.CodeLocationService
 import com.blackducksoftware.integration.hub.service.HubServicesFactory
 import com.blackducksoftware.integration.hub.service.ProjectService
 import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 import com.blackducksoftware.integration.log.IntLogger
+import com.blackducksoftware.integration.rest.connection.RestConnection
 import com.blackducksoftware.integration.test.tool.TestLogger
+import org.junit.Before
 
 class BasicRecipe {
     public static final String PROJECT_NAME = 'My Recipe Project'
@@ -68,7 +67,7 @@ class BasicRecipe {
 
     public void deleteProject(String projectName) {
         ProjectService projectDataService = hubServicesFactory.createProjectService()
-        ProjectView project =  projectDataService.getProjectByName(projectName)
+        ProjectView project = projectDataService.getProjectByName(projectName)
         projectDataService.deleteHubProject(project)
     }
 
