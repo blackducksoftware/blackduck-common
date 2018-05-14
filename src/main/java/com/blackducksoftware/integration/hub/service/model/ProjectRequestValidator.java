@@ -27,9 +27,9 @@ import java.text.SimpleDateFormat;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.blackducksoftware.integration.hub.RestConstants;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
+import com.blackducksoftware.integration.rest.RestConstants;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 import com.blackducksoftware.integration.validator.ValidationResult;
 import com.blackducksoftware.integration.validator.ValidationResultEnum;

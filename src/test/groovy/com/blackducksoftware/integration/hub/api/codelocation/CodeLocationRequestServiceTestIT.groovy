@@ -19,16 +19,8 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
- * under the License.
- */
+ * under the License.*/
 package com.blackducksoftware.integration.hub.api.codelocation
-
-import org.apache.commons.lang3.StringUtils
-import org.junit.After
-import org.junit.Assert
-import org.junit.BeforeClass
-import org.junit.Test
-import org.junit.experimental.categories.Category
 
 import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
@@ -37,7 +29,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionVi
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
-import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
 import com.blackducksoftware.integration.hub.service.DryRunUploadResponse
 import com.blackducksoftware.integration.hub.service.DryRunUploadService
 import com.blackducksoftware.integration.hub.service.HubService
@@ -47,7 +38,14 @@ import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.log.LogLevel
 import com.blackducksoftware.integration.log.PrintStreamIntLogger
+import com.blackducksoftware.integration.rest.exception.IntegrationRestException
 import com.blackducksoftware.integration.test.annotation.IntegrationTest
+import org.apache.commons.lang3.StringUtils
+import org.junit.After
+import org.junit.Assert
+import org.junit.BeforeClass
+import org.junit.Test
+import org.junit.experimental.categories.Category
 
 @Category(IntegrationTest.class)
 class CodeLocationRequestServiceTestIT {
@@ -58,20 +56,20 @@ class CodeLocationRequestServiceTestIT {
     private static File dryRunFile;
 
     @BeforeClass
-    public static void init(){
+    public static void init() {
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader()
         dryRunFile = new File(classLoader.getResource('dryRun.json').getFile())
     }
 
     @After
-    public void testCleanup(){
+    public void testCleanup() {
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         ProjectView project = services.createProjectService().getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
         services.createProjectService().deleteHubProject(project)
     }
 
     @Test
-    public void testDryRunUpload(){
+    public void testDryRunUpload() {
         final String projectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
         final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
@@ -104,7 +102,7 @@ class CodeLocationRequestServiceTestIT {
         try {
             services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
             Assert.fail('This should have thrown an exception')
-        } catch (IntegrationRestException e){
+        } catch (IntegrationRestException e) {
             Assert.assertEquals(404, e.getHttpStatusCode())
         }
     }

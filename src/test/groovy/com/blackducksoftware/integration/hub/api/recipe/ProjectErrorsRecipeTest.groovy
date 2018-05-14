@@ -1,17 +1,16 @@
 package com.blackducksoftware.integration.hub.api.recipe
 
-import static org.junit.Assert.*
-
+import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
+import com.blackducksoftware.integration.hub.exception.DoesNotExistException
+import com.blackducksoftware.integration.hub.service.ProjectService
+import com.blackducksoftware.integration.rest.exception.IntegrationRestException
+import com.blackducksoftware.integration.test.annotation.IntegrationTest
 import org.junit.After
 import org.junit.Test
 import org.junit.experimental.categories.Category
 
-import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
-import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
-import com.blackducksoftware.integration.hub.exception.DoesNotExistException
-import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException
-import com.blackducksoftware.integration.hub.service.ProjectService
-import com.blackducksoftware.integration.test.annotation.IntegrationTest
+import static org.junit.Assert.*
 
 @Category(IntegrationTest.class)
 class ProjectErrorsRecipeTest extends BasicRecipe {
@@ -52,7 +51,7 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
         } catch (Exception e) {
             assertTrue(e instanceof IntegrationRestException)
             //since the project already existed, a 412 Precondition Failed http error response should occur
-            assertEquals(412, ((IntegrationRestException)e).httpStatusCode)
+            assertEquals(412, ((IntegrationRestException) e).httpStatusCode)
         }
     }
 

@@ -19,25 +19,23 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
- * under the License.
- */
+ * under the License.*/
 package com.blackducksoftware.integration.hub.request.builder
 
-import java.text.SimpleDateFormat
-
-import org.junit.Assert
-import org.junit.Test
-
-import com.blackducksoftware.integration.hub.RestConstants
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
 import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
+import com.blackducksoftware.integration.rest.RestConstants
+import org.junit.Assert
+import org.junit.Test
+
+import java.text.SimpleDateFormat
 
 class ProjectRequestBuilderTest {
 
     @Test
-    public void testInvalidValues(){
+    public void testInvalidValues() {
         ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()
         projectRequestBuilder.setProjectName(null)
         projectRequestBuilder.setProjectLevelAdjustments(null)
@@ -54,7 +52,7 @@ class ProjectRequestBuilderTest {
         try {
             projectRequestBuilder.build()
             Assert.fail("Should have thrown an exception")
-        } catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             Assert.assertNotNull(e)
         }
 
@@ -74,13 +72,13 @@ class ProjectRequestBuilderTest {
         try {
             projectRequestBuilder.build()
             Assert.fail("Should have thrown an exception")
-        } catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             Assert.assertNotNull(e)
         }
     }
 
     @Test
-    public void testValidValues(){
+    public void testValidValues() {
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         final String releasedOn = sdf.format(new Date());
 
@@ -125,7 +123,7 @@ class ProjectRequestBuilderTest {
     }
 
     @Test
-    public void testConciseValidValues(){
+    public void testConciseValidValues() {
         String projectName = 'Project'
         String versionName = 'Version'
 

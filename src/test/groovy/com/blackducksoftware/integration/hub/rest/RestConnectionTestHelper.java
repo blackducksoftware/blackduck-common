@@ -42,11 +42,11 @@ import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
+import com.blackducksoftware.integration.rest.connection.RestConnection;
 
 public class RestConnectionTestHelper {
-    private Properties testProperties;
-
     private final String hubServerUrl;
+    private Properties testProperties;
 
     public RestConnectionTestHelper() {
         initProperties();

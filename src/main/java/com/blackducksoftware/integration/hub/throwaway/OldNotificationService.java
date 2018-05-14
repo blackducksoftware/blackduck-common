@@ -36,16 +36,16 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.RestConstants;
 import com.blackducksoftware.integration.hub.api.core.HubPathMultipleResponses;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationUserView;
-import com.blackducksoftware.integration.hub.request.Request;
 import com.blackducksoftware.integration.hub.service.DataService;
 import com.blackducksoftware.integration.hub.service.HubResponseTransformer;
 import com.blackducksoftware.integration.hub.service.HubResponsesTransformer;
 import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.rest.RestConstants;
+import com.blackducksoftware.integration.rest.request.Request;
 import com.google.gson.JsonObject;
 
 public class OldNotificationService extends DataService {
