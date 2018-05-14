@@ -21,26 +21,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification.content;
+package com.blackducksoftware.integration.hub.service.model;
 
-import java.util.List;
+public class ProjectVersionDescription {
+    private final String projectName;
+    private final String projectVersionName;
+    private final String projectVersionUri;
 
-import com.blackducksoftware.integration.hub.api.core.HubComponent;
-import com.blackducksoftware.integration.hub.service.model.ProjectVersionDescription;
+    public ProjectVersionDescription(final String projectName, final String projectVersionName, final String projectVersionUri) {
+        this.projectName = projectName;
+        this.projectVersionName = projectVersionName;
+        this.projectVersionUri = projectVersionUri;
+    }
 
-public abstract class NotificationContent extends HubComponent {
-    public abstract boolean providesPolicyDetails();
+    public String getProjectName() {
+        return projectName;
+    }
 
-    public abstract boolean providesVulnerabilityDetails();
+    public String getProjectVersionName() {
+        return projectVersionName;
+    }
 
-    public abstract boolean providesProjectComponentDetails();
-
-    public abstract boolean providesLicenseDetails();
-
-    public abstract List<NotificationContentDetail> getNotificationContentDetails();
-
-    public abstract String getNotificationGroup();
-
-    public abstract List<ProjectVersionDescription> getAffectedProjectVersionDescriptions();
+    public String getProjectVersionUri() {
+        return projectVersionUri;
+    }
 
 }

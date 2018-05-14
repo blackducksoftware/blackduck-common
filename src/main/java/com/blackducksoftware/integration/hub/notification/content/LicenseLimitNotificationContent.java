@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.enumeration.LicenseLimitType;
+import com.blackducksoftware.integration.hub.service.model.ProjectVersionDescription;
 
 public class LicenseLimitNotificationContent extends NotificationContent {
     public LicenseLimitType licenseViolationType;
@@ -64,6 +65,11 @@ public class LicenseLimitNotificationContent extends NotificationContent {
     @Override
     public String getNotificationGroup() {
         return NotificationContentDetail.CONTENT_KEY_GROUP_LICENSE;
+    }
+
+    @Override
+    public List<ProjectVersionDescription> getAffectedProjectVersionDescriptions() {
+        return Collections.emptyList();
     }
 
 }
