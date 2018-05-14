@@ -44,8 +44,7 @@ public class NotificationResults {
         this.hubBucket = hubBucket;
     }
 
-    // TODO We should rename this to something like getCommonNotificationStates (but this would be a breaking change...)
-    public Collection<CommonNotificationState> getNotificationContentItems() {
+    public Collection<CommonNotificationState> getCommonNotificationStates() {
         if (notificationViewResults == null) {
             return Collections.emptyList();
         }
