@@ -26,9 +26,9 @@ package com.blackducksoftware.integration.hub.service;
 import java.io.File;
 
 import com.blackducksoftware.integration.hub.api.core.HubPath;
-import com.blackducksoftware.integration.hub.request.Request;
-import com.blackducksoftware.integration.hub.request.Response;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.rest.request.Request;
+import com.blackducksoftware.integration.rest.request.Response;
 
 public class DryRunUploadService extends DataService {
     public DryRunUploadService(final HubService hubService) {

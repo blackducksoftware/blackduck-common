@@ -23,31 +23,6 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
-import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.generated.component.RiskCountView;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportFormatType;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportType;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.RiskCountType;
-import com.blackducksoftware.integration.hub.api.generated.view.*;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.report.RiskReportWriter;
-import com.blackducksoftware.integration.hub.report.api.BomComponent;
-import com.blackducksoftware.integration.hub.report.api.PolicyRule;
-import com.blackducksoftware.integration.hub.report.api.ReportData;
-import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
-import com.blackducksoftware.integration.hub.report.pdf.PDFBoxWriter;
-import com.blackducksoftware.integration.hub.request.Request;
-import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.HttpMethod;
-import com.blackducksoftware.integration.hub.rest.exception.IntegrationRestException;
-import com.blackducksoftware.integration.hub.service.model.RequestFactory;
-import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -55,6 +30,37 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.component.RiskCountView;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportFormatType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.RiskCountType;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2;
+import com.blackducksoftware.integration.hub.api.generated.view.PolicyStatusView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
+import com.blackducksoftware.integration.hub.api.generated.view.ReportView;
+import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.report.RiskReportWriter;
+import com.blackducksoftware.integration.hub.report.api.BomComponent;
+import com.blackducksoftware.integration.hub.report.api.PolicyRule;
+import com.blackducksoftware.integration.hub.report.api.ReportData;
+import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
+import com.blackducksoftware.integration.hub.report.pdf.RiskReportPdfWriter;
+import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.rest.HttpMethod;
+import com.blackducksoftware.integration.rest.exception.IntegrationRestException;
+import com.blackducksoftware.integration.rest.request.Request;
+import com.blackducksoftware.integration.rest.request.Response;
+import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class ReportService extends DataService {
     public final static long DEFAULT_TIMEOUT = 1000L * 60 * 5;
@@ -201,7 +207,7 @@ public class ReportService extends DataService {
     public File createReportPdfFile(final File outputDirectory, final ReportData reportData) throws HubIntegrationException {
         try {
             this.logger.trace("Creating Risk Report Pdf in : " + outputDirectory.getCanonicalPath());
-            final PDFBoxWriter writer = new PDFBoxWriter(this.logger);
+            final RiskReportPdfWriter writer = new RiskReportPdfWriter(this.logger);
             final File pdfFile = writer.createPDFReportFile(outputDirectory, reportData);
             this.logger.trace("Created Risk Report Pdf : " + pdfFile.getCanonicalPath());
             return pdfFile;
@@ -311,7 +317,6 @@ public class ReportService extends DataService {
 
     /**
      * Assumes the BOM has already been updated
-     *
      */
     public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws InterruptedException, IntegrationException {
         if (this.hubService.hasLink(version, ProjectVersionView.LICENSEREPORTS_LINK)) {

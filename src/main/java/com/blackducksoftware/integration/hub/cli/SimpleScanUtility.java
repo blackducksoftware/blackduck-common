@@ -51,11 +51,11 @@ import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ScanFailedException;
-import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
 import com.blackducksoftware.integration.hub.service.model.HubCertificateHandler;
 import com.blackducksoftware.integration.hub.service.model.ScannerSplitStream;
 import com.blackducksoftware.integration.hub.service.model.StreamRedirectThread;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.rest.proxy.ProxyInfo;
 import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 import com.google.gson.Gson;
 
@@ -91,11 +91,9 @@ public class SimpleScanUtility {
 
     /**
      * This will setup the command-line invocation of the Hub scanner. The workingDirectoryPath is the parent folder of the scan logs and other scan artifacts.
-     *
      * @throws EncryptionException
      * @throws IllegalArgumentException
      * @throws HubIntegrationException
-     *
      * @throws ScanFailedException
      */
     public void setupAndExecuteScan(final CLILocation cliLocation) throws IllegalArgumentException, EncryptionException, InterruptedException, HubIntegrationException {
@@ -246,7 +244,6 @@ public class SimpleScanUtility {
 
     /**
      * If running in an environment that handles process creation, this method should be overridden to construct a process to execute the scan in the environment-specific way.
-     *
      * @throws IOException
      * @throws HubIntegrationException
      */

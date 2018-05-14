@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
@@ -44,12 +45,11 @@ import com.blackducksoftware.integration.hub.api.core.ResourceLink;
 import com.blackducksoftware.integration.hub.api.core.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.hub.request.Request;
-import com.blackducksoftware.integration.hub.request.Response;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.hub.service.model.PagedRequest;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.rest.connection.RestConnection;
+import com.blackducksoftware.integration.rest.request.Request;
+import com.blackducksoftware.integration.rest.request.Response;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
@@ -64,18 +64,12 @@ public class HubService {
     private final URL hubBaseUrl;
     private final JsonParser jsonParser;
     private final Gson gson;
-    private final UriCombiner uriCombiner;
 
     public HubService(final RestConnection restConnection) {
-        this(restConnection, new UriCombiner());
-    }
-
-    public HubService(final RestConnection restConnection, final UriCombiner uriCombiner) {
         this.restConnection = restConnection;
         this.hubBaseUrl = restConnection.baseUrl;
         this.jsonParser = restConnection.jsonParser;
         this.gson = restConnection.gson;
-        this.uriCombiner = uriCombiner;
         this.metaHandler = new MetaHandler(restConnection.logger);
         this.hubResponseTransformer = new HubResponseTransformer(restConnection);
         this.hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer);
@@ -130,7 +124,7 @@ public class HubService {
     }
 
     public String getUri(final HubPath path) throws IntegrationException {
-        return uriCombiner.pieceTogetherUri(hubBaseUrl, path.getPath());
+        return pieceTogetherUri(hubBaseUrl, path.getPath());
     }
 
     // ------------------------------------------------
@@ -145,7 +139,7 @@ public class HubService {
     }
 
     public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses, final boolean getAll) throws IntegrationException {
-        final String uri = uriCombiner.pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath.getPath());
+        final String uri = pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath.getPath());
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
         return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), hubPathMultipleResponses.responseClass, getAll, null);
     }
@@ -156,13 +150,13 @@ public class HubService {
 
     public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses, final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
             throws IntegrationException {
-        final String uri = uriCombiner.pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath.getPath());
+        final String uri = pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath.getPath());
         requestBuilder.uri(uri);
         return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), hubPathMultipleResponses.responseClass, getAll, typeMap);
     }
 
     public <T extends HubResponse> T getResponse(final HubPathSingleResponse<T> hubPathSingleResponse) throws IntegrationException {
-        final String uri = uriCombiner.pieceTogetherUri(hubBaseUrl, hubPathSingleResponse.hubPath.getPath());
+        final String uri = pieceTogetherUri(hubBaseUrl, hubPathSingleResponse.hubPath.getPath());
         final Request request = RequestFactory.createCommonGetRequest(uri);
         return hubResponseTransformer.getResponse(request, hubPathSingleResponse.responseClass);
     }
@@ -224,11 +218,10 @@ public class HubService {
 
     public <T extends HubResponse> List<T> getResponses(final String uri, final Class<T> responseClass, final boolean getAll) throws IntegrationException {
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
-        return getResponses(responseClass, requestBuilder, getAll);
+        return getResponses(requestBuilder, responseClass, getAll);
     }
 
-    // TODO we should likely swap responseClass and requestBuilder (but this would be a breaking change...)
-    public <T extends HubResponse> List<T> getResponses(final Class<T> responseClass, final Request.Builder requestBuilder, final boolean getAll) throws IntegrationException {
+    public <T extends HubResponse> List<T> getResponses(final Request.Builder requestBuilder, final Class<T> responseClass, final boolean getAll) throws IntegrationException {
         return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), responseClass, getAll, null);
     }
 
@@ -253,7 +246,7 @@ public class HubService {
     }
 
     public Response executeGetRequest(final HubPath path) throws IntegrationException {
-        final String uri = uriCombiner.pieceTogetherUri(restConnection.baseUrl, path.getPath());
+        final String uri = pieceTogetherUri(restConnection.baseUrl, path.getPath());
         return restConnection.executeRequest(RequestFactory.createCommonGetRequest(uri));
     }
 
@@ -265,7 +258,7 @@ public class HubService {
     // posting and getting location header
     // ------------------------------------------------
     public String executePostRequestAndRetrieveURL(final HubPath path, final Request.Builder requestBuilder) throws IntegrationException {
-        final String uri = uriCombiner.pieceTogetherUri(restConnection.baseUrl, path.getPath());
+        final String uri = pieceTogetherUri(restConnection.baseUrl, path.getPath());
         requestBuilder.uri(uri);
         return executePostRequestAndRetrieveURL(requestBuilder.build());
     }
@@ -276,6 +269,16 @@ public class HubService {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
+    }
+
+    private String pieceTogetherUri(URL baseURL, String spec) throws HubIntegrationException {
+        URL url;
+        try {
+            url = new URL(baseURL, spec);
+        } catch (MalformedURLException e) {
+            throw new HubIntegrationException(String.format("Could not construct the URL from %s and %s", baseURL.toString(), spec), e);
+        }
+        return url.toString();
     }
 
 }

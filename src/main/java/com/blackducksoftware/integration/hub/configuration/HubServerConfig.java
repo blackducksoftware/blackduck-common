@@ -29,15 +29,14 @@ import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.Credentials;
-import com.blackducksoftware.integration.hub.proxy.ProxyInfo;
 import com.blackducksoftware.integration.hub.rest.ApiTokenRestConnection;
 import com.blackducksoftware.integration.hub.rest.ApiTokenRestConnectionBuilder;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnectionBuilder;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.blackducksoftware.integration.hub.rest.UriCombiner;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.rest.connection.RestConnection;
+import com.blackducksoftware.integration.rest.credentials.Credentials;
+import com.blackducksoftware.integration.rest.proxy.ProxyInfo;
 import com.blackducksoftware.integration.util.Stringable;
 
 public class HubServerConfig extends Stringable implements Serializable {
@@ -49,26 +48,23 @@ public class HubServerConfig extends Stringable implements Serializable {
     private final String apiToken;
     private final ProxyInfo proxyInfo;
     private final boolean alwaysTrustServerCertificate;
-    private final UriCombiner uriCombiner;
 
-    public HubServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate, final UriCombiner uriCombiner) {
+    public HubServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
         this.hubUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.credentials = credentials;
         this.apiToken = null;
         this.proxyInfo = proxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
-        this.uriCombiner = uriCombiner;
     }
 
-    public HubServerConfig(final URL url, final int timeoutSeconds, final String apiToken, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate, final UriCombiner uriCombiner) {
+    public HubServerConfig(final URL url, final int timeoutSeconds, final String apiToken, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
         this.hubUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.credentials = null;
         this.apiToken = apiToken;
         this.proxyInfo = proxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
-        this.uriCombiner = uriCombiner;
     }
 
     public boolean shouldUseProxyForHub() {
@@ -102,9 +98,6 @@ public class HubServerConfig extends Stringable implements Serializable {
                 logger.alwaysLog("--> Proxy Username: " + proxyInfo.getUsername());
             }
         }
-        if (uriCombiner != null) {
-            logger.alwaysLog("--> UriCombiner: " + uriCombiner);
-        }
     }
 
     public RestConnection createRestConnection(final IntLogger logger) throws EncryptionException {
@@ -123,7 +116,6 @@ public class HubServerConfig extends Stringable implements Serializable {
         builder.applyCredentials(getGlobalCredentials());
         builder.setAlwaysTrustServerCertificate(isAlwaysTrustServerCertificate());
         builder.applyProxyInfo(getProxyInfo());
-        builder.setUriCombiner(uriCombiner);
 
         return builder.build();
     }
@@ -136,7 +128,6 @@ public class HubServerConfig extends Stringable implements Serializable {
         builder.setApiToken(getApiToken());
         builder.setAlwaysTrustServerCertificate(isAlwaysTrustServerCertificate());
         builder.applyProxyInfo(getProxyInfo());
-        builder.setUriCombiner(uriCombiner);
 
         return builder.build();
     }
