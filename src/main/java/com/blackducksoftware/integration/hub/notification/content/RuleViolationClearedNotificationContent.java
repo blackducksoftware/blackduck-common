@@ -24,9 +24,12 @@
 package com.blackducksoftware.integration.hub.notification.content;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.blackducksoftware.integration.hub.service.model.ProjectVersionDescription;
 
 public class RuleViolationClearedNotificationContent extends NotificationContent {
     public String projectName;
@@ -79,6 +82,12 @@ public class RuleViolationClearedNotificationContent extends NotificationContent
     @Override
     public String getNotificationGroup() {
         return NotificationContentDetail.CONTENT_KEY_GROUP_POLICY;
+    }
+
+    @Override
+    public List<ProjectVersionDescription> getAffectedProjectVersionDescriptions() {
+        final ProjectVersionDescription projectVersionDescription = new ProjectVersionDescription(projectName, projectVersionName, projectVersion);
+        return Arrays.asList(projectVersionDescription);
     }
 
 }
