@@ -27,7 +27,7 @@ import java.io.IOException;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.core.HubPath;
-import com.blackducksoftware.integration.hub.request.Response;
+import com.blackducksoftware.integration.rest.request.Response;
 import com.google.gson.JsonObject;
 
 public class HubRegistrationService extends DataService {

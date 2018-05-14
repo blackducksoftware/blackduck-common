@@ -32,7 +32,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchR
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.LicenseView;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
-import com.blackducksoftware.integration.hub.request.Response;
+import com.blackducksoftware.integration.rest.request.Response;
 
 public class LicenseService extends DataService {
     private final ComponentService componentDataService;

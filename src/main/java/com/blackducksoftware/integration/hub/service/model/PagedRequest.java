@@ -25,7 +25,7 @@ package com.blackducksoftware.integration.hub.service.model;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.blackducksoftware.integration.hub.request.Request;
+import com.blackducksoftware.integration.rest.request.Request;
 
 public class PagedRequest {
     private final Request.Builder requestBuilder;
