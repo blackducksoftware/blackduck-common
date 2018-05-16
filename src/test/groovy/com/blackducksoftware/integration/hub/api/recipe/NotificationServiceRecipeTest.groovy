@@ -1,5 +1,15 @@
 package com.blackducksoftware.integration.hub.api.recipe
 
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.ThreadFactory
+
+import org.junit.After
+import org.junit.Test
+import org.junit.experimental.categories.Category
+
 import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
@@ -12,15 +22,6 @@ import com.blackducksoftware.integration.hub.service.ProjectService
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService
 import com.blackducksoftware.integration.test.annotation.IntegrationTest
-import org.junit.After
-import org.junit.Test
-import org.junit.experimental.categories.Category
-
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.ThreadFactory
 
 @Category(IntegrationTest.class)
 class NotificationServiceRecipeTest extends BasicRecipe {
@@ -88,7 +89,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
                 String componentVersion
                 String policyName
                 boolean isVulnerability = false
-                it.content.notificationContentDetails.each({
+                it.content.createNotificationContentDetails().each({
                     contentDetailKey = it.contentDetailKey
                     projectName = it.projectName
                     projectVersion = it.projectVersionName
@@ -145,7 +146,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
                 String componentVersion
                 String policyName
                 boolean isVulnerability = false
-                it.content.notificationContentDetails.each({
+                it.content.createNotificationContentDetails().each({
                     contentDetailKey = it.contentDetailKey
                     projectName = it.projectName
                     projectVersion = it.projectVersionName

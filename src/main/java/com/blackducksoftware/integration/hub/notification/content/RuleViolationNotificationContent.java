@@ -60,7 +60,7 @@ public class RuleViolationNotificationContent extends NotificationContent {
     }
 
     @Override
-    public List<NotificationContentDetail> getNotificationContentDetails() {
+    public List<NotificationContentDetail> createNotificationContentDetails() {
         final Map<String, String> uriToName = policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
         final List<NotificationContentDetail> details = new ArrayList<>();
         componentVersionStatuses.forEach(componentVersionStatus -> {

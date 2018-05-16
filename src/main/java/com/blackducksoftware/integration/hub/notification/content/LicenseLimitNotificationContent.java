@@ -58,7 +58,7 @@ public class LicenseLimitNotificationContent extends NotificationContent {
     }
 
     @Override
-    public List<NotificationContentDetail> getNotificationContentDetails() {
+    public List<NotificationContentDetail> createNotificationContentDetails() {
         return Collections.emptyList();
     }
 
