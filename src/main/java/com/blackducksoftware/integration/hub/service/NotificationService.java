@@ -50,6 +50,7 @@ import com.blackducksoftware.integration.hub.notification.content.PolicyOverride
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.VulnerabilityNotificationContent;
+import com.blackducksoftware.integration.hub.notification.content.collector.ContentDetailCollector;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
@@ -136,45 +137,44 @@ public class NotificationService extends DataService {
 
     public List<CommonNotificationState> getCommonNotifications(final List<NotificationView> notificationViews) {
         final List<CommonNotificationState> commonStates = notificationViews
-                                                                   .stream()
-                                                                   .map(view -> {
-                                                                       final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
-                                                                       return new CommonNotificationState(view, notificationContent.orElse(null));
-                                                                   }).collect(Collectors.toList());
+                .stream()
+                .map(view -> {
+                    final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
+                    return new CommonNotificationState(view, notificationContent.orElse(null));
+                }).collect(Collectors.toList());
 
         return commonStates;
     }
 
     public List<CommonNotificationState> getCommonUserNotifications(final List<NotificationUserView> notificationUserViews) {
         final List<CommonNotificationState> commonStates = notificationUserViews
-                                                                   .stream()
-                                                                   .map(view -> {
-                                                                       final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
-                                                                       return new CommonNotificationState(view, notificationContent.orElse(null));
-                                                                   }).collect(Collectors.toList());
+                .stream()
+                .map(view -> {
+                    final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
+                    return new CommonNotificationState(view, notificationContent.orElse(null));
+                }).collect(Collectors.toList());
 
         return commonStates;
     }
 
-    public List<UriSingleResponse<? extends HubResponse>> getAllLinks(final List<CommonNotificationState> commonNotifications) {
+    public List<UriSingleResponse<? extends HubResponse>> getAllLinks(final List<NotificationContentDetail> details) {
         final List<UriSingleResponse<? extends HubResponse>> uriResponses = new ArrayList<>();
-        commonNotifications.forEach(notification -> {
-            final List<NotificationContentDetail> details = notification.getContent().createNotificationContentDetails();
-            details.forEach(detail -> {
-                uriResponses.addAll(detail.getPresentLinks());
-            });
+        details.forEach(detail -> {
+            uriResponses.addAll(detail.getPresentLinks());
         });
 
         return uriResponses;
     }
 
     private NotificationResults createNotificationResults(final NotificationViewResults notificationViewResults) throws IntegrationException {
+        final ContentDetailCollector detailCollector = new ContentDetailCollector();
         final NotificationResults results;
         final List<CommonNotificationState> commonNotifications = notificationViewResults.getCommonNotificationStates();
-        final List<UriSingleResponse<? extends HubResponse>> uriResponseList = getAllLinks(commonNotifications);
+        final List<NotificationContentDetail> notificationContentDetails = detailCollector.collect(commonNotifications);
+        final List<UriSingleResponse<? extends HubResponse>> uriResponseList = getAllLinks(notificationContentDetails);
         final HubBucket bucket = hubBucketService.startTheBucket(uriResponseList);
 
-        results = new NotificationResults(notificationViewResults, bucket);
+        results = new NotificationResults(notificationViewResults, bucket, notificationContentDetails);
         return results;
     }
 

@@ -23,11 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.notification.content;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionDescription;
 
@@ -57,26 +54,6 @@ public class RuleViolationClearedNotificationContent extends NotificationContent
     @Override
     public boolean providesLicenseDetails() {
         return false;
-    }
-
-    @Override
-    public List<NotificationContentDetail> createNotificationContentDetails() {
-        final Map<String, String> uriToName = policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
-        final List<NotificationContentDetail> details = new ArrayList<>();
-        componentVersionStatuses.forEach(componentVersionStatus -> {
-            componentVersionStatus.policies.forEach(policyUri -> {
-                final String policyName = uriToName.get(policyUri);
-                if (componentVersionStatus.componentVersion != null) {
-                    details.add(
-                            NotificationContentDetail.createPolicyDetailWithComponentVersionAndIssue(this, projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.componentVersionName,
-                                    componentVersionStatus.componentVersion, policyName, policyUri, componentVersionStatus.componentIssueLink));
-                } else {
-                    details.add(NotificationContentDetail.createPolicyDetailWithComponentAndIssue(this, projectName, projectVersionName, projectVersion, componentVersionStatus.componentName, componentVersionStatus.component, policyName,
-                            policyUri, componentVersionStatus.componentIssueLink));
-                }
-            });
-        });
-        return details;
     }
 
     @Override
