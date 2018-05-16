@@ -36,7 +36,7 @@ public class PolicyOverrideDetailFactory extends NotificationDetailFactory {
         final PolicyOverrideNotificationContent content = (PolicyOverrideNotificationContent) notificationContent;
         final List<NotificationContentDetail> details = new ArrayList<>();
         content.policyInfos.forEach(policyInfo -> {
-            details.add(NotificationContentDetail.createDetail(content, content.projectName, content.projectVersionName, content.projectVersion, content.componentName,
+            details.add(NotificationContentDetail.createDetail(content, NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, content.projectName, content.projectVersionName, content.projectVersion, content.componentName,
                     content.component, content.componentVersionName, content.componentVersion, policyInfo.policyName,
                     policyInfo.policy, null, null, null));
         });

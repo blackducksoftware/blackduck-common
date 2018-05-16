@@ -41,7 +41,7 @@ public class RuleViolationClearedDetailFactory extends NotificationDetailFactory
         content.componentVersionStatuses.forEach(componentVersionStatus -> {
             componentVersionStatus.policies.forEach(policyUri -> {
                 final String policyName = uriToName.get(policyUri);
-                details.add(NotificationContentDetail.createDetail(content, content.projectName, content.projectVersionName, content.projectVersion, componentVersionStatus.componentName,
+                details.add(NotificationContentDetail.createDetail(content, NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, content.projectName, content.projectVersionName, content.projectVersion, componentVersionStatus.componentName,
                         componentVersionStatus.component, componentVersionStatus.componentVersionName, componentVersionStatus.componentVersion, policyName,
                         policyUri, null, componentVersionStatus.componentIssueLink, null));
             });

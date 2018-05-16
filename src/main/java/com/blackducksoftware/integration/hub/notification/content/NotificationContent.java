@@ -37,8 +37,6 @@ public abstract class NotificationContent extends HubComponent {
 
     public abstract boolean providesLicenseDetails();
 
-    public abstract String getNotificationGroup();
-
     public abstract List<ProjectVersionDescription> getAffectedProjectVersionDescriptions();
 
 }

@@ -41,6 +41,7 @@ import com.blackducksoftware.integration.util.Stringable;
 
 public class NotificationContentDetail extends Stringable {
     private final NotificationContent notificationContent;
+    private final String notificationGroup;
     private final String contentDetailKey;
     private final String projectName;
     private final String projectVersionName;
@@ -65,19 +66,22 @@ public class NotificationContentDetail extends Stringable {
     public final static String CONTENT_KEY_GROUP_VULNERABILITY = "vulnerability";
     public final static String CONTENT_KEY_SEPARATOR = "|";
 
-    public static NotificationContentDetail createDetail(final NotificationContent notificationContent, final String projectName, final String projectVersionName, final String projectVersionUri,
+    public static NotificationContentDetail createDetail(final NotificationContent notificationContent, final String notificationGroup, final String projectName, final String projectVersionName, final String projectVersionUri,
             final String componentName, final String componentUri, final String componentVersionName, final String componentVersionUri, final String policyName, final String policyUri,
             final String componentVersionOriginName, final String componentIssueUri, final String componentVersionOriginId) {
         // TODO take the view instead: originView
-        return new NotificationContentDetail(notificationContent, projectName, projectVersionName, projectVersion(projectVersionUri), Optional.ofNullable(componentName), component(componentUri), Optional.ofNullable(componentVersionName),
+        return new NotificationContentDetail(notificationContent, notificationGroup, projectName, projectVersionName, projectVersion(projectVersionUri), Optional.ofNullable(componentName), component(componentUri),
+                Optional.ofNullable(componentVersionName),
                 componentVersion(componentVersionUri), Optional.ofNullable(policyName), policy(policyUri), Optional.ofNullable(componentVersionOriginName), componentIssue(componentIssueUri), Optional.ofNullable(componentVersionOriginId));
     }
 
-    private NotificationContentDetail(final NotificationContent notificationContent, final String projectName, final String projectVersionName, final Optional<UriSingleResponse<ProjectVersionView>> projectVersion,
+    private NotificationContentDetail(final NotificationContent notificationContent, final String notificationGroup, final String projectName, final String projectVersionName,
+            final Optional<UriSingleResponse<ProjectVersionView>> projectVersion,
             final Optional<String> componentName, final Optional<UriSingleResponse<ComponentView>> component, final Optional<String> componentVersionName, final Optional<UriSingleResponse<ComponentVersionView>> componentVersion,
             final Optional<String> policyName, final Optional<UriSingleResponse<PolicyRuleViewV2>> policy, final Optional<String> componentVersionOriginName, final Optional<UriSingleResponse<IssueView>> componentIssue,
             final Optional<String> componentVersionOriginId) {
         this.notificationContent = notificationContent;
+        this.notificationGroup = notificationGroup;
         this.projectName = projectName;
         this.projectVersionName = projectVersionName;
         this.projectVersion = projectVersion;
@@ -95,7 +99,7 @@ public class NotificationContentDetail extends Stringable {
 
     private String createContentDetailKey() {
         final StringBuilder keyBuilder = new StringBuilder();
-        keyBuilder.append(notificationContent.getNotificationGroup());
+        keyBuilder.append(notificationGroup);
         keyBuilder.append(CONTENT_KEY_SEPARATOR);
 
         if (projectVersion.isPresent()) {
@@ -152,6 +156,10 @@ public class NotificationContentDetail extends Stringable {
             presentLinks.add(policy.get());
         }
         return presentLinks;
+    }
+
+    public String getNotificationGroup() {
+        return notificationGroup;
     }
 
     public String getContentDetailKey() {
