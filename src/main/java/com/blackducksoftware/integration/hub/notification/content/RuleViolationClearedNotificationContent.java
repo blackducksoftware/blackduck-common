@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.notification.content;
 import java.util.Arrays;
 import java.util.List;
 
+import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionDescription;
 
 public class RuleViolationClearedNotificationContent extends NotificationContent {

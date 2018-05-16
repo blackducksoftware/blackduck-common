@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.api.enumeration.LicenseLimitType;
+import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionDescription;
 
 public class LicenseLimitNotificationContent extends NotificationContent {

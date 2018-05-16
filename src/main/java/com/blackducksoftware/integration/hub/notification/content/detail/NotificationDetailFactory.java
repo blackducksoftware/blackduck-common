@@ -26,7 +26,6 @@ package com.blackducksoftware.integration.hub.notification.content.detail;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.NotificationContentDetail;
 
 public abstract class NotificationDetailFactory {
 

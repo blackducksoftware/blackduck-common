@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
 
 public class PolicyOverrideDetailFactory extends NotificationDetailFactory {

@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.NotificationContentDetail;
 
 public class LicenseLimitDetailFactory extends NotificationDetailFactory {
 

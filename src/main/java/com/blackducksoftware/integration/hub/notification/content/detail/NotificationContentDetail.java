@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification.content;
+package com.blackducksoftware.integration.hub.notification.content.detail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +36,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
 import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
+import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 import com.blackducksoftware.integration.util.Stringable;
 
 public class NotificationContentDetail extends Stringable {

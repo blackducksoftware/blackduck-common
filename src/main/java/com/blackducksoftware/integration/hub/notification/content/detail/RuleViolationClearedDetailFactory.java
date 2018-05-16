@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 
 public class RuleViolationClearedDetailFactory extends NotificationDetailFactory {

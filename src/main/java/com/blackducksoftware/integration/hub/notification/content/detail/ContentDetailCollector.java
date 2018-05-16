@@ -31,7 +31,6 @@ import java.util.Map;
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 import com.blackducksoftware.integration.hub.notification.content.LicenseLimitNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
