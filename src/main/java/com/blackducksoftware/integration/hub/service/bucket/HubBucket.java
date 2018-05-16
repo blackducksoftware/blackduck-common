@@ -55,8 +55,14 @@ public class HubBucket {
         final String uri = uriSingleResponse.uri;
         if (contains(uri)) {
             final HubBucketItem<HubResponse> bucketItem = get(uri);
-            if (bucketItem.hasValidResponse() && bucketItem.getHubResponse().isPresent() && bucketItem.getHubResponse().get().getClass().equals(uriSingleResponse.responseClass)) {
-                return getResponseFromBucket(bucketItem);
+            if (bucketItem.hasValidResponse()) {
+                final Optional<HubResponse> optionalHubResponse = bucketItem.getHubResponse();
+                if (optionalHubResponse.isPresent()) {
+                    final HubResponse hubResponse = optionalHubResponse.get();
+                    if (hubResponse.getClass().equals(uriSingleResponse.responseClass)) {
+                        return getResponseFromBucket(bucketItem);
+                    }
+                }
             }
         }
         return null;
