@@ -30,13 +30,13 @@ import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContentDetail;
-import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
+import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 
-public class RuleViolationDetailCollector extends NotificationDetailCollector {
+public class RuleViolationClearedDetailFactory extends NotificationDetailFactory {
 
     @Override
     public List<NotificationContentDetail> createDetails(final NotificationContent notificationContent) {
-        final RuleViolationNotificationContent content = (RuleViolationNotificationContent) notificationContent;
+        final RuleViolationClearedNotificationContent content = (RuleViolationClearedNotificationContent) notificationContent;
         final Map<String, String> uriToName = content.policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
         final List<NotificationContentDetail> details = new ArrayList<>();
         content.componentVersionStatuses.forEach(componentVersionStatus -> {

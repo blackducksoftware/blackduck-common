@@ -23,13 +23,24 @@
  */
 package com.blackducksoftware.integration.hub.notification.content.collector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContentDetail;
+import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
 
-public abstract class NotificationDetailCollector {
+public class PolicyOverrideDetailFactory extends NotificationDetailFactory {
 
-    public abstract List<NotificationContentDetail> createDetails(final NotificationContent notificationContent);
-
+    @Override
+    public List<NotificationContentDetail> createDetails(final NotificationContent notificationContent) {
+        final PolicyOverrideNotificationContent content = (PolicyOverrideNotificationContent) notificationContent;
+        final List<NotificationContentDetail> details = new ArrayList<>();
+        content.policyInfos.forEach(policyInfo -> {
+            details.add(NotificationContentDetail.createDetail(content, content.projectName, content.projectVersionName, content.projectVersion, content.componentName,
+                    content.component, content.componentVersionName, content.componentVersion, policyInfo.policyName,
+                    policyInfo.policy, null, null, null));
+        });
+        return details;
+    }
 }

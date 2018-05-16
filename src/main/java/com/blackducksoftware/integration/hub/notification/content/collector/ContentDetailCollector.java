@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 import com.blackducksoftware.integration.hub.notification.content.LicenseLimitNotificationContent;
@@ -40,14 +38,14 @@ import com.blackducksoftware.integration.hub.notification.content.RuleViolationN
 import com.blackducksoftware.integration.hub.notification.content.VulnerabilityNotificationContent;
 
 public class ContentDetailCollector {
-    Map<Class<? extends NotificationContent>, Function<NotificationContent, List<NotificationContentDetail>>> creatorMap;
+    Map<Class<? extends NotificationContent>, NotificationDetailFactory> factoryMap;
 
     public ContentDetailCollector() {
-        creatorMap.put(RuleViolationNotificationContent.class, this::createRuleViolationDetails);
-        creatorMap.put(RuleViolationClearedNotificationContent.class, this::createRuleViolationClearedDetails);
-        creatorMap.put(PolicyOverrideNotificationContent.class, this::createPolicyOverrideDetails);
-        creatorMap.put(VulnerabilityNotificationContent.class, this::createVulnerabilityDetails);
-        creatorMap.put(LicenseLimitNotificationContent.class, this::createLicenseDetails);
+        factoryMap.put(RuleViolationNotificationContent.class, new RuleViolationDetailFactory());
+        factoryMap.put(RuleViolationClearedNotificationContent.class, new RuleViolationClearedDetailFactory());
+        factoryMap.put(PolicyOverrideNotificationContent.class, new PolicyOverrideDetailFactory());
+        factoryMap.put(VulnerabilityNotificationContent.class, new VulnerabilityDetailFactory());
+        factoryMap.put(LicenseLimitNotificationContent.class, new LicenseLimitDetailFactory());
     }
 
     public List<NotificationContentDetail> collect(final List<CommonNotificationState> commonNotificationStates) {
@@ -64,65 +62,9 @@ public class ContentDetailCollector {
 
     private void collectDetails(final List<NotificationContentDetail> contentDetailList, final NotificationContent notificationContent) {
         final Class<?> key = notificationContent.getClass();
-        if (creatorMap.containsKey(key)) {
-            final Function<NotificationContent, List<NotificationContentDetail>> createDetailFunction = creatorMap.get(key);
-            contentDetailList.addAll(createDetailFunction.apply(notificationContent));
+        if (factoryMap.containsKey(key)) {
+            final NotificationDetailFactory factory = factoryMap.get(key);
+            contentDetailList.addAll(factory.createDetails(notificationContent));
         }
-    }
-
-    private List<NotificationContentDetail> createRuleViolationDetails(final NotificationContent notificationContent) {
-        final RuleViolationNotificationContent content = (RuleViolationNotificationContent) notificationContent;
-        final Map<String, String> uriToName = content.policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
-        final List<NotificationContentDetail> details = new ArrayList<>();
-        content.componentVersionStatuses.forEach(componentVersionStatus -> {
-            componentVersionStatus.policies.forEach(policyUri -> {
-                final String policyName = uriToName.get(policyUri);
-                details.add(NotificationContentDetail.createDetail(content, content.projectName, content.projectVersionName, content.projectVersion, componentVersionStatus.componentName,
-                        componentVersionStatus.component, componentVersionStatus.componentVersionName, componentVersionStatus.componentVersion, policyName,
-                        policyUri, null, componentVersionStatus.componentIssueLink, null));
-            });
-        });
-        return details;
-    }
-
-    private List<NotificationContentDetail> createRuleViolationClearedDetails(final NotificationContent notificationContent) {
-        final RuleViolationClearedNotificationContent content = (RuleViolationClearedNotificationContent) notificationContent;
-        final Map<String, String> uriToName = content.policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
-        final List<NotificationContentDetail> details = new ArrayList<>();
-        content.componentVersionStatuses.forEach(componentVersionStatus -> {
-            componentVersionStatus.policies.forEach(policyUri -> {
-                final String policyName = uriToName.get(policyUri);
-                details.add(NotificationContentDetail.createDetail(content, content.projectName, content.projectVersionName, content.projectVersion, componentVersionStatus.componentName,
-                        componentVersionStatus.component, componentVersionStatus.componentVersionName, componentVersionStatus.componentVersion, policyName,
-                        policyUri, null, componentVersionStatus.componentIssueLink, null));
-            });
-        });
-        return details;
-    }
-
-    private List<NotificationContentDetail> createPolicyOverrideDetails(final NotificationContent notificationContent) {
-        final PolicyOverrideNotificationContent content = (PolicyOverrideNotificationContent) notificationContent;
-        final List<NotificationContentDetail> details = new ArrayList<>();
-        content.policyInfos.forEach(policyInfo -> {
-            details.add(NotificationContentDetail.createDetail(content, content.projectName, content.projectVersionName, content.projectVersion, content.componentName,
-                    content.component, content.componentVersionName, content.componentVersion, policyInfo.policyName,
-                    policyInfo.policy, null, null, null));
-        });
-        return details;
-    }
-
-    private List<NotificationContentDetail> createVulnerabilityDetails(final NotificationContent notificationContent) {
-        final VulnerabilityNotificationContent content = (VulnerabilityNotificationContent) notificationContent;
-        final List<NotificationContentDetail> details = new ArrayList<>();
-        content.affectedProjectVersions.forEach(projectVersion -> {
-            details.add(NotificationContentDetail.createDetail(content, projectVersion.projectName, projectVersion.projectVersionName, projectVersion.projectVersion, content.componentName,
-                    null, content.versionName, content.componentVersion, null, null,
-                    content.componentVersionOriginName, projectVersion.componentIssueUrl, content.componentVersionOriginId));
-        });
-        return details;
-    }
-
-    private List<NotificationContentDetail> createLicenseDetails(final NotificationContent notificationContent) {
-        return Collections.emptyList();
     }
 }

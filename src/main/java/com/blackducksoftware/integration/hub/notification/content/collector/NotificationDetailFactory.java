@@ -23,17 +23,13 @@
  */
 package com.blackducksoftware.integration.hub.notification.content.collector;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContentDetail;
 
-public class LicenseLimitDetailCollector extends NotificationDetailCollector {
+public abstract class NotificationDetailFactory {
 
-    @Override
-    public List<NotificationContentDetail> createDetails(final NotificationContent notificationContent) {
-        return Collections.emptyList();
-    }
+    public abstract List<NotificationContentDetail> createDetails(final NotificationContent notificationContent);
 
 }
