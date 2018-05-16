@@ -159,7 +159,7 @@ public class NotificationService extends DataService {
     public List<UriSingleResponse<? extends HubResponse>> getAllLinks(final List<CommonNotificationState> commonNotifications) {
         final List<UriSingleResponse<? extends HubResponse>> uriResponses = new ArrayList<>();
         commonNotifications.forEach(notification -> {
-            final List<NotificationContentDetail> details = notification.getContent().getNotificationContentDetails();
+            final List<NotificationContentDetail> details = notification.getContent().createNotificationContentDetails();
             details.forEach(detail -> {
                 uriResponses.addAll(detail.getPresentLinks());
             });

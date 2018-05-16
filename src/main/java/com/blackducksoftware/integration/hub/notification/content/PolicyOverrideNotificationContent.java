@@ -70,7 +70,7 @@ public class PolicyOverrideNotificationContent extends NotificationContent {
     }
 
     @Override
-    public List<NotificationContentDetail> getNotificationContentDetails() {
+    public List<NotificationContentDetail> createNotificationContentDetails() {
         final List<NotificationContentDetail> details = new ArrayList<>();
         policyInfos.forEach(policyInfo -> {
             if (componentVersion != null) {
