@@ -26,22 +26,20 @@ package com.blackducksoftware.integration.hub.notification;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
-import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 
 public class NotificationResults {
     private final NotificationViewResults notificationViewResults;
     private final HubBucket hubBucket;
-    private final List<NotificationContentDetail> notificationContentDetails;
+    private final NotificationContentDetailResults notificationContentDetails;
 
-    public NotificationResults(final NotificationViewResults notificationViewResults, final HubBucket hubBucket, final List<NotificationContentDetail> notificationContentDetails) {
+    public NotificationResults(final NotificationViewResults notificationViewResults, final HubBucket hubBucket, final NotificationContentDetailResults notificationContentDetails) {
         super();
         this.notificationViewResults = notificationViewResults;
         this.hubBucket = hubBucket;
@@ -59,7 +57,7 @@ public class NotificationResults {
         return hubBucket;
     }
 
-    public List<NotificationContentDetail> getNotificationContentDetails() {
+    public NotificationContentDetailResults getNotificationContentDetails() {
         return notificationContentDetails;
     }
 
@@ -75,5 +73,4 @@ public class NotificationResults {
     public String toString() {
         return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
     }
-
 }

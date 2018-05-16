@@ -24,7 +24,6 @@
 package com.blackducksoftware.integration.hub.notification.content.detail;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,22 +48,26 @@ public class ContentDetailCollector {
         factoryMap.put(LicenseLimitNotificationContent.class, new LicenseLimitDetailFactory());
     }
 
-    public List<NotificationContentDetail> collect(final List<CommonNotificationState> commonNotificationStates) {
-        if (commonNotificationStates.isEmpty()) {
-            return Collections.emptyList();
-        }
-        final List<NotificationContentDetail> contentDetailList = new ArrayList<>(50);
+    public Map<NotificationContent, List<NotificationContentDetail>> collect(final List<CommonNotificationState> commonNotificationStates) {
+        final Map<NotificationContent, List<NotificationContentDetail>> detailMap = new HashMap<>();
         commonNotificationStates.stream().map(CommonNotificationState::getContent).forEach(content -> {
-            collectDetails(contentDetailList, content);
+            collectDetails(detailMap, content);
         });
 
-        return contentDetailList;
+        return detailMap;
     }
 
-    private void collectDetails(final List<NotificationContentDetail> contentDetailList, final NotificationContent notificationContent) {
+    private void collectDetails(final Map<NotificationContent, List<NotificationContentDetail>> detailMap, final NotificationContent notificationContent) {
         final Class<?> key = notificationContent.getClass();
         if (factoryMap.containsKey(key)) {
             final NotificationDetailFactory factory = factoryMap.get(key);
+            List<NotificationContentDetail> contentDetailList;
+            if (detailMap.containsKey(notificationContent)) {
+                contentDetailList = detailMap.get(notificationContent);
+            } else {
+                contentDetailList = new ArrayList<>();
+                detailMap.put(notificationContent, contentDetailList);
+            }
             contentDetailList.addAll(factory.createDetails(notificationContent));
         }
     }

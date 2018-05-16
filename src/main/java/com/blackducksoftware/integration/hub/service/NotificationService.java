@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -41,6 +42,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationUser
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
+import com.blackducksoftware.integration.hub.notification.NotificationContentDetailResults;
 import com.blackducksoftware.integration.hub.notification.NotificationResults;
 import com.blackducksoftware.integration.hub.notification.NotificationViewResults;
 import com.blackducksoftware.integration.hub.notification.content.LicenseLimitNotificationContent;
@@ -170,11 +172,15 @@ public class NotificationService extends DataService {
         final ContentDetailCollector detailCollector = new ContentDetailCollector();
         final NotificationResults results;
         final List<CommonNotificationState> commonNotifications = notificationViewResults.getCommonNotificationStates();
-        final List<NotificationContentDetail> notificationContentDetails = detailCollector.collect(commonNotifications);
-        final List<UriSingleResponse<? extends HubResponse>> uriResponseList = getAllLinks(notificationContentDetails);
+        final Map<NotificationContent, List<NotificationContentDetail>> detailMap = detailCollector.collect(commonNotifications);
+        final NotificationContentDetailResults detailResults = new NotificationContentDetailResults(detailMap);
+        final List<UriSingleResponse<? extends HubResponse>> uriResponseList = new ArrayList<>();
+        detailMap.values().forEach(notificationContentDetails -> {
+            uriResponseList.addAll(getAllLinks(notificationContentDetails));
+        });
         final HubBucket bucket = hubBucketService.startTheBucket(uriResponseList);
 
-        results = new NotificationResults(notificationViewResults, bucket, notificationContentDetails);
+        results = new NotificationResults(notificationViewResults, bucket, detailResults);
         return results;
     }
 

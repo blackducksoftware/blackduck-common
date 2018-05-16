@@ -158,6 +158,10 @@ public class NotificationContentDetail extends Stringable {
         return presentLinks;
     }
 
+    public NotificationContent getNotificationContent() {
+        return notificationContent;
+    }
+
     public String getNotificationGroup() {
         return notificationGroup;
     }
