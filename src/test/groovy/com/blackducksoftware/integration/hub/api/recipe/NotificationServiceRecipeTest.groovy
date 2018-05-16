@@ -14,9 +14,8 @@ import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView
-import com.blackducksoftware.integration.hub.api.view.CommonNotificationState
-import com.blackducksoftware.integration.hub.notification.NotificationContentDetailResults
 import com.blackducksoftware.integration.hub.notification.NotificationResults
+import com.blackducksoftware.integration.hub.notification.NotificationViewResult
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail
 import com.blackducksoftware.integration.hub.service.CodeLocationService
 import com.blackducksoftware.integration.hub.service.NotificationService
@@ -83,17 +82,16 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         endTime = endTime.plusMinutes(1)
         final Date endDate = Date.from(endTime.toInstant())
         final NotificationResults results = notificationService.getAllNotificationResults(startDate, endDate)
-        final List<CommonNotificationState> commonNotificationList = results.getCommonNotificationStates()
-        final NotificationContentDetailResults detailResults = results.getNotificationContentDetails()
+        final List<NotificationViewResult> notificationViewResultList = results.notificationViewResults.getResultList()
 
         Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate().get();
         println("Start Date: ${startDate}, End Date: ${endDate}, latestNotification: ${latestNotificationEndDate}")
 
         final HubBucket bucket = results.getHubBucket()
 
-        commonNotificationList.each({
-            if (!it.content.providesLicenseDetails()) {
-                List<NotificationContentDetail> detailsList = detailResults.getDetails(it.content)
+        notificationViewResultList.each({
+            if (!it.commonNotificationState.content.providesLicenseDetails()) {
+                List<NotificationContentDetail> detailsList = it.notificationContentDetails
                 detailsList.each({
                     String contentDetailKey
                     String projectName

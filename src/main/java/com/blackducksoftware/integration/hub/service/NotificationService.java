@@ -25,9 +25,9 @@ package com.blackducksoftware.integration.hub.service;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -42,8 +42,8 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationUser
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
-import com.blackducksoftware.integration.hub.notification.NotificationContentDetailResults;
 import com.blackducksoftware.integration.hub.notification.NotificationResults;
+import com.blackducksoftware.integration.hub.notification.NotificationViewResult;
 import com.blackducksoftware.integration.hub.notification.NotificationViewResults;
 import com.blackducksoftware.integration.hub.notification.content.LicenseLimitNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
@@ -124,7 +124,7 @@ public class NotificationService extends DataService {
 
     private NotificationViewResults createNotificationViewResults(final List<CommonNotificationState> commonNotifications) {
         if (commonNotifications == null || commonNotifications.isEmpty()) {
-            return new NotificationViewResults(commonNotifications, Optional.empty(), Optional.empty());
+            return new NotificationViewResults(Collections.emptyList(), Optional.empty(), Optional.empty());
         }
 
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
@@ -133,8 +133,9 @@ public class NotificationService extends DataService {
         // we know that the first notification in the list is the most current
         final Date latestCreatedAtDate = commonNotifications.get(0).getCreatedAt();
         final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
-
-        return new NotificationViewResults(commonNotifications, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString));
+        final ContentDetailCollector detailCollector = new ContentDetailCollector();
+        final List<NotificationViewResult> notificationViewResultList = detailCollector.collect(commonNotifications);
+        return new NotificationViewResults(notificationViewResultList, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString));
     }
 
     public List<CommonNotificationState> getCommonNotifications(final List<NotificationView> notificationViews) {
@@ -169,18 +170,16 @@ public class NotificationService extends DataService {
     }
 
     private NotificationResults createNotificationResults(final NotificationViewResults notificationViewResults) throws IntegrationException {
-        final ContentDetailCollector detailCollector = new ContentDetailCollector();
+
         final NotificationResults results;
-        final List<CommonNotificationState> commonNotifications = notificationViewResults.getCommonNotificationStates();
-        final Map<NotificationContent, List<NotificationContentDetail>> detailMap = detailCollector.collect(commonNotifications);
-        final NotificationContentDetailResults detailResults = new NotificationContentDetailResults(detailMap);
+
         final List<UriSingleResponse<? extends HubResponse>> uriResponseList = new ArrayList<>();
-        detailMap.values().forEach(notificationContentDetails -> {
-            uriResponseList.addAll(getAllLinks(notificationContentDetails));
+        notificationViewResults.getResultList().forEach(notificationViewResult -> {
+            uriResponseList.addAll(getAllLinks(notificationViewResult.getNotificationContentDetails()));
         });
         final HubBucket bucket = hubBucketService.startTheBucket(uriResponseList);
 
-        results = new NotificationResults(notificationViewResults, bucket, detailResults);
+        results = new NotificationResults(notificationViewResults, bucket);
         return results;
     }
 

@@ -27,21 +27,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
-
 public class NotificationViewResults {
-    private final List<CommonNotificationState> commonNotificationStates;
+    private final List<NotificationViewResult> resultList;
     private final Optional<Date> latestNotificationCreatedAtDate;
     private final Optional<String> latestNotificationCreatedAtString;
 
-    public NotificationViewResults(final List<CommonNotificationState> notificationViews, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
-        this.commonNotificationStates = notificationViews;
+    public NotificationViewResults(final List<NotificationViewResult> notificationViews, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
+        this.resultList = notificationViews;
         this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate;
         this.latestNotificationCreatedAtString = latestNotificationCreatedAtString;
     }
 
-    public List<CommonNotificationState> getCommonNotificationStates() {
-        return commonNotificationStates;
+    public List<NotificationViewResult> getResultList() {
+        return resultList;
     }
 
     public Optional<Date> getLatestNotificationCreatedAtDate() {
@@ -50,6 +48,10 @@ public class NotificationViewResults {
 
     public Optional<String> getLatestNotificationCreatedAtString() {
         return latestNotificationCreatedAtString;
+    }
+
+    public boolean isEmpty() {
+        return resultList == null || resultList.isEmpty();
     }
 
 }

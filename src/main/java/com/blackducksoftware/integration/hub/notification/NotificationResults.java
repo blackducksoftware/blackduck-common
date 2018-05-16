@@ -23,42 +23,29 @@
  */
 package com.blackducksoftware.integration.hub.notification;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 
 public class NotificationResults {
     private final NotificationViewResults notificationViewResults;
     private final HubBucket hubBucket;
-    private final NotificationContentDetailResults notificationContentDetails;
 
-    public NotificationResults(final NotificationViewResults notificationViewResults, final HubBucket hubBucket, final NotificationContentDetailResults notificationContentDetails) {
-        super();
+    public NotificationResults(final NotificationViewResults notificationViewResults, final HubBucket hubBucket) {
         this.notificationViewResults = notificationViewResults;
         this.hubBucket = hubBucket;
-        this.notificationContentDetails = notificationContentDetails;
     }
 
-    public Collection<CommonNotificationState> getCommonNotificationStates() {
-        if (notificationViewResults == null) {
-            return Collections.emptyList();
-        }
-        return notificationViewResults.getCommonNotificationStates();
+    public NotificationViewResults getNotificationViewResults() {
+        return notificationViewResults;
     }
 
     public HubBucket getHubBucket() {
         return hubBucket;
-    }
-
-    public NotificationContentDetailResults getNotificationContentDetails() {
-        return notificationContentDetails;
     }
 
     public Optional<Date> getLatestNotificationCreatedAtDate() {

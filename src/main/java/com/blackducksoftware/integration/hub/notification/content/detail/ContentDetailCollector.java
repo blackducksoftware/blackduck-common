@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
+import com.blackducksoftware.integration.hub.notification.NotificationViewResult;
 import com.blackducksoftware.integration.hub.notification.content.LicenseLimitNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
@@ -48,27 +49,23 @@ public class ContentDetailCollector {
         factoryMap.put(LicenseLimitNotificationContent.class, new LicenseLimitDetailFactory());
     }
 
-    public Map<NotificationContent, List<NotificationContentDetail>> collect(final List<CommonNotificationState> commonNotificationStates) {
-        final Map<NotificationContent, List<NotificationContentDetail>> detailMap = new HashMap<>();
-        commonNotificationStates.stream().map(CommonNotificationState::getContent).forEach(content -> {
-            collectDetails(detailMap, content);
+    public List<NotificationViewResult> collect(final List<CommonNotificationState> commonNotificationStates) {
+        final List<NotificationViewResult> resultList = new ArrayList<>();
+        commonNotificationStates.forEach(commonNotificationState -> {
+            collectDetails(resultList, commonNotificationState);
         });
 
-        return detailMap;
+        return resultList;
     }
 
-    private void collectDetails(final Map<NotificationContent, List<NotificationContentDetail>> detailMap, final NotificationContent notificationContent) {
-        final Class<?> key = notificationContent.getClass();
+    private void collectDetails(final List<NotificationViewResult> resultList, final CommonNotificationState commonNotificationState) {
+        final NotificationContent content = commonNotificationState.getContent();
+        final Class<?> key = content.getClass();
         if (factoryMap.containsKey(key)) {
             final NotificationDetailFactory factory = factoryMap.get(key);
-            List<NotificationContentDetail> contentDetailList;
-            if (detailMap.containsKey(notificationContent)) {
-                contentDetailList = detailMap.get(notificationContent);
-            } else {
-                contentDetailList = new ArrayList<>();
-                detailMap.put(notificationContent, contentDetailList);
-            }
-            contentDetailList.addAll(factory.createDetails(notificationContent));
+            final List<NotificationContentDetail> contentDetailList = factory.createDetails(content);
+            final NotificationViewResult notificationViewResult = new NotificationViewResult(commonNotificationState, contentDetailList);
+            resultList.add(notificationViewResult);
         }
     }
 }

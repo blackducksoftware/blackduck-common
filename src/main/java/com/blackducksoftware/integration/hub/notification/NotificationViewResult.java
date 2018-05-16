@@ -23,26 +23,26 @@
  */
 package com.blackducksoftware.integration.hub.notification;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
+import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 
-public class NotificationContentDetailResults {
+public class NotificationViewResult {
 
-    private final Map<NotificationContent, List<NotificationContentDetail>> detailsMap;
+    private final CommonNotificationState commonNotificationState;
+    private final List<NotificationContentDetail> notificationContentDetails;
 
-    public NotificationContentDetailResults(final Map<NotificationContent, List<NotificationContentDetail>> detailsMap) {
-        this.detailsMap = detailsMap;
+    public NotificationViewResult(final CommonNotificationState commonNotificationState, final List<NotificationContentDetail> notificationContentDetails) {
+        this.commonNotificationState = commonNotificationState;
+        this.notificationContentDetails = notificationContentDetails;
     }
 
-    public List<NotificationContentDetail> getDetails(final NotificationContent content) {
-        if (detailsMap.containsKey(content)) {
-            return detailsMap.get(content);
-        } else {
-            return Collections.emptyList();
-        }
+    public CommonNotificationState getCommonNotificationState() {
+        return commonNotificationState;
+    }
+
+    public List<NotificationContentDetail> getNotificationContentDetails() {
+        return notificationContentDetails;
     }
 }
