@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification.content.collector;
+package com.blackducksoftware.integration.hub.notification.content.detail;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -21,25 +21,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification.content.collector;
+package com.blackducksoftware.integration.hub.notification.content.detail;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContentDetail;
-import com.blackducksoftware.integration.hub.notification.content.VulnerabilityNotificationContent;
+import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 
-public class VulnerabilityDetailFactory extends NotificationDetailFactory {
+public class RuleViolationClearedDetailFactory extends NotificationDetailFactory {
 
     @Override
     public List<NotificationContentDetail> createDetails(final NotificationContent notificationContent) {
-        final VulnerabilityNotificationContent content = (VulnerabilityNotificationContent) notificationContent;
+        final RuleViolationClearedNotificationContent content = (RuleViolationClearedNotificationContent) notificationContent;
+        final Map<String, String> uriToName = content.policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
         final List<NotificationContentDetail> details = new ArrayList<>();
-        content.affectedProjectVersions.forEach(projectVersion -> {
-            details.add(NotificationContentDetail.createDetail(content, projectVersion.projectName, projectVersion.projectVersionName, projectVersion.projectVersion, content.componentName,
-                    null, content.versionName, content.componentVersion, null, null,
-                    content.componentVersionOriginName, projectVersion.componentIssueUrl, content.componentVersionOriginId));
+        content.componentVersionStatuses.forEach(componentVersionStatus -> {
+            componentVersionStatus.policies.forEach(policyUri -> {
+                final String policyName = uriToName.get(policyUri);
+                details.add(NotificationContentDetail.createDetail(content, content.projectName, content.projectVersionName, content.projectVersion, componentVersionStatus.componentName,
+                        componentVersionStatus.component, componentVersionStatus.componentVersionName, componentVersionStatus.componentVersion, policyName,
+                        policyUri, null, componentVersionStatus.componentIssueLink, null));
+            });
         });
         return details;
     }

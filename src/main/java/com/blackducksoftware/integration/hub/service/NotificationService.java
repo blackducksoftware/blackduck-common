@@ -50,7 +50,7 @@ import com.blackducksoftware.integration.hub.notification.content.PolicyOverride
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.VulnerabilityNotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.collector.ContentDetailCollector;
+import com.blackducksoftware.integration.hub.notification.content.detail.ContentDetailCollector;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;

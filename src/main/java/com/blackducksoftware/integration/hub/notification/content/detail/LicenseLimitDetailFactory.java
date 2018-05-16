@@ -21,26 +21,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification.content.collector;
+package com.blackducksoftware.integration.hub.notification.content.detail;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContentDetail;
-import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
 
-public class PolicyOverrideDetailFactory extends NotificationDetailFactory {
+public class LicenseLimitDetailFactory extends NotificationDetailFactory {
 
     @Override
     public List<NotificationContentDetail> createDetails(final NotificationContent notificationContent) {
-        final PolicyOverrideNotificationContent content = (PolicyOverrideNotificationContent) notificationContent;
-        final List<NotificationContentDetail> details = new ArrayList<>();
-        content.policyInfos.forEach(policyInfo -> {
-            details.add(NotificationContentDetail.createDetail(content, content.projectName, content.projectVersionName, content.projectVersion, content.componentName,
-                    content.component, content.componentVersionName, content.componentVersion, policyInfo.policyName,
-                    policyInfo.policy, null, null, null));
-        });
-        return details;
+        return Collections.emptyList();
     }
+
 }
