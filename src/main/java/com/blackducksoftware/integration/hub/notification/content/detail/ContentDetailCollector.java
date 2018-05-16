@@ -25,6 +25,7 @@ package com.blackducksoftware.integration.hub.notification.content.detail;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ public class ContentDetailCollector {
     Map<Class<? extends NotificationContent>, NotificationDetailFactory> factoryMap;
 
     public ContentDetailCollector() {
+        factoryMap = new HashMap<>();
         factoryMap.put(RuleViolationNotificationContent.class, new RuleViolationDetailFactory());
         factoryMap.put(RuleViolationClearedNotificationContent.class, new RuleViolationClearedDetailFactory());
         factoryMap.put(PolicyOverrideNotificationContent.class, new PolicyOverrideDetailFactory());

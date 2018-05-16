@@ -16,6 +16,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState
 import com.blackducksoftware.integration.hub.notification.NotificationResults
+import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail
 import com.blackducksoftware.integration.hub.service.CodeLocationService
 import com.blackducksoftware.integration.hub.service.NotificationService
 import com.blackducksoftware.integration.hub.service.ProjectService
@@ -73,6 +74,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final Date endDate = Date.from(endTime.toInstant())
         final NotificationResults results = notificationService.getAllNotificationResults(startDate, endDate)
         final List<CommonNotificationState> commonNotificationList = results.getCommonNotificationStates()
+        final List<NotificationContentDetail> contentDetailList = results.getNotificationContentDetails()
 
         Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate().get();
 
@@ -80,39 +82,35 @@ class NotificationServiceRecipeTest extends BasicRecipe {
 
         final HubBucket bucket = results.getHubBucket()
 
-        commonNotificationList.each({
-            if (!it.content.providesLicenseDetails()) {
-                String contentDetailKey
-                String projectName
-                String projectVersion
-                String componentName
-                String componentVersion
-                String policyName
-                boolean isVulnerability = false
-                it.content.createNotificationContentDetails().each({
-                    contentDetailKey = it.contentDetailKey
-                    projectName = it.projectName
-                    projectVersion = it.projectVersionName
-                    if (it.hasComponentVersion()) {
-                        componentName = it.componentName.get()
-                        componentVersion = it.componentVersionName.get()
-                    }
-
-                    if (it.hasOnlyComponent()) {
-                        componentName = it.componentName.get()
-                    }
-
-                    if (it.isPolicy()) {
-                        policyName = it.policyName.get()
-                    }
-
-                    if (it.isVulnerability()) {
-                        isVulnerability = true
-                    }
-                })
-
-                println("ContentDetailKey: ${contentDetailKey} ProjectName: ${projectName} Project Version: ${projectVersion} Component: ${componentName} Component Version: ${componentVersion} Policy: ${policyName} isVulnerability: ${isVulnerability}")
+        contentDetailList.each({
+            String contentDetailKey
+            String projectName
+            String projectVersion
+            String componentName
+            String componentVersion
+            String policyName
+            boolean isVulnerability = false
+            contentDetailKey = it.contentDetailKey
+            projectName = it.projectName
+            projectVersion = it.projectVersionName
+            if (it.hasComponentVersion()) {
+                componentName = it.componentName.get()
+                componentVersion = it.componentVersionName.get()
             }
+
+            if (it.hasOnlyComponent()) {
+                componentName = it.componentName.get()
+            }
+
+            if (it.isPolicy()) {
+                policyName = it.policyName.get()
+            }
+
+            if (it.isVulnerability()) {
+                isVulnerability = true
+            }
+
+            println("ContentDetailKey: ${contentDetailKey} ProjectName: ${projectName} Project Version: ${projectVersion} Component: ${componentName} Component Version: ${componentVersion} Policy: ${policyName} isVulnerability: ${isVulnerability}")
         })
     }
 
@@ -131,45 +129,42 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final Date endDate = Date.from(endTime.toInstant())
         final NotificationResults results = notificationService.getAllNotificationResults(startDate, endDate)
         final List<CommonNotificationState> commonNotificationList = results.getCommonNotificationStates()
+        final List<NotificationContentDetail> contentDetailList = results.getNotificationContentDetails()
 
         Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate().get();
         println("Start Date: ${startDate}, End Date: ${endDate}, latestNotification: ${latestNotificationEndDate}")
 
         final HubBucket bucket = results.getHubBucket()
 
-        commonNotificationList.each({
-            if (!it.content.providesLicenseDetails()) {
-                String contentDetailKey
-                String projectName
-                String projectVersion
-                String componentName
-                String componentVersion
-                String policyName
-                boolean isVulnerability = false
-                it.content.createNotificationContentDetails().each({
-                    contentDetailKey = it.contentDetailKey
-                    projectName = it.projectName
-                    projectVersion = it.projectVersionName
-                    if (it.hasComponentVersion()) {
-                        componentName = it.componentName.get()
-                        componentVersion = it.componentVersionName.get()
-                    }
-
-                    if (it.hasOnlyComponent()) {
-                        componentName = it.componentName.get()
-                    }
-
-                    if (it.isPolicy()) {
-                        policyName = it.policyName.get()
-                    }
-
-                    if (it.isVulnerability()) {
-                        isVulnerability = true
-                    }
-                })
-
-                println("ContentDetailKey: ${contentDetailKey} ProjectName: ${projectName} Project Version: ${projectVersion} Component: ${componentName} Component Version: ${componentVersion} Policy: ${policyName} isVulnerability: ${isVulnerability}")
+        contentDetailList.each({
+            String contentDetailKey
+            String projectName
+            String projectVersion
+            String componentName
+            String componentVersion
+            String policyName
+            boolean isVulnerability = false
+            contentDetailKey = it.contentDetailKey
+            projectName = it.projectName
+            projectVersion = it.projectVersionName
+            if (it.hasComponentVersion()) {
+                componentName = it.componentName.get()
+                componentVersion = it.componentVersionName.get()
             }
+
+            if (it.hasOnlyComponent()) {
+                componentName = it.componentName.get()
+            }
+
+            if (it.isPolicy()) {
+                policyName = it.policyName.get()
+            }
+
+            if (it.isVulnerability()) {
+                isVulnerability = true
+            }
+
+            println("ContentDetailKey: ${contentDetailKey} ProjectName: ${projectName} Project Version: ${projectVersion} Component: ${componentName} Component Version: ${componentVersion} Policy: ${policyName} isVulnerability: ${isVulnerability}")
         })
     }
 
