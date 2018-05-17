@@ -30,35 +30,43 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
-import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
-import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.VulnerabilityNotificationContent;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class NotificationContentDetailFactory {
-    public List<NotificationContentDetail> generateNotificationContentDetails(final CommonNotificationState commonNotificationState) {
-        return generateNotificationContentDetails(commonNotificationState.getType(), commonNotificationState.getContent());
+    private final Gson gson;
+    private final JsonParser jsonParser;
+
+    public NotificationContentDetailFactory(final Gson gson, final JsonParser jsonParser) {
+        this.gson = gson;
+        this.jsonParser = jsonParser;
     }
 
-    public List<NotificationContentDetail> generateNotificationContentDetails(final NotificationType notificationType, final NotificationContent notificationContent) {
-        List<NotificationContentDetail> detailsList;
-        if (NotificationType.POLICY_OVERRIDE.equals(notificationType)) {
-            detailsList = generatePolicyOverrideContentDetails((PolicyOverrideNotificationContent) notificationContent);
-        } else if (NotificationType.RULE_VIOLATION.equals(notificationType)) {
-            detailsList = generateRuleViolationContentDetails((RuleViolationNotificationContent) notificationContent);
-        } else if (NotificationType.RULE_VIOLATION_CLEARED.equals(notificationType)) {
-            detailsList = generateRuleViolationClearedContentDetails((RuleViolationClearedNotificationContent) notificationContent);
-        } else if (NotificationType.VULNERABILITY.equals(notificationType)) {
-            detailsList = generateVulnerabilityContentDetails((VulnerabilityNotificationContent) notificationContent);
-        } else {
-            detailsList = Collections.emptyList();
+    // TODO there should be a method that takes a NotificationView or NotificationUserView and delegates to this.
+    public List<NotificationContentDetail> generateContentDetails(final NotificationType type, final String notificationJson) {
+        final JsonObject jsonObject = jsonParser.parse(notificationJson).getAsJsonObject();
+        if (NotificationType.POLICY_OVERRIDE.equals(type)) {
+            final PolicyOverrideNotificationContent content = gson.fromJson(jsonObject.get("content"), PolicyOverrideNotificationContent.class);
+            return generateContentDetails(content);
+        } else if (NotificationType.RULE_VIOLATION.equals(type)) {
+            final RuleViolationNotificationContent content = gson.fromJson(jsonObject.get("content"), RuleViolationNotificationContent.class);
+            return generateContentDetails(content);
+        } else if (NotificationType.RULE_VIOLATION_CLEARED.equals(type)) {
+            final RuleViolationClearedNotificationContent content = gson.fromJson(jsonObject.get("content"), RuleViolationClearedNotificationContent.class);
+            return generateContentDetails(content);
+        } else if (NotificationType.VULNERABILITY.equals(type)) {
+            final VulnerabilityNotificationContent content = gson.fromJson(jsonObject.get("content"), VulnerabilityNotificationContent.class);
+            return generateContentDetails(content);
         }
-        return detailsList;
+        return Collections.emptyList();
     }
 
-    public List<NotificationContentDetail> generatePolicyOverrideContentDetails(final PolicyOverrideNotificationContent content) {
+    public List<NotificationContentDetail> generateContentDetails(final PolicyOverrideNotificationContent content) {
         final List<NotificationContentDetail> details = new ArrayList<>();
         content.policyInfos.forEach(policyInfo -> {
             String componentValue;
@@ -73,7 +81,7 @@ public class NotificationContentDetailFactory {
         return details;
     }
 
-    public List<NotificationContentDetail> generateRuleViolationContentDetails(final RuleViolationNotificationContent content) {
+    public List<NotificationContentDetail> generateContentDetails(final RuleViolationNotificationContent content) {
         final Map<String, String> uriToName = content.policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
         final List<NotificationContentDetail> details = new ArrayList<>();
         content.componentVersionStatuses.forEach(componentVersionStatus -> {
@@ -92,7 +100,7 @@ public class NotificationContentDetailFactory {
         return details;
     }
 
-    public List<NotificationContentDetail> generateRuleViolationClearedContentDetails(final RuleViolationClearedNotificationContent content) {
+    public List<NotificationContentDetail> generateContentDetails(final RuleViolationClearedNotificationContent content) {
         final Map<String, String> uriToName = content.policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
         final List<NotificationContentDetail> details = new ArrayList<>();
         content.componentVersionStatuses.forEach(componentVersionStatus -> {
@@ -111,7 +119,7 @@ public class NotificationContentDetailFactory {
         return details;
     }
 
-    public List<NotificationContentDetail> generateVulnerabilityContentDetails(final VulnerabilityNotificationContent content) {
+    public List<NotificationContentDetail> generateContentDetails(final VulnerabilityNotificationContent content) {
         final List<NotificationContentDetail> details = new ArrayList<>();
         content.affectedProjectVersions.forEach(projectVersion -> {
             details.add(NotificationContentDetail.createDetail(content, NotificationContentDetail.CONTENT_KEY_GROUP_VULNERABILITY, projectVersion.projectName, projectVersion.projectVersionName, projectVersion.projectVersion,

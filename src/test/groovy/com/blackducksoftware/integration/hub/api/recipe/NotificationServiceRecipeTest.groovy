@@ -14,7 +14,7 @@ import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView
-import com.blackducksoftware.integration.hub.notification.NotificationResults
+import com.blackducksoftware.integration.hub.notification.NotificationDetailResults
 import com.blackducksoftware.integration.hub.notification.NotificationViewResult
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail
 import com.blackducksoftware.integration.hub.service.CodeLocationService
@@ -81,7 +81,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         endTime = endTime.withSecond(0).withNano(0)
         endTime = endTime.plusMinutes(1)
         final Date endDate = Date.from(endTime.toInstant())
-        final NotificationResults results = notificationService.getAllNotificationResults(startDate, endDate)
+        final NotificationDetailResults results = notificationService.getAllNotificationResults(startDate, endDate)
         final List<NotificationViewResult> notificationViewResultList = results.notificationViewResults.getResultList()
 
         Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate().get();
