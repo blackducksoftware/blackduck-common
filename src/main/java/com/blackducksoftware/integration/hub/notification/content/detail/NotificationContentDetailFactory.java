@@ -61,8 +61,14 @@ public class NotificationContentDetailFactory {
     public List<NotificationContentDetail> generatePolicyOverrideContentDetails(final PolicyOverrideNotificationContent content) {
         final List<NotificationContentDetail> details = new ArrayList<>();
         content.policyInfos.forEach(policyInfo -> {
+            String componentValue;
+            if (content.componentVersion != null) {
+                componentValue = null;
+            } else {
+                componentValue = content.component;
+            }
             details.add(NotificationContentDetail.createDetail(content, NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, content.projectName, content.projectVersionName, content.projectVersion, content.componentName,
-                    content.component, content.componentVersionName, content.componentVersion, policyInfo.policyName, policyInfo.policy, null, null, null));
+                    componentValue, content.componentVersionName, content.componentVersion, policyInfo.policyName, policyInfo.policy, null, null, null));
         });
         return details;
     }
@@ -73,8 +79,14 @@ public class NotificationContentDetailFactory {
         content.componentVersionStatuses.forEach(componentVersionStatus -> {
             componentVersionStatus.policies.forEach(policyUri -> {
                 final String policyName = uriToName.get(policyUri);
+                String componentValue;
+                if (componentVersionStatus.componentVersion != null) {
+                    componentValue = null;
+                } else {
+                    componentValue = componentVersionStatus.component;
+                }
                 details.add(NotificationContentDetail.createDetail(content, NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, content.projectName, content.projectVersionName, content.projectVersion, componentVersionStatus.componentName,
-                        componentVersionStatus.component, componentVersionStatus.componentVersionName, componentVersionStatus.componentVersion, policyName, policyUri, null, componentVersionStatus.componentIssueLink, null));
+                        componentValue, componentVersionStatus.componentVersionName, componentVersionStatus.componentVersion, policyName, policyUri, null, componentVersionStatus.componentIssueLink, null));
             });
         });
         return details;
@@ -86,8 +98,14 @@ public class NotificationContentDetailFactory {
         content.componentVersionStatuses.forEach(componentVersionStatus -> {
             componentVersionStatus.policies.forEach(policyUri -> {
                 final String policyName = uriToName.get(policyUri);
+                String componentValue;
+                if (componentVersionStatus.componentVersion != null) {
+                    componentValue = null;
+                } else {
+                    componentValue = componentVersionStatus.component;
+                }
                 details.add(NotificationContentDetail.createDetail(content, NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, content.projectName, content.projectVersionName, content.projectVersion, componentVersionStatus.componentName,
-                        componentVersionStatus.component, componentVersionStatus.componentVersionName, componentVersionStatus.componentVersion, policyName, policyUri, null, componentVersionStatus.componentIssueLink, null));
+                        componentValue, componentVersionStatus.componentVersionName, componentVersionStatus.componentVersion, policyName, policyUri, null, componentVersionStatus.componentIssueLink, null));
             });
         });
         return details;
