@@ -51,8 +51,8 @@ import com.blackducksoftware.integration.hub.notification.content.PolicyOverride
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.VulnerabilityNotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.detail.ContentDetailCollector;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
+import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetailFactory;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
@@ -133,8 +133,12 @@ public class NotificationService extends DataService {
         // we know that the first notification in the list is the most current
         final Date latestCreatedAtDate = commonNotifications.get(0).getCreatedAt();
         final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
-        final ContentDetailCollector detailCollector = new ContentDetailCollector();
-        final List<NotificationViewResult> notificationViewResultList = detailCollector.collect(commonNotifications);
+        final NotificationContentDetailFactory detailFactory = new NotificationContentDetailFactory();
+        final List<NotificationViewResult> notificationViewResultList = new ArrayList<>();
+        commonNotifications.forEach(commonNotification -> {
+            final NotificationViewResult result = new NotificationViewResult(commonNotification, detailFactory.generateNotificationContentDetails(commonNotification));
+            notificationViewResultList.add(result);
+        });
         return new NotificationViewResults(notificationViewResultList, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString));
     }
 

@@ -69,10 +69,10 @@ public class NotificationContentDetail extends Stringable {
     public static NotificationContentDetail createDetail(final NotificationContent notificationContent, final String notificationGroup, final String projectName, final String projectVersionName, final String projectVersionUri,
             final String componentName, final String componentUri, final String componentVersionName, final String componentVersionUri, final String policyName, final String policyUri,
             final String componentVersionOriginName, final String componentIssueUri, final String componentVersionOriginId) {
-        // TODO take the view instead: originView
-        return new NotificationContentDetail(notificationContent, notificationGroup, projectName, projectVersionName, projectVersion(projectVersionUri), Optional.ofNullable(componentName), component(componentUri),
-                Optional.ofNullable(componentVersionName),
-                componentVersion(componentVersionUri), Optional.ofNullable(policyName), policy(policyUri), Optional.ofNullable(componentVersionOriginName), componentIssue(componentIssueUri), Optional.ofNullable(componentVersionOriginId));
+        return new NotificationContentDetail(notificationContent, notificationGroup, projectName, projectVersionName, projectVersion(projectVersionUri),
+                Optional.ofNullable(componentName), component(componentUri), Optional.ofNullable(componentVersionName), componentVersion(componentVersionUri),
+                Optional.ofNullable(policyName), policy(policyUri),
+                Optional.ofNullable(componentVersionOriginName), componentIssue(componentIssueUri), Optional.ofNullable(componentVersionOriginId));
     }
 
     private NotificationContentDetail(final NotificationContent notificationContent, final String notificationGroup, final String projectName, final String projectVersionName,
