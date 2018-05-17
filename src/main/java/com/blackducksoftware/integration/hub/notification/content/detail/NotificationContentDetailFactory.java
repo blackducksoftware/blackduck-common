@@ -25,11 +25,15 @@ package com.blackducksoftware.integration.hub.notification.content.detail;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationStateRequestStateType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationUserView;
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
@@ -47,26 +51,34 @@ public class NotificationContentDetailFactory {
         this.jsonParser = jsonParser;
     }
 
-    // TODO there should be a method that takes a NotificationView or NotificationUserView and delegates to this.
-    public List<NotificationContentDetail> generateContentDetails(final NotificationType type, final String notificationJson) {
+    public List<NotificationContentDetail> generateUserContentDetails(final NotificationUserView view) {
+        return generateContentDetails(view.contentType, view.createdAt, view.notificationState, view.type, view.json);
+    }
+
+    public List<NotificationContentDetail> generateContentDetails(final NotificationView view) {
+        return generateContentDetails(view.contentType, view.createdAt, null, view.type, view.json);
+    }
+
+    public List<NotificationContentDetail> generateContentDetails(final String contentType, final Date createdAt, final NotificationStateRequestStateType notificationState, final NotificationType type, final String notificationJson) {
         final JsonObject jsonObject = jsonParser.parse(notificationJson).getAsJsonObject();
         if (NotificationType.POLICY_OVERRIDE.equals(type)) {
             final PolicyOverrideNotificationContent content = gson.fromJson(jsonObject.get("content"), PolicyOverrideNotificationContent.class);
-            return generateContentDetails(content);
+            return generateContentDetails(contentType, createdAt, notificationState, type, content);
         } else if (NotificationType.RULE_VIOLATION.equals(type)) {
             final RuleViolationNotificationContent content = gson.fromJson(jsonObject.get("content"), RuleViolationNotificationContent.class);
-            return generateContentDetails(content);
+            return generateContentDetails(contentType, createdAt, notificationState, type, content);
         } else if (NotificationType.RULE_VIOLATION_CLEARED.equals(type)) {
             final RuleViolationClearedNotificationContent content = gson.fromJson(jsonObject.get("content"), RuleViolationClearedNotificationContent.class);
-            return generateContentDetails(content);
+            return generateContentDetails(contentType, createdAt, notificationState, type, content);
         } else if (NotificationType.VULNERABILITY.equals(type)) {
             final VulnerabilityNotificationContent content = gson.fromJson(jsonObject.get("content"), VulnerabilityNotificationContent.class);
-            return generateContentDetails(content);
+            return generateContentDetails(contentType, createdAt, notificationState, type, content);
         }
         return Collections.emptyList();
     }
 
-    public List<NotificationContentDetail> generateContentDetails(final PolicyOverrideNotificationContent content) {
+    public List<NotificationContentDetail> generateContentDetails(final String contentType, final Date createdAt, final NotificationStateRequestStateType notificationState, final NotificationType type,
+            final PolicyOverrideNotificationContent content) {
         final List<NotificationContentDetail> details = new ArrayList<>();
         content.policyInfos.forEach(policyInfo -> {
             String componentValue;
@@ -75,13 +87,15 @@ public class NotificationContentDetailFactory {
             } else {
                 componentValue = content.component;
             }
-            details.add(NotificationContentDetail.createDetail(content, NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, content.projectName, content.projectVersionName, content.projectVersion, content.componentName,
+            details.add(NotificationContentDetail.createDetail(content, contentType,
+                    createdAt, type, NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, notificationState, content.projectName, content.projectVersionName, content.projectVersion, content.componentName,
                     componentValue, content.componentVersionName, content.componentVersion, policyInfo.policyName, policyInfo.policy, null, null, null));
         });
         return details;
     }
 
-    public List<NotificationContentDetail> generateContentDetails(final RuleViolationNotificationContent content) {
+    public List<NotificationContentDetail> generateContentDetails(final String contentType, final Date createdAt, final NotificationStateRequestStateType notificationState, final NotificationType type,
+            final RuleViolationNotificationContent content) {
         final Map<String, String> uriToName = content.policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
         final List<NotificationContentDetail> details = new ArrayList<>();
         content.componentVersionStatuses.forEach(componentVersionStatus -> {
@@ -93,14 +107,16 @@ public class NotificationContentDetailFactory {
                 } else {
                     componentValue = componentVersionStatus.component;
                 }
-                details.add(NotificationContentDetail.createDetail(content, NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, content.projectName, content.projectVersionName, content.projectVersion, componentVersionStatus.componentName,
+                details.add(NotificationContentDetail.createDetail(content, contentType,
+                        createdAt, type, NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, notificationState, content.projectName, content.projectVersionName, content.projectVersion, componentVersionStatus.componentName,
                         componentValue, componentVersionStatus.componentVersionName, componentVersionStatus.componentVersion, policyName, policyUri, null, componentVersionStatus.componentIssueLink, null));
             });
         });
         return details;
     }
 
-    public List<NotificationContentDetail> generateContentDetails(final RuleViolationClearedNotificationContent content) {
+    public List<NotificationContentDetail> generateContentDetails(final String contentType, final Date createdAt, final NotificationStateRequestStateType notificationState, final NotificationType type,
+            final RuleViolationClearedNotificationContent content) {
         final Map<String, String> uriToName = content.policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
         final List<NotificationContentDetail> details = new ArrayList<>();
         content.componentVersionStatuses.forEach(componentVersionStatus -> {
@@ -112,17 +128,20 @@ public class NotificationContentDetailFactory {
                 } else {
                     componentValue = componentVersionStatus.component;
                 }
-                details.add(NotificationContentDetail.createDetail(content, NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, content.projectName, content.projectVersionName, content.projectVersion, componentVersionStatus.componentName,
+                details.add(NotificationContentDetail.createDetail(content, contentType,
+                        createdAt, type, NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, notificationState, content.projectName, content.projectVersionName, content.projectVersion, componentVersionStatus.componentName,
                         componentValue, componentVersionStatus.componentVersionName, componentVersionStatus.componentVersion, policyName, policyUri, null, componentVersionStatus.componentIssueLink, null));
             });
         });
         return details;
     }
 
-    public List<NotificationContentDetail> generateContentDetails(final VulnerabilityNotificationContent content) {
+    public List<NotificationContentDetail> generateContentDetails(final String contentType, final Date createdAt, final NotificationStateRequestStateType notificationState, final NotificationType type,
+            final VulnerabilityNotificationContent content) {
         final List<NotificationContentDetail> details = new ArrayList<>();
         content.affectedProjectVersions.forEach(projectVersion -> {
-            details.add(NotificationContentDetail.createDetail(content, NotificationContentDetail.CONTENT_KEY_GROUP_VULNERABILITY, projectVersion.projectName, projectVersion.projectVersionName, projectVersion.projectVersion,
+            details.add(NotificationContentDetail.createDetail(content, contentType,
+                    createdAt, type, NotificationContentDetail.CONTENT_KEY_GROUP_VULNERABILITY, notificationState, projectVersion.projectName, projectVersion.projectVersionName, projectVersion.projectVersion,
                     content.componentName, null, content.versionName, content.componentVersion, null, null, content.componentVersionOriginName, projectVersion.componentIssueUrl, content.componentVersionOriginId));
         });
         return details;

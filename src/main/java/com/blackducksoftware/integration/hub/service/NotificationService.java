@@ -95,7 +95,7 @@ public class NotificationService extends DataService {
 
     public NotificationDetailResults getAllUserNotificationResults(final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
         final List<NotificationUserView> notificationViewResults = getAllUserNotifications(user, startDate, endDate);
-        final NotificationDetailResults results = createNotificationDetailResults(notificationViewResults);
+        final NotificationDetailResults results = createUserNotificationDetails(notificationViewResults);
         return results;
     }
 
@@ -156,7 +156,20 @@ public class NotificationService extends DataService {
         return uriResponses;
     }
 
-    // TODO do the same thing for userViews and abstract common functionality
+    private NotificationDetailResults createUserNotificationDetails(final List<NotificationUserView> views) throws IntegrationException {
+        if (views == null || views.isEmpty()) {
+            return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty(), new HubBucket());
+        }
+        final List<NotificationContentDetail> details = new ArrayList<>();
+
+        final NotificationContentDetailFactory detailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
+        views.forEach(view -> {
+            details.addAll(detailFactory.generateUserContentDetails(view));
+        });
+
+        return createNotificationDetailResultsFromList(details);
+    }
+
     private NotificationDetailResults createNotificationDetailResults(final List<NotificationView> views) throws IntegrationException {
         if (views == null || views.isEmpty()) {
             return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty(), new HubBucket());
@@ -165,18 +178,22 @@ public class NotificationService extends DataService {
 
         final NotificationContentDetailFactory detailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
         views.forEach(view -> {
-            details.addAll(detailFactory.generateContentDetails(view.type, view.json));
+            details.addAll(detailFactory.generateContentDetails(view));
         });
 
+        return createNotificationDetailResultsFromList(details);
+    }
+
+    private NotificationDetailResults createNotificationDetailResultsFromList(final List<NotificationContentDetail> details) throws IntegrationException {
         final List<UriSingleResponse<? extends HubResponse>> uriResponseList = new ArrayList<>();
-        // TODO
-        // notificationViewResults.forEach(notificationViewResult -> {
-        // uriResponseList.addAll(getAllLinks(notificationViewResult.getNotificationContentDetails()));
-        // });
+        uriResponseList.addAll(getAllLinks(details));
         final HubBucket bucket = hubBucketService.startTheBucket(uriResponseList);
 
-        // TODO lastNotificationDate/String
-        return new NotificationDetailResults(details, , , bucket);
+        final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        final Date latestCreatedAtDate = details.get(0).getCreatedAt();
+        final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
+        return new NotificationDetailResults(details, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString), bucket);
     }
 
     private Request.Builder createNotificationRequestBuilder(final Date startDate, final Date endDate) {
