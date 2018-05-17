@@ -174,7 +174,6 @@ public class NotificationService extends DataService {
     }
 
     private NotificationResults createNotificationResults(final NotificationViewResults notificationViewResults) throws IntegrationException {
-
         final NotificationResults results;
 
         final List<UriSingleResponse<? extends HubResponse>> uriResponseList = new ArrayList<>();

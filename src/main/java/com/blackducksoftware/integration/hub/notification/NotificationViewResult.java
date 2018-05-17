@@ -29,7 +29,6 @@ import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 
 public class NotificationViewResult {
-
     private final CommonNotificationState commonNotificationState;
     private final List<NotificationContentDetail> notificationContentDetails;
 

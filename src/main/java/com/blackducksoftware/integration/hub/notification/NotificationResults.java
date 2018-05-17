@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.notification;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
@@ -32,28 +33,32 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 
 public class NotificationResults {
-    private final NotificationViewResults notificationViewResults;
+    private final List<NotificationViewResult> notificationResults;
+    private final Optional<Date> latestNotificationCreatedAtDate;
+    private final Optional<String> latestNotificationCreatedAtString;
     private final HubBucket hubBucket;
 
     public NotificationResults(final NotificationViewResults notificationViewResults, final HubBucket hubBucket) {
-        this.notificationViewResults = notificationViewResults;
+        this.notificationResults = notificationViewResults.getResultList();
+        this.latestNotificationCreatedAtDate = notificationViewResults.getLatestNotificationCreatedAtDate();
+        this.latestNotificationCreatedAtString = notificationViewResults.getLatestNotificationCreatedAtString();
         this.hubBucket = hubBucket;
     }
 
-    public NotificationViewResults getNotificationViewResults() {
-        return notificationViewResults;
+    public List<NotificationViewResult> getNotificationResults() {
+        return notificationResults;
+    }
+
+    public Optional<Date> getLatestNotificationCreatedAtDate() {
+        return latestNotificationCreatedAtDate;
+    }
+
+    public Optional<String> getLatestNotificationCreatedAtString() {
+        return latestNotificationCreatedAtString;
     }
 
     public HubBucket getHubBucket() {
         return hubBucket;
-    }
-
-    public Optional<Date> getLatestNotificationCreatedAtDate() {
-        return notificationViewResults.getLatestNotificationCreatedAtDate();
-    }
-
-    public Optional<String> getLatestNotificationCreatedAtString() {
-        return notificationViewResults.getLatestNotificationCreatedAtString();
     }
 
     @Override
