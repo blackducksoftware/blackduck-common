@@ -37,7 +37,6 @@ import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubPathMultipleResponses;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
@@ -166,21 +165,18 @@ public class NotificationService extends DataService {
 
         final NotificationContentDetailFactory detailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
         views.forEach(view -> {
-            details.addAll(getDetailsFromSingleView(detailFactory, view.type, view.json));
+            details.addAll(detailFactory.generateContentDetails(view.type, view.json));
         });
 
         final List<UriSingleResponse<? extends HubResponse>> uriResponseList = new ArrayList<>();
-        notificationViewResults.forEach(notificationViewResult -> {
-            uriResponseList.addAll(getAllLinks(notificationViewResult.getNotificationContentDetails()));
-        });
+        // TODO
+        // notificationViewResults.forEach(notificationViewResult -> {
+        // uriResponseList.addAll(getAllLinks(notificationViewResult.getNotificationContentDetails()));
+        // });
         final HubBucket bucket = hubBucketService.startTheBucket(uriResponseList);
 
         // TODO lastNotificationDate/String
         return new NotificationDetailResults(details, , , bucket);
-    }
-
-    private List<NotificationContentDetail> getDetailsFromSingleView(final NotificationContentDetailFactory detailFactory, final NotificationType type, final String notificationJson) {
-        return detailFactory.generateContentDetails(type, notificationJson);
     }
 
     private Request.Builder createNotificationRequestBuilder(final Date startDate, final Date endDate) {
