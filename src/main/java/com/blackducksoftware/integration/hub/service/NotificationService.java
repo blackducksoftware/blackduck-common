@@ -54,10 +54,18 @@ import com.blackducksoftware.integration.rest.request.Request;
 
 public class NotificationService extends DataService {
     private final HubBucketService hubBucketService;
+    private final NotificationContentDetailFactory notificationContentDetailFactory;
 
     public NotificationService(final HubService hubService, final HubBucketService hubBucketService) {
         super(hubService);
         this.hubBucketService = hubBucketService;
+        this.notificationContentDetailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
+    }
+
+    public NotificationService(final HubService hubService, final HubBucketService hubBucketService, final NotificationContentDetailFactory notificationContentDetailFactory) {
+        super(hubService);
+        this.hubBucketService = hubBucketService;
+        this.notificationContentDetailFactory = notificationContentDetailFactory;
     }
 
     public List<NotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
@@ -158,13 +166,11 @@ public class NotificationService extends DataService {
     }
 
     private NotificationDetailResults createUserNotificationDetails(final List<NotificationUserView> views) throws IntegrationException {
-        final NotificationContentDetailFactory detailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
-        return createNotificationDetailResults(views, detailFactory::generateUserContentDetails);
+        return createNotificationDetailResults(views, notificationContentDetailFactory::generateUserContentDetails);
     }
 
     private NotificationDetailResults createNotificationDetailResults(final List<NotificationView> views) throws IntegrationException {
-        final NotificationContentDetailFactory detailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
-        return createNotificationDetailResults(views, detailFactory::generateContentDetails);
+        return createNotificationDetailResults(views, notificationContentDetailFactory::generateContentDetails);
     }
 
     private <V> NotificationDetailResults createNotificationDetailResults(final List<V> views, final Function<V, List<NotificationContentDetail>> createFunction) throws IntegrationException {
