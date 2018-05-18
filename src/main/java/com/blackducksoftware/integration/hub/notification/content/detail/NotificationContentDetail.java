@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.notification.content.detail;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +32,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationStateRequestStateType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
 import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
@@ -41,10 +44,15 @@ import com.blackducksoftware.integration.util.Stringable;
 
 public class NotificationContentDetail extends Stringable {
     private final NotificationContent notificationContent;
+    private final String contentType;
+    private final Date createdAt;
+    private final NotificationType type;
     private final String notificationGroup;
     private final String contentDetailKey;
     private final String projectName;
     private final String projectVersionName;
+    private final Optional<NotificationStateRequestStateType> notificationState;
+
     private final Optional<UriSingleResponse<ProjectVersionView>> projectVersion;
 
     private final Optional<String> componentName;
@@ -66,22 +74,28 @@ public class NotificationContentDetail extends Stringable {
     public final static String CONTENT_KEY_GROUP_VULNERABILITY = "vulnerability";
     public final static String CONTENT_KEY_SEPARATOR = "|";
 
-    public static NotificationContentDetail createDetail(final NotificationContent notificationContent, final String notificationGroup, final String projectName, final String projectVersionName, final String projectVersionUri,
-            final String componentName, final String componentUri, final String componentVersionName, final String componentVersionUri, final String policyName, final String policyUri,
+    public static NotificationContentDetail createDetail(final NotificationContent notificationContent, final String contentType,
+            final Date createdAt, final NotificationType type, final String notificationGroup, final NotificationStateRequestStateType notificationState, final String projectName, final String projectVersionName,
+            final String projectVersionUri, final String componentName, final String componentUri, final String componentVersionName, final String componentVersionUri, final String policyName, final String policyUri,
             final String componentVersionOriginName, final String componentIssueUri, final String componentVersionOriginId) {
-        // TODO take the view instead: originView
-        return new NotificationContentDetail(notificationContent, notificationGroup, projectName, projectVersionName, projectVersion(projectVersionUri), Optional.ofNullable(componentName), component(componentUri),
-                Optional.ofNullable(componentVersionName),
-                componentVersion(componentVersionUri), Optional.ofNullable(policyName), policy(policyUri), Optional.ofNullable(componentVersionOriginName), componentIssue(componentIssueUri), Optional.ofNullable(componentVersionOriginId));
+        return new NotificationContentDetail(notificationContent, contentType, createdAt, type, notificationGroup, projectName, projectVersionName, Optional.ofNullable(notificationState), projectVersion(projectVersionUri),
+                Optional.ofNullable(componentName), component(componentUri), Optional.ofNullable(componentVersionName), componentVersion(componentVersionUri),
+                Optional.ofNullable(policyName), policy(policyUri),
+                Optional.ofNullable(componentVersionOriginName), componentIssue(componentIssueUri), Optional.ofNullable(componentVersionOriginId));
     }
 
-    private NotificationContentDetail(final NotificationContent notificationContent, final String notificationGroup, final String projectName, final String projectVersionName,
-            final Optional<UriSingleResponse<ProjectVersionView>> projectVersion,
+    private NotificationContentDetail(final NotificationContent notificationContent, final String contentType,
+            final Date createdAt, final NotificationType type, final String notificationGroup, final String projectName, final String projectVersionName,
+            final Optional<NotificationStateRequestStateType> notificationState, final Optional<UriSingleResponse<ProjectVersionView>> projectVersion,
             final Optional<String> componentName, final Optional<UriSingleResponse<ComponentView>> component, final Optional<String> componentVersionName, final Optional<UriSingleResponse<ComponentVersionView>> componentVersion,
             final Optional<String> policyName, final Optional<UriSingleResponse<PolicyRuleViewV2>> policy, final Optional<String> componentVersionOriginName, final Optional<UriSingleResponse<IssueView>> componentIssue,
             final Optional<String> componentVersionOriginId) {
         this.notificationContent = notificationContent;
+        this.contentType = contentType;
+        this.createdAt = createdAt;
+        this.type = type;
         this.notificationGroup = notificationGroup;
+        this.notificationState = notificationState;
         this.projectName = projectName;
         this.projectVersionName = projectVersionName;
         this.projectVersion = projectVersion;
@@ -141,6 +155,10 @@ public class NotificationContentDetail extends Stringable {
         return !isPolicy();
     }
 
+    public boolean isUserNotification() {
+        return notificationState.isPresent();
+    }
+
     public List<UriSingleResponse<? extends HubResponse>> getPresentLinks() {
         final List<UriSingleResponse<? extends HubResponse>> presentLinks = new ArrayList<>();
         if (projectVersion.isPresent()) {
@@ -160,6 +178,22 @@ public class NotificationContentDetail extends Stringable {
 
     public NotificationContent getNotificationContent() {
         return notificationContent;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public NotificationType getType() {
+        return type;
+    }
+
+    public Optional<NotificationStateRequestStateType> getNotificationState() {
+        return notificationState;
     }
 
     public String getNotificationGroup() {

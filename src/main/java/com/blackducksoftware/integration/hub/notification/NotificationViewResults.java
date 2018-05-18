@@ -27,31 +27,24 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-public class NotificationViewResults {
-    private final List<NotificationViewResult> resultList;
-    private final Optional<Date> latestNotificationCreatedAtDate;
-    private final Optional<String> latestNotificationCreatedAtString;
+import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 
-    public NotificationViewResults(final List<NotificationViewResult> notificationViews, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
-        this.resultList = notificationViews;
-        this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate;
-        this.latestNotificationCreatedAtString = latestNotificationCreatedAtString;
+public class NotificationViewResults extends NotificationResults<CommonNotificationState> {
+    private final List<CommonNotificationState> commonNotificationStates;
+
+    public NotificationViewResults(final List<CommonNotificationState> commonNotificationStates, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
+        super(latestNotificationCreatedAtDate, latestNotificationCreatedAtString);
+        this.commonNotificationStates = commonNotificationStates;
     }
 
-    public List<NotificationViewResult> getResultList() {
-        return resultList;
+    @Override
+    public List<CommonNotificationState> getResults() {
+        return commonNotificationStates;
     }
 
-    public Optional<Date> getLatestNotificationCreatedAtDate() {
-        return latestNotificationCreatedAtDate;
-    }
-
-    public Optional<String> getLatestNotificationCreatedAtString() {
-        return latestNotificationCreatedAtString;
-    }
-
+    @Override
     public boolean isEmpty() {
-        return resultList == null || resultList.isEmpty();
+        return commonNotificationStates == null || commonNotificationStates.isEmpty();
     }
 
 }

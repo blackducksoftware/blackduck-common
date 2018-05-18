@@ -23,26 +23,35 @@
  */
 package com.blackducksoftware.integration.hub.notification;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
-import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
+import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 
-public class NotificationViewResult {
+public class NotificationDetailResults extends NotificationResults<NotificationContentDetail> {
+    private final List<NotificationContentDetail> notificationDetails;
+    private final HubBucket hubBucket;
 
-    private final CommonNotificationState commonNotificationState;
-    private final List<NotificationContentDetail> notificationContentDetails;
-
-    public NotificationViewResult(final CommonNotificationState commonNotificationState, final List<NotificationContentDetail> notificationContentDetails) {
-        this.commonNotificationState = commonNotificationState;
-        this.notificationContentDetails = notificationContentDetails;
+    public NotificationDetailResults(final List<NotificationContentDetail> notificationDetails, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString, final HubBucket hubBucket) {
+        super(latestNotificationCreatedAtDate, latestNotificationCreatedAtString);
+        this.notificationDetails = notificationDetails;
+        this.hubBucket = hubBucket;
     }
 
-    public CommonNotificationState getCommonNotificationState() {
-        return commonNotificationState;
+    @Override
+    public List<NotificationContentDetail> getResults() {
+        return notificationDetails;
     }
 
-    public List<NotificationContentDetail> getNotificationContentDetails() {
-        return notificationContentDetails;
+    public HubBucket getHubBucket() {
+        return hubBucket;
     }
+
+    @Override
+    public boolean isEmpty() {
+        return notificationDetails == null || notificationDetails.isEmpty();
+    }
+
 }

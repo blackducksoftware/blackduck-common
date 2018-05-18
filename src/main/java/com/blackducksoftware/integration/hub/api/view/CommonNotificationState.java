@@ -30,7 +30,6 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.Notificat
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
-import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 import com.blackducksoftware.integration.util.Stringable;
 
 /**
@@ -42,24 +41,21 @@ public class CommonNotificationState extends Stringable {
     private final String contentType;
     private final Date createdAt;
     private final NotificationType type;
-    private final NotificationContent content;
     private final NotificationStateRequestStateType notificationState;
 
-    public CommonNotificationState(final NotificationView notificationView, final NotificationContent content) {
+    public CommonNotificationState(final NotificationView notificationView) {
         this.sourceView = notificationView;
         this.contentType = notificationView.contentType;
         this.createdAt = notificationView.createdAt;
         this.type = notificationView.type;
-        this.content = content;
         this.notificationState = null;
     }
 
-    public CommonNotificationState(final NotificationUserView notificationUserView, final NotificationContent content) {
+    public CommonNotificationState(final NotificationUserView notificationUserView) {
         this.sourceView = notificationUserView;
         this.contentType = notificationUserView.contentType;
         this.createdAt = notificationUserView.createdAt;
         this.type = notificationUserView.type;
-        this.content = content;
         this.notificationState = notificationUserView.notificationState;
     }
 
@@ -77,10 +73,6 @@ public class CommonNotificationState extends Stringable {
 
     public NotificationType getType() {
         return type;
-    }
-
-    public NotificationContent getContent() {
-        return content;
     }
 
     public NotificationStateRequestStateType getNotificationState() {
