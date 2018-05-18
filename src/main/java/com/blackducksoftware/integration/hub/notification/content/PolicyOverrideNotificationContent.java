@@ -23,7 +23,6 @@
  */
 package com.blackducksoftware.integration.hub.notification.content;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,25 +66,6 @@ public class PolicyOverrideNotificationContent extends NotificationContent {
     @Override
     public boolean providesLicenseDetails() {
         return false;
-    }
-
-    @Override
-    public List<NotificationContentDetail> createNotificationContentDetails() {
-        final List<NotificationContentDetail> details = new ArrayList<>();
-        policyInfos.forEach(policyInfo -> {
-            if (componentVersion != null) {
-                details.add(NotificationContentDetail.createPolicyDetailWithComponentVersion(this, projectName, projectVersionName, projectVersion, componentName, componentVersionName, componentVersion, policyInfo.policyName,
-                        policyInfo.policy));
-            } else {
-                details.add(NotificationContentDetail.createPolicyDetailWithComponentOnly(this, projectName, projectVersionName, projectVersion, componentName, component, policyInfo.policyName, policyInfo.policy));
-            }
-        });
-        return details;
-    }
-
-    @Override
-    public String getNotificationGroup() {
-        return NotificationContentDetail.CONTENT_KEY_GROUP_POLICY;
     }
 
     @Override

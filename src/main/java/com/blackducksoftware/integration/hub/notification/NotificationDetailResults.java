@@ -27,24 +27,31 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
+import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
+import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 
-public class NotificationViewResults extends NotificationResults<CommonNotificationState> {
-    private final List<CommonNotificationState> commonNotificationStates;
+public class NotificationDetailResults extends NotificationResults<NotificationContentDetail> {
+    private final List<NotificationContentDetail> notificationDetails;
+    private final HubBucket hubBucket;
 
-    public NotificationViewResults(final List<CommonNotificationState> commonNotificationStates, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
+    public NotificationDetailResults(final List<NotificationContentDetail> notificationDetails, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString, final HubBucket hubBucket) {
         super(latestNotificationCreatedAtDate, latestNotificationCreatedAtString);
-        this.commonNotificationStates = commonNotificationStates;
+        this.notificationDetails = notificationDetails;
+        this.hubBucket = hubBucket;
     }
 
     @Override
-    public List<CommonNotificationState> getResults() {
-        return commonNotificationStates;
+    public List<NotificationContentDetail> getResults() {
+        return notificationDetails;
+    }
+
+    public HubBucket getHubBucket() {
+        return hubBucket;
     }
 
     @Override
     public boolean isEmpty() {
-        return commonNotificationStates == null || commonNotificationStates.isEmpty();
+        return notificationDetails == null || notificationDetails.isEmpty();
     }
 
 }

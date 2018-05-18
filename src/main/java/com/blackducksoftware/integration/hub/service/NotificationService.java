@@ -25,10 +25,12 @@ package com.blackducksoftware.integration.hub.service;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -36,26 +38,19 @@ import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubPathMultipleResponses;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
-import com.blackducksoftware.integration.hub.notification.NotificationResults;
+import com.blackducksoftware.integration.hub.notification.NotificationDetailResults;
 import com.blackducksoftware.integration.hub.notification.NotificationViewResults;
-import com.blackducksoftware.integration.hub.notification.content.LicenseLimitNotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.NotificationContentDetail;
-import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.VulnerabilityNotificationContent;
+import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
+import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetailFactory;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.rest.RestConstants;
 import com.blackducksoftware.integration.rest.request.Request;
-import com.google.gson.JsonObject;
 
 public class NotificationService extends DataService {
     private final HubBucketService hubBucketService;
@@ -63,18 +58,6 @@ public class NotificationService extends DataService {
     public NotificationService(final HubService hubService, final HubBucketService hubBucketService) {
         super(hubService);
         this.hubBucketService = hubBucketService;
-    }
-
-    public NotificationResults getAllNotificationResults(final Date startDate, final Date endDate) throws IntegrationException {
-        final NotificationViewResults notificationViewResults = getAllNotificationViewResults(startDate, endDate);
-        final NotificationResults results = createNotificationResults(notificationViewResults);
-        return results;
-    }
-
-    public NotificationResults getAllUserNotificationResults(final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
-        final NotificationViewResults notificationViewResults = getAllNotificationViewResults(user, startDate, endDate);
-        final NotificationResults results = createNotificationResults(notificationViewResults);
-        return results;
     }
 
     public List<NotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
@@ -93,6 +76,30 @@ public class NotificationService extends DataService {
         return allUserNotificationItems;
     }
 
+    public NotificationViewResults getAllNotificationViewResults(final Date startDate, final Date endDate) throws IntegrationException {
+        final List<NotificationView> allNotificationItems = getAllNotifications(startDate, endDate);
+        final List<CommonNotificationState> commonNotifications = getCommonNotifications(allNotificationItems);
+        return createNotificationViewResults(commonNotifications);
+    }
+
+    public NotificationViewResults getAllNotificationViewResults(final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
+        final List<NotificationUserView> allNotificationItems = getAllUserNotifications(user, startDate, endDate);
+        final List<CommonNotificationState> commonNotifications = getCommonUserNotifications(allNotificationItems);
+        return createNotificationViewResults(commonNotifications);
+    }
+
+    public NotificationDetailResults getAllNotificationResults(final Date startDate, final Date endDate) throws IntegrationException {
+        final List<NotificationView> notificationViewResults = getAllNotifications(startDate, endDate);
+        final NotificationDetailResults results = createNotificationDetailResults(notificationViewResults);
+        return results;
+    }
+
+    public NotificationDetailResults getAllUserNotificationResults(final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
+        final List<NotificationUserView> notificationViewResults = getAllUserNotifications(user, startDate, endDate);
+        final NotificationDetailResults results = createUserNotificationDetails(notificationViewResults);
+        return results;
+    }
+
     /**
      * @return The java.util.Date of the most recent notification. If there are no notifications, the current date will be returned. This can set an initial start time window for all future notifications.
      * @throws IntegrationException
@@ -107,21 +114,9 @@ public class NotificationService extends DataService {
         }
     }
 
-    public NotificationViewResults getAllNotificationViewResults(final Date startDate, final Date endDate) throws IntegrationException {
-        final List<NotificationView> allNotificationItems = getAllNotifications(startDate, endDate);
-        final List<CommonNotificationState> commonNotifications = getCommonNotifications(allNotificationItems);
-        return createNotificationViewResults(commonNotifications);
-    }
-
-    public NotificationViewResults getAllNotificationViewResults(final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
-        final List<NotificationUserView> allNotificationItems = getAllUserNotifications(user, startDate, endDate);
-        final List<CommonNotificationState> commonNotifications = getCommonUserNotifications(allNotificationItems);
-        return createNotificationViewResults(commonNotifications);
-    }
-
     private NotificationViewResults createNotificationViewResults(final List<CommonNotificationState> commonNotifications) {
         if (commonNotifications == null || commonNotifications.isEmpty()) {
-            return new NotificationViewResults(commonNotifications, Optional.empty(), Optional.empty());
+            return new NotificationViewResults(Collections.emptyList(), Optional.empty(), Optional.empty());
         }
 
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
@@ -130,68 +125,67 @@ public class NotificationService extends DataService {
         // we know that the first notification in the list is the most current
         final Date latestCreatedAtDate = commonNotifications.get(0).getCreatedAt();
         final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
-
         return new NotificationViewResults(commonNotifications, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString));
     }
 
     public List<CommonNotificationState> getCommonNotifications(final List<NotificationView> notificationViews) {
         final List<CommonNotificationState> commonStates = notificationViews
-                                                                   .stream()
-                                                                   .map(view -> {
-                                                                       final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
-                                                                       return new CommonNotificationState(view, notificationContent.orElse(null));
-                                                                   }).collect(Collectors.toList());
+                .stream()
+                .map(view -> {
+                    return new CommonNotificationState(view);
+                }).collect(Collectors.toList());
 
         return commonStates;
     }
 
     public List<CommonNotificationState> getCommonUserNotifications(final List<NotificationUserView> notificationUserViews) {
         final List<CommonNotificationState> commonStates = notificationUserViews
-                                                                   .stream()
-                                                                   .map(view -> {
-                                                                       final Optional<NotificationContent> notificationContent = parseNotificationContent(view.json, view.type);
-                                                                       return new CommonNotificationState(view, notificationContent.orElse(null));
-                                                                   }).collect(Collectors.toList());
+                .stream()
+                .map(view -> {
+                    return new CommonNotificationState(view);
+                }).collect(Collectors.toList());
 
         return commonStates;
     }
 
-    public List<UriSingleResponse<? extends HubResponse>> getAllLinks(final List<CommonNotificationState> commonNotifications) {
+    public List<UriSingleResponse<? extends HubResponse>> getAllLinks(final List<NotificationContentDetail> details) {
         final List<UriSingleResponse<? extends HubResponse>> uriResponses = new ArrayList<>();
-        commonNotifications.forEach(notification -> {
-            final List<NotificationContentDetail> details = notification.getContent().createNotificationContentDetails();
-            details.forEach(detail -> {
-                uriResponses.addAll(detail.getPresentLinks());
-            });
+        details.forEach(detail -> {
+            uriResponses.addAll(detail.getPresentLinks());
         });
 
         return uriResponses;
     }
 
-    private NotificationResults createNotificationResults(final NotificationViewResults notificationViewResults) throws IntegrationException {
-        final NotificationResults results;
-        final List<CommonNotificationState> commonNotifications = notificationViewResults.getCommonNotificationStates();
-        final List<UriSingleResponse<? extends HubResponse>> uriResponseList = getAllLinks(commonNotifications);
-        final HubBucket bucket = hubBucketService.startTheBucket(uriResponseList);
-
-        results = new NotificationResults(notificationViewResults, bucket);
-        return results;
+    private NotificationDetailResults createUserNotificationDetails(final List<NotificationUserView> views) throws IntegrationException {
+        final NotificationContentDetailFactory detailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
+        return createNotificationDetailResults(views, detailFactory::generateUserContentDetails);
     }
 
-    private Optional<NotificationContent> parseNotificationContent(final String notificationJson, final NotificationType type) {
-        final JsonObject jsonObject = hubService.getJsonParser().parse(notificationJson).getAsJsonObject();
-        if (type == NotificationType.LICENSE_LIMIT) {
-            return Optional.of(hubService.getGson().fromJson(jsonObject.get("content"), LicenseLimitNotificationContent.class));
-        } else if (type == NotificationType.POLICY_OVERRIDE) {
-            return Optional.of(hubService.getGson().fromJson(jsonObject.get("content"), PolicyOverrideNotificationContent.class));
-        } else if (type == NotificationType.RULE_VIOLATION) {
-            return Optional.of(hubService.getGson().fromJson(jsonObject.get("content"), RuleViolationNotificationContent.class));
-        } else if (type == NotificationType.RULE_VIOLATION_CLEARED) {
-            return Optional.of(hubService.getGson().fromJson(jsonObject.get("content"), RuleViolationClearedNotificationContent.class));
-        } else if (type == NotificationType.VULNERABILITY) {
-            return Optional.of(hubService.getGson().fromJson(jsonObject.get("content"), VulnerabilityNotificationContent.class));
+    private NotificationDetailResults createNotificationDetailResults(final List<NotificationView> views) throws IntegrationException {
+        final NotificationContentDetailFactory detailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
+        return createNotificationDetailResults(views, detailFactory::generateContentDetails);
+    }
+
+    private <V> NotificationDetailResults createNotificationDetailResults(final List<V> views, final Function<V, List<NotificationContentDetail>> createFunction) throws IntegrationException {
+        if (views == null || views.isEmpty()) {
+            return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty(), new HubBucket());
         }
-        return Optional.empty();
+        final List<NotificationContentDetail> details = new ArrayList<>();
+
+        views.forEach(view -> {
+            details.addAll(createFunction.apply(view));
+        });
+
+        final List<UriSingleResponse<? extends HubResponse>> uriResponseList = new ArrayList<>();
+        uriResponseList.addAll(getAllLinks(details));
+        final HubBucket bucket = hubBucketService.startTheBucket(uriResponseList);
+
+        final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        final Date latestCreatedAtDate = details.get(0).getCreatedAt();
+        final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
+        return new NotificationDetailResults(details, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString), bucket);
     }
 
     private Request.Builder createNotificationRequestBuilder(final Date startDate, final Date endDate) {
