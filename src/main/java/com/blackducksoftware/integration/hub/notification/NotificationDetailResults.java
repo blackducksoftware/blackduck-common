@@ -30,7 +30,7 @@ import java.util.Optional;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 
-public class NotificationDetailResults extends NotificationResults {
+public class NotificationDetailResults extends NotificationResults<NotificationContentDetail> {
     private final List<NotificationContentDetail> notificationDetails;
     private final HubBucket hubBucket;
 

@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -157,34 +158,25 @@ public class NotificationService extends DataService {
     }
 
     private NotificationDetailResults createUserNotificationDetails(final List<NotificationUserView> views) throws IntegrationException {
-        if (views == null || views.isEmpty()) {
-            return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty(), new HubBucket());
-        }
-        final List<NotificationContentDetail> details = new ArrayList<>();
-
         final NotificationContentDetailFactory detailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
-        views.forEach(view -> {
-            details.addAll(detailFactory.generateUserContentDetails(view));
-        });
-
-        return createNotificationDetailResultsFromList(details);
+        return createNotificationDetailResults(views, detailFactory::generateUserContentDetails);
     }
 
     private NotificationDetailResults createNotificationDetailResults(final List<NotificationView> views) throws IntegrationException {
+        final NotificationContentDetailFactory detailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
+        return createNotificationDetailResults(views, detailFactory::generateContentDetails);
+    }
+
+    private <V> NotificationDetailResults createNotificationDetailResults(final List<V> views, final Function<V, List<NotificationContentDetail>> createFunction) throws IntegrationException {
         if (views == null || views.isEmpty()) {
             return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty(), new HubBucket());
         }
         final List<NotificationContentDetail> details = new ArrayList<>();
 
-        final NotificationContentDetailFactory detailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
         views.forEach(view -> {
-            details.addAll(detailFactory.generateContentDetails(view));
+            details.addAll(createFunction.apply(view));
         });
 
-        return createNotificationDetailResultsFromList(details);
-    }
-
-    private NotificationDetailResults createNotificationDetailResultsFromList(final List<NotificationContentDetail> details) throws IntegrationException {
         final List<UriSingleResponse<? extends HubResponse>> uriResponseList = new ArrayList<>();
         uriResponseList.addAll(getAllLinks(details));
         final HubBucket bucket = hubBucketService.startTheBucket(uriResponseList);

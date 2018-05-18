@@ -29,7 +29,7 @@ import java.util.Optional;
 
 import com.blackducksoftware.integration.hub.api.view.CommonNotificationState;
 
-public class NotificationViewResults extends NotificationResults {
+public class NotificationViewResults extends NotificationResults<CommonNotificationState> {
     private final List<CommonNotificationState> commonNotificationStates;
 
     public NotificationViewResults(final List<CommonNotificationState> commonNotificationStates, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
