@@ -23,12 +23,19 @@
  */
 package com.blackducksoftware.integration.hub.configuration;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.text.WordUtils;
 
 import com.blackducksoftware.integration.builder.AbstractBuilder;
 import com.blackducksoftware.integration.exception.IntegrationCertificateException;
@@ -42,32 +49,25 @@ import com.blackducksoftware.integration.rest.proxy.ProxyInfoBuilder;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 
 public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
+    public static final String HUB_SERVER_CONFIG_ENVIRONMENT_VARIABLE_PREFIX = "BLACKDUCK_HUB_";
+    public static final String HUB_SERVER_CONFIG_PROPERTY_KEY_PREFIX = "blackduck.hub.";
+
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
+
     private final HubServerConfigValidator validator;
-    private String hubUrl;
-    private String timeoutSeconds;
-    private String username;
-    private String password;
-    private int passwordLength;
-    private String apiToken;
-    private String proxyHost;
-    private String proxyPort;
-    private String proxyUsername;
-    private String proxyPassword;
-    private String proxyNtlmDomain;
-    private String proxyNtlmWorkstation;
-    private int proxyPasswordLength;
-    private String ignoredProxyHosts;
-    private boolean alwaysTrustServerCertificate;
+    private final Map<Property, String> values = new HashMap<>();
     private IntLogger logger;
 
     public HubServerConfigBuilder() {
-        this.timeoutSeconds = String.valueOf(DEFAULT_TIMEOUT_SECONDS);
-        this.validator = new HubServerConfigValidator();
+        this(new HubServerConfigValidator());
     }
 
     public HubServerConfigBuilder(final HubServerConfigValidator validator) {
         this.validator = validator;
+        EnumSet.allOf(Property.class).forEach(property -> {
+            values.put(property, null);
+        });
+        values.put(Property.TIMEOUT, String.valueOf(DEFAULT_TIMEOUT_SECONDS));
     }
 
     @Override
@@ -78,7 +78,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
             if (!stateException.getMessage().contains("SunCertPathBuilderException")) {
                 throw stateException;
             }
-            throw new IntegrationCertificateException(String.format("Please import the certificate for %s into your Java keystore.", hubUrl), stateException);
+            throw new IntegrationCertificateException(String.format("Please import the certificate for %s into your Java keystore.", url()), stateException);
         }
     }
 
@@ -86,7 +86,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     public HubServerConfig buildObject() {
         URL hubURL = null;
         try {
-            String tempUrl = hubUrl;
+            String tempUrl = url();
             if (!tempUrl.endsWith("/")) {
                 hubURL = new URL(tempUrl);
             } else {
@@ -97,152 +97,101 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         }
 
         final ProxyInfo proxyInfo = getHubProxyInfo();
-        if (StringUtils.isNotBlank(apiToken)) {
-            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), apiToken, proxyInfo, alwaysTrustServerCertificate);
+        if (StringUtils.isNotBlank(apiToken())) {
+            return new HubServerConfig(hubURL, timeoutSeconds(), apiToken(), proxyInfo, trustCert());
         } else {
             final Credentials credentials = getHubCredentials();
-            return new HubServerConfig(hubURL, NumberUtils.toInt(timeoutSeconds), credentials, proxyInfo, alwaysTrustServerCertificate);
+            return new HubServerConfig(hubURL, timeoutSeconds(), credentials, proxyInfo, trustCert());
         }
     }
 
     private Credentials getHubCredentials() {
         final CredentialsBuilder credentialsBuilder = new CredentialsBuilder();
-        credentialsBuilder.setUsername(username);
-        credentialsBuilder.setPassword(password);
-        credentialsBuilder.setPasswordLength(passwordLength);
+        credentialsBuilder.setUsername(values.get(Property.USERNAME));
+        credentialsBuilder.setPassword(values.get(Property.PASSWORD));
+        credentialsBuilder.setPasswordLength(passwordLength());
         return credentialsBuilder.buildObject();
     }
 
     private ProxyInfo getHubProxyInfo() {
         final ProxyInfoBuilder proxyBuilder = new ProxyInfoBuilder();
-        proxyBuilder.setHost(proxyHost);
-        proxyBuilder.setPort(proxyPort);
-        proxyBuilder.setIgnoredProxyHosts(ignoredProxyHosts);
-        proxyBuilder.setUsername(proxyUsername);
-        proxyBuilder.setPassword(proxyPassword);
-        proxyBuilder.setPasswordLength(proxyPasswordLength);
-        proxyBuilder.setNtlmDomain(proxyNtlmDomain);
-        proxyBuilder.setNtlmWorkstation(proxyNtlmWorkstation);
+        proxyBuilder.setHost(values.get(Property.PROXY_HOST));
+        proxyBuilder.setPort(values.get(Property.PROXY_PORT));
+        proxyBuilder.setIgnoredProxyHosts(values.get(Property.IGNORED_PROXY_HOSTS));
+        proxyBuilder.setUsername(values.get(Property.PROXY_USERNAME));
+        proxyBuilder.setPassword(values.get(Property.PROXY_PASSWORD));
+        proxyBuilder.setPasswordLength(proxyPasswordLength());
+        proxyBuilder.setNtlmDomain(values.get(Property.PROXY_NTLM_DOMAIN));
+        proxyBuilder.setNtlmWorkstation(values.get(Property.PROXY_NTLM_WORKSTATION));
         return proxyBuilder.buildObject();
     }
 
     @Override
     public AbstractValidator createValidator() {
-        validator.setHubUrl(hubUrl);
-        validator.setUsername(username);
-        validator.setPassword(password);
-        validator.setApiToken(apiToken);
-        validator.setTimeout(timeoutSeconds);
-        validator.setProxyHost(proxyHost);
-        validator.setProxyPort(proxyPort);
-        validator.setIgnoredProxyHosts(ignoredProxyHosts);
-        validator.setProxyUsername(proxyUsername);
-        validator.setProxyPassword(proxyPassword);
-        validator.setProxyPasswordLength(proxyPasswordLength);
-        validator.setAlwaysTrustServerCertificate(alwaysTrustServerCertificate);
-        validator.setProxyNtlmDomain(proxyNtlmDomain);
-        validator.setProxyNtlmWorkstation(proxyNtlmWorkstation);
+        validator.setHubUrl(url());
+        validator.setUsername(values.get(Property.USERNAME));
+        validator.setPassword(values.get(Property.PASSWORD));
+        validator.setPasswordLength(passwordLength());
+        validator.setApiToken(apiToken());
+        validator.setTimeout(values.get(Property.TIMEOUT));
+        validator.setProxyHost(values.get(Property.PROXY_HOST));
+        validator.setProxyPort(values.get(Property.PROXY_PORT));
+        validator.setIgnoredProxyHosts(values.get(Property.IGNORED_PROXY_HOSTS));
+        validator.setProxyUsername(values.get(Property.PROXY_USERNAME));
+        validator.setProxyPassword(values.get(Property.PROXY_PASSWORD));
+        validator.setProxyPasswordLength(proxyPasswordLength());
+        validator.setAlwaysTrustServerCertificate(trustCert());
+        validator.setProxyNtlmDomain(values.get(Property.PROXY_NTLM_DOMAIN));
+        validator.setProxyNtlmWorkstation(values.get(Property.PROXY_NTLM_WORKSTATION));
         return validator;
     }
 
+    public void setFromProperties(final Map<String, String> properties) {
+        for (final Property configProperty : Property.values()) {
+            if (configProperty.isWithin(properties.keySet())) {
+                final String value = configProperty.getValueFrom(properties);
+                final String setterMethodName = configProperty.getBuilderPropertySetterName();
+                try {
+                    final Method setter = this.getClass().getMethod(setterMethodName, String.class);
+                    setter.invoke(this, value);
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                    // who cares - ekerwin 2018-05-15
+                }
+            }
+        }
+    }
+
     public void setFromProperties(final Properties properties) {
-        final String hubUrl = properties.getProperty("blackduck.hub.url");
-        final String hubUsername = properties.getProperty("blackduck.hub.username");
-        final String hubPassword = properties.getProperty("blackduck.hub.password");
-        final String hubApiToken = properties.getProperty("blackduck.hub.api.token");
-        final String hubTimeout = properties.getProperty("blackduck.hub.timeout");
-        final String hubProxyHost = properties.getProperty("blackduck.hub.proxy.host");
-        final String hubProxyPort = properties.getProperty("blackduck.hub.proxy.port");
-        final String hubIgnoredProxyHosts = properties.getProperty("blackduck.hub.ignored.proxy.hosts");
-        final String hubProxyUsername = properties.getProperty("blackduck.hub.proxy.username");
-        final String hubProxyPassword = properties.getProperty("blackduck.hub.proxy.password");
-        final boolean hubAlwaysTrustServerCertificate = Boolean.parseBoolean(properties.getProperty("blackduck.hub.trust.cert"));
+        final Map<String, String> propertiesMap = new HashMap<>();
+        for (final String propertyName : properties.stringPropertyNames()) {
+            propertiesMap.put(propertyName, properties.getProperty(propertyName));
+        }
 
-        setHubUrl(hubUrl);
-        setUsername(hubUsername);
-        setPassword(hubPassword);
-        setApiToken(hubApiToken);
-        setTimeout(hubTimeout);
-        setProxyHost(hubProxyHost);
-        setProxyPort(hubProxyPort);
-        setIgnoredProxyHosts(hubIgnoredProxyHosts);
-        setProxyUsername(hubProxyUsername);
-        setProxyPassword(hubProxyPassword);
-        setAlwaysTrustServerCertificate(hubAlwaysTrustServerCertificate);
+        setFromProperties(propertiesMap);
     }
 
-    public void setHubUrl(final String hubUrl) {
-        this.hubUrl = StringUtils.trimToNull(hubUrl);
+    private String url() {
+        return values.get(Property.URL);
     }
 
-    public void setTimeout(final String timeoutSeconds) {
-        this.timeoutSeconds = timeoutSeconds;
+    private String apiToken() {
+        return values.get(Property.API_TOKEN);
     }
 
-    public void setTimeout(final int timeoutSeconds) {
-        setTimeout(String.valueOf(timeoutSeconds));
+    private int timeoutSeconds() {
+        return NumberUtils.toInt(values.get(Property.TIMEOUT), DEFAULT_TIMEOUT_SECONDS);
     }
 
-    public void setUsername(final String username) {
-        this.username = username;
+    private int passwordLength() {
+        return NumberUtils.toInt(values.get(Property.PASSWORD_LENGTH), 0);
     }
 
-    public void setPassword(final String password) {
-        this.password = password;
+    private int proxyPasswordLength() {
+        return NumberUtils.toInt(values.get(Property.PROXY_PASSWORD_LENGTH), 0);
     }
 
-    /**
-     * IMPORTANT : The password length should only be set if the password is already encrypted
-     */
-    public void setPasswordLength(final int passwordLength) {
-        this.passwordLength = passwordLength;
-    }
-
-    public void setApiToken(final String apiToken) {
-        this.apiToken = apiToken;
-    }
-
-    public void setProxyHost(final String proxyHost) {
-        this.proxyHost = proxyHost;
-    }
-
-    public void setProxyPort(final int proxyPort) {
-        setProxyPort(String.valueOf(proxyPort));
-    }
-
-    public void setProxyPort(final String proxyPort) {
-        this.proxyPort = proxyPort;
-    }
-
-    public void setProxyUsername(final String proxyUsername) {
-        this.proxyUsername = proxyUsername;
-    }
-
-    public void setProxyPassword(final String proxyPassword) {
-        this.proxyPassword = proxyPassword;
-    }
-
-    /**
-     * IMPORTANT: The proxy password length should only be set if the proxy password is already encrypted
-     */
-    public void setProxyPasswordLength(final int proxyPasswordLength) {
-        this.proxyPasswordLength = proxyPasswordLength;
-    }
-
-    public void setProxyNtlmDomain(final String proxyNtlmDomain) {
-        this.proxyNtlmDomain = proxyNtlmDomain;
-    }
-
-    public void setProxyNtlmWorkstation(final String proxyNtlmWorkstation) {
-        this.proxyNtlmWorkstation = proxyNtlmWorkstation;
-    }
-
-    public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
-        this.ignoredProxyHosts = ignoredProxyHosts;
-    }
-
-    public void setAlwaysTrustServerCertificate(final boolean alwaysTrustServerCertificate) {
-        this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
+    private boolean trustCert() {
+        return Boolean.parseBoolean(values.get(Property.TRUST_CERT));
     }
 
     public IntLogger getLogger() {
@@ -255,4 +204,176 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     public void setLogger(final IntLogger logger) {
         this.logger = logger;
     }
+
+    // setters for the values of HubServerConfigBuilder
+    @Deprecated
+    /**
+     * @deprecated Please use setUrl(final String url) instead.
+     */
+    public void setHubUrl(final String hubUrl) {
+        setUrl(hubUrl);
+    }
+
+    @Deprecated
+    /**
+     * @deprecated Please use setTrustCert(final boolean trustCert) instead.
+     */
+    public void setAlwaysTrustServerCertificate(final boolean alwaysTrustServerCertificate) {
+        setTrustCert(alwaysTrustServerCertificate);
+    }
+
+    public void setUrl(final String url) {
+        values.put(Property.URL, url);
+    }
+
+    public void setUsername(final String username) {
+        values.put(Property.USERNAME, username);
+    }
+
+    public void setPassword(final String password) {
+        values.put(Property.PASSWORD, password);
+    }
+
+    /**
+     * IMPORTANT : The password length should only be set if the password is already encrypted
+     */
+    public void setPasswordLength(final String passwordLength) {
+        values.put(Property.PASSWORD_LENGTH, passwordLength);
+    }
+
+    /**
+     * IMPORTANT : The password length should only be set if the password is already encrypted
+     */
+    public void setPasswordLength(final int passwordLength) {
+        setPasswordLength(String.valueOf(passwordLength));
+    }
+
+    public void setApiToken(final String apiToken) {
+        values.put(Property.API_TOKEN, apiToken);
+    }
+
+    public void setTimeout(final String timeout) {
+        values.put(Property.TIMEOUT, timeout);
+    }
+
+    public void setTimeout(final int timeout) {
+        setTimeout(String.valueOf(timeout));
+    }
+
+    public void setProxyHost(final String proxyHost) {
+        values.put(Property.PROXY_HOST, proxyHost);
+    }
+
+    public void setProxyPort(final String proxyPort) {
+        values.put(Property.PROXY_PORT, proxyPort);
+    }
+
+    public void setProxyPort(final int proxyPort) {
+        setProxyPort(String.valueOf(proxyPort));
+    }
+
+    public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
+        values.put(Property.IGNORED_PROXY_HOSTS, ignoredProxyHosts);
+    }
+
+    public void setProxyUsername(final String proxyUsername) {
+        values.put(Property.PROXY_USERNAME, proxyUsername);
+    }
+
+    public void setProxyPassword(final String proxyPassword) {
+        values.put(Property.PROXY_PASSWORD, proxyPassword);
+    }
+
+    /**
+     * IMPORTANT : The proxy password length should only be set if the proxy password is already encrypted
+     */
+    public void setProxyPasswordLength(final String proxyPasswordLength) {
+        values.put(Property.PROXY_PASSWORD_LENGTH, proxyPasswordLength);
+    }
+
+    /**
+     * IMPORTANT : The proxy password length should only be set if the proxy password is already encrypted
+     */
+    public void setProxyPasswordLength(final int proxyPasswordLength) {
+        setProxyPassword(String.valueOf(proxyPasswordLength));
+    }
+
+    public void setProxyNtlmDomain(final String proxyNtlmDomain) {
+        values.put(Property.PROXY_NTLM_DOMAIN, proxyNtlmDomain);
+    }
+
+    public void setProxyNtlmWorkstation(final String proxyNtlmWorkstation) {
+        values.put(Property.PROXY_NTLM_WORKSTATION, proxyNtlmWorkstation);
+    }
+
+    public void setTrustCert(final String trustCert) {
+        values.put(Property.TRUST_CERT, trustCert);
+    }
+
+    public void setTrustCert(final boolean trustCert) {
+        setTrustCert(String.valueOf(trustCert));
+    }
+
+    public enum Property {
+        URL,
+        USERNAME,
+        PASSWORD,
+        PASSWORD_LENGTH,
+        API_TOKEN,
+        TIMEOUT,
+        PROXY_HOST,
+        PROXY_PORT,
+        IGNORED_PROXY_HOSTS,
+        PROXY_USERNAME,
+        PROXY_PASSWORD,
+        PROXY_PASSWORD_LENGTH,
+        PROXY_NTLM_DOMAIN,
+        PROXY_NTLM_WORKSTATION,
+        TRUST_CERT;
+
+        private final String environmentVariableKey;
+        private final String propertyKey;
+        private final String builderPropertyName;
+        private final String builderPropertySetterName;
+
+        private Property() {
+            final String name = name();
+            environmentVariableKey = HUB_SERVER_CONFIG_ENVIRONMENT_VARIABLE_PREFIX + name;
+            propertyKey = environmentVariableKey.toLowerCase().replace("_", ".");
+
+            final String camelCaseName = WordUtils.capitalizeFully(name, '_').replace("_", "");
+            builderPropertyName = StringUtils.uncapitalize(camelCaseName);
+            builderPropertySetterName = "set" + camelCaseName;
+        }
+
+        public boolean isWithin(final Set<String> keys) {
+            return keys.contains(environmentVariableKey) || keys.contains(propertyKey);
+        }
+
+        public String getValueFrom(final Map<String, String> values) {
+            if (values.containsKey(environmentVariableKey)) {
+                return values.get(environmentVariableKey);
+            } else {
+                return values.get(propertyKey);
+            }
+        }
+
+        public String getEnvironmentVariableKey() {
+            return environmentVariableKey;
+        }
+
+        public String getPropertyKey() {
+            return propertyKey;
+        }
+
+        public String getBuilderPropertyName() {
+            return builderPropertyName;
+        }
+
+        public String getBuilderPropertySetterName() {
+            return builderPropertySetterName;
+        }
+
+    }
+
 }
