@@ -176,6 +176,7 @@ public class SignatureScannerService extends DataService {
         return scanSummaryView;
     }
 
+    // TODO ekerwin - this really needs to be fixed so new properties can't be forgotten
     private HubScanConfig getControlledScanConfig(final HubScanConfig originalHubScanConfig) {
         final HubScanConfigBuilder builder = new HubScanConfigBuilder();
         builder.setCodeLocationAlias(originalHubScanConfig.getCodeLocationAlias());
@@ -187,6 +188,7 @@ public class SignatureScannerService extends DataService {
         builder.setWorkingDirectory(originalHubScanConfig.getWorkingDirectory());
         builder.addAllScanTargetPaths(new ArrayList<>(originalHubScanConfig.getScanTargetPaths()));
         builder.setSnippetModeEnabled(originalHubScanConfig.isSnippetModeEnabled());
+        builder.setAdditionalScanParameters(originalHubScanConfig.getAdditionalScanParameters());
         return builder.build();
     }
 

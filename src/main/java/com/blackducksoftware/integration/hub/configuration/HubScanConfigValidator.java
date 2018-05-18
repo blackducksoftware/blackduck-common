@@ -37,21 +37,14 @@ import com.blackducksoftware.integration.validator.ValidationResults;
 
 public class HubScanConfigValidator extends AbstractValidator {
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
-
     public static final int DEFAULT_BOM_UPDATE_WAIT_TIME_IN_MINUTES = 5;
-
     public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
     private File workingDirectory;
-
     private String scanMemory;
-
     private final Set<String> scanTargetPaths = new HashSet<>();
-
     private String[] excludePatterns;
-
     private boolean disableScanTargetPathExistenceCheck;
-
     private boolean enableScanTargetPathsWithinWorkingDirectoryCheck;
 
     @Override
@@ -59,9 +52,7 @@ public class HubScanConfigValidator extends AbstractValidator {
         final ValidationResults result = new ValidationResults();
 
         validateScanMemory(result, DEFAULT_MEMORY_IN_MEGABYTES);
-
         validateScanTargetPaths(result, workingDirectory);
-
         validateExcludePatterns(result);
 
         return result;
@@ -71,19 +62,16 @@ public class HubScanConfigValidator extends AbstractValidator {
         validateScanMemory(result, null);
     }
 
-    private void validateScanMemory(final ValidationResults result,
-            final Integer defaultScanMemory) {
+    private void validateScanMemory(final ValidationResults result, final Integer defaultScanMemory) {
         if (StringUtils.isBlank(scanMemory)) {
-            result.addResult(HubScanConfigFieldEnum.SCANMEMORY,
-                    new ValidationResult(ValidationResultEnum.ERROR, "No scan memory was specified."));
+            result.addResult(HubScanConfigFieldEnum.SCANMEMORY, new ValidationResult(ValidationResultEnum.ERROR, "No scan memory was specified."));
             return;
         }
         int scanMemoryInt = 0;
         try {
             scanMemoryInt = stringToInteger(scanMemory);
         } catch (final IllegalArgumentException e) {
-            result.addResult(HubScanConfigFieldEnum.SCANMEMORY,
-                    new ValidationResult(ValidationResultEnum.ERROR, e.getMessage()));
+            result.addResult(HubScanConfigFieldEnum.SCANMEMORY, new ValidationResult(ValidationResultEnum.ERROR, e.getMessage()));
             return;
         }
         if (scanMemoryInt < MINIMUM_MEMORY_IN_MEGABYTES) {
@@ -93,9 +81,7 @@ public class HubScanConfigValidator extends AbstractValidator {
     }
 
     /**
-     * If running this validation outside of a Build, make sure you run
-     * disableScanTargetPathExistenceCheck() because the targets may not exist
-     * yet.
+     * If running this validation outside of a Build, make sure you run disableScanTargetPathExistenceCheck() because the targets may not exist yet.
      */
     public void validateScanTargetPaths(final ValidationResults result) {
         validateScanTargetPaths(result, null);

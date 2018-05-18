@@ -50,11 +50,12 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
     private boolean debug;
     private boolean verbose = true;
     private boolean snippetModeEnabled;
+    private String additionalScanParameters;
 
     @Override
     public HubScanConfig buildObject() {
         final HubScanConfig config = new HubScanConfig(workingDirectory, NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias,
-                unmapPreviousCodeLocations, deletePreviousCodeLocations, debug, verbose, snippetModeEnabled);
+                unmapPreviousCodeLocations, deletePreviousCodeLocations, debug, verbose, snippetModeEnabled, additionalScanParameters);
 
         return config;
     }
@@ -153,6 +154,10 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     public void setSnippetModeEnabled(final boolean snippetModeEnabled) {
         this.snippetModeEnabled = snippetModeEnabled;
+    }
+
+    public void setAdditionalScanParameters(final String additionalScanParameters) {
+        this.additionalScanParameters = additionalScanParameters;
     }
 
 }

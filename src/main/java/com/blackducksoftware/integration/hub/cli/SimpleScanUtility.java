@@ -91,6 +91,7 @@ public class SimpleScanUtility {
 
     /**
      * This will setup the command-line invocation of the Hub scanner. The workingDirectoryPath is the parent folder of the scan logs and other scan artifacts.
+     * 
      * @throws EncryptionException
      * @throws IllegalArgumentException
      * @throws HubIntegrationException
@@ -179,6 +180,10 @@ public class SimpleScanUtility {
                     logger.warn("Could not find a port to use for the Server.");
                 }
             }
+
+            if (hubServerConfig.isAlwaysTrustServerCertificate()) {
+                cmd.add("--insecure");
+            }
         }
 
         makeVerbose(cmd);
@@ -231,6 +236,10 @@ public class SimpleScanUtility {
             }
         }
 
+        if (StringUtils.isNotBlank(hubScanConfig.getAdditionalScanParameters())) {
+            cmd.add(hubScanConfig.getAdditionalScanParameters());
+        }
+
         for (final String target : hubScanConfig.getScanTargetPaths()) {
             cmd.add(target);
         }
@@ -244,6 +253,7 @@ public class SimpleScanUtility {
 
     /**
      * If running in an environment that handles process creation, this method should be overridden to construct a process to execute the scan in the environment-specific way.
+     * 
      * @throws IOException
      * @throws HubIntegrationException
      */
