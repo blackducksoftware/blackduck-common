@@ -91,8 +91,8 @@ public class ProjectService extends DataService {
         throw new DoesNotExistException("This Project does not exist. Project : " + projectName);
     }
 
-    public String createHubProject(final ProjectRequest project) throws IntegrationException {
-        final Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(project);
+    public String createHubProject(final ProjectRequest projectRequest) throws IntegrationException {
+        final Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(projectRequest);
         return hubService.executePostRequestAndRetrieveURL(ApiDiscovery.PROJECTS_LINK, requestBuilder);
     }
 
@@ -117,13 +117,13 @@ public class ProjectService extends DataService {
         throw new DoesNotExistException(String.format("Could not find the version: %s for project: %s", projectVersionName, project.name));
     }
 
-    public String createHubVersion(final ProjectView project, final ProjectVersionRequest version) throws IntegrationException {
+    public String createHubVersion(final ProjectView project, final ProjectVersionRequest versionRequest) throws IntegrationException {
         final String uri = hubService.getFirstLink(project, ProjectView.VERSIONS_LINK);
-        return createHubVersion(uri, version);
+        return createHubVersion(uri, versionRequest);
     }
 
-    public String createHubVersion(final String versionsUri, final ProjectVersionRequest version) throws IntegrationException {
-        final Request request = RequestFactory.createCommonPostRequestBuilder(version).uri(versionsUri).build();
+    public String createHubVersion(final String versionsUri, final ProjectVersionRequest versionRequest) throws IntegrationException {
+        final Request request = RequestFactory.createCommonPostRequestBuilder(versionRequest).uri(versionsUri).build();
         return hubService.executePostRequestAndRetrieveURL(request);
     }
 
@@ -166,6 +166,30 @@ public class ProjectService extends DataService {
         projectVersionWrapper.setProjectView(project);
         projectVersionWrapper.setProjectVersionView(projectVersion);
         return projectVersionWrapper;
+    }
+
+    public void updateProjectAndVersion(final ProjectView project, ProjectRequest projectRequest) throws IntegrationException {
+        updateProjectAndVersion(hubService.getHref(project), projectRequest);
+    }
+
+    public void updateProjectAndVersion(final String projectUri, ProjectRequest projectRequest) throws IntegrationException {
+        final Request request = RequestFactory.createCommonPutRequestBuilder(projectRequest).uri(projectUri).build();
+        try (Response response = hubService.executeRequest(request)) {
+        } catch (IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
+    }
+
+    public void updateProjectVersion(ProjectVersionView version, ProjectVersionRequest versionRequest) throws IntegrationException {
+        updateProjectVersion(hubService.getHref(version), versionRequest);
+    }
+
+    public void updateProjectVersion(final String versionUri, ProjectVersionRequest versionRequest) throws IntegrationException {
+        final Request request = RequestFactory.createCommonPutRequestBuilder(versionRequest).uri(versionUri).build();
+        try (Response response = hubService.executeRequest(request)) {
+        } catch (IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
     }
 
     public List<AssignedUserView> getAssignedUsersToProject(final String projectName) throws IntegrationException {

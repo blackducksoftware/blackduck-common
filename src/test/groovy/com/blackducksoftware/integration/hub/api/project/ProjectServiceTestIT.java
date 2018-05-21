@@ -23,12 +23,11 @@
  */
 package com.blackducksoftware.integration.hub.api.project;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -41,7 +40,10 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVe
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
+import com.blackducksoftware.integration.hub.service.HubService;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
+import com.blackducksoftware.integration.hub.service.ProjectService;
+import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 
@@ -56,8 +58,8 @@ public class ProjectServiceTestIT {
         hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
     }
 
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
+    @After
+    public void tearDownAfterTest() throws Exception {
         if (project != null) {
             hubServicesFactory.createProjectService().deleteHubProject(project);
         }
@@ -116,6 +118,76 @@ public class ProjectServiceTestIT {
         } catch (final IntegrationRestException e) {
             // expected
         }
+    }
+
+    @Test
+    public void testCreateUpdateProject() throws IllegalArgumentException, IntegrationException {
+        HubService hubService = hubServicesFactory.createHubService();
+        ProjectService projectService = hubServicesFactory.createProjectService();
+
+        final ProjectRequest projectRequest = new ProjectRequest();
+        projectRequest.name = "InitialName";
+        projectRequest.projectTier = 2;
+        projectRequest.description = "Initial Description";
+        String projectUrl = projectService.createHubProject(projectRequest);
+
+        project = hubService.getResponse(projectUrl, ProjectView.class);
+
+        assertEquals("InitialName", project.name);
+        assertTrue(2 == project.projectTier);
+        assertEquals("Initial Description", project.description);
+
+        projectRequest.name = "New Name";
+        projectRequest.projectTier = 4;
+        projectRequest.description = "New Description";
+
+        projectService.updateProjectAndVersion(project, projectRequest);
+
+        project = hubService.getResponse(projectUrl, ProjectView.class);
+
+        assertEquals("New Name", project.name);
+        assertTrue(4 == project.projectTier);
+        assertEquals("New Description", project.description);
+    }
+
+    @Test
+    public void testCreateUpdateProjectVersion() throws IllegalArgumentException, IntegrationException {
+        HubService hubService = hubServicesFactory.createHubService();
+        ProjectService projectService = hubServicesFactory.createProjectService();
+
+        final ProjectRequest projectRequest = new ProjectRequest();
+        projectRequest.name = "InitialName";
+        projectRequest.projectTier = 2;
+        projectRequest.description = "Initial Description";
+        ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
+        projectVersionRequest.versionName = "Initial VersionName";
+        projectVersionRequest.phase = ProjectVersionPhaseType.PLANNING;
+        projectVersionRequest.distribution = ProjectVersionDistributionType.EXTERNAL;
+        projectRequest.versionRequest = projectVersionRequest;
+
+        String projectUrl = projectService.createHubProject(projectRequest);
+
+        project = hubService.getResponse(projectUrl, ProjectView.class);
+
+        ProjectVersionWrapper projectVersionWrapper = projectService.getProjectVersion("InitialName", "Initial VersionName");
+
+        ProjectVersionView projectVersionView = projectVersionWrapper.getProjectVersionView();
+
+        assertEquals("Initial VersionName", projectVersionView.versionName);
+        assertEquals(ProjectVersionPhaseType.PLANNING, projectVersionView.phase);
+        assertEquals(ProjectVersionDistributionType.EXTERNAL, projectVersionView.distribution);
+
+        projectVersionRequest.versionName = "New VersionName";
+        projectVersionRequest.phase = ProjectVersionPhaseType.DEPRECATED;
+        projectVersionRequest.distribution = ProjectVersionDistributionType.INTERNAL;
+
+        projectService.updateProjectVersion(projectVersionView, projectVersionRequest);
+
+        projectVersionView = hubService.getResponse(hubService.getHref(projectVersionView), ProjectVersionView.class);
+
+        assertEquals("New VersionName", projectVersionView.versionName);
+        assertEquals(ProjectVersionPhaseType.DEPRECATED, projectVersionView.phase);
+        assertEquals(ProjectVersionDistributionType.INTERNAL, projectVersionView.distribution);
     }
 
 }
