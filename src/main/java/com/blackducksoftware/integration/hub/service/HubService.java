@@ -250,6 +250,12 @@ public class HubService {
         return restConnection.executeRequest(RequestFactory.createCommonGetRequest(uri));
     }
 
+    public Response executeRequest(final HubPath path, final Request.Builder requestBuilder) throws IntegrationException {
+        final String uri = pieceTogetherUri(restConnection.baseUrl, path.getPath());
+        requestBuilder.uri(uri);
+        return executeRequest(requestBuilder.build());
+    }
+
     public Response executeRequest(final Request request) throws IntegrationException {
         return restConnection.executeRequest(request);
     }
