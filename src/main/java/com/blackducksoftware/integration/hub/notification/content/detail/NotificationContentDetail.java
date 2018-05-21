@@ -24,30 +24,21 @@
 package com.blackducksoftware.integration.hub.notification.content.detail;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationStateRequestStateType;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
 import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 import com.blackducksoftware.integration.util.Stringable;
 
 public class NotificationContentDetail extends Stringable {
-    private final NotificationContent notificationContent;
-    private final String contentType;
-    private final Date createdAt;
-    private final NotificationType type;
     private final String notificationGroup;
     private final String contentDetailKey;
-    private final Optional<NotificationStateRequestStateType> notificationState;
 
     private final Optional<String> projectName;
     private final Optional<String> projectVersionName;
@@ -74,12 +65,7 @@ public class NotificationContentDetail extends Stringable {
 
     // @formatter:off
     public static NotificationContentDetail createDetail(
-            final NotificationContent notificationContent
-            ,final String contentType
-            ,final Date createdAt
-            ,final NotificationType type
-            ,final String notificationGroup
-            ,final Optional<NotificationStateRequestStateType> optionalNotificationState
+            final String notificationGroup
             ,final Optional<String> projectName
             ,final Optional<String> projectVersionName
             ,final Optional<String> projectVersionUri
@@ -94,14 +80,9 @@ public class NotificationContentDetail extends Stringable {
             ,final Optional<String> componentVersionOriginId
             ) {
         return new NotificationContentDetail(
-                notificationContent
-                ,contentType
-                ,createdAt
-                ,type
-                ,notificationGroup
+                notificationGroup
                 ,projectName
                 ,projectVersionName
-                ,optionalNotificationState
                 ,projectVersionUri
                 ,componentName
                 ,componentUri
@@ -118,14 +99,9 @@ public class NotificationContentDetail extends Stringable {
 
     // @formatter:off
     private NotificationContentDetail(
-            final NotificationContent notificationContent
-            ,final String contentType
-            ,final Date createdAt
-            ,final NotificationType type
-            ,final String notificationGroup
+            final String notificationGroup
             ,final Optional<String> projectName
             ,final Optional<String> projectVersionName
-            ,final Optional<NotificationStateRequestStateType> notificationState
             ,final Optional<String> projectVersion
             ,final Optional<String> componentName
             ,final Optional<String> component
@@ -137,12 +113,7 @@ public class NotificationContentDetail extends Stringable {
             ,final Optional<String> componentIssue
             ,final Optional<String> componentVersionOriginId
             ) {
-        this.notificationContent = notificationContent;
-        this.contentType = contentType;
-        this.createdAt = createdAt;
-        this.type = type;
         this.notificationGroup = notificationGroup;
-        this.notificationState = notificationState;
         this.projectName = projectName;
         this.projectVersionName = projectVersionName;
         this.projectVersion = createUriSingleResponse(projectVersion, ProjectVersionView.class);
@@ -210,10 +181,6 @@ public class NotificationContentDetail extends Stringable {
         return !isPolicy();
     }
 
-    public boolean isUserNotification() {
-        return notificationState.isPresent();
-    }
-
     public List<UriSingleResponse<? extends HubResponse>> getPresentLinks() {
         final List<UriSingleResponse<? extends HubResponse>> presentLinks = new ArrayList<>();
         if (projectVersion.isPresent()) {
@@ -229,26 +196,6 @@ public class NotificationContentDetail extends Stringable {
             presentLinks.add(policy.get());
         }
         return presentLinks;
-    }
-
-    public NotificationContent getNotificationContent() {
-        return notificationContent;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public NotificationType getType() {
-        return type;
-    }
-
-    public Optional<NotificationStateRequestStateType> getNotificationState() {
-        return notificationState;
     }
 
     public String getNotificationGroup() {

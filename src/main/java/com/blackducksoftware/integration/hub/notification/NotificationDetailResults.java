@@ -23,10 +23,13 @@
  */
 package com.blackducksoftware.integration.hub.notification;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.blackducksoftware.integration.hub.api.UriSingleResponse;
+import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 
@@ -38,6 +41,15 @@ public class NotificationDetailResults extends NotificationResults<NotificationC
         super(latestNotificationCreatedAtDate, latestNotificationCreatedAtString);
         this.notificationDetails = notificationDetails;
         this.hubBucket = hubBucket;
+    }
+
+    public List<UriSingleResponse<? extends HubResponse>> getAllLinks() {
+        final List<UriSingleResponse<? extends HubResponse>> uriResponses = new ArrayList<>();
+        notificationDetails.forEach(detail -> {
+            uriResponses.addAll(detail.getPresentLinks());
+        });
+
+        return uriResponses;
     }
 
     @Override
