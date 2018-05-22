@@ -24,35 +24,24 @@
 package com.blackducksoftware.integration.hub.notification.content.detail;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationStateRequestStateType;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
 import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
-import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 import com.blackducksoftware.integration.util.Stringable;
 
 public class NotificationContentDetail extends Stringable {
-    private final NotificationContent notificationContent;
-    private final String contentType;
-    private final Date createdAt;
-    private final NotificationType type;
     private final String notificationGroup;
     private final String contentDetailKey;
-    private final String projectName;
-    private final String projectVersionName;
-    private final Optional<NotificationStateRequestStateType> notificationState;
 
+    private final Optional<String> projectName;
+    private final Optional<String> projectVersionName;
     private final Optional<UriSingleResponse<ProjectVersionView>> projectVersion;
 
     private final Optional<String> componentName;
@@ -74,41 +63,78 @@ public class NotificationContentDetail extends Stringable {
     public final static String CONTENT_KEY_GROUP_VULNERABILITY = "vulnerability";
     public final static String CONTENT_KEY_SEPARATOR = "|";
 
-    public static NotificationContentDetail createDetail(final NotificationContent notificationContent, final String contentType,
-            final Date createdAt, final NotificationType type, final String notificationGroup, final NotificationStateRequestStateType notificationState, final String projectName, final String projectVersionName,
-            final String projectVersionUri, final String componentName, final String componentUri, final String componentVersionName, final String componentVersionUri, final String policyName, final String policyUri,
-            final String componentVersionOriginName, final String componentIssueUri, final String componentVersionOriginId) {
-        return new NotificationContentDetail(notificationContent, contentType, createdAt, type, notificationGroup, projectName, projectVersionName, Optional.ofNullable(notificationState), projectVersion(projectVersionUri),
-                Optional.ofNullable(componentName), component(componentUri), Optional.ofNullable(componentVersionName), componentVersion(componentVersionUri),
-                Optional.ofNullable(policyName), policy(policyUri),
-                Optional.ofNullable(componentVersionOriginName), componentIssue(componentIssueUri), Optional.ofNullable(componentVersionOriginId));
+    // @formatter:off
+    public static NotificationContentDetail createDetail(
+            final String notificationGroup
+            ,final Optional<String> projectName
+            ,final Optional<String> projectVersionName
+            ,final Optional<String> projectVersionUri
+            ,final Optional<String> componentName
+            ,final Optional<String> componentUri
+            ,final Optional<String> componentVersionName
+            ,final Optional<String> componentVersionUri
+            ,final Optional<String> policyName
+            ,final Optional<String> policyUri
+            ,final Optional<String> componentVersionOriginName
+            ,final Optional<String> componentIssueUri
+            ,final Optional<String> componentVersionOriginId
+            ) {
+        return new NotificationContentDetail(
+                notificationGroup
+                ,projectName
+                ,projectVersionName
+                ,projectVersionUri
+                ,componentName
+                ,componentUri
+                ,componentVersionName
+                ,componentVersionUri
+                ,policyName
+                ,policyUri
+                ,componentVersionOriginName
+                ,componentIssueUri
+                ,componentVersionOriginId
+                );
     }
+    // @formatter:on
 
-    private NotificationContentDetail(final NotificationContent notificationContent, final String contentType,
-            final Date createdAt, final NotificationType type, final String notificationGroup, final String projectName, final String projectVersionName,
-            final Optional<NotificationStateRequestStateType> notificationState, final Optional<UriSingleResponse<ProjectVersionView>> projectVersion,
-            final Optional<String> componentName, final Optional<UriSingleResponse<ComponentView>> component, final Optional<String> componentVersionName, final Optional<UriSingleResponse<ComponentVersionView>> componentVersion,
-            final Optional<String> policyName, final Optional<UriSingleResponse<PolicyRuleViewV2>> policy, final Optional<String> componentVersionOriginName, final Optional<UriSingleResponse<IssueView>> componentIssue,
-            final Optional<String> componentVersionOriginId) {
-        this.notificationContent = notificationContent;
-        this.contentType = contentType;
-        this.createdAt = createdAt;
-        this.type = type;
+    // @formatter:off
+    private NotificationContentDetail(
+            final String notificationGroup
+            ,final Optional<String> projectName
+            ,final Optional<String> projectVersionName
+            ,final Optional<String> projectVersion
+            ,final Optional<String> componentName
+            ,final Optional<String> component
+            ,final Optional<String> componentVersionName
+            ,final Optional<String> componentVersion
+            ,final Optional<String> policyName
+            ,final Optional<String> policy
+            ,final Optional<String> componentVersionOriginName
+            ,final Optional<String> componentIssue
+            ,final Optional<String> componentVersionOriginId
+            ) {
         this.notificationGroup = notificationGroup;
-        this.notificationState = notificationState;
         this.projectName = projectName;
         this.projectVersionName = projectVersionName;
-        this.projectVersion = projectVersion;
+        this.projectVersion = createUriSingleResponse(projectVersion, ProjectVersionView.class);
         this.componentName = componentName;
-        this.component = component;
+        this.component = createUriSingleResponse(component, ComponentView.class);
         this.componentVersionName = componentVersionName;
-        this.componentVersion = componentVersion;
+        this.componentVersion = createUriSingleResponse(componentVersion, ComponentVersionView.class);
         this.policyName = policyName;
-        this.policy = policy;
+        this.policy = createUriSingleResponse(policy, PolicyRuleViewV2.class);
         this.componentVersionOriginName = componentVersionOriginName;
-        this.componentIssue = componentIssue;
+        this.componentIssue = createUriSingleResponse(componentIssue, IssueView.class);
         this.componentVersionOriginId = componentVersionOriginId;
         this.contentDetailKey = createContentDetailKey();
+    }
+    // @formatter:on
+
+    private <T extends HubResponse> Optional<UriSingleResponse<T>> createUriSingleResponse(final Optional<String> uri, final Class<T> responseClass) {
+        if (uri.isPresent()) {
+            return Optional.of(new UriSingleResponse<T>(uri.get(), responseClass));
+        }
+        return Optional.empty();
     }
 
     private String createContentDetailKey() {
@@ -155,10 +181,6 @@ public class NotificationContentDetail extends Stringable {
         return !isPolicy();
     }
 
-    public boolean isUserNotification() {
-        return notificationState.isPresent();
-    }
-
     public List<UriSingleResponse<? extends HubResponse>> getPresentLinks() {
         final List<UriSingleResponse<? extends HubResponse>> presentLinks = new ArrayList<>();
         if (projectVersion.isPresent()) {
@@ -176,26 +198,6 @@ public class NotificationContentDetail extends Stringable {
         return presentLinks;
     }
 
-    public NotificationContent getNotificationContent() {
-        return notificationContent;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public NotificationType getType() {
-        return type;
-    }
-
-    public Optional<NotificationStateRequestStateType> getNotificationState() {
-        return notificationState;
-    }
-
     public String getNotificationGroup() {
         return notificationGroup;
     }
@@ -204,11 +206,11 @@ public class NotificationContentDetail extends Stringable {
         return contentDetailKey;
     }
 
-    public String getProjectName() {
+    public Optional<String> getProjectName() {
         return projectName;
     }
 
-    public String getProjectVersionName() {
+    public Optional<String> getProjectVersionName() {
         return projectVersionName;
     }
 
@@ -252,31 +254,4 @@ public class NotificationContentDetail extends Stringable {
         return componentVersionOriginId;
     }
 
-    // private methods to assist in static building NotificationContentDetail instances
-    private static Optional<UriSingleResponse<ProjectVersionView>> projectVersion(final String projectVersionUri) {
-        return optional(projectVersionUri, ProjectVersionView.class);
-    }
-
-    private static Optional<UriSingleResponse<ComponentView>> component(final String componentUri) {
-        return optional(componentUri, ComponentView.class);
-    }
-
-    private static Optional<UriSingleResponse<ComponentVersionView>> componentVersion(final String componentVersionUri) {
-        return optional(componentVersionUri, ComponentVersionView.class);
-    }
-
-    private static Optional<UriSingleResponse<PolicyRuleViewV2>> policy(final String policyUri) {
-        return optional(policyUri, PolicyRuleViewV2.class);
-    }
-
-    private static Optional<UriSingleResponse<IssueView>> componentIssue(final String componentIssueUri) {
-        return optional(componentIssueUri, IssueView.class);
-    }
-
-    private static <T extends HubResponse> Optional<UriSingleResponse<T>> optional(final String uri, final Class<T> responseClass) {
-        if (StringUtils.isBlank(uri)) {
-            return Optional.empty();
-        }
-        return Optional.of(new UriSingleResponse<>(uri, responseClass));
-    }
 }
