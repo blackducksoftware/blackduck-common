@@ -105,8 +105,16 @@ public class HubServicesFactory {
         return new NotificationService(createHubService(), createHubBucketService());
     }
 
+    public NotificationService createNotificationService(final boolean oldestFirst) {
+        return new NotificationService(createHubService(), createHubBucketService(), oldestFirst);
+    }
+
     public NotificationService createNotificationService(final ExecutorService executorService) {
         return new NotificationService(createHubService(), createHubBucketService(executorService));
+    }
+
+    public NotificationService createNotificationService(final ExecutorService executorService, final boolean oldestFirst) {
+        return new NotificationService(createHubService(), createHubBucketService(executorService), oldestFirst);
     }
 
     public LicenseService createLicenseService() {

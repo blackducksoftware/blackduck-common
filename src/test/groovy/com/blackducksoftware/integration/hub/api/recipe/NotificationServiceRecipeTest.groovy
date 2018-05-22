@@ -61,7 +61,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
 
     @Test
     void fetchNotificationsSynchronous() {
-        final NotificationService notificationService = hubServicesFactory.createNotificationService()
+        final NotificationService notificationService = hubServicesFactory.createNotificationService(true)
         processNotifications(notificationService)
     }
 

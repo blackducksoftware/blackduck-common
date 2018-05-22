@@ -54,17 +54,28 @@ import com.blackducksoftware.integration.rest.request.Request;
 public class NotificationService extends DataService {
     private final HubBucketService hubBucketService;
     private final NotificationContentDetailFactory notificationContentDetailFactory;
+    private final boolean oldestFirst;
 
     public NotificationService(final HubService hubService, final HubBucketService hubBucketService) {
         super(hubService);
         this.hubBucketService = hubBucketService;
         this.notificationContentDetailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
+        // hub default behavior is to return the latest notifications first.
+        this.oldestFirst = false;
     }
 
-    public NotificationService(final HubService hubService, final HubBucketService hubBucketService, final NotificationContentDetailFactory notificationContentDetailFactory) {
+    public NotificationService(final HubService hubService, final HubBucketService hubBucketService, final boolean oldestFirst) {
+        super(hubService);
+        this.hubBucketService = hubBucketService;
+        this.notificationContentDetailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
+        this.oldestFirst = oldestFirst;
+    }
+
+    public NotificationService(final HubService hubService, final HubBucketService hubBucketService, final NotificationContentDetailFactory notificationContentDetailFactory, final boolean oldestFirst) {
         super(hubService);
         this.hubBucketService = hubBucketService;
         this.notificationContentDetailFactory = notificationContentDetailFactory;
+        this.oldestFirst = oldestFirst;
     }
 
     public List<NotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
@@ -188,17 +199,27 @@ public class NotificationService extends DataService {
         if (views == null || views.isEmpty()) {
             return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty(), hubBucket);
         }
+        List<NotificationDetailResult> sortedDetails;
         final List<NotificationDetailResult> details = new ArrayList<>();
 
         views.forEach(view -> {
             details.addAll(notificationContentDetailFactory.generateContentDetails(view));
         });
 
+        if (oldestFirst) {
+            sortedDetails = details.stream().sorted((result_1, result_2) -> {
+                return result_1.getCreatedAt().compareTo(result_2.getCreatedAt());
+            }).collect(Collectors.toList());
+        } else {
+            // use the default sorting from the Hub.
+            sortedDetails = details;
+        }
+
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final Date latestCreatedAtDate = views.get(0).getCreatedAt();
         final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
-        return new NotificationDetailResults(details, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString), hubBucket);
+        return new NotificationDetailResults(sortedDetails, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString), hubBucket);
     }
 
     private Request.Builder createNotificationRequestBuilder(final Date startDate, final Date endDate) {
