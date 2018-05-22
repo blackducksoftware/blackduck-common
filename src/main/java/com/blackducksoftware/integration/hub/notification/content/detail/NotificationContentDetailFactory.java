@@ -52,7 +52,7 @@ public class NotificationContentDetailFactory {
     }
 
     public List<NotificationContentDetail> generateUserContentDetails(final CommonNotificationView view) {
-        return generateContentDetails(view.getContentType(), view.getCreatedAt(), Optional.of(view.getNotificationState()), view.getType(), view.json);
+        return generateContentDetails(view.getContentType(), view.getCreatedAt(), Optional.ofNullable(view.getNotificationState()), view.getType(), view.json);
     }
 
     public List<NotificationContentDetail> generateContentDetails(final CommonNotificationView view) {
@@ -87,9 +87,11 @@ public class NotificationContentDetailFactory {
             } else {
                 componentValue = content.component;
             }
-            details.add(NotificationContentDetail.createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, Optional.of(content.projectName), Optional.of(content.projectVersionName), Optional.of(content.projectVersion),
-                    Optional.of(content.componentName), Optional.of(componentValue), Optional.of(content.componentVersionName), Optional.of(content.componentVersion), Optional.of(policyInfo.policyName), Optional.of(policyInfo.policy),
-                    Optional.empty(), Optional.empty(), Optional.empty()));
+            details.add(NotificationContentDetail
+                                .createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, Optional.ofNullable(content.projectName), Optional.ofNullable(content.projectVersionName), Optional.ofNullable(content.projectVersion),
+                                        Optional.ofNullable(content.componentName), Optional.ofNullable(componentValue), Optional.ofNullable(content.componentVersionName), Optional.ofNullable(content.componentVersion),
+                                        Optional.ofNullable(policyInfo.policyName), Optional.ofNullable(policyInfo.policy),
+                                        Optional.empty(), Optional.empty(), Optional.empty()));
         });
         return details;
     }
@@ -106,9 +108,11 @@ public class NotificationContentDetailFactory {
                 } else {
                     componentValue = componentVersionStatus.component;
                 }
-                details.add(NotificationContentDetail.createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, Optional.of(content.projectName), Optional.of(content.projectVersionName), Optional.of(content.projectVersion),
-                        Optional.of(componentVersionStatus.componentName), Optional.of(componentValue), Optional.of(componentVersionStatus.componentVersionName), Optional.of(componentVersionStatus.componentVersion), Optional.of(policyName),
-                        Optional.of(policyUri), Optional.empty(), Optional.of(componentVersionStatus.componentIssueLink), Optional.empty()));
+                details.add(NotificationContentDetail
+                                    .createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, Optional.ofNullable(content.projectName), Optional.ofNullable(content.projectVersionName), Optional.ofNullable(content.projectVersion),
+                                            Optional.ofNullable(componentVersionStatus.componentName), Optional.ofNullable(componentValue), Optional.ofNullable(componentVersionStatus.componentVersionName),
+                                            Optional.ofNullable(componentVersionStatus.componentVersion), Optional.ofNullable(policyName),
+                                            Optional.ofNullable(policyUri), Optional.empty(), Optional.ofNullable(componentVersionStatus.componentIssueLink), Optional.empty()));
             });
         });
         return details;
@@ -126,9 +130,11 @@ public class NotificationContentDetailFactory {
                 } else {
                     componentValue = componentVersionStatus.component;
                 }
-                details.add(NotificationContentDetail.createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, Optional.of(content.projectName), Optional.of(content.projectVersionName), Optional.of(content.projectVersion),
-                        Optional.of(componentVersionStatus.componentName), Optional.of(componentValue), Optional.of(componentVersionStatus.componentVersionName), Optional.of(componentVersionStatus.componentVersion), Optional.of(policyName),
-                        Optional.of(policyUri), Optional.empty(), Optional.of(componentVersionStatus.componentIssueLink), Optional.empty()));
+                details.add(NotificationContentDetail
+                                    .createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, Optional.ofNullable(content.projectName), Optional.ofNullable(content.projectVersionName), Optional.ofNullable(content.projectVersion),
+                                            Optional.ofNullable(componentVersionStatus.componentName), Optional.ofNullable(componentValue), Optional.ofNullable(componentVersionStatus.componentVersionName),
+                                            Optional.ofNullable(componentVersionStatus.componentVersion), Optional.ofNullable(policyName),
+                                            Optional.ofNullable(policyUri), Optional.empty(), Optional.ofNullable(componentVersionStatus.componentIssueLink), Optional.empty()));
             });
         });
         return details;
@@ -137,9 +143,10 @@ public class NotificationContentDetailFactory {
     public List<NotificationContentDetail> generateContentDetails(final VulnerabilityNotificationContent content) {
         final List<NotificationContentDetail> details = new ArrayList<>();
         content.affectedProjectVersions.forEach(projectVersion -> {
-            details.add(NotificationContentDetail.createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_VULNERABILITY, Optional.of(projectVersion.projectName), Optional.of(projectVersion.projectVersionName),
-                    Optional.of(projectVersion.projectVersion), Optional.of(content.componentName), Optional.empty(), Optional.of(content.versionName), Optional.of(content.componentVersion), Optional.empty(), Optional.empty(),
-                    Optional.of(content.componentVersionOriginName), Optional.of(projectVersion.componentIssueUrl), Optional.of(content.componentVersionOriginId)));
+            details.add(NotificationContentDetail.createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_VULNERABILITY, Optional.ofNullable(projectVersion.projectName), Optional.ofNullable(projectVersion.projectVersionName),
+                    Optional.ofNullable(projectVersion.projectVersion), Optional.ofNullable(content.componentName), Optional.empty(), Optional.ofNullable(content.versionName), Optional.ofNullable(content.componentVersion), Optional.empty(),
+                    Optional.empty(),
+                    Optional.ofNullable(content.componentVersionOriginName), Optional.ofNullable(projectVersion.componentIssueUrl), Optional.ofNullable(content.componentVersionOriginId)));
         });
         return details;
     }
