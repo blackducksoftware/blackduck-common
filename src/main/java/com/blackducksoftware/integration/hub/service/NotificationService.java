@@ -116,7 +116,7 @@ public class NotificationService extends DataService {
     public NotificationDetailResults getAllUserNotificationDetailResults(final HubBucket hubBucket, final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
         final List<NotificationUserView> notificationViewResults = getAllUserNotifications(user, startDate, endDate);
         final List<CommonNotificationView> commonNotificationViews = getCommonUserNotifications(notificationViewResults);
-        final NotificationDetailResults results = createUserNotificationDetails(hubBucket, commonNotificationViews);
+        final NotificationDetailResults results = createNotificationDetailResults(hubBucket, commonNotificationViews);
         return results;
     }
 
@@ -131,7 +131,7 @@ public class NotificationService extends DataService {
     public NotificationDetailResults getAllUserNotificationDetailResultsPopulated(final HubBucket hubBucket, final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
         final List<NotificationUserView> notificationViewResults = getAllUserNotifications(user, startDate, endDate);
         final List<CommonNotificationView> commonNotificationViews = getCommonUserNotifications(notificationViewResults);
-        final NotificationDetailResults results = createUserNotificationDetails(hubBucket, commonNotificationViews);
+        final NotificationDetailResults results = createNotificationDetailResults(hubBucket, commonNotificationViews);
         populateNotificationDetailResults(results);
         return results;
     }
@@ -188,10 +188,6 @@ public class NotificationService extends DataService {
         final Date latestCreatedAtDate = commonNotifications.get(0).getCreatedAt();
         final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
         return new CommonNotificationViewResults(commonNotifications, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString));
-    }
-
-    private NotificationDetailResults createUserNotificationDetails(final HubBucket hubBucket, final List<CommonNotificationView> views) throws IntegrationException {
-        return createNotificationDetailResults(hubBucket, views);
     }
 
     private NotificationDetailResults createNotificationDetailResults(final HubBucket hubBucket, final List<CommonNotificationView> views)

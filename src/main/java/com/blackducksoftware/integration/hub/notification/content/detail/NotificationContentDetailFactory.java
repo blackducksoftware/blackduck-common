@@ -143,7 +143,7 @@ public class NotificationContentDetailFactory {
         content.affectedProjectVersions.forEach(projectVersion -> {
             final NotificationContentDetail detail = NotificationContentDetail.createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_VULNERABILITY, Optional.of(projectVersion.projectName), Optional.of(projectVersion.projectVersionName),
                     Optional.of(projectVersion.projectVersion), Optional.of(content.componentName), Optional.empty(), Optional.of(content.versionName), Optional.of(content.componentVersion), Optional.empty(), Optional.empty(),
-                    Optional.of(content.componentVersionOriginName), Optional.of(projectVersion.componentIssueUrl), Optional.of(content.componentVersionOriginId));
+                    Optional.ofNullable(content.componentVersionOriginName), Optional.ofNullable(projectVersion.componentIssueUrl), Optional.ofNullable(content.componentVersionOriginId));
             resultList.add(new NotificationDetailResult(content, view.getContentType(), view.getCreatedAt(), view.getType(), detail.getNotificationGroup(), detail.getContentDetailKey(), Optional.ofNullable(view.getNotificationState()),
                     detail));
         });
