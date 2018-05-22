@@ -199,7 +199,7 @@ public class NotificationService extends DataService {
         final List<NotificationDetailResult> details = new ArrayList<>();
 
         views.forEach(view -> {
-            details.addAll(notificationContentDetailFactory.generateContentDetails(view));
+            details.add(notificationContentDetailFactory.generateContentDetails(view));
         });
 
         if (oldestFirst) {

@@ -295,7 +295,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
      * IMPORTANT : The proxy password length should only be set if the proxy password is already encrypted
      */
     public void setProxyPasswordLength(final int proxyPasswordLength) {
-        setProxyPassword(String.valueOf(proxyPasswordLength));
+        setProxyPasswordLength(String.valueOf(proxyPasswordLength));
     }
 
     public void setProxyNtlmDomain(final String proxyNtlmDomain) {

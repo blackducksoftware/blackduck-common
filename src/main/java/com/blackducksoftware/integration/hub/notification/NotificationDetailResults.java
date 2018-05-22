@@ -45,7 +45,9 @@ public class NotificationDetailResults extends NotificationResults<NotificationD
     public List<UriSingleResponse<? extends HubResponse>> getAllLinks() {
         final List<UriSingleResponse<? extends HubResponse>> uriResponses = new ArrayList<>();
         resultList.forEach(result -> {
-            uriResponses.addAll(result.getNotificationContentDetail().getPresentLinks());
+            result.getNotificationContentDetails().forEach(contentDetail -> {
+                uriResponses.addAll(contentDetail.getPresentLinks());
+            });
         });
 
         return uriResponses;

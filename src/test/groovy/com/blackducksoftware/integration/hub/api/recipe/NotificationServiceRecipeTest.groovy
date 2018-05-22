@@ -91,35 +91,37 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final HubBucket bucket = results.getHubBucket()
 
         notificationResultList.each({
-            NotificationContentDetail detail = it.getNotificationContentDetail()
-            String contentDetailKey
-            String projectName
-            String projectVersion
-            String componentName
-            String componentVersion
-            String policyName
-            boolean isVulnerability = false
-            contentDetailKey = detail.contentDetailKey
-            projectName = detail.projectName.get()
-            projectVersion = detail.projectVersionName.get()
-            if (detail.hasComponentVersion()) {
-                componentName = detail.componentName.get()
-                componentVersion = detail.componentVersionName.get()
-            }
+            it.getNotificationContentDetails().each({
+                NotificationContentDetail detail = it
+                String contentDetailKey
+                String projectName
+                String projectVersion
+                String componentName
+                String componentVersion
+                String policyName
+                boolean isVulnerability = false
+                contentDetailKey = detail.contentDetailKey
+                projectName = detail.projectName.get()
+                projectVersion = detail.projectVersionName.get()
+                if (detail.hasComponentVersion()) {
+                    componentName = detail.componentName.get()
+                    componentVersion = detail.componentVersionName.get()
+                }
 
-            if (detail.hasOnlyComponent()) {
-                componentName = detail.componentName.get()
-            }
+                if (detail.hasOnlyComponent()) {
+                    componentName = detail.componentName.get()
+                }
 
-            if (detail.isPolicy()) {
-                policyName = detail.policyName.get()
-            }
+                if (detail.isPolicy()) {
+                    policyName = detail.policyName.get()
+                }
 
-            if (detail.isVulnerability()) {
-                isVulnerability = true
-            }
+                if (detail.isVulnerability()) {
+                    isVulnerability = true
+                }
 
-            println("ContentDetailKey: ${contentDetailKey} ProjectName: ${projectName} Project Version: ${projectVersion} Component: ${componentName} Component Version: ${componentVersion} Policy: ${policyName} isVulnerability: ${isVulnerability}")
+                println("ContentDetailKey: ${contentDetailKey} ProjectName: ${projectName} Project Version: ${projectVersion} Component: ${componentName} Component Version: ${componentVersion} Policy: ${policyName} isVulnerability: ${isVulnerability}")
+            })
         })
     }
 
