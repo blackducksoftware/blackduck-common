@@ -30,31 +30,30 @@ import java.util.Optional;
 
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
-import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 
-public class NotificationDetailResults extends NotificationResults<NotificationContentDetail> {
-    private final List<NotificationContentDetail> notificationDetails;
+public class NotificationDetailResults extends NotificationResults<NotificationDetailResult> {
+    private final List<NotificationDetailResult> resultList;
     private final HubBucket hubBucket;
 
-    public NotificationDetailResults(final List<NotificationContentDetail> notificationDetails, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString, final HubBucket hubBucket) {
+    public NotificationDetailResults(final List<NotificationDetailResult> resultList, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString, final HubBucket hubBucket) {
         super(latestNotificationCreatedAtDate, latestNotificationCreatedAtString);
-        this.notificationDetails = notificationDetails;
+        this.resultList = resultList;
         this.hubBucket = hubBucket;
     }
 
     public List<UriSingleResponse<? extends HubResponse>> getAllLinks() {
         final List<UriSingleResponse<? extends HubResponse>> uriResponses = new ArrayList<>();
-        notificationDetails.forEach(detail -> {
-            uriResponses.addAll(detail.getPresentLinks());
+        resultList.forEach(result -> {
+            uriResponses.addAll(result.getNotificationContentDetail().getPresentLinks());
         });
 
         return uriResponses;
     }
 
     @Override
-    public List<NotificationContentDetail> getResults() {
-        return notificationDetails;
+    public List<NotificationDetailResult> getResults() {
+        return resultList;
     }
 
     public HubBucket getHubBucket() {
@@ -63,7 +62,7 @@ public class NotificationDetailResults extends NotificationResults<NotificationC
 
     @Override
     public boolean isEmpty() {
-        return notificationDetails == null || notificationDetails.isEmpty();
+        return resultList == null || resultList.isEmpty();
     }
 
 }

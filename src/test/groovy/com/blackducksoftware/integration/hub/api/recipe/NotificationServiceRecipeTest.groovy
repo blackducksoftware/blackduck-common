@@ -14,6 +14,7 @@ import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView
+import com.blackducksoftware.integration.hub.notification.NotificationDetailResult
 import com.blackducksoftware.integration.hub.notification.NotificationDetailResults
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail
 import com.blackducksoftware.integration.hub.service.CodeLocationService
@@ -80,8 +81,9 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         endTime = endTime.withSecond(0).withNano(0)
         endTime = endTime.plusMinutes(1)
         final Date endDate = Date.from(endTime.toInstant())
-        final NotificationDetailResults results = notificationService.getAllNotificationResults(startDate, endDate)
-        final List<NotificationContentDetail> notificationResultList = results.getResults()
+        final HubBucket hubBucket = new HubBucket();
+        final NotificationDetailResults results = notificationService.getAllNotificationDetailResultsPopulated(hubBucket,startDate, endDate)
+        final List<NotificationDetailResult> notificationResultList = results.getResults()
 
         Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate().get();
         println("Start Date: ${startDate}, End Date: ${endDate}, latestNotification: ${latestNotificationEndDate}")
@@ -89,6 +91,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final HubBucket bucket = results.getHubBucket()
 
         notificationResultList.each({
+            NotificationContentDetail detail = it.getNotificationContentDetail()
             String contentDetailKey
             String projectName
             String projectVersion
@@ -96,23 +99,23 @@ class NotificationServiceRecipeTest extends BasicRecipe {
             String componentVersion
             String policyName
             boolean isVulnerability = false
-            contentDetailKey = it.contentDetailKey
-            projectName = it.projectName
-            projectVersion = it.projectVersionName
-            if (it.hasComponentVersion()) {
-                componentName = it.componentName.get()
-                componentVersion = it.componentVersionName.get()
+            contentDetailKey = detail.contentDetailKey
+            projectName = detail.projectName.get()
+            projectVersion = detail.projectVersionName.get()
+            if (detail.hasComponentVersion()) {
+                componentName = detail.componentName.get()
+                componentVersion = detail.componentVersionName.get()
             }
 
-            if (it.hasOnlyComponent()) {
-                componentName = it.componentName.get()
+            if (detail.hasOnlyComponent()) {
+                componentName = detail.componentName.get()
             }
 
-            if (it.isPolicy()) {
-                policyName = it.policyName.get()
+            if (detail.isPolicy()) {
+                policyName = detail.policyName.get()
             }
 
-            if (it.isVulnerability()) {
+            if (detail.isVulnerability()) {
                 isVulnerability = true
             }
 

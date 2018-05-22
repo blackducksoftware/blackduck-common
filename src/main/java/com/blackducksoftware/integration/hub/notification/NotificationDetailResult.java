@@ -24,7 +24,6 @@
 package com.blackducksoftware.integration.hub.notification;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationStateRequestStateType;
@@ -41,10 +40,10 @@ public class NotificationDetailResult {
     private final String contentDetailKey;
     private final Optional<NotificationStateRequestStateType> notificationState;
 
-    private final List<NotificationContentDetail> notificationContentDetails;
+    private final NotificationContentDetail notificationContentDetail;
 
     public NotificationDetailResult(final NotificationContent notificationContent, final String contentType, final Date createdAt, final NotificationType type, final String notificationGroup, final String contentDetailKey,
-            final Optional<NotificationStateRequestStateType> notificationState, final List<NotificationContentDetail> notificationContentDetails) {
+            final Optional<NotificationStateRequestStateType> notificationState, final NotificationContentDetail notificationContentDetail) {
         this.notificationContent = notificationContent;
         this.contentType = contentType;
         this.createdAt = createdAt;
@@ -52,7 +51,7 @@ public class NotificationDetailResult {
         this.notificationGroup = notificationGroup;
         this.contentDetailKey = contentDetailKey;
         this.notificationState = notificationState;
-        this.notificationContentDetails = notificationContentDetails;
+        this.notificationContentDetail = notificationContentDetail;
     }
 
     public NotificationContent getNotificationContent() {
@@ -83,8 +82,8 @@ public class NotificationDetailResult {
         return notificationState;
     }
 
-    public List<NotificationContentDetail> getNotificationContentDetails() {
-        return notificationContentDetails;
+    public NotificationContentDetail getNotificationContentDetail() {
+        return notificationContentDetail;
     }
 
 }

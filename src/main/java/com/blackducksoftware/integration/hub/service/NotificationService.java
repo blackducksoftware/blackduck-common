@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -43,8 +42,8 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.notification.CommonNotificationView;
 import com.blackducksoftware.integration.hub.notification.CommonNotificationViewResults;
+import com.blackducksoftware.integration.hub.notification.NotificationDetailResult;
 import com.blackducksoftware.integration.hub.notification.NotificationDetailResults;
-import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetailFactory;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
@@ -181,22 +180,18 @@ public class NotificationService extends DataService {
     }
 
     private NotificationDetailResults createUserNotificationDetails(final HubBucket hubBucket, final List<CommonNotificationView> views) throws IntegrationException {
-        return createNotificationDetailResults(hubBucket, views, notificationContentDetailFactory::generateUserContentDetails);
+        return createNotificationDetailResults(hubBucket, views);
     }
 
-    private NotificationDetailResults createNotificationDetailResults(final HubBucket hubBucket, final List<CommonNotificationView> views) throws IntegrationException {
-        return createNotificationDetailResults(hubBucket, views, notificationContentDetailFactory::generateContentDetails);
-    }
-
-    private NotificationDetailResults createNotificationDetailResults(final HubBucket hubBucket, final List<CommonNotificationView> views, final Function<CommonNotificationView, List<NotificationContentDetail>> createFunction)
+    private NotificationDetailResults createNotificationDetailResults(final HubBucket hubBucket, final List<CommonNotificationView> views)
             throws IntegrationException {
         if (views == null || views.isEmpty()) {
             return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty(), hubBucket);
         }
-        final List<NotificationContentDetail> details = new ArrayList<>();
+        final List<NotificationDetailResult> details = new ArrayList<>();
 
         views.forEach(view -> {
-            details.addAll(createFunction.apply(view));
+            details.addAll(notificationContentDetailFactory.generateContentDetails(view));
         });
 
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
