@@ -27,25 +27,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class NotificationResults<T> {
-    private final Optional<Date> latestNotificationCreatedAtDate;
-    private final Optional<String> latestNotificationCreatedAtString;
+public class CommonNotificationViewResults extends NotificationResults<CommonNotificationView> {
+    private final List<CommonNotificationView> commonNotificationViews;
 
-    public NotificationResults(final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
-        this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate;
-        this.latestNotificationCreatedAtString = latestNotificationCreatedAtString;
+    public CommonNotificationViewResults(final List<CommonNotificationView> commonNotificationViews, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
+        super(latestNotificationCreatedAtDate, latestNotificationCreatedAtString);
+        this.commonNotificationViews = commonNotificationViews;
     }
 
-    public abstract List<T> getResults();
-
-    public final Optional<Date> getLatestNotificationCreatedAtDate() {
-        return latestNotificationCreatedAtDate;
+    @Override
+    public List<CommonNotificationView> getResults() {
+        return commonNotificationViews;
     }
 
-    public final Optional<String> getLatestNotificationCreatedAtString() {
-        return latestNotificationCreatedAtString;
+    @Override
+    public boolean isEmpty() {
+        return commonNotificationViews == null || commonNotificationViews.isEmpty();
     }
-
-    public abstract boolean isEmpty();
 
 }

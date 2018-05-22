@@ -117,4 +117,8 @@ public class RequestFactory {
         return new Request.Builder().method(HttpMethod.POST).bodyContent(new BodyContent(bodyContentObject));
     }
 
+    public static Request.Builder createCommonPutRequestBuilder(final Object bodyContentObject) {
+        return new Request.Builder().method(HttpMethod.PUT).bodyContent(new BodyContent(bodyContentObject));
+    }
+
 }
