@@ -1,15 +1,5 @@
 package com.blackducksoftware.integration.hub.api.recipe
 
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.ThreadFactory
-
-import org.junit.After
-import org.junit.Test
-import org.junit.experimental.categories.Category
-
 import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
@@ -21,12 +11,23 @@ import com.blackducksoftware.integration.hub.service.NotificationService
 import com.blackducksoftware.integration.hub.service.ProjectService
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket
 import com.blackducksoftware.integration.test.annotation.IntegrationTest
+import org.junit.After
+import org.junit.Test
+import org.junit.experimental.categories.Category
+
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.ThreadFactory
 
 @Category(IntegrationTest.class)
 class NotificationServiceRecipeTest extends BasicRecipe {
 
     private static final String NOTIFICATION_PROJECT_NAME = "hub-notification-data-test"
     private static final String NOTIFICATION_PROJECT_VERSION_NAME = "1.0.0"
+
+    private HubBucket hubBucket = new HubBucket()
 
     Date generateNotifications() {
         ProjectRequest projectRequest = createProjectRequest(NOTIFICATION_PROJECT_NAME, NOTIFICATION_PROJECT_VERSION_NAME)
@@ -80,13 +81,11 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         endTime = endTime.withSecond(0).withNano(0)
         endTime = endTime.plusMinutes(1)
         final Date endDate = Date.from(endTime.toInstant())
-        final NotificationDetailResults results = notificationService.getAllNotificationResults(startDate, endDate)
+        final NotificationDetailResults results = notificationService.getAllNotificationDetailResults(hubBucket, startDate, endDate)
         final List<NotificationContentDetail> notificationResultList = results.getResults()
 
         Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate().get();
         println("Start Date: ${startDate}, End Date: ${endDate}, latestNotification: ${latestNotificationEndDate}")
-
-        final HubBucket bucket = results.getHubBucket()
 
         notificationResultList.each({
             String contentDetailKey
