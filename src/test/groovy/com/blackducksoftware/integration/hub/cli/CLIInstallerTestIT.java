@@ -49,7 +49,6 @@ import com.blackducksoftware.integration.hub.rest.TestingPropertyKey;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.test.TestLogger;
 import com.blackducksoftware.integration.test.annotation.IntegrationTest;
-import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 
 @Category(IntegrationTest.class)
 public class CLIInstallerTestIT {
@@ -60,8 +59,6 @@ public class CLIInstallerTestIT {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-
-    private final IntEnvironmentVariables IntEnvironmentVariables = new IntEnvironmentVariables();
 
     private File setupFakeCliStructure() throws Exception {
         folder.create();
@@ -455,7 +452,7 @@ public class CLIInstallerTestIT {
         final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
         final String hubVersion = currentVersion.version;
-        cliDownloadService.performInstallation(installDir, IntEnvironmentVariables, hubUrl.toString(), hubVersion);
+        cliDownloadService.performInstallation(installDir, hubUrl.toString(), hubVersion);
 
         final File file = new File(installDir, CLILocation.VERSION_FILE_NAME);
 
@@ -479,13 +476,13 @@ public class CLIInstallerTestIT {
         final CLILocation cliLocation = new CLILocation(logger, installDir);
 
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl(restConnectionTestHelper.getProperty("TEST_HUB_SERVER_URL"));
+        builder.setUrl(restConnectionTestHelper.getProperty("TEST_HUB_SERVER_URL"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setTimeout(restConnectionTestHelper.getProperty("TEST_HUB_TIMEOUT"));
         builder.setProxyHost(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
         builder.setProxyPort(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"));
-        builder.setAlwaysTrustServerCertificate(Boolean.valueOf(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
+        builder.setTrustCert(Boolean.valueOf(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
         final CredentialsRestConnection restConnection = restConnectionTestHelper.getRestConnection(builder.build());
         restConnection.logger = logger;
@@ -497,7 +494,7 @@ public class CLIInstallerTestIT {
         final String hubVersion = currentVersion.version;
 
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
-        cliDownloadService.performInstallation(installDir, IntEnvironmentVariables, hubUrl.toString(), hubVersion);
+        cliDownloadService.performInstallation(installDir, hubUrl.toString(), hubVersion);
 
         final File file = new File(installDir, CLILocation.VERSION_FILE_NAME);
 
@@ -520,7 +517,7 @@ public class CLIInstallerTestIT {
         final CLILocation cliLocation = new CLILocation(logger, installDir);
 
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl(restConnectionTestHelper.getProperty("TEST_HUB_SERVER_URL"));
+        builder.setUrl(restConnectionTestHelper.getProperty("TEST_HUB_SERVER_URL"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setTimeout(restConnectionTestHelper.getProperty("TEST_HUB_TIMEOUT"));
@@ -528,7 +525,7 @@ public class CLIInstallerTestIT {
         builder.setProxyPort(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_BASIC"));
         builder.setProxyUsername(restConnectionTestHelper.getProperty("TEST_PROXY_USER_BASIC"));
         builder.setProxyPassword(restConnectionTestHelper.getProperty("TEST_PROXY_PASSWORD_BASIC"));
-        builder.setAlwaysTrustServerCertificate(Boolean.valueOf(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
+        builder.setTrustCert(Boolean.valueOf(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
         final CredentialsRestConnection restConnection = restConnectionTestHelper.getRestConnection(builder.build());
         restConnection.logger = logger;
@@ -540,7 +537,7 @@ public class CLIInstallerTestIT {
         final String hubVersion = currentVersion.version;
 
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
-        cliDownloadService.performInstallation(installDir, IntEnvironmentVariables, hubUrl.toString(), hubVersion);
+        cliDownloadService.performInstallation(installDir, hubUrl.toString(), hubVersion);
 
         final File file = new File(installDir, CLILocation.VERSION_FILE_NAME);
 

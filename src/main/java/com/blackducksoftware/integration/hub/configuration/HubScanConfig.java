@@ -27,14 +27,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.RecursiveToStringStyle;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.util.Stringable;
 
-public class HubScanConfig {
+public class HubScanConfig extends Stringable {
     private final File workingDirectory;
     private final int scanMemory;
     private final Set<String> scanTargetPaths;
@@ -48,14 +44,17 @@ public class HubScanConfig {
     private final boolean debug;
     private final boolean verbose;
     private final boolean snippetModeEnabled;
+    private final String additionalScanParameters;
 
     public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
-            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean snippetModeEnabled) {
-        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations, false, true, snippetModeEnabled);
+            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean snippetModeEnabled, final String additionalScanParameters) {
+        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations, false, true, snippetModeEnabled,
+                additionalScanParameters);
     }
 
     public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
-            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean debug, final boolean verbose, final boolean snippetModeEnabled) {
+            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean debug, final boolean verbose, final boolean snippetModeEnabled,
+            final String additionalScanParameters) {
         this.workingDirectory = workingDirectory;
         this.scanMemory = scanMemory;
         this.scanTargetPaths = scanTargetPaths;
@@ -69,6 +68,7 @@ public class HubScanConfig {
         this.debug = debug;
         this.verbose = verbose;
         this.snippetModeEnabled = snippetModeEnabled;
+        this.additionalScanParameters = additionalScanParameters;
     }
 
     public File getWorkingDirectory() {
@@ -123,13 +123,17 @@ public class HubScanConfig {
         return snippetModeEnabled;
     }
 
+    public String getAdditionalScanParameters() {
+        return additionalScanParameters;
+    }
+
     public void print(final IntLogger logger) {
         try {
-            logger.alwaysLog("--> Using Working Directory : " + getWorkingDirectory().getCanonicalPath());
+            logger.alwaysLog("--> Using Working Directory: " + getWorkingDirectory().getCanonicalPath());
         } catch (final IOException e) {
             logger.alwaysLog("Extremely unlikely exception getting the canonical path: " + e.getMessage());
         }
-        logger.alwaysLog("--> Scanning the following targets  : ");
+        logger.alwaysLog("--> Scanning the following targets:");
         if (scanTargetPaths != null) {
             for (final String target : scanTargetPaths) {
                 logger.alwaysLog("--> " + target);
@@ -137,7 +141,7 @@ public class HubScanConfig {
         } else {
             logger.alwaysLog("--> null");
         }
-        logger.alwaysLog("--> Directory Exclusion Patterns  : ");
+        logger.alwaysLog("--> Directory Exclusion Patterns:");
         if (excludePatterns != null) {
             for (final String exclusionPattern : excludePatterns) {
                 logger.alwaysLog("--> " + exclusionPattern);
@@ -146,28 +150,14 @@ public class HubScanConfig {
             logger.alwaysLog("--> null");
         }
 
-        logger.alwaysLog("--> Scan Memory : " + getScanMemory());
-        logger.alwaysLog("--> Dry Run : " + isDryRun());
-        logger.alwaysLog("--> Clean-up logs on success : " + isCleanupLogsOnSuccess());
-        logger.alwaysLog("--> Code Location Name : " + getCodeLocationAlias());
-        logger.alwaysLog("--> Un-map previous Code Locations : " + isUnmapPreviousCodeLocations());
-        logger.alwaysLog("--> Delete previous Code Locations : " + isDeletePreviousCodeLocations());
-        logger.alwaysLog("--> Enable Snippet Mode : " + isSnippetModeEnabled());
-    }
-
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
-    }
-
-    @Override
-    public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this, false);
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj, false);
+        logger.alwaysLog("--> Scan Memory: " + getScanMemory());
+        logger.alwaysLog("--> Dry Run: " + isDryRun());
+        logger.alwaysLog("--> Clean-up logs on success: " + isCleanupLogsOnSuccess());
+        logger.alwaysLog("--> Code Location Name: " + getCodeLocationAlias());
+        logger.alwaysLog("--> Un-map previous Code Locations: " + isUnmapPreviousCodeLocations());
+        logger.alwaysLog("--> Delete previous Code Locations: " + isDeletePreviousCodeLocations());
+        logger.alwaysLog("--> Enable Snippet Mode: " + isSnippetModeEnabled());
+        logger.alwaysLog("--> Additional Scan Parameters: " + isSnippetModeEnabled());
     }
 
 }

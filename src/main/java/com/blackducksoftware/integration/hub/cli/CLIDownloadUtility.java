@@ -53,12 +53,11 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.rest.certificate.CertificateHandler;
+import com.blackducksoftware.integration.rest.RestConstants;
 import com.blackducksoftware.integration.rest.connection.RestConnection;
 import com.blackducksoftware.integration.rest.request.Request;
 import com.blackducksoftware.integration.rest.request.Response;
 import com.blackducksoftware.integration.util.HostNameHelper;
-import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 
 public class CLIDownloadUtility {
     private final IntLogger logger;
@@ -69,13 +68,12 @@ public class CLIDownloadUtility {
         this.restConnection = restConnection;
     }
 
-    public void performInstallation(final File directoryToInstallTo, final IntEnvironmentVariables intEnvironmentVariables, final String hubUrl, final String hubVersion)
-            throws HubIntegrationException, EncryptionException {
+    public void performInstallation(final File directoryToInstallTo, final String hubUrl, final String hubVersion) throws HubIntegrationException, EncryptionException {
         final CLILocation cliLocation = new CLILocation(this.logger, directoryToInstallTo);
         final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(this.logger, hubUrl);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
             try {
-                customInstall(cliLocation, intEnvironmentVariables, new URL(cliDownloadUrl), hubVersion);
+                customInstall(cliLocation, new URL(cliDownloadUrl), hubVersion);
             } catch (final MalformedURLException e) {
                 throw new HubIntegrationException(String.format("The cli could not be downloaded from %s: %s", cliDownloadUrl, e.getMessage()), e);
             }
@@ -84,7 +82,7 @@ public class CLIDownloadUtility {
         }
     }
 
-    public void customInstall(final CLILocation cliLocation, final IntEnvironmentVariables intEnvironmentVariables, final URL cliDownloadUrl, final String hubVersion) throws HubIntegrationException, EncryptionException {
+    public void customInstall(final CLILocation cliLocation, final URL cliDownloadUrl, final String hubVersion) throws HubIntegrationException, EncryptionException {
         final String directoryToInstallTo;
         try {
             directoryToInstallTo = cliLocation.getCanonicalPath();
@@ -126,7 +124,7 @@ public class CLIDownloadUtility {
 
             final Request request = requestBuilder.build();
             try (Response response = this.restConnection.executeRequest(request)) {
-                if (304 == response.getStatusCode()) {
+                if (RestConstants.NOT_MODIFIED_304 == response.getStatusCode()) {
                     // CLI has not been modified
                     return;
                 }
@@ -168,7 +166,6 @@ public class CLIDownloadUtility {
                     try (CountingInputStream cis = new CountingInputStream(cliStream)) {
                         byteCount = cis.getByteCount();
                         unzip(cliInstallDirectory, cis, this.logger);
-                        updateJreSecurity(this.logger, cliLocation, intEnvironmentVariables);
                     } catch (final IOException e) {
                         throw new HubIntegrationException(String.format("Failed to unpack %s (%d bytes read of total %d)", cliDownloadUrl, byteCount, response.getContentLength()), e);
                     }
@@ -181,39 +178,6 @@ public class CLIDownloadUtility {
             throw new HubIntegrationException("Failed to install " + cliDownloadUrl + " to " + directoryToInstallTo, e);
         } catch (final URISyntaxException e) {
             throw new HubIntegrationException("Failed to convert " + cliDownloadUrl + " to a URI : " + e.getMessage(), e);
-        }
-    }
-
-    private void updateJreSecurity(final IntLogger logger, final CLILocation cliLocation, final IntEnvironmentVariables intEnvironmentVariables) throws IOException {
-        final File securityDirectory = cliLocation.getJreSecurityDirectory();
-        if (securityDirectory == null || !securityDirectory.isDirectory()) {
-            // the cli might not have the jre included
-            logger.warn("CLI location : " + cliLocation.getCanonicalPath());
-            logger.warn("Can not copy the trust store into the CLI JRE. Can not find the CLI JRE.");
-            return;
-        }
-        File trustStoreFile = null;
-        if (intEnvironmentVariables.containsKey(IntEnvironmentVariables.BDS_CACERTS_OVERRIDE)) {
-            logger.trace("Found the variable : " + IntEnvironmentVariables.BDS_CACERTS_OVERRIDE + ", using value : " + intEnvironmentVariables.getValue(IntEnvironmentVariables.BDS_CACERTS_OVERRIDE));
-            final String trustStorePath = intEnvironmentVariables.getValue(IntEnvironmentVariables.BDS_CACERTS_OVERRIDE);
-            trustStoreFile = new File(trustStorePath);
-        } else {
-            final CertificateHandler certificateHandler = new CertificateHandler(logger);
-            trustStoreFile = certificateHandler.getTrustStore();
-        }
-        logger.trace("Copying the trust store from : " + trustStoreFile.getAbsolutePath());
-        final String trustStoreFilename = trustStoreFile.getName();
-        final File trustStore = new File(securityDirectory, trustStoreFilename);
-        final File trustStoreBackup = new File(securityDirectory, trustStoreFilename + System.currentTimeMillis());
-        try {
-            if (trustStore.exists()) {
-                // only backup the trust store if it exists
-                FileUtils.moveFile(trustStore, trustStoreBackup);
-            }
-            FileUtils.copyFile(trustStoreFile, trustStore);
-        } catch (final IOException e) {
-            logger.error("Could not copy the trust store file from: " + trustStoreFile.getAbsolutePath() + " to: " + trustStore.getAbsolutePath() + " msg: " + e.getMessage());
-            throw e;
         }
     }
 
