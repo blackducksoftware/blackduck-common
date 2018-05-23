@@ -40,9 +40,4 @@ public class CommonNotificationViewResults extends NotificationResults<CommonNot
         return commonNotificationViews;
     }
 
-    @Override
-    public boolean isEmpty() {
-        return commonNotificationViews == null || commonNotificationViews.isEmpty();
-    }
-
 }

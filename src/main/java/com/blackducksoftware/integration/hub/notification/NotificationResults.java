@@ -46,6 +46,8 @@ public abstract class NotificationResults<T> {
         return latestNotificationCreatedAtString;
     }
 
-    public abstract boolean isEmpty();
+    public boolean isEmpty() {
+        return getResults() == null || getResults().isEmpty();
+    }
 
 }

@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -43,8 +42,8 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.notification.CommonNotificationView;
 import com.blackducksoftware.integration.hub.notification.CommonNotificationViewResults;
+import com.blackducksoftware.integration.hub.notification.NotificationDetailResult;
 import com.blackducksoftware.integration.hub.notification.NotificationDetailResults;
-import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetailFactory;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
@@ -55,17 +54,28 @@ import com.blackducksoftware.integration.rest.request.Request;
 public class NotificationService extends DataService {
     private final HubBucketService hubBucketService;
     private final NotificationContentDetailFactory notificationContentDetailFactory;
+    private final boolean oldestFirst;
 
     public NotificationService(final HubService hubService, final HubBucketService hubBucketService) {
         super(hubService);
         this.hubBucketService = hubBucketService;
         this.notificationContentDetailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
+        // hub default behavior is to return the latest notifications first.
+        this.oldestFirst = false;
     }
 
-    public NotificationService(final HubService hubService, final HubBucketService hubBucketService, final NotificationContentDetailFactory notificationContentDetailFactory) {
+    public NotificationService(final HubService hubService, final HubBucketService hubBucketService, final boolean oldestFirst) {
+        super(hubService);
+        this.hubBucketService = hubBucketService;
+        this.notificationContentDetailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
+        this.oldestFirst = oldestFirst;
+    }
+
+    public NotificationService(final HubService hubService, final HubBucketService hubBucketService, final NotificationContentDetailFactory notificationContentDetailFactory, final boolean oldestFirst) {
         super(hubService);
         this.hubBucketService = hubBucketService;
         this.notificationContentDetailFactory = notificationContentDetailFactory;
+        this.oldestFirst = oldestFirst;
     }
 
     public List<NotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
@@ -106,7 +116,7 @@ public class NotificationService extends DataService {
     public NotificationDetailResults getAllUserNotificationDetailResults(final HubBucket hubBucket, final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
         final List<NotificationUserView> notificationViewResults = getAllUserNotifications(user, startDate, endDate);
         final List<CommonNotificationView> commonNotificationViews = getCommonUserNotifications(notificationViewResults);
-        final NotificationDetailResults results = createUserNotificationDetails(hubBucket, commonNotificationViews);
+        final NotificationDetailResults results = createNotificationDetailResults(hubBucket, commonNotificationViews);
         return results;
     }
 
@@ -121,7 +131,7 @@ public class NotificationService extends DataService {
     public NotificationDetailResults getAllUserNotificationDetailResultsPopulated(final HubBucket hubBucket, final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
         final List<NotificationUserView> notificationViewResults = getAllUserNotifications(user, startDate, endDate);
         final List<CommonNotificationView> commonNotificationViews = getCommonUserNotifications(notificationViewResults);
-        final NotificationDetailResults results = createUserNotificationDetails(hubBucket, commonNotificationViews);
+        final NotificationDetailResults results = createNotificationDetailResults(hubBucket, commonNotificationViews);
         populateNotificationDetailResults(results);
         return results;
     }
@@ -180,30 +190,32 @@ public class NotificationService extends DataService {
         return new CommonNotificationViewResults(commonNotifications, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString));
     }
 
-    private NotificationDetailResults createUserNotificationDetails(final HubBucket hubBucket, final List<CommonNotificationView> views) throws IntegrationException {
-        return createNotificationDetailResults(hubBucket, views, notificationContentDetailFactory::generateUserContentDetails);
-    }
-
-    private NotificationDetailResults createNotificationDetailResults(final HubBucket hubBucket, final List<CommonNotificationView> views) throws IntegrationException {
-        return createNotificationDetailResults(hubBucket, views, notificationContentDetailFactory::generateContentDetails);
-    }
-
-    private NotificationDetailResults createNotificationDetailResults(final HubBucket hubBucket, final List<CommonNotificationView> views, final Function<CommonNotificationView, List<NotificationContentDetail>> createFunction)
+    private NotificationDetailResults createNotificationDetailResults(final HubBucket hubBucket, final List<CommonNotificationView> views)
             throws IntegrationException {
         if (views == null || views.isEmpty()) {
             return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty(), hubBucket);
         }
-        final List<NotificationContentDetail> details = new ArrayList<>();
+        List<NotificationDetailResult> sortedDetails;
+        final List<NotificationDetailResult> details = new ArrayList<>();
 
         views.forEach(view -> {
-            details.addAll(createFunction.apply(view));
+            details.add(notificationContentDetailFactory.generateContentDetails(view));
         });
+
+        if (oldestFirst) {
+            sortedDetails = details.stream().sorted((result_1, result_2) -> {
+                return result_1.getCreatedAt().compareTo(result_2.getCreatedAt());
+            }).collect(Collectors.toList());
+        } else {
+            // use the default sorting from the Hub.
+            sortedDetails = details;
+        }
 
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final Date latestCreatedAtDate = views.get(0).getCreatedAt();
         final String latestCreatedAtString = sdf.format(latestCreatedAtDate);
-        return new NotificationDetailResults(details, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString), hubBucket);
+        return new NotificationDetailResults(sortedDetails, Optional.of(latestCreatedAtDate), Optional.of(latestCreatedAtString), hubBucket);
     }
 
     private Request.Builder createNotificationRequestBuilder(final Date startDate, final Date endDate) {

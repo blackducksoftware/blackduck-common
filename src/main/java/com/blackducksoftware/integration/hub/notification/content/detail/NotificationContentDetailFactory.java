@@ -25,15 +25,17 @@ package com.blackducksoftware.integration.hub.notification.content.detail;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationStateRequestStateType;
+import com.blackducksoftware.integration.hub.api.component.AffectedProjectVersion;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.notification.CommonNotificationView;
+import com.blackducksoftware.integration.hub.notification.NotificationDetailResult;
+import com.blackducksoftware.integration.hub.notification.content.ComponentVersionStatus;
+import com.blackducksoftware.integration.hub.notification.content.PolicyInfo;
 import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationClearedNotificationContent;
 import com.blackducksoftware.integration.hub.notification.content.RuleViolationNotificationContent;
@@ -51,56 +53,54 @@ public class NotificationContentDetailFactory {
         this.jsonParser = jsonParser;
     }
 
-    public List<NotificationContentDetail> generateUserContentDetails(final CommonNotificationView view) {
-        return generateContentDetails(view.getContentType(), view.getCreatedAt(), Optional.ofNullable(view.getNotificationState()), view.getType(), view.json);
-    }
-
-    public List<NotificationContentDetail> generateContentDetails(final CommonNotificationView view) {
-        return generateContentDetails(view.getContentType(), view.getCreatedAt(), Optional.empty(), view.getType(), view.json);
-    }
-
-    public List<NotificationContentDetail> generateContentDetails(final String contentType, final Date createdAt, final Optional<NotificationStateRequestStateType> optionalNotificationState, final NotificationType type,
-            final String notificationJson) {
+    public NotificationDetailResult generateContentDetails(final CommonNotificationView view) {
+        final NotificationType type = view.getType();
+        final String notificationJson = view.json;
         final JsonObject jsonObject = jsonParser.parse(notificationJson).getAsJsonObject();
         if (NotificationType.POLICY_OVERRIDE.equals(type)) {
             final PolicyOverrideNotificationContent content = gson.fromJson(jsonObject.get("content"), PolicyOverrideNotificationContent.class);
-            return generateContentDetails(content);
+            return generateContentDetails(view, content);
         } else if (NotificationType.RULE_VIOLATION.equals(type)) {
             final RuleViolationNotificationContent content = gson.fromJson(jsonObject.get("content"), RuleViolationNotificationContent.class);
-            return generateContentDetails(content);
+            return generateContentDetails(view, content);
         } else if (NotificationType.RULE_VIOLATION_CLEARED.equals(type)) {
             final RuleViolationClearedNotificationContent content = gson.fromJson(jsonObject.get("content"), RuleViolationClearedNotificationContent.class);
-            return generateContentDetails(content);
+            return generateContentDetails(view, content);
         } else if (NotificationType.VULNERABILITY.equals(type)) {
             final VulnerabilityNotificationContent content = gson.fromJson(jsonObject.get("content"), VulnerabilityNotificationContent.class);
-            return generateContentDetails(content);
+            return generateContentDetails(view, content);
         }
-        return Collections.emptyList();
+        return new NotificationDetailResult(null, view.getContentType(), view.getCreatedAt(), view.getType(), null, Optional.of(view.getNotificationState()), Collections.emptyList());
     }
 
-    public List<NotificationContentDetail> generateContentDetails(final PolicyOverrideNotificationContent content) {
-        final List<NotificationContentDetail> details = new ArrayList<>();
-        content.policyInfos.forEach(policyInfo -> {
+    public NotificationDetailResult generateContentDetails(final CommonNotificationView view, final PolicyOverrideNotificationContent content) {
+        final List<NotificationContentDetail> detailList = new ArrayList<>();
+        final String notificationGroup = NotificationContentDetail.CONTENT_KEY_GROUP_POLICY;
+        for (final PolicyInfo policyInfo : content.policyInfos) {
             String componentValue;
             if (content.componentVersion != null) {
                 componentValue = null;
             } else {
                 componentValue = content.component;
             }
-            details.add(NotificationContentDetail
-                                .createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, Optional.ofNullable(content.projectName), Optional.ofNullable(content.projectVersionName), Optional.ofNullable(content.projectVersion),
-                                        Optional.ofNullable(content.componentName), Optional.ofNullable(componentValue), Optional.ofNullable(content.componentVersionName), Optional.ofNullable(content.componentVersion),
-                                        Optional.ofNullable(policyInfo.policyName), Optional.ofNullable(policyInfo.policy),
-                                        Optional.empty(), Optional.empty(), Optional.empty()));
-        });
-        return details;
+            final NotificationContentDetail detail = NotificationContentDetail.createDetail(notificationGroup, Optional.of(content.projectName), Optional.of(content.projectVersionName),
+                    Optional.of(content.projectVersion),
+                    Optional.of(content.componentName), Optional.ofNullable(componentValue), Optional.of(content.componentVersionName), Optional.of(content.componentVersion),
+                    Optional.of(policyInfo.policyName),
+                    Optional.of(policyInfo.policy),
+                    Optional.empty(), Optional.empty(), Optional.empty());
+            detailList.add(detail);
+        }
+        return new NotificationDetailResult(content, view.getContentType(), view.getCreatedAt(), view.getType(), notificationGroup, Optional.ofNullable(view.getNotificationState()),
+                detailList);
     }
 
-    public List<NotificationContentDetail> generateContentDetails(final RuleViolationNotificationContent content) {
+    public NotificationDetailResult generateContentDetails(final CommonNotificationView view, final RuleViolationNotificationContent content) {
         final Map<String, String> uriToName = content.policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
-        final List<NotificationContentDetail> details = new ArrayList<>();
-        content.componentVersionStatuses.forEach(componentVersionStatus -> {
-            componentVersionStatus.policies.forEach(policyUri -> {
+        final List<NotificationContentDetail> detailList = new ArrayList<>();
+        final String notificationGroup = NotificationContentDetail.CONTENT_KEY_GROUP_POLICY;
+        for (final ComponentVersionStatus componentVersionStatus : content.componentVersionStatuses) {
+            for (final String policyUri : componentVersionStatus.policies) {
                 final String policyName = uriToName.get(policyUri);
                 String componentValue;
                 if (componentVersionStatus.componentVersion != null) {
@@ -108,21 +108,25 @@ public class NotificationContentDetailFactory {
                 } else {
                     componentValue = componentVersionStatus.component;
                 }
-                details.add(NotificationContentDetail
-                                    .createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, Optional.ofNullable(content.projectName), Optional.ofNullable(content.projectVersionName), Optional.ofNullable(content.projectVersion),
-                                            Optional.ofNullable(componentVersionStatus.componentName), Optional.ofNullable(componentValue), Optional.ofNullable(componentVersionStatus.componentVersionName),
-                                            Optional.ofNullable(componentVersionStatus.componentVersion), Optional.ofNullable(policyName),
-                                            Optional.ofNullable(policyUri), Optional.empty(), Optional.ofNullable(componentVersionStatus.componentIssueLink), Optional.empty()));
-            });
-        });
-        return details;
+                final NotificationContentDetail detail = NotificationContentDetail.createDetail(notificationGroup, Optional.of(content.projectName), Optional.of(content.projectVersionName),
+                        Optional.of(content.projectVersion),
+                        Optional.of(componentVersionStatus.componentName), Optional.ofNullable(componentValue), Optional.of(componentVersionStatus.componentVersionName),
+                        Optional.of(componentVersionStatus.componentVersion),
+                        Optional.of(policyName),
+                        Optional.of(policyUri), Optional.empty(), Optional.ofNullable(componentVersionStatus.componentIssueLink), Optional.empty());
+                detailList.add(detail);
+            }
+        }
+        return new NotificationDetailResult(content, view.getContentType(), view.getCreatedAt(), view.getType(), notificationGroup, Optional.ofNullable(view.getNotificationState()),
+                detailList);
     }
 
-    public List<NotificationContentDetail> generateContentDetails(final RuleViolationClearedNotificationContent content) {
+    public NotificationDetailResult generateContentDetails(final CommonNotificationView view, final RuleViolationClearedNotificationContent content) {
         final Map<String, String> uriToName = content.policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
-        final List<NotificationContentDetail> details = new ArrayList<>();
-        content.componentVersionStatuses.forEach(componentVersionStatus -> {
-            componentVersionStatus.policies.forEach(policyUri -> {
+        final List<NotificationContentDetail> detailList = new ArrayList<>();
+        final String notificationGroup = NotificationContentDetail.CONTENT_KEY_GROUP_POLICY;
+        for (final ComponentVersionStatus componentVersionStatus : content.componentVersionStatuses) {
+            for (final String policyUri : componentVersionStatus.policies) {
                 final String policyName = uriToName.get(policyUri);
                 String componentValue;
                 if (componentVersionStatus.componentVersion != null) {
@@ -130,25 +134,32 @@ public class NotificationContentDetailFactory {
                 } else {
                     componentValue = componentVersionStatus.component;
                 }
-                details.add(NotificationContentDetail
-                                    .createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_POLICY, Optional.ofNullable(content.projectName), Optional.ofNullable(content.projectVersionName), Optional.ofNullable(content.projectVersion),
-                                            Optional.ofNullable(componentVersionStatus.componentName), Optional.ofNullable(componentValue), Optional.ofNullable(componentVersionStatus.componentVersionName),
-                                            Optional.ofNullable(componentVersionStatus.componentVersion), Optional.ofNullable(policyName),
-                                            Optional.ofNullable(policyUri), Optional.empty(), Optional.ofNullable(componentVersionStatus.componentIssueLink), Optional.empty()));
-            });
-        });
-        return details;
+                final NotificationContentDetail detail = NotificationContentDetail.createDetail(notificationGroup, Optional.of(content.projectName), Optional.of(content.projectVersionName),
+                        Optional.of(content.projectVersion),
+                        Optional.of(componentVersionStatus.componentName), Optional.ofNullable(componentValue), Optional.of(componentVersionStatus.componentVersionName),
+                        Optional.of(componentVersionStatus.componentVersion),
+                        Optional.of(policyName),
+                        Optional.of(policyUri), Optional.empty(), Optional.of(componentVersionStatus.componentIssueLink), Optional.empty());
+                detailList.add(detail);
+            }
+        }
+        return new NotificationDetailResult(content, view.getContentType(), view.getCreatedAt(), view.getType(), notificationGroup, Optional.ofNullable(view.getNotificationState()),
+                detailList);
     }
 
-    public List<NotificationContentDetail> generateContentDetails(final VulnerabilityNotificationContent content) {
-        final List<NotificationContentDetail> details = new ArrayList<>();
-        content.affectedProjectVersions.forEach(projectVersion -> {
-            details.add(NotificationContentDetail.createDetail(NotificationContentDetail.CONTENT_KEY_GROUP_VULNERABILITY, Optional.ofNullable(projectVersion.projectName), Optional.ofNullable(projectVersion.projectVersionName),
-                    Optional.ofNullable(projectVersion.projectVersion), Optional.ofNullable(content.componentName), Optional.empty(), Optional.ofNullable(content.versionName), Optional.ofNullable(content.componentVersion), Optional.empty(),
+    public NotificationDetailResult generateContentDetails(final CommonNotificationView view, final VulnerabilityNotificationContent content) {
+        final List<NotificationContentDetail> detailList = new ArrayList<>();
+        final String notificationGroup = NotificationContentDetail.CONTENT_KEY_GROUP_VULNERABILITY;
+        for (final AffectedProjectVersion projectVersion : content.affectedProjectVersions) {
+            final NotificationContentDetail detail = NotificationContentDetail.createDetail(notificationGroup, Optional.of(projectVersion.projectName),
+                    Optional.of(projectVersion.projectVersionName),
+                    Optional.of(projectVersion.projectVersion), Optional.of(content.componentName), Optional.empty(), Optional.of(content.versionName), Optional.of(content.componentVersion), Optional.empty(),
                     Optional.empty(),
-                    Optional.ofNullable(content.componentVersionOriginName), Optional.ofNullable(projectVersion.componentIssueUrl), Optional.ofNullable(content.componentVersionOriginId)));
-        });
-        return details;
+                    Optional.ofNullable(content.componentVersionOriginName), Optional.ofNullable(projectVersion.componentIssueUrl), Optional.ofNullable(content.componentVersionOriginId));
+            detailList.add(detail);
+        }
+        return new NotificationDetailResult(content, view.getContentType(), view.getCreatedAt(), view.getType(), notificationGroup, Optional.ofNullable(view.getNotificationState()),
+                detailList);
     }
 
 }
