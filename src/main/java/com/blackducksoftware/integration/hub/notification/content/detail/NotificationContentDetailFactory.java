@@ -129,7 +129,7 @@ public class NotificationContentDetailFactory {
         final Map<String, String> uriToName = content.policyInfos.stream().collect(Collectors.toMap(policyInfo -> policyInfo.policy, policyInfo -> policyInfo.policyName));
         final List<NotificationContentDetail> detailList = new ArrayList<>();
         final String notificationGroup = NotificationContentDetail.CONTENT_KEY_GROUP_POLICY;
-        final String contentDetailKey = "";
+        String contentDetailKey = "";
         for (final ComponentVersionStatus componentVersionStatus : content.componentVersionStatuses) {
             for (final String policyUri : componentVersionStatus.policies) {
                 final String policyName = uriToName.get(policyUri);
@@ -145,6 +145,7 @@ public class NotificationContentDetailFactory {
                         Optional.of(componentVersionStatus.componentVersion),
                         Optional.of(policyName),
                         Optional.of(policyUri), Optional.empty(), Optional.of(componentVersionStatus.componentIssueLink), Optional.empty());
+                contentDetailKey = detail.getContentDetailKey();
                 detailList.add(detail);
             }
         }
