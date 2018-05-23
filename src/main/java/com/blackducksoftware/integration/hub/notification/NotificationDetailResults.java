@@ -62,9 +62,4 @@ public class NotificationDetailResults extends NotificationResults<NotificationD
         return hubBucket;
     }
 
-    @Override
-    public boolean isEmpty() {
-        return resultList == null || resultList.isEmpty();
-    }
-
 }
