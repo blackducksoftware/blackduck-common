@@ -38,19 +38,17 @@ public class NotificationDetailResult {
     private final Date createdAt;
     private final NotificationType type;
     private final String notificationGroup;
-    private final String contentDetailKey;
     private final Optional<NotificationStateRequestStateType> notificationState;
 
     private final List<NotificationContentDetail> notificationContentDetails;
 
-    public NotificationDetailResult(final NotificationContent notificationContent, final String contentType, final Date createdAt, final NotificationType type, final String notificationGroup, final String contentDetailKey,
+    public NotificationDetailResult(final NotificationContent notificationContent, final String contentType, final Date createdAt, final NotificationType type, final String notificationGroup,
             final Optional<NotificationStateRequestStateType> notificationState, final List<NotificationContentDetail> notificationContentDetails) {
         this.notificationContent = notificationContent;
         this.contentType = contentType;
         this.createdAt = createdAt;
         this.type = type;
         this.notificationGroup = notificationGroup;
-        this.contentDetailKey = contentDetailKey;
         this.notificationState = notificationState;
         this.notificationContentDetails = notificationContentDetails;
     }
@@ -73,10 +71,6 @@ public class NotificationDetailResult {
 
     public String getNotificationGroup() {
         return notificationGroup;
-    }
-
-    public String getContentDetailKey() {
-        return contentDetailKey;
     }
 
     public Optional<NotificationStateRequestStateType> getNotificationState() {
