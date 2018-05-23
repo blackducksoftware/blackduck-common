@@ -45,13 +45,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
-import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ScanFailedException;
-import com.blackducksoftware.integration.hub.service.model.HubCertificateHandler;
 import com.blackducksoftware.integration.hub.service.model.ScannerSplitStream;
 import com.blackducksoftware.integration.hub.service.model.StreamRedirectThread;
 import com.blackducksoftware.integration.log.IntLogger;
@@ -91,7 +89,6 @@ public class SimpleScanUtility {
 
     /**
      * This will setup the command-line invocation of the Hub scanner. The workingDirectoryPath is the parent folder of the scan logs and other scan artifacts.
-     * 
      * @throws EncryptionException
      * @throws IllegalArgumentException
      * @throws HubIntegrationException
@@ -109,16 +106,7 @@ public class SimpleScanUtility {
             throw new HubIntegrationException(String.format("The provided directory %s did not have a Hub CLI.", hubScanConfig.getToolsDir().getAbsolutePath()), e);
         }
         logger.debug("Using this java installation : " + pathToJavaExecutable);
-
-        if (hubServerConfig.isAlwaysTrustServerCertificate() && !hubScanConfig.isDryRun()) {
-            try {
-                final HubCertificateHandler hubCertificateHandler = new HubCertificateHandler(logger, cliLocation.getJavaHome());
-                hubCertificateHandler.importHttpsCertificateForHubServer(hubServerConfig);
-            } catch (IOException | IntegrationException e) {
-                logger.error("Could not automatically import the certificate to the CLI: " + e.getMessage());
-            }
-        }
-
+        
         cmd.add(pathToJavaExecutable);
         cmd.add("-Done-jar.silent=true");
         cmd.add("-Done-jar.jar.path=" + pathToOneJar);
@@ -253,7 +241,6 @@ public class SimpleScanUtility {
 
     /**
      * If running in an environment that handles process creation, this method should be overridden to construct a process to execute the scan in the environment-specific way.
-     * 
      * @throws IOException
      * @throws HubIntegrationException
      */
