@@ -195,20 +195,16 @@ public class NotificationService extends DataService {
         if (views == null || views.isEmpty()) {
             return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty(), hubBucket);
         }
-        List<NotificationDetailResult> sortedDetails;
-        final List<NotificationDetailResult> details = new ArrayList<>();
 
-        views.forEach(view -> {
-            details.add(notificationContentDetailFactory.generateContentDetails(view));
-        });
+        List<NotificationDetailResult> sortedDetails = views.stream().map(view -> {
+            return notificationContentDetailFactory.generateContentDetails(view);
+        }).collect(Collectors.toList());
 
         if (oldestFirst) {
-            sortedDetails = details.stream().sorted((result_1, result_2) -> {
+            // we don't want to use the default sorting from the hub
+            sortedDetails = sortedDetails.stream().sorted((result_1, result_2) -> {
                 return result_1.getCreatedAt().compareTo(result_2.getCreatedAt());
             }).collect(Collectors.toList());
-        } else {
-            // use the default sorting from the Hub.
-            sortedDetails = details;
         }
 
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
