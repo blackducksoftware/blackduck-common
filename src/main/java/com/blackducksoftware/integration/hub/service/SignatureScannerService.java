@@ -124,7 +124,7 @@ public class SignatureScannerService extends DataService {
     private void preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
         printConfiguration(hubScanConfig, projectRequest);
         final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), intEnvironmentVariables, hubServerConfig.getHubUrl().toString(), currentVersion.version);
+        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), hubServerConfig.getHubUrl().toString(), currentVersion.version);
 
         if (!hubScanConfig.isDryRun()) {
             projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);
