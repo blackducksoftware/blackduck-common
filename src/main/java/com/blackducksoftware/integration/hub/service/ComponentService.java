@@ -23,10 +23,12 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.hub.api.generated.component.RemediatingVersionView;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
@@ -38,8 +40,12 @@ import com.blackducksoftware.integration.hub.service.model.HubMediaTypes;
 import com.blackducksoftware.integration.hub.service.model.HubQuery;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.rest.request.Request;
+import com.blackducksoftware.integration.rest.request.Response;
+import com.google.gson.JsonElement;
 
 public class ComponentService extends DataService {
+    private final String REMEDIATING_LINK = "remediating";
+
     public ComponentService(final HubService hubService) {
         super(hubService);
     }
@@ -98,6 +104,18 @@ public class ComponentService extends DataService {
         }
 
         throw new HubIntegrationException("Couldn't get a componentVersion url from the component matching " + externalId.createExternalId());
+    }
+
+    // TODO deprecate when the REMEDIATING_LINK is included in ComponentVersionView
+    public RemediatingVersionView getRemediationInformation(final ComponentVersionView componentVersionView) throws IntegrationException {
+        final String href = hubService.getHref(componentVersionView);
+        final String remediatingURL = href + "/" + REMEDIATING_LINK;
+        try (final Response response = hubService.executeGetRequest(remediatingURL);) {
+            final JsonElement jsonElement = hubService.getJsonParser().parse(response.getContentString());
+            return hubService.getGson().fromJson(jsonElement, RemediatingVersionView.class);
+        } catch (final IOException e) {
+            throw new IntegrationException(e);
+        }
     }
 
 }
