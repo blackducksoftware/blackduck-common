@@ -24,7 +24,6 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,9 +110,7 @@ public class ComponentService extends DataService {
     public RemediationOptionsView getRemediationInformation(final ComponentVersionView componentVersionView) throws IntegrationException {
         final String href = hubService.getHref(componentVersionView);
         try {
-            // TODO this functionality should be abstracted
-            final URL componentVersionURL = new URL(href);
-            final String remediatingURL = new URL(componentVersionURL, REMEDIATING_LINK).toString();
+            final String remediatingURL = href + "/" + REMEDIATING_LINK;
             try (final Response response = hubService.executeGetRequest(remediatingURL);) {
                 final JsonElement jsonElement = hubService.getJsonParser().parse(response.getContentString());
                 return hubService.getGson().fromJson(jsonElement, RemediationOptionsView.class);
