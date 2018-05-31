@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +45,7 @@ import com.blackducksoftware.integration.rest.request.Response;
 import com.google.gson.JsonElement;
 
 public class ComponentService extends DataService {
-    private final String REMEDIATING_LINK = "remediating";
+    public static final String REMEDIATING_LINK = "remediating";
 
     public ComponentService(final HubService hubService) {
         super(hubService);
@@ -109,12 +110,18 @@ public class ComponentService extends DataService {
     // TODO deprecate when the REMEDIATING_LINK is included in ComponentVersionView
     public RemediatingVersionView getRemediationInformation(final ComponentVersionView componentVersionView) throws IntegrationException {
         final String href = hubService.getHref(componentVersionView);
-        final String remediatingURL = href + "/" + REMEDIATING_LINK;
-        try (final Response response = hubService.executeGetRequest(remediatingURL);) {
-            final JsonElement jsonElement = hubService.getJsonParser().parse(response.getContentString());
-            return hubService.getGson().fromJson(jsonElement, RemediatingVersionView.class);
-        } catch (final IOException e) {
-            throw new IntegrationException(e);
+        try {
+            // TODO this functionality should be abstracted
+            final URL componentVersionURL = new URL(href);
+            final String remediatingURL = new URL(componentVersionURL, REMEDIATING_LINK).toString();
+            try (final Response response = hubService.executeGetRequest(remediatingURL);) {
+                final JsonElement jsonElement = hubService.getJsonParser().parse(response.getContentString());
+                return hubService.getGson().fromJson(jsonElement, RemediatingVersionView.class);
+            } catch (final IOException ioException) {
+                throw new IntegrationException(ioException);
+            }
+        } catch (final Exception genericException) {
+            throw new IntegrationException(genericException);
         }
     }
 
