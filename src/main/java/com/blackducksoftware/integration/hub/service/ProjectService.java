@@ -169,15 +169,35 @@ public class ProjectService extends DataService {
     }
 
     public void updateProjectAndVersion(final ProjectView project, ProjectRequest projectRequest) throws IntegrationException {
-        updateProjectAndVersion(hubService.getHref(project), projectRequest);
-    }
-
-    public void updateProjectAndVersion(final String projectUri, ProjectRequest projectRequest) throws IntegrationException {
-        final Request request = RequestFactory.createCommonPutRequestBuilder(projectRequest).uri(projectUri).build();
-        try (Response response = hubService.executeRequest(request)) {
+        String projectUri = hubService.getHref(project);
+        final Request projectUpdateRequest = RequestFactory.createCommonPutRequestBuilder(projectRequest).uri(projectUri).build();
+        try (Response response = hubService.executeRequest(projectUpdateRequest)) {
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
+        if (null != projectRequest.versionRequest && StringUtils.isNotBlank(projectRequest.versionRequest.versionName)) {
+            ProjectVersionView projectVersionView = getProjectVersion(project, projectRequest.versionRequest.versionName);
+            if (null != projectVersionView) {
+                updateProjectVersion(projectVersionView, projectRequest.versionRequest);
+            }
+        }
+    }
+
+    public void updateProjectAndVersion(final String projectUri, ProjectRequest projectRequest) throws IntegrationException {
+        updateProjectAndVersion(hubService.getResponse(projectUri, ProjectView.class), projectRequest);
+    }
+
+    public void updateProjectAndVersion(final ProjectView project, ProjectVersionView version, ProjectRequest projectRequest) throws IntegrationException {
+        updateProjectAndVersion(hubService.getHref(project), hubService.getHref(version), projectRequest);
+    }
+
+    public void updateProjectAndVersion(final String projectUri, final String projectVersionUri, ProjectRequest projectRequest) throws IntegrationException {
+        final Request projectUpdateRequest = RequestFactory.createCommonPutRequestBuilder(projectRequest).uri(projectUri).build();
+        try (Response response = hubService.executeRequest(projectUpdateRequest)) {
+        } catch (IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
+        updateProjectVersion(projectVersionUri, projectRequest.versionRequest);
     }
 
     public void updateProjectVersion(ProjectVersionView version, ProjectVersionRequest versionRequest) throws IntegrationException {
@@ -185,8 +205,8 @@ public class ProjectService extends DataService {
     }
 
     public void updateProjectVersion(final String versionUri, ProjectVersionRequest versionRequest) throws IntegrationException {
-        final Request request = RequestFactory.createCommonPutRequestBuilder(versionRequest).uri(versionUri).build();
-        try (Response response = hubService.executeRequest(request)) {
+        final Request projectVersionUpdateRequest = RequestFactory.createCommonPutRequestBuilder(versionRequest).uri(versionUri).build();
+        try (Response response = hubService.executeRequest(projectVersionUpdateRequest)) {
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
