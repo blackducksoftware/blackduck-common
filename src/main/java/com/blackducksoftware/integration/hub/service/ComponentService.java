@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.api.generated.component.RemediatingVersionView;
+import com.blackducksoftware.integration.hub.api.generated.component.RemediationOptionsView;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchResultView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
@@ -108,7 +108,7 @@ public class ComponentService extends DataService {
     }
 
     // TODO deprecate when the REMEDIATING_LINK is included in ComponentVersionView
-    public RemediatingVersionView getRemediationInformation(final ComponentVersionView componentVersionView) throws IntegrationException {
+    public RemediationOptionsView getRemediationInformation(final ComponentVersionView componentVersionView) throws IntegrationException {
         final String href = hubService.getHref(componentVersionView);
         try {
             // TODO this functionality should be abstracted
@@ -116,7 +116,7 @@ public class ComponentService extends DataService {
             final String remediatingURL = new URL(componentVersionURL, REMEDIATING_LINK).toString();
             try (final Response response = hubService.executeGetRequest(remediatingURL);) {
                 final JsonElement jsonElement = hubService.getJsonParser().parse(response.getContentString());
-                return hubService.getGson().fromJson(jsonElement, RemediatingVersionView.class);
+                return hubService.getGson().fromJson(jsonElement, RemediationOptionsView.class);
             } catch (final IOException ioException) {
                 throw new IntegrationException(ioException);
             }
