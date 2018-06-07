@@ -351,10 +351,10 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         }
 
         public String getValueFrom(final Map<String, String> values) {
-            if (values.containsKey(environmentVariableKey)) {
-                return values.get(environmentVariableKey);
-            } else {
+            if (values.containsKey(propertyKey)) {
                 return values.get(propertyKey);
+            } else {
+                return values.get(environmentVariableKey);
             }
         }
 
