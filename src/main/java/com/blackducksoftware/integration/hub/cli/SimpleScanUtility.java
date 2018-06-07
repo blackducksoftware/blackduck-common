@@ -106,7 +106,7 @@ public class SimpleScanUtility {
             throw new HubIntegrationException(String.format("The provided directory %s did not have a Hub CLI.", hubScanConfig.getToolsDir().getAbsolutePath()), e);
         }
         logger.debug("Using this java installation : " + pathToJavaExecutable);
-        
+
         cmd.add(pathToJavaExecutable);
         cmd.add("-Done-jar.silent=true");
         cmd.add("-Done-jar.jar.path=" + pathToOneJar);
@@ -136,7 +136,14 @@ public class SimpleScanUtility {
                 cmd.add("-Dblackduck.http.auth.ntlm.workstation=" + proxyNtlmWorkstation);
             }
         }
-
+        final String scanCliOpts = intEnvironmentVariables.getValue("SCAN_CLI_OPTS");
+        if (StringUtils.isNotBlank(scanCliOpts)) {
+            for (String scanOpt : scanCliOpts.split(" ")) {
+                if (StringUtils.isNotBlank(scanOpt)) {
+                    cmd.add(scanOpt);
+                }
+            }
+        }
         cmd.add("-Xmx" + hubScanConfig.getScanMemory() + "m");
         cmd.add("-jar");
         cmd.add(pathToScanExecutable);
@@ -225,7 +232,11 @@ public class SimpleScanUtility {
         }
 
         if (StringUtils.isNotBlank(hubScanConfig.getAdditionalScanParameters())) {
-            cmd.add(hubScanConfig.getAdditionalScanParameters());
+            for (String additionalArgument : hubScanConfig.getAdditionalScanParameters().split(" ")) {
+                if (StringUtils.isNotBlank(additionalArgument)) {
+                    cmd.add(additionalArgument);
+                }
+            }
         }
 
         for (final String target : hubScanConfig.getScanTargetPaths()) {
@@ -252,6 +263,7 @@ public class SimpleScanUtility {
         try (FileOutputStream outputFileStream = new FileOutputStream(standardOutFile)) {
             final ScannerSplitStream splitOutputStream = new ScannerSplitStream(logger, outputFileStream);
             final ProcessBuilder processBuilder = new ProcessBuilder(cmd).redirectError(PIPE).redirectOutput(PIPE);
+            processBuilder.environment().putAll(intEnvironmentVariables.getVariables());
 
             if (!hubScanConfig.isDryRun()) {
                 if (!StringUtils.isEmpty(hubServerConfig.getApiToken())) {
@@ -261,11 +273,6 @@ public class SimpleScanUtility {
                 }
             }
             processBuilder.environment().put("BD_HUB_NO_PROMPT", "true");
-
-            final String bdioEnvVar = intEnvironmentVariables.getValue("BD_HUB_DECLARED_COMPONENTS");
-            if (StringUtils.isNotBlank(bdioEnvVar)) {
-                processBuilder.environment().put("BD_HUB_DECLARED_COMPONENTS", bdioEnvVar);
-            }
 
             final Process hubCliProcess = processBuilder.start();
 

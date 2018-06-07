@@ -44,6 +44,7 @@ public class HubScanConfig extends Stringable {
     private final boolean debug;
     private final boolean verbose;
     private final boolean snippetModeEnabled;
+    //TODO in the next Major version release, rename additionalScanParameters to additionalScanArguments
     private final String additionalScanParameters;
 
     public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
@@ -157,7 +158,7 @@ public class HubScanConfig extends Stringable {
         logger.alwaysLog("--> Un-map previous Code Locations: " + isUnmapPreviousCodeLocations());
         logger.alwaysLog("--> Delete previous Code Locations: " + isDeletePreviousCodeLocations());
         logger.alwaysLog("--> Enable Snippet Mode: " + isSnippetModeEnabled());
-        logger.alwaysLog("--> Additional Scan Parameters: " + isSnippetModeEnabled());
+        logger.alwaysLog("--> Additional Scan Arguments: " + getAdditionalScanParameters());
     }
 
 }
