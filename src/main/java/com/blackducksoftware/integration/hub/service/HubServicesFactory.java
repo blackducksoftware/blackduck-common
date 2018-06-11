@@ -64,11 +64,7 @@ public class HubServicesFactory {
     }
 
     public SignatureScannerService createSignatureScannerService() {
-        return createSignatureScannerService(120000l);
-    }
-
-    public SignatureScannerService createSignatureScannerService(final long timeoutInMilliseconds) {
-        return new SignatureScannerService(createHubService(), intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService(), createScanStatusService(timeoutInMilliseconds));
+        return new SignatureScannerService(createHubService(), intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService());
     }
 
     public PhoneHomeService createPhoneHomeService() {

@@ -36,16 +36,13 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
@@ -231,8 +228,8 @@ public class SimpleScanUtility {
             }
         }
 
-        if (StringUtils.isNotBlank(hubScanConfig.getAdditionalScanParameters())) {
-            for (String additionalArgument : hubScanConfig.getAdditionalScanParameters().split(" ")) {
+        if (StringUtils.isNotBlank(hubScanConfig.getAdditionalScanArguments())) {
+            for (String additionalArgument : hubScanConfig.getAdditionalScanArguments().split(" ")) {
                 if (StringUtils.isNotBlank(additionalArgument)) {
                     cmd.add(additionalArgument);
                 }
@@ -307,41 +304,6 @@ public class SimpleScanUtility {
                 throw new ScanFailedException("The scan failed with return code : " + returnCode);
             }
         }
-    }
-
-    /**
-     * For all error cases, return an empty list. If all goes well, return a list of scan summary urls.
-     */
-    public List<ScanSummaryView> getScanSummaryItems() {
-        if (logDirectory == null || !logDirectory.exists()) {
-            return Collections.emptyList();
-        }
-        final File scanStatusDirectory = getStatusDirectory();
-        if (!scanStatusDirectory.exists()) {
-            return Collections.emptyList();
-        }
-        final File[] statusFiles = scanStatusDirectory.listFiles();
-
-        if (statusFiles.length != hubScanConfig.getScanTargetPaths().size()) {
-            logger.error(String.format("There were %d scans target paths and %d status files.", hubScanConfig.getScanTargetPaths().size(), statusFiles.length));
-            return Collections.emptyList();
-        }
-
-        final List<ScanSummaryView> scanSummaryItems = new ArrayList<>();
-        for (final File currentStatusFile : statusFiles) {
-            final String fileContent;
-            try {
-                fileContent = FileUtils.readFileToString(currentStatusFile, "UTF8");
-            } catch (final IOException e) {
-                logger.error(String.format("There was an exception reading the status file: %s", e.getMessage(), e));
-                return Collections.emptyList();
-            }
-            final ScanSummaryView scanSummaryItem = gson.fromJson(fileContent, ScanSummaryView.class);
-            scanSummaryItem.json = fileContent;
-            scanSummaryItems.add(scanSummaryItem);
-        }
-
-        return scanSummaryItems;
     }
 
     /**
@@ -448,14 +410,20 @@ public class SimpleScanUtility {
         return new File(logDirectory, "CLI_Output.txt");
     }
 
-    public File[] getScanSummaryFiles() {
+    public List<File> getScanSummaryFiles() {
         final File scanStatusDirectory = getStatusDirectory();
-        return scanStatusDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
+        if (null != scanStatusDirectory) {
+            return Arrays.asList(scanStatusDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json")));
+        }
+        return null;
     }
 
-    public File[] getDryRunFiles() {
+    public List<File> getDryRunFiles() {
         final File dataDirectory = getDataDirectory();
-        return dataDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
+        if (null != dataDirectory) {
+            return Arrays.asList(dataDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json")));
+        }
+        return null;
     }
 
 }

@@ -42,20 +42,17 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
     private File toolsDir;
     private boolean disableScanTargetPathExistenceCheck;
     private boolean enableScanTargetPathsWithinWorkingDirectoryCheck;
-    private boolean cleanupLogsOnSuccess = true;
     private String[] excludePatterns;
     private String codeLocationAlias;
-    private boolean unmapPreviousCodeLocations;
-    private boolean deletePreviousCodeLocations;
     private boolean debug;
     private boolean verbose = true;
     private boolean snippetModeEnabled;
-    private String additionalScanParameters;
+    private String additionalScanArguments;
 
     @Override
     public HubScanConfig buildObject() {
-        final HubScanConfig config = new HubScanConfig(workingDirectory, NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias,
-                unmapPreviousCodeLocations, deletePreviousCodeLocations, debug, verbose, snippetModeEnabled, additionalScanParameters);
+        final HubScanConfig config = new HubScanConfig(workingDirectory, NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, excludePatterns,
+                codeLocationAlias, debug, verbose, snippetModeEnabled, additionalScanArguments);
 
         return config;
     }
@@ -124,24 +121,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         enableScanTargetPathsWithinWorkingDirectoryCheck = true;
     }
 
-    public boolean isCleanupLogsOnSuccess() {
-        return cleanupLogsOnSuccess;
-    }
-
-    public void setCleanupLogsOnSuccess(final boolean cleanupLogsOnSuccess) {
-        this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
-    }
-
     public void setExcludePatterns(final String[] excludePatterns) {
         this.excludePatterns = excludePatterns;
-    }
-
-    public void setUnmapPreviousCodeLocations(final boolean unmapPreviousCodeLocations) {
-        this.unmapPreviousCodeLocations = unmapPreviousCodeLocations;
-    }
-
-    public void setDeletePreviousCodeLocations(final boolean deletePreviousCodeLocations) {
-        this.deletePreviousCodeLocations = deletePreviousCodeLocations;
     }
 
     public void setDebug(final boolean debug) {
@@ -156,8 +137,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         this.snippetModeEnabled = snippetModeEnabled;
     }
 
-    public void setAdditionalScanParameters(final String additionalScanParameters) {
-        this.additionalScanParameters = additionalScanParameters;
+    public void setAdditionalScanArguments(final String additionalScanArguments) {
+        this.additionalScanArguments = additionalScanArguments;
     }
 
 }
