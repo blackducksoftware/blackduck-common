@@ -122,7 +122,7 @@ public class SignatureScannerService extends DataService {
             throws IntegrationException {
         logger.trace(String.format("Scan is dry run %s", hubScanConfig.isDryRun()));
         if (cleanupLogsOnSuccess) {
-            cleanUpLogFiles(simpleScanUtility);
+            cleanUpLogFiles(simpleScanUtility.getStandardOutputFile(), simpleScanUtility.getCLILogDirectory());
         }
 
         if (!hubScanConfig.isDryRun()) {
@@ -159,12 +159,10 @@ public class SignatureScannerService extends DataService {
         return scanSummaryView;
     }
 
-    private void cleanUpLogFiles(final SimpleScanUtility simpleScanUtility) {
-        final File standardOutputFile = simpleScanUtility.getStandardOutputFile();
+    private void cleanUpLogFiles(final File standardOutputFile, File cliLogDirectory) {
         if (standardOutputFile != null && standardOutputFile.exists()) {
             standardOutputFile.delete();
         }
-        final File cliLogDirectory = simpleScanUtility.getCLILogDirectory();
         if (cliLogDirectory != null && cliLogDirectory.exists()) {
             for (final File log : cliLogDirectory.listFiles()) {
                 log.delete();
