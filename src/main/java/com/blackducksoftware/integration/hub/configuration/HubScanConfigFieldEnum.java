@@ -27,6 +27,7 @@ import com.blackducksoftware.integration.validator.FieldEnum;
 
 public enum HubScanConfigFieldEnum implements FieldEnum {
     ADDITIONAL_SCAN_ARGUMENTS("additionalScanArguments"),
+    CLEANUP_LOGS("cleanupLogsOnSuccess"),
     CODE_LOCATION_ALIAS("codeLocationAlias"),
     DEBUG("debug"),
     DRY_RUN("dryRun"),

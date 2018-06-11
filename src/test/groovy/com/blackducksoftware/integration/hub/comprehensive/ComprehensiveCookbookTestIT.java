@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.comprehensive;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Ignore;
@@ -234,6 +235,7 @@ public class ComprehensiveCookbookTestIT {
         hubScanConfigBuilder.setWorkingDirectory(workingDirectory);
         // always use the canonical path since we validate the paths by string matching
         hubScanConfigBuilder.addScanTargetPath(scanTarget.getCanonicalPath());
+        hubScanConfigBuilder.setCleanupLogsOnSuccess(true);
 
         final HubScanConfig hubScanConfig = hubScanConfigBuilder.build();
 
@@ -243,14 +245,16 @@ public class ComprehensiveCookbookTestIT {
 
         final ProjectRequest projectRequest = projectRequestBuilder.build();
 
-        final ScanServiceOutput scanServiceOutput = cliService.executeScan(hubServerConfig, hubScanConfig, true, projectRequest);
-        assertNotNull(scanServiceOutput);
-        assertTrue(scanServiceOutput.getScanSummaryViews().isPresent());
+        final List<ScanServiceOutput> scanServiceOutputs = cliService.executeScans(hubServerConfig, hubScanConfig, projectRequest);
+        assertNotNull(scanServiceOutputs);
+        assertTrue(scanServiceOutputs.size() == 1);
+        ScanServiceOutput scanServiceOutput = scanServiceOutputs.get(0);
+        assertTrue(scanServiceOutput.getScanSummaryView().isPresent());
 
-        final List<ScanSummaryView> scanSummaryViews = scanServiceOutput.getScanSummaryViews().get();
+        final ScanSummaryView scanSummaryView = scanServiceOutput.getScanSummaryView().get();
 
         ScanStatusService scanStatusDataService = hubServicesFactory.createScanStatusService(TWENTY_MINUTES);
-        scanStatusDataService.assertScansFinished(scanSummaryViews);
+        scanStatusDataService.assertScansFinished(Arrays.asList(scanSummaryView));
 
         assertTrue(scanServiceOutput.getProjectVersionWrapper().isPresent());
         ProjectVersionWrapper projectVersionWrapper = scanServiceOutput.getProjectVersionWrapper().get();

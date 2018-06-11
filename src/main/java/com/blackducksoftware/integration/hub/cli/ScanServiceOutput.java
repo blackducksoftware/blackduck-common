@@ -24,29 +24,33 @@
 package com.blackducksoftware.integration.hub.cli;
 
 import java.io.File;
-import java.util.List;
 import java.util.Optional;
 
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 
 public class ScanServiceOutput {
-    private final File logDirectory;
     private final File cliLogDirectory;
-    private final File standardOutputFile;
-    private final List<File> dryRunFiles;
-    private final List<ScanSummaryView> scanSummaryViews;
-
+    private final File dryRunFile;
+    private final File logDirectory;
     private final ProjectVersionWrapper projectVersionWrapper;
+    private final ScanSummaryView scanSummaryView;
+    private final String scanTarget;
+    private final File standardOutputFile;
 
-    public ScanServiceOutput(File logDirectory, File cliLogDirectory, File standardOutputFile, List<File> dryRunFiles, List<ScanSummaryView> scanSummaryViews,
+    public ScanServiceOutput(String scanTarget, File logDirectory, File cliLogDirectory, File standardOutputFile, File dryRunFile, ScanSummaryView scanSummaryView,
             ProjectVersionWrapper projectVersionWrapper) {
+        this.scanTarget = scanTarget;
         this.logDirectory = logDirectory;
         this.cliLogDirectory = cliLogDirectory;
         this.standardOutputFile = standardOutputFile;
-        this.dryRunFiles = dryRunFiles;
-        this.scanSummaryViews = scanSummaryViews;
+        this.dryRunFile = dryRunFile;
+        this.scanSummaryView = scanSummaryView;
         this.projectVersionWrapper = projectVersionWrapper;
+    }
+
+    public String getScanTarget() {
+        return scanTarget;
     }
 
     public File getLogDirectory() {
@@ -61,12 +65,12 @@ public class ScanServiceOutput {
         return standardOutputFile;
     }
 
-    public Optional<List<File>> getDryRunFiles() {
-        return Optional.ofNullable(dryRunFiles);
+    public Optional<File> getDryRunFile() {
+        return Optional.ofNullable(dryRunFile);
     }
 
-    public Optional<List<ScanSummaryView>> getScanSummaryViews() {
-        return Optional.ofNullable(scanSummaryViews);
+    public Optional<ScanSummaryView> getScanSummaryView() {
+        return Optional.ofNullable(scanSummaryView);
     }
 
     public Optional<ProjectVersionWrapper> getProjectVersionWrapper() {

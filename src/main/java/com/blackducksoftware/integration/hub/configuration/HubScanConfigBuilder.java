@@ -35,23 +35,24 @@ import com.blackducksoftware.integration.builder.AbstractBuilder;
 import com.blackducksoftware.integration.validator.AbstractValidator;
 
 public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
-    private File workingDirectory;
-    private String scanMemory;
-    private final Set<String> scanTargetPaths = new HashSet<>();
+    private String additionalScanArguments;
+    private boolean cleanupLogsOnSuccess;
+    private String codeLocationAlias;
+    private boolean debug;
     private boolean dryRun;
-    private File toolsDir;
     private boolean disableScanTargetPathExistenceCheck;
     private boolean enableScanTargetPathsWithinWorkingDirectoryCheck;
     private String[] excludePatterns;
-    private String codeLocationAlias;
-    private boolean debug;
-    private boolean verbose = true;
+    private String scanMemory;
+    private final Set<String> scanTargetPaths = new HashSet<>();
     private boolean snippetModeEnabled;
-    private String additionalScanArguments;
+    private File toolsDir;
+    private File workingDirectory;
+    private boolean verbose = true;
 
     @Override
     public HubScanConfig buildObject() {
-        final HubScanConfig config = new HubScanConfig(workingDirectory, NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, excludePatterns,
+        final HubScanConfig config = new HubScanConfig(workingDirectory, NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns,
                 codeLocationAlias, debug, verbose, snippetModeEnabled, additionalScanArguments);
 
         return config;
@@ -71,6 +72,10 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         }
         validator.setExcludePatterns(excludePatterns);
         return validator;
+    }
+
+    public void setCleanupLogsOnSuccess(boolean cleanupLogsOnSuccess) {
+        this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
     }
 
     public void setCodeLocationAlias(final String codeLocationAlias) {
