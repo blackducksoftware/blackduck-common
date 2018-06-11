@@ -68,7 +68,7 @@ public class CLIDownloadUtility {
         this.restConnection = restConnection;
     }
 
-    public void performInstallation(final File directoryToInstallTo, final String hubUrl, final String hubVersion) throws HubIntegrationException, EncryptionException {
+    public CLILocation performInstallation(final File directoryToInstallTo, final String hubUrl, final String hubVersion) throws HubIntegrationException, EncryptionException {
         final CLILocation cliLocation = new CLILocation(this.logger, directoryToInstallTo);
         final String cliDownloadUrl = cliLocation.getCLIDownloadUrl(this.logger, hubUrl);
         if (StringUtils.isNotBlank(cliDownloadUrl)) {
@@ -80,6 +80,7 @@ public class CLIDownloadUtility {
         } else {
             this.logger.error("Could not find the correct Hub CLI download URL.");
         }
+        return cliLocation;
     }
 
     public void customInstall(final CLILocation cliLocation, final URL cliDownloadUrl, final String hubVersion) throws HubIntegrationException, EncryptionException {

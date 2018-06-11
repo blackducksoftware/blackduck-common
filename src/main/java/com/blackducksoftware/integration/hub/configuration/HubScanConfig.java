@@ -25,37 +25,37 @@ package com.blackducksoftware.integration.hub.configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
+import com.blackducksoftware.integration.hub.cli.SignatureScanConfig;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.Stringable;
 
 public class HubScanConfig extends Stringable {
-    private final File workingDirectory;
+    private final String additionalScanArguments;
+    private final boolean cleanupLogsOnSuccess;
+    private final String codeLocationAlias;
+    private final boolean debug;
+    private final boolean dryRun;
+    private final String[] excludePatterns;
     private final int scanMemory;
     private final Set<String> scanTargetPaths;
-    private final boolean dryRun;
-    private final File toolsDir;
-    private final boolean cleanupLogsOnSuccess;
-    private final String[] excludePatterns;
-    private final String codeLocationAlias;
-    private final boolean unmapPreviousCodeLocations;
-    private final boolean deletePreviousCodeLocations;
-    private final boolean debug;
-    private final boolean verbose;
     private final boolean snippetModeEnabled;
-    //TODO in the next Major version release, rename additionalScanParameters to additionalScanArguments
-    private final String additionalScanParameters;
+    private final File toolsDir;
+    private final File workingDirectory;
+    private final boolean verbose;
 
-    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
-            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean snippetModeEnabled, final String additionalScanParameters) {
-        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations, false, true, snippetModeEnabled,
+    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, boolean cleanupLogsOnSuccess, final String[] excludePatterns,
+            final String codeLocationAlias, final boolean snippetModeEnabled, final String additionalScanParameters) {
+        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, false, true, snippetModeEnabled,
                 additionalScanParameters);
     }
 
-    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
-            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean debug, final boolean verbose, final boolean snippetModeEnabled,
-            final String additionalScanParameters) {
+    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, boolean cleanupLogsOnSuccess, final String[] excludePatterns,
+            final String codeLocationAlias, final boolean debug, final boolean verbose, final boolean snippetModeEnabled,
+            final String additionalScanArguments) {
         this.workingDirectory = workingDirectory;
         this.scanMemory = scanMemory;
         this.scanTargetPaths = scanTargetPaths;
@@ -64,12 +64,19 @@ public class HubScanConfig extends Stringable {
         this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
         this.excludePatterns = excludePatterns;
         this.codeLocationAlias = codeLocationAlias;
-        this.unmapPreviousCodeLocations = unmapPreviousCodeLocations;
-        this.deletePreviousCodeLocations = deletePreviousCodeLocations;
         this.debug = debug;
         this.verbose = verbose;
         this.snippetModeEnabled = snippetModeEnabled;
-        this.additionalScanParameters = additionalScanParameters;
+        this.additionalScanArguments = additionalScanArguments;
+    }
+
+    public List<SignatureScanConfig> createSignatureScanConfigs() {
+        List<SignatureScanConfig> signatureScanConfigs = new ArrayList<>();
+        for (String scanTarget : scanTargetPaths) {
+            SignatureScanConfig signatureScanConfig = new SignatureScanConfig(additionalScanArguments, codeLocationAlias, debug, dryRun, excludePatterns, scanMemory, scanTarget, snippetModeEnabled, toolsDir, workingDirectory, verbose);
+            signatureScanConfigs.add(signatureScanConfig);
+        }
+        return signatureScanConfigs;
     }
 
     public File getWorkingDirectory() {
@@ -104,14 +111,6 @@ public class HubScanConfig extends Stringable {
         return codeLocationAlias;
     }
 
-    public boolean isUnmapPreviousCodeLocations() {
-        return unmapPreviousCodeLocations;
-    }
-
-    public boolean isDeletePreviousCodeLocations() {
-        return deletePreviousCodeLocations;
-    }
-
     public boolean isDebug() {
         return debug;
     }
@@ -124,8 +123,8 @@ public class HubScanConfig extends Stringable {
         return snippetModeEnabled;
     }
 
-    public String getAdditionalScanParameters() {
-        return additionalScanParameters;
+    public String getAdditionalScanArguments() {
+        return additionalScanArguments;
     }
 
     public void print(final IntLogger logger) {
@@ -140,6 +139,7 @@ public class HubScanConfig extends Stringable {
                 logger.alwaysLog("--> " + target);
             }
         } else {
+
             logger.alwaysLog("--> null");
         }
         logger.alwaysLog("--> Directory Exclusion Patterns:");
@@ -155,10 +155,8 @@ public class HubScanConfig extends Stringable {
         logger.alwaysLog("--> Dry Run: " + isDryRun());
         logger.alwaysLog("--> Clean-up logs on success: " + isCleanupLogsOnSuccess());
         logger.alwaysLog("--> Code Location Name: " + getCodeLocationAlias());
-        logger.alwaysLog("--> Un-map previous Code Locations: " + isUnmapPreviousCodeLocations());
-        logger.alwaysLog("--> Delete previous Code Locations: " + isDeletePreviousCodeLocations());
         logger.alwaysLog("--> Enable Snippet Mode: " + isSnippetModeEnabled());
-        logger.alwaysLog("--> Additional Scan Arguments: " + getAdditionalScanParameters());
+        logger.alwaysLog("--> Additional Scan Arguments: " + getAdditionalScanArguments());
     }
 
 }

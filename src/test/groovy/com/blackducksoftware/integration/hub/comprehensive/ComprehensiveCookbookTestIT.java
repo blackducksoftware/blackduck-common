@@ -23,12 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.comprehensive;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Ignore;
@@ -50,6 +48,8 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
+import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
+import com.blackducksoftware.integration.hub.cli.ScanServiceOutput;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
@@ -209,7 +209,7 @@ public class ComprehensiveCookbookTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
-        final SignatureScannerService cliService = hubServicesFactory.createSignatureScannerService(TWENTY_MINUTES);
+        final SignatureScannerService cliService = hubServicesFactory.createSignatureScannerService();
         final ProjectService projectService = hubServicesFactory.createProjectService();
 
         // delete the project, if it exists
@@ -235,6 +235,7 @@ public class ComprehensiveCookbookTestIT {
         hubScanConfigBuilder.setWorkingDirectory(workingDirectory);
         // always use the canonical path since we validate the paths by string matching
         hubScanConfigBuilder.addScanTargetPath(scanTarget.getCanonicalPath());
+        hubScanConfigBuilder.setCleanupLogsOnSuccess(true);
 
         final HubScanConfig hubScanConfig = hubScanConfigBuilder.build();
 
@@ -244,9 +245,20 @@ public class ComprehensiveCookbookTestIT {
 
         final ProjectRequest projectRequest = projectRequestBuilder.build();
 
-        final ProjectVersionWrapper projectVersionWrapper = cliService.installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, true);
+        final List<ScanServiceOutput> scanServiceOutputs = cliService.executeScans(hubServerConfig, hubScanConfig, projectRequest);
+        assertNotNull(scanServiceOutputs);
+        assertTrue(scanServiceOutputs.size() == 1);
+        ScanServiceOutput scanServiceOutput = scanServiceOutputs.get(0);
+        assertTrue(scanServiceOutput.getScanSummaryView().isPresent());
 
-        assertNotNull(projectVersionWrapper);
+        final ScanSummaryView scanSummaryView = scanServiceOutput.getScanSummaryView().get();
+
+        ScanStatusService scanStatusDataService = hubServicesFactory.createScanStatusService(TWENTY_MINUTES);
+        scanStatusDataService.assertScansFinished(Arrays.asList(scanSummaryView));
+
+        assertTrue(scanServiceOutput.getProjectVersionWrapper().isPresent());
+        ProjectVersionWrapper projectVersionWrapper = scanServiceOutput.getProjectVersionWrapper().get();
+
         assertNotNull(projectVersionWrapper.getProjectView());
         assertNotNull(projectVersionWrapper.getProjectVersionView());
 
