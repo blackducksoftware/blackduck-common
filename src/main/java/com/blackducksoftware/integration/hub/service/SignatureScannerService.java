@@ -84,18 +84,6 @@ public class SignatureScannerService extends DataService {
         }
     }
 
-    /**
-     * This should only be invoked directly when dryRun == true. Otherwise, installAndRunControlledScan should be used.
-     */
-    public List<File> executeDryRunScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final boolean cleanupLogsOnSuccess, final ProjectRequest projectRequest) throws InterruptedException, IntegrationException {
-        final SimpleScanUtility simpleScanUtility = createScanService(hubServerConfig, hubScanConfig, projectRequest);
-        final List<File> scanSummaryFiles = runScan(simpleScanUtility);
-        if (cleanupLogsOnSuccess) {
-            cleanUpLogFiles(simpleScanUtility);
-        }
-        return scanSummaryFiles;
-    }
-
     private List<File> runScan(final SimpleScanUtility simpleScanUtility) throws IllegalArgumentException, EncryptionException, InterruptedException, HubIntegrationException {
         simpleScanUtility.setupAndExecuteScan();
         final List<File> scanSummaryFiles = simpleScanUtility.getScanSummaryFiles();
