@@ -76,26 +76,44 @@ public class SignatureScannerService extends DataService {
 
         List<ScanServiceOutput> scanServiceOutputs = new ArrayList<>();
 
-        List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
-        List<File> standardOutputFiles = new ArrayList<>();
-        List<File> cliLogDirectories = new ArrayList<>();
         logger.info("Starting the Hub signature scans");
         for (SimpleScanUtility simpleScanUtility : simpleScanUtilities) {
-            simpleScanUtility.setupAndExecuteScan(cliLocation);
-            ScanSummaryView scanSummaryView = getScanSummaryFromFile(simpleScanUtility.getScanSummaryFile());
-            scanSummaryViews.add(scanSummaryView);
-            standardOutputFiles.add(simpleScanUtility.getStandardOutputFile());
-            cliLogDirectories.add(simpleScanUtility.getCLILogDirectory());
+            ScanSummaryView scanSummaryView = null;
+            File standardOutputFile = null;
+            File cliLogDirectory = null;
+            String scanTarget = simpleScanUtility.getSignatureScanConfig().getScanTarget();
+            try {
+                simpleScanUtility.setupAndExecuteScan(cliLocation);
 
-            ScanServiceOutput scanServiceOutput = new ScanServiceOutput(simpleScanUtility.getSignatureScanConfig().getScanTarget(), simpleScanUtility.getLogDirectory(), simpleScanUtility.getCLILogDirectory(),
-                    simpleScanUtility.getStandardOutputFile(), simpleScanUtility.getDryRunFile(), scanSummaryView, projectVersionWrapper);
+                scanSummaryView = getScanSummaryFromFile(simpleScanUtility.getScanSummaryFile());
+                standardOutputFile = simpleScanUtility.getStandardOutputFile();
+                cliLogDirectory = simpleScanUtility.getCLILogDirectory();
+            } catch (IllegalArgumentException | IntegrationException e) {
+                String errorMessage = String.format("There was a problem scanning target '%s' : %s", scanTarget, e.getMessage());
+                ScanServiceOutput scanServiceOutput = ScanServiceOutput.FAILURE(scanTarget, simpleScanUtility.getLogDirectory(), cliLogDirectory,
+                        standardOutputFile, simpleScanUtility.getDryRunFile(), scanSummaryView, projectVersionWrapper, errorMessage, e);
+                scanServiceOutputs.add(scanServiceOutput);
+                continue;
+            }
+
+            logger.info(String.format("Starting the post scan step for target %s", simpleScanUtility.getSignatureScanConfig().getScanTarget()));
+            try {
+                postScan(hubScanConfig, scanSummaryView, standardOutputFile, cliLogDirectory);
+            } catch (IntegrationException e) {
+                String errorMessage = String.format("There was a problem mapping the code location for scan target '%s' : %s", scanTarget, e.getMessage());
+                ScanServiceOutput scanServiceOutput = ScanServiceOutput.FAILURE(scanTarget, simpleScanUtility.getLogDirectory(), cliLogDirectory,
+                        standardOutputFile, simpleScanUtility.getDryRunFile(), scanSummaryView, projectVersionWrapper, errorMessage, e);
+                scanServiceOutputs.add(scanServiceOutput);
+                continue;
+            }
+            logger.info(String.format("Completed the post scan step for target %s", simpleScanUtility.getSignatureScanConfig().getScanTarget()));
+
+            ScanServiceOutput scanServiceOutput = ScanServiceOutput.SUCCESS(scanTarget, simpleScanUtility.getLogDirectory(), cliLogDirectory,
+                    standardOutputFile, simpleScanUtility.getDryRunFile(), scanSummaryView, projectVersionWrapper);
             scanServiceOutputs.add(scanServiceOutput);
 
         }
         logger.info("Completed the Hub signature scans");
-        logger.info("Starting the post scan step");
-        postScan(hubScanConfig, scanSummaryViews, standardOutputFiles, cliLogDirectories);
-        logger.info("Completed the post scan step");
         return scanServiceOutputs;
     }
 
@@ -148,7 +166,7 @@ public class SignatureScannerService extends DataService {
         return cliLocation;
     }
 
-    private void postScan(final HubScanConfig hubScanConfig, List<ScanSummaryView> scanSummaryViews, List<File> standardOutputFiles, List<File> cliLogDirectories)
+    private void postScan(final HubScanConfig hubScanConfig, ScanSummaryView scanSummaryView, File standardOutputFiles, File cliLogDirectories)
             throws IntegrationException {
         logger.trace(String.format("Scan is dry run %s", hubScanConfig.isDryRun()));
         if (hubScanConfig.isCleanupLogsOnSuccess()) {
@@ -156,15 +174,11 @@ public class SignatureScannerService extends DataService {
         }
 
         if (!hubScanConfig.isDryRun()) {
-            logger.trace(String.format("Found %s scan summaries", scanSummaryViews.size()));
-            for (final ScanSummaryView scanSummaryView : scanSummaryViews) {
+            // TODO update when ScanSummaryView is part of the swagger
+            final String codeLocationUrl = hubService.getFirstLinkSafely(scanSummaryView, ScanSummaryView.CODELOCATION_LINK);
 
-                // TODO update when ScanSummaryView is part of the swagger
-                final String codeLocationUrl = hubService.getFirstLinkSafely(scanSummaryView, ScanSummaryView.CODELOCATION_LINK);
-
-                final CodeLocationView codeLocationView = hubService.getResponse(codeLocationUrl, CodeLocationView.class);
-                codeLocationDataService.mapCodeLocation(codeLocationView, projectVersionWrapper.getProjectVersionView());
-            }
+            final CodeLocationView codeLocationView = hubService.getResponse(codeLocationUrl, CodeLocationView.class);
+            codeLocationDataService.mapCodeLocation(codeLocationView, projectVersionWrapper.getProjectVersionView());
         }
     }
 
@@ -184,20 +198,17 @@ public class SignatureScannerService extends DataService {
         return scanSummaryView;
     }
 
-    private void cleanUpLogFiles(final List<File> standardOutputFiles, List<File> cliLogDirectories) {
-        for (File standardOutputFile : standardOutputFiles) {
-            if (standardOutputFile != null && standardOutputFile.exists()) {
-                standardOutputFile.delete();
-            }
+    private void cleanUpLogFiles(final File standardOutputFile, File cliLogDirectory) {
+        if (standardOutputFile != null && standardOutputFile.exists()) {
+            standardOutputFile.delete();
         }
-        for (File cliLogDirectory : cliLogDirectories) {
-            if (cliLogDirectory != null && cliLogDirectory.exists()) {
-                for (final File log : cliLogDirectory.listFiles()) {
-                    log.delete();
-                }
-                cliLogDirectory.delete();
+        if (cliLogDirectory != null && cliLogDirectory.exists()) {
+            for (final File log : cliLogDirectory.listFiles()) {
+                log.delete();
             }
+            cliLogDirectory.delete();
         }
+
     }
 
 }

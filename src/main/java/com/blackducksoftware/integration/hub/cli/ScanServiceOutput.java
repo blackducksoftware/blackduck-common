@@ -24,56 +24,83 @@
 package com.blackducksoftware.integration.hub.cli;
 
 import java.io.File;
-import java.util.Optional;
 
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
+import com.blackducksoftware.integration.hub.cli.summary.Result;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 
 public class ScanServiceOutput {
     private final File cliLogDirectory;
     private final File dryRunFile;
+    private final String errorMessage;
+    private final Exception exception;
     private final File logDirectory;
     private final ProjectVersionWrapper projectVersionWrapper;
+    private final Result result;
     private final ScanSummaryView scanSummaryView;
     private final String scanTarget;
     private final File standardOutputFile;
 
-    public ScanServiceOutput(String scanTarget, File logDirectory, File cliLogDirectory, File standardOutputFile, File dryRunFile, ScanSummaryView scanSummaryView,
-            ProjectVersionWrapper projectVersionWrapper) {
-        this.scanTarget = scanTarget;
-        this.logDirectory = logDirectory;
+    private ScanServiceOutput(String scanTarget, File logDirectory, File cliLogDirectory, File standardOutputFile, File dryRunFile, ScanSummaryView scanSummaryView, ProjectVersionWrapper projectVersionWrapper, Result result,
+            String errorMessage, Exception exception) {
         this.cliLogDirectory = cliLogDirectory;
-        this.standardOutputFile = standardOutputFile;
         this.dryRunFile = dryRunFile;
-        this.scanSummaryView = scanSummaryView;
+        this.logDirectory = logDirectory;
         this.projectVersionWrapper = projectVersionWrapper;
+        this.result = result;
+        this.scanSummaryView = scanSummaryView;
+        this.scanTarget = scanTarget;
+        this.standardOutputFile = standardOutputFile;
+        this.errorMessage = errorMessage;
+        this.exception = exception;
+    }
+
+    public static ScanServiceOutput SUCCESS(String scanTarget, File logDirectory, File cliLogDirectory, File standardOutputFile, File dryRunFile, ScanSummaryView scanSummaryView, ProjectVersionWrapper projectVersionWrapper) {
+        return new ScanServiceOutput(scanTarget, logDirectory, cliLogDirectory, standardOutputFile, dryRunFile, scanSummaryView, projectVersionWrapper, Result.SUCCESS, null, null);
+    }
+
+    public static ScanServiceOutput FAILURE(String scanTarget, File logDirectory, File cliLogDirectory, File standardOutputFile, File dryRunFile, ScanSummaryView scanSummaryView, ProjectVersionWrapper projectVersionWrapper,
+            String errorMessage, Exception e) {
+        return new ScanServiceOutput(scanTarget, logDirectory, cliLogDirectory, standardOutputFile, dryRunFile, scanSummaryView, projectVersionWrapper, Result.SUCCESS, errorMessage, e);
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public Exception getException() {
+        return exception;
+    }
+
+    public Result getResult() {
+        return result;
     }
 
     public String getScanTarget() {
         return scanTarget;
     }
 
-    public File getLogDirectory() {
-        return logDirectory;
-    }
-
     public File getCliLogDirectory() {
         return cliLogDirectory;
     }
 
+    public File getDryRunFile() {
+        return dryRunFile;
+    }
+
+    public File getLogDirectory() {
+        return logDirectory;
+    }
+
+    public ProjectVersionWrapper getProjectVersionWrapper() {
+        return projectVersionWrapper;
+    }
+
+    public ScanSummaryView getScanSummaryView() {
+        return scanSummaryView;
+    }
+
     public File getStandardOutputFile() {
         return standardOutputFile;
-    }
-
-    public Optional<File> getDryRunFile() {
-        return Optional.ofNullable(dryRunFile);
-    }
-
-    public Optional<ScanSummaryView> getScanSummaryView() {
-        return Optional.ofNullable(scanSummaryView);
-    }
-
-    public Optional<ProjectVersionWrapper> getProjectVersionWrapper() {
-        return Optional.ofNullable(projectVersionWrapper);
     }
 }

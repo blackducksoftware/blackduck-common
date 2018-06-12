@@ -50,6 +50,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicy
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.cli.ScanServiceOutput;
+import com.blackducksoftware.integration.hub.cli.summary.Result;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
@@ -249,15 +250,16 @@ public class ComprehensiveCookbookTestIT {
         assertNotNull(scanServiceOutputs);
         assertTrue(scanServiceOutputs.size() == 1);
         ScanServiceOutput scanServiceOutput = scanServiceOutputs.get(0);
-        assertTrue(scanServiceOutput.getScanSummaryView().isPresent());
+        assertTrue(scanServiceOutput.getResult() == Result.SUCCESS);
+        assertNotNull(scanServiceOutput.getScanSummaryView());
 
-        final ScanSummaryView scanSummaryView = scanServiceOutput.getScanSummaryView().get();
+        final ScanSummaryView scanSummaryView = scanServiceOutput.getScanSummaryView();
 
         ScanStatusService scanStatusDataService = hubServicesFactory.createScanStatusService(TWENTY_MINUTES);
         scanStatusDataService.assertScansFinished(Arrays.asList(scanSummaryView));
 
-        assertTrue(scanServiceOutput.getProjectVersionWrapper().isPresent());
-        ProjectVersionWrapper projectVersionWrapper = scanServiceOutput.getProjectVersionWrapper().get();
+        assertNotNull(scanServiceOutput.getProjectVersionWrapper());
+        ProjectVersionWrapper projectVersionWrapper = scanServiceOutput.getProjectVersionWrapper();
 
         assertNotNull(projectVersionWrapper.getProjectView());
         assertNotNull(projectVersionWrapper.getProjectVersionView());
