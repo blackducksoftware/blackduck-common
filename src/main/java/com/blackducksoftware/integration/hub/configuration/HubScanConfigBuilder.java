@@ -54,8 +54,9 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     @Override
     public HubScanConfig buildObject() {
-        final HubScanConfig config = new HubScanConfig(workingDirectory, NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, cleanupLogsOnSuccess, targetToExclusionPatterns,
-                targetToCodeLocationName, debug, verbose, snippetModeEnabled, additionalScanArguments);
+        final CommonScanConfig commonScanConfig = new CommonScanConfig(additionalScanArguments, debug, dryRun, NumberUtils.toInt(scanMemory), snippetModeEnabled, toolsDir, workingDirectory, verbose);
+        final HubScanConfig config = new HubScanConfig(commonScanConfig, Collections.unmodifiableSet(scanTargetPaths), cleanupLogsOnSuccess, targetToExclusionPatterns,
+                targetToCodeLocationName);
 
         return config;
     }

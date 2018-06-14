@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.cli.summary;
+package com.blackducksoftware.integration.hub.summary;
 
 public enum Result {
     SUCCESS, FAILURE;

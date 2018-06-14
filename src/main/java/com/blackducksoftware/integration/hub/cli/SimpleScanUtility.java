@@ -64,12 +64,16 @@ public class SimpleScanUtility {
     private final String project;
     private final String version;
     private final List<String> cmd = new ArrayList<>();
-    private final boolean runningParallelScans;
 
     private File logDirectory;
 
+    public SimpleScanUtility(final IntLogger logger, final Gson gson, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig,
+            final String project, final String version) {
+        this(logger, gson, null, intEnvironmentVariables, signatureScanConfig, project, version);
+    }
+
     public SimpleScanUtility(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig,
-            final String project, final String version, final boolean runningParallelScans) {
+            final String project, final String version) {
         this.gson = gson;
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
@@ -77,11 +81,10 @@ public class SimpleScanUtility {
         this.signatureScanConfig = signatureScanConfig;
         this.project = project;
         this.version = version;
-        this.runningParallelScans = runningParallelScans;
     }
 
     public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, InterruptedException, HubIntegrationException {
-        final CLILocation cliLocation = new CLILocation(logger, signatureScanConfig.getToolsDir());
+        final CLILocation cliLocation = new CLILocation(logger, signatureScanConfig.getCommonScanConfig().getToolsDir());
         setupAndExecuteScan(cliLocation);
     }
 
@@ -101,7 +104,7 @@ public class SimpleScanUtility {
             pathToOneJar = cliLocation.getOneJarFile().getCanonicalPath();
             pathToScanExecutable = cliLocation.getCLI(logger).getCanonicalPath();
         } catch (final IOException e) {
-            throw new HubIntegrationException(String.format("The provided directory %s did not have a Hub CLI.", signatureScanConfig.getToolsDir().getAbsolutePath()), e);
+            throw new HubIntegrationException(String.format("The provided directory %s did not have a Hub CLI.", signatureScanConfig.getCommonScanConfig().getToolsDir().getAbsolutePath()), e);
         }
         logger.debug("Using this java installation : " + pathToJavaExecutable);
 
@@ -109,7 +112,7 @@ public class SimpleScanUtility {
         cmd.add("-Done-jar.silent=true");
         cmd.add("-Done-jar.jar.path=" + pathToOneJar);
 
-        if (hubServerConfig.shouldUseProxyForHub() && !signatureScanConfig.isDryRun()) {
+        if (isNotDryRun(hubServerConfig, signatureScanConfig) && hubServerConfig.shouldUseProxyForHub()) {
             final ProxyInfo hubProxyInfo = hubServerConfig.getProxyInfo();
             final String proxyHost = hubProxyInfo.getHost();
             final int proxyPort = hubProxyInfo.getPort();
@@ -142,13 +145,13 @@ public class SimpleScanUtility {
                 }
             }
         }
-        cmd.add("-Xmx" + signatureScanConfig.getScanMemory() + "m");
+        cmd.add("-Xmx" + signatureScanConfig.getCommonScanConfig().getScanMemory() + "m");
         cmd.add("-jar");
         cmd.add(pathToScanExecutable);
 
         cmd.add("--no-prompt");
 
-        if (!signatureScanConfig.isDryRun()) {
+        if (isNotDryRun(hubServerConfig, signatureScanConfig)) {
             cmd.add("--scheme");
             cmd.add(hubServerConfig.getHubUrl().getProtocol());
             cmd.add("--host");
@@ -191,7 +194,7 @@ public class SimpleScanUtility {
         cmd.add("--logDir");
         cmd.add(logDirectoryPath);
 
-        if (signatureScanConfig.isDryRun()) {
+        if (signatureScanConfig.getCommonScanConfig().isDryRun()) {
             // The dryRunWriteDir is the same as the log directory path
             // The CLI will create a subdirectory for the json files
             cmd.add("--dryRunWriteDir");
@@ -216,7 +219,7 @@ public class SimpleScanUtility {
             cmd.add(signatureScanConfig.getCodeLocationAlias());
         }
 
-        if (signatureScanConfig.isSnippetModeEnabled()) {
+        if (signatureScanConfig.getCommonScanConfig().isSnippetModeEnabled()) {
             cmd.add("--snippet-matching");
         }
 
@@ -228,9 +231,9 @@ public class SimpleScanUtility {
                 }
             }
         }
-
-        if (StringUtils.isNotBlank(signatureScanConfig.getAdditionalScanArguments())) {
-            for (final String additionalArgument : signatureScanConfig.getAdditionalScanArguments().split(" ")) {
+        final String additionalScanArguments = signatureScanConfig.getCommonScanConfig().getAdditionalScanArguments();
+        if (StringUtils.isNotBlank(additionalScanArguments)) {
+            for (final String additionalArgument : additionalScanArguments.split(" ")) {
                 if (StringUtils.isNotBlank(additionalArgument)) {
                     cmd.add(additionalArgument);
                 }
@@ -261,7 +264,7 @@ public class SimpleScanUtility {
             final ProcessBuilder processBuilder = new ProcessBuilder(cmd).redirectError(PIPE).redirectOutput(PIPE);
             processBuilder.environment().putAll(intEnvironmentVariables.getVariables());
 
-            if (!signatureScanConfig.isDryRun()) {
+            if (isNotDryRun(hubServerConfig, signatureScanConfig)) {
                 if (!StringUtils.isEmpty(hubServerConfig.getApiToken())) {
                     processBuilder.environment().put("BD_HUB_TOKEN", hubServerConfig.getApiToken());
                 } else {
@@ -305,29 +308,33 @@ public class SimpleScanUtility {
         }
     }
 
+    private boolean isNotDryRun(final HubServerConfig hubServerConfig, final SignatureScanConfig signatureScanConfig) {
+        if (null != hubServerConfig && !signatureScanConfig.getCommonScanConfig().isDryRun()) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * This method can be overridden to provide a more appropriate directory name for the logs of a specific scan execution.
      */
     public String getSpecificScanExecutionLogDirectory() {
         final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZone(ZoneOffset.UTC);
         final String timeString = Instant.now().atZone(ZoneOffset.UTC).format(dateTimeFormatter);
-        String uniqueLogDirectoryName = timeString;
-        if (runningParallelScans) {
-            uniqueLogDirectoryName = uniqueLogDirectoryName + "_" + Thread.currentThread().getId();
-        }
+        final String uniqueLogDirectoryName = timeString + "_" + Thread.currentThread().getId();
         return uniqueLogDirectoryName;
     }
 
     private void populateLogDirectory() throws IOException {
         final String logDirectoryName = "HubScanLogs";
-        final File logsDirectory = new File(signatureScanConfig.getWorkingDirectory(), logDirectoryName);
+        final File logsDirectory = new File(signatureScanConfig.getCommonScanConfig().getWorkingDirectory(), logDirectoryName);
         final String specificScanExecutionLogDirectory = getSpecificScanExecutionLogDirectory();
 
         logDirectory = new File(logsDirectory, specificScanExecutionLogDirectory);
         if (!logDirectory.exists() && !logDirectory.mkdirs()) {
             throw new IOException(String.format("Could not create the %s directory!", logDirectory.getAbsolutePath()));
         }
-        final File bdIgnoreLogsFile = new File(signatureScanConfig.getWorkingDirectory(), ".bdignore");
+        final File bdIgnoreLogsFile = new File(signatureScanConfig.getCommonScanConfig().getWorkingDirectory(), ".bdignore");
         if (!bdIgnoreLogsFile.exists()) {
             if (!bdIgnoreLogsFile.createNewFile()) {
                 throw new IOException(String.format("Could not create the %s file!", bdIgnoreLogsFile.getAbsolutePath()));
@@ -377,10 +384,10 @@ public class SimpleScanUtility {
     }
 
     private void makeVerbose(final List<String> cmd) {
-        if (signatureScanConfig.isVerbose()) {
+        if (signatureScanConfig.getCommonScanConfig().isVerbose()) {
             cmd.add("-v");
         }
-        if (signatureScanConfig.isDebug()) {
+        if (signatureScanConfig.getCommonScanConfig().isDebug()) {
             cmd.add("--debug");
         }
     }

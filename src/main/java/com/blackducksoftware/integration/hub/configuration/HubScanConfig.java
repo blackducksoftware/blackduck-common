@@ -23,7 +23,6 @@
  */
 package com.blackducksoftware.integration.hub.configuration;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,42 +34,20 @@ import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.Stringable;
 
 public class HubScanConfig extends Stringable {
-    private final String additionalScanArguments;
+    private final CommonScanConfig commonScanConfig;
     private final boolean cleanupLogsOnSuccess;
     private final Map<String, String> targetToCodeLocationName;
-    private final boolean debug;
-    private final boolean dryRun;
     private final Map<String, Set<String>> targetToExclusionPatterns;
-    private final int scanMemory;
     private final Set<String> scanTargetPaths;
-    private final boolean snippetModeEnabled;
-    private final File toolsDir;
-    private final File workingDirectory;
-    private final boolean verbose;
 
-    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess,
+    public HubScanConfig(final CommonScanConfig commonScanConfig, final Set<String> scanTargetPaths, final boolean cleanupLogsOnSuccess,
             final Map<String, Set<String>> targetToExclusionPatterns,
-            final Map<String, String> targetToCodeLocationName, final boolean snippetModeEnabled, final String additionalScanParameters) {
-        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, targetToExclusionPatterns, targetToCodeLocationName, false, true, snippetModeEnabled,
-                additionalScanParameters);
-    }
-
-    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess,
-            final Map<String, Set<String>> targetToExclusionPatterns,
-            final Map<String, String> targetToCodeLocationName, final boolean debug, final boolean verbose, final boolean snippetModeEnabled,
-            final String additionalScanArguments) {
-        this.workingDirectory = workingDirectory;
-        this.scanMemory = scanMemory;
+            final Map<String, String> targetToCodeLocationName) {
+        this.commonScanConfig = commonScanConfig;
         this.scanTargetPaths = scanTargetPaths;
-        this.dryRun = dryRun;
-        this.toolsDir = toolsDir;
         this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
         this.targetToExclusionPatterns = targetToExclusionPatterns;
         this.targetToCodeLocationName = targetToCodeLocationName;
-        this.debug = debug;
-        this.verbose = verbose;
-        this.snippetModeEnabled = snippetModeEnabled;
-        this.additionalScanArguments = additionalScanArguments;
     }
 
     public List<SignatureScanConfig> createSignatureScanConfigs() {
@@ -81,31 +58,18 @@ public class HubScanConfig extends Stringable {
             if (null != patterns && !patterns.isEmpty()) {
                 exclusionPatterns = patterns.toArray(new String[patterns.size()]);
             }
-            final SignatureScanConfig signatureScanConfig = new SignatureScanConfig(additionalScanArguments, targetToCodeLocationName.get(scanTarget), debug, dryRun, exclusionPatterns, scanMemory, scanTarget,
-                    snippetModeEnabled, toolsDir, workingDirectory, verbose);
+            final SignatureScanConfig signatureScanConfig = new SignatureScanConfig(commonScanConfig, targetToCodeLocationName.get(scanTarget), exclusionPatterns, scanTarget);
             signatureScanConfigs.add(signatureScanConfig);
         }
         return signatureScanConfigs;
     }
 
-    public File getWorkingDirectory() {
-        return workingDirectory;
-    }
-
-    public int getScanMemory() {
-        return scanMemory;
+    public CommonScanConfig getCommonScanConfig() {
+        return commonScanConfig;
     }
 
     public Set<String> getScanTargetPaths() {
         return scanTargetPaths;
-    }
-
-    public boolean isDryRun() {
-        return dryRun;
-    }
-
-    public File getToolsDir() {
-        return toolsDir;
     }
 
     public boolean isCleanupLogsOnSuccess() {
@@ -120,25 +84,9 @@ public class HubScanConfig extends Stringable {
         return targetToCodeLocationName;
     }
 
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public boolean isVerbose() {
-        return verbose;
-    }
-
-    public boolean isSnippetModeEnabled() {
-        return snippetModeEnabled;
-    }
-
-    public String getAdditionalScanArguments() {
-        return additionalScanArguments;
-    }
-
     public void print(final IntLogger logger) {
         try {
-            logger.alwaysLog("--> Using Working Directory: " + getWorkingDirectory().getCanonicalPath());
+            logger.alwaysLog("--> Using Working Directory: " + commonScanConfig.getWorkingDirectory().getCanonicalPath());
         } catch (final IOException e) {
             logger.alwaysLog("Extremely unlikely exception getting the canonical path: " + e.getMessage());
         }
@@ -160,11 +108,11 @@ public class HubScanConfig extends Stringable {
             logger.alwaysLog("--> null");
         }
 
-        logger.alwaysLog("--> Scan Memory: " + getScanMemory());
-        logger.alwaysLog("--> Dry Run: " + isDryRun());
+        logger.alwaysLog("--> Scan Memory: " + commonScanConfig.getScanMemory());
+        logger.alwaysLog("--> Dry Run: " + commonScanConfig.isDryRun());
         logger.alwaysLog("--> Clean-up logs on success: " + isCleanupLogsOnSuccess());
-        logger.alwaysLog("--> Enable Snippet Mode: " + isSnippetModeEnabled());
-        logger.alwaysLog("--> Additional Scan Arguments: " + getAdditionalScanArguments());
+        logger.alwaysLog("--> Enable Snippet Mode: " + commonScanConfig.isSnippetModeEnabled());
+        logger.alwaysLog("--> Additional Scan Arguments: " + commonScanConfig.getAdditionalScanArguments());
     }
 
 }

@@ -37,31 +37,33 @@ import com.blackducksoftware.integration.hub.cli.SignatureScanConfig;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.cli.summary.ScanTargetOutput;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 import com.google.gson.Gson;
 
 public class ScanPathCallable implements Callable<ScanTargetOutput> {
-    private final ThreadIntLogger logger;
+    private final IntLogger logger;
     private final HubServerConfig hubServerConfig;
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final SignatureScanConfig signatureScanConfig;
     private final String projectName;
     private final String projectVersionName;
-    private final boolean runningParallelScans;
-
     private final CLILocation cliLocation;
-
     private final Gson gson;
 
-    public ScanPathCallable(final ThreadIntLogger logger, final HubServerConfig hubServerConfig, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig, final String projectName,
-            final String projectVersionName, final boolean runningParallelScans, final CLILocation cliLocation, final Gson gson) {
+    public ScanPathCallable(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig, final String projectName,
+            final String projectVersionName, final CLILocation cliLocation, final Gson gson) {
+        this(logger, null, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName, cliLocation, gson);
+    }
+
+    public ScanPathCallable(final IntLogger logger, final HubServerConfig hubServerConfig, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig, final String projectName,
+            final String projectVersionName, final CLILocation cliLocation, final Gson gson) {
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.signatureScanConfig = signatureScanConfig;
         this.projectName = projectName;
         this.projectVersionName = projectVersionName;
-        this.runningParallelScans = runningParallelScans;
         this.cliLocation = cliLocation;
         this.gson = gson;
     }
@@ -70,7 +72,12 @@ public class ScanPathCallable implements Callable<ScanTargetOutput> {
     public ScanTargetOutput call() throws InterruptedException {
         ScanTargetOutput scanTargetOutput = null;
 
-        final SimpleScanUtility simpleScanUtility = new SimpleScanUtility(logger, gson, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName, runningParallelScans);
+        final SimpleScanUtility simpleScanUtility;
+        if (null != hubServerConfig) {
+            simpleScanUtility = new SimpleScanUtility(logger, gson, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName);
+        } else {
+            simpleScanUtility = new SimpleScanUtility(logger, gson, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName);
+        }
 
         logger.info(String.format("Starting the signature scan of %s", simpleScanUtility.getSignatureScanConfig().getScanTarget()));
         ScanSummaryView scanSummaryView = null;

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,24 +47,31 @@ public class ParallelSimpleScanner {
     private final IntLogger logger;
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final Gson gson;
+    private final ExecutorService executorService;
 
-    public ParallelSimpleScanner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final Gson gson) {
+    public ParallelSimpleScanner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final Gson gson, final ExecutorService executorService) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.gson = gson;
+        this.executorService = executorService;
     }
 
-    public List<ScanTargetOutput> executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final CLILocation cliLocation, final int numberOfParallelProcessors)
+    public List<ScanTargetOutput> executeDryRunScans(final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final CLILocation cliLocation)
+            throws InterruptedException, IntegrationException {
+        return executeScans(null, hubScanConfig, projectRequest, cliLocation);
+    }
+
+    public List<ScanTargetOutput> executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final CLILocation cliLocation)
             throws InterruptedException, IntegrationException {
         final List<ScanTargetOutput> scanTargetOutputs = new ArrayList<>();
-        final List<ScanPathCallable> scanPathCallables = createScanPathCallables(hubScanConfig.createSignatureScanConfigs(), logger, hubServerConfig, hubScanConfig.isDryRun(), projectRequest, numberOfParallelProcessors, cliLocation, gson);
+        final List<ScanPathCallable> scanPathCallables = createScanPathCallables(hubScanConfig.createSignatureScanConfigs(), logger, hubServerConfig, hubScanConfig.getCommonScanConfig().isDryRun(), projectRequest, cliLocation, gson);
 
         logger.info("Starting the Hub signature scans");
-        final ExecutorService pool = Executors.newFixedThreadPool(numberOfParallelProcessors);
+
         try {
             final List<Future<ScanTargetOutput>> submittedScanPathCallables = new ArrayList<>();
             for (final ScanPathCallable scanPathCallable : scanPathCallables) {
-                submittedScanPathCallables.add(pool.submit(scanPathCallable));
+                submittedScanPathCallables.add(executorService.submit(scanPathCallable));
             }
             for (final Future<ScanTargetOutput> futureScanTargetOutput : submittedScanPathCallables) {
                 final ScanTargetOutput scanTargetOutput = futureScanTargetOutput.get();
@@ -75,17 +81,13 @@ public class ParallelSimpleScanner {
             }
         } catch (final ExecutionException e) {
             throw new ScanFailedException(String.format("Encountered a problem waiting for a scan to finish. %s", e.getMessage()), e);
-        } finally {
-            // get() was called on every java.util.concurrent.Future, no need to wait any longer
-            pool.shutdownNow();
         }
         logger.info("Completed the Hub signature scans");
         return scanTargetOutputs;
     }
 
     private List<ScanPathCallable> createScanPathCallables(final List<SignatureScanConfig> signatureScanConfigs, final IntLogger logger, final HubServerConfig hubServerConfig, final boolean dryRun,
-            final ProjectRequest projectRequest, final int numberOfParallelProcessors,
-            final CLILocation cliLocation, final Gson gson) {
+            final ProjectRequest projectRequest, final CLILocation cliLocation, final Gson gson) {
         final List<ScanPathCallable> scanPathCallables = new ArrayList<>();
 
         String projectName = null;
@@ -94,14 +96,15 @@ public class ParallelSimpleScanner {
             projectName = projectRequest.name;
             projectVersionName = projectRequest.versionRequest.versionName;
         }
-        boolean runningParallelScans = false;
-        if (numberOfParallelProcessors > 1) {
-            runningParallelScans = true;
-        }
 
         for (final SignatureScanConfig signatureScanConfig : signatureScanConfigs) {
-            final ScanPathCallable scanPathCallable = new ScanPathCallable(new ThreadIntLogger(logger), hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName, runningParallelScans, cliLocation,
-                    gson);
+            final ScanPathCallable scanPathCallable;
+            if (null != hubServerConfig) {
+                scanPathCallable = new ScanPathCallable(logger, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName, cliLocation, gson);
+            } else {
+                scanPathCallable = new ScanPathCallable(logger, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName, cliLocation, gson);
+            }
+
             scanPathCallables.add(scanPathCallable);
         }
         return scanPathCallables;

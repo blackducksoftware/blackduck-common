@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.cli.summary;
 import java.io.File;
 
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
+import com.blackducksoftware.integration.hub.summary.Result;
 
 public class ScanTargetOutput {
     private final File cliLogDirectory;
@@ -37,7 +38,8 @@ public class ScanTargetOutput {
     private final String scanTarget;
     private final File standardOutputFile;
 
-    private ScanTargetOutput(File cliLogDirectory, String errorMessage, Exception exception, Result result, File dryRunFile, ScanSummaryView scanSummaryView, String scanTarget, File standardOutputFile) {
+    private ScanTargetOutput(final File cliLogDirectory, final String errorMessage, final Exception exception, final Result result, final File dryRunFile, final ScanSummaryView scanSummaryView, final String scanTarget,
+            final File standardOutputFile) {
         this.cliLogDirectory = cliLogDirectory;
         this.errorMessage = errorMessage;
         this.exception = exception;
@@ -48,11 +50,12 @@ public class ScanTargetOutput {
         this.standardOutputFile = standardOutputFile;
     }
 
-    public static ScanTargetOutput SUCCESS(String scanTarget, File cliLogDirectory, File standardOutputFile, File dryRunFile, ScanSummaryView scanSummaryView) {
+    public static ScanTargetOutput SUCCESS(final String scanTarget, final File cliLogDirectory, final File standardOutputFile, final File dryRunFile, final ScanSummaryView scanSummaryView) {
         return new ScanTargetOutput(cliLogDirectory, null, null, Result.SUCCESS, dryRunFile, scanSummaryView, scanTarget, standardOutputFile);
     }
 
-    public static ScanTargetOutput FAILURE(String scanTarget, File cliLogDirectory, File standardOutputFile, File dryRunFile, ScanSummaryView scanSummaryView, String errorMessage, Exception exception) {
+    public static ScanTargetOutput FAILURE(final String scanTarget, final File cliLogDirectory, final File standardOutputFile, final File dryRunFile, final ScanSummaryView scanSummaryView, final String errorMessage,
+            final Exception exception) {
         return new ScanTargetOutput(cliLogDirectory, errorMessage, exception, Result.FAILURE, dryRunFile, scanSummaryView, scanTarget, standardOutputFile);
     }
 

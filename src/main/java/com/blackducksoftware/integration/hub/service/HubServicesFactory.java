@@ -63,8 +63,8 @@ public class HubServicesFactory {
         intEnvironmentVariables.putAll(environmentVariables);
     }
 
-    public SignatureScannerService createSignatureScannerService() {
-        return new SignatureScannerService(createHubService(), intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService());
+    public SignatureScannerService createSignatureScannerService(final ExecutorService executorService) {
+        return new SignatureScannerService(createHubService(), intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService(), executorService);
     }
 
     public PhoneHomeService createPhoneHomeService() {
@@ -130,7 +130,7 @@ public class HubServicesFactory {
     }
 
     public SimpleScanUtility createSimpleScanUtility(final HubServerConfig hubServerConfig, final SignatureScanConfig signatureScanConfig, final String projectName, final String versionName) {
-        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, versionName, false);
+        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, versionName);
     }
 
     public HubRegistrationService createHubRegistrationService() {

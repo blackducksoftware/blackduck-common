@@ -23,77 +23,34 @@
  */
 package com.blackducksoftware.integration.hub.cli;
 
-import java.io.File;
+import com.blackducksoftware.integration.hub.configuration.CommonScanConfig;
 
 public class SignatureScanConfig {
-    private final String additionalScanArguments;
+    private final CommonScanConfig commonScanConfig;
     private final String codeLocationAlias;
-    private final boolean debug;
-    private final boolean dryRun;
     private final String[] excludePatterns;
-    private final int scanMemory;
     private final String scanTarget;
-    private final boolean snippetModeEnabled;
-    private final File toolsDir;
-    private final File workingDirectory;
-    private final boolean verbose;
 
-    public SignatureScanConfig(String additionalScanArguments, String codeLocationAlias, boolean debug, boolean dryRun, String[] excludePatterns, int scanMemory, String scanTarget,
-            boolean snippetModeEnabled, File toolsDir, File workingDirectory, boolean verbose) {
-        this.additionalScanArguments = additionalScanArguments;
+    public SignatureScanConfig(final CommonScanConfig commonScanConfig, final String codeLocationAlias, final String[] excludePatterns, final String scanTarget) {
+        this.commonScanConfig = commonScanConfig;
         this.codeLocationAlias = codeLocationAlias;
-        this.debug = debug;
-        this.dryRun = dryRun;
         this.excludePatterns = excludePatterns;
-        this.scanMemory = scanMemory;
         this.scanTarget = scanTarget;
-        this.snippetModeEnabled = snippetModeEnabled;
-        this.toolsDir = toolsDir;
-        this.workingDirectory = workingDirectory;
-        this.verbose = verbose;
     }
 
-    public String getAdditionalScanArguments() {
-        return additionalScanArguments;
+    public CommonScanConfig getCommonScanConfig() {
+        return commonScanConfig;
     }
 
     public String getCodeLocationAlias() {
         return codeLocationAlias;
     }
 
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public boolean isDryRun() {
-        return dryRun;
-    }
-
     public String[] getExcludePatterns() {
         return excludePatterns;
     }
 
-    public int getScanMemory() {
-        return scanMemory;
-    }
-
     public String getScanTarget() {
         return scanTarget;
-    }
-
-    public boolean isSnippetModeEnabled() {
-        return snippetModeEnabled;
-    }
-
-    public File getToolsDir() {
-        return toolsDir;
-    }
-
-    public File getWorkingDirectory() {
-        return workingDirectory;
-    }
-
-    public boolean isVerbose() {
-        return verbose;
     }
 }

@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
@@ -36,12 +37,12 @@ import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
 import com.blackducksoftware.integration.hub.cli.parallel.ParallelSimpleScanner;
-import com.blackducksoftware.integration.hub.cli.summary.Result;
 import com.blackducksoftware.integration.hub.cli.summary.ScanServiceOutput;
 import com.blackducksoftware.integration.hub.cli.summary.ScanTargetOutput;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
+import com.blackducksoftware.integration.hub.summary.Result;
 import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 
 public class SignatureScannerService extends DataService {
@@ -49,35 +50,27 @@ public class SignatureScannerService extends DataService {
     private final CLIDownloadUtility cliDownloadService;
     private final ProjectService projectDataService;
     private final CodeLocationService codeLocationService;
+    private final ExecutorService executorService;
 
     private ProjectVersionWrapper projectVersionWrapper;
 
     public SignatureScannerService(final HubService hubService, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
-            final CodeLocationService codeLocationService) {
+            final CodeLocationService codeLocationService, final ExecutorService executorService) {
         super(hubService);
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
         this.projectDataService = projectDataService;
         this.codeLocationService = codeLocationService;
+        this.executorService = executorService;
     }
 
     public ScanServiceOutput executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest)
             throws InterruptedException, IntegrationException {
-        return executeScans(hubServerConfig, hubScanConfig, projectRequest, null, 1);
-    }
+        final CLILocation cliLocation = preScan(hubServerConfig, hubScanConfig, projectRequest);
 
-    public ScanServiceOutput executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final int numberOfParallelProcessors)
-            throws InterruptedException, IntegrationException {
-        return executeScans(hubServerConfig, hubScanConfig, projectRequest, null, numberOfParallelProcessors);
-    }
+        final ParallelSimpleScanner parallelSimpleScanner = new ParallelSimpleScanner(logger, intEnvironmentVariables, hubService.getGson(), executorService);
+        final List<ScanTargetOutput> scanTargetOutputs = parallelSimpleScanner.executeScans(hubServerConfig, hubScanConfig, projectRequest, cliLocation);
 
-    public ScanServiceOutput executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final File signatureScanDirectory, final int numberOfParallelProcessors)
-            throws InterruptedException, IntegrationException {
-        final CLILocation cliLocation = preScan(hubServerConfig, hubScanConfig, projectRequest, signatureScanDirectory);
-
-        final ParallelSimpleScanner parallelSimpleScanner = new ParallelSimpleScanner(logger, intEnvironmentVariables, hubService.getGson());
-        final List<ScanTargetOutput> scanTargetOutputs = parallelSimpleScanner.executeScans(hubServerConfig, hubScanConfig, projectRequest, cliLocation, numberOfParallelProcessors);
-        
         logger.info("Starting the post scan steps");
         final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
         final List<File> standardOutputFiles = new ArrayList<>();
@@ -89,23 +82,18 @@ public class SignatureScannerService extends DataService {
                 cliLogDirectories.add(scanTargetOutput.getCliLogDirectory());
             }
         }
-        postScan(hubScanConfig.isCleanupLogsOnSuccess(), standardOutputFiles, cliLogDirectories, hubScanConfig.isDryRun(), scanSummaryViews);
+        postScan(hubScanConfig.isCleanupLogsOnSuccess(), standardOutputFiles, cliLogDirectories, hubScanConfig.getCommonScanConfig().isDryRun(), scanSummaryViews);
         logger.info("Completed the post scan steps");
         return new ScanServiceOutput(projectVersionWrapper, scanTargetOutputs);
     }
 
-    private CLILocation preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final File signatureScanDirectory) throws IntegrationException {
+    private CLILocation preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
         printConfiguration(hubScanConfig, projectRequest);
         final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-        final File directoryToInstallTo;
-        if (null != signatureScanDirectory) {
-            directoryToInstallTo = signatureScanDirectory;
-        } else {
-            directoryToInstallTo = hubScanConfig.getToolsDir();
-        }
+        final File directoryToInstallTo = hubScanConfig.getCommonScanConfig().getToolsDir();
         final CLILocation cliLocation = cliDownloadService.performInstallation(directoryToInstallTo, hubServerConfig.getHubUrl().toString(), currentVersion.version);
 
-        if (!hubScanConfig.isDryRun()) {
+        if (!hubScanConfig.getCommonScanConfig().isDryRun()) {
             projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);
         }
         return cliLocation;
