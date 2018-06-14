@@ -28,6 +28,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
@@ -37,6 +39,7 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.Notificat
 import com.blackducksoftware.integration.hub.notification.content.detail.LicenseLimitNotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail2;
 import com.blackducksoftware.integration.hub.notification.content.detail.PolicyNotificationContentDetail;
+import com.blackducksoftware.integration.hub.notification.content.detail.ProjectNotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.detail.VulnerabilityNotificationContentDetail;
 
 public class NotificationDetailResult2 {
@@ -72,6 +75,10 @@ public class NotificationDetailResult2 {
 
     public List<VulnerabilityNotificationContentDetail> getVulnerabilityDetails() {
         return (List<VulnerabilityNotificationContentDetail>) notificationDetails.get(NotificationTypeGrouping.VULNERABILITY);
+    }
+
+    public List<ProjectNotificationContentDetail> getProjectDetails() {
+        return Stream.concat(getPolicyDetails().stream(), getVulnerabilityDetails().stream()).collect(Collectors.toList());
     }
 
     public Optional<NotificationStateRequestStateType> getNotificationState() {
