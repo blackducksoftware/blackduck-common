@@ -21,39 +21,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.service.model;
+package com.blackducksoftware.integration.hub.cli.summary;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.List;
 
-/**
- * Remember to close the Streams when they are done being used.
- */
-public class StreamRedirectThread extends Thread {
-    private final InputStream in;
+import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 
-    private final OutputStream out;
+public class ScanServiceOutput {
+    private final ProjectVersionWrapper projectVersionWrapper;
+    private final List<ScanTargetOutput> scanTargetOutputs;
 
-    public StreamRedirectThread(final InputStream in, final OutputStream out) {
-        super(Thread.currentThread().getName() + "-Stream Redirect Thread");
-        this.in = in;
-        this.out = out;
+    public ScanServiceOutput(ProjectVersionWrapper projectVersionWrapper, List<ScanTargetOutput> scanTargetOutputs) {
+        this.projectVersionWrapper = projectVersionWrapper;
+        this.scanTargetOutputs = scanTargetOutputs;
     }
 
-    @Override
-    public void run() {
-        try {
-            int i;
-            while ((i = in.read()) >= 0) {
-                if (i == -1) {
-                    break;
-                }
-                out.write(i);
-            }
-        } catch (final IOException e) {
-            // Ignore
-        }
+    public ProjectVersionWrapper getProjectVersionWrapper() {
+        return projectVersionWrapper;
     }
 
+    public List<ScanTargetOutput> getScanTargetOutputs() {
+        return scanTargetOutputs;
+    }
 }

@@ -49,8 +49,9 @@ import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
-import com.blackducksoftware.integration.hub.cli.ScanServiceOutput;
 import com.blackducksoftware.integration.hub.cli.summary.Result;
+import com.blackducksoftware.integration.hub.cli.summary.ScanServiceOutput;
+import com.blackducksoftware.integration.hub.cli.summary.ScanTargetOutput;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
@@ -63,6 +64,7 @@ import com.blackducksoftware.integration.hub.service.SignatureScannerService;
 import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 
 @Category(IntegrationTest.class)
@@ -246,20 +248,20 @@ public class ComprehensiveCookbookTestIT {
 
         final ProjectRequest projectRequest = projectRequestBuilder.build();
 
-        final List<ScanServiceOutput> scanServiceOutputs = cliService.executeScans(hubServerConfig, hubScanConfig, projectRequest);
-        assertNotNull(scanServiceOutputs);
-        assertTrue(scanServiceOutputs.size() == 1);
-        ScanServiceOutput scanServiceOutput = scanServiceOutputs.get(0);
-        assertTrue(scanServiceOutput.getResult() == Result.SUCCESS);
-        assertNotNull(scanServiceOutput.getScanSummaryView());
+        final ScanServiceOutput scanServiceOutput = cliService.executeScans(hubServerConfig, hubScanConfig, projectRequest);
+        assertNotNull(scanServiceOutput);
+        assertTrue(scanServiceOutput.getScanTargetOutputs().size() == 1);
+        final ScanTargetOutput scanTargetOutput = scanServiceOutput.getScanTargetOutputs().get(0);
+        assertTrue(scanTargetOutput.getResult() == Result.SUCCESS);
+        assertNotNull(scanTargetOutput.getScanSummaryView());
 
-        final ScanSummaryView scanSummaryView = scanServiceOutput.getScanSummaryView();
+        final ScanSummaryView scanSummaryView = scanTargetOutput.getScanSummaryView();
 
-        ScanStatusService scanStatusDataService = hubServicesFactory.createScanStatusService(TWENTY_MINUTES);
+        final ScanStatusService scanStatusDataService = hubServicesFactory.createScanStatusService(TWENTY_MINUTES);
         scanStatusDataService.assertScansFinished(Arrays.asList(scanSummaryView));
 
         assertNotNull(scanServiceOutput.getProjectVersionWrapper());
-        ProjectVersionWrapper projectVersionWrapper = scanServiceOutput.getProjectVersionWrapper();
+        final ProjectVersionWrapper projectVersionWrapper = scanServiceOutput.getProjectVersionWrapper();
 
         assertNotNull(projectVersionWrapper.getProjectView());
         assertNotNull(projectVersionWrapper.getProjectVersionView());
@@ -268,6 +270,42 @@ public class ComprehensiveCookbookTestIT {
         final VersionBomPolicyStatusView policyStatusItem = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView());
         assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
         System.out.println(policyStatusItem);
+    }
+
+    @Test
+    public void testMutlipleTargetScan() throws Exception {
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        logger.setLogLevel(LogLevel.INFO);
+        final SignatureScannerService cliService = hubServicesFactory.createSignatureScannerService();
+
+        final HubServerConfig hubServerConfig = restConnectionTestHelper.getHubServerConfig();
+
+        // scan the file in its parent directory
+        final File scanTarget = restConnectionTestHelper.getFile("hub-artifactory-1.0.1-RC.zip");
+        final File workingDirectory = scanTarget.getParentFile();
+
+        final HubScanConfigBuilder hubScanConfigBuilder = new HubScanConfigBuilder();
+        hubScanConfigBuilder.setScanMemory(4096);
+        hubScanConfigBuilder.setDryRun(true);
+        // download the cli to where ever the file is just for convenience
+        hubScanConfigBuilder.setToolsDir(workingDirectory);
+        hubScanConfigBuilder.setWorkingDirectory(workingDirectory);
+        // always use the canonical path since we validate the paths by string matching
+        hubScanConfigBuilder.addScanTargetPath(scanTarget.getCanonicalPath());
+        hubScanConfigBuilder.addScanTargetPath(scanTarget.getParentFile().getCanonicalPath());
+        hubScanConfigBuilder.setCleanupLogsOnSuccess(true);
+
+        final HubScanConfig hubScanConfig = hubScanConfigBuilder.build();
+
+        final ScanServiceOutput scanServiceOutput = cliService.executeScans(hubServerConfig, hubScanConfig, null, 2);
+        assertNotNull(scanServiceOutput);
+        assertTrue(scanServiceOutput.getScanTargetOutputs().size() == 2);
+
+        for (final ScanTargetOutput scanTargetOutput : scanServiceOutput.getScanTargetOutputs()) {
+            assertTrue(scanTargetOutput.getResult() == Result.SUCCESS);
+            assertNotNull(scanTargetOutput.getDryRunFile());
+        }
     }
 
     @Test

@@ -25,7 +25,9 @@ package com.blackducksoftware.integration.hub.configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +45,7 @@ public class HubScanConfigValidator extends AbstractValidator {
     private File workingDirectory;
     private String scanMemory;
     private final Set<String> scanTargetPaths = new HashSet<>();
-    private String[] excludePatterns;
+    private Map<String, Set<String>> targetToExclusionPatterns = new HashMap<>();
     private boolean disableScanTargetPathExistenceCheck;
     private boolean enableScanTargetPathsWithinWorkingDirectoryCheck;
 
@@ -96,7 +98,7 @@ public class HubScanConfigValidator extends AbstractValidator {
 
             final Set<String> targetPaths = new HashSet<>();
             for (final String currentTargetPath : scanTargetPaths) {
-                String targetPath;
+                final String targetPath;
                 if (StringUtils.isBlank(currentTargetPath) && defaultTargetPath != null) {
                     targetPath = defaultTargetPath.getCanonicalPath();
                 } else {
@@ -118,7 +120,7 @@ public class HubScanConfigValidator extends AbstractValidator {
                         }
 
                         if (enableScanTargetPathsWithinWorkingDirectoryCheck) {
-                            String targetCanonicalPath;
+                            final String targetCanonicalPath;
                             try {
                                 targetCanonicalPath = target.getCanonicalPath();
                                 if (!targetCanonicalPath.startsWith(workingDirectory.getCanonicalPath())) {
@@ -142,16 +144,17 @@ public class HubScanConfigValidator extends AbstractValidator {
     }
 
     public void validateExcludePatterns(final ValidationResults result) {
-        validateExcludePatterns(result, excludePatterns);
+        validateExcludePatterns(result, targetToExclusionPatterns);
     }
 
-    private void validateExcludePatterns(final ValidationResults result, final String[] excludePatterns) {
-        if (excludePatterns == null || excludePatterns.length == 0) {
+    private void validateExcludePatterns(final ValidationResults result, final Map<String, Set<String>> targetToExclusionPatterns) {
+        if (targetToExclusionPatterns == null || targetToExclusionPatterns.isEmpty()) {
             return;
         }
-
-        for (final String excludePattern : excludePatterns) {
-            validateExcludePattern(result, excludePattern);
+        for (final Map.Entry<String, Set<String>> targetToExclusionPatternEntry : targetToExclusionPatterns.entrySet()) {
+            for (final String excludePattern : targetToExclusionPatternEntry.getValue()) {
+                validateExcludePattern(result, excludePattern);
+            }
         }
     }
 
@@ -188,8 +191,12 @@ public class HubScanConfigValidator extends AbstractValidator {
         this.scanTargetPaths.addAll(scanTargetPaths);
     }
 
-    public void setExcludePatterns(final String[] excludePatterns) {
-        this.excludePatterns = excludePatterns;
+    public void addTargetToExclusionPatterns(final String scanTargetPath, final Set<String> exclusionPatterns) {
+        targetToExclusionPatterns.put(scanTargetPath, exclusionPatterns);
+    }
+
+    public void addAllTargetToExclusionPatterns(final Map<String, Set<String>> targetToExclusionPatterns) {
+        this.targetToExclusionPatterns.putAll(targetToExclusionPatterns);
     }
 
     public void setWorkingDirectory(final File workingDirectory) {

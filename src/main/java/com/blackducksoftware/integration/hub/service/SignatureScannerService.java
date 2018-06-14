@@ -24,12 +24,8 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.io.FileUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
@@ -39,9 +35,10 @@ import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
-import com.blackducksoftware.integration.hub.cli.ScanServiceOutput;
-import com.blackducksoftware.integration.hub.cli.SignatureScanConfig;
-import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
+import com.blackducksoftware.integration.hub.cli.parallel.ParallelSimpleScanner;
+import com.blackducksoftware.integration.hub.cli.summary.Result;
+import com.blackducksoftware.integration.hub.cli.summary.ScanServiceOutput;
+import com.blackducksoftware.integration.hub.cli.summary.ScanTargetOutput;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
@@ -51,84 +48,67 @@ public class SignatureScannerService extends DataService {
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final CLIDownloadUtility cliDownloadService;
     private final ProjectService projectDataService;
-    private final CodeLocationService codeLocationDataService;
+    private final CodeLocationService codeLocationService;
 
     private ProjectVersionWrapper projectVersionWrapper;
 
     public SignatureScannerService(final HubService hubService, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
-            final CodeLocationService codeLocationDataService) {
+            final CodeLocationService codeLocationService) {
         super(hubService);
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
         this.projectDataService = projectDataService;
-        this.codeLocationDataService = codeLocationDataService;
+        this.codeLocationService = codeLocationService;
     }
 
-    public List<ScanServiceOutput> executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest)
+    public ScanServiceOutput executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest)
             throws InterruptedException, IntegrationException {
-        return executeScans(hubServerConfig, hubScanConfig, projectRequest, null);
+        return executeScans(hubServerConfig, hubScanConfig, projectRequest, null, 1);
     }
 
-    public List<ScanServiceOutput> executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, File signatureScanDirectory)
+    public ScanServiceOutput executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final int numberOfParallelProcessors)
             throws InterruptedException, IntegrationException {
-        CLILocation cliLocation = preScan(hubServerConfig, hubScanConfig, projectRequest, signatureScanDirectory);
-        final List<SimpleScanUtility> simpleScanUtilities = createScanUtilities(hubServerConfig, hubScanConfig, projectRequest);
-
-        List<ScanServiceOutput> scanServiceOutputs = new ArrayList<>();
-
-        logger.info("Starting the Hub signature scans");
-        for (SimpleScanUtility simpleScanUtility : simpleScanUtilities) {
-            ScanSummaryView scanSummaryView = null;
-            File standardOutputFile = null;
-            File cliLogDirectory = null;
-            String scanTarget = simpleScanUtility.getSignatureScanConfig().getScanTarget();
-            try {
-                simpleScanUtility.setupAndExecuteScan(cliLocation);
-
-                scanSummaryView = getScanSummaryFromFile(simpleScanUtility.getScanSummaryFile());
-                standardOutputFile = simpleScanUtility.getStandardOutputFile();
-                cliLogDirectory = simpleScanUtility.getCLILogDirectory();
-            } catch (IllegalArgumentException | IntegrationException e) {
-                String errorMessage = String.format("There was a problem scanning target '%s' : %s", scanTarget, e.getMessage());
-                ScanServiceOutput scanServiceOutput = ScanServiceOutput.FAILURE(scanTarget, simpleScanUtility.getLogDirectory(), cliLogDirectory,
-                        standardOutputFile, simpleScanUtility.getDryRunFile(), scanSummaryView, projectVersionWrapper, errorMessage, e);
-                scanServiceOutputs.add(scanServiceOutput);
-                continue;
-            }
-
-            logger.info(String.format("Starting the post scan step for target %s", simpleScanUtility.getSignatureScanConfig().getScanTarget()));
-            try {
-                postScan(hubScanConfig, scanSummaryView, standardOutputFile, cliLogDirectory);
-            } catch (IntegrationException e) {
-                String errorMessage = String.format("There was a problem mapping the code location for scan target '%s' : %s", scanTarget, e.getMessage());
-                ScanServiceOutput scanServiceOutput = ScanServiceOutput.FAILURE(scanTarget, simpleScanUtility.getLogDirectory(), cliLogDirectory,
-                        standardOutputFile, simpleScanUtility.getDryRunFile(), scanSummaryView, projectVersionWrapper, errorMessage, e);
-                scanServiceOutputs.add(scanServiceOutput);
-                continue;
-            }
-            logger.info(String.format("Completed the post scan step for target %s", simpleScanUtility.getSignatureScanConfig().getScanTarget()));
-
-            ScanServiceOutput scanServiceOutput = ScanServiceOutput.SUCCESS(scanTarget, simpleScanUtility.getLogDirectory(), cliLogDirectory,
-                    standardOutputFile, simpleScanUtility.getDryRunFile(), scanSummaryView, projectVersionWrapper);
-            scanServiceOutputs.add(scanServiceOutput);
-
-        }
-        logger.info("Completed the Hub signature scans");
-        return scanServiceOutputs;
+        return executeScans(hubServerConfig, hubScanConfig, projectRequest, null, numberOfParallelProcessors);
     }
 
-    private List<SimpleScanUtility> createScanUtilities(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
-        List<SimpleScanUtility> simpleScanUtilities = new ArrayList<>();
-        for (SignatureScanConfig signatureScanConfig : hubScanConfig.createSignatureScanConfigs()) {
-            String projectName = null;
-            String projectVersionName = null;
-            if (hubScanConfig.isDryRun()) {
-                projectName = projectRequest.name;
-                projectVersionName = projectRequest.versionRequest.versionName;
+    public ScanServiceOutput executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final File signatureScanDirectory, final int numberOfParallelProcessors)
+            throws InterruptedException, IntegrationException {
+        final CLILocation cliLocation = preScan(hubServerConfig, hubScanConfig, projectRequest, signatureScanDirectory);
+
+        final ParallelSimpleScanner parallelSimpleScanner = new ParallelSimpleScanner(logger, intEnvironmentVariables, hubService.getGson());
+        final List<ScanTargetOutput> scanTargetOutputs = parallelSimpleScanner.executeScans(hubServerConfig, hubScanConfig, projectRequest, cliLocation, numberOfParallelProcessors);
+        
+        logger.info("Starting the post scan steps");
+        final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
+        final List<File> standardOutputFiles = new ArrayList<>();
+        final List<File> cliLogDirectories = new ArrayList<>();
+        for (final ScanTargetOutput scanTargetOutput : scanTargetOutputs) {
+            if (scanTargetOutput.getResult() == Result.SUCCESS) {
+                scanSummaryViews.add(scanTargetOutput.getScanSummaryView());
+                standardOutputFiles.add(scanTargetOutput.getStandardOutputFile());
+                cliLogDirectories.add(scanTargetOutput.getCliLogDirectory());
             }
-            simpleScanUtilities.add(new SimpleScanUtility(logger, hubService.getGson(), hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName));
         }
-        return simpleScanUtilities;
+        postScan(hubScanConfig.isCleanupLogsOnSuccess(), standardOutputFiles, cliLogDirectories, hubScanConfig.isDryRun(), scanSummaryViews);
+        logger.info("Completed the post scan steps");
+        return new ScanServiceOutput(projectVersionWrapper, scanTargetOutputs);
+    }
+
+    private CLILocation preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final File signatureScanDirectory) throws IntegrationException {
+        printConfiguration(hubScanConfig, projectRequest);
+        final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        final File directoryToInstallTo;
+        if (null != signatureScanDirectory) {
+            directoryToInstallTo = signatureScanDirectory;
+        } else {
+            directoryToInstallTo = hubScanConfig.getToolsDir();
+        }
+        final CLILocation cliLocation = cliDownloadService.performInstallation(directoryToInstallTo, hubServerConfig.getHubUrl().toString(), currentVersion.version);
+
+        if (!hubScanConfig.isDryRun()) {
+            projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);
+        }
+        return cliLocation;
     }
 
     private void printConfiguration(final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
@@ -149,66 +129,36 @@ public class SignatureScannerService extends DataService {
         hubScanConfig.print(logger);
     }
 
-    private CLILocation preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, File signatureScanDirectory) throws IntegrationException {
-        printConfiguration(hubScanConfig, projectRequest);
-        final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-        File directoryToInstallTo;
-        if (null != signatureScanDirectory) {
-            directoryToInstallTo = signatureScanDirectory;
-        } else {
-            directoryToInstallTo = hubScanConfig.getToolsDir();
-        }
-        CLILocation cliLocation = cliDownloadService.performInstallation(directoryToInstallTo, hubServerConfig.getHubUrl().toString(), currentVersion.version);
-
-        if (!hubScanConfig.isDryRun()) {
-            projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);
-        }
-        return cliLocation;
-    }
-
-    private void postScan(final HubScanConfig hubScanConfig, ScanSummaryView scanSummaryView, File standardOutputFiles, File cliLogDirectories)
+    private void postScan(final boolean cleanupLogDirectories, final List<File> standardOutputFiles, final List<File> cliLogDirectories, final boolean dryRun, final List<ScanSummaryView> scanSummaryViews)
             throws IntegrationException {
-        logger.trace(String.format("Scan is dry run %s", hubScanConfig.isDryRun()));
-        if (hubScanConfig.isCleanupLogsOnSuccess()) {
-            cleanUpLogFiles(standardOutputFiles, cliLogDirectories);
-        }
-
-        if (!hubScanConfig.isDryRun()) {
-            // TODO update when ScanSummaryView is part of the swagger
-            final String codeLocationUrl = hubService.getFirstLinkSafely(scanSummaryView, ScanSummaryView.CODELOCATION_LINK);
-
-            final CodeLocationView codeLocationView = hubService.getResponse(codeLocationUrl, CodeLocationView.class);
-            codeLocationDataService.mapCodeLocation(codeLocationView, projectVersionWrapper.getProjectVersionView());
-        }
-    }
-
-    private ScanSummaryView getScanSummaryFromFile(final File scanSummaryFile) {
-        ScanSummaryView scanSummaryView = null;
-        try {
-            if (null != scanSummaryFile) {
-                final String scanSummaryJson = FileUtils.readFileToString(scanSummaryFile, Charset.forName("UTF8"));
-                scanSummaryView = hubService.getGson().fromJson(scanSummaryJson, ScanSummaryView.class);
-                scanSummaryView.json = scanSummaryJson;
-                scanSummaryFile.delete();
-                scanSummaryFile.getParentFile().delete();
+        if (cleanupLogDirectories) {
+            if (!standardOutputFiles.isEmpty()) {
+                for (final File standardOutputFile : standardOutputFiles) {
+                    if (null != standardOutputFile && standardOutputFile.exists()) {
+                        standardOutputFile.delete();
+                    }
+                }
             }
-        } catch (final IOException ex) {
-            logger.trace("Error reading scan summary file", ex);
-        }
-        return scanSummaryView;
-    }
-
-    private void cleanUpLogFiles(final File standardOutputFile, File cliLogDirectory) {
-        if (standardOutputFile != null && standardOutputFile.exists()) {
-            standardOutputFile.delete();
-        }
-        if (cliLogDirectory != null && cliLogDirectory.exists()) {
-            for (final File log : cliLogDirectory.listFiles()) {
-                log.delete();
+            if (!cliLogDirectories.isEmpty()) {
+                for (final File cliLogDirectory : cliLogDirectories) {
+                    if (null != cliLogDirectory && cliLogDirectory.isDirectory()) {
+                        for (final File log : cliLogDirectory.listFiles()) {
+                            log.delete();
+                        }
+                        cliLogDirectory.delete();
+                    }
+                }
             }
-            cliLogDirectory.delete();
         }
+        logger.trace(String.format("Scan is dry run %s", dryRun));
+        if (!dryRun) {
+            for (final ScanSummaryView scanSummaryView : scanSummaryViews) {
+                // TODO update when ScanSummaryView is part of the swagger
+                final String codeLocationUrl = hubService.getFirstLinkSafely(scanSummaryView, ScanSummaryView.CODELOCATION_LINK);
 
+                final CodeLocationView codeLocationView = hubService.getResponse(codeLocationUrl, CodeLocationView.class);
+                codeLocationService.mapCodeLocation(codeLocationView, projectVersionWrapper.getProjectVersionView());
+            }
+        }
     }
-
 }

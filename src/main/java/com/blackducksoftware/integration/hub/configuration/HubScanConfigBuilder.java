@@ -25,8 +25,10 @@ package com.blackducksoftware.integration.hub.configuration;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -37,12 +39,12 @@ import com.blackducksoftware.integration.validator.AbstractValidator;
 public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
     private String additionalScanArguments;
     private boolean cleanupLogsOnSuccess;
-    private String codeLocationAlias;
+    private final Map<String, String> targetToCodeLocationName = new HashMap<>();
     private boolean debug;
     private boolean dryRun;
     private boolean disableScanTargetPathExistenceCheck;
     private boolean enableScanTargetPathsWithinWorkingDirectoryCheck;
-    private String[] excludePatterns;
+    private Map<String, Set<String>> targetToExclusionPatterns = new HashMap<>();
     private String scanMemory;
     private final Set<String> scanTargetPaths = new HashSet<>();
     private boolean snippetModeEnabled;
@@ -52,8 +54,8 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
 
     @Override
     public HubScanConfig buildObject() {
-        final HubScanConfig config = new HubScanConfig(workingDirectory, NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns,
-                codeLocationAlias, debug, verbose, snippetModeEnabled, additionalScanArguments);
+        final HubScanConfig config = new HubScanConfig(workingDirectory, NumberUtils.toInt(scanMemory), Collections.unmodifiableSet(scanTargetPaths), dryRun, toolsDir, cleanupLogsOnSuccess, targetToExclusionPatterns,
+                targetToCodeLocationName, debug, verbose, snippetModeEnabled, additionalScanArguments);
 
         return config;
     }
@@ -70,16 +72,20 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         if (enableScanTargetPathsWithinWorkingDirectoryCheck) {
             validator.enableScanTargetPathsWithinWorkingDirectoryCheck();
         }
-        validator.setExcludePatterns(excludePatterns);
+        validator.addAllTargetToExclusionPatterns(targetToExclusionPatterns);
         return validator;
     }
 
-    public void setCleanupLogsOnSuccess(boolean cleanupLogsOnSuccess) {
+    public void setCleanupLogsOnSuccess(final boolean cleanupLogsOnSuccess) {
         this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
     }
 
-    public void setCodeLocationAlias(final String codeLocationAlias) {
-        this.codeLocationAlias = codeLocationAlias;
+    public void addTargetToCodeLocationName(final String scanTargetPath, final String codeLocationName) {
+        targetToCodeLocationName.put(scanTargetPath, codeLocationName);
+    }
+
+    public void addAllTargetToCodeLocationName(final Map<String, String> targetToCodeLocationName) {
+        this.targetToCodeLocationName.putAll(targetToCodeLocationName);
     }
 
     public void setToolsDir(final File toolsDir) {
@@ -126,8 +132,12 @@ public class HubScanConfigBuilder extends AbstractBuilder<HubScanConfig> {
         enableScanTargetPathsWithinWorkingDirectoryCheck = true;
     }
 
-    public void setExcludePatterns(final String[] excludePatterns) {
-        this.excludePatterns = excludePatterns;
+    public void addTargetToExclusionPatterns(final String scanTargetPath, final Set<String> exclusionPatterns) {
+        targetToExclusionPatterns.put(scanTargetPath, exclusionPatterns);
+    }
+
+    public void addAllTargetToExclusionPatterns(final Map<String, Set<String>> targetToExclusionPatterns) {
+        this.targetToExclusionPatterns.putAll(targetToExclusionPatterns);
     }
 
     public void setDebug(final boolean debug) {

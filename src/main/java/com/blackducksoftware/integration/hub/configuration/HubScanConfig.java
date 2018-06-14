@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.blackducksoftware.integration.hub.cli.SignatureScanConfig;
@@ -36,10 +37,10 @@ import com.blackducksoftware.integration.util.Stringable;
 public class HubScanConfig extends Stringable {
     private final String additionalScanArguments;
     private final boolean cleanupLogsOnSuccess;
-    private final String codeLocationAlias;
+    private final Map<String, String> targetToCodeLocationName;
     private final boolean debug;
     private final boolean dryRun;
-    private final String[] excludePatterns;
+    private final Map<String, Set<String>> targetToExclusionPatterns;
     private final int scanMemory;
     private final Set<String> scanTargetPaths;
     private final boolean snippetModeEnabled;
@@ -47,14 +48,16 @@ public class HubScanConfig extends Stringable {
     private final File workingDirectory;
     private final boolean verbose;
 
-    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, boolean cleanupLogsOnSuccess, final String[] excludePatterns,
-            final String codeLocationAlias, final boolean snippetModeEnabled, final String additionalScanParameters) {
-        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, false, true, snippetModeEnabled,
+    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess,
+            final Map<String, Set<String>> targetToExclusionPatterns,
+            final Map<String, String> targetToCodeLocationName, final boolean snippetModeEnabled, final String additionalScanParameters) {
+        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, targetToExclusionPatterns, targetToCodeLocationName, false, true, snippetModeEnabled,
                 additionalScanParameters);
     }
 
-    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, boolean cleanupLogsOnSuccess, final String[] excludePatterns,
-            final String codeLocationAlias, final boolean debug, final boolean verbose, final boolean snippetModeEnabled,
+    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess,
+            final Map<String, Set<String>> targetToExclusionPatterns,
+            final Map<String, String> targetToCodeLocationName, final boolean debug, final boolean verbose, final boolean snippetModeEnabled,
             final String additionalScanArguments) {
         this.workingDirectory = workingDirectory;
         this.scanMemory = scanMemory;
@@ -62,8 +65,8 @@ public class HubScanConfig extends Stringable {
         this.dryRun = dryRun;
         this.toolsDir = toolsDir;
         this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
-        this.excludePatterns = excludePatterns;
-        this.codeLocationAlias = codeLocationAlias;
+        this.targetToExclusionPatterns = targetToExclusionPatterns;
+        this.targetToCodeLocationName = targetToCodeLocationName;
         this.debug = debug;
         this.verbose = verbose;
         this.snippetModeEnabled = snippetModeEnabled;
@@ -71,9 +74,15 @@ public class HubScanConfig extends Stringable {
     }
 
     public List<SignatureScanConfig> createSignatureScanConfigs() {
-        List<SignatureScanConfig> signatureScanConfigs = new ArrayList<>();
-        for (String scanTarget : scanTargetPaths) {
-            SignatureScanConfig signatureScanConfig = new SignatureScanConfig(additionalScanArguments, codeLocationAlias, debug, dryRun, excludePatterns, scanMemory, scanTarget, snippetModeEnabled, toolsDir, workingDirectory, verbose);
+        final List<SignatureScanConfig> signatureScanConfigs = new ArrayList<>();
+        for (final String scanTarget : scanTargetPaths) {
+            String[] exclusionPatterns = new String[0];
+            final Set<String> patterns = targetToExclusionPatterns.get(scanTarget);
+            if (null != patterns && !patterns.isEmpty()) {
+                exclusionPatterns = patterns.toArray(new String[patterns.size()]);
+            }
+            final SignatureScanConfig signatureScanConfig = new SignatureScanConfig(additionalScanArguments, targetToCodeLocationName.get(scanTarget), debug, dryRun, exclusionPatterns, scanMemory, scanTarget,
+                    snippetModeEnabled, toolsDir, workingDirectory, verbose);
             signatureScanConfigs.add(signatureScanConfig);
         }
         return signatureScanConfigs;
@@ -103,12 +112,12 @@ public class HubScanConfig extends Stringable {
         return cleanupLogsOnSuccess;
     }
 
-    public String[] getExcludePatterns() {
-        return excludePatterns;
+    public Map<String, Set<String>> getTargetToExclusionPatterns() {
+        return targetToExclusionPatterns;
     }
 
-    public String getCodeLocationAlias() {
-        return codeLocationAlias;
+    public Map<String, String> getTargetToCodeLocationName() {
+        return targetToCodeLocationName;
     }
 
     public boolean isDebug() {
@@ -136,16 +145,16 @@ public class HubScanConfig extends Stringable {
         logger.alwaysLog("--> Scanning the following targets:");
         if (scanTargetPaths != null) {
             for (final String target : scanTargetPaths) {
-                logger.alwaysLog("--> " + target);
-            }
-        } else {
-
-            logger.alwaysLog("--> null");
-        }
-        logger.alwaysLog("--> Directory Exclusion Patterns:");
-        if (excludePatterns != null) {
-            for (final String exclusionPattern : excludePatterns) {
-                logger.alwaysLog("--> " + exclusionPattern);
+                final String codeLocationName = getTargetToCodeLocationName().get(target);
+                logger.alwaysLog(String.format("--> Target: %s", target));
+                logger.alwaysLog(String.format("    --> Code Location Name: %s", codeLocationName));
+                final Set<String> excludePatterns = getTargetToExclusionPatterns().get(target);
+                if (excludePatterns != null && !excludePatterns.isEmpty()) {
+                    logger.alwaysLog("--> Directory Exclusion Patterns:");
+                    for (final String exclusionPattern : excludePatterns) {
+                        logger.alwaysLog(String.format("--> Exclusion Pattern: %s", exclusionPattern));
+                    }
+                }
             }
         } else {
             logger.alwaysLog("--> null");
@@ -154,7 +163,6 @@ public class HubScanConfig extends Stringable {
         logger.alwaysLog("--> Scan Memory: " + getScanMemory());
         logger.alwaysLog("--> Dry Run: " + isDryRun());
         logger.alwaysLog("--> Clean-up logs on success: " + isCleanupLogsOnSuccess());
-        logger.alwaysLog("--> Code Location Name: " + getCodeLocationAlias());
         logger.alwaysLog("--> Enable Snippet Mode: " + isSnippetModeEnabled());
         logger.alwaysLog("--> Additional Scan Arguments: " + getAdditionalScanArguments());
     }

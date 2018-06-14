@@ -130,7 +130,7 @@ public class HubServicesFactory {
     }
 
     public SimpleScanUtility createSimpleScanUtility(final HubServerConfig hubServerConfig, final SignatureScanConfig signatureScanConfig, final String projectName, final String versionName) {
-        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, versionName);
+        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, versionName, false);
     }
 
     public HubRegistrationService createHubRegistrationService() {

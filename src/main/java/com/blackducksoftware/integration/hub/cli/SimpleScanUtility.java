@@ -64,11 +64,12 @@ public class SimpleScanUtility {
     private final String project;
     private final String version;
     private final List<String> cmd = new ArrayList<>();
+    private final boolean runningParallelScans;
 
     private File logDirectory;
 
     public SimpleScanUtility(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig,
-            final String project, final String version) {
+            final String project, final String version, final boolean runningParallelScans) {
         this.gson = gson;
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
@@ -76,6 +77,7 @@ public class SimpleScanUtility {
         this.signatureScanConfig = signatureScanConfig;
         this.project = project;
         this.version = version;
+        this.runningParallelScans = runningParallelScans;
     }
 
     public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, InterruptedException, HubIntegrationException {
@@ -134,7 +136,7 @@ public class SimpleScanUtility {
         }
         final String scanCliOpts = intEnvironmentVariables.getValue("SCAN_CLI_OPTS");
         if (StringUtils.isNotBlank(scanCliOpts)) {
-            for (String scanOpt : scanCliOpts.split(" ")) {
+            for (final String scanOpt : scanCliOpts.split(" ")) {
                 if (StringUtils.isNotBlank(scanOpt)) {
                     cmd.add(scanOpt);
                 }
@@ -228,7 +230,7 @@ public class SimpleScanUtility {
         }
 
         if (StringUtils.isNotBlank(signatureScanConfig.getAdditionalScanArguments())) {
-            for (String additionalArgument : signatureScanConfig.getAdditionalScanArguments().split(" ")) {
+            for (final String additionalArgument : signatureScanConfig.getAdditionalScanArguments().split(" ")) {
                 if (StringUtils.isNotBlank(additionalArgument)) {
                     cmd.add(additionalArgument);
                 }
@@ -309,7 +311,11 @@ public class SimpleScanUtility {
     public String getSpecificScanExecutionLogDirectory() {
         final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZone(ZoneOffset.UTC);
         final String timeString = Instant.now().atZone(ZoneOffset.UTC).format(dateTimeFormatter);
-        return timeString;
+        String uniqueLogDirectoryName = timeString;
+        if (runningParallelScans) {
+            uniqueLogDirectoryName = uniqueLogDirectoryName + "_" + Thread.currentThread().getId();
+        }
+        return uniqueLogDirectoryName;
     }
 
     private void populateLogDirectory() throws IOException {
@@ -414,7 +420,7 @@ public class SimpleScanUtility {
     public File getScanSummaryFile() {
         final File scanStatusDirectory = getStatusDirectory();
         if (null != scanStatusDirectory) {
-            File[] scanSummaryFiles = scanStatusDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
+            final File[] scanSummaryFiles = scanStatusDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
             if (null != scanSummaryFiles) {
                 if (scanSummaryFiles.length == 0) {
                     logger.error("There were no status files found in " + scanStatusDirectory.getAbsolutePath());
@@ -431,7 +437,7 @@ public class SimpleScanUtility {
     public File getDryRunFile() {
         final File dataDirectory = getDataDirectory();
         if (null != dataDirectory) {
-            File[] dryRunFiles = dataDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
+            final File[] dryRunFiles = dataDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
             if (null != dryRunFiles) {
                 if (dryRunFiles.length == 0) {
                     logger.error("There were no dry run files found in " + dataDirectory.getAbsolutePath());
