@@ -228,11 +228,7 @@ public class ScannerSplitStream extends OutputStream {
         }
         final StringBuilder outputBuilder = new StringBuilder();
         outputBuilder.append(output);
-        if (StringUtils.containsIgnoreCase(trimmedLine, FINISHED)) {
-            outputBuilder.append(trimmedLine);
-            outputBuilder.append(System.getProperty("line.separator"));
-            logger.info(trimmedLine);
-        } else if (doesStartWith(trimmedLine, ERROR)) {
+        if (doesStartWith(trimmedLine, ERROR)) {
             outputBuilder.append(trimmedLine);
             outputBuilder.append(System.getProperty("line.separator"));
             logger.error(trimmedLine);
@@ -249,6 +245,10 @@ public class ScannerSplitStream extends OutputStream {
             outputBuilder.append(trimmedLine);
             outputBuilder.append(System.getProperty("line.separator"));
             logger.error(trimmedLine);
+        } else if (StringUtils.containsIgnoreCase(trimmedLine, FINISHED)) {
+            outputBuilder.append(trimmedLine);
+            outputBuilder.append(System.getProperty("line.separator"));
+            logger.info(trimmedLine);
         }
 
         output = outputBuilder.toString();
