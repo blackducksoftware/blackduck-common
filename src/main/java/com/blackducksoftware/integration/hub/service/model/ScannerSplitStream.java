@@ -116,19 +116,19 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     private Boolean isLoggableLine(final String line) {
-        if (StringUtils.containsIgnoreCase(line, ERROR)) {
+        if (doesStartWith(line, ERROR)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(line, WARN)) {
+        if (doesStartWith(line, WARN)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(line, INFO)) {
+        if (doesStartWith(line, INFO)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(line, DEBUG)) {
+        if (doesStartWith(line, DEBUG)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(line, TRACE)) {
+        if (doesStartWith(line, TRACE)) {
             return true;
         }
         if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
@@ -220,36 +220,42 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     private void writeToConsole(final String line) {
-        if (StringUtils.containsIgnoreCase(line, DEBUG) || StringUtils.containsIgnoreCase(line, TRACE)) {
+        String trimmedLine = line.trim();
+        if (doesStartWith(trimmedLine, DEBUG) || doesStartWith(trimmedLine, TRACE)) {
             // We dont want to print Debug or Trace logs to the logger
             return;
         }
         final StringBuilder outputBuilder = new StringBuilder();
         outputBuilder.append(output);
-        if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
+        if (StringUtils.containsIgnoreCase(trimmedLine, FINISHED)) {
+            outputBuilder.append(trimmedLine);
+            outputBuilder.append(System.getProperty("line.separator"));
+            logger.info(trimmedLine);
+        } else if (doesStartWith(trimmedLine, ERROR)) {
+            outputBuilder.append(trimmedLine);
+            outputBuilder.append(System.getProperty("line.separator"));
+            logger.error(trimmedLine);
+        } else if (doesStartWith(trimmedLine, WARN)) {
+            outputBuilder.append(trimmedLine);
+            outputBuilder.append(System.getProperty("line.separator"));
+            logger.warn(trimmedLine);
+        } else if (doesStartWith(trimmedLine, INFO)) {
+            outputBuilder.append(trimmedLine);
+            outputBuilder.append(System.getProperty("line.separator"));
+            logger.info(trimmedLine);
+        } else if (StringUtils.containsIgnoreCase(trimmedLine, EXCEPTION)) {
             // looking for 'Exception in thread' type messages
-            outputBuilder.append(line);
+            outputBuilder.append(trimmedLine);
             outputBuilder.append(System.getProperty("line.separator"));
-            logger.error(line);
-        } else if (StringUtils.containsIgnoreCase(line, FINISHED)) {
-            outputBuilder.append(line);
-            outputBuilder.append(System.getProperty("line.separator"));
-            logger.info(line);
-        } else if (StringUtils.containsIgnoreCase(line, ERROR)) {
-            outputBuilder.append(line);
-            outputBuilder.append(System.getProperty("line.separator"));
-            logger.error(line);
-        } else if (StringUtils.containsIgnoreCase(line, WARN)) {
-            outputBuilder.append(line);
-            outputBuilder.append(System.getProperty("line.separator"));
-            logger.warn(line);
-        } else if (StringUtils.containsIgnoreCase(line, INFO)) {
-            outputBuilder.append(line);
-            outputBuilder.append(System.getProperty("line.separator"));
-            logger.info(line);
+            logger.error(trimmedLine);
         }
 
         output = outputBuilder.toString();
+    }
+
+    private boolean doesStartWith(String line, String string) {
+        String relevantPartOfLine = line.substring(0, string.length());
+        return StringUtils.equalsIgnoreCase(relevantPartOfLine, string);
     }
 
 }
