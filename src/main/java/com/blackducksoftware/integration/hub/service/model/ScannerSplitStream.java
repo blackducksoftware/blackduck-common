@@ -116,25 +116,26 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     private Boolean isLoggableLine(final String line) {
-        if (doesStartWith(line, ERROR)) {
+        String trimmedLine = line.trim();
+        if (doesStartWith(trimmedLine, ERROR)) {
             return true;
         }
-        if (doesStartWith(line, WARN)) {
+        if (doesStartWith(trimmedLine, WARN)) {
             return true;
         }
-        if (doesStartWith(line, INFO)) {
+        if (doesStartWith(trimmedLine, INFO)) {
             return true;
         }
-        if (doesStartWith(line, DEBUG)) {
+        if (doesStartWith(trimmedLine, DEBUG)) {
             return true;
         }
-        if (doesStartWith(line, TRACE)) {
+        if (doesStartWith(trimmedLine, TRACE)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
+        if (StringUtils.containsIgnoreCase(trimmedLine, EXCEPTION)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(line, FINISHED)) {
+        if (StringUtils.containsIgnoreCase(trimmedLine, FINISHED)) {
             return true;
         }
         return false;
