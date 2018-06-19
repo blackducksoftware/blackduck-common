@@ -36,7 +36,7 @@ public class StreamRedirectThread extends Thread {
     private final OutputStream out;
 
     public StreamRedirectThread(final InputStream in, final OutputStream out) {
-        super("Stream Redirect Thread");
+        super(Thread.currentThread().getName() + "-Stream Redirect Thread");
         this.in = in;
         this.out = out;
     }

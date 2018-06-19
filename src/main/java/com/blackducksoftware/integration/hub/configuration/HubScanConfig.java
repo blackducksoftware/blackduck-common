@@ -23,142 +23,96 @@
  */
 package com.blackducksoftware.integration.hub.configuration;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.blackducksoftware.integration.hub.cli.SignatureScanConfig;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.Stringable;
 
 public class HubScanConfig extends Stringable {
-    private final File workingDirectory;
-    private final int scanMemory;
-    private final Set<String> scanTargetPaths;
-    private final boolean dryRun;
-    private final File toolsDir;
+    private final CommonScanConfig commonScanConfig;
     private final boolean cleanupLogsOnSuccess;
-    private final String[] excludePatterns;
-    private final String codeLocationAlias;
-    private final boolean unmapPreviousCodeLocations;
-    private final boolean deletePreviousCodeLocations;
-    private final boolean debug;
-    private final boolean verbose;
-    private final boolean snippetModeEnabled;
-    //TODO in the next Major version release, rename additionalScanParameters to additionalScanArguments
-    private final String additionalScanParameters;
+    private final Map<String, String> targetToCodeLocationName;
+    private final Map<String, Set<String>> targetToExclusionPatterns;
+    private final Set<String> scanTargetPaths;
 
-    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
-            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean snippetModeEnabled, final String additionalScanParameters) {
-        this(workingDirectory, scanMemory, scanTargetPaths, dryRun, toolsDir, cleanupLogsOnSuccess, excludePatterns, codeLocationAlias, unmapPreviousCodeLocations, deletePreviousCodeLocations, false, true, snippetModeEnabled,
-                additionalScanParameters);
-    }
-
-    public HubScanConfig(final File workingDirectory, final int scanMemory, final Set<String> scanTargetPaths, final boolean dryRun, final File toolsDir, final boolean cleanupLogsOnSuccess, final String[] excludePatterns,
-            final String codeLocationAlias, final boolean unmapPreviousCodeLocations, final boolean deletePreviousCodeLocations, final boolean debug, final boolean verbose, final boolean snippetModeEnabled,
-            final String additionalScanParameters) {
-        this.workingDirectory = workingDirectory;
-        this.scanMemory = scanMemory;
+    public HubScanConfig(final CommonScanConfig commonScanConfig, final Set<String> scanTargetPaths, final boolean cleanupLogsOnSuccess,
+            final Map<String, Set<String>> targetToExclusionPatterns,
+            final Map<String, String> targetToCodeLocationName) {
+        this.commonScanConfig = commonScanConfig;
         this.scanTargetPaths = scanTargetPaths;
-        this.dryRun = dryRun;
-        this.toolsDir = toolsDir;
         this.cleanupLogsOnSuccess = cleanupLogsOnSuccess;
-        this.excludePatterns = excludePatterns;
-        this.codeLocationAlias = codeLocationAlias;
-        this.unmapPreviousCodeLocations = unmapPreviousCodeLocations;
-        this.deletePreviousCodeLocations = deletePreviousCodeLocations;
-        this.debug = debug;
-        this.verbose = verbose;
-        this.snippetModeEnabled = snippetModeEnabled;
-        this.additionalScanParameters = additionalScanParameters;
+        this.targetToExclusionPatterns = targetToExclusionPatterns;
+        this.targetToCodeLocationName = targetToCodeLocationName;
     }
 
-    public File getWorkingDirectory() {
-        return workingDirectory;
+    public List<SignatureScanConfig> createSignatureScanConfigs() {
+        final List<SignatureScanConfig> signatureScanConfigs = new ArrayList<>();
+        for (final String scanTarget : scanTargetPaths) {
+            String[] exclusionPatterns = new String[0];
+            final Set<String> patterns = targetToExclusionPatterns.get(scanTarget);
+            if (null != patterns && !patterns.isEmpty()) {
+                exclusionPatterns = patterns.toArray(new String[patterns.size()]);
+            }
+            final SignatureScanConfig signatureScanConfig = new SignatureScanConfig(commonScanConfig, targetToCodeLocationName.get(scanTarget), exclusionPatterns, scanTarget);
+            signatureScanConfigs.add(signatureScanConfig);
+        }
+        return signatureScanConfigs;
     }
 
-    public int getScanMemory() {
-        return scanMemory;
+    public CommonScanConfig getCommonScanConfig() {
+        return commonScanConfig;
     }
 
     public Set<String> getScanTargetPaths() {
         return scanTargetPaths;
     }
 
-    public boolean isDryRun() {
-        return dryRun;
-    }
-
-    public File getToolsDir() {
-        return toolsDir;
-    }
-
     public boolean isCleanupLogsOnSuccess() {
         return cleanupLogsOnSuccess;
     }
 
-    public String[] getExcludePatterns() {
-        return excludePatterns;
+    public Map<String, Set<String>> getTargetToExclusionPatterns() {
+        return targetToExclusionPatterns;
     }
 
-    public String getCodeLocationAlias() {
-        return codeLocationAlias;
-    }
-
-    public boolean isUnmapPreviousCodeLocations() {
-        return unmapPreviousCodeLocations;
-    }
-
-    public boolean isDeletePreviousCodeLocations() {
-        return deletePreviousCodeLocations;
-    }
-
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public boolean isVerbose() {
-        return verbose;
-    }
-
-    public boolean isSnippetModeEnabled() {
-        return snippetModeEnabled;
-    }
-
-    public String getAdditionalScanParameters() {
-        return additionalScanParameters;
+    public Map<String, String> getTargetToCodeLocationName() {
+        return targetToCodeLocationName;
     }
 
     public void print(final IntLogger logger) {
         try {
-            logger.alwaysLog("--> Using Working Directory: " + getWorkingDirectory().getCanonicalPath());
+            logger.alwaysLog("--> Using Working Directory: " + commonScanConfig.getWorkingDirectory().getCanonicalPath());
         } catch (final IOException e) {
             logger.alwaysLog("Extremely unlikely exception getting the canonical path: " + e.getMessage());
         }
         logger.alwaysLog("--> Scanning the following targets:");
         if (scanTargetPaths != null) {
             for (final String target : scanTargetPaths) {
-                logger.alwaysLog("--> " + target);
-            }
-        } else {
-            logger.alwaysLog("--> null");
-        }
-        logger.alwaysLog("--> Directory Exclusion Patterns:");
-        if (excludePatterns != null) {
-            for (final String exclusionPattern : excludePatterns) {
-                logger.alwaysLog("--> " + exclusionPattern);
+                final String codeLocationName = getTargetToCodeLocationName().get(target);
+                logger.alwaysLog(String.format("--> Target: %s", target));
+                logger.alwaysLog(String.format("    --> Code Location Name: %s", codeLocationName));
+                final Set<String> excludePatterns = getTargetToExclusionPatterns().get(target);
+                if (excludePatterns != null && !excludePatterns.isEmpty()) {
+                    logger.alwaysLog("--> Directory Exclusion Patterns:");
+                    for (final String exclusionPattern : excludePatterns) {
+                        logger.alwaysLog(String.format("--> Exclusion Pattern: %s", exclusionPattern));
+                    }
+                }
             }
         } else {
             logger.alwaysLog("--> null");
         }
 
-        logger.alwaysLog("--> Scan Memory: " + getScanMemory());
-        logger.alwaysLog("--> Dry Run: " + isDryRun());
+        logger.alwaysLog("--> Scan Memory: " + commonScanConfig.getScanMemory());
+        logger.alwaysLog("--> Dry Run: " + commonScanConfig.isDryRun());
         logger.alwaysLog("--> Clean-up logs on success: " + isCleanupLogsOnSuccess());
-        logger.alwaysLog("--> Code Location Name: " + getCodeLocationAlias());
-        logger.alwaysLog("--> Un-map previous Code Locations: " + isUnmapPreviousCodeLocations());
-        logger.alwaysLog("--> Delete previous Code Locations: " + isDeletePreviousCodeLocations());
-        logger.alwaysLog("--> Enable Snippet Mode: " + isSnippetModeEnabled());
-        logger.alwaysLog("--> Additional Scan Arguments: " + getAdditionalScanParameters());
+        logger.alwaysLog("--> Enable Snippet Mode: " + commonScanConfig.isSnippetModeEnabled());
+        logger.alwaysLog("--> Additional Scan Arguments: " + commonScanConfig.getAdditionalScanArguments());
     }
 
 }

@@ -21,33 +21,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.configuration;
+package com.blackducksoftware.integration.hub.cli.summary;
 
-import com.blackducksoftware.integration.validator.FieldEnum;
+import java.util.List;
 
-public enum HubScanConfigFieldEnum implements FieldEnum {
-    ADDITIONAL_SCAN_ARGUMENTS("additionalScanArguments"),
-    CLEANUP_LOGS("cleanupLogsOnSuccess"),
-    CODE_LOCATION_ALIAS("codeLocationAlias"),
-    DEBUG("debug"),
-    DRY_RUN("dryRun"),
-    EXCLUDE_PATTERNS("excludePatterns"),
-    SCANMEMORY("hubScanMemory"),
-    SNIPPET_MODE("snippetModeEnabled"),
-    TARGETS("hubTargets"),
-    TOOLS_DIRECTORTY("toolsDirectory"),
-    WORKING_DIRECTORTY("workingDirectory"),
-    VERBOSE("verbose");
+import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 
-    private String key;
+public class ScanServiceOutput {
+    private final ProjectVersionWrapper projectVersionWrapper;
+    private final List<ScanTargetOutput> scanTargetOutputs;
 
-    private HubScanConfigFieldEnum(final String key) {
-        this.key = key;
+    public ScanServiceOutput(ProjectVersionWrapper projectVersionWrapper, List<ScanTargetOutput> scanTargetOutputs) {
+        this.projectVersionWrapper = projectVersionWrapper;
+        this.scanTargetOutputs = scanTargetOutputs;
     }
 
-    @Override
-    public String getKey() {
-        return key;
+    public ProjectVersionWrapper getProjectVersionWrapper() {
+        return projectVersionWrapper;
     }
 
+    public List<ScanTargetOutput> getScanTargetOutputs() {
+        return scanTargetOutputs;
+    }
 }

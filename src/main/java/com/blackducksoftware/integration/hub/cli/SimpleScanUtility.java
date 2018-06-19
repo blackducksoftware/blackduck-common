@@ -36,17 +36,13 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.EncryptionException;
-import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
-import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.ScanFailedException;
@@ -64,26 +60,31 @@ public class SimpleScanUtility {
     private final IntLogger logger;
     private final HubServerConfig hubServerConfig;
     private final IntEnvironmentVariables intEnvironmentVariables;
-    private final HubScanConfig hubScanConfig;
+    private final SignatureScanConfig signatureScanConfig;
     private final String project;
     private final String version;
     private final List<String> cmd = new ArrayList<>();
 
     private File logDirectory;
 
-    public SimpleScanUtility(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final IntEnvironmentVariables intEnvironmentVariables, final HubScanConfig hubScanConfig,
+    public SimpleScanUtility(final IntLogger logger, final Gson gson, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig,
+            final String project, final String version) {
+        this(logger, gson, null, intEnvironmentVariables, signatureScanConfig, project, version);
+    }
+
+    public SimpleScanUtility(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig,
             final String project, final String version) {
         this.gson = gson;
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
         this.intEnvironmentVariables = intEnvironmentVariables;
-        this.hubScanConfig = hubScanConfig;
+        this.signatureScanConfig = signatureScanConfig;
         this.project = project;
         this.version = version;
     }
 
     public void setupAndExecuteScan() throws IllegalArgumentException, EncryptionException, InterruptedException, HubIntegrationException {
-        final CLILocation cliLocation = new CLILocation(logger, hubScanConfig.getToolsDir());
+        final CLILocation cliLocation = new CLILocation(logger, signatureScanConfig.getCommonScanConfig().getToolsDir());
         setupAndExecuteScan(cliLocation);
     }
 
@@ -103,7 +104,7 @@ public class SimpleScanUtility {
             pathToOneJar = cliLocation.getOneJarFile().getCanonicalPath();
             pathToScanExecutable = cliLocation.getCLI(logger).getCanonicalPath();
         } catch (final IOException e) {
-            throw new HubIntegrationException(String.format("The provided directory %s did not have a Hub CLI.", hubScanConfig.getToolsDir().getAbsolutePath()), e);
+            throw new HubIntegrationException(String.format("The provided directory %s did not have a Hub CLI.", signatureScanConfig.getCommonScanConfig().getToolsDir().getAbsolutePath()), e);
         }
         logger.debug("Using this java installation : " + pathToJavaExecutable);
 
@@ -111,7 +112,7 @@ public class SimpleScanUtility {
         cmd.add("-Done-jar.silent=true");
         cmd.add("-Done-jar.jar.path=" + pathToOneJar);
 
-        if (hubServerConfig.shouldUseProxyForHub() && !hubScanConfig.isDryRun()) {
+        if (isNotDryRun(hubServerConfig, signatureScanConfig) && hubServerConfig.shouldUseProxyForHub()) {
             final ProxyInfo hubProxyInfo = hubServerConfig.getProxyInfo();
             final String proxyHost = hubProxyInfo.getHost();
             final int proxyPort = hubProxyInfo.getPort();
@@ -138,19 +139,19 @@ public class SimpleScanUtility {
         }
         final String scanCliOpts = intEnvironmentVariables.getValue("SCAN_CLI_OPTS");
         if (StringUtils.isNotBlank(scanCliOpts)) {
-            for (String scanOpt : scanCliOpts.split(" ")) {
+            for (final String scanOpt : scanCliOpts.split(" ")) {
                 if (StringUtils.isNotBlank(scanOpt)) {
                     cmd.add(scanOpt);
                 }
             }
         }
-        cmd.add("-Xmx" + hubScanConfig.getScanMemory() + "m");
+        cmd.add("-Xmx" + signatureScanConfig.getCommonScanConfig().getScanMemory() + "m");
         cmd.add("-jar");
         cmd.add(pathToScanExecutable);
 
         cmd.add("--no-prompt");
 
-        if (!hubScanConfig.isDryRun()) {
+        if (isNotDryRun(hubServerConfig, signatureScanConfig)) {
             cmd.add("--scheme");
             cmd.add(hubServerConfig.getHubUrl().getProtocol());
             cmd.add("--host");
@@ -193,7 +194,7 @@ public class SimpleScanUtility {
         cmd.add("--logDir");
         cmd.add(logDirectoryPath);
 
-        if (hubScanConfig.isDryRun()) {
+        if (signatureScanConfig.getCommonScanConfig().isDryRun()) {
             // The dryRunWriteDir is the same as the log directory path
             // The CLI will create a subdirectory for the json files
             cmd.add("--dryRunWriteDir");
@@ -213,35 +214,33 @@ public class SimpleScanUtility {
             cmd.add(version);
         }
 
-        if (StringUtils.isNotBlank(hubScanConfig.getCodeLocationAlias())) {
+        if (StringUtils.isNotBlank(signatureScanConfig.getCodeLocationAlias())) {
             cmd.add("--name");
-            cmd.add(hubScanConfig.getCodeLocationAlias());
+            cmd.add(signatureScanConfig.getCodeLocationAlias());
         }
 
-        if (hubScanConfig.isSnippetModeEnabled()) {
+        if (signatureScanConfig.getCommonScanConfig().isSnippetModeEnabled()) {
             cmd.add("--snippet-matching");
         }
 
-        if (hubScanConfig.getExcludePatterns() != null) {
-            for (final String exclusionPattern : hubScanConfig.getExcludePatterns()) {
+        if (signatureScanConfig.getExcludePatterns() != null) {
+            for (final String exclusionPattern : signatureScanConfig.getExcludePatterns()) {
                 if (StringUtils.isNotBlank(exclusionPattern)) {
                     cmd.add("--exclude");
                     cmd.add(exclusionPattern);
                 }
             }
         }
-
-        if (StringUtils.isNotBlank(hubScanConfig.getAdditionalScanParameters())) {
-            for (String additionalArgument : hubScanConfig.getAdditionalScanParameters().split(" ")) {
+        final String additionalScanArguments = signatureScanConfig.getCommonScanConfig().getAdditionalScanArguments();
+        if (StringUtils.isNotBlank(additionalScanArguments)) {
+            for (final String additionalArgument : additionalScanArguments.split(" ")) {
                 if (StringUtils.isNotBlank(additionalArgument)) {
                     cmd.add(additionalArgument);
                 }
             }
         }
 
-        for (final String target : hubScanConfig.getScanTargetPaths()) {
-            cmd.add(target);
-        }
+        cmd.add(signatureScanConfig.getScanTarget());
 
         try {
             executeScan();
@@ -265,7 +264,7 @@ public class SimpleScanUtility {
             final ProcessBuilder processBuilder = new ProcessBuilder(cmd).redirectError(PIPE).redirectOutput(PIPE);
             processBuilder.environment().putAll(intEnvironmentVariables.getVariables());
 
-            if (!hubScanConfig.isDryRun()) {
+            if (isNotDryRun(hubServerConfig, signatureScanConfig)) {
                 if (!StringUtils.isEmpty(hubServerConfig.getApiToken())) {
                     processBuilder.environment().put("BD_HUB_TOKEN", hubServerConfig.getApiToken());
                 } else {
@@ -309,39 +308,11 @@ public class SimpleScanUtility {
         }
     }
 
-    /**
-     * For all error cases, return an empty list. If all goes well, return a list of scan summary urls.
-     */
-    public List<ScanSummaryView> getScanSummaryItems() {
-        if (logDirectory == null || !logDirectory.exists()) {
-            return Collections.emptyList();
+    private boolean isNotDryRun(final HubServerConfig hubServerConfig, final SignatureScanConfig signatureScanConfig) {
+        if (null != hubServerConfig && !signatureScanConfig.getCommonScanConfig().isDryRun()) {
+            return true;
         }
-        final File scanStatusDirectory = getStatusDirectory();
-        if (!scanStatusDirectory.exists()) {
-            return Collections.emptyList();
-        }
-        final File[] statusFiles = scanStatusDirectory.listFiles();
-
-        if (statusFiles.length != hubScanConfig.getScanTargetPaths().size()) {
-            logger.error(String.format("There were %d scans target paths and %d status files.", hubScanConfig.getScanTargetPaths().size(), statusFiles.length));
-            return Collections.emptyList();
-        }
-
-        final List<ScanSummaryView> scanSummaryItems = new ArrayList<>();
-        for (final File currentStatusFile : statusFiles) {
-            final String fileContent;
-            try {
-                fileContent = FileUtils.readFileToString(currentStatusFile, "UTF8");
-            } catch (final IOException e) {
-                logger.error(String.format("There was an exception reading the status file: %s", e.getMessage(), e));
-                return Collections.emptyList();
-            }
-            final ScanSummaryView scanSummaryItem = gson.fromJson(fileContent, ScanSummaryView.class);
-            scanSummaryItem.json = fileContent;
-            scanSummaryItems.add(scanSummaryItem);
-        }
-
-        return scanSummaryItems;
+        return false;
     }
 
     /**
@@ -350,19 +321,20 @@ public class SimpleScanUtility {
     public String getSpecificScanExecutionLogDirectory() {
         final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZone(ZoneOffset.UTC);
         final String timeString = Instant.now().atZone(ZoneOffset.UTC).format(dateTimeFormatter);
-        return timeString;
+        final String uniqueLogDirectoryName = timeString + "_" + Thread.currentThread().getId();
+        return uniqueLogDirectoryName;
     }
 
     private void populateLogDirectory() throws IOException {
         final String logDirectoryName = "HubScanLogs";
-        final File logsDirectory = new File(hubScanConfig.getWorkingDirectory(), logDirectoryName);
+        final File logsDirectory = new File(signatureScanConfig.getCommonScanConfig().getWorkingDirectory(), logDirectoryName);
         final String specificScanExecutionLogDirectory = getSpecificScanExecutionLogDirectory();
 
         logDirectory = new File(logsDirectory, specificScanExecutionLogDirectory);
         if (!logDirectory.exists() && !logDirectory.mkdirs()) {
             throw new IOException(String.format("Could not create the %s directory!", logDirectory.getAbsolutePath()));
         }
-        final File bdIgnoreLogsFile = new File(hubScanConfig.getWorkingDirectory(), ".bdignore");
+        final File bdIgnoreLogsFile = new File(signatureScanConfig.getCommonScanConfig().getWorkingDirectory(), ".bdignore");
         if (!bdIgnoreLogsFile.exists()) {
             if (!bdIgnoreLogsFile.createNewFile()) {
                 throw new IOException(String.format("Could not create the %s file!", bdIgnoreLogsFile.getAbsolutePath()));
@@ -412,10 +384,10 @@ public class SimpleScanUtility {
     }
 
     private void makeVerbose(final List<String> cmd) {
-        if (hubScanConfig.isVerbose()) {
+        if (signatureScanConfig.getCommonScanConfig().isVerbose()) {
             cmd.add("-v");
         }
-        if (hubScanConfig.isDebug()) {
+        if (signatureScanConfig.getCommonScanConfig().isDebug()) {
             cmd.add("--debug");
         }
     }
@@ -426,6 +398,10 @@ public class SimpleScanUtility {
 
     public List<String> getCmd() {
         return cmd;
+    }
+
+    public SignatureScanConfig getSignatureScanConfig() {
+        return signatureScanConfig;
     }
 
     public File getLogDirectory() {
@@ -448,14 +424,38 @@ public class SimpleScanUtility {
         return new File(logDirectory, "CLI_Output.txt");
     }
 
-    public File[] getScanSummaryFiles() {
+    public File getScanSummaryFile() {
         final File scanStatusDirectory = getStatusDirectory();
-        return scanStatusDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
+        if (null != scanStatusDirectory) {
+            final File[] scanSummaryFiles = scanStatusDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
+            if (null != scanSummaryFiles) {
+                if (scanSummaryFiles.length == 0) {
+                    logger.error("There were no status files found in " + scanStatusDirectory.getAbsolutePath());
+                    return null;
+                } else if (scanSummaryFiles.length > 1) {
+                    logger.error(String.format("There were should have only been 1 status file in '%s' but there are %s", scanStatusDirectory.getAbsolutePath(), scanSummaryFiles.length));
+                }
+                return scanSummaryFiles[0];
+            }
+        }
+        return null;
     }
 
-    public File[] getDryRunFiles() {
+    public File getDryRunFile() {
         final File dataDirectory = getDataDirectory();
-        return dataDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
+        if (null != dataDirectory) {
+            final File[] dryRunFiles = dataDirectory.listFiles((FilenameFilter) (dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
+            if (null != dryRunFiles) {
+                if (dryRunFiles.length == 0) {
+                    logger.error("There were no dry run files found in " + dataDirectory.getAbsolutePath());
+                    return null;
+                } else if (dryRunFiles.length > 1) {
+                    logger.error(String.format("There were should have only been 1 dry run in '%s' but there are %s", dataDirectory.getAbsolutePath(), dryRunFiles.length));
+                }
+                return dryRunFiles[0];
+            }
+        }
+        return null;
     }
 
 }

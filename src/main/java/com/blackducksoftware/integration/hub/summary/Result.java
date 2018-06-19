@@ -21,33 +21,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.configuration;
+package com.blackducksoftware.integration.hub.summary;
 
-import com.blackducksoftware.integration.validator.FieldEnum;
-
-public enum HubScanConfigFieldEnum implements FieldEnum {
-    ADDITIONAL_SCAN_ARGUMENTS("additionalScanArguments"),
-    CLEANUP_LOGS("cleanupLogsOnSuccess"),
-    CODE_LOCATION_ALIAS("codeLocationAlias"),
-    DEBUG("debug"),
-    DRY_RUN("dryRun"),
-    EXCLUDE_PATTERNS("excludePatterns"),
-    SCANMEMORY("hubScanMemory"),
-    SNIPPET_MODE("snippetModeEnabled"),
-    TARGETS("hubTargets"),
-    TOOLS_DIRECTORTY("toolsDirectory"),
-    WORKING_DIRECTORTY("workingDirectory"),
-    VERBOSE("verbose");
-
-    private String key;
-
-    private HubScanConfigFieldEnum(final String key) {
-        this.key = key;
-    }
-
-    @Override
-    public String getKey() {
-        return key;
-    }
-
+public enum Result {
+    SUCCESS, FAILURE;
 }

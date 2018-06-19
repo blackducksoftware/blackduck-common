@@ -23,13 +23,13 @@
  */
 package com.blackducksoftware.integration.hub.comprehensive;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -50,6 +50,9 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.generated.view.UserView;
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
+import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
+import com.blackducksoftware.integration.hub.cli.summary.ScanServiceOutput;
+import com.blackducksoftware.integration.hub.cli.summary.ScanTargetOutput;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
@@ -61,7 +64,9 @@ import com.blackducksoftware.integration.hub.service.ScanStatusService;
 import com.blackducksoftware.integration.hub.service.SignatureScannerService;
 import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
+import com.blackducksoftware.integration.hub.summary.Result;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 
 @Category(IntegrationTest.class)
@@ -209,51 +214,110 @@ public class ComprehensiveCookbookTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         final MetaHandler metaHandler = new MetaHandler(logger);
-        final SignatureScannerService cliService = hubServicesFactory.createSignatureScannerService(TWENTY_MINUTES);
-        final ProjectService projectService = hubServicesFactory.createProjectService();
-
-        // delete the project, if it exists
-        deleteIfProjectExists(logger, hubServicesFactory, metaHandler, projectName);
-
+        final ExecutorService executorService = Executors.newFixedThreadPool(1);
         try {
-            hubServicesFactory.createProjectService().getProjectByName(projectName);
-            fail("The project should not exist.");
-        } catch (final HubIntegrationException e) {
+            final SignatureScannerService cliService = hubServicesFactory.createSignatureScannerService(executorService);
+            final ProjectService projectService = hubServicesFactory.createProjectService();
+
+            // delete the project, if it exists
+            deleteIfProjectExists(logger, hubServicesFactory, metaHandler, projectName);
+
+            try {
+                hubServicesFactory.createProjectService().getProjectByName(projectName);
+                fail("The project should not exist.");
+            } catch (final HubIntegrationException e) {
+            }
+
+            final HubServerConfig hubServerConfig = restConnectionTestHelper.getHubServerConfig();
+
+            // scan the file in its parent directory
+            final File scanTarget = restConnectionTestHelper.getFile("hub-artifactory-1.0.1-RC.zip");
+            final File workingDirectory = scanTarget.getParentFile();
+
+            final HubScanConfigBuilder hubScanConfigBuilder = new HubScanConfigBuilder();
+            hubScanConfigBuilder.setScanMemory(4096);
+            hubScanConfigBuilder.setDryRun(false);
+            // download the cli to where ever the file is just for convenience
+            hubScanConfigBuilder.setToolsDir(workingDirectory);
+            hubScanConfigBuilder.setWorkingDirectory(workingDirectory);
+            // always use the canonical path since we validate the paths by string matching
+            hubScanConfigBuilder.addScanTargetPath(scanTarget.getCanonicalPath());
+            hubScanConfigBuilder.setCleanupLogsOnSuccess(true);
+
+            final HubScanConfig hubScanConfig = hubScanConfigBuilder.build();
+
+            final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
+            projectRequestBuilder.setProjectName(projectName);
+            projectRequestBuilder.setVersionName(versionName);
+
+            final ProjectRequest projectRequest = projectRequestBuilder.build();
+
+            final ScanServiceOutput scanServiceOutput = cliService.executeScans(hubServerConfig, hubScanConfig, projectRequest);
+            assertNotNull(scanServiceOutput);
+            assertTrue(scanServiceOutput.getScanTargetOutputs().size() == 1);
+            final ScanTargetOutput scanTargetOutput = scanServiceOutput.getScanTargetOutputs().get(0);
+            assertTrue(scanTargetOutput.getResult() == Result.SUCCESS);
+            assertNotNull(scanTargetOutput.getScanSummaryView());
+
+            final ScanSummaryView scanSummaryView = scanTargetOutput.getScanSummaryView();
+
+            final ScanStatusService scanStatusDataService = hubServicesFactory.createScanStatusService(TWENTY_MINUTES);
+            scanStatusDataService.assertScansFinished(Arrays.asList(scanSummaryView));
+
+            assertNotNull(scanServiceOutput.getProjectVersionWrapper());
+            final ProjectVersionWrapper projectVersionWrapper = scanServiceOutput.getProjectVersionWrapper();
+
+            assertNotNull(projectVersionWrapper.getProjectView());
+            assertNotNull(projectVersionWrapper.getProjectVersionView());
+
+            // verify the policy
+            final VersionBomPolicyStatusView policyStatusItem = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView());
+            assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
+            System.out.println(policyStatusItem);
+        } finally {
+            executorService.shutdownNow();
         }
+    }
 
-        final HubServerConfig hubServerConfig = restConnectionTestHelper.getHubServerConfig();
+    @Test
+    public void testMutlipleTargetScan() throws Exception {
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        logger.setLogLevel(LogLevel.INFO);
+        final ExecutorService executorService = Executors.newFixedThreadPool(1);
+        try {
+            final SignatureScannerService cliService = hubServicesFactory.createSignatureScannerService(executorService);
 
-        // scan the file in its parent directory
-        final File scanTarget = restConnectionTestHelper.getFile("hub-artifactory-1.0.1-RC.zip");
-        final File workingDirectory = scanTarget.getParentFile();
+            final HubServerConfig hubServerConfig = restConnectionTestHelper.getHubServerConfig();
 
-        final HubScanConfigBuilder hubScanConfigBuilder = new HubScanConfigBuilder();
-        hubScanConfigBuilder.setScanMemory(4096);
-        hubScanConfigBuilder.setDryRun(false);
-        // download the cli to where ever the file is just for convenience
-        hubScanConfigBuilder.setToolsDir(workingDirectory);
-        hubScanConfigBuilder.setWorkingDirectory(workingDirectory);
-        // always use the canonical path since we validate the paths by string matching
-        hubScanConfigBuilder.addScanTargetPath(scanTarget.getCanonicalPath());
+            // scan the file in its parent directory
+            final File scanTarget = restConnectionTestHelper.getFile("hub-artifactory-1.0.1-RC.zip");
+            final File workingDirectory = scanTarget.getParentFile();
 
-        final HubScanConfig hubScanConfig = hubScanConfigBuilder.build();
+            final HubScanConfigBuilder hubScanConfigBuilder = new HubScanConfigBuilder();
+            hubScanConfigBuilder.setScanMemory(4096);
+            hubScanConfigBuilder.setDryRun(true);
+            // download the cli to where ever the file is just for convenience
+            hubScanConfigBuilder.setToolsDir(workingDirectory);
+            hubScanConfigBuilder.setWorkingDirectory(workingDirectory);
+            // always use the canonical path since we validate the paths by string matching
+            hubScanConfigBuilder.addScanTargetPath(scanTarget.getCanonicalPath());
+            hubScanConfigBuilder.addScanTargetPath(scanTarget.getParentFile().getCanonicalPath());
+            hubScanConfigBuilder.setCleanupLogsOnSuccess(true);
 
-        final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
-        projectRequestBuilder.setProjectName(projectName);
-        projectRequestBuilder.setVersionName(versionName);
+            final HubScanConfig hubScanConfig = hubScanConfigBuilder.build();
 
-        final ProjectRequest projectRequest = projectRequestBuilder.build();
+            final ScanServiceOutput scanServiceOutput = cliService.executeScans(hubServerConfig, hubScanConfig, null);
+            assertNotNull(scanServiceOutput);
+            assertTrue(scanServiceOutput.getScanTargetOutputs().size() == 2);
 
-        final ProjectVersionWrapper projectVersionWrapper = cliService.installAndRunControlledScan(hubServerConfig, hubScanConfig, projectRequest, true);
-
-        assertNotNull(projectVersionWrapper);
-        assertNotNull(projectVersionWrapper.getProjectView());
-        assertNotNull(projectVersionWrapper.getProjectVersionView());
-
-        // verify the policy
-        final VersionBomPolicyStatusView policyStatusItem = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView());
-        assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
-        System.out.println(policyStatusItem);
+            for (final ScanTargetOutput scanTargetOutput : scanServiceOutput.getScanTargetOutputs()) {
+                assertTrue(scanTargetOutput.getResult() == Result.SUCCESS);
+                assertNotNull(scanTargetOutput.getDryRunFile());
+            }
+        } finally {
+            executorService.shutdownNow();
+        }
     }
 
     @Test
