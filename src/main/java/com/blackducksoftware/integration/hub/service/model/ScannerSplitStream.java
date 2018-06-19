@@ -58,6 +58,8 @@ public class ScannerSplitStream extends OutputStream {
 
     private static final String TRACE = "TRACE:";
 
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
     private final OutputStream outputFileStream;
 
     private final IntLogger logger;
@@ -116,25 +118,26 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     private Boolean isLoggableLine(final String line) {
-        if (StringUtils.containsIgnoreCase(line, ERROR)) {
+        String trimmedLine = line.trim();
+        if (trimmedLine.startsWith(ERROR)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(line, WARN)) {
+        if (trimmedLine.startsWith(WARN)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(line, INFO)) {
+        if (trimmedLine.startsWith(INFO)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(line, DEBUG)) {
+        if (trimmedLine.startsWith(DEBUG)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(line, TRACE)) {
+        if (trimmedLine.startsWith(TRACE)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
+        if (StringUtils.containsIgnoreCase(trimmedLine, EXCEPTION)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(line, FINISHED)) {
+        if (StringUtils.containsIgnoreCase(trimmedLine, FINISHED)) {
             return true;
         }
         return false;
@@ -159,7 +162,7 @@ public class ScannerSplitStream extends OutputStream {
             final StringBuilder builder = new StringBuilder();
             builder.append(lineBuffer);
 
-            builder.append(System.getProperty("line.separator"));
+            builder.append(LINE_SEPARATOR);
             builder.append(line);
             lineBuffer = builder.toString();
         }
@@ -170,8 +173,8 @@ public class ScannerSplitStream extends OutputStream {
         outputFileStream.write(byteArray);
 
         final String currentLine = new String(byteArray, "UTF-8");
-        if (currentLine.contains(System.getProperty("line.separator"))) {
-            final String[] splitLines = currentLine.split(System.getProperty("line.separator"));
+        if (currentLine.contains(LINE_SEPARATOR)) {
+            final String[] splitLines = currentLine.split(LINE_SEPARATOR);
 
             for (final String line : splitLines) {
                 processLine(line);
@@ -186,8 +189,8 @@ public class ScannerSplitStream extends OutputStream {
         outputFileStream.write(byteArray, offset, length);
 
         final String currentLine = new String(byteArray, offset, length, "UTF-8");
-        if (currentLine.contains(System.getProperty("line.separator"))) {
-            final String[] splitLines = currentLine.split(System.getProperty("line.separator"));
+        if (currentLine.contains(LINE_SEPARATOR)) {
+            final String[] splitLines = currentLine.split(LINE_SEPARATOR);
 
             for (final String line : splitLines) {
                 processLine(line);
@@ -220,33 +223,34 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     private void writeToConsole(final String line) {
-        if (StringUtils.containsIgnoreCase(line, DEBUG) || StringUtils.containsIgnoreCase(line, TRACE)) {
+        String trimmedLine = line.trim();
+        if (trimmedLine.startsWith(DEBUG) || trimmedLine.startsWith(TRACE)) {
             // We dont want to print Debug or Trace logs to the logger
             return;
         }
         final StringBuilder outputBuilder = new StringBuilder();
         outputBuilder.append(output);
-        if (StringUtils.containsIgnoreCase(line, EXCEPTION)) {
+        if (trimmedLine.startsWith(ERROR)) {
+            outputBuilder.append(trimmedLine);
+            outputBuilder.append(LINE_SEPARATOR);
+            logger.error(trimmedLine);
+        } else if (trimmedLine.startsWith(WARN)) {
+            outputBuilder.append(trimmedLine);
+            outputBuilder.append(LINE_SEPARATOR);
+            logger.warn(trimmedLine);
+        } else if (trimmedLine.startsWith(INFO)) {
+            outputBuilder.append(trimmedLine);
+            outputBuilder.append(LINE_SEPARATOR);
+            logger.info(trimmedLine);
+        } else if (StringUtils.containsIgnoreCase(trimmedLine, EXCEPTION)) {
             // looking for 'Exception in thread' type messages
-            outputBuilder.append(line);
-            outputBuilder.append(System.getProperty("line.separator"));
-            logger.error(line);
-        } else if (StringUtils.containsIgnoreCase(line, FINISHED)) {
-            outputBuilder.append(line);
-            outputBuilder.append(System.getProperty("line.separator"));
-            logger.info(line);
-        } else if (StringUtils.containsIgnoreCase(line, ERROR)) {
-            outputBuilder.append(line);
-            outputBuilder.append(System.getProperty("line.separator"));
-            logger.error(line);
-        } else if (StringUtils.containsIgnoreCase(line, WARN)) {
-            outputBuilder.append(line);
-            outputBuilder.append(System.getProperty("line.separator"));
-            logger.warn(line);
-        } else if (StringUtils.containsIgnoreCase(line, INFO)) {
-            outputBuilder.append(line);
-            outputBuilder.append(System.getProperty("line.separator"));
-            logger.info(line);
+            outputBuilder.append(trimmedLine);
+            outputBuilder.append(LINE_SEPARATOR);
+            logger.error(trimmedLine);
+        } else if (StringUtils.containsIgnoreCase(trimmedLine, FINISHED)) {
+            outputBuilder.append(trimmedLine);
+            outputBuilder.append(LINE_SEPARATOR);
+            logger.info(trimmedLine);
         }
 
         output = outputBuilder.toString();
