@@ -286,7 +286,7 @@ public class ComprehensiveCookbookTestIT {
         logger.setLogLevel(LogLevel.INFO);
         final ExecutorService executorService = Executors.newFixedThreadPool(1);
         try {
-            final SignatureScannerService cliService = hubServicesFactory.createSignatureScannerService(executorService);
+            final SignatureScannerService signatureScannerService = hubServicesFactory.createSignatureScannerService(executorService);
 
             final HubServerConfig hubServerConfig = restConnectionTestHelper.getHubServerConfig();
 
@@ -303,11 +303,12 @@ public class ComprehensiveCookbookTestIT {
             // always use the canonical path since we validate the paths by string matching
             hubScanConfigBuilder.addScanTargetPath(scanTarget.getCanonicalPath());
             hubScanConfigBuilder.addScanTargetPath(scanTarget.getParentFile().getCanonicalPath());
+
             hubScanConfigBuilder.setCleanupLogsOnSuccess(true);
 
             final HubScanConfig hubScanConfig = hubScanConfigBuilder.build();
 
-            final ScanServiceOutput scanServiceOutput = cliService.executeScans(hubServerConfig, hubScanConfig, null);
+            final ScanServiceOutput scanServiceOutput = signatureScannerService.executeScans(hubServerConfig, hubScanConfig, null);
             assertNotNull(scanServiceOutput);
             assertTrue(scanServiceOutput.getScanTargetOutputs().size() == 2);
 

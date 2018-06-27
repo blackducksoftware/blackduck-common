@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.blackducksoftware.integration.hub.cli.SignatureScanConfig;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.Stringable;
@@ -95,7 +97,9 @@ public class HubScanConfig extends Stringable {
             for (final String target : scanTargetPaths) {
                 final String codeLocationName = getTargetToCodeLocationName().get(target);
                 logger.alwaysLog(String.format("--> Target: %s", target));
-                logger.alwaysLog(String.format("    --> Code Location Name: %s", codeLocationName));
+                if (StringUtils.isNotBlank(codeLocationName)) {
+                    logger.alwaysLog(String.format("    --> Code Location Name: %s", codeLocationName));
+                }
                 final Set<String> excludePatterns = getTargetToExclusionPatterns().get(target);
                 if (excludePatterns != null && !excludePatterns.isEmpty()) {
                     logger.alwaysLog("--> Directory Exclusion Patterns:");
