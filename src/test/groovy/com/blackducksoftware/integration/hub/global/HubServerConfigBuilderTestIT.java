@@ -23,11 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.global;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.net.URL;
 
@@ -68,7 +64,7 @@ public class HubServerConfigBuilderTestIT {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         setBuilderDefaults(builder);
         setBuilderProxyDefaults(builder);
-        builder.setIgnoredProxyHosts(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"));
+        builder.setProxyIgnoredHosts(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"));
         final HubServerConfig config = builder.build();
 
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
@@ -139,7 +135,7 @@ public class HubServerConfigBuilderTestIT {
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         builder.setProxyHost(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
         builder.setProxyPort(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"));
-        builder.setIgnoredProxyHosts(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"));
+        builder.setProxyIgnoredHosts(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"));
         final HubServerConfig config = builder.build();
 
         assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());

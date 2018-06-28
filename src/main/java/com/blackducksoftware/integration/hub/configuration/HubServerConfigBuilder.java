@@ -117,7 +117,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         final ProxyInfoBuilder proxyBuilder = new ProxyInfoBuilder();
         proxyBuilder.setHost(values.get(Property.PROXY_HOST));
         proxyBuilder.setPort(values.get(Property.PROXY_PORT));
-        proxyBuilder.setIgnoredProxyHosts(values.get(Property.IGNORED_PROXY_HOSTS));
+        proxyBuilder.setIgnoredProxyHosts(values.get(Property.PROXY_IGNORED_HOSTS));
         proxyBuilder.setUsername(values.get(Property.PROXY_USERNAME));
         proxyBuilder.setPassword(values.get(Property.PROXY_PASSWORD));
         proxyBuilder.setPasswordLength(proxyPasswordLength());
@@ -136,7 +136,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         validator.setTimeout(values.get(Property.TIMEOUT));
         validator.setProxyHost(values.get(Property.PROXY_HOST));
         validator.setProxyPort(values.get(Property.PROXY_PORT));
-        validator.setIgnoredProxyHosts(values.get(Property.IGNORED_PROXY_HOSTS));
+        validator.setIgnoredProxyHosts(values.get(Property.PROXY_IGNORED_HOSTS));
         validator.setProxyUsername(values.get(Property.PROXY_USERNAME));
         validator.setProxyPassword(values.get(Property.PROXY_PASSWORD));
         validator.setProxyPasswordLength(proxyPasswordLength());
@@ -272,8 +272,8 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         setProxyPort(String.valueOf(proxyPort));
     }
 
-    public void setIgnoredProxyHosts(final String ignoredProxyHosts) {
-        values.put(Property.IGNORED_PROXY_HOSTS, ignoredProxyHosts);
+    public void setProxyIgnoredHosts(final String proxyIgnoredHosts) {
+        values.put(Property.PROXY_IGNORED_HOSTS, proxyIgnoredHosts);
     }
 
     public void setProxyUsername(final String proxyUsername) {
@@ -323,7 +323,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         TIMEOUT,
         PROXY_HOST,
         PROXY_PORT,
-        IGNORED_PROXY_HOSTS,
+        PROXY_IGNORED_HOSTS,
         PROXY_USERNAME,
         PROXY_PASSWORD,
         PROXY_PASSWORD_LENGTH,
