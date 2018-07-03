@@ -44,10 +44,10 @@ public class HubResponsesTransformer {
     private final HubResponseTransformer hubResponseTransformer;
     private final JsonParser jsonParser;
 
-    public HubResponsesTransformer(final RestConnection restConnection, final HubResponseTransformer hubResponseTransformer) {
+    public HubResponsesTransformer(final RestConnection restConnection, final HubResponseTransformer hubResponseTransformer, final JsonParser jsonParser) {
         this.restConnection = restConnection;
         this.hubResponseTransformer = hubResponseTransformer;
-        this.jsonParser = restConnection.jsonParser;
+        this.jsonParser = jsonParser;
     }
 
     public <T extends HubResponse> List<T> getResponses(final PagedRequest pagedRequest, final Class<T> clazz) throws IntegrationException {

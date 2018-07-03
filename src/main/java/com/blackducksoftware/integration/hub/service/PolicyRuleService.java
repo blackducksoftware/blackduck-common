@@ -54,12 +54,14 @@ public class PolicyRuleService {
     }
 
     public String createPolicyRule(final PolicyRuleViewV2 policyRuleViewV2) throws IntegrationException {
-        final Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(policyRuleViewV2);
+        final String json = hubService.convertToJson(policyRuleViewV2);
+        final Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(json);
         return hubService.executePostRequestAndRetrieveURL(ApiDiscovery.POLICY_RULES_LINK, requestBuilder);
     }
 
     public void updatePolicyRule(final PolicyRuleViewV2 policyRuleView) throws IntegrationException {
-        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.PUT).bodyContent(new BodyContent(policyRuleView)).uri(hubService.getHref(policyRuleView));
+        final String json = hubService.convertToJson(policyRuleView);
+        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.PUT).bodyContent(new BodyContent(json)).uri(hubService.getHref(policyRuleView));
         try (Response response = hubService.executeRequest(requestBuilder.build())) {
 
         } catch (final IOException e) {

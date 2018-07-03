@@ -43,6 +43,7 @@ import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.summary.Result;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 
 public class SignatureScannerService extends DataService {
@@ -54,9 +55,9 @@ public class SignatureScannerService extends DataService {
 
     private ProjectVersionWrapper projectVersionWrapper;
 
-    public SignatureScannerService(final HubService hubService, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
+    public SignatureScannerService(final HubService hubService, final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
             final CodeLocationService codeLocationService, final ExecutorService executorService) {
-        super(hubService);
+        super(hubService, logger);
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
         this.projectDataService = projectDataService;

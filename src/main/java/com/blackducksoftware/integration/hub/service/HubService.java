@@ -47,6 +47,7 @@ import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.service.model.PagedRequest;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.connection.RestConnection;
 import com.blackducksoftware.integration.rest.request.Request;
 import com.blackducksoftware.integration.rest.request.Response;
@@ -65,14 +66,14 @@ public class HubService {
     private final JsonParser jsonParser;
     private final Gson gson;
 
-    public HubService(final RestConnection restConnection) {
+    public HubService(final IntLogger logger, final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
         this.restConnection = restConnection;
-        this.hubBaseUrl = restConnection.baseUrl;
-        this.jsonParser = restConnection.jsonParser;
-        this.gson = restConnection.gson;
-        this.metaHandler = new MetaHandler(restConnection.logger);
-        this.hubResponseTransformer = new HubResponseTransformer(restConnection);
-        this.hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer);
+        this.hubBaseUrl = restConnection.getBaseUrl();
+        this.jsonParser = jsonParser;
+        this.gson = gson;
+        this.metaHandler = new MetaHandler(logger);
+        this.hubResponseTransformer = new HubResponseTransformer(restConnection, gson, jsonParser);
+        this.hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer, jsonParser);
     }
 
     public RestConnection getRestConnection() {
@@ -89,6 +90,10 @@ public class HubService {
 
     public Gson getGson() {
         return gson;
+    }
+
+    public String convertToJson(final Object obj) {
+        return gson.toJson(obj);
     }
 
     public boolean hasLink(final HubView view, final String linkKey) throws HubIntegrationException {
@@ -246,12 +251,12 @@ public class HubService {
     }
 
     public Response executeGetRequest(final HubPath path) throws IntegrationException {
-        final String uri = pieceTogetherUri(restConnection.baseUrl, path.getPath());
+        final String uri = pieceTogetherUri(restConnection.getBaseUrl(), path.getPath());
         return restConnection.executeRequest(RequestFactory.createCommonGetRequest(uri));
     }
 
     public Response executeRequest(final HubPath path, final Request.Builder requestBuilder) throws IntegrationException {
-        final String uri = pieceTogetherUri(restConnection.baseUrl, path.getPath());
+        final String uri = pieceTogetherUri(restConnection.getBaseUrl(), path.getPath());
         requestBuilder.uri(uri);
         return executeRequest(requestBuilder.build());
     }
@@ -264,7 +269,7 @@ public class HubService {
     // posting and getting location header
     // ------------------------------------------------
     public String executePostRequestAndRetrieveURL(final HubPath path, final Request.Builder requestBuilder) throws IntegrationException {
-        final String uri = pieceTogetherUri(restConnection.baseUrl, path.getPath());
+        final String uri = pieceTogetherUri(restConnection.getBaseUrl(), path.getPath());
         requestBuilder.uri(uri);
         return executePostRequestAndRetrieveURL(requestBuilder.build());
     }
@@ -277,11 +282,11 @@ public class HubService {
         }
     }
 
-    private String pieceTogetherUri(URL baseURL, String spec) throws HubIntegrationException {
+    private String pieceTogetherUri(final URL baseURL, final String spec) throws HubIntegrationException {
         URL url;
         try {
             url = new URL(baseURL, spec);
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             throw new HubIntegrationException(String.format("Could not construct the URL from %s and %s", baseURL.toString(), spec), e);
         }
         return url.toString();

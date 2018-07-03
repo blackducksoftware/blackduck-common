@@ -53,6 +53,7 @@ import com.blackducksoftware.integration.hub.report.api.ReportData;
 import com.blackducksoftware.integration.hub.report.exception.RiskReportException;
 import com.blackducksoftware.integration.hub.report.pdf.RiskReportPdfWriter;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.HttpMethod;
 import com.blackducksoftware.integration.rest.exception.IntegrationRestException;
 import com.blackducksoftware.integration.rest.request.Request;
@@ -69,12 +70,12 @@ public class ReportService extends DataService {
     private final IntegrationEscapeUtil escapeUtil;
     private final long timeoutInMilliseconds;
 
-    public ReportService(final HubService hubService, final ProjectService projectDataService, final IntegrationEscapeUtil escapeUtil) {
-        this(hubService, projectDataService, escapeUtil, DEFAULT_TIMEOUT);
+    public ReportService(final HubService hubService, final IntLogger logger, final ProjectService projectDataService, final IntegrationEscapeUtil escapeUtil) {
+        this(hubService, logger, projectDataService, escapeUtil, DEFAULT_TIMEOUT);
     }
 
-    public ReportService(final HubService hubService, final ProjectService projectDataService, final IntegrationEscapeUtil escapeUtil, final long timeoutInMilliseconds) {
-        super(hubService);
+    public ReportService(final HubService hubService, final IntLogger logger, final ProjectService projectDataService, final IntegrationEscapeUtil escapeUtil, final long timeoutInMilliseconds) {
+        super(hubService, logger);
         this.projectDataService = projectDataService;
         this.escapeUtil = escapeUtil;
 
@@ -356,10 +357,11 @@ public class ReportService extends DataService {
     public String startGeneratingHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws IntegrationException {
         final String reportUri = this.hubService.getFirstLink(version, ProjectVersionView.LICENSEREPORTS_LINK);
 
-        final JsonObject json = new JsonObject();
-        json.addProperty("reportFormat", reportFormat.toString());
-        json.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("reportFormat", reportFormat.toString());
+        jsonObject.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
 
+        final String json = hubService.convertToJson(jsonObject);
         final Request request = RequestFactory.createCommonPostRequestBuilder(json).uri(reportUri).build();
         return this.hubService.executePostRequestAndRetrieveURL(request);
     }
