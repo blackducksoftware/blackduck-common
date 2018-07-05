@@ -29,7 +29,7 @@ import org.junit.Test
 import com.blackducksoftware.integration.hub.api.enumeration.PolicySeverityType
 import com.blackducksoftware.integration.hub.api.generated.component.ComponentVersionPolicyViolationDetails
 import com.blackducksoftware.integration.hub.api.generated.component.NameValuePairView
-import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusSummaryStatusType
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomPolicyStatusView
 import com.blackducksoftware.integration.hub.service.model.PolicyStatusDescription
 
@@ -53,7 +53,7 @@ class PolicyStatusDescriptionTest {
         componentVersionPolicyViolationDetails.severityLevels = violations
 
         final NameValuePairView inViolation = new NameValuePairView()
-        inViolation.name = PolicyStatusApprovalStatusType.IN_VIOLATION
+        inViolation.name = PolicyStatusSummaryStatusType.IN_VIOLATION
         inViolation.value = 4
 
         def statuses = []
@@ -62,7 +62,7 @@ class PolicyStatusDescriptionTest {
         final VersionBomPolicyStatusView policyStatusItem = new VersionBomPolicyStatusView()
         policyStatusItem.componentVersionPolicyViolationDetails = componentVersionPolicyViolationDetails
         policyStatusItem.componentVersionStatusCounts = statuses
-        policyStatusItem.overallStatus = PolicyStatusApprovalStatusType.IN_VIOLATION
+        policyStatusItem.overallStatus = PolicyStatusSummaryStatusType.IN_VIOLATION
 
         final PolicyStatusDescription test = new PolicyStatusDescription(policyStatusItem)
 
@@ -71,8 +71,8 @@ class PolicyStatusDescriptionTest {
         int expectedBlockerSeverity = 3
         int expectedTrivialSeverity = 1
         int expectedMajorSeverity = 0
-        int actualInViolationOverall = test.getCountOfStatus(PolicyStatusApprovalStatusType.IN_VIOLATION)
-        int actualNotInViolationOverall = test.getCountOfStatus(PolicyStatusApprovalStatusType.NOT_IN_VIOLATION)
+        int actualInViolationOverall = test.getCountOfStatus(PolicyStatusSummaryStatusType.IN_VIOLATION)
+        int actualNotInViolationOverall = test.getCountOfStatus(PolicyStatusSummaryStatusType.NOT_IN_VIOLATION)
         int actualBlockerSeverity = test.getCountOfSeverity(PolicySeverityType.BLOCKER)
         int actualTrivialSeverity = test.getCountOfSeverity(PolicySeverityType.TRIVIAL)
         int actualMajorSeverity = test.getCountOfSeverity(PolicySeverityType.MAJOR)

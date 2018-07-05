@@ -44,7 +44,7 @@ import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequ
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusSummaryStatusType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
@@ -204,7 +204,7 @@ public class ComprehensiveCookbookTestIT {
 
         // verify the policy
         final VersionBomPolicyStatusView policyStatusItem = projectService.getPolicyStatusForProjectAndVersion("ek_mtglist", "0.0.1");
-        assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
+        assertEquals(PolicyStatusSummaryStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
         System.out.println(policyStatusItem);
     }
 
@@ -275,7 +275,7 @@ public class ComprehensiveCookbookTestIT {
 
             // verify the policy
             final VersionBomPolicyStatusView policyStatusItem = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView());
-            assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
+            assertEquals(PolicyStatusSummaryStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
             System.out.println(policyStatusItem);
         } finally {
             executorService.shutdownNow();

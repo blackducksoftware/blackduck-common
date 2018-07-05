@@ -35,7 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.component.RiskCountView;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusSummaryStatusType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportFormatType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ReportType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.RiskCountType;
@@ -267,8 +267,8 @@ public class ReportService extends DataService {
 
     public void populatePolicyRuleInfo(final BomComponent component, final VersionBomComponentView bomEntry) throws IntegrationException {
         if (bomEntry != null && bomEntry.approvalStatus != null) {
-            final PolicyStatusApprovalStatusType status = bomEntry.approvalStatus;
-            if (status == PolicyStatusApprovalStatusType.IN_VIOLATION) {
+            final PolicyStatusSummaryStatusType status = bomEntry.approvalStatus;
+            if (status == PolicyStatusSummaryStatusType.IN_VIOLATION) {
                 final List<PolicyRuleViewV2> rules = this.hubService.getAllResponses(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE);
                 final List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (final PolicyRuleViewV2 policyRuleView : rules) {
