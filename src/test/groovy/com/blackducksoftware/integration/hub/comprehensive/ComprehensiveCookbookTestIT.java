@@ -23,7 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.comprehensive;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.Arrays;
@@ -84,7 +87,7 @@ public class ComprehensiveCookbookTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        final IntLogger logger = hubServicesFactory.getLogger();
         final MetaHandler metaHandler = new MetaHandler(logger);
 
         // delete the project, if it exists
@@ -125,7 +128,7 @@ public class ComprehensiveCookbookTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        final IntLogger logger = hubServicesFactory.getLogger();
         final MetaHandler metaHandler = new MetaHandler(logger);
 
         // delete the project, if it exists
@@ -166,7 +169,7 @@ public class ComprehensiveCookbookTestIT {
     @Test
     public void testPolicyStatusFromBdioImport() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        final IntLogger logger = hubServicesFactory.getLogger();
         final MetaHandler metaHandler = new MetaHandler(logger);
         final ScanStatusService scanStatusService = hubServicesFactory.createScanStatusService(FIVE_MINUTES);
         final ProjectService projectService = hubServicesFactory.createProjectService();
@@ -212,7 +215,7 @@ public class ComprehensiveCookbookTestIT {
         final String versionName = restConnectionTestHelper.getProperty("TEST_SCAN_VERSION");
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        final IntLogger logger = hubServicesFactory.getLogger();
         final MetaHandler metaHandler = new MetaHandler(logger);
         final ExecutorService executorService = Executors.newFixedThreadPool(1);
         try {
@@ -282,7 +285,7 @@ public class ComprehensiveCookbookTestIT {
     @Test
     public void testMutlipleTargetScan() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        final IntLogger logger = hubServicesFactory.getLogger();
         logger.setLogLevel(LogLevel.INFO);
         final ExecutorService executorService = Executors.newFixedThreadPool(1);
         try {

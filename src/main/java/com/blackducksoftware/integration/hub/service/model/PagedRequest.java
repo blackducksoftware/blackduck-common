@@ -23,6 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.service.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.rest.request.Request;
@@ -37,11 +40,14 @@ public class PagedRequest {
         int offset = 0;
         int limit = 100;
         if (requestBuilder.getQueryParameters() != null) {
+            // we know that limit and offset are only ever set as single values
+            // so iterator().next() is a reasonable way to get them out of the
+            // Set
             if (requestBuilder.getQueryParameters().containsKey("offset")) {
-                offset = NumberUtils.toInt(requestBuilder.getQueryParameters().get("offset"), 0);
+                offset = NumberUtils.toInt(requestBuilder.getQueryParameters().get("offset").iterator().next(), 0);
             }
             if (requestBuilder.getQueryParameters().containsKey("limit")) {
-                limit = NumberUtils.toInt(requestBuilder.getQueryParameters().get("limit"), 100);
+                limit = NumberUtils.toInt(requestBuilder.getQueryParameters().get("limit").iterator().next(), 100);
             }
         }
 
@@ -57,8 +63,14 @@ public class PagedRequest {
 
     public Request createRequest() {
         final Request request = requestBuilder.build();
-        request.getQueryParameters().put("limit", String.valueOf(getLimit()));
-        request.getQueryParameters().put("offset", String.valueOf(getOffset()));
+        final Set<String> limitValue = new HashSet<>();
+        limitValue.add(String.valueOf(getLimit()));
+
+        final Set<String> offsetValue = new HashSet<>();
+        offsetValue.add(String.valueOf(getOffset()));
+
+        request.getQueryParameters().put("limit", limitValue);
+        request.getQueryParameters().put("offset", offsetValue);
         return request;
     }
 
