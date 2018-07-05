@@ -51,19 +51,11 @@ public class HubFilter {
     }
 
     public void addFilter(final String key, final String value) {
-        if (!filterKeysToValues.containsKey(key)) {
-            filterKeysToValues.put(key, new HashSet<>());
-        }
-
-        filterKeysToValues.get(key).add(value);
+        filterKeysToValues.computeIfAbsent(key, k -> new HashSet<String>()).add(value);
     }
 
     public void addFilter(final String key, final List<String> values) {
-        if (!filterKeysToValues.containsKey(key)) {
-            filterKeysToValues.put(key, new HashSet<>());
-        }
-
-        filterKeysToValues.get(key).addAll(values);
+        filterKeysToValues.computeIfAbsent(key, k -> new HashSet<String>()).addAll(values);
     }
 
     /**
