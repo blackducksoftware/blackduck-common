@@ -67,6 +67,10 @@ public class HubServicesFactory {
         return new SignatureScannerService(createHubService(), intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService(), executorService);
     }
 
+    public SignatureScannerService createSignatureScannerService() {
+        return new SignatureScannerService(createHubService(), intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService());
+    }
+
     public PhoneHomeService createPhoneHomeService() {
         return new PhoneHomeService(createHubService(), createPhoneHomeClient(), createHubRegistrationService(), intEnvironmentVariables);
     }

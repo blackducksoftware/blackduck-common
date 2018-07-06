@@ -280,11 +280,11 @@ public class ComprehensiveCookbookTestIT {
     }
 
     @Test
-    public void testMutlipleTargetScan() throws Exception {
+    public void testMutlipleTargetScanInParallel() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getRestConnection().logger;
         logger.setLogLevel(LogLevel.INFO);
-        final ExecutorService executorService = Executors.newFixedThreadPool(1);
+        final ExecutorService executorService = Executors.newFixedThreadPool(2);
         try {
             final SignatureScannerService signatureScannerService = hubServicesFactory.createSignatureScannerService(executorService);
 
@@ -318,6 +318,43 @@ public class ComprehensiveCookbookTestIT {
             }
         } finally {
             executorService.shutdownNow();
+        }
+    }
+
+    @Test
+    public void testMutlipleTargetScan() throws Exception {
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        logger.setLogLevel(LogLevel.INFO);
+        final SignatureScannerService signatureScannerService = hubServicesFactory.createSignatureScannerService();
+
+        final HubServerConfig hubServerConfig = restConnectionTestHelper.getHubServerConfig();
+
+        // scan the file in its parent directory
+        final File scanTarget = restConnectionTestHelper.getFile("hub-artifactory-1.0.1-RC.zip");
+        final File workingDirectory = scanTarget.getParentFile();
+
+        final HubScanConfigBuilder hubScanConfigBuilder = new HubScanConfigBuilder();
+        hubScanConfigBuilder.setScanMemory(4096);
+        hubScanConfigBuilder.setDryRun(true);
+        // download the cli to where ever the file is just for convenience
+        hubScanConfigBuilder.setToolsDir(workingDirectory);
+        hubScanConfigBuilder.setWorkingDirectory(workingDirectory);
+        // always use the canonical path since we validate the paths by string matching
+        hubScanConfigBuilder.addScanTargetPath(scanTarget.getCanonicalPath());
+        hubScanConfigBuilder.addScanTargetPath(scanTarget.getParentFile().getCanonicalPath());
+
+        hubScanConfigBuilder.setCleanupLogsOnSuccess(true);
+
+        final HubScanConfig hubScanConfig = hubScanConfigBuilder.build();
+
+        final ScanServiceOutput scanServiceOutput = signatureScannerService.executeScans(hubServerConfig, hubScanConfig, null);
+        assertNotNull(scanServiceOutput);
+        assertTrue(scanServiceOutput.getScanTargetOutputs().size() == 2);
+
+        for (final ScanTargetOutput scanTargetOutput : scanServiceOutput.getScanTargetOutputs()) {
+            assertTrue(scanTargetOutput.getResult() == Result.SUCCESS);
+            assertNotNull(scanTargetOutput.getDryRunFile());
         }
     }
 

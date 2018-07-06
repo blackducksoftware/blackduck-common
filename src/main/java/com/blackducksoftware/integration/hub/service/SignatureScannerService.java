@@ -26,6 +26,7 @@ package com.blackducksoftware.integration.hub.service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -50,9 +51,19 @@ public class SignatureScannerService extends DataService {
     private final CLIDownloadUtility cliDownloadService;
     private final ProjectService projectDataService;
     private final CodeLocationService codeLocationService;
-    private final ExecutorService executorService;
+    private final Optional<ExecutorService> optionalExecutorService;
 
     private ProjectVersionWrapper projectVersionWrapper;
+
+    public SignatureScannerService(final HubService hubService, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
+            final CodeLocationService codeLocationService) {
+        super(hubService);
+        this.intEnvironmentVariables = intEnvironmentVariables;
+        this.cliDownloadService = cliDownloadService;
+        this.projectDataService = projectDataService;
+        this.codeLocationService = codeLocationService;
+        this.optionalExecutorService = Optional.empty();
+    }
 
     public SignatureScannerService(final HubService hubService, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
             final CodeLocationService codeLocationService, final ExecutorService executorService) {
@@ -61,14 +72,20 @@ public class SignatureScannerService extends DataService {
         this.cliDownloadService = cliDownloadService;
         this.projectDataService = projectDataService;
         this.codeLocationService = codeLocationService;
-        this.executorService = executorService;
+        this.optionalExecutorService = Optional.of(executorService);
     }
 
     public ScanServiceOutput executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest)
             throws InterruptedException, IntegrationException {
         final CLILocation cliLocation = preScan(hubServerConfig, hubScanConfig, projectRequest);
 
-        final ParallelSimpleScanner parallelSimpleScanner = new ParallelSimpleScanner(logger, intEnvironmentVariables, hubService.getGson(), executorService);
+        final ParallelSimpleScanner parallelSimpleScanner;
+        if (optionalExecutorService.isPresent()) {
+            parallelSimpleScanner = new ParallelSimpleScanner(logger, intEnvironmentVariables, hubService.getGson(), optionalExecutorService.get());
+        } else {
+            parallelSimpleScanner = new ParallelSimpleScanner(logger, intEnvironmentVariables, hubService.getGson());
+        }
+
         final List<ScanTargetOutput> scanTargetOutputs = parallelSimpleScanner.executeScans(hubServerConfig, hubScanConfig, projectRequest, cliLocation);
 
         logger.info("Starting the post scan steps");
