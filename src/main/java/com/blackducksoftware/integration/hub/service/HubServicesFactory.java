@@ -36,6 +36,7 @@ import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.SignatureScanConfig;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
+import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetailFactory;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
@@ -113,19 +114,11 @@ public class HubServicesFactory {
     }
 
     public NotificationService createNotificationService() {
-        return new NotificationService(createHubService(), logger, createHubBucketService());
+        return new NotificationService(createHubService(), logger);
     }
 
-    public NotificationService createNotificationService(final boolean oldestFirst) {
-        return new NotificationService(createHubService(), logger, createHubBucketService(), oldestFirst);
-    }
-
-    public NotificationService createNotificationService(final ExecutorService executorService) {
-        return new NotificationService(createHubService(), logger, createHubBucketService(executorService));
-    }
-
-    public NotificationService createNotificationService(final ExecutorService executorService, final boolean oldestFirst) {
-        return new NotificationService(createHubService(), logger, createHubBucketService(executorService), oldestFirst);
+    public CommonNotificationService createCommonNotificationService(final NotificationContentDetailFactory notificationContentDetailFactory, final boolean oldestFirst) {
+        return new CommonNotificationService(notificationContentDetailFactory, oldestFirst);
     }
 
     public LicenseService createLicenseService() {

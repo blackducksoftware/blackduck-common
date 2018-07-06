@@ -12,20 +12,24 @@ import org.junit.experimental.categories.Category
 
 import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
+import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView
+import com.blackducksoftware.integration.hub.notification.CommonNotificationView
 import com.blackducksoftware.integration.hub.notification.NotificationDetailResult
 import com.blackducksoftware.integration.hub.notification.NotificationDetailResults
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail
+import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetailFactory
 import com.blackducksoftware.integration.hub.service.CodeLocationService
+import com.blackducksoftware.integration.hub.service.CommonNotificationService
 import com.blackducksoftware.integration.hub.service.NotificationService
 import com.blackducksoftware.integration.hub.service.ProjectService
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket
+import com.blackducksoftware.integration.hub.service.bucket.HubBucketService
 import com.blackducksoftware.integration.test.annotation.IntegrationTest
 
 @Category(IntegrationTest.class)
 class NotificationServiceRecipeTest extends BasicRecipe {
-
     private static final String NOTIFICATION_PROJECT_NAME = "hub-notification-data-test"
     private static final String NOTIFICATION_PROJECT_VERSION_NAME = "1.0.0"
 
@@ -61,19 +65,30 @@ class NotificationServiceRecipeTest extends BasicRecipe {
 
     @Test
     void fetchNotificationsSynchronous() {
-        final NotificationService notificationService = hubServicesFactory.createNotificationService(true)
-        processNotifications(notificationService)
+        final HubBucketService hubBucketService = hubServicesFactory.createHubBucketService()
+        final NotificationService notificationService = hubServicesFactory.createNotificationService()
+
+        final NotificationContentDetailFactory notificationContentDetailFactory = new NotificationContentDetailFactory(gson, jsonParser);
+        final CommonNotificationService commonNotificationService = hubServicesFactory.createCommonNotificationService(notificationContentDetailFactory, true)
+
+        processNotifications(hubBucketService, notificationService, commonNotificationService)
     }
 
     @Test
     void fetchNotificationsAsynchronous() {
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
-        final NotificationService notificationService = hubServicesFactory.createNotificationService(executorService)
-        processNotifications(notificationService)
+
+        final HubBucketService hubBucketService = hubServicesFactory.createHubBucketService(executorService)
+        final NotificationService notificationService = hubServicesFactory.createNotificationService()
+
+        final NotificationContentDetailFactory notificationContentDetailFactory = new NotificationContentDetailFactory(gson, jsonParser);
+        final CommonNotificationService commonNotificationService = hubServicesFactory.createCommonNotificationService(notificationContentDetailFactory, true)
+
+        processNotifications(hubBucketService, notificationService, commonNotificationService)
     }
 
-    private void processNotifications(final NotificationService notificationService) {
+    private void processNotifications(final HubBucketService hubBucketService, final NotificationService notificationService, CommonNotificationService commonNotificationService) {
         cleanup()
         final Date startDate = generateNotifications()
         ZonedDateTime endTime = ZonedDateTime.now()
@@ -81,14 +96,17 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         endTime = endTime.withSecond(0).withNano(0)
         endTime = endTime.plusMinutes(1)
         final Date endDate = Date.from(endTime.toInstant())
+
+        List<NotificationView> notificationViews = notificationService.getAllNotifications(startDate, endDate)
+        List<CommonNotificationView> commonNotificationViews = commonNotificationService.getCommonNotifications(notificationViews)
+        final NotificationDetailResults notificationDetailResults = commonNotificationService.getNotificationDetailResults(commonNotificationViews)
+
         final HubBucket hubBucket = new HubBucket();
-        final NotificationDetailResults results = notificationService.getAllNotificationDetailResultsPopulated(hubBucket,startDate, endDate)
-        final List<NotificationDetailResult> notificationResultList = results.getResults()
+        commonNotificationService.populateHubBucket(hubBucketService, hubBucket, notificationDetailResults);
+        final List<NotificationDetailResult> notificationResultList = notificationDetailResults.getResults()
 
-        Date latestNotificationEndDate = results.getLatestNotificationCreatedAtDate().get();
+        Date latestNotificationEndDate = notificationDetailResults.getLatestNotificationCreatedAtDate().get();
         println("Start Date: ${startDate}, End Date: ${endDate}, latestNotification: ${latestNotificationEndDate}")
-
-        final HubBucket bucket = results.getHubBucket()
 
         notificationResultList.each({
             it.getNotificationContentDetails().each({

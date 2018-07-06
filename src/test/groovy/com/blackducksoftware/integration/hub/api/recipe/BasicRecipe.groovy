@@ -26,6 +26,9 @@ class BasicRecipe {
 
     public HubServicesFactory hubServicesFactory
 
+    protected Gson gson;
+    protected JsonParser jsonParser;
+
     @Before
     public void startRecipe() {
         /*
@@ -48,8 +51,8 @@ class BasicRecipe {
          * HubServicesFactory, the wrapper to get/use all the Hub API's
          */
         RestConnection restConnection = hubServerConfig.createCredentialsRestConnection(intLogger)
-        Gson gson = HubServicesFactory.createDefaultGson()
-        JsonParser jsonParser = HubServicesFactory.createDefaultJsonParser()
+        gson = HubServicesFactory.createDefaultGson()
+        jsonParser = HubServicesFactory.createDefaultJsonParser()
         hubServicesFactory = new HubServicesFactory(gson, jsonParser, restConnection, intLogger)
     }
 
