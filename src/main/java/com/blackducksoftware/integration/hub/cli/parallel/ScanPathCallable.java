@@ -82,22 +82,20 @@ public class ScanPathCallable implements Callable<ScanTargetOutput> {
         logger.info(String.format("Starting the signature scan of %s", simpleScanUtility.getSignatureScanConfig().getScanTarget()));
         ScanSummaryView scanSummaryView = null;
         File dryRunFile = null;
-        File standardOutputFile = null;
-        File cliLogDirectory = null;
+        File logDirectory = null;
         final String scanTarget = simpleScanUtility.getSignatureScanConfig().getScanTarget();
         try {
             simpleScanUtility.setupAndExecuteScan(cliLocation);
 
             scanSummaryView = getScanSummaryFromFile(simpleScanUtility.getScanSummaryFile());
             dryRunFile = simpleScanUtility.getDryRunFile();
-            standardOutputFile = simpleScanUtility.getStandardOutputFile();
-            cliLogDirectory = simpleScanUtility.getCLILogDirectory();
+            logDirectory = simpleScanUtility.getLogDirectory();
         } catch (IllegalArgumentException | IntegrationException e) {
             final String errorMessage = String.format("There was a problem scanning target '%s' : %s", scanTarget, e.getMessage());
-            scanTargetOutput = ScanTargetOutput.FAILURE(scanTarget, cliLogDirectory, standardOutputFile, dryRunFile, scanSummaryView, errorMessage, e);
+            scanTargetOutput = ScanTargetOutput.FAILURE(scanTarget, logDirectory, dryRunFile, scanSummaryView, errorMessage, e);
             return scanTargetOutput;
         }
-        scanTargetOutput = ScanTargetOutput.SUCCESS(scanTarget, cliLogDirectory, standardOutputFile, dryRunFile, scanSummaryView);
+        scanTargetOutput = ScanTargetOutput.SUCCESS(scanTarget, logDirectory, dryRunFile, scanSummaryView);
 
         logger.info(String.format("Completed the signature scan of %s", simpleScanUtility.getSignatureScanConfig().getScanTarget()));
         return scanTargetOutput;
