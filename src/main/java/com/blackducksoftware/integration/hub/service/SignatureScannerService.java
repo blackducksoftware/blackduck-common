@@ -24,9 +24,12 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+
+import org.apache.commons.io.FileUtils;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
@@ -74,16 +77,15 @@ public class SignatureScannerService extends DataService {
 
         logger.info("Starting the post scan steps");
         final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
-        final List<File> standardOutputFiles = new ArrayList<>();
-        final List<File> cliLogDirectories = new ArrayList<>();
+        final List<File> logDirectories = new ArrayList<>();
         for (final ScanTargetOutput scanTargetOutput : scanTargetOutputs) {
             if (scanTargetOutput.getResult() == Result.SUCCESS) {
                 scanSummaryViews.add(scanTargetOutput.getScanSummaryView());
-                standardOutputFiles.add(scanTargetOutput.getStandardOutputFile());
-                cliLogDirectories.add(scanTargetOutput.getCliLogDirectory());
+                logDirectories.add(scanTargetOutput.getLogDirectory());
             }
         }
-        postScan(hubScanConfig.isCleanupLogsOnSuccess(), standardOutputFiles, cliLogDirectories, hubScanConfig.getCommonScanConfig().isDryRun(), scanSummaryViews);
+        cleanLogs(hubScanConfig.isCleanupLogsOnSuccess(), logDirectories);
+        mapCodeLocations(hubScanConfig.getCommonScanConfig().isDryRun(), scanSummaryViews);
         logger.info("Completed the post scan steps");
         return new ScanServiceOutput(projectVersionWrapper, scanTargetOutputs);
     }
@@ -118,27 +120,23 @@ public class SignatureScannerService extends DataService {
         hubScanConfig.print(logger);
     }
 
-    private void postScan(final boolean cleanupLogDirectories, final List<File> standardOutputFiles, final List<File> cliLogDirectories, final boolean dryRun, final List<ScanSummaryView> scanSummaryViews)
-            throws IntegrationException {
+    private void cleanLogs(final boolean cleanupLogDirectories, final List<File> logDirectories) {
         if (cleanupLogDirectories) {
-            if (!standardOutputFiles.isEmpty()) {
-                for (final File standardOutputFile : standardOutputFiles) {
-                    if (null != standardOutputFile && standardOutputFile.exists()) {
-                        standardOutputFile.delete();
-                    }
-                }
-            }
-            if (!cliLogDirectories.isEmpty()) {
-                for (final File cliLogDirectory : cliLogDirectories) {
-                    if (null != cliLogDirectory && cliLogDirectory.isDirectory()) {
-                        for (final File log : cliLogDirectory.listFiles()) {
-                            log.delete();
+            if (null != logDirectories && !logDirectories.isEmpty()) {
+                for (final File logDirectory : logDirectories) {
+                    if (null != logDirectory && logDirectory.isDirectory()) {
+                        try {
+                            FileUtils.deleteDirectory(logDirectory);
+                        } catch (IOException e) {
+                            logger.error(String.format("Could not delete the directory '%s' because: %s", logDirectory.getAbsolutePath(), e.getMessage()), e);
                         }
-                        cliLogDirectory.delete();
                     }
                 }
             }
         }
+    }
+
+    private void mapCodeLocations(final boolean dryRun, final List<ScanSummaryView> scanSummaryViews) throws IntegrationException {
         logger.trace(String.format("Scan is dry run %s", dryRun));
         if (!dryRun) {
             for (final ScanSummaryView scanSummaryView : scanSummaryViews) {
@@ -150,4 +148,5 @@ public class SignatureScannerService extends DataService {
             }
         }
     }
+
 }
