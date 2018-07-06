@@ -83,7 +83,7 @@ public class SignatureScannerService extends DataService {
                 logDirectories.add(scanTargetOutput.getLogDirectory());
             }
         }
-        cleanLogs(hubScanConfig.isCleanupLogsOnSuccess(), logDirectories, );
+        cleanLogs(hubScanConfig.isCleanupLogsOnSuccess(), logDirectories);
         mapCodeLocations(hubScanConfig.getCommonScanConfig().isDryRun(), scanSummaryViews);
         logger.info("Completed the post scan steps");
         return new ScanServiceOutput(projectVersionWrapper, scanTargetOutputs);
