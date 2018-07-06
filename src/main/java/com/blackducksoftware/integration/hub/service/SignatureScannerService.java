@@ -83,7 +83,8 @@ public class SignatureScannerService extends DataService {
                 logDirectories.add(scanTargetOutput.getLogDirectory());
             }
         }
-        postScan(hubScanConfig.isCleanupLogsOnSuccess(), logDirectories, hubScanConfig.getCommonScanConfig().isDryRun(), scanSummaryViews);
+        cleanLogs(hubScanConfig.isCleanupLogsOnSuccess(), logDirectories, );
+        mapCodeLocations(hubScanConfig.getCommonScanConfig().isDryRun(), scanSummaryViews);
         logger.info("Completed the post scan steps");
         return new ScanServiceOutput(projectVersionWrapper, scanTargetOutputs);
     }
@@ -118,8 +119,7 @@ public class SignatureScannerService extends DataService {
         hubScanConfig.print(logger);
     }
 
-    private void postScan(final boolean cleanupLogDirectories, final List<File> logDirectories, final boolean dryRun, final List<ScanSummaryView> scanSummaryViews)
-            throws IntegrationException {
+    private void cleanLogs(final boolean cleanupLogDirectories, final List<File> logDirectories) {
         if (cleanupLogDirectories) {
             if (null != logDirectories && !logDirectories.isEmpty()) {
                 for (final File logDirectory : logDirectories) {
@@ -133,6 +133,9 @@ public class SignatureScannerService extends DataService {
                 }
             }
         }
+    }
+
+    private void mapCodeLocations(final boolean dryRun, final List<ScanSummaryView> scanSummaryViews) throws IntegrationException {
         logger.trace(String.format("Scan is dry run %s", dryRun));
         if (!dryRun) {
             for (final ScanSummaryView scanSummaryView : scanSummaryViews) {
