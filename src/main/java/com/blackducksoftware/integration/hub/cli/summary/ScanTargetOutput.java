@@ -29,38 +29,35 @@ import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.summary.Result;
 
 public class ScanTargetOutput {
-    private final File cliLogDirectory;
+    private final File dryRunFile;
     private final String errorMessage;
     private final Exception exception;
+    private final File logDirectory;
     private final Result result;
-    private final File dryRunFile;
     private final ScanSummaryView scanSummaryView;
     private final String scanTarget;
-    private final File standardOutputFile;
 
-    private ScanTargetOutput(final File cliLogDirectory, final String errorMessage, final Exception exception, final Result result, final File dryRunFile, final ScanSummaryView scanSummaryView, final String scanTarget,
-            final File standardOutputFile) {
-        this.cliLogDirectory = cliLogDirectory;
+    private ScanTargetOutput(final String errorMessage, final Exception exception, final File logDirectory, final Result result, final File dryRunFile, final ScanSummaryView scanSummaryView, final String scanTarget) {
         this.errorMessage = errorMessage;
         this.exception = exception;
+        this.logDirectory = logDirectory;
         this.result = result;
         this.dryRunFile = dryRunFile;
         this.scanSummaryView = scanSummaryView;
         this.scanTarget = scanTarget;
-        this.standardOutputFile = standardOutputFile;
     }
 
-    public static ScanTargetOutput SUCCESS(final String scanTarget, final File cliLogDirectory, final File standardOutputFile, final File dryRunFile, final ScanSummaryView scanSummaryView) {
-        return new ScanTargetOutput(cliLogDirectory, null, null, Result.SUCCESS, dryRunFile, scanSummaryView, scanTarget, standardOutputFile);
+    public static ScanTargetOutput SUCCESS(final String scanTarget, final File logDirectory, final File dryRunFile, final ScanSummaryView scanSummaryView) {
+        return new ScanTargetOutput(null, null, logDirectory, Result.SUCCESS, dryRunFile, scanSummaryView, scanTarget);
     }
 
-    public static ScanTargetOutput FAILURE(final String scanTarget, final File cliLogDirectory, final File standardOutputFile, final File dryRunFile, final ScanSummaryView scanSummaryView, final String errorMessage,
+    public static ScanTargetOutput FAILURE(final String scanTarget, final File logDirectory, final File dryRunFile, final ScanSummaryView scanSummaryView, final String errorMessage,
             final Exception exception) {
-        return new ScanTargetOutput(cliLogDirectory, errorMessage, exception, Result.FAILURE, dryRunFile, scanSummaryView, scanTarget, standardOutputFile);
+        return new ScanTargetOutput(errorMessage, exception, logDirectory, Result.FAILURE, dryRunFile, scanSummaryView, scanTarget);
     }
 
-    public File getCliLogDirectory() {
-        return cliLogDirectory;
+    public File getLogDirectory() {
+        return logDirectory;
     }
 
     public String getErrorMessage() {
@@ -87,7 +84,4 @@ public class ScanTargetOutput {
         return scanTarget;
     }
 
-    public File getStandardOutputFile() {
-        return standardOutputFile;
-    }
 }

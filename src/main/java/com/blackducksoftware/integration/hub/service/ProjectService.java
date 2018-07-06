@@ -53,6 +53,7 @@ import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.hub.service.model.VersionBomComponentModel;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.HttpMethod;
 import com.blackducksoftware.integration.rest.request.Request;
 import com.blackducksoftware.integration.rest.request.Response;
@@ -60,8 +61,8 @@ import com.blackducksoftware.integration.rest.request.Response;
 public class ProjectService extends DataService {
     private final ComponentService componentDataService;
 
-    public ProjectService(final HubService hubService, final ComponentService componentDataService) {
-        super(hubService);
+    public ProjectService(final HubService hubService, final IntLogger logger, final ComponentService componentDataService) {
+        super(hubService, logger);
         this.componentDataService = componentDataService;
     }
 
@@ -92,7 +93,8 @@ public class ProjectService extends DataService {
     }
 
     public String createHubProject(final ProjectRequest projectRequest) throws IntegrationException {
-        final Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(projectRequest);
+        final String json = hubService.convertToJson(projectRequest);
+        final Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(json);
         return hubService.executePostRequestAndRetrieveURL(ApiDiscovery.PROJECTS_LINK, requestBuilder);
     }
 
@@ -123,7 +125,8 @@ public class ProjectService extends DataService {
     }
 
     public String createHubVersion(final String versionsUri, final ProjectVersionRequest versionRequest) throws IntegrationException {
-        final Request request = RequestFactory.createCommonPostRequestBuilder(versionRequest).uri(versionsUri).build();
+        final String json = hubService.convertToJson(versionRequest);
+        final Request request = RequestFactory.createCommonPostRequestBuilder(json).uri(versionsUri).build();
         return hubService.executePostRequestAndRetrieveURL(request);
     }
 
@@ -168,46 +171,49 @@ public class ProjectService extends DataService {
         return projectVersionWrapper;
     }
 
-    public void updateProjectAndVersion(final ProjectView project, ProjectRequest projectRequest) throws IntegrationException {
-        String projectUri = hubService.getHref(project);
-        final Request projectUpdateRequest = RequestFactory.createCommonPutRequestBuilder(projectRequest).uri(projectUri).build();
+    public void updateProjectAndVersion(final ProjectView project, final ProjectRequest projectRequest) throws IntegrationException {
+        final String projectUri = hubService.getHref(project);
+        final String json = hubService.convertToJson(projectRequest);
+        final Request projectUpdateRequest = RequestFactory.createCommonPutRequestBuilder(json).uri(projectUri).build();
         try (Response response = hubService.executeRequest(projectUpdateRequest)) {
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
         if (null != projectRequest.versionRequest && StringUtils.isNotBlank(projectRequest.versionRequest.versionName)) {
-            ProjectVersionView projectVersionView = getProjectVersion(project, projectRequest.versionRequest.versionName);
+            final ProjectVersionView projectVersionView = getProjectVersion(project, projectRequest.versionRequest.versionName);
             if (null != projectVersionView) {
                 updateProjectVersion(projectVersionView, projectRequest.versionRequest);
             }
         }
     }
 
-    public void updateProjectAndVersion(final String projectUri, ProjectRequest projectRequest) throws IntegrationException {
+    public void updateProjectAndVersion(final String projectUri, final ProjectRequest projectRequest) throws IntegrationException {
         updateProjectAndVersion(hubService.getResponse(projectUri, ProjectView.class), projectRequest);
     }
 
-    public void updateProjectAndVersion(final ProjectView project, ProjectVersionView version, ProjectRequest projectRequest) throws IntegrationException {
+    public void updateProjectAndVersion(final ProjectView project, final ProjectVersionView version, final ProjectRequest projectRequest) throws IntegrationException {
         updateProjectAndVersion(hubService.getHref(project), hubService.getHref(version), projectRequest);
     }
 
-    public void updateProjectAndVersion(final String projectUri, final String projectVersionUri, ProjectRequest projectRequest) throws IntegrationException {
-        final Request projectUpdateRequest = RequestFactory.createCommonPutRequestBuilder(projectRequest).uri(projectUri).build();
+    public void updateProjectAndVersion(final String projectUri, final String projectVersionUri, final ProjectRequest projectRequest) throws IntegrationException {
+        final String json = hubService.convertToJson(projectRequest);
+        final Request projectUpdateRequest = RequestFactory.createCommonPutRequestBuilder(json).uri(projectUri).build();
         try (Response response = hubService.executeRequest(projectUpdateRequest)) {
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
         updateProjectVersion(projectVersionUri, projectRequest.versionRequest);
     }
 
-    public void updateProjectVersion(ProjectVersionView version, ProjectVersionRequest versionRequest) throws IntegrationException {
+    public void updateProjectVersion(final ProjectVersionView version, final ProjectVersionRequest versionRequest) throws IntegrationException {
         updateProjectVersion(hubService.getHref(version), versionRequest);
     }
 
-    public void updateProjectVersion(final String versionUri, ProjectVersionRequest versionRequest) throws IntegrationException {
-        final Request projectVersionUpdateRequest = RequestFactory.createCommonPutRequestBuilder(versionRequest).uri(versionUri).build();
+    public void updateProjectVersion(final String versionUri, final ProjectVersionRequest versionRequest) throws IntegrationException {
+        final String json = hubService.convertToJson(versionRequest);
+        final Request projectVersionUpdateRequest = RequestFactory.createCommonPutRequestBuilder(json).uri(versionUri).build();
         try (Response response = hubService.executeRequest(projectVersionUpdateRequest)) {
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
     }

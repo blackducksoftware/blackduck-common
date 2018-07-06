@@ -48,6 +48,7 @@ import com.blackducksoftware.integration.hub.notification.content.detail.Notific
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.RestConstants;
 import com.blackducksoftware.integration.rest.request.Request;
 
@@ -56,23 +57,23 @@ public class NotificationService extends DataService {
     private final NotificationContentDetailFactory notificationContentDetailFactory;
     private final boolean oldestFirst;
 
-    public NotificationService(final HubService hubService, final HubBucketService hubBucketService) {
-        super(hubService);
+    public NotificationService(final HubService hubService, final IntLogger logger, final HubBucketService hubBucketService) {
+        super(hubService, logger);
         this.hubBucketService = hubBucketService;
         this.notificationContentDetailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
         // hub default behavior is to return the latest notifications first.
         this.oldestFirst = false;
     }
 
-    public NotificationService(final HubService hubService, final HubBucketService hubBucketService, final boolean oldestFirst) {
-        super(hubService);
+    public NotificationService(final HubService hubService, final IntLogger logger, final HubBucketService hubBucketService, final boolean oldestFirst) {
+        super(hubService, logger);
         this.hubBucketService = hubBucketService;
         this.notificationContentDetailFactory = new NotificationContentDetailFactory(hubService.getGson(), hubService.getJsonParser());
         this.oldestFirst = oldestFirst;
     }
 
-    public NotificationService(final HubService hubService, final HubBucketService hubBucketService, final NotificationContentDetailFactory notificationContentDetailFactory, final boolean oldestFirst) {
-        super(hubService);
+    public NotificationService(final HubService hubService, final IntLogger logger, final HubBucketService hubBucketService, final NotificationContentDetailFactory notificationContentDetailFactory, final boolean oldestFirst) {
+        super(hubService, logger);
         this.hubBucketService = hubBucketService;
         this.notificationContentDetailFactory = notificationContentDetailFactory;
         this.oldestFirst = oldestFirst;

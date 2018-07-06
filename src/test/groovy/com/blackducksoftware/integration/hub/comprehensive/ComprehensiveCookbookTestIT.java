@@ -23,7 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.comprehensive;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.Arrays;
@@ -41,7 +44,7 @@ import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequ
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectVersionRequest;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusSummaryStatusType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
@@ -84,7 +87,7 @@ public class ComprehensiveCookbookTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        final IntLogger logger = hubServicesFactory.getLogger();
         final MetaHandler metaHandler = new MetaHandler(logger);
 
         // delete the project, if it exists
@@ -125,7 +128,7 @@ public class ComprehensiveCookbookTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        final IntLogger logger = hubServicesFactory.getLogger();
         final MetaHandler metaHandler = new MetaHandler(logger);
 
         // delete the project, if it exists
@@ -166,7 +169,7 @@ public class ComprehensiveCookbookTestIT {
     @Test
     public void testPolicyStatusFromBdioImport() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        final IntLogger logger = hubServicesFactory.getLogger();
         final MetaHandler metaHandler = new MetaHandler(logger);
         final ScanStatusService scanStatusService = hubServicesFactory.createScanStatusService(FIVE_MINUTES);
         final ProjectService projectService = hubServicesFactory.createProjectService();
@@ -201,7 +204,7 @@ public class ComprehensiveCookbookTestIT {
 
         // verify the policy
         final VersionBomPolicyStatusView policyStatusItem = projectService.getPolicyStatusForProjectAndVersion("ek_mtglist", "0.0.1");
-        assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
+        assertEquals(PolicyStatusSummaryStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
         System.out.println(policyStatusItem);
     }
 
@@ -212,7 +215,7 @@ public class ComprehensiveCookbookTestIT {
         final String versionName = restConnectionTestHelper.getProperty("TEST_SCAN_VERSION");
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        final IntLogger logger = hubServicesFactory.getLogger();
         final MetaHandler metaHandler = new MetaHandler(logger);
         final ExecutorService executorService = Executors.newFixedThreadPool(1);
         try {
@@ -272,7 +275,7 @@ public class ComprehensiveCookbookTestIT {
 
             // verify the policy
             final VersionBomPolicyStatusView policyStatusItem = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView());
-            assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
+            assertEquals(PolicyStatusSummaryStatusType.IN_VIOLATION, policyStatusItem.overallStatus);
             System.out.println(policyStatusItem);
         } finally {
             executorService.shutdownNow();
@@ -282,7 +285,7 @@ public class ComprehensiveCookbookTestIT {
     @Test
     public void testMutlipleTargetScanInParallel() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        final IntLogger logger = hubServicesFactory.getLogger();
         logger.setLogLevel(LogLevel.INFO);
         final ExecutorService executorService = Executors.newFixedThreadPool(2);
         try {

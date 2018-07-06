@@ -39,6 +39,7 @@ import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.service.model.HubMediaTypes;
 import com.blackducksoftware.integration.hub.service.model.HubQuery;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.request.Request;
 import com.blackducksoftware.integration.rest.request.Response;
 import com.google.gson.JsonElement;
@@ -46,8 +47,8 @@ import com.google.gson.JsonElement;
 public class ComponentService extends DataService {
     public static final String REMEDIATING_LINK = "remediating";
 
-    public ComponentService(final HubService hubService) {
-        super(hubService);
+    public ComponentService(final HubService hubService, final IntLogger logger) {
+        super(hubService, logger);
     }
 
     public ComponentVersionView getComponentVersion(final ExternalId externalId) throws IntegrationException {

@@ -40,8 +40,8 @@ public class UserGroupService {
     private final IntLogger logger;
     private final HubService hubService;
 
-    public UserGroupService(final HubService hubService) {
-        this.logger = hubService.getRestConnection().logger;
+    public UserGroupService(final HubService hubService, final IntLogger logger) {
+        this.logger = logger;
         this.hubService = hubService;
     }
 

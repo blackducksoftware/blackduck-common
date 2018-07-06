@@ -43,7 +43,6 @@ import org.junit.rules.TemporaryFolder;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.response.CurrentVersionView;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfigBuilder;
-import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper;
 import com.blackducksoftware.integration.hub.rest.TestingPropertyKey;
 import com.blackducksoftware.integration.hub.service.HubServicesFactory;
@@ -447,7 +446,7 @@ public class CLIInstallerTestIT {
         final File installDir = folder.newFolder();
         final CLILocation cliLocation = new CLILocation(logger, installDir);
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory(logger);
-        final URL hubUrl = hubServicesFactory.getRestConnection().baseUrl;
+        final URL hubUrl = hubServicesFactory.getRestConnection().getBaseUrl();
 
         final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
         final CLIDownloadUtility cliDownloadService = hubServicesFactory.createCliDownloadUtility();
@@ -460,13 +459,13 @@ public class CLIInstallerTestIT {
 
         String output = logger.getOutputString();
         assertTrue(output, output.contains("Unpacking "));
-        assertTrue(cliLocation.getCLIExists(hubServicesFactory.getRestConnection().logger));
-        output = ((TestLogger) hubServicesFactory.getRestConnection().logger).getOutputString();
+        assertTrue(cliLocation.getCLIExists(hubServicesFactory.getLogger()));
+        output = ((TestLogger) hubServicesFactory.getLogger()).getOutputString();
         assertTrue(output, output.contains("BlackDuck scan directory: "));
         assertTrue(output, output.contains("directories in the BlackDuck scan directory: "));
         assertTrue(output, output.contains("BlackDuck scan lib directory: "));
 
-        assertNotNull(cliLocation.getCLI(hubServicesFactory.getRestConnection().logger));
+        assertNotNull(cliLocation.getCLI(hubServicesFactory.getLogger()));
     }
 
     @Test
@@ -484,11 +483,8 @@ public class CLIInstallerTestIT {
         builder.setProxyPort(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"));
         builder.setTrustCert(Boolean.valueOf(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
-        final CredentialsRestConnection restConnection = restConnectionTestHelper.getRestConnection(builder.build());
-        restConnection.logger = logger;
-
-        final HubServicesFactory hubServicesFactory = new HubServicesFactory(restConnection);
-        final URL hubUrl = restConnection.baseUrl;
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory(builder.build(), logger);
+        final URL hubUrl = hubServicesFactory.getRestConnection().getBaseUrl();
 
         final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
         final String hubVersion = currentVersion.version;
@@ -527,11 +523,8 @@ public class CLIInstallerTestIT {
         builder.setProxyPassword(restConnectionTestHelper.getProperty("TEST_PROXY_PASSWORD_BASIC"));
         builder.setTrustCert(Boolean.valueOf(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
-        final CredentialsRestConnection restConnection = restConnectionTestHelper.getRestConnection(builder.build());
-        restConnection.logger = logger;
-
-        final HubServicesFactory hubServicesFactory = new HubServicesFactory(restConnection);
-        final URL hubUrl = restConnection.baseUrl;
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory(builder.build(), logger);
+        final URL hubUrl = hubServicesFactory.getRestConnection().getBaseUrl();
 
         final CurrentVersionView currentVersion = hubServicesFactory.createHubService().getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
         final String hubVersion = currentVersion.version;

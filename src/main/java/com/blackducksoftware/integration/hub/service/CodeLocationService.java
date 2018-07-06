@@ -43,14 +43,15 @@ import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.service.model.HubQuery;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.HttpMethod;
 import com.blackducksoftware.integration.rest.request.BodyContent;
 import com.blackducksoftware.integration.rest.request.Request;
 import com.blackducksoftware.integration.rest.request.Response;
 
 public class CodeLocationService extends DataService {
-    public CodeLocationService(final HubService hubService) {
-        super(hubService);
+    public CodeLocationService(final HubService hubService, final IntLogger logger) {
+        super(hubService, logger);
     }
 
     public void importBomFile(final File file) throws IntegrationException {
