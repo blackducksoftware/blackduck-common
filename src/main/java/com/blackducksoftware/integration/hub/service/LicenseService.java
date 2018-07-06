@@ -32,13 +32,14 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentSearchR
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.LicenseView;
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.request.Response;
 
 public class LicenseService extends DataService {
     private final ComponentService componentDataService;
 
-    public LicenseService(final HubService hubService, final ComponentService componentDataService) {
-        super(hubService);
+    public LicenseService(final HubService hubService, final IntLogger logger, final ComponentService componentDataService) {
+        super(hubService, logger);
         this.componentDataService = componentDataService;
     }
 

@@ -40,19 +40,36 @@ import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
 import com.blackducksoftware.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
+import com.blackducksoftware.integration.rest.RestConstants;
 import com.blackducksoftware.integration.rest.connection.RestConnection;
 import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 import com.blackducksoftware.integration.util.IntegrationEscapeUtil;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 
 public class HubServicesFactory {
     private final IntEnvironmentVariables intEnvironmentVariables;
+    private final Gson gson;
+    private final JsonParser jsonParser;
     private final RestConnection restConnection;
+    private final IntLogger logger;
 
-    public HubServicesFactory(final RestConnection restConnection) {
+    public static Gson createDefaultGson() {
+        return new GsonBuilder().setDateFormat(RestConstants.JSON_DATE_FORMAT).create();
+    }
+
+    public static JsonParser createDefaultJsonParser() {
+        return new JsonParser();
+    }
+
+    public HubServicesFactory(final Gson gson, final JsonParser jsonParser, final RestConnection restConnection, final IntLogger logger) {
         this.intEnvironmentVariables = new IntEnvironmentVariables();
 
+        this.gson = gson;
+        this.jsonParser = jsonParser;
         this.restConnection = restConnection;
+        this.logger = logger;
     }
 
     public void addEnvironmentVariable(final String key, final String value) {
@@ -64,29 +81,27 @@ public class HubServicesFactory {
     }
 
     public SignatureScannerService createSignatureScannerService(final ExecutorService executorService) {
-        return new SignatureScannerService(createHubService(), intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService(), executorService);
+        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService(), executorService);
     }
 
     public PhoneHomeService createPhoneHomeService() {
-        return new PhoneHomeService(createHubService(), createPhoneHomeClient(), createHubRegistrationService(), intEnvironmentVariables);
+        return new PhoneHomeService(createHubService(), logger, createPhoneHomeClient(), createHubRegistrationService(), intEnvironmentVariables);
     }
 
     public PhoneHomeClient createPhoneHomeClient() {
         final String googleAnalyticsTrackingId = GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID;
         final HttpClientBuilder httpClientBuilder = restConnection.getClientBuilder();
-        final Gson gson = restConnection.gson;
         return new PhoneHomeClient(googleAnalyticsTrackingId, httpClientBuilder, gson);
     }
 
     public PhoneHomeClient createPhoneHomeClient(final Logger logger) {
         final String googleAnalyticsTrackingId = GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID;
         final HttpClientBuilder httpClientBuilder = restConnection.getClientBuilder();
-        final Gson gson = restConnection.gson;
         return new PhoneHomeClient(googleAnalyticsTrackingId, httpClientBuilder, logger, gson);
     }
 
     public ReportService createReportService(final long timeoutInMilliseconds) throws IntegrationException {
-        return new ReportService(createHubService(), createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
+        return new ReportService(createHubService(), logger, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
     }
 
     public PolicyRuleService createPolicyRuleService() {
@@ -94,35 +109,35 @@ public class HubServicesFactory {
     }
 
     public ScanStatusService createScanStatusService(final long timeoutInMilliseconds) {
-        return new ScanStatusService(createHubService(), createProjectService(), createCodeLocationService(), timeoutInMilliseconds);
+        return new ScanStatusService(createHubService(), logger, createProjectService(), createCodeLocationService(), timeoutInMilliseconds);
     }
 
     public NotificationService createNotificationService() {
-        return new NotificationService(createHubService(), createHubBucketService());
+        return new NotificationService(createHubService(), logger, createHubBucketService());
     }
 
     public NotificationService createNotificationService(final boolean oldestFirst) {
-        return new NotificationService(createHubService(), createHubBucketService(), oldestFirst);
+        return new NotificationService(createHubService(), logger, createHubBucketService(), oldestFirst);
     }
 
     public NotificationService createNotificationService(final ExecutorService executorService) {
-        return new NotificationService(createHubService(), createHubBucketService(executorService));
+        return new NotificationService(createHubService(), logger, createHubBucketService(executorService));
     }
 
     public NotificationService createNotificationService(final ExecutorService executorService, final boolean oldestFirst) {
-        return new NotificationService(createHubService(), createHubBucketService(executorService), oldestFirst);
+        return new NotificationService(createHubService(), logger, createHubBucketService(executorService), oldestFirst);
     }
 
     public LicenseService createLicenseService() {
-        return new LicenseService(createHubService(), createComponentService());
+        return new LicenseService(createHubService(), logger, createComponentService());
     }
 
     public CodeLocationService createCodeLocationService() {
-        return new CodeLocationService(createHubService());
+        return new CodeLocationService(createHubService(), logger);
     }
 
     public CLIDownloadUtility createCliDownloadUtility() {
-        return new CLIDownloadUtility(restConnection.logger, restConnection);
+        return new CLIDownloadUtility(logger, restConnection);
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {
@@ -130,39 +145,39 @@ public class HubServicesFactory {
     }
 
     public SimpleScanUtility createSimpleScanUtility(final HubServerConfig hubServerConfig, final SignatureScanConfig signatureScanConfig, final String projectName, final String versionName) {
-        return new SimpleScanUtility(restConnection.logger, restConnection.gson, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, versionName);
+        return new SimpleScanUtility(logger, gson, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, versionName);
     }
 
     public HubRegistrationService createHubRegistrationService() {
-        return new HubRegistrationService(createHubService());
+        return new HubRegistrationService(createHubService(), logger);
     }
 
     public HubService createHubService() {
-        return new HubService(restConnection);
+        return new HubService(logger, restConnection, gson, jsonParser);
     }
 
     public ComponentService createComponentService() {
-        return new ComponentService(createHubService());
+        return new ComponentService(createHubService(), logger);
     }
 
     public IssueService createIssueService() {
-        return new IssueService(createHubService());
+        return new IssueService(createHubService(), logger);
     }
 
     public ProjectService createProjectService() {
-        return new ProjectService(createHubService(), createComponentService());
+        return new ProjectService(createHubService(), logger, createComponentService());
     }
 
     public UserGroupService createUserGroupService() {
-        return new UserGroupService(createHubService());
+        return new UserGroupService(createHubService(), logger);
     }
 
     public HubBucketService createHubBucketService() {
-        return new HubBucketService(createHubService());
+        return new HubBucketService(createHubService(), logger);
     }
 
     public HubBucketService createHubBucketService(final ExecutorService executorService) {
-        return new HubBucketService(createHubService(), executorService);
+        return new HubBucketService(createHubService(), logger, executorService);
     }
 
     public RestConnection getRestConnection() {
@@ -170,11 +185,11 @@ public class HubServicesFactory {
     }
 
     public IntLogger getLogger() {
-        return restConnection.logger;
+        return logger;
     }
 
     public Gson getGson() {
-        return restConnection.gson;
+        return gson;
     }
 
     @Override

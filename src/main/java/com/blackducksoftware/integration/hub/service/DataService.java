@@ -29,12 +29,9 @@ public class DataService {
     protected HubService hubService;
     protected IntLogger logger;
 
-    public DataService(final HubService hubService) {
-        this(hubService, hubService.getRestConnection().logger);
-    }
-
     public DataService(final HubService hubService, final IntLogger logger) {
         this.hubService = hubService;
         this.logger = logger;
     }
+
 }

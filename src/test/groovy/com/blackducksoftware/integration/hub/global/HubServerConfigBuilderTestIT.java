@@ -23,7 +23,11 @@
  */
 package com.blackducksoftware.integration.hub.global;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.net.URL;
 
@@ -82,12 +86,12 @@ public class HubServerConfigBuilderTestIT {
     public void testValidBuildConnect() throws Exception {
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setAlwaysTrustServerCertificate(true);
-        builder.setHubUrl(hubServer);
+        builder.setTrustCert(true);
+        builder.setUrl(hubServer);
         builder.setTimeout(120);
         builder.setPassword("blackduck");
         builder.setUsername("sysadmin");
-        builder.setAlwaysTrustServerCertificate(true);
+        builder.setTrustCert(true);
         final HubServerConfig config = builder.build();
         assertNotNull(config);
     }
@@ -96,8 +100,8 @@ public class HubServerConfigBuilderTestIT {
     public void testValidBuild() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
-        builder.setAlwaysTrustServerCertificate(true);
-        builder.setHubUrl(hubServer);
+        builder.setTrustCert(true);
+        builder.setUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_INTEGER);
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
@@ -111,9 +115,9 @@ public class HubServerConfigBuilderTestIT {
     @Test
     public void testValidBuildTimeoutString() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setAlwaysTrustServerCertificate(true);
+        builder.setTrustCert(true);
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
-        builder.setHubUrl(hubServer);
+        builder.setUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_STRING);
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
@@ -127,9 +131,9 @@ public class HubServerConfigBuilderTestIT {
     @Test
     public void testValidBuildWithProxy() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setAlwaysTrustServerCertificate(true);
+        builder.setTrustCert(true);
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
-        builder.setHubUrl(hubServer);
+        builder.setUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_STRING);
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
@@ -150,9 +154,9 @@ public class HubServerConfigBuilderTestIT {
     @Test
     public void testUrlwithTrailingSlash() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setAlwaysTrustServerCertificate(true);
+        builder.setTrustCert(true);
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
-        builder.setHubUrl(hubServer);
+        builder.setUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_STRING);
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
@@ -166,9 +170,9 @@ public class HubServerConfigBuilderTestIT {
     @Test
     public void testValidBuildWithProxyPortZero() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setAlwaysTrustServerCertificate(true);
+        builder.setTrustCert(true);
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
-        builder.setHubUrl(hubServer);
+        builder.setUrl(hubServer);
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         HubServerConfig config = builder.build();
@@ -193,8 +197,8 @@ public class HubServerConfigBuilderTestIT {
 
     private void setBuilderDefaults(final HubServerConfigBuilder builder) throws Exception {
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
-        builder.setAlwaysTrustServerCertificate(true);
-        builder.setHubUrl(hubServer);
+        builder.setTrustCert(true);
+        builder.setUrl(hubServer);
         builder.setTimeout("100");
         builder.setUsername("User");
         builder.setPassword("Pass");

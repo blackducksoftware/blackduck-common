@@ -43,6 +43,8 @@ import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
 import com.blackducksoftware.integration.rest.connection.RestConnection;
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 
 public class RestConnectionTestHelper {
     private final String hubServerUrl;
@@ -96,11 +98,11 @@ public class RestConnectionTestHelper {
 
     public HubServerConfig getHubServerConfig() {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setHubUrl(hubServerUrl);
+        builder.setUrl(hubServerUrl);
         builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
         builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
         builder.setTimeout(getProperty(TestingPropertyKey.TEST_HUB_TIMEOUT));
-        builder.setAlwaysTrustServerCertificate(Boolean.parseBoolean(getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
+        builder.setTrustCert(Boolean.parseBoolean(getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
         return builder.build();
     }
@@ -117,26 +119,6 @@ public class RestConnectionTestHelper {
         return getProperty(TestingPropertyKey.TEST_PASSWORD);
     }
 
-    public CredentialsRestConnection getIntegrationHubRestConnection() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        return getRestConnection(getHubServerConfig());
-    }
-
-    public CredentialsRestConnection getRestConnection(final HubServerConfig serverConfig) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        return getRestConnection(serverConfig, LogLevel.TRACE);
-    }
-
-    public CredentialsRestConnection getRestConnection(final HubServerConfig serverConfig, final LogLevel logLevel) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        return serverConfig.createCredentialsRestConnection(new PrintStreamIntLogger(System.out, logLevel));
-    }
-
-    public HubServicesFactory createHubServicesFactory() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        return createHubServicesFactory(LogLevel.TRACE);
-    }
-
-    public HubServicesFactory createHubServicesFactory(final LogLevel logLevel) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        return createHubServicesFactory(createIntLogger(logLevel));
-    }
-
     public IntLogger createIntLogger() {
         return new PrintStreamIntLogger(System.out, LogLevel.TRACE);
     }
@@ -145,10 +127,21 @@ public class RestConnectionTestHelper {
         return new PrintStreamIntLogger(System.out, logLevel);
     }
 
+    public HubServicesFactory createHubServicesFactory() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+        return createHubServicesFactory(createIntLogger());
+    }
+
     public HubServicesFactory createHubServicesFactory(final IntLogger logger) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        final RestConnection restConnection = getIntegrationHubRestConnection();
-        restConnection.logger = logger;
-        final HubServicesFactory hubServicesFactory = new HubServicesFactory(restConnection);
+        final HubServerConfig hubServerConfig = getHubServerConfig();
+        return createHubServicesFactory(hubServerConfig, logger);
+    }
+
+    public HubServicesFactory createHubServicesFactory(final HubServerConfig hubServerConfig, final IntLogger logger) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+        final RestConnection restConnection = hubServerConfig.createCredentialsRestConnection(logger);
+
+        final Gson gson = HubServicesFactory.createDefaultGson();
+        final JsonParser jsonParser = HubServicesFactory.createDefaultJsonParser();
+        final HubServicesFactory hubServicesFactory = new HubServicesFactory(gson, jsonParser, restConnection, logger);
         return hubServicesFactory;
     }
 

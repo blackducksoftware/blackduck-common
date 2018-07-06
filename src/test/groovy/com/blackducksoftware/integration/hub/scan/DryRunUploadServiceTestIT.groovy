@@ -22,6 +22,11 @@
  * under the License.*/
 package com.blackducksoftware.integration.hub.scan
 
+import org.junit.Assert
+import org.junit.BeforeClass
+import org.junit.Test
+import org.junit.experimental.categories.Category
+
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
 import com.blackducksoftware.integration.hub.rest.RestConnectionTestHelper
 import com.blackducksoftware.integration.hub.service.DryRunUploadResponse
@@ -32,10 +37,6 @@ import com.blackducksoftware.integration.log.LogLevel
 import com.blackducksoftware.integration.log.PrintStreamIntLogger
 import com.blackducksoftware.integration.rest.exception.IntegrationRestException
 import com.blackducksoftware.integration.test.annotation.IntegrationTest
-import org.junit.Assert
-import org.junit.BeforeClass
-import org.junit.Test
-import org.junit.experimental.categories.Category
 
 @Category(IntegrationTest.class)
 class DryRunUploadServiceTestIT {
@@ -54,7 +55,7 @@ class DryRunUploadServiceTestIT {
     @Test
     public void testDryRunUpload() {
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createHubService())
+        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createHubService(), logger)
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 

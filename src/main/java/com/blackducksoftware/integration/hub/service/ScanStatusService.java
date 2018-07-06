@@ -23,6 +23,12 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.enumeration.ScanSummaryStatusType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.CodeLocationType;
@@ -32,12 +38,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.exception.HubTimeoutExceededException;
-
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class ScanStatusService extends DataService {
     public static final long FIVE_SECONDS = 5L * 1000;
@@ -52,8 +53,8 @@ public class ScanStatusService extends DataService {
     private final CodeLocationService codeLocationDataService;
     private final long timeoutInMilliseconds;
 
-    public ScanStatusService(final HubService hubService, final ProjectService projectDataService, final CodeLocationService codeLocationDataService, final long timeoutInMilliseconds) {
-        super(hubService);
+    public ScanStatusService(final HubService hubService, final IntLogger logger, final ProjectService projectDataService, final CodeLocationService codeLocationDataService, final long timeoutInMilliseconds) {
+        super(hubService, logger);
         this.projectDataService = projectDataService;
         this.codeLocationDataService = codeLocationDataService;
 

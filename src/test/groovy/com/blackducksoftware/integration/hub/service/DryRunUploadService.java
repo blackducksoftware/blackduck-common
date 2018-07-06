@@ -27,12 +27,13 @@ import java.io.File;
 
 import com.blackducksoftware.integration.hub.api.core.HubPath;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.request.Request;
 import com.blackducksoftware.integration.rest.request.Response;
 
 public class DryRunUploadService extends DataService {
-    public DryRunUploadService(final HubService hubService) {
-        super(hubService);
+    public DryRunUploadService(final HubService hubService, final IntLogger logger) {
+        super(hubService, logger);
     }
 
     public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws Exception {
@@ -45,4 +46,5 @@ public class DryRunUploadService extends DataService {
             return uploadResponse;
         }
     }
+
 }

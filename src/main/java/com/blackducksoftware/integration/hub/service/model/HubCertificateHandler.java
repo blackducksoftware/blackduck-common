@@ -45,13 +45,14 @@ public class HubCertificateHandler {
         if (hubServerConfig == null || hubServerConfig.getHubUrl() == null || !hubServerConfig.getHubUrl().getProtocol().startsWith("https")) {
             return;
         }
-        handler.timeout = hubServerConfig.getTimeout();
+        handler.setTimeout(hubServerConfig.getTimeout());
         if (hubServerConfig.getProxyInfo() != null) {
-            handler.proxyInfo = hubServerConfig.getProxyInfo();
+            handler.setProxyInfo(hubServerConfig.getProxyInfo());
         }
         if (handler.isCertificateInTrustStore(hubServerConfig.getHubUrl())) {
             return;
         }
         handler.retrieveAndImportHttpsCertificate(hubServerConfig.getHubUrl());
     }
+
 }

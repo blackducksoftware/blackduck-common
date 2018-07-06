@@ -44,7 +44,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.LicenseView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.rest.connection.RestConnection;
+import com.blackducksoftware.integration.rest.RestConstants;
 
 public class PolicyRuleExpressionSetBuilder {
     private final List<PolicyRuleExpressionView> expressions = new ArrayList<>();
@@ -75,7 +75,7 @@ public class PolicyRuleExpressionSetBuilder {
     }
 
     public void addComponentReleaseDateCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final Date date) throws HubIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.RELEASE_DATE, RestConnection.formatDate(date));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.RELEASE_DATE, RestConstants.formatDate(date));
     }
 
     public void addNewerVersionCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final Integer count) throws HubIntegrationException {

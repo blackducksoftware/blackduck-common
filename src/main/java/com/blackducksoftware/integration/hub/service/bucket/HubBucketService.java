@@ -35,17 +35,18 @@ import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.service.DataService;
 import com.blackducksoftware.integration.hub.service.HubService;
+import com.blackducksoftware.integration.log.IntLogger;
 
 public class HubBucketService extends DataService {
     private final Optional<ExecutorService> executorService;
 
-    public HubBucketService(final HubService hubService) {
-        super(hubService);
+    public HubBucketService(final HubService hubService, final IntLogger logger) {
+        super(hubService, logger);
         executorService = Optional.empty();
     }
 
-    public HubBucketService(final HubService hubService, final ExecutorService executorService) {
-        super(hubService);
+    public HubBucketService(final HubService hubService, final IntLogger logger, final ExecutorService executorService) {
+        super(hubService, logger);
         this.executorService = Optional.of(executorService);
     }
 

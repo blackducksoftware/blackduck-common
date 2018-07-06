@@ -48,15 +48,6 @@ public class PhoneHomeService extends DataService {
     private final ExecutorService executorService;
     private final IntEnvironmentVariables intEnvironmentVariables;
 
-    public PhoneHomeService(final HubService hubService, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final IntEnvironmentVariables intEnvironmentVariables) {
-        super(hubService);
-        this.hubRegistrationService = hubRegistrationService;
-        this.phoneHomeClient = phoneHomeClient;
-        this.intEnvironmentVariables = intEnvironmentVariables;
-        final ThreadFactory threadFactory = Executors.defaultThreadFactory();
-        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
-    }
-
     public PhoneHomeService(final HubService hubService, final IntLogger logger, final PhoneHomeClient phoneHomeClient, final HubRegistrationService hubRegistrationService, final IntEnvironmentVariables intEnvironmentVariables) {
         super(hubService, logger);
         this.hubRegistrationService = hubRegistrationService;

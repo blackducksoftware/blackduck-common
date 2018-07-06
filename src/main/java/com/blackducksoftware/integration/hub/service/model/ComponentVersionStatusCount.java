@@ -30,21 +30,21 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.blackducksoftware.integration.hub.api.generated.component.NameValuePairView;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusSummaryStatusType;
 import com.blackducksoftware.integration.util.Stringable;
 
 public class ComponentVersionStatusCount extends Stringable {
-    public PolicyStatusApprovalStatusType name;
+    public PolicyStatusSummaryStatusType name;
     public int value;
 
     public ComponentVersionStatusCount() {
     }
 
     public ComponentVersionStatusCount(final NameValuePairView nameValuePair) {
-        final Set<PolicyStatusApprovalStatusType> policyStatusTypes = EnumSet.allOf(PolicyStatusApprovalStatusType.class);
+        final Set<PolicyStatusSummaryStatusType> policyStatusTypes = EnumSet.allOf(PolicyStatusSummaryStatusType.class);
         final Set<String> policyStatusTypeValues = policyStatusTypes.stream().map(Object::toString).collect(Collectors.toSet());
         if (policyStatusTypeValues.contains(nameValuePair.name)) {
-            name = PolicyStatusApprovalStatusType.valueOf(nameValuePair.name);
+            name = PolicyStatusSummaryStatusType.valueOf(nameValuePair.name);
         }
 
         if (nameValuePair.value != null) {
