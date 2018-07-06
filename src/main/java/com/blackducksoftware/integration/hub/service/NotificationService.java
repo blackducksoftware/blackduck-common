@@ -99,7 +99,7 @@ public class NotificationService extends DataService {
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final HubFilter hubFilter = HubFilter.createFilterWithMultipleValues("NOTIFICATION_TYPE", notificationTypesToInclude);
+        final HubFilter hubFilter = HubFilter.createFilterWithMultipleValues("notificationType", notificationTypesToInclude);
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
         RequestFactory.addHubFilter(requestBuilder, hubFilter);
         return requestBuilder;
