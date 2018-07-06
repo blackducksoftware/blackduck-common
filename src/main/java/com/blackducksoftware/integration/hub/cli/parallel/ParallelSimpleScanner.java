@@ -25,6 +25,7 @@ package com.blackducksoftware.integration.hub.cli.parallel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -47,13 +48,20 @@ public class ParallelSimpleScanner {
     private final IntLogger logger;
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final Gson gson;
-    private final ExecutorService executorService;
+    private final Optional<ExecutorService> optionalExecutorService;
+
+    public ParallelSimpleScanner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final Gson gson) {
+        this.logger = logger;
+        this.intEnvironmentVariables = intEnvironmentVariables;
+        this.gson = gson;
+        this.optionalExecutorService = Optional.empty();
+    }
 
     public ParallelSimpleScanner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final Gson gson, final ExecutorService executorService) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.gson = gson;
-        this.executorService = executorService;
+        this.optionalExecutorService = Optional.of(executorService);
     }
 
     public List<ScanTargetOutput> executeDryRunScans(final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final CLILocation cliLocation)
@@ -69,14 +77,21 @@ public class ParallelSimpleScanner {
         logger.info("Starting the Hub signature scans");
 
         try {
-            final List<Future<ScanTargetOutput>> submittedScanPathCallables = new ArrayList<>();
-            for (final ScanPathCallable scanPathCallable : scanPathCallables) {
-                submittedScanPathCallables.add(executorService.submit(scanPathCallable));
-            }
-            for (final Future<ScanTargetOutput> futureScanTargetOutput : submittedScanPathCallables) {
-                final ScanTargetOutput scanTargetOutput = futureScanTargetOutput.get();
-                if (scanTargetOutput != null) {
-                    scanTargetOutputs.add(scanTargetOutput);
+            if (optionalExecutorService.isPresent()) {
+                ExecutorService executorService = optionalExecutorService.get();
+                final List<Future<ScanTargetOutput>> submittedScanPathCallables = new ArrayList<>();
+                for (final ScanPathCallable scanPathCallable : scanPathCallables) {
+                    submittedScanPathCallables.add(executorService.submit(scanPathCallable));
+                }
+                for (final Future<ScanTargetOutput> futureScanTargetOutput : submittedScanPathCallables) {
+                    final ScanTargetOutput scanTargetOutput = futureScanTargetOutput.get();
+                    if (scanTargetOutput != null) {
+                        scanTargetOutputs.add(scanTargetOutput);
+                    }
+                }
+            } else {
+                for (final ScanPathCallable scanPathCallable : scanPathCallables) {
+                    scanTargetOutputs.add(scanPathCallable.call());
                 }
             }
         } catch (final ExecutionException e) {
