@@ -58,7 +58,11 @@ public class HubServicesFactory {
     private final IntLogger logger;
 
     public static Gson createDefaultGson() {
-        return new GsonBuilder().setDateFormat(RestConstants.JSON_DATE_FORMAT).create();
+        return createDefaultGsonBuilder().create();
+    }
+
+    public static GsonBuilder createDefaultGsonBuilder() {
+        return new GsonBuilder().setDateFormat(RestConstants.JSON_DATE_FORMAT);
     }
 
     public static JsonParser createDefaultJsonParser() {
