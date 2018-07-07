@@ -37,6 +37,7 @@ import com.blackducksoftware.integration.hub.cli.SignatureScanConfig;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetailFactory;
+import com.blackducksoftware.integration.hub.rest.BlackduckRestConnection;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
@@ -53,7 +54,7 @@ public class HubServicesFactory {
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final Gson gson;
     private final JsonParser jsonParser;
-    private final RestConnection restConnection;
+    private final BlackduckRestConnection restConnection;
     private final IntLogger logger;
 
     public static Gson createDefaultGson() {
@@ -64,7 +65,7 @@ public class HubServicesFactory {
         return new JsonParser();
     }
 
-    public HubServicesFactory(final Gson gson, final JsonParser jsonParser, final RestConnection restConnection, final IntLogger logger) {
+    public HubServicesFactory(final Gson gson, final JsonParser jsonParser, final BlackduckRestConnection restConnection, final IntLogger logger) {
         this.intEnvironmentVariables = new IntEnvironmentVariables();
 
         this.gson = gson;

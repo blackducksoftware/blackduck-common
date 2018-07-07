@@ -45,10 +45,10 @@ import com.blackducksoftware.integration.hub.api.core.ResourceLink;
 import com.blackducksoftware.integration.hub.api.core.ResourceMetadata;
 import com.blackducksoftware.integration.hub.api.view.MetaHandler;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.rest.BlackduckRestConnection;
 import com.blackducksoftware.integration.hub.service.model.PagedRequest;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.rest.connection.RestConnection;
 import com.blackducksoftware.integration.rest.request.Request;
 import com.blackducksoftware.integration.rest.request.Response;
 import com.google.gson.Gson;
@@ -58,7 +58,7 @@ public class HubService {
     public static final HubPath BOMIMPORT_PATH = new HubPath("/api/bom-import");
     public static final HubPath SCANSUMMARIES_PATH = new HubPath("/api/scan-summaries");
 
-    private final RestConnection restConnection;
+    private final BlackduckRestConnection restConnection;
     private final MetaHandler metaHandler;
     private final HubResponseTransformer hubResponseTransformer;
     private final HubResponsesTransformer hubResponsesTransformer;
@@ -66,7 +66,7 @@ public class HubService {
     private final JsonParser jsonParser;
     private final Gson gson;
 
-    public HubService(final IntLogger logger, final RestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+    public HubService(final IntLogger logger, final BlackduckRestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
         this.restConnection = restConnection;
         this.hubBaseUrl = restConnection.getBaseUrl();
         this.jsonParser = jsonParser;
@@ -76,7 +76,7 @@ public class HubService {
         this.hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer, jsonParser);
     }
 
-    public RestConnection getRestConnection() {
+    public BlackduckRestConnection getRestConnection() {
         return restConnection;
     }
 

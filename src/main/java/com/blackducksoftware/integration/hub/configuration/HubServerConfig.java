@@ -31,10 +31,10 @@ import org.apache.commons.lang3.StringUtils;
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.rest.ApiTokenRestConnection;
 import com.blackducksoftware.integration.hub.rest.ApiTokenRestConnectionBuilder;
+import com.blackducksoftware.integration.hub.rest.BlackduckRestConnection;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnectionBuilder;
 import com.blackducksoftware.integration.log.IntLogger;
-import com.blackducksoftware.integration.rest.connection.RestConnection;
 import com.blackducksoftware.integration.rest.credentials.Credentials;
 import com.blackducksoftware.integration.rest.proxy.ProxyInfo;
 import com.blackducksoftware.integration.util.Stringable;
@@ -100,7 +100,7 @@ public class HubServerConfig extends Stringable implements Serializable {
         }
     }
 
-    public RestConnection createRestConnection(final IntLogger logger) throws EncryptionException {
+    public BlackduckRestConnection createRestConnection(final IntLogger logger) throws EncryptionException {
         if (StringUtils.isNotBlank(apiToken)) {
             return createApiTokenRestConnection(logger);
         } else {
