@@ -36,17 +36,19 @@ import com.blackducksoftware.integration.validator.ValidationResultEnum;
 import com.blackducksoftware.integration.validator.ValidationResults;
 
 public class ProjectRequestValidator extends AbstractValidator {
-    private String projectName;
-    private String description;
-    private Boolean projectLevelAdjustments;
-    private String projectOwner;
-    private Integer projectTier;
-    private String distribution;
-    private String phase;
-    private String versionName;
-    private String versionNickname;
-    private String releaseComments;
-    private String releasedOn;
+    private final String projectName;
+    private final String distribution;
+    private final String phase;
+    private final String versionName;
+    private final String releasedOn;
+
+    public ProjectRequestValidator(final ProjectRequestBuilder projectRequestBuilder) {
+        this.projectName = projectRequestBuilder.getProjectName();
+        this.distribution = projectRequestBuilder.getDistribution();
+        this.phase = projectRequestBuilder.getPhase();
+        this.versionName = projectRequestBuilder.getVersionName();
+        this.releasedOn = projectRequestBuilder.getReleasedOn();
+    }
 
     @Override
     public ValidationResults assertValid() {
@@ -96,47 +98,4 @@ public class ProjectRequestValidator extends AbstractValidator {
         }
     }
 
-    public void setProjectName(final String projectName) {
-        this.projectName = projectName;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public void setProjectLevelAdjustments(final Boolean projectLevelAdjustments) {
-        this.projectLevelAdjustments = projectLevelAdjustments;
-    }
-
-    public void setProjectOwner(final String projectOwner) {
-        this.projectOwner = projectOwner;
-    }
-
-    public void setProjectTier(final Integer projectTier) {
-        this.projectTier = projectTier;
-    }
-
-    public void setDistribution(final String distribution) {
-        this.distribution = distribution;
-    }
-
-    public void setPhase(final String phase) {
-        this.phase = phase;
-    }
-
-    public void setVersionName(final String versionName) {
-        this.versionName = versionName;
-    }
-
-    public void setVersionNickname(final String versionNickname) {
-        this.versionNickname = versionNickname;
-    }
-
-    public void setReleaseComments(final String releaseComments) {
-        this.releaseComments = releaseComments;
-    }
-
-    public void setReleasedOn(final String releasedOn) {
-        this.releasedOn = releasedOn;
-    }
 }

@@ -51,18 +51,7 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
 
     @Override
     public AbstractValidator createValidator() {
-        final ProjectRequestValidator validator = new ProjectRequestValidator();
-        validator.setProjectName(projectName);
-        validator.setDescription(description);
-        validator.setProjectLevelAdjustments(projectLevelAdjustments);
-        validator.setProjectOwner(projectOwner);
-        validator.setProjectTier(projectTier);
-        validator.setDistribution(distribution);
-        validator.setPhase(phase);
-        validator.setVersionName(versionName);
-        validator.setVersionNickname(versionNickname);
-        validator.setReleaseComments(releaseComments);
-        validator.setReleasedOn(releasedOn);
+        final ProjectRequestValidator validator = new ProjectRequestValidator(this);
         return validator;
     }
 
@@ -146,4 +135,49 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
     public void setReleasedOn(final String releasedOn) {
         this.releasedOn = releasedOn;
     }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Boolean getProjectLevelAdjustments() {
+        return projectLevelAdjustments;
+    }
+
+    public String getProjectOwner() {
+        return projectOwner;
+    }
+
+    public Integer getProjectTier() {
+        return projectTier;
+    }
+
+    public String getDistribution() {
+        return distribution;
+    }
+
+    public String getPhase() {
+        return phase;
+    }
+
+    public String getVersionName() {
+        return versionName;
+    }
+
+    public String getVersionNickname() {
+        return versionNickname;
+    }
+
+    public String getReleaseComments() {
+        return releaseComments;
+    }
+
+    public String getReleasedOn() {
+        return releasedOn;
+    }
+
 }

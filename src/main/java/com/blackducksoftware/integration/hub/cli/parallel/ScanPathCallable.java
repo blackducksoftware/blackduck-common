@@ -74,9 +74,9 @@ public class ScanPathCallable implements Callable<ScanTargetOutput> {
 
         final SimpleScanUtility simpleScanUtility;
         if (null != hubServerConfig) {
-            simpleScanUtility = new SimpleScanUtility(logger, gson, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName);
+            simpleScanUtility = new SimpleScanUtility(logger, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName);
         } else {
-            simpleScanUtility = new SimpleScanUtility(logger, gson, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName);
+            simpleScanUtility = new SimpleScanUtility(logger, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName);
         }
 
         logger.info(String.format("Starting the signature scan of %s", simpleScanUtility.getSignatureScanConfig().getScanTarget()));

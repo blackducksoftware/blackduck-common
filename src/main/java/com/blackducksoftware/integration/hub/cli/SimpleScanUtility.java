@@ -51,12 +51,10 @@ import com.blackducksoftware.integration.hub.service.model.StreamRedirectThread;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.proxy.ProxyInfo;
 import com.blackducksoftware.integration.util.IntEnvironmentVariables;
-import com.google.gson.Gson;
 
 public class SimpleScanUtility {
     public static final int DEFAULT_MEMORY = 4096;
 
-    private final Gson gson;
     private final IntLogger logger;
     private final HubServerConfig hubServerConfig;
     private final IntEnvironmentVariables intEnvironmentVariables;
@@ -67,14 +65,13 @@ public class SimpleScanUtility {
 
     private File logDirectory;
 
-    public SimpleScanUtility(final IntLogger logger, final Gson gson, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig,
+    public SimpleScanUtility(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig,
             final String project, final String version) {
-        this(logger, gson, null, intEnvironmentVariables, signatureScanConfig, project, version);
+        this(logger, null, intEnvironmentVariables, signatureScanConfig, project, version);
     }
 
-    public SimpleScanUtility(final IntLogger logger, final Gson gson, final HubServerConfig hubServerConfig, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig,
+    public SimpleScanUtility(final IntLogger logger, final HubServerConfig hubServerConfig, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig,
             final String project, final String version) {
-        this.gson = gson;
         this.logger = logger;
         this.hubServerConfig = hubServerConfig;
         this.intEnvironmentVariables = intEnvironmentVariables;
@@ -90,6 +87,7 @@ public class SimpleScanUtility {
 
     /**
      * This will setup the command-line invocation of the Hub scanner. The workingDirectoryPath is the parent folder of the scan logs and other scan artifacts.
+     * 
      * @throws EncryptionException
      * @throws IllegalArgumentException
      * @throws HubIntegrationException
@@ -251,6 +249,7 @@ public class SimpleScanUtility {
 
     /**
      * If running in an environment that handles process creation, this method should be overridden to construct a process to execute the scan in the environment-specific way.
+     * 
      * @throws IOException
      * @throws HubIntegrationException
      */
