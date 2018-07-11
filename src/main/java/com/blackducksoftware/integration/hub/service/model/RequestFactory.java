@@ -71,10 +71,10 @@ public class RequestFactory {
     }
 
     public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<HubQuery> hubQuery, final int limit, final int offset) {
-        return createCommonGetRequestBuilder(uri, hubQuery, Optional.empty(), limit, offset);
+        return createCommonGetRequestBuilder(uri, hubQuery, null, limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<HubQuery> hubQuery, final Optional<HubFilter> hubFilter, final int limit, final int offset) {
+    public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<HubQuery> hubQuery, final HubFilter hubFilter, final int limit, final int offset) {
         final Request.Builder requestBuilder = new Request.Builder();
         if (StringUtils.isNotBlank(uri)) {
             requestBuilder.uri(uri);
@@ -107,9 +107,9 @@ public class RequestFactory {
         return requestBuilder;
     }
 
-    public static Request.Builder addHubFilter(final Request.Builder requestBuilder, final Optional<HubFilter> hubFilter) {
-        if (hubFilter.isPresent()) {
-            hubFilter.get().getFilterParameters().forEach(parameter -> {
+    public static Request.Builder addHubFilter(final Request.Builder requestBuilder, final HubFilter hubFilter) {
+        if (hubFilter != null) {
+            hubFilter.getFilterParameters().forEach(parameter -> {
                 requestBuilder.addQueryParameter(FILTER_PARAMETER, parameter);
             });
         }

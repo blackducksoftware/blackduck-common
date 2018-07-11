@@ -42,7 +42,6 @@ import com.blackducksoftware.integration.hub.service.HubServicesFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.log.LogLevel;
 import com.blackducksoftware.integration.log.PrintStreamIntLogger;
-import com.blackducksoftware.integration.rest.connection.RestConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
@@ -137,7 +136,7 @@ public class RestConnectionTestHelper {
     }
 
     public HubServicesFactory createHubServicesFactory(final HubServerConfig hubServerConfig, final IntLogger logger) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        final RestConnection restConnection = hubServerConfig.createCredentialsRestConnection(logger);
+        final BlackduckRestConnection restConnection = hubServerConfig.createCredentialsRestConnection(logger);
 
         final Gson gson = HubServicesFactory.createDefaultGson();
         final JsonParser jsonParser = HubServicesFactory.createDefaultJsonParser();

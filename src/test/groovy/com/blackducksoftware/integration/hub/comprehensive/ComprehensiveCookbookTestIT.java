@@ -327,7 +327,7 @@ public class ComprehensiveCookbookTestIT {
     @Test
     public void testMutlipleTargetScan() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger;
+        final IntLogger logger = hubServicesFactory.getLogger();
         logger.setLogLevel(LogLevel.INFO);
         final SignatureScannerService signatureScannerService = hubServicesFactory.createSignatureScannerService();
 

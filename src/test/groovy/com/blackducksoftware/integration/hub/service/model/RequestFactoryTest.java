@@ -15,7 +15,7 @@ public class RequestFactoryTest {
     @Test
     public void testFilterWithMultipleValues() {
         final HubFilter hubFilter = HubFilter.createFilterWithMultipleValues("KEY1", Arrays.asList(new String[] { "value1", "value2" }));
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder("http://www.url.com/api/something", Optional.empty(), Optional.of(hubFilter), 1, 0);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder("http://www.url.com/api/something", Optional.empty(), hubFilter, 1, 0);
         final Request request = requestBuilder.build();
 
         assertTrue(request.getQueryParameters().containsKey("filter"));

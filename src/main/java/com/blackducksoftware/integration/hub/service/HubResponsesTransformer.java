@@ -31,8 +31,8 @@ import java.util.Map;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.rest.BlackduckRestConnection;
 import com.blackducksoftware.integration.hub.service.model.PagedRequest;
-import com.blackducksoftware.integration.rest.connection.RestConnection;
 import com.blackducksoftware.integration.rest.request.Response;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -40,11 +40,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class HubResponsesTransformer {
-    private final RestConnection restConnection;
+    private final BlackduckRestConnection restConnection;
     private final HubResponseTransformer hubResponseTransformer;
     private final JsonParser jsonParser;
 
-    public HubResponsesTransformer(final RestConnection restConnection, final HubResponseTransformer hubResponseTransformer, final JsonParser jsonParser) {
+    public HubResponsesTransformer(final BlackduckRestConnection restConnection, final HubResponseTransformer hubResponseTransformer, final JsonParser jsonParser) {
         this.restConnection = restConnection;
         this.hubResponseTransformer = hubResponseTransformer;
         this.jsonParser = jsonParser;
