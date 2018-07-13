@@ -108,8 +108,6 @@ public class ScanPathCallable implements Callable<ScanTargetOutput> {
                 final String scanSummaryJson = FileUtils.readFileToString(scanSummaryFile, Charset.forName("UTF8"));
                 scanSummaryView = gson.fromJson(scanSummaryJson, ScanSummaryView.class);
                 scanSummaryView.json = scanSummaryJson;
-                scanSummaryFile.delete();
-                scanSummaryFile.getParentFile().delete();
             }
         } catch (final IOException ex) {
             logger.trace("Error reading scan summary file", ex);
