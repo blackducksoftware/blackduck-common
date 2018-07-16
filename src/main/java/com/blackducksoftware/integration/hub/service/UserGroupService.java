@@ -24,7 +24,10 @@
 package com.blackducksoftware.integration.hub.service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
@@ -82,6 +85,27 @@ public class UserGroupService {
 
     public List<RoleAssignmentView> getRolesForUser(final UserView userView) throws IntegrationException {
         return hubService.getAllResponses(userView, UserView.ROLES_LINK_RESPONSE);
+    }
+
+    public List<RoleAssignmentView> getInheritedRolesForUser(final String userName) throws IntegrationException {
+        final UserView user = getUserByUserName(userName);
+        return getInheritedRolesForUser(user);
+    }
+
+    public List<RoleAssignmentView> getInheritedRolesForUser(final UserView userView) throws IntegrationException {
+        return hubService.getAllResponses(userView, UserView.INHERITED_ROLES_LINK_RESPONSE);
+    }
+
+    public List<RoleAssignmentView> getAllRolesForUser(final String userName) throws IntegrationException {
+        final UserView user = getUserByUserName(userName);
+        return getAllRolesForUser(user);
+    }
+
+    public List<RoleAssignmentView> getAllRolesForUser(final UserView userView) throws IntegrationException {
+        Set<RoleAssignmentView> roleSet = new LinkedHashSet<>();
+        roleSet.addAll(getRolesForUser(userView));
+        roleSet.addAll(getInheritedRolesForUser(userView));
+        return roleSet.stream().collect(Collectors.toList());
     }
 
     public UserGroupView getGroupByName(final String groupName) throws IntegrationException {
