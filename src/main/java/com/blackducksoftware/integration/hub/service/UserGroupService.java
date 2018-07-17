@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
@@ -48,14 +47,14 @@ public class UserGroupService {
         this.hubService = hubService;
     }
 
-    public UserView getUserByUserName(final String userName) throws IntegrationException {
+    public UserView getUserByUserName(final String username) throws IntegrationException {
         final List<UserView> allUsers = hubService.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
         for (final UserView user : allUsers) {
-            if (user.userName.equalsIgnoreCase(userName)) {
+            if (user.userName.equalsIgnoreCase(username)) {
                 return user;
             }
         }
-        throw new DoesNotExistException("This User does not exist. UserName : " + userName);
+        throw new DoesNotExistException("This User does not exist. UserName : " + username);
     }
 
     public List<ProjectView> getProjectsForUser(final String userName) throws IntegrationException {
@@ -78,8 +77,8 @@ public class UserGroupService {
         return resolvedProjectViews;
     }
 
-    public List<RoleAssignmentView> getRolesForUser(final String userName) throws IntegrationException {
-        final UserView user = getUserByUserName(userName);
+    public List<RoleAssignmentView> getRolesForUser(final String username) throws IntegrationException {
+        final UserView user = getUserByUserName(username);
         return getRolesForUser(user);
     }
 
@@ -87,8 +86,8 @@ public class UserGroupService {
         return hubService.getAllResponses(userView, UserView.ROLES_LINK_RESPONSE);
     }
 
-    public List<RoleAssignmentView> getInheritedRolesForUser(final String userName) throws IntegrationException {
-        final UserView user = getUserByUserName(userName);
+    public List<RoleAssignmentView> getInheritedRolesForUser(final String username) throws IntegrationException {
+        final UserView user = getUserByUserName(username);
         return getInheritedRolesForUser(user);
     }
 
@@ -96,16 +95,16 @@ public class UserGroupService {
         return hubService.getAllResponses(userView, UserView.INHERITED_ROLES_LINK_RESPONSE);
     }
 
-    public List<RoleAssignmentView> getAllRolesForUser(final String userName) throws IntegrationException {
-        final UserView user = getUserByUserName(userName);
+    public List<RoleAssignmentView> getAllRolesForUser(final String username) throws IntegrationException {
+        final UserView user = getUserByUserName(username);
         return getAllRolesForUser(user);
     }
 
     public List<RoleAssignmentView> getAllRolesForUser(final UserView userView) throws IntegrationException {
-        Set<RoleAssignmentView> roleSet = new LinkedHashSet<>();
+        final Set<RoleAssignmentView> roleSet = new LinkedHashSet<>();
         roleSet.addAll(getRolesForUser(userView));
         roleSet.addAll(getInheritedRolesForUser(userView));
-        return roleSet.stream().collect(Collectors.toList());
+        return new ArrayList(roleSet);
     }
 
     public UserGroupView getGroupByName(final String groupName) throws IntegrationException {
