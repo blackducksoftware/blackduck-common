@@ -47,7 +47,7 @@ public class UserGroupService {
         this.hubService = hubService;
     }
 
-    public UserView getUserByUserName(final String username) throws IntegrationException {
+    public UserView getUserByUsername(final String username) throws IntegrationException {
         final List<UserView> allUsers = hubService.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
         for (final UserView user : allUsers) {
             if (user.userName.equalsIgnoreCase(username)) {
@@ -58,7 +58,7 @@ public class UserGroupService {
     }
 
     public List<ProjectView> getProjectsForUser(final String userName) throws IntegrationException {
-        final UserView user = getUserByUserName(userName);
+        final UserView user = getUserByUsername(userName);
         return getProjectsForUser(user);
     }
 
@@ -78,7 +78,7 @@ public class UserGroupService {
     }
 
     public List<RoleAssignmentView> getRolesForUser(final String username) throws IntegrationException {
-        final UserView user = getUserByUserName(username);
+        final UserView user = getUserByUsername(username);
         return getRolesForUser(user);
     }
 
@@ -87,7 +87,7 @@ public class UserGroupService {
     }
 
     public List<RoleAssignmentView> getInheritedRolesForUser(final String username) throws IntegrationException {
-        final UserView user = getUserByUserName(username);
+        final UserView user = getUserByUsername(username);
         return getInheritedRolesForUser(user);
     }
 
@@ -96,7 +96,7 @@ public class UserGroupService {
     }
 
     public List<RoleAssignmentView> getAllRolesForUser(final String username) throws IntegrationException {
-        final UserView user = getUserByUserName(username);
+        final UserView user = getUserByUsername(username);
         return getAllRolesForUser(user);
     }
 
