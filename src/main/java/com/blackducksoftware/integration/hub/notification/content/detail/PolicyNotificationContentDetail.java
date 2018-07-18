@@ -48,13 +48,13 @@ public class PolicyNotificationContentDetail extends ProjectNotificationContentD
             ,final String componentVersionName
             ,final String componentVersionUri
             ,final String policyName
-            ,final UriSingleResponse<PolicyRuleViewV2> policy
+            ,final String policyUri
             ,final String firstName
             ,final String lastName
             ) {
         super(NotificationTypeGrouping.POLICY, projectName, projectVersionName, projectVersionUri, componentName, componentUri, componentVersionName, componentVersionUri);
         this.policyName = policyName;
-        this.policy = policy;
+        this.policy = createUriSingleResponse(policyUri, PolicyRuleViewV2.class);
         this.firstName = firstName;
         this.lastName = lastName;
     }

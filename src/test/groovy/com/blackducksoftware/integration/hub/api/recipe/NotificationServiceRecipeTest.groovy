@@ -16,9 +16,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView
 import com.blackducksoftware.integration.hub.notification.CommonNotificationView
-import com.blackducksoftware.integration.hub.notification.NotificationDetailResult
-import com.blackducksoftware.integration.hub.notification.NotificationDetailResults
-import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetailFactory
 import com.blackducksoftware.integration.hub.service.CodeLocationService
 import com.blackducksoftware.integration.hub.service.CommonNotificationService
@@ -26,6 +23,9 @@ import com.blackducksoftware.integration.hub.service.NotificationService
 import com.blackducksoftware.integration.hub.service.ProjectService
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService
+import com.blackducksoftware.integration.hub.throwaway.NotificationContentDetailOld
+import com.blackducksoftware.integration.hub.throwaway.NotificationDetailResultOld
+import com.blackducksoftware.integration.hub.throwaway.NotificationDetailResultsOld
 import com.blackducksoftware.integration.test.annotation.IntegrationTest
 
 @Category(IntegrationTest.class)
@@ -99,18 +99,18 @@ class NotificationServiceRecipeTest extends BasicRecipe {
 
         List<NotificationView> notificationViews = notificationService.getAllNotifications(startDate, endDate)
         List<CommonNotificationView> commonNotificationViews = commonNotificationService.getCommonNotifications(notificationViews)
-        final NotificationDetailResults notificationDetailResults = commonNotificationService.getNotificationDetailResults(commonNotificationViews)
+        final NotificationDetailResultsOld notificationDetailResults = commonNotificationService.getNotificationDetailResults(commonNotificationViews)
 
         final HubBucket hubBucket = new HubBucket();
         commonNotificationService.populateHubBucket(hubBucketService, hubBucket, notificationDetailResults);
-        final List<NotificationDetailResult> notificationResultList = notificationDetailResults.getResults()
+        final List<NotificationDetailResultOld> notificationResultList = notificationDetailResults.getResults()
 
         Date latestNotificationEndDate = notificationDetailResults.getLatestNotificationCreatedAtDate().get();
         println("Start Date: ${startDate}, End Date: ${endDate}, latestNotification: ${latestNotificationEndDate}")
 
         notificationResultList.each({
             it.getNotificationContentDetails().each({
-                NotificationContentDetail detail = it
+                NotificationContentDetailOld detail = it
                 String contentDetailKey
                 String projectName
                 String projectVersion

@@ -65,6 +65,11 @@ public class NotificationDetailResult2 {
     }
     // @formatter:on
 
+    public List<NotificationContentDetail2> getBomEditDetails() {
+        // TODO add bom edit content detail
+        return (List<NotificationContentDetail2>) notificationDetails.get(NotificationTypeGrouping.BOM_EDIT);
+    }
+
     public List<LicenseLimitNotificationContentDetail> getLicenseDetails() {
         return (List<LicenseLimitNotificationContentDetail>) notificationDetails.get(NotificationTypeGrouping.LICENSE);
     }

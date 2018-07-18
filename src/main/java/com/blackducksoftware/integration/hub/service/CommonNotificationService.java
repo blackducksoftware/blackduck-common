@@ -39,8 +39,8 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationUser
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.notification.CommonNotificationView;
 import com.blackducksoftware.integration.hub.notification.CommonNotificationViewResults;
-import com.blackducksoftware.integration.hub.notification.NotificationDetailResult;
-import com.blackducksoftware.integration.hub.notification.NotificationDetailResults;
+import com.blackducksoftware.integration.hub.notification.NotificationDetailResult2;
+import com.blackducksoftware.integration.hub.notification.NotificationDetailResults2;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetailFactory;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
@@ -84,28 +84,29 @@ public class CommonNotificationService {
         return new CommonNotificationViewResults(commonNotifications, datePair.date, datePair.dateString);
     }
 
-    public NotificationDetailResults getNotificationDetailResults(final List<CommonNotificationView> commonNotifications)
-            throws IntegrationException {
+    public NotificationDetailResults2 getNotificationDetailResults(final List<CommonNotificationView> commonNotifications) throws IntegrationException {
         if (commonNotifications == null || commonNotifications.isEmpty()) {
-            return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty());
+            return new NotificationDetailResults2(Collections.emptyList(), Optional.empty(), Optional.empty());
         }
 
-        List<NotificationDetailResult> sortedDetails = commonNotifications.stream().map(view -> {
-            return notificationContentDetailFactory.generateContentDetails(view);
-        }).collect(Collectors.toList());
+        List<NotificationDetailResult2> sortedDetails = commonNotifications
+                .stream()
+                .map(view -> notificationContentDetailFactory.generateContentDetails(view))
+                .collect(Collectors.toList());
 
         if (oldestFirst) {
             // we don't want to use the default sorting from the hub
-            sortedDetails = sortedDetails.stream().sorted((result_1, result_2) -> {
-                return result_1.getCreatedAt().compareTo(result_2.getCreatedAt());
-            }).collect(Collectors.toList());
+            sortedDetails = sortedDetails
+                    .stream()
+                    .sorted((result_1, result_2) -> result_1.getCreatedAt().compareTo(result_2.getCreatedAt()))
+                    .collect(Collectors.toList());
         }
 
         final DatePair datePair = getLatestCreatedAtString(commonNotifications);
-        return new NotificationDetailResults(sortedDetails, datePair.date, datePair.dateString);
+        return new NotificationDetailResults2(sortedDetails, datePair.date, datePair.dateString);
     }
 
-    public void populateHubBucket(final HubBucketService hubBucketService, final HubBucket hubBucket, final NotificationDetailResults notificationDetailResults) throws IntegrationException {
+    public void populateHubBucket(final HubBucketService hubBucketService, final HubBucket hubBucket, final NotificationDetailResults2 notificationDetailResults) throws IntegrationException {
         final List<UriSingleResponse<? extends HubResponse>> uriResponseList = new ArrayList<>();
         uriResponseList.addAll(notificationDetailResults.getAllLinks());
         hubBucketService.addToTheBucket(hubBucket, uriResponseList);

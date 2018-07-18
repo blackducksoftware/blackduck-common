@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification;
+package com.blackducksoftware.integration.hub.throwaway;
 
 import java.util.Date;
 import java.util.List;
@@ -30,9 +30,10 @@ import java.util.Optional;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationStateRequestStateType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
-import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 
-public class NotificationDetailResult {
+// TODO remove this before merging
+@Deprecated
+public class NotificationDetailResultOld {
     private final NotificationContent notificationContent;
     private final String contentType;
     private final Date createdAt;
@@ -40,10 +41,10 @@ public class NotificationDetailResult {
     private final String notificationGroup;
     private final Optional<NotificationStateRequestStateType> notificationState;
 
-    private final List<NotificationContentDetail> notificationContentDetails;
+    private final List<NotificationContentDetailOld> notificationContentDetails;
 
-    public NotificationDetailResult(final NotificationContent notificationContent, final String contentType, final Date createdAt, final NotificationType type, final String notificationGroup,
-            final Optional<NotificationStateRequestStateType> notificationState, final List<NotificationContentDetail> notificationContentDetails) {
+    public NotificationDetailResultOld(final NotificationContent notificationContent, final String contentType, final Date createdAt, final NotificationType type, final String notificationGroup,
+            final Optional<NotificationStateRequestStateType> notificationState, final List<NotificationContentDetailOld> notificationContentDetails) {
         this.notificationContent = notificationContent;
         this.contentType = contentType;
         this.createdAt = createdAt;
@@ -77,7 +78,7 @@ public class NotificationDetailResult {
         return notificationState;
     }
 
-    public List<NotificationContentDetail> getNotificationContentDetails() {
+    public List<NotificationContentDetailOld> getNotificationContentDetails() {
         return notificationContentDetails;
     }
 

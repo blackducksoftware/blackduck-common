@@ -24,6 +24,7 @@
 package com.blackducksoftware.integration.hub.api.enumeration;
 
 public enum NotificationTypeGrouping {
+    BOM_EDIT,
     LICENSE,
     POLICY,
     VULNERABILITY;

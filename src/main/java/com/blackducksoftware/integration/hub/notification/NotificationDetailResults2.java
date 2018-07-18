@@ -23,23 +23,29 @@
  */
 package com.blackducksoftware.integration.hub.notification;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
+import com.blackducksoftware.integration.hub.api.UriSingleResponse;
+import com.blackducksoftware.integration.hub.api.core.HubResponse;
 
 public class NotificationDetailResults2 {
     private final List<NotificationDetailResult2> notificationResults;
     private final Date latestNotificationCreatedAtDate;
     private final String latestNotificationCreatedAtString;
-    private final HubBucket hubBucket;
 
-    public NotificationDetailResults2(final List<NotificationDetailResult2> notificationResults, final Date latestNotificationCreatedAtDate, final String latestNotificationCreatedAtString, final HubBucket hubBucket) {
+    public NotificationDetailResults2(final List<NotificationDetailResult2> notificationResults, final Date latestNotificationCreatedAtDate, final String latestNotificationCreatedAtString) {
         this.notificationResults = notificationResults;
         this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate;
         this.latestNotificationCreatedAtString = latestNotificationCreatedAtString;
-        this.hubBucket = hubBucket;
+    }
+
+    public NotificationDetailResults2(final List<NotificationDetailResult2> notificationResults, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
+        this.notificationResults = notificationResults;
+        this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate.orElse(null);
+        this.latestNotificationCreatedAtString = latestNotificationCreatedAtString.orElse(null);
     }
 
     public Optional<Date> getLatestNotificationCreatedAtDate() {
@@ -50,12 +56,14 @@ public class NotificationDetailResults2 {
         return Optional.ofNullable(latestNotificationCreatedAtString);
     }
 
-    public HubBucket getHubBucket() {
-        return hubBucket;
-    }
-
     public boolean isEmpty() {
         return notificationResults == null || notificationResults.isEmpty();
+    }
+
+    public List<UriSingleResponse<? extends HubResponse>> getAllLinks() {
+        final List<UriSingleResponse<? extends HubResponse>> uriResponses = new ArrayList<>();
+        notificationResults.forEach(result -> uriResponses.addAll(result.getAllLinks()));
+        return uriResponses;
     }
 
 }

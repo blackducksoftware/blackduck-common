@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification;
+package com.blackducksoftware.integration.hub.throwaway;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,11 +30,14 @@ import java.util.Optional;
 
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
+import com.blackducksoftware.integration.hub.notification.NotificationResults;
 
-public class NotificationDetailResults extends NotificationResults<NotificationDetailResult> {
-    private final List<NotificationDetailResult> resultList;
+// TODO remove this before merging
+@Deprecated
+public class NotificationDetailResultsOld extends NotificationResults<NotificationDetailResultOld> {
+    private final List<NotificationDetailResultOld> resultList;
 
-    public NotificationDetailResults(final List<NotificationDetailResult> resultList, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
+    public NotificationDetailResultsOld(final List<NotificationDetailResultOld> resultList, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
         super(latestNotificationCreatedAtDate, latestNotificationCreatedAtString);
         this.resultList = resultList;
     }
@@ -51,7 +54,7 @@ public class NotificationDetailResults extends NotificationResults<NotificationD
     }
 
     @Override
-    public List<NotificationDetailResult> getResults() {
+    public List<NotificationDetailResultOld> getResults() {
         return resultList;
     }
 

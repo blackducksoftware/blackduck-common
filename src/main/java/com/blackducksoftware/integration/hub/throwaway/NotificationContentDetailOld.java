@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.notification.content.detail;
+package com.blackducksoftware.integration.hub.throwaway;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,9 @@ import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.util.Stringable;
 
-public class NotificationContentDetail extends Stringable {
+// TODO remove this before merging
+@Deprecated
+public class NotificationContentDetailOld extends Stringable {
     private final String notificationGroup;
     private final String contentDetailKey;
 
@@ -64,7 +66,7 @@ public class NotificationContentDetail extends Stringable {
     public final static String CONTENT_KEY_SEPARATOR = "|";
 
     // @formatter:off
-    public static NotificationContentDetail createDetail(
+    public static NotificationContentDetailOld createDetail(
             final String notificationGroup
             ,final Optional<String> projectName
             ,final Optional<String> projectVersionName
@@ -79,7 +81,7 @@ public class NotificationContentDetail extends Stringable {
             ,final Optional<String> componentIssueUri
             ,final Optional<String> componentVersionOriginId
             ) {
-        return new NotificationContentDetail(
+        return new NotificationContentDetailOld(
                 notificationGroup
                 ,projectName
                 ,projectVersionName
@@ -98,7 +100,7 @@ public class NotificationContentDetail extends Stringable {
     // @formatter:on
 
     // @formatter:off
-    private NotificationContentDetail(
+    private NotificationContentDetailOld(
             final String notificationGroup
             ,final Optional<String> projectName
             ,final Optional<String> projectVersionName
@@ -132,7 +134,7 @@ public class NotificationContentDetail extends Stringable {
 
     private <T extends HubResponse> Optional<UriSingleResponse<T>> createUriSingleResponse(final Optional<String> uri, final Class<T> responseClass) {
         if (uri.isPresent()) {
-            return Optional.of(new UriSingleResponse<T>(uri.get(), responseClass));
+            return Optional.of(new UriSingleResponse<>(uri.get(), responseClass));
         }
         return Optional.empty();
     }
