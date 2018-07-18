@@ -36,8 +36,6 @@ import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.util.Stringable;
 
-// TODO remove this before merging
-@Deprecated
 public class NotificationContentDetailOld extends Stringable {
     private final String notificationGroup;
     private final String contentDetailKey;

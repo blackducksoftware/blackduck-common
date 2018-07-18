@@ -31,7 +31,7 @@ import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.enumeration.LicenseLimitType;
 import com.blackducksoftware.integration.hub.api.enumeration.NotificationTypeGrouping;
 
-public class LicenseLimitNotificationContentDetail extends NotificationContentDetail2 {
+public class LicenseLimitNotificationContentDetail extends NotificationContentDetail {
     private final LicenseLimitType licenseViolationType;
     private final String message;
     private final String marketingPageUrl;

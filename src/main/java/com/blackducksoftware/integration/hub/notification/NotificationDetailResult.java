@@ -37,21 +37,21 @@ import com.blackducksoftware.integration.hub.api.enumeration.NotificationTypeGro
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationStateRequestStateType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.notification.content.detail.LicenseLimitNotificationContentDetail;
-import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail2;
+import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.detail.PolicyNotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.detail.ProjectNotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.detail.VulnerabilityNotificationContentDetail;
 
-public class NotificationDetailResult2 {
-    private final Map<NotificationTypeGrouping, List<? extends NotificationContentDetail2>> notificationDetails;
+public class NotificationDetailResult {
+    private final Map<NotificationTypeGrouping, List<? extends NotificationContentDetail>> notificationDetails;
     private final NotificationStateRequestStateType notificationState;
     private final String contentType;
     private final Date createdAt;
     private final NotificationType type;
 
     // @formatter:off
-    public NotificationDetailResult2(
-             final Map<NotificationTypeGrouping, List<? extends NotificationContentDetail2>> notificationDetails
+    public NotificationDetailResult(
+             final Map<NotificationTypeGrouping, List<? extends NotificationContentDetail>> notificationDetails
             ,final NotificationStateRequestStateType notificationState
             ,final String contentType
             ,final Date createdAt
@@ -65,9 +65,9 @@ public class NotificationDetailResult2 {
     }
     // @formatter:on
 
-    public List<NotificationContentDetail2> getBomEditDetails() {
+    public List<NotificationContentDetail> getBomEditDetails() {
         // TODO add bom edit content detail
-        return (List<NotificationContentDetail2>) notificationDetails.get(NotificationTypeGrouping.BOM_EDIT);
+        return (List<NotificationContentDetail>) notificationDetails.get(NotificationTypeGrouping.BOM_EDIT);
     }
 
     public List<LicenseLimitNotificationContentDetail> getLicenseDetails() {

@@ -30,10 +30,10 @@ import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.enumeration.NotificationTypeGrouping;
 import com.blackducksoftware.integration.util.Stringable;
 
-public abstract class NotificationContentDetail2 extends Stringable {
+public abstract class NotificationContentDetail extends Stringable {
     private final NotificationTypeGrouping notificationTypeGrouping;
 
-    public NotificationContentDetail2(final NotificationTypeGrouping notificationTypeGrouping) {
+    public NotificationContentDetail(final NotificationTypeGrouping notificationTypeGrouping) {
         this.notificationTypeGrouping = notificationTypeGrouping;
     }
 

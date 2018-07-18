@@ -31,8 +31,6 @@ import com.blackducksoftware.integration.hub.api.generated.enumeration.Notificat
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.notification.content.NotificationContent;
 
-// TODO remove this before merging
-@Deprecated
 public class NotificationDetailResultOld {
     private final NotificationContent notificationContent;
     private final String contentType;

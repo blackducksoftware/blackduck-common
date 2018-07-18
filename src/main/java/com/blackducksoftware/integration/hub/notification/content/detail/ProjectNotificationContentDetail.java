@@ -34,7 +34,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersion
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 
-public abstract class ProjectNotificationContentDetail extends NotificationContentDetail2 {
+public abstract class ProjectNotificationContentDetail extends NotificationContentDetail {
     private final String projectName;
     private final String projectVersionName;
     private final UriSingleResponse<ProjectVersionView> projectVersion;

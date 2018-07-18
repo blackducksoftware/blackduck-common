@@ -31,18 +31,18 @@ import java.util.Optional;
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 
-public class NotificationDetailResults2 {
-    private final List<NotificationDetailResult2> notificationResults;
+public class NotificationDetailResults {
+    private final List<NotificationDetailResult> notificationResults;
     private final Date latestNotificationCreatedAtDate;
     private final String latestNotificationCreatedAtString;
 
-    public NotificationDetailResults2(final List<NotificationDetailResult2> notificationResults, final Date latestNotificationCreatedAtDate, final String latestNotificationCreatedAtString) {
+    public NotificationDetailResults(final List<NotificationDetailResult> notificationResults, final Date latestNotificationCreatedAtDate, final String latestNotificationCreatedAtString) {
         this.notificationResults = notificationResults;
         this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate;
         this.latestNotificationCreatedAtString = latestNotificationCreatedAtString;
     }
 
-    public NotificationDetailResults2(final List<NotificationDetailResult2> notificationResults, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
+    public NotificationDetailResults(final List<NotificationDetailResult> notificationResults, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
         this.notificationResults = notificationResults;
         this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate.orElse(null);
         this.latestNotificationCreatedAtString = latestNotificationCreatedAtString.orElse(null);

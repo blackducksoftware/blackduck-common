@@ -43,8 +43,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-// TODO remove this before merging
-@Deprecated
 public class NotificationContentDetailFactoryOld {
     private final Gson gson;
     private final JsonParser jsonParser;

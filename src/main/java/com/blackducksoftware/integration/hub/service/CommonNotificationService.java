@@ -39,8 +39,8 @@ import com.blackducksoftware.integration.hub.api.generated.view.NotificationUser
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
 import com.blackducksoftware.integration.hub.notification.CommonNotificationView;
 import com.blackducksoftware.integration.hub.notification.CommonNotificationViewResults;
-import com.blackducksoftware.integration.hub.notification.NotificationDetailResult2;
-import com.blackducksoftware.integration.hub.notification.NotificationDetailResults2;
+import com.blackducksoftware.integration.hub.notification.NotificationDetailResult;
+import com.blackducksoftware.integration.hub.notification.NotificationDetailResults;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetailFactory;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
@@ -84,12 +84,12 @@ public class CommonNotificationService {
         return new CommonNotificationViewResults(commonNotifications, datePair.date, datePair.dateString);
     }
 
-    public NotificationDetailResults2 getNotificationDetailResults(final List<CommonNotificationView> commonNotifications) throws IntegrationException {
+    public NotificationDetailResults getNotificationDetailResults(final List<CommonNotificationView> commonNotifications) throws IntegrationException {
         if (commonNotifications == null || commonNotifications.isEmpty()) {
-            return new NotificationDetailResults2(Collections.emptyList(), Optional.empty(), Optional.empty());
+            return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty());
         }
 
-        List<NotificationDetailResult2> sortedDetails = commonNotifications
+        List<NotificationDetailResult> sortedDetails = commonNotifications
                 .stream()
                 .map(view -> notificationContentDetailFactory.generateContentDetails(view))
                 .collect(Collectors.toList());
@@ -103,10 +103,10 @@ public class CommonNotificationService {
         }
 
         final DatePair datePair = getLatestCreatedAtString(commonNotifications);
-        return new NotificationDetailResults2(sortedDetails, datePair.date, datePair.dateString);
+        return new NotificationDetailResults(sortedDetails, datePair.date, datePair.dateString);
     }
 
-    public void populateHubBucket(final HubBucketService hubBucketService, final HubBucket hubBucket, final NotificationDetailResults2 notificationDetailResults) throws IntegrationException {
+    public void populateHubBucket(final HubBucketService hubBucketService, final HubBucket hubBucket, final NotificationDetailResults notificationDetailResults) throws IntegrationException {
         final List<UriSingleResponse<? extends HubResponse>> uriResponseList = new ArrayList<>();
         uriResponseList.addAll(notificationDetailResults.getAllLinks());
         hubBucketService.addToTheBucket(hubBucket, uriResponseList);

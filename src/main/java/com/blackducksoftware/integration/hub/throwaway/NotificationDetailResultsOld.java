@@ -32,8 +32,6 @@ import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.notification.NotificationResults;
 
-// TODO remove this before merging
-@Deprecated
 public class NotificationDetailResultsOld extends NotificationResults<NotificationDetailResultOld> {
     private final List<NotificationDetailResultOld> resultList;
 
