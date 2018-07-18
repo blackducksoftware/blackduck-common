@@ -22,6 +22,13 @@
  * under the License.*/
 package com.blackducksoftware.integration.hub.api.codelocation
 
+import org.apache.commons.lang3.StringUtils
+import org.junit.After
+import org.junit.Assert
+import org.junit.BeforeClass
+import org.junit.Test
+import org.junit.experimental.categories.Category
+
 import com.blackducksoftware.integration.exception.IntegrationException
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView
@@ -40,12 +47,6 @@ import com.blackducksoftware.integration.log.LogLevel
 import com.blackducksoftware.integration.log.PrintStreamIntLogger
 import com.blackducksoftware.integration.rest.exception.IntegrationRestException
 import com.blackducksoftware.integration.test.annotation.IntegrationTest
-import org.apache.commons.lang3.StringUtils
-import org.junit.After
-import org.junit.Assert
-import org.junit.BeforeClass
-import org.junit.Test
-import org.junit.experimental.categories.Category
 
 @Category(IntegrationTest.class)
 class CodeLocationRequestServiceTestIT {
@@ -74,7 +75,7 @@ class CodeLocationRequestServiceTestIT {
         final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createHubService())
+        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createHubService(), logger)
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         Assert.assertNotNull(response)
 

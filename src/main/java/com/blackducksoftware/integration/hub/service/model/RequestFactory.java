@@ -37,6 +37,7 @@ public class RequestFactory {
     public static final String LIMIT_PARAMETER = "limit";
     public static final String OFFSET_PARAMETER = "offset";
     public static final String Q_PARAMETER = "q";
+    public static final String FILTER_PARAMETER = "filter";
 
     public static final int DEFAULT_LIMIT = 100;
     public static final int DEFAULT_OFFSET = 0;
@@ -70,11 +71,16 @@ public class RequestFactory {
     }
 
     public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<HubQuery> hubQuery, final int limit, final int offset) {
+        return createCommonGetRequestBuilder(uri, hubQuery, null, limit, offset);
+    }
+
+    public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<HubQuery> hubQuery, final HubFilter hubFilter, final int limit, final int offset) {
         final Request.Builder requestBuilder = new Request.Builder();
         if (StringUtils.isNotBlank(uri)) {
             requestBuilder.uri(uri);
         }
         addHubQuery(requestBuilder, hubQuery);
+        addHubFilter(requestBuilder, hubFilter);
         addLimit(requestBuilder, limit);
         addOffset(requestBuilder, offset);
         return requestBuilder;
@@ -101,6 +107,15 @@ public class RequestFactory {
         return requestBuilder;
     }
 
+    public static Request.Builder addHubFilter(final Request.Builder requestBuilder, final HubFilter hubFilter) {
+        if (hubFilter != null) {
+            hubFilter.getFilterParameters().forEach(parameter -> {
+                requestBuilder.addQueryParameter(FILTER_PARAMETER, parameter);
+            });
+        }
+        return requestBuilder;
+    }
+
     public static Request.Builder createCommonPostRequestBuilder(final File bodyContentFile) {
         return new Request.Builder().method(HttpMethod.POST).bodyContent(new BodyContent(bodyContentFile));
     }
@@ -113,12 +128,8 @@ public class RequestFactory {
         return new Request.Builder().method(HttpMethod.POST).bodyContent(new BodyContent(bodyContent));
     }
 
-    public static Request.Builder createCommonPostRequestBuilder(final Object bodyContentObject) {
-        return new Request.Builder().method(HttpMethod.POST).bodyContent(new BodyContent(bodyContentObject));
-    }
-
-    public static Request.Builder createCommonPutRequestBuilder(final Object bodyContentObject) {
-        return new Request.Builder().method(HttpMethod.PUT).bodyContent(new BodyContent(bodyContentObject));
+    public static Request.Builder createCommonPutRequestBuilder(final String bodyContent) {
+        return new Request.Builder().method(HttpMethod.PUT).bodyContent(new BodyContent(bodyContent));
     }
 
 }

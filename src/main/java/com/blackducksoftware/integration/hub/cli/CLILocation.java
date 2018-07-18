@@ -105,6 +105,10 @@ public class CLILocation {
     }
 
     public File getCLIHome() throws IOException {
+        return getCLIHome(logger);
+    }
+
+    private File getCLIHome(final IntLogger logger) throws IOException {
         final File cliHome = getCLIInstallDir();
         if (cliHome == null) {
             logger.error("Could not find the CLI home directory");
@@ -171,7 +175,7 @@ public class CLILocation {
     }
 
     public File getCLI(final IntLogger logger) throws IOException {
-        final File cliHomeFile = getCLIHome();
+        final File cliHomeFile = getCLIHome(logger);
         if (cliHomeFile == null) {
             logger.error("Could not find the CLI home directory");
             return null;

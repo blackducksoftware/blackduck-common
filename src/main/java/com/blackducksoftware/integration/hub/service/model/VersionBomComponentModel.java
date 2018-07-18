@@ -32,7 +32,7 @@ import com.blackducksoftware.integration.hub.api.generated.component.ReviewedDet
 import com.blackducksoftware.integration.hub.api.generated.component.VersionBomLicenseView;
 import com.blackducksoftware.integration.hub.api.generated.component.VersionBomOriginView;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.MatchedFileUsagesType;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType;
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusSummaryStatusType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.RiskCountType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.VersionBomComponentMatchType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.VersionBomComponentReviewStatusType;
@@ -136,7 +136,7 @@ public class VersionBomComponentModel {
         return component.reviewedDetails;
     }
 
-    public PolicyStatusApprovalStatusType getApprovalStatus() {
+    public PolicyStatusSummaryStatusType getApprovalStatus() {
         return component.approvalStatus;
     }
 

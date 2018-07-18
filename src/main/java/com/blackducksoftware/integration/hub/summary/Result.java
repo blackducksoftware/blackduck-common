@@ -21,19 +21,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.throwaway;
+package com.blackducksoftware.integration.hub.summary;
 
-import java.util.Collection;
-
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-
-public interface SubProcessorCache {
-
-    public void addEvent(final NotificationEvent event);
-
-    public void removeEvent(final NotificationEvent event);
-
-    public boolean hasEvent(final String eventKey);
-
-    public Collection<NotificationEvent> getEvents() throws HubIntegrationException;
+public enum Result {
+    SUCCESS, FAILURE;
 }

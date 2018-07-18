@@ -27,12 +27,13 @@ import java.io.IOException;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.core.HubPath;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.request.Response;
 import com.google.gson.JsonObject;
 
 public class HubRegistrationService extends DataService {
-    public HubRegistrationService(final HubService hubService) {
-        super(hubService);
+    public HubRegistrationService(final HubService hubService, final IntLogger logger) {
+        super(hubService, logger);
     }
 
     public String getRegistrationId() throws IntegrationException {

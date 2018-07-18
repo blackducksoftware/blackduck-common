@@ -28,7 +28,7 @@ import java.io.IOException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
-import com.blackducksoftware.integration.rest.connection.RestConnection;
+import com.blackducksoftware.integration.hub.rest.BlackduckRestConnection;
 import com.blackducksoftware.integration.rest.request.Request;
 import com.blackducksoftware.integration.rest.request.Response;
 import com.google.gson.Gson;
@@ -37,14 +37,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class HubResponseTransformer {
-    private final RestConnection restConnection;
+    private final BlackduckRestConnection restConnection;
     private final JsonParser jsonParser;
     private final Gson gson;
 
-    public HubResponseTransformer(final RestConnection restConnection) {
+    public HubResponseTransformer(final BlackduckRestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
         this.restConnection = restConnection;
-        this.jsonParser = restConnection.jsonParser;
-        this.gson = restConnection.gson;
+        this.jsonParser = jsonParser;
+        this.gson = gson;
     }
 
     public <T extends HubResponse> T getResponse(final Request request, final Class<T> clazz) throws IntegrationException {

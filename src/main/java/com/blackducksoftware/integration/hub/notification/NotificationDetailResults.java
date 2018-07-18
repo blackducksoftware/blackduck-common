@@ -30,16 +30,13 @@ import java.util.Optional;
 
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
-import com.blackducksoftware.integration.hub.service.bucket.HubBucket;
 
 public class NotificationDetailResults extends NotificationResults<NotificationDetailResult> {
     private final List<NotificationDetailResult> resultList;
-    private final HubBucket hubBucket;
 
-    public NotificationDetailResults(final List<NotificationDetailResult> resultList, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString, final HubBucket hubBucket) {
+    public NotificationDetailResults(final List<NotificationDetailResult> resultList, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
         super(latestNotificationCreatedAtDate, latestNotificationCreatedAtString);
         this.resultList = resultList;
-        this.hubBucket = hubBucket;
     }
 
     public List<UriSingleResponse<? extends HubResponse>> getAllLinks() {
@@ -56,10 +53,6 @@ public class NotificationDetailResults extends NotificationResults<NotificationD
     @Override
     public List<NotificationDetailResult> getResults() {
         return resultList;
-    }
-
-    public HubBucket getHubBucket() {
-        return hubBucket;
     }
 
 }

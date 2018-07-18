@@ -1,5 +1,7 @@
 package com.blackducksoftware.integration.hub.api.recipe
 
+import org.junit.Before
+
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionDistributionType
 import com.blackducksoftware.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
@@ -14,7 +16,8 @@ import com.blackducksoftware.integration.hub.service.model.ProjectRequestBuilder
 import com.blackducksoftware.integration.log.IntLogger
 import com.blackducksoftware.integration.rest.connection.RestConnection
 import com.blackducksoftware.integration.test.tool.TestLogger
-import org.junit.Before
+import com.google.gson.Gson
+import com.google.gson.JsonParser
 
 class BasicRecipe {
     public static final String PROJECT_NAME = 'My Recipe Project'
@@ -22,6 +25,9 @@ class BasicRecipe {
     public static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper()
 
     public HubServicesFactory hubServicesFactory
+
+    protected Gson gson;
+    protected JsonParser jsonParser;
 
     @Before
     public void startRecipe() {
@@ -45,7 +51,9 @@ class BasicRecipe {
          * HubServicesFactory, the wrapper to get/use all the Hub API's
          */
         RestConnection restConnection = hubServerConfig.createCredentialsRestConnection(intLogger)
-        hubServicesFactory = new HubServicesFactory(restConnection)
+        gson = HubServicesFactory.createDefaultGson()
+        jsonParser = HubServicesFactory.createDefaultJsonParser()
+        hubServicesFactory = new HubServicesFactory(gson, jsonParser, restConnection, intLogger)
     }
 
     public ProjectRequest createProjectRequest(String projectName, String projectVersionName) {

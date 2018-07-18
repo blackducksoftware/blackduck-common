@@ -21,11 +21,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.throwaway;
+package com.blackducksoftware.integration.hub.cli.summary;
 
-import com.blackducksoftware.integration.hub.notification.content.PolicyOverrideNotificationContent;
+import java.util.List;
 
-public class PolicyOverrideNotificationView extends ReducedNotificationView {
-    public PolicyOverrideNotificationContent content;
+import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
 
+public class ScanServiceOutput {
+    private final ProjectVersionWrapper projectVersionWrapper;
+    private final List<ScanTargetOutput> scanTargetOutputs;
+
+    public ScanServiceOutput(ProjectVersionWrapper projectVersionWrapper, List<ScanTargetOutput> scanTargetOutputs) {
+        this.projectVersionWrapper = projectVersionWrapper;
+        this.scanTargetOutputs = scanTargetOutputs;
+    }
+
+    public ProjectVersionWrapper getProjectVersionWrapper() {
+        return projectVersionWrapper;
+    }
+
+    public List<ScanTargetOutput> getScanTargetOutputs() {
+        return scanTargetOutputs;
+    }
 }

@@ -9,7 +9,7 @@ import org.junit.experimental.categories.Category
 import com.blackducksoftware.integration.hub.api.enumeration.PolicyRuleConditionOperatorType
 import com.blackducksoftware.integration.hub.api.generated.component.PolicyRuleExpressionSetView
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
-import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusApprovalStatusType
+import com.blackducksoftware.integration.hub.api.generated.enumeration.PolicyStatusSummaryStatusType
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleView
 import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2
@@ -73,7 +73,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         projectService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView())
 
         VersionBomPolicyStatusView policyStatus = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView())
-        Assert.assertEquals(PolicyStatusApprovalStatusType.IN_VIOLATION, policyStatus.overallStatus)
+        Assert.assertEquals(PolicyStatusSummaryStatusType.IN_VIOLATION, policyStatus.overallStatus)
     }
 
 

@@ -25,82 +25,98 @@ package com.blackducksoftware.integration.hub.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.io.FileUtils;
 
-import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.response.CurrentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
-import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
-import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
+import com.blackducksoftware.integration.hub.cli.CLILocation;
+import com.blackducksoftware.integration.hub.cli.parallel.ParallelSimpleScanner;
+import com.blackducksoftware.integration.hub.cli.summary.ScanServiceOutput;
+import com.blackducksoftware.integration.hub.cli.summary.ScanTargetOutput;
 import com.blackducksoftware.integration.hub.configuration.HubScanConfig;
-import com.blackducksoftware.integration.hub.configuration.HubScanConfigBuilder;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.service.model.ProjectVersionWrapper;
+import com.blackducksoftware.integration.hub.summary.Result;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 
 public class SignatureScannerService extends DataService {
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final CLIDownloadUtility cliDownloadService;
     private final ProjectService projectDataService;
-    private final CodeLocationService codeLocationDataService;
-    private final ScanStatusService scanStatusDataService;
+    private final CodeLocationService codeLocationService;
+    private final Optional<ExecutorService> optionalExecutorService;
 
     private ProjectVersionWrapper projectVersionWrapper;
 
-    public SignatureScannerService(final HubService hubService, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
-            final CodeLocationService codeLocationDataService, final ScanStatusService scanStatusDataService) {
-        super(hubService);
+    public SignatureScannerService(final HubService hubService, final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
+            final CodeLocationService codeLocationService) {
+        super(hubService, logger);
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
         this.projectDataService = projectDataService;
-        this.codeLocationDataService = codeLocationDataService;
-        this.scanStatusDataService = scanStatusDataService;
+        this.codeLocationService = codeLocationService;
+        this.optionalExecutorService = Optional.empty();
     }
 
-    public ProjectVersionWrapper installAndRunControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished)
+    public SignatureScannerService(final HubService hubService, final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
+            final CodeLocationService codeLocationService, final ExecutorService executorService) {
+        super(hubService, logger);
+        this.intEnvironmentVariables = intEnvironmentVariables;
+        this.cliDownloadService = cliDownloadService;
+        this.projectDataService = projectDataService;
+        this.codeLocationService = codeLocationService;
+        this.optionalExecutorService = Optional.of(executorService);
+    }
+
+    public ScanServiceOutput executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest)
             throws InterruptedException, IntegrationException {
-        preScan(hubServerConfig, hubScanConfig, projectRequest);
-        final SimpleScanUtility simpleScanService = createScanService(hubServerConfig, hubScanConfig, projectRequest);
-        final File[] scanSummaryFiles = runScan(simpleScanService);
-        postScan(hubScanConfig, scanSummaryFiles, projectRequest, shouldWaitForScansFinished, simpleScanService);
-        return projectVersionWrapper;
-    }
+        final CLILocation cliLocation = preScan(hubServerConfig, hubScanConfig, projectRequest);
 
-    private SimpleScanUtility createScanService(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
-        final HubScanConfig controlledConfig = getControlledScanConfig(hubScanConfig);
-        if (hubScanConfig.isDryRun()) {
-            return new SimpleScanUtility(logger, hubService.getGson(), hubServerConfig, intEnvironmentVariables, controlledConfig, projectRequest.name, projectRequest.versionRequest.versionName);
+        final ParallelSimpleScanner parallelSimpleScanner;
+        if (optionalExecutorService.isPresent()) {
+            parallelSimpleScanner = new ParallelSimpleScanner(logger, intEnvironmentVariables, hubService.getGson(), optionalExecutorService.get());
         } else {
-            return new SimpleScanUtility(logger, hubService.getGson(), hubServerConfig, intEnvironmentVariables, controlledConfig, null, null);
+            parallelSimpleScanner = new ParallelSimpleScanner(logger, intEnvironmentVariables, hubService.getGson());
         }
+
+        final List<ScanTargetOutput> scanTargetOutputs = parallelSimpleScanner.executeScans(hubServerConfig, hubScanConfig, projectRequest, cliLocation);
+
+        logger.info("Starting the post scan steps");
+        final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
+        final List<File> logDirectories = new ArrayList<>();
+        for (final ScanTargetOutput scanTargetOutput : scanTargetOutputs) {
+            if (scanTargetOutput.getResult() == Result.SUCCESS) {
+                scanSummaryViews.add(scanTargetOutput.getScanSummaryView());
+                logDirectories.add(scanTargetOutput.getLogDirectory());
+            }
+        }
+        cleanLogs(hubScanConfig.isCleanupLogsOnSuccess(), logDirectories);
+        mapCodeLocations(hubScanConfig.getCommonScanConfig().isDryRun(), scanSummaryViews);
+        logger.info("Completed the post scan steps");
+        return new ScanServiceOutput(projectVersionWrapper, scanTargetOutputs);
     }
 
-    /**
-     * This should only be invoked directly when dryRun == true. Otherwise, installAndRunControlledScan should be used.
-     */
-    public File[] runControlledScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws InterruptedException, IntegrationException {
-        final SimpleScanUtility simpleScanService = createScanService(hubServerConfig, hubScanConfig, projectRequest);
-        final File[] scanSummaryFiles = runScan(simpleScanService);
-        if (hubScanConfig.isCleanupLogsOnSuccess()) {
-            cleanUpLogFiles(simpleScanService);
-        }
-        return scanSummaryFiles;
-    }
+    private CLILocation preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
+        printConfiguration(hubScanConfig, projectRequest);
+        final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        final File directoryToInstallTo = hubScanConfig.getCommonScanConfig().getToolsDir();
+        final CLILocation cliLocation = cliDownloadService.performInstallation(directoryToInstallTo, hubServerConfig.getHubUrl().toString(), currentVersion.version);
 
-    private File[] runScan(final SimpleScanUtility simpleScanService) throws IllegalArgumentException, EncryptionException, InterruptedException, HubIntegrationException {
-        simpleScanService.setupAndExecuteScan();
-        final File[] scanSummaryFiles = simpleScanService.getScanSummaryFiles();
-        return scanSummaryFiles;
+        if (!hubScanConfig.getCommonScanConfig().isDryRun()) {
+            projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);
+        }
+        return cliLocation;
     }
 
     private void printConfiguration(final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
@@ -121,122 +137,33 @@ public class SignatureScannerService extends DataService {
         hubScanConfig.print(logger);
     }
 
-    private void preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
-        printConfiguration(hubScanConfig, projectRequest);
-        final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-        cliDownloadService.performInstallation(hubScanConfig.getToolsDir(), hubServerConfig.getHubUrl().toString(), currentVersion.version);
-
-        if (!hubScanConfig.isDryRun()) {
-            projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);
-        }
-    }
-
-    private void postScan(final HubScanConfig hubScanConfig, final File[] scanSummaryFiles, final ProjectRequest projectRequest, final boolean shouldWaitForScansFinished, final SimpleScanUtility simpleScanService)
-            throws InterruptedException, IntegrationException {
-        logger.trace(String.format("Scan is dry run %s", hubScanConfig.isDryRun()));
-        if (hubScanConfig.isCleanupLogsOnSuccess()) {
-            cleanUpLogFiles(simpleScanService);
-        }
-
-        if (!hubScanConfig.isDryRun()) {
-            final List<CodeLocationView> codeLocationViews = new ArrayList<>();
-            final List<ScanSummaryView> scanSummaries = new ArrayList<>();
-            logger.trace(String.format("Found %s scan summary files", scanSummaryFiles.length));
-            for (final File scanSummaryFile : scanSummaryFiles) {
-                final ScanSummaryView scanSummary;
-                try {
-                    scanSummary = getScanSummaryFromFile(scanSummaryFile);
-                    scanSummaries.add(scanSummary);
-                    scanSummaryFile.delete();
-
-                    // TODO update when ScanSummaryView is part of the swagger
-                    final String codeLocationUrl = hubService.getFirstLinkSafely(scanSummary, ScanSummaryView.CODELOCATION_LINK);
-
-                    final CodeLocationView codeLocationView = hubService.getResponse(codeLocationUrl, CodeLocationView.class);
-                    codeLocationViews.add(codeLocationView);
-                    codeLocationDataService.mapCodeLocation(codeLocationView, projectVersionWrapper.getProjectVersionView());
-                } catch (final IOException ex) {
-                    logger.trace("Error reading scan summary file", ex);
+    private void cleanLogs(final boolean cleanupLogDirectories, final List<File> logDirectories) {
+        if (cleanupLogDirectories) {
+            if (null != logDirectories && !logDirectories.isEmpty()) {
+                for (final File logDirectory : logDirectories) {
+                    if (null != logDirectory && logDirectory.isDirectory()) {
+                        try {
+                            FileUtils.deleteDirectory(logDirectory);
+                        } catch (IOException e) {
+                            logger.error(String.format("Could not delete the directory '%s' because: %s", logDirectory.getAbsolutePath(), e.getMessage()), e);
+                        }
+                    }
                 }
             }
-            simpleScanService.getStatusDirectory().delete();
-
-            cleanupCodeLocations(codeLocationViews, hubScanConfig);
-            if (shouldWaitForScansFinished) {
-                logger.debug("Waiting for the Bom to be updated.");
-                scanStatusDataService.assertScansFinished(scanSummaries);
-            }
         }
     }
 
-    private ScanSummaryView getScanSummaryFromFile(final File scanSummaryFile) throws IOException {
-        final String scanSummaryJson = FileUtils.readFileToString(scanSummaryFile, Charset.forName("UTF8"));
-        final ScanSummaryView scanSummaryView = hubService.getGson().fromJson(scanSummaryJson, ScanSummaryView.class);
-        scanSummaryView.json = scanSummaryJson;
-        return scanSummaryView;
-    }
+    private void mapCodeLocations(final boolean dryRun, final List<ScanSummaryView> scanSummaryViews) throws IntegrationException {
+        logger.trace(String.format("Scan is dry run %s", dryRun));
+        if (!dryRun) {
+            for (final ScanSummaryView scanSummaryView : scanSummaryViews) {
+                // TODO update when ScanSummaryView is part of the swagger
+                final String codeLocationUrl = hubService.getFirstLinkSafely(scanSummaryView, ScanSummaryView.CODELOCATION_LINK);
 
-    // TODO ekerwin - this really needs to be fixed so new properties can't be forgotten
-    private HubScanConfig getControlledScanConfig(final HubScanConfig originalHubScanConfig) {
-        final HubScanConfigBuilder builder = new HubScanConfigBuilder();
-        builder.setCodeLocationAlias(originalHubScanConfig.getCodeLocationAlias());
-        builder.setVerbose(originalHubScanConfig.isVerbose());
-        builder.setDryRun(originalHubScanConfig.isDryRun());
-        builder.setExcludePatterns(originalHubScanConfig.getExcludePatterns());
-        builder.setScanMemory(originalHubScanConfig.getScanMemory());
-        builder.setToolsDir(originalHubScanConfig.getToolsDir());
-        builder.setWorkingDirectory(originalHubScanConfig.getWorkingDirectory());
-        builder.addAllScanTargetPaths(new ArrayList<>(originalHubScanConfig.getScanTargetPaths()));
-        builder.setSnippetModeEnabled(originalHubScanConfig.isSnippetModeEnabled());
-        builder.setAdditionalScanParameters(originalHubScanConfig.getAdditionalScanParameters());
-        return builder.build();
-    }
-
-    private void cleanUpLogFiles(final SimpleScanUtility simpleScanService) {
-        final File standardOutputFile = simpleScanService.getStandardOutputFile();
-        if (standardOutputFile != null && standardOutputFile.exists()) {
-            standardOutputFile.delete();
-        }
-        final File cliLogDirectory = simpleScanService.getCLILogDirectory();
-        if (cliLogDirectory != null && cliLogDirectory.exists()) {
-            for (final File log : cliLogDirectory.listFiles()) {
-                log.delete();
-            }
-            cliLogDirectory.delete();
-        }
-    }
-
-    private void cleanupCodeLocations(final List<CodeLocationView> codeLocationsFromCurentScan, final HubScanConfig hubScanConfig) throws IntegrationException {
-        if (hubScanConfig.isDeletePreviousCodeLocations() || hubScanConfig.isUnmapPreviousCodeLocations()) {
-            final List<CodeLocationView> codeLocationsNotJustScanned = getCodeLocationsNotJustScanned(projectVersionWrapper.getProjectVersionView(), codeLocationsFromCurentScan);
-            if (hubScanConfig.isDeletePreviousCodeLocations()) {
-                codeLocationDataService.deleteCodeLocations(codeLocationsNotJustScanned);
-            } else if (hubScanConfig.isUnmapPreviousCodeLocations()) {
-                codeLocationDataService.unmapCodeLocations(codeLocationsNotJustScanned);
+                final CodeLocationView codeLocationView = hubService.getResponse(codeLocationUrl, CodeLocationView.class);
+                codeLocationService.mapCodeLocation(codeLocationView, projectVersionWrapper.getProjectVersionView());
             }
         }
-    }
-
-    private List<CodeLocationView> getCodeLocationsNotJustScanned(final ProjectVersionView version, final List<CodeLocationView> codeLocationsFromCurentScan) throws IntegrationException {
-        final List<CodeLocationView> codeLocationsMappedToVersion = hubService.getAllResponses(version, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
-        return getCodeLocationsNotJustScanned(codeLocationsMappedToVersion, codeLocationsFromCurentScan);
-    }
-
-    private List<CodeLocationView> getCodeLocationsNotJustScanned(final List<CodeLocationView> codeLocationsMappedToVersion, final List<CodeLocationView> codeLocationsFromCurentScan) {
-        final List<CodeLocationView> codeLocationsNotJustScanned = new ArrayList<>();
-        for (final CodeLocationView codeLocationItemMappedToVersion : codeLocationsMappedToVersion) {
-            boolean partOfCurrentScan = false;
-            for (final CodeLocationView codeLocationFromCurentScan : codeLocationsFromCurentScan) {
-                if (codeLocationItemMappedToVersion.url.equals(codeLocationFromCurentScan.url)) {
-                    partOfCurrentScan = true;
-                    break;
-                }
-            }
-            if (!partOfCurrentScan) {
-                codeLocationsNotJustScanned.add(codeLocationItemMappedToVersion);
-            }
-        }
-        return codeLocationsNotJustScanned;
     }
 
 }

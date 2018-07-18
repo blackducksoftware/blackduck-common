@@ -28,23 +28,26 @@ import java.io.IOException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
+import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.HttpMethod;
 import com.blackducksoftware.integration.rest.request.BodyContent;
 import com.blackducksoftware.integration.rest.request.Request;
 import com.blackducksoftware.integration.rest.request.Response;
 
 public class IssueService extends DataService {
-    public IssueService(final HubService hubService) {
-        super(hubService);
+    public IssueService(final HubService hubService, final IntLogger logger) {
+        super(hubService, logger);
     }
 
     public String createIssue(final IssueView issueItem, final String uri) throws IntegrationException {
-        final Request request = RequestFactory.createCommonPostRequestBuilder(issueItem).uri(uri).build();
+        final String json = hubService.convertToJson(issueItem);
+        final Request request = RequestFactory.createCommonPostRequestBuilder(json).uri(uri).build();
         return hubService.executePostRequestAndRetrieveURL(request);
     }
 
     public void updateIssue(final IssueView issueItem, final String uri) throws IntegrationException {
-        final Request request = new Request.Builder(uri).method(HttpMethod.PUT).bodyContent(new BodyContent(issueItem)).build();
+        final String json = hubService.convertToJson(issueItem);
+        final Request request = new Request.Builder(uri).method(HttpMethod.PUT).bodyContent(new BodyContent(json)).build();
         try (Response response = hubService.executeRequest(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);

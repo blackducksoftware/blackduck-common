@@ -26,22 +26,18 @@ package com.blackducksoftware.integration.hub.configuration;
 import com.blackducksoftware.integration.validator.FieldEnum;
 
 public enum HubScanConfigFieldEnum implements FieldEnum {
-    PROJECT("hubProject"),
-    VERSION("hubVersion"),
-    PHASE("hubPhase"),
-    DISTRIBUTION("hubDistribution"),
-    PROJECT_LEVEL_ADJUSTMENTS("projectLevelAdjustments"),
-    GENERATE_RISK_REPORT("shouldGenerateRiskReport"),
-    DRY_RUN("dryRun"),
-    CLEANUP_LOGS_ON_SUCCESS("cleanupLogsOnSuccess"),
-    UNMAP_PREVIOUS_CODE_LOCATIONS("unmapPreviousCodeLocations"),
-    DELETE_PREVIOUS_CODE_LOCATIONS("deletePreviousCodeLocations"),
-    EXCLUDE_PATTERNS("excludePatterns"),
+    ADDITIONAL_SCAN_ARGUMENTS("additionalScanArguments"),
+    CLEANUP_LOGS("cleanupLogsOnSuccess"),
     CODE_LOCATION_ALIAS("codeLocationAlias"),
-    MAX_WAIT_TIME_FOR_BOM_UPDATE("maxWaitTimeForBomUpdate"),
+    DEBUG("debug"),
+    DRY_RUN("dryRun"),
+    EXCLUDE_PATTERNS("excludePatterns"),
     SCANMEMORY("hubScanMemory"),
+    SNIPPET_MODE("snippetModeEnabled"),
     TARGETS("hubTargets"),
-    FAIL_ON_POLICY_VIOLATION("failOnPolicyViolation");
+    TOOLS_DIRECTORTY("toolsDirectory"),
+    WORKING_DIRECTORTY("workingDirectory"),
+    VERBOSE("verbose");
 
     private String key;
 
