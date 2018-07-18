@@ -79,7 +79,9 @@ public class PolicyNotificationContentDetail extends ProjectNotificationContentD
     @Override
     public List<UriSingleResponse<? extends HubResponse>> getPresentLinks() {
         final List<UriSingleResponse<? extends HubResponse>> presentLinks = super.getPresentLinks();
-        presentLinks.add(policy);
+        if (policy != null) {
+            presentLinks.add(policy);
+        }
         return presentLinks;
     }
 

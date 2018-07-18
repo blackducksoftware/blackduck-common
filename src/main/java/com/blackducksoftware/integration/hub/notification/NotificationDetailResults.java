@@ -23,10 +23,11 @@
  */
 package com.blackducksoftware.integration.hub.notification;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
@@ -60,8 +61,8 @@ public class NotificationDetailResults {
         return notificationResults == null || notificationResults.isEmpty();
     }
 
-    public List<UriSingleResponse<? extends HubResponse>> getAllLinks() {
-        final List<UriSingleResponse<? extends HubResponse>> uriResponses = new ArrayList<>();
+    public Set<UriSingleResponse<? extends HubResponse>> getAllLinks() {
+        final Set<UriSingleResponse<? extends HubResponse>> uriResponses = new HashSet<>();
         notificationResults.forEach(result -> uriResponses.addAll(result.getAllLinks()));
         return uriResponses;
     }

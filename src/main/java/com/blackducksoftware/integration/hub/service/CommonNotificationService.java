@@ -114,9 +114,10 @@ public class CommonNotificationService {
 
     private DatePair getLatestCreatedAtString(final List<CommonNotificationView> views) {
         // sortedViews will be sorted most recent to oldest
-        final List<CommonNotificationView> sortedViews = views.stream().sorted((left, right) -> {
-            return right.getCreatedAt().compareTo(left.getCreatedAt());
-        }).collect(Collectors.toList());
+        final List<CommonNotificationView> sortedViews = views
+                .stream()
+                .sorted((left, right) -> right.getCreatedAt().compareTo(left.getCreatedAt()))
+                .collect(Collectors.toList());
 
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
