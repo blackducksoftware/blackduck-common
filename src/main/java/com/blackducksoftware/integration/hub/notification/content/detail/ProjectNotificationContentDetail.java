@@ -113,16 +113,16 @@ public abstract class ProjectNotificationContentDetail extends NotificationConte
         final StringBuilder keyBuilder = super.createContentDetailKeyBuilder();
 
         keyBuilder.append(getProjectVersion().uri.hashCode());
+        keyBuilder.append(CONTENT_KEY_SEPARATOR);
 
         final Optional<UriSingleResponse<ComponentView>> optionalComponent = getComponent();
         if (optionalComponent.isPresent()) {
-            keyBuilder.append(CONTENT_KEY_SEPARATOR);
             keyBuilder.append(optionalComponent.get().uri.hashCode());
         }
+        keyBuilder.append(CONTENT_KEY_SEPARATOR);
 
         final Optional<UriSingleResponse<ComponentVersionView>> optionalComponentVersion = getComponentVersion();
         if (optionalComponentVersion.isPresent()) {
-            keyBuilder.append(CONTENT_KEY_SEPARATOR);
             keyBuilder.append(optionalComponentVersion.get().uri.hashCode());
         }
 
