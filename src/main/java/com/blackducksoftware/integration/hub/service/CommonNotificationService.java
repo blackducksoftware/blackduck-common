@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -77,7 +76,7 @@ public class CommonNotificationService {
 
     public CommonNotificationViewResults getCommonNotificationViewResults(final List<CommonNotificationView> commonNotifications) {
         if (commonNotifications == null || commonNotifications.isEmpty()) {
-            return new CommonNotificationViewResults(Collections.emptyList(), Optional.empty(), Optional.empty());
+            return new CommonNotificationViewResults(Collections.emptyList(), null, null);
         }
 
         final DatePair datePair = getLatestCreatedAtString(commonNotifications);
@@ -86,7 +85,7 @@ public class CommonNotificationService {
 
     public NotificationDetailResults getNotificationDetailResults(final List<CommonNotificationView> commonNotifications) throws IntegrationException {
         if (commonNotifications == null || commonNotifications.isEmpty()) {
-            return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty());
+            return new NotificationDetailResults(Collections.emptyList(), null, null);
         }
 
         List<NotificationDetailResult> sortedDetails = commonNotifications
@@ -129,12 +128,12 @@ public class CommonNotificationService {
     }
 
     private static class DatePair {
-        public final Optional<Date> date;
-        public final Optional<String> dateString;
+        public final Date date;
+        public final String dateString;
 
         public DatePair(final Date date, final String dateString) {
-            this.date = Optional.ofNullable(date);
-            this.dateString = Optional.ofNullable(dateString);
+            this.date = date;
+            this.dateString = dateString;
         }
     }
 

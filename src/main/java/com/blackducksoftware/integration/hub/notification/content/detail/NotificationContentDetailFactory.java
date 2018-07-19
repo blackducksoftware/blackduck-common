@@ -24,13 +24,11 @@
 package com.blackducksoftware.integration.hub.notification.content.detail;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.blackducksoftware.integration.hub.api.component.AffectedProjectVersion;
-import com.blackducksoftware.integration.hub.api.enumeration.NotificationTypeGrouping;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.notification.CommonNotificationView;
 import com.blackducksoftware.integration.hub.notification.NotificationDetailResult;
@@ -61,45 +59,36 @@ public class NotificationContentDetailFactory {
         final JsonObject jsonObject = jsonParser.parse(notificationJson).getAsJsonObject();
 
         NotificationContent notificationContent = null;
-        final Map<NotificationTypeGrouping, List<? extends NotificationContentDetail>> contentDetailMap = createInitialContentDetailMap();
+        final List<? extends NotificationContentDetail> contentDetailList = new ArrayList<>();
 
         if (NotificationType.LICENSE_LIMIT.equals(type)) {
             notificationContent = gson.fromJson(jsonObject.get("content"), LicenseLimitNotificationContent.class);
-            populateContentDetails((List<LicenseLimitNotificationContentDetail>) contentDetailMap.get(NotificationTypeGrouping.LICENSE), (LicenseLimitNotificationContent) notificationContent);
+            populateContentDetails((List<LicenseLimitNotificationContentDetail>) contentDetailList, (LicenseLimitNotificationContent) notificationContent);
         } else if (NotificationType.POLICY_OVERRIDE.equals(type)) {
             notificationContent = gson.fromJson(jsonObject.get("content"), PolicyOverrideNotificationContent.class);
-            populateContentDetails((List<PolicyNotificationContentDetail>) contentDetailMap.get(NotificationTypeGrouping.POLICY), (PolicyOverrideNotificationContent) notificationContent);
+            populateContentDetails((List<PolicyNotificationContentDetail>) contentDetailList, (PolicyOverrideNotificationContent) notificationContent);
         } else if (NotificationType.RULE_VIOLATION.equals(type)) {
             notificationContent = gson.fromJson(jsonObject.get("content"), RuleViolationNotificationContent.class);
-            populateContentDetails((List<PolicyNotificationContentDetail>) contentDetailMap.get(NotificationTypeGrouping.POLICY), (RuleViolationNotificationContent) notificationContent);
+            populateContentDetails((List<PolicyNotificationContentDetail>) contentDetailList, (RuleViolationNotificationContent) notificationContent);
         } else if (NotificationType.RULE_VIOLATION_CLEARED.equals(type)) {
             notificationContent = gson.fromJson(jsonObject.get("content"), RuleViolationClearedNotificationContent.class);
-            populateContentDetails((List<PolicyNotificationContentDetail>) contentDetailMap.get(NotificationTypeGrouping.POLICY), (RuleViolationClearedNotificationContent) notificationContent);
+            populateContentDetails((List<PolicyNotificationContentDetail>) contentDetailList, (RuleViolationClearedNotificationContent) notificationContent);
         } else if (NotificationType.VULNERABILITY.equals(type)) {
             notificationContent = gson.fromJson(jsonObject.get("content"), VulnerabilityNotificationContent.class);
-            populateContentDetails((List<VulnerabilityNotificationContentDetail>) contentDetailMap.get(NotificationTypeGrouping.VULNERABILITY), (VulnerabilityNotificationContent) notificationContent);
+            populateContentDetails((List<VulnerabilityNotificationContentDetail>) contentDetailList, (VulnerabilityNotificationContent) notificationContent);
         }
-        // TODO don't forget to add this
+        // TODO don't forget to add this for Hub 4.8.0
         // else if (NotificationType.BOM_EDIT.equals(type)) {
         // }
 
         // @formatter:off
         return new NotificationDetailResult(
-                  contentDetailMap
-                 ,view.getNotificationState()
+                  contentDetailList
                  ,view.getContentType()
                  ,view.getCreatedAt()
                  ,view.getType()
                 );
         // @formatter:on
-    }
-
-    private Map<NotificationTypeGrouping, List<? extends NotificationContentDetail>> createInitialContentDetailMap() {
-        final Map<NotificationTypeGrouping, List<? extends NotificationContentDetail>> contentDetailMap = new HashMap<>();
-        for (final NotificationTypeGrouping grouping : NotificationTypeGrouping.values()) {
-            contentDetailMap.put(grouping, new ArrayList<>());
-        }
-        return contentDetailMap;
     }
 
     public void populateContentDetails(final List<LicenseLimitNotificationContentDetail> notificationContentDetails, final LicenseLimitNotificationContent content) {

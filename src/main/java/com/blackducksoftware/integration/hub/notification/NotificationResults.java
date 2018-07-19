@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class NotificationResults<T> {
-    private final Optional<Date> latestNotificationCreatedAtDate;
-    private final Optional<String> latestNotificationCreatedAtString;
+    private final Date latestNotificationCreatedAtDate;
+    private final String latestNotificationCreatedAtString;
 
-    public NotificationResults(final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
+    public NotificationResults(final Date latestNotificationCreatedAtDate, final String latestNotificationCreatedAtString) {
         this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate;
         this.latestNotificationCreatedAtString = latestNotificationCreatedAtString;
     }
@@ -39,11 +39,11 @@ public abstract class NotificationResults<T> {
     public abstract List<T> getResults();
 
     public final Optional<Date> getLatestNotificationCreatedAtDate() {
-        return latestNotificationCreatedAtDate;
+        return Optional.ofNullable(latestNotificationCreatedAtDate);
     }
 
     public final Optional<String> getLatestNotificationCreatedAtString() {
-        return latestNotificationCreatedAtString;
+        return Optional.ofNullable(latestNotificationCreatedAtString);
     }
 
     public boolean isEmpty() {

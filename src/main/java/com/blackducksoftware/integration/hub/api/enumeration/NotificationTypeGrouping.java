@@ -23,14 +23,37 @@
  */
 package com.blackducksoftware.integration.hub.api.enumeration;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
+
 public enum NotificationTypeGrouping {
-    BOM_EDIT,
+    BOM,
     LICENSE,
     POLICY,
     VULNERABILITY;
 
+    private static final Map<NotificationType, NotificationTypeGrouping> typeToGrouping = new HashMap<>();
+    static {
+        typeToGrouping.put(NotificationType.LICENSE_LIMIT, NotificationTypeGrouping.LICENSE);
+        typeToGrouping.put(NotificationType.POLICY_OVERRIDE, NotificationTypeGrouping.POLICY);
+        typeToGrouping.put(NotificationType.RULE_VIOLATION, NotificationTypeGrouping.POLICY);
+        typeToGrouping.put(NotificationType.RULE_VIOLATION_CLEARED, NotificationTypeGrouping.POLICY);
+        typeToGrouping.put(NotificationType.VULNERABILITY, NotificationTypeGrouping.VULNERABILITY);
+        // TODO BOM_EDIT to BOM
+    }
+
     public String getContentKey() {
         return this.name().toLowerCase();
+    }
+
+    public static NotificationTypeGrouping fromNotificationType(final NotificationType type) {
+        final NotificationTypeGrouping grouping = typeToGrouping.get(type);
+        if (grouping == null) {
+            throw new IllegalArgumentException("Cannot convert '" + type.name() + "' to " + NotificationTypeGrouping.class.getSimpleName());
+        }
+        return grouping;
     }
 
 }

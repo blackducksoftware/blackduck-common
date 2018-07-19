@@ -23,42 +23,26 @@
  */
 package com.blackducksoftware.integration.hub.notification;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 
-public class NotificationDetailResults {
+public class NotificationDetailResults extends NotificationResults<NotificationDetailResult> {
     private final List<NotificationDetailResult> notificationResults;
-    private final Date latestNotificationCreatedAtDate;
-    private final String latestNotificationCreatedAtString;
 
     public NotificationDetailResults(final List<NotificationDetailResult> notificationResults, final Date latestNotificationCreatedAtDate, final String latestNotificationCreatedAtString) {
+        super(latestNotificationCreatedAtDate, latestNotificationCreatedAtString);
         this.notificationResults = notificationResults;
-        this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate;
-        this.latestNotificationCreatedAtString = latestNotificationCreatedAtString;
     }
 
-    public NotificationDetailResults(final List<NotificationDetailResult> notificationResults, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
-        this.notificationResults = notificationResults;
-        this.latestNotificationCreatedAtDate = latestNotificationCreatedAtDate.orElse(null);
-        this.latestNotificationCreatedAtString = latestNotificationCreatedAtString.orElse(null);
-    }
-
-    public Optional<Date> getLatestNotificationCreatedAtDate() {
-        return Optional.ofNullable(latestNotificationCreatedAtDate);
-    }
-
-    public Optional<String> getLatestNotificationCreatedAtString() {
-        return Optional.ofNullable(latestNotificationCreatedAtString);
-    }
-
-    public boolean isEmpty() {
-        return notificationResults == null || notificationResults.isEmpty();
+    @Override
+    public List<NotificationDetailResult> getResults() {
+        return Collections.unmodifiableList(notificationResults);
     }
 
     public Set<UriSingleResponse<? extends HubResponse>> getAllLinks() {

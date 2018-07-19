@@ -36,7 +36,7 @@ public class NotificationDetailResultsOld extends NotificationResults<Notificati
     private final List<NotificationDetailResultOld> resultList;
 
     public NotificationDetailResultsOld(final List<NotificationDetailResultOld> resultList, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
-        super(latestNotificationCreatedAtDate, latestNotificationCreatedAtString);
+        super(latestNotificationCreatedAtDate.orElse(null), latestNotificationCreatedAtString.orElse(null));
         this.resultList = resultList;
     }
 

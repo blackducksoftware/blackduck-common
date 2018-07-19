@@ -25,12 +25,11 @@ package com.blackducksoftware.integration.hub.notification;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 public class CommonNotificationViewResults extends NotificationResults<CommonNotificationView> {
     private final List<CommonNotificationView> commonNotificationViews;
 
-    public CommonNotificationViewResults(final List<CommonNotificationView> commonNotificationViews, final Optional<Date> latestNotificationCreatedAtDate, final Optional<String> latestNotificationCreatedAtString) {
+    public CommonNotificationViewResults(final List<CommonNotificationView> commonNotificationViews, final Date latestNotificationCreatedAtDate, final String latestNotificationCreatedAtString) {
         super(latestNotificationCreatedAtDate, latestNotificationCreatedAtString);
         this.commonNotificationViews = commonNotificationViews;
     }

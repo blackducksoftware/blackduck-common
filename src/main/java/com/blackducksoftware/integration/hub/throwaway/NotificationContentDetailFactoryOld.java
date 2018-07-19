@@ -79,7 +79,7 @@ public class NotificationContentDetailFactoryOld {
             populateContentDetails(notificationContentDetails, notificationGroup, (VulnerabilityNotificationContent) notificationContent);
         }
 
-        return new NotificationDetailResultOld(notificationContent, view.getContentType(), view.getCreatedAt(), view.getType(), notificationGroup, Optional.ofNullable(view.getNotificationState()), notificationContentDetails);
+        return new NotificationDetailResultOld(notificationContent, view.getContentType(), view.getCreatedAt(), view.getType(), notificationGroup, Optional.empty(), notificationContentDetails);
     }
 
     public void populateContentDetails(final List<NotificationContentDetailOld> notificationContentDetails, final String notificationGroup, final PolicyOverrideNotificationContent content) {

@@ -23,72 +23,49 @@
  */
 package com.blackducksoftware.integration.hub.notification;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.blackducksoftware.integration.hub.api.UriSingleResponse;
 import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.enumeration.NotificationTypeGrouping;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationStateRequestStateType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
-import com.blackducksoftware.integration.hub.notification.content.detail.LicenseLimitNotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
-import com.blackducksoftware.integration.hub.notification.content.detail.PolicyNotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.detail.ProjectNotificationContentDetail;
-import com.blackducksoftware.integration.hub.notification.content.detail.VulnerabilityNotificationContentDetail;
 
 public class NotificationDetailResult {
-    private final Map<NotificationTypeGrouping, List<? extends NotificationContentDetail>> notificationDetails;
-    private final NotificationStateRequestStateType notificationState;
+    private final List<? extends NotificationContentDetail> notificationDetails;
     private final String contentType;
     private final Date createdAt;
     private final NotificationType type;
 
     // @formatter:off
     public NotificationDetailResult(
-             final Map<NotificationTypeGrouping, List<? extends NotificationContentDetail>> notificationDetails
-            ,final NotificationStateRequestStateType notificationState
+             final List<? extends NotificationContentDetail> notificationDetails
             ,final String contentType
             ,final Date createdAt
             ,final NotificationType type
             ) {
         this.notificationDetails = notificationDetails;
-        this.notificationState = notificationState;
         this.contentType = contentType;
         this.createdAt = createdAt;
         this.type = type;
     }
     // @formatter:on
 
-    public List<NotificationContentDetail> getBomEditDetails() {
-        // TODO add bom edit content detail
-        return (List<NotificationContentDetail>) notificationDetails.get(NotificationTypeGrouping.BOM_EDIT);
+    public List<? extends NotificationContentDetail> getNotificationDetails() {
+        return notificationDetails;
     }
 
-    public List<LicenseLimitNotificationContentDetail> getLicenseDetails() {
-        return (List<LicenseLimitNotificationContentDetail>) notificationDetails.get(NotificationTypeGrouping.LICENSE);
-    }
-
-    public List<PolicyNotificationContentDetail> getPolicyDetails() {
-        return (List<PolicyNotificationContentDetail>) notificationDetails.get(NotificationTypeGrouping.POLICY);
-    }
-
-    public List<VulnerabilityNotificationContentDetail> getVulnerabilityDetails() {
-        return (List<VulnerabilityNotificationContentDetail>) notificationDetails.get(NotificationTypeGrouping.VULNERABILITY);
-    }
-
-    public List<ProjectNotificationContentDetail> getProjectDetails() {
-        return Stream.concat(getPolicyDetails().stream(), getVulnerabilityDetails().stream()).collect(Collectors.toList());
-    }
-
-    public Optional<NotificationStateRequestStateType> getNotificationState() {
-        return Optional.ofNullable(notificationState);
+    public List<ProjectNotificationContentDetail> getProjectNotificationDetails() {
+        final NotificationTypeGrouping grouping = NotificationTypeGrouping.fromNotificationType(type);
+        if (NotificationTypeGrouping.POLICY.equals(grouping) || NotificationTypeGrouping.VULNERABILITY.equals(grouping)) {
+            return (List<ProjectNotificationContentDetail>) notificationDetails;
+        }
+        return Collections.emptyList();
     }
 
     public String getContentType() {
@@ -105,10 +82,8 @@ public class NotificationDetailResult {
 
     public Set<UriSingleResponse<? extends HubResponse>> getAllLinks() {
         final Set<UriSingleResponse<? extends HubResponse>> uriResponses = new HashSet<>();
-        notificationDetails.values().forEach(detailList -> {
-            detailList.forEach(detail -> {
-                uriResponses.addAll(detail.getPresentLinks());
-            });
+        notificationDetails.forEach(detail -> {
+            uriResponses.addAll(detail.getPresentLinks());
         });
         return uriResponses;
     }
