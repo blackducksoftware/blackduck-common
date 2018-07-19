@@ -31,6 +31,8 @@ import com.blackducksoftware.integration.hub.api.enumeration.NotificationTypeGro
 import com.blackducksoftware.integration.util.Stringable;
 
 public abstract class NotificationContentDetail extends Stringable {
+    protected static final String CONTENT_KEY_SEPARATOR = "|";
+
     private final NotificationTypeGrouping notificationTypeGrouping;
 
     public NotificationContentDetail(final NotificationTypeGrouping notificationTypeGrouping) {
@@ -41,6 +43,10 @@ public abstract class NotificationContentDetail extends Stringable {
         return notificationTypeGrouping;
     }
 
+    public String getContentDetailKey() {
+        return createContentDetailKeyBuilder().toString();
+    }
+
     public abstract List<UriSingleResponse<? extends HubResponse>> getPresentLinks();
 
     protected final <T extends HubResponse> UriSingleResponse<T> createUriSingleResponse(final String uri, final Class<T> responseClass) {
@@ -48,6 +54,11 @@ public abstract class NotificationContentDetail extends Stringable {
             return new UriSingleResponse<>(uri, responseClass);
         }
         return null;
+    }
+
+    protected StringBuilder createContentDetailKeyBuilder() {
+        final String contentKey = getNotificationTypeGrouping().getContentKey();
+        return new StringBuilder(contentKey + CONTENT_KEY_SEPARATOR);
     }
 
 }

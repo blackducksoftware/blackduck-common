@@ -11,21 +11,23 @@ import org.junit.Test
 import org.junit.experimental.categories.Category
 
 import com.blackducksoftware.integration.exception.IntegrationException
+import com.blackducksoftware.integration.hub.api.enumeration.NotificationTypeGrouping
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectView
 import com.blackducksoftware.integration.hub.api.generated.view.VersionBomComponentView
 import com.blackducksoftware.integration.hub.notification.CommonNotificationView
+import com.blackducksoftware.integration.hub.notification.NotificationDetailResult
+import com.blackducksoftware.integration.hub.notification.NotificationDetailResults
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetailFactory
+import com.blackducksoftware.integration.hub.notification.content.detail.PolicyNotificationContentDetail
+import com.blackducksoftware.integration.hub.notification.content.detail.ProjectNotificationContentDetail
 import com.blackducksoftware.integration.hub.service.CodeLocationService
 import com.blackducksoftware.integration.hub.service.CommonNotificationService
 import com.blackducksoftware.integration.hub.service.NotificationService
 import com.blackducksoftware.integration.hub.service.ProjectService
 import com.blackducksoftware.integration.hub.service.bucket.HubBucket
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService
-import com.blackducksoftware.integration.hub.throwaway.NotificationContentDetailOld
-import com.blackducksoftware.integration.hub.throwaway.NotificationDetailResultOld
-import com.blackducksoftware.integration.hub.throwaway.NotificationDetailResultsOld
 import com.blackducksoftware.integration.test.annotation.IntegrationTest
 
 @Category(IntegrationTest.class)
@@ -52,7 +54,8 @@ class NotificationServiceRecipeTest extends BasicRecipe {
             tryCount++
         }
         if (!components.empty) {
-            Thread.sleep(60000) // arbitrary wait for notifications
+            // arbitrary wait for notifications
+            Thread.sleep(60000)
         }
         return Date.from(startTime.toInstant())
     }
@@ -99,18 +102,18 @@ class NotificationServiceRecipeTest extends BasicRecipe {
 
         List<NotificationView> notificationViews = notificationService.getAllNotifications(startDate, endDate)
         List<CommonNotificationView> commonNotificationViews = commonNotificationService.getCommonNotifications(notificationViews)
-        final NotificationDetailResultsOld notificationDetailResults = commonNotificationService.getNotificationDetailResults(commonNotificationViews)
+        final NotificationDetailResults notificationDetailResults = commonNotificationService.getNotificationDetailResults(commonNotificationViews)
 
         final HubBucket hubBucket = new HubBucket();
         commonNotificationService.populateHubBucket(hubBucketService, hubBucket, notificationDetailResults);
-        final List<NotificationDetailResultOld> notificationResultList = notificationDetailResults.getResults()
+        final List<NotificationDetailResult> notificationResultList = notificationDetailResults.getResults()
 
         Date latestNotificationEndDate = notificationDetailResults.getLatestNotificationCreatedAtDate().get();
         println("Start Date: ${startDate}, End Date: ${endDate}, latestNotification: ${latestNotificationEndDate}")
 
         notificationResultList.each({
-            it.getNotificationContentDetails().each({
-                NotificationContentDetailOld detail = it
+            it.getProjectNotificationDetails().each({
+                ProjectNotificationContentDetail detail = it
                 String contentDetailKey
                 String projectName
                 String projectVersion
@@ -118,23 +121,18 @@ class NotificationServiceRecipeTest extends BasicRecipe {
                 String componentVersion
                 String policyName
                 boolean isVulnerability = false
-                contentDetailKey = detail.contentDetailKey
-                projectName = detail.projectName.get()
-                projectVersion = detail.projectVersionName.get()
-                if (detail.hasComponentVersion()) {
-                    componentName = detail.componentName.get()
-                    componentVersion = detail.componentVersionName.get()
+                contentDetailKey = detail.getContentDetailKey()
+                projectName = detail.projectName
+                projectVersion = detail.projectVersionName
+                componentName = detail.componentName
+                componentVersion = detail.componentVersionName.orElse("<unknown>")
+
+                NotificationTypeGrouping grouping = detail.getNotificationTypeGrouping()
+                if (NotificationTypeGrouping.POLICY.equals(grouping)) {
+                    policyName = ((PolicyNotificationContentDetail) detail).policyName
                 }
 
-                if (detail.hasOnlyComponent()) {
-                    componentName = detail.componentName.get()
-                }
-
-                if (detail.isPolicy()) {
-                    policyName = detail.policyName.get()
-                }
-
-                if (detail.isVulnerability()) {
+                if (NotificationTypeGrouping.VULNERABILITY.equals(grouping)) {
                     isVulnerability = true
                 }
 

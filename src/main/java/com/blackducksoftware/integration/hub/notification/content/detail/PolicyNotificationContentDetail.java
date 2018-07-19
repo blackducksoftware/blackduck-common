@@ -85,4 +85,13 @@ public class PolicyNotificationContentDetail extends ProjectNotificationContentD
         return presentLinks;
     }
 
+    @Override
+    protected StringBuilder createContentDetailKeyBuilder() {
+        final StringBuilder keyBuilder = super.createContentDetailKeyBuilder();
+        keyBuilder.append(policy.uri.hashCode());
+
+        keyBuilder.append(CONTENT_KEY_SEPARATOR);
+        return keyBuilder;
+    }
+
 }

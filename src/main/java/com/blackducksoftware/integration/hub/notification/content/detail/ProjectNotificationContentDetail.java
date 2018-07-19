@@ -108,4 +108,26 @@ public abstract class ProjectNotificationContentDetail extends NotificationConte
         return presentLinks;
     }
 
+    @Override
+    protected StringBuilder createContentDetailKeyBuilder() {
+        final StringBuilder keyBuilder = super.createContentDetailKeyBuilder();
+
+        keyBuilder.append(getProjectVersion().uri.hashCode());
+
+        final Optional<UriSingleResponse<ComponentView>> optionalComponent = getComponent();
+        if (optionalComponent.isPresent()) {
+            keyBuilder.append(CONTENT_KEY_SEPARATOR);
+            keyBuilder.append(optionalComponent.get().uri.hashCode());
+        }
+
+        final Optional<UriSingleResponse<ComponentVersionView>> optionalComponentVersion = getComponentVersion();
+        if (optionalComponentVersion.isPresent()) {
+            keyBuilder.append(CONTENT_KEY_SEPARATOR);
+            keyBuilder.append(optionalComponentVersion.get().uri.hashCode());
+        }
+
+        keyBuilder.append(CONTENT_KEY_SEPARATOR);
+        return keyBuilder;
+    }
+
 }
