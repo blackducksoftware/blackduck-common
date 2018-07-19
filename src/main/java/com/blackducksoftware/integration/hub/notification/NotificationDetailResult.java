@@ -35,8 +35,9 @@ import com.blackducksoftware.integration.hub.api.enumeration.NotificationTypeGro
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetail;
 import com.blackducksoftware.integration.hub.notification.content.detail.ProjectNotificationContentDetail;
+import com.blackducksoftware.integration.util.Stringable;
 
-public class NotificationDetailResult {
+public class NotificationDetailResult extends Stringable {
     private final List<? extends NotificationContentDetail> notificationDetails;
     private final String contentType;
     private final Date createdAt;
