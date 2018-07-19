@@ -26,7 +26,6 @@ package com.blackducksoftware.integration.hub.notification;
 import java.util.Date;
 
 import com.blackducksoftware.integration.hub.api.core.HubView;
-import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationStateRequestStateType;
 import com.blackducksoftware.integration.hub.api.generated.enumeration.NotificationType;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationUserView;
 import com.blackducksoftware.integration.hub.api.generated.view.NotificationView;
@@ -40,14 +39,12 @@ public class CommonNotificationView extends HubView {
     private final String contentType;
     private final Date createdAt;
     private final NotificationType type;
-    private final NotificationStateRequestStateType notificationState;
 
     public CommonNotificationView(final NotificationView notificationView) {
         this.sourceView = notificationView;
         this.contentType = notificationView.contentType;
         this.createdAt = notificationView.createdAt;
         this.type = notificationView.type;
-        this.notificationState = null;
         this._meta = notificationView._meta;
         this.json = notificationView.json;
     }
@@ -57,7 +54,6 @@ public class CommonNotificationView extends HubView {
         this.contentType = notificationUserView.contentType;
         this.createdAt = notificationUserView.createdAt;
         this.type = notificationUserView.type;
-        this.notificationState = notificationUserView.notificationState;
         this._meta = notificationUserView._meta;
         this.json = notificationUserView.json;
     }
@@ -76,10 +72,6 @@ public class CommonNotificationView extends HubView {
 
     public NotificationType getType() {
         return type;
-    }
-
-    public NotificationStateRequestStateType getNotificationState() {
-        return notificationState;
     }
 
 }
