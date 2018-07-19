@@ -116,6 +116,7 @@ public class NotificationContentDetailFactory {
                      ,content.component
                      ,content.componentVersionName
                      ,content.componentVersion
+                     ,null
                      ,policyInfo.policyName
                      ,policyInfo.policy
                      ,content.firstName
@@ -140,6 +141,7 @@ public class NotificationContentDetailFactory {
                          ,componentVersionStatus.component
                          ,componentVersionStatus.componentVersionName
                          ,componentVersionStatus.componentVersion
+                         ,componentVersionStatus.componentIssueLink
                          ,policyName
                          ,policyUri
                          ,null
@@ -165,6 +167,7 @@ public class NotificationContentDetailFactory {
                          ,componentVersionStatus.component
                          ,componentVersionStatus.componentVersionName
                          ,componentVersionStatus.componentVersion
+                         ,componentVersionStatus.componentIssueLink
                          ,policyName
                          ,policyUri
                          ,null
@@ -186,6 +189,9 @@ public class NotificationContentDetailFactory {
                      ,content.componentName
                      ,content.versionName
                      ,content.componentVersion
+                     ,content.componentVersionOriginName
+                     ,content.componentVersionOriginId
+                     ,projectVersion.componentIssueUrl
                      ,content.newVulnerabilityIds
                      ,content.updatedVulnerabilityIds
                      ,content.deletedVulnerabilityIds

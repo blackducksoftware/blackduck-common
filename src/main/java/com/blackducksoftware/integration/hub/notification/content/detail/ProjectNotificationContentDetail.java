@@ -32,6 +32,7 @@ import com.blackducksoftware.integration.hub.api.core.HubResponse;
 import com.blackducksoftware.integration.hub.api.enumeration.NotificationTypeGrouping;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentVersionView;
 import com.blackducksoftware.integration.hub.api.generated.view.ComponentView;
+import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
 import com.blackducksoftware.integration.hub.api.generated.view.ProjectVersionView;
 
 public abstract class ProjectNotificationContentDetail extends NotificationContentDetail {
@@ -45,6 +46,8 @@ public abstract class ProjectNotificationContentDetail extends NotificationConte
     private final String componentVersionName;
     private final UriSingleResponse<ComponentVersionView> componentVersion;
 
+    private final UriSingleResponse<IssueView> componentIssue;
+
     // @formatter:off
     public ProjectNotificationContentDetail(
              final NotificationTypeGrouping notificationTypeGrouping
@@ -55,6 +58,7 @@ public abstract class ProjectNotificationContentDetail extends NotificationConte
             ,final String componentUri
             ,final String componentVersionName
             ,final String componentVersionUri
+            ,final String componentIssueUri
             ) {
         super(notificationTypeGrouping);
         this.projectName = projectName;
@@ -64,6 +68,7 @@ public abstract class ProjectNotificationContentDetail extends NotificationConte
         this.component = createUriSingleResponse(componentUri, ComponentView.class);
         this.componentVersionName = componentVersionName;
         this.componentVersion = createUriSingleResponse(componentVersionUri, ComponentVersionView.class);
+        this.componentIssue = createUriSingleResponse(componentIssueUri, IssueView.class);
     }
     // @formatter:on
 
@@ -93,6 +98,10 @@ public abstract class ProjectNotificationContentDetail extends NotificationConte
 
     public Optional<UriSingleResponse<ComponentVersionView>> getComponentVersion() {
         return Optional.ofNullable(componentVersion);
+    }
+
+    public Optional<UriSingleResponse<IssueView>> getComponentIssue() {
+        return Optional.ofNullable(componentIssue);
     }
 
     @Override

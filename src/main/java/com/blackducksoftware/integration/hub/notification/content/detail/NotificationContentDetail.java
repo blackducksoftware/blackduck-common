@@ -43,6 +43,14 @@ public abstract class NotificationContentDetail extends Stringable {
         return notificationTypeGrouping;
     }
 
+    public boolean isPolicy() {
+        return NotificationTypeGrouping.POLICY.equals(getNotificationTypeGrouping());
+    }
+
+    public boolean isVulnerability() {
+        return NotificationTypeGrouping.VULNERABILITY.equals(getNotificationTypeGrouping());
+    }
+
     public String getContentDetailKey() {
         return createContentDetailKeyBuilder().toString();
     }
