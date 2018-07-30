@@ -1,9 +1,9 @@
 /**
  * hub-common
- *
+ * <p>
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -70,7 +70,7 @@ public class HubServicesFactory {
     }
 
     public HubServicesFactory(final Gson gson, final JsonParser jsonParser, final BlackduckRestConnection restConnection, final IntLogger logger) {
-        this.intEnvironmentVariables = new IntEnvironmentVariables();
+        intEnvironmentVariables = new IntEnvironmentVariables();
 
         this.gson = gson;
         this.jsonParser = jsonParser;
@@ -87,11 +87,11 @@ public class HubServicesFactory {
     }
 
     public SignatureScannerService createSignatureScannerService(final ExecutorService executorService) {
-        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService(), executorService);
+        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), executorService);
     }
 
     public SignatureScannerService createSignatureScannerService() {
-        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService());
+        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService());
     }
 
     public PhoneHomeService createPhoneHomeService() {

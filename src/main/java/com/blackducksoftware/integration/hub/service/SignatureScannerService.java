@@ -1,9 +1,9 @@
 /**
  * hub-common
- *
+ * <p>
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -53,28 +53,24 @@ public class SignatureScannerService extends DataService {
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final CLIDownloadUtility cliDownloadService;
     private final ProjectService projectDataService;
-    private final CodeLocationService codeLocationService;
     private final Optional<ExecutorService> optionalExecutorService;
 
     private ProjectVersionWrapper projectVersionWrapper;
 
-    public SignatureScannerService(final HubService hubService, final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
-            final CodeLocationService codeLocationService) {
+    public SignatureScannerService(final HubService hubService, final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService) {
         super(hubService, logger);
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
         this.projectDataService = projectDataService;
-        this.codeLocationService = codeLocationService;
         optionalExecutorService = Optional.empty();
     }
 
     public SignatureScannerService(final HubService hubService, final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
-            final CodeLocationService codeLocationService, final ExecutorService executorService) {
+            final ExecutorService executorService) {
         super(hubService, logger);
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
         this.projectDataService = projectDataService;
-        this.codeLocationService = codeLocationService;
         optionalExecutorService = Optional.of(executorService);
     }
 
